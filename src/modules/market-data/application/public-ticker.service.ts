@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { MarketTicker } from '../domain/market-ticker';
 import { TICKER_STREAM, TickerStream } from '../domain/ticker-stream';
+import { LatestMarketPriceService } from './latest-market-price.service';
 
 @Injectable()
 export class PublicTickerService implements OnModuleInit, OnModuleDestroy {
@@ -14,17 +15,19 @@ export class PublicTickerService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     @Inject(TICKER_STREAM) private readonly tickerStream: TickerStream,
+    private readonly latestMarketPrice: LatestMarketPriceService,
   ) {}
 
   onModuleInit(): void {
-    this.tickerStream.start((ticker) => this.logTicker(ticker));
+    this.tickerStream.start((ticker) => this.handleTicker(ticker));
   }
 
   onModuleDestroy(): void {
     this.tickerStream.stop();
   }
 
-  private logTicker(ticker: MarketTicker): void {
+  private handleTicker(ticker: MarketTicker): void {
+    this.latestMarketPrice.update(ticker);
     this.logger.log({
       event: 'market.ticker.received',
       provider: ticker.provider,

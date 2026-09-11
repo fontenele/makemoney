@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { MarketDataModule } from '../market-data/market-data.module';
 import { PaperWalletService } from './application/paper-wallet.service';
+import { PortfolioValuationService } from './application/portfolio-valuation.service';
 import { PaperWallet } from './domain/paper-wallet';
 
 @Module({
+  imports: [MarketDataModule],
   providers: [
     {
       provide: PaperWallet,
@@ -15,7 +18,8 @@ import { PaperWallet } from './domain/paper-wallet';
         }),
     },
     PaperWalletService,
+    PortfolioValuationService,
   ],
-  exports: [PaperWalletService],
+  exports: [PaperWalletService, PortfolioValuationService],
 })
 export class PaperWalletModule {}

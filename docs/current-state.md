@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0 through M2.1 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2.1 provides a fictional, in-memory BTC/USDT wallet with no exchange-account access. No dashboard, persistence, portfolio valuation, paper orders, strategy, authenticated integration, or order execution exists.
+M0 through M2.2 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2.1–M2.2 provide a fictional, in-memory BTC/USDT wallet and USDT portfolio valuation with no exchange-account access. No dashboard, persistence, paper orders, strategy, authenticated integration, or order execution exists.
 
 ## Implemented application
 
@@ -32,6 +32,8 @@ M0 through M2.1 are complete in the working tree. M1 provides unauthenticated pu
 - In-memory paper wallet with `BTC` and `USDT` balances, configurable initial USDT (default `1000`), and initial BTC of `0`.
 - Exact `decimal.js` credit and debit operations, positive-amount validation, and insufficient-funds rejection without partial mutation.
 - Structured wallet initialization and successful balance-change logs.
+- Process-local retention of the latest normalized BTC/USDT ticker for downstream read models.
+- Exact USDT portfolio valuation from BTC and USDT balances, with explicit failure before a price is available.
 
 ## Local endpoints and ports
 
@@ -44,11 +46,11 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M2.1:
+The following passed on 2026-09-11 after M2.2:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 70 tests passed across 14 suites
+- `npm test -- --runInBand` — 80 tests passed across 16 suites
 - `npm run test:e2e -- --runInBand` — 1 test passed with local test environment variables
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
@@ -57,7 +59,7 @@ The following passed on 2026-09-11 after M2.1:
 
 ## Repository state
 
-M0 through M1.8 are committed and synchronized with `origin/main`. M2.1 changes are currently in the working tree.
+M0 through M1.8 are committed and synchronized with `origin/main`. M2.1 and M2.2 changes are currently in the working tree.
 
 ## Known issues and cautions
 

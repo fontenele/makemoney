@@ -83,3 +83,9 @@ The first wallet increment is a fictional process-local domain object supporting
 Balances and amounts are decimal strings. Arithmetic uses a cloned `decimal.js` constructor with precision 40 and half-even rounding, consistent with the project's financial-arithmetic rule. Credits and debits must be strictly positive, and insufficient debits fail before state changes. The application service adds structured audit-oriented logs for initialization and successful mutations.
 
 There is no HTTP API, portfolio conversion, order model, fee, spread, slippage, PnL, exchange account, or real-fund access in M2.1.
+
+## M2.2 latest-price portfolio valuation
+
+The market-data module owns a process-local `LatestMarketPriceService`. `PublicTickerService` updates it only with normalized `MarketTicker` values, so paper-wallet code does not depend on Binance payloads or clients. The service is exported as the narrow cross-module dependency used by portfolio valuation.
+
+The portfolio value is quoted only in USDT: `USDT balance + (BTC balance × latest BTC/USDT price)`. The same precision-40, half-even `decimal.js` strategy is used, and results remain canonical decimal strings. Before the first ticker, valuation fails explicitly rather than returning a misleading partial total. Price persistence, staleness rules, BRL conversion, and HTTP exposure are deferred.

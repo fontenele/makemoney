@@ -13,6 +13,7 @@ M0 Bootstrap:             DONE
 M1 Market Data:           DONE (M1.1 through M1.8)
 M2 Paper Wallet:          IN PROGRESS
 M2.1 Paper Wallet Core:   DONE
+M2.2 Portfolio Valuation: DONE
 Next increment:           NOT APPROVED
 ```
 
@@ -1653,7 +1654,7 @@ Roadmap:
 ```text
 M0 — Bootstrap                    DONE
 M1 — Market Data                  DONE
-M2 — Paper Wallet                 IN PROGRESS (M2.1 DONE)
+M2 — Paper Wallet                 IN PROGRESS (M2.1–M2.2 DONE)
 M3 — Paper Trading                PLANNED
 M4 — Risk Engine                  PLANNED
 M5 — Strategies                   PLANNED
@@ -2164,6 +2165,7 @@ M0 Bootstrap:         DONE
 M1 Market Data:       DONE
 M2 Paper Wallet:      IN PROGRESS
 M2.1 Wallet Core:     DONE
+M2.2 Valuation:       DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS

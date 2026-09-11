@@ -2,6 +2,25 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M2.2 portfolio valuation completed
+
+### Added
+
+- Process-local retention of the latest normalized BTC/USDT ticker.
+- Exact BTC value and total portfolio value in USDT.
+- Explicit unavailable-price behavior before the first ticker.
+- Validation for malformed, zero, and negative market prices.
+- Unit coverage for latest-price replacement, ticker integration, zero BTC, exact arithmetic, unavailable price, and invalid prices.
+
+### Changed
+
+- The market-data module exports its provider-neutral latest-price service to the paper-wallet module.
+- Project context, roadmap, current state, decisions, paper-wallet guide, keyword map, plan, and README now reflect M2.2.
+
+### Scope confirmation
+
+- No HTTP endpoint, dashboard, BRL conversion, persistence, stale-price policy, order, execution, fee, slippage, PnL, strategy, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M2.1 paper wallet core completed
 
 ### Added

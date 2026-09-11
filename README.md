@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. The project has completed **M1 — Market Data** and **M2.1 — Paper Wallet Core**. Market feeds are public and unauthenticated; the wallet is fictional and in memory, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. The project has completed **M1 — Market Data**, **M2.1 — Paper Wallet Core**, and **M2.2 — Portfolio Valuation**. Market feeds are public and unauthenticated; the wallet and valuation are fictional and in memory, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -63,4 +63,4 @@ docker compose config
 - `prisma`: database schema and future migrations
 - `test`: end-to-end tests
 
-The M2.1 paper wallet is process-local and resets at startup. It does not expose an HTTP endpoint or submit orders.
+The paper wallet, latest price, and USDT valuation are process-local and reset at startup. They do not expose an HTTP endpoint or submit orders.
