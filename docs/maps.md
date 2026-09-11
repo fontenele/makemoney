@@ -6,7 +6,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | --- | --- | --- |
 | context, scope, safety, rules | `../PROJECT_CONTEXT.md`, `../AGENTS.md` | — |
 | current status, verification, known issues | `current-state.md`, `CHANGELOG.md` | — |
-| milestones, next work, M1.1, M1.2 | `roadmap.md`, `../PROJECT_CONTEXT.md` | — |
+| milestones, next work, M1.1, M1.2, M1.3 | `roadmap.md`, `../PROJECT_CONTEXT.md` | — |
 | decisions, ports, ESM, Prisma | `decisions.md` | `../package.json`, `../tsconfig.json`, `../compose.yaml` |
 | bootstrap, NestJS, modules | `current-state.md` | `../src/main.ts`, `../src/app.module.ts` |
 | configuration, environment, secrets | `../AGENTS.md`, `current-state.md` | `../src/config/environment.ts`, `../.env.example` |
@@ -15,7 +15,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | health, readiness | `current-state.md` | `../src/modules/health`, `../test/app.e2e-spec.ts` |
 | Docker, Compose, containers | `current-state.md`, `decisions.md` | `../Dockerfile`, `../compose.yaml` |
 | tests, Jest, E2E, lint, formatting | `current-state.md`, `decisions.md` | `../package.json`, `../eslint.config.mjs`, `../test` |
-| Binance, WebSocket, reconnect, backoff, public trades, BTC/USDT | `binance-public-trades.md`, `decisions.md`, `roadmap.md` | `../src/modules/market-data` |
+| Binance, WebSocket, reconnect, backoff, public trades, mini ticker, latest price, BTC/USDT | `binance-public-trades.md`, `binance-public-ticker.md`, `decisions.md`, `roadmap.md` | `../src/modules/market-data` |
 | dashboard, Vue, frontend | `roadmap.md` | Not implemented; M8 |
 | paper wallet, paper trading, PnL, fees | `roadmap.md`, `../AGENTS.md` | Not implemented; M2–M3 |
 | risk, limits, emergency stop | `roadmap.md`, `../AGENTS.md` | Not implemented; M4 and later safety increments |

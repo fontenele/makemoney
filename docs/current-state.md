@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0, M1.1, and M1.2 are complete in the working tree. The only Binance integration is the unauthenticated public BTC/USDT trade stream with bounded automatic reconnection. No dashboard, persistence of market trades, paper-trading logic, strategy, wallet integration, or order execution exists.
+M0, M1.1, M1.2, and M1.3 are complete in the working tree. Binance integrations are limited to unauthenticated public BTC/USDT trade and mini ticker streams with bounded automatic reconnection. No dashboard, market-data persistence, paper-trading logic, strategy, wallet integration, or order execution exists.
 
 ## Implemented application
 
@@ -20,6 +20,8 @@ M0, M1.1, and M1.2 are complete in the working tree. The only Binance integratio
 - Provider-neutral `MarketTrade` normalization with decimal price and quantity preserved as strings.
 - Structured trade logging and clean WebSocket shutdown through NestJS lifecycle hooks.
 - Unexpected WebSocket closes trigger exponential retry delays from 1 second up to a 30-second cap; a successful connection resets the delay.
+- Public Binance Spot `btcusdt@miniTicker` WebSocket consumption with provider-neutral latest-price normalization.
+- Mini ticker volume and rolling-window fields are validated at the Binance boundary but are not exposed to the domain in M1.3.
 
 ## Local endpoints and ports
 
@@ -32,19 +34,19 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M1.1:
+The following passed on 2026-09-11 after M1.3:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 12 tests passed across 3 suites
+- `npm test -- --runInBand` — 22 tests passed across 5 suites
 - `npm run test:e2e -- --runInBand` — 1 test passed with local test environment variables
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
-- Live Binance connection — received normalized BTC/USDT public trades with no credentials
+- Live Binance connections — received normalized BTC/USDT public trades and mini tickers with no credentials
 
 ## Repository state
 
-M0 and M1.1 are committed on `main`. M1.2 changes are currently in the working tree. The Compose stack is running locally.
+M0 through M1.2 are committed and synchronized with `origin/main`. M1.3 changes are currently in the working tree. The Compose stack is running locally.
 
 ## Known issues and cautions
 

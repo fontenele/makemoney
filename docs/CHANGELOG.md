@@ -2,6 +2,26 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M1.3 Binance public mini ticker completed
+
+### Added
+
+- Public, unauthenticated Binance Spot `btcusdt@miniTicker` WebSocket client.
+- Provider-neutral ticker stream contract and minimal `MarketTicker` domain type.
+- Structured `market.ticker.received` and `market.ticker.reconnect_scheduled` logs.
+- Unit coverage for normalization, invalid payloads, message delivery, lifecycle, reconnection reset, and shutdown cancellation.
+- M1.3 operational and domain documentation.
+
+### Changed
+
+- The market-data module now starts and stops independent public trade and mini ticker streams.
+- Corrected repository-state documentation after M1.2 was committed.
+
+### Scope confirmation
+
+- Binance volume and rolling-window fields are validated but not exposed to the domain.
+- No dependency, authentication, persistence, candles, order book, spread, dashboard, wallet, strategy, or financial behavior was introduced.
+
 ## 2026-09-11 — M1.2 WebSocket reconnection completed
 
 ### Added

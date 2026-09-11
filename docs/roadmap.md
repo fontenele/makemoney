@@ -10,7 +10,8 @@ NestJS bootstrap, validated configuration, lint/format tooling, tests, Docker Co
 
 - **M1.1 — complete:** Binance public BTC/USDT trades over WebSocket, normalized into the internal domain model. No authentication.
 - **M1.2 — complete:** bounded exponential reconnection for unexpected WebSocket closes, with reset after connection and clean shutdown cancellation.
-- Later M1 increments: ticker, candles, volume, order book, spread, and pair metadata. These require separate approval.
+- **M1.3 — complete:** Binance public BTC/USDT mini ticker, normalized to the latest price and timestamps. No authentication.
+- Later M1 increments: candles, volume, order book, spread, and pair metadata. These require separate approval.
 
 ## M2 — Paper Wallet — planned
 

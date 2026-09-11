@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1.1 — Binance public BTC/USDT trades**, and **M1.2 — WebSocket reconnection**.
+- Completed milestones: **M0 — Bootstrap**, **M1.1 — Binance public BTC/USDT trades**, **M1.2 — WebSocket reconnection**, and **M1.3 — Binance public BTC/USDT mini ticker**.
 - No next increment is approved. Stop and present a minimal plan before starting more market-data work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -16,9 +16,9 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Immediate boundary
 
-M1.1 receives BTC/USDT public trade events from Binance WebSocket, requires no authentication, and normalizes those events into the internal domain representation.
+The current market-data scope receives BTC/USDT public trade and mini ticker events from Binance WebSocket, requires no authentication, and normalizes those events into internal domain representations.
 
-Ticker streams, candles, order books, persistence, paper trading, strategies, wallet access, authenticated APIs, and order execution remain unimplemented and require separately approved milestones.
+Candles, exposed volume data, order books, spread, persistence, paper trading, strategies, wallet access, authenticated APIs, and order execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 
@@ -35,3 +35,4 @@ Ticker streams, candles, order books, persistence, paper trading, strategies, wa
 - `docs/CHANGELOG.md`: chronological record of meaningful changes.
 - `docs/decisions.md`: durable technical decisions and their reasons.
 - `docs/binance-public-trades.md`: M1.1 stream contract and operation.
+- `docs/binance-public-ticker.md`: M1.3 stream contract and operation.
