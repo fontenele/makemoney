@@ -75,3 +75,11 @@ Absolute spread is `ask - bid`, midpoint is `(ask + bid) / 2`, and spread basis 
 M1.8 uses the public Binance Spot `GET /api/v3/exchangeInfo?symbol=BTCUSDT` endpoint through the public-data base URL `https://data-api.binance.vision`. The application uses Node 24's native `fetch` with a ten-second timeout, so no HTTP dependency is added.
 
 The provider boundary validates the BTC/USDT identity, status, `PRICE_FILTER`, `LOT_SIZE`, and minimum notional from either `MIN_NOTIONAL` or `NOTIONAL`. Financial values remain decimal strings. One snapshot starts loading during module initialization without blocking application startup; failure is logged, and shutdown aborts an in-flight request. Refresh, caching, persistence, and enforcement are deferred.
+
+## M2.1 in-memory paper wallet
+
+The first wallet increment is a fictional process-local domain object supporting only BTC and USDT. Its USDT opening balance comes from `PAPER_INITIAL_USDT_BALANCE` with a safe default of `1000`; BTC starts at zero. Restarting the application resets both balances, because persistence is deliberately deferred.
+
+Balances and amounts are decimal strings. Arithmetic uses a cloned `decimal.js` constructor with precision 40 and half-even rounding, consistent with the project's financial-arithmetic rule. Credits and debits must be strictly positive, and insufficient debits fail before state changes. The application service adds structured audit-oriented logs for initialization and successful mutations.
+
+There is no HTTP API, portfolio conversion, order model, fee, spread, slippage, PnL, exchange account, or real-fund access in M2.1.

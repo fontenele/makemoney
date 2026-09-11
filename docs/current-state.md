@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0 through M1.8 are complete in the working tree. Binance integrations are limited to unauthenticated public BTC/USDT trade, mini ticker, one-minute candle, and top-of-book streams with bounded automatic reconnection plus one public pair-metadata snapshot at startup. The application calculates deterministic spread metrics from each valid top-of-book update. No dashboard, market-data persistence, paper-trading logic, strategy, wallet integration, or order execution exists.
+M0 through M2.1 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2.1 provides a fictional, in-memory BTC/USDT wallet with no exchange-account access. No dashboard, persistence, portfolio valuation, paper orders, strategy, authenticated integration, or order execution exists.
 
 ## Implemented application
 
@@ -29,6 +29,9 @@ M0 through M1.8 are complete in the working tree. Binance integrations are limit
 - Each valid, non-crossed, positive-midpoint top of book produces absolute spread, midpoint, and spread in basis points through `decimal.js`; results remain decimal strings and basis points use eight decimal places with half-even rounding.
 - Public Binance Spot exchange information supplies BTC/USDT status, assets, price filter, lot-size filter, and minimum notional once at startup through a provider-neutral metadata contract.
 - Pair metadata requests use Node's native `fetch`, a ten-second timeout, strict boundary validation, non-blocking startup, and shutdown cancellation.
+- In-memory paper wallet with `BTC` and `USDT` balances, configurable initial USDT (default `1000`), and initial BTC of `0`.
+- Exact `decimal.js` credit and debit operations, positive-amount validation, and insufficient-funds rejection without partial mutation.
+- Structured wallet initialization and successful balance-change logs.
 
 ## Local endpoints and ports
 
@@ -41,19 +44,20 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M1.8:
+The following passed on 2026-09-11 after M2.1:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 58 tests passed across 12 suites
+- `npm test -- --runInBand` — 70 tests passed across 14 suites
 - `npm run test:e2e -- --runInBand` — 1 test passed with local test environment variables
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
+- Live paper wallet initialization — reported BTC `0` and USDT `1000` from the default configuration
 
 ## Repository state
 
-M0 through M1.7 are committed and synchronized with `origin/main`. M1.8 changes are currently in the working tree. The Compose stack is running locally.
+M0 through M1.8 are committed and synchronized with `origin/main`. M2.1 changes are currently in the working tree.
 
 ## Known issues and cautions
 

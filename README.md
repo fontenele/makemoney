@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. The project has completed **M1.1 — Binance public trades**. It connects only to Binance's public BTC/USDT trade stream and has no wallet or trading access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. The project has completed **M1 — Market Data** and **M2.1 — Paper Wallet Core**. Market feeds are public and unauthenticated; the wallet is fictional and in memory, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -39,7 +39,7 @@ docker compose up --build
 
 Verify the complete stack at `http://localhost:3000/health`. A healthy response reports the API, PostgreSQL, and Redis as `up`.
 
-The API also connects to the public Binance `btcusdt@trade` WebSocket stream and writes normalized trade events to its logs:
+The API connects to public Binance BTC/USDT trade, mini ticker, one-minute candle, and top-of-book streams, loads public pair metadata, and writes normalized events to its logs:
 
 ```bash
 docker compose logs -f api
@@ -63,4 +63,4 @@ docker compose config
 - `prisma`: database schema and future migrations
 - `test`: end-to-end tests
 
-No financial entities are created in M0. They will be modeled only when a milestone requires them.
+The M2.1 paper wallet is process-local and resets at startup. It does not expose an HTTP endpoint or submit orders.

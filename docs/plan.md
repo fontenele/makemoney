@@ -6,6 +6,18 @@
 >
 > O projeto deve evoluir incrementalmente. Não implemente milestones futuras antecipadamente.
 
+## Status verified on 2026-09-11
+
+```text
+M0 Bootstrap:             DONE
+M1 Market Data:           DONE (M1.1 through M1.8)
+M2 Paper Wallet:          IN PROGRESS
+M2.1 Paper Wallet Core:   DONE
+Next increment:           NOT APPROVED
+```
+
+The detailed sections below preserve the original product plan. For current delivery status and exact increment boundaries, `docs/roadmap.md` and `docs/current-state.md` are authoritative.
+
 ---
 
 # 1. Visão do Projeto
@@ -505,7 +517,7 @@ REST pode ser usado para snapshots/metadados.
 
 ---
 
-# 14. Milestone atual
+# 14. Bootstrap status
 
 ## M0 — Bootstrap
 
@@ -542,7 +554,7 @@ Corrigir apenas problemas encontrados.
 
 # 15. M1 — Market Data
 
-ESTA É A MILESTONE ATUAL.
+STATUS: COMPLETE through M1.8.
 
 Objetivo:
 
@@ -1640,16 +1652,16 @@ Roadmap:
 
 ```text
 M0 — Bootstrap                    DONE
-M1 — Market Data                 CURRENT
-M2 — Paper Wallet
-M3 — Paper Trading
-M4 — Risk Engine
-M5 — Strategies
-M6 — Backtesting
-M7 — New Listing Scanner
-M8 — Dashboard
-M9 — Polymarket
-M10 — Agentic Wallet / Real Trading
+M1 — Market Data                  DONE
+M2 — Paper Wallet                 IN PROGRESS (M2.1 DONE)
+M3 — Paper Trading                PLANNED
+M4 — Risk Engine                  PLANNED
+M5 — Strategies                   PLANNED
+M6 — Backtesting                  PLANNED
+M7 — New Listing Scanner          PLANNED
+M8 — Dashboard                    PLANNED
+M9 — Polymarket                   PLANNED
+M10 — Agentic Wallet / Real Trading PLANNED
 ```
 
 ---
@@ -1997,7 +2009,9 @@ Tomar quando a milestone exigir.
 
 ---
 
-# 72. Próximo passo IMEDIATO
+# 72. Historical M1.1 startup plan
+
+STATUS: COMPLETED. This section records the original startup sequence and is no longer the current task.
 
 M0 já foi feito.
 
@@ -2147,7 +2161,9 @@ simple working architecture
 Project:              Crypto Trader
 
 M0 Bootstrap:         DONE
-M1 Market Data:       NEXT
+M1 Market Data:       DONE
+M2 Paper Wallet:      IN PROGRESS
+M2.1 Wallet Core:     DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2156,7 +2172,7 @@ Agentic Wallet:       CREATED
 Agentic Balance:      R$0
 Agent Connected:      NO
 
-Paper Capital:        R$1,000 configurable
+Paper Capital:        1000 USDT configurable; BTC 0
 Real Capital:         R$10 planned
 
 Real Trading:         DISABLED
@@ -2166,9 +2182,6 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M1.1 Binance Public Market Trades
-BTC/USDT
-WebSocket
-Read-only
-No credentials
+No next increment approved.
+Stop and present a minimal plan before further implementation.
 ```

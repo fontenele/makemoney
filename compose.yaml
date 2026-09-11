@@ -10,6 +10,7 @@ services:
       REDIS_URL: redis://redis:6379
       BINANCE_WS_BASE_URL: wss://stream.binance.com:9443
       BINANCE_REST_BASE_URL: https://data-api.binance.vision
+      PAPER_INITIAL_USDT_BALANCE: "1000"
     ports:
       - "3000:3000"
     volumes:

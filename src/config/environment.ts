@@ -7,6 +7,7 @@ interface Environment {
   REDIS_URL: string;
   BINANCE_WS_BASE_URL: string;
   BINANCE_REST_BASE_URL: string;
+  PAPER_INITIAL_USDT_BALANCE: string;
 }
 
 const environmentSchema = Joi.object<Environment>({
@@ -22,6 +23,9 @@ const environmentSchema = Joi.object<Environment>({
   BINANCE_REST_BASE_URL: Joi.string()
     .uri({ scheme: ['https'] })
     .default('https://data-api.binance.vision'),
+  PAPER_INITIAL_USDT_BALANCE: Joi.string()
+    .pattern(/^(0|[1-9]\d*)(\.\d+)?$/)
+    .default('1000'),
 }).unknown(true);
 
 export function validateEnvironment(

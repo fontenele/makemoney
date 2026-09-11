@@ -2,6 +2,26 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M2.1 paper wallet core completed
+
+### Added
+
+- Fictional in-memory wallet with BTC and USDT balances.
+- Configurable initial USDT balance with a safe default of `1000`; BTC starts at zero.
+- Exact decimal balance queries, credits, and debits with insufficient-funds protection.
+- Structured initialization and balance-change logs.
+- Unit coverage for exact arithmetic, validation, full debits, insufficient funds, and service delegation.
+- M2.1 domain and operational documentation.
+
+### Changed
+
+- The application module now initializes the paper-wallet module.
+- Project context, roadmap, current state, decisions, keyword map, and README now reflect completion of M1 and M2.1.
+
+### Scope confirmation
+
+- No persistence, HTTP endpoint, valuation, BRL conversion, order, execution, fee, spread/slippage simulation, PnL, strategy, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M1.8 Binance public pair metadata completed
 
 ### Added

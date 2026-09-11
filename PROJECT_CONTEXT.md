@@ -8,8 +8,8 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1.1 — Binance public BTC/USDT trades**, **M1.2 — WebSocket reconnection**, **M1.3 — Binance public BTC/USDT mini ticker**, **M1.4 — Binance public BTC/USDT 1m candles**, **M1.5 — candle volume**, **M1.6 — BTC/USDT top of book**, **M1.7 — deterministic spread calculation**, and **M1.8 — BTC/USDT pair metadata**.
-- No next increment is approved. Stop and present a minimal plan before starting more market-data work.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, and **M2.1 — Paper Wallet Core**.
+- No next increment is approved. Stop and present a minimal plan before starting more wallet or trading work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -18,7 +18,9 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 The current market-data scope receives BTC/USDT public trade, mini ticker, one-minute candle, and top-of-book events from Binance WebSocket and loads public pair metadata from Binance REST. It requires no authentication and normalizes provider data into internal domain representations.
 
-Historical candles, aggregate volume analytics, metadata refresh and enforcement, multi-level order books, persistence, paper trading, strategies, wallet access, authenticated APIs, and order execution remain unimplemented and require separately approved milestones.
+M2.1 adds an in-memory fictional wallet for BTC and USDT with configurable initial USDT, exact decimal credit/debit operations, balance queries, and insufficient-funds protection.
+
+Historical data, market-data persistence, portfolio valuation, wallet persistence, orders, fees, spread/slippage modeling, PnL, strategies, authenticated APIs, and execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 
@@ -32,6 +34,7 @@ Historical candles, aggregate volume analytics, metadata refresh and enforcement
 - `docs/maps.md`: keyword and subsystem navigation map.
 - `docs/current-state.md`: evidence-based implementation and environment status.
 - `docs/roadmap.md`: milestone scope and completion state.
+- `docs/plan.md`: original product plan with a synchronized current-status summary.
 - `docs/CHANGELOG.md`: chronological record of meaningful changes.
 - `docs/decisions.md`: durable technical decisions and their reasons.
 - `docs/binance-public-trades.md`: M1.1 stream contract and operation.
@@ -39,3 +42,4 @@ Historical candles, aggregate volume analytics, metadata refresh and enforcement
 - `docs/binance-public-candles.md`: M1.4–M1.5 candle and volume contract and operation.
 - `docs/binance-public-top-of-book.md`: M1.6–M1.7 best bid/ask and spread contract and operation.
 - `docs/binance-pair-metadata.md`: M1.8 public BTC/USDT trading-rule metadata.
+- `docs/paper-wallet.md`: M2.1 fictional wallet configuration and domain behavior.

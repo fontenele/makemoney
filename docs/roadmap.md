@@ -6,7 +6,7 @@ Implementation is incremental. A milestone starts only after the preceding scope
 
 NestJS bootstrap, validated configuration, lint/format tooling, tests, Docker Compose, PostgreSQL, Redis, Prisma, health checks, and initial documentation.
 
-## M1 — Market Data — planned
+## M1 — Market Data — complete
 
 - **M1.1 — complete:** Binance public BTC/USDT trades over WebSocket, normalized into the internal domain model. No authentication.
 - **M1.2 — complete:** bounded exponential reconnection for unexpected WebSocket closes, with reset after connection and clean shutdown cancellation.
@@ -20,7 +20,10 @@ NestJS bootstrap, validated configuration, lint/format tooling, tests, Docker Co
 
 ## M2 — Paper Wallet — planned
 
-Configurable virtual balances and portfolio valuation. No real funds.
+- **M2.1 — complete:** in-memory fictional BTC/USDT balances, configurable initial USDT, exact decimal credit/debit operations, balance queries, and insufficient-funds protection.
+- Later M2 increments may add portfolio valuation, additional approved assets, and persistence. Each requires a separate plan and approval.
+
+No real funds or exchange-account access.
 
 ## M3 — Paper Trading — planned
 
