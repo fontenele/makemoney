@@ -2,6 +2,25 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M1.7 deterministic spread calculation completed
+
+### Added
+
+- `decimal.js` as the explicit arbitrary-precision strategy for financial arithmetic.
+- Provider-neutral `MarketSpread` with absolute spread, midpoint, and spread basis points.
+- Deterministic `SpreadCalculator` with precision 40 and half-even rounding to eight basis-point decimal places.
+- Structured `market.spread.calculated` logs derived from live top-of-book updates.
+- Unit coverage for exact decimal arithmetic, locked and crossed books, and zero midpoint rejection.
+
+### Changed
+
+- The top-of-book lifecycle service now calculates spread after logging each normalized update.
+- Updated project context, roadmap, state, decision, operation, and keyword-map documentation for M1.7.
+
+### Scope confirmation
+
+- No new WebSocket, multi-level depth, snapshot, persistence, authentication, wallet, strategy, or order execution was introduced.
+
 ## 2026-09-11 — M1.6 Binance public top of book completed
 
 ### Added

@@ -10,6 +10,7 @@ import {
   TOP_OF_BOOK_STREAM,
   TopOfBookStream,
 } from '../domain/top-of-book-stream';
+import { SpreadCalculator } from './spread-calculator';
 
 @Injectable()
 export class PublicTopOfBookService implements OnModuleInit, OnModuleDestroy {
@@ -18,6 +19,7 @@ export class PublicTopOfBookService implements OnModuleInit, OnModuleDestroy {
   constructor(
     @Inject(TOP_OF_BOOK_STREAM)
     private readonly topOfBookStream: TopOfBookStream,
+    private readonly spreadCalculator: SpreadCalculator,
   ) {}
 
   onModuleInit(): void {
@@ -39,6 +41,25 @@ export class PublicTopOfBookService implements OnModuleInit, OnModuleDestroy {
       askPrice: topOfBook.askPrice,
       askQuantity: topOfBook.askQuantity,
       receivedAt: topOfBook.receivedAt.toISOString(),
+    });
+
+    const spread = this.spreadCalculator.calculate(topOfBook);
+
+    if (spread === null) {
+      return;
+    }
+
+    this.logger.log({
+      event: 'market.spread.calculated',
+      provider: spread.provider,
+      symbol: spread.symbol,
+      updateId: spread.updateId,
+      bidPrice: spread.bidPrice,
+      askPrice: spread.askPrice,
+      absoluteSpread: spread.absoluteSpread,
+      midPrice: spread.midPrice,
+      spreadBasisPoints: spread.spreadBasisPoints,
+      receivedAt: spread.receivedAt.toISOString(),
     });
   }
 }

@@ -4,6 +4,7 @@ import { PublicCandlesService } from './application/public-candles.service';
 import { PublicTickerService } from './application/public-ticker.service';
 import { PublicTopOfBookService } from './application/public-top-of-book.service';
 import { PublicTradesService } from './application/public-trades.service';
+import { SpreadCalculator } from './application/spread-calculator';
 import { CANDLE_STREAM } from './domain/candle-stream';
 import { TICKER_STREAM } from './domain/ticker-stream';
 import { TOP_OF_BOOK_STREAM } from './domain/top-of-book-stream';
@@ -50,6 +51,7 @@ import { BinancePublicTradesClient } from './infrastructure/binance/binance-publ
     PublicTradesService,
     PublicTickerService,
     PublicCandlesService,
+    SpreadCalculator,
     PublicTopOfBookService,
   ],
 })

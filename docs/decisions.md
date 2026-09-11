@@ -63,3 +63,9 @@ M1.6 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@
 The internal `MarketTopOfBook` contains the provider, normalized symbol, provider update ID, best bid price and quantity, best ask price and quantity, and receipt time. Update IDs are strings; all prices and quantities remain decimal strings.
 
 This increment intentionally represents only level one of the book. It does not calculate spread, reconstruct depth, request REST snapshots, or persist updates. The stream has its own provider-neutral contract, lifecycle service, socket, and bounded reconnection policy.
+
+## M1.7 deterministic spread calculation
+
+M1.7 derives spread metrics from each M1.6 top-of-book update without opening another connection. Monetary arithmetic uses a local `decimal.js` constructor configured with precision 40 and half-even rounding; native JavaScript floating-point arithmetic is not used.
+
+Absolute spread is `ask - bid`, midpoint is `(ask + bid) / 2`, and spread basis points are `(absolute spread / midpoint) * 10000`. Absolute spread and midpoint are canonical decimal strings. Basis points are rounded to exactly eight decimal places. Crossed books (`ask < bid`) and non-positive midpoints are rejected; a locked positive book produces zero spread.

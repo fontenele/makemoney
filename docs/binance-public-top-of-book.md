@@ -1,8 +1,8 @@
-# Binance Public Top of Book (M1.6)
+# Binance Public Top of Book and Spread (M1.6–M1.7)
 
 ## Scope
 
-M1.6 consumes only public BTC/USDT Spot best bid and ask updates. It does not calculate spread, reconstruct multi-level depth, request snapshots, authenticate, persist data, access an account or wallet, or submit orders.
+M1.6 consumes public BTC/USDT Spot best bid and ask updates. M1.7 derives spread metrics from those updates. This scope does not reconstruct multi-level depth, request snapshots, authenticate, persist data, access an account or wallet, or submit orders.
 
 Official reference: [Binance Spot WebSocket Market Streams](https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams#individual-symbol-book-ticker-streams)
 
@@ -38,7 +38,17 @@ The normalized `MarketTopOfBook` contains:
 - `askPrice` and `askQuantity`: decimal strings
 - `receivedAt`: `Date`
 
-The Binance payload has no event timestamp, so receipt time is the only time in the M1.6 domain object. No numeric conversion or spread calculation is performed.
+The Binance payload has no event timestamp, so receipt time is the only time in the M1.6 domain object.
+
+## Spread calculation
+
+For every valid top-of-book update, M1.7 calculates:
+
+- absolute spread: `askPrice - bidPrice`
+- midpoint: `(askPrice + bidPrice) / 2`
+- spread basis points: `(absoluteSpread / midPrice) * 10000`
+
+Calculations use `decimal.js` with precision 40 and half-even rounding. Outputs remain decimal strings; basis points always have eight decimal places. Crossed books and non-positive midpoints do not produce a spread. A locked positive book produces zero spread.
 
 ## Reconnection
 
@@ -55,4 +65,4 @@ docker compose up -d --build
 docker compose logs -f api
 ```
 
-Normalized entries use the event name `market.top_of_book.received`. The health endpoint remains available at `http://localhost:3000/health`.
+Normalized entries use `market.top_of_book.received`; derived spread entries use `market.spread.calculated`. The health endpoint remains available at `http://localhost:3000/health`.
