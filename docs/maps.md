@@ -15,7 +15,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | health, readiness | `current-state.md` | `../src/modules/health`, `../test/app.e2e-spec.ts` |
 | Docker, Compose, containers | `current-state.md`, `decisions.md` | `../Dockerfile`, `../compose.yaml` |
 | tests, Jest, E2E, lint, formatting | `current-state.md`, `decisions.md` | `../package.json`, `../eslint.config.mjs`, `../test` |
-| Binance, WebSocket, public trades, BTC/USDT | `../PROJECT_CONTEXT.md`, `roadmap.md` | Not implemented; M1.1 requires approval |
+| Binance, WebSocket, public trades, BTC/USDT | `binance-public-trades.md`, `../PROJECT_CONTEXT.md`, `roadmap.md` | `../src/modules/market-data` |
 | dashboard, Vue, frontend | `roadmap.md` | Not implemented; M8 |
 | paper wallet, paper trading, PnL, fees | `roadmap.md`, `../AGENTS.md` | Not implemented; M2–M3 |
 | risk, limits, emergency stop | `roadmap.md`, `../AGENTS.md` | Not implemented; M4 and later safety increments |

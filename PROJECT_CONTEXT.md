@@ -8,18 +8,17 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestone: **M0 — Bootstrap**.
-- Current approved planning target: **M1.1 — Binance public BTC/USDT trades**.
-- M1.1 has not been implemented and requires explicit user approval after review of the proposed plan.
+- Completed milestones: **M0 — Bootstrap** and **M1.1 — Binance public BTC/USDT trades**.
+- No next increment is approved. Stop and present a minimal plan before starting more market-data work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
 
 ## Immediate boundary
 
-M1.1 is limited to receiving BTC/USDT public trade events from Binance WebSocket, requiring no authentication, and normalizing those events into the internal domain representation.
+M1.1 receives BTC/USDT public trade events from Binance WebSocket, requires no authentication, and normalizes those events into the internal domain representation.
 
-Do not add ticker streams, candles, order books, persistence, paper trading, strategies, wallet access, authenticated APIs, or order execution as part of M1.1.
+Ticker streams, candles, order books, persistence, advanced reconnection, paper trading, strategies, wallet access, authenticated APIs, and order execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 
@@ -35,3 +34,4 @@ Do not add ticker streams, candles, order books, persistence, paper trading, str
 - `docs/roadmap.md`: milestone scope and completion state.
 - `docs/CHANGELOG.md`: chronological record of meaningful changes.
 - `docs/decisions.md`: durable technical decisions and their reasons.
+- `docs/binance-public-trades.md`: M1.1 stream contract and operation.

@@ -8,6 +8,7 @@ services:
       PORT: 3000
       DATABASE_URL: postgresql://crypto_trader:crypto_trader@postgres:5432/crypto_trader?schema=public
       REDIS_URL: redis://redis:6379
+      BINANCE_WS_BASE_URL: wss://stream.binance.com:9443
     ports:
       - "3000:3000"
     volumes:

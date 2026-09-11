@@ -2,6 +2,28 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M1.1 Binance public trades completed
+
+### Added
+
+- Public, unauthenticated Binance Spot `btcusdt@trade` WebSocket client.
+- Provider-neutral trade stream contract and normalized `MarketTrade` domain type.
+- Validation of Binance payload shape before it reaches the domain.
+- Structured logging for normalized BTC/USDT trades.
+- WebSocket shutdown through the NestJS module lifecycle.
+- Unit coverage for payload normalization, taker-side mapping, invalid messages, and service lifecycle.
+- M1.1 operational and domain documentation.
+
+### Verified
+
+- Eight unit tests across three suites, lint, formatting, and TypeScript build.
+- Docker Compose API, PostgreSQL, and Redis health.
+- Live public trades received from Binance with price and quantity preserved as decimal strings.
+
+### Scope confirmation
+
+- No authentication, credentials, persistence, ticker, candles, order book, paper trading, strategy, wallet, or order execution was added.
+
 ## 2026-09-11 — Documentation baseline
 
 ### Added

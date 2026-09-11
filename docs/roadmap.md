@@ -8,7 +8,7 @@ NestJS bootstrap, validated configuration, lint/format tooling, tests, Docker Co
 
 ## M1 — Market Data — planned
 
-- **M1.1:** Binance public BTC/USDT trades over WebSocket, normalized into the internal domain model. No authentication.
+- **M1.1 — complete:** Binance public BTC/USDT trades over WebSocket, normalized into the internal domain model. No authentication.
 - Later M1 increments: ticker, candles, volume, order book, spread, pair metadata, and production-grade reconnection behavior. These are explicitly excluded from M1.1 unless separately approved.
 
 ## M2 — Paper Wallet — planned

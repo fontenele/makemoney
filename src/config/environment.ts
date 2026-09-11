@@ -5,6 +5,7 @@ interface Environment {
   PORT: number;
   DATABASE_URL: string;
   REDIS_URL: string;
+  BINANCE_WS_BASE_URL: string;
 }
 
 const environmentSchema = Joi.object<Environment>({
@@ -14,6 +15,9 @@ const environmentSchema = Joi.object<Environment>({
   PORT: Joi.number().port().default(3000),
   DATABASE_URL: Joi.string().uri().required(),
   REDIS_URL: Joi.string().uri().required(),
+  BINANCE_WS_BASE_URL: Joi.string()
+    .uri({ scheme: ['wss'] })
+    .default('wss://stream.binance.com:9443'),
 }).unknown(true);
 
 export function validateEnvironment(

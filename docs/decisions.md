@@ -19,3 +19,11 @@ NestJS 12 packages use ESM. Jest runs through Node with `--experimental-vm-modul
 ## Financial and provider boundaries
 
 External market providers must be encapsulated. Domain objects must not expose provider payload shapes. Strategies will produce signals, the Risk Engine will assess them, and only an executor may eventually submit an order. No executor exists in M0 or M1.1.
+
+## M1.1 raw trade stream
+
+M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.
+
+The provider payload is validated and translated at the infrastructure boundary. Price and quantity remain decimal strings to avoid premature floating-point arithmetic. Binance's buyer-maker flag maps to the internal taker side: buyer maker means `sell`; otherwise `buy`.
+
+The `ws` package is the explicit WebSocket transport. Automatic reconnection is deliberately deferred beyond M1.1.

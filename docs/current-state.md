@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0 is complete in the working tree. M1.1 is planned but not implemented. No Binance integration, dashboard, paper-trading logic, strategy, wallet integration, or order execution exists.
+M0 and M1.1 are complete in the working tree. The only Binance integration is the unauthenticated public BTC/USDT trade stream. No dashboard, persistence of market trades, paper-trading logic, strategy, wallet integration, or order execution exists.
 
 ## Implemented application
 
@@ -16,6 +16,9 @@ M0 is complete in the working tree. M1.1 is planned but not implemented. No Bina
 - Docker Compose services for the API, PostgreSQL 17, and Redis 8.
 - ESLint, Prettier, Jest unit tests, Jest E2E tests, and TypeScript build scripts.
 - Safe `.env.example`; local `.env` files and generated/build artifacts are ignored by Git.
+- Public Binance Spot `btcusdt@trade` WebSocket consumption through the `ws` transport.
+- Provider-neutral `MarketTrade` normalization with decimal price and quantity preserved as strings.
+- Structured trade logging and clean WebSocket shutdown through NestJS lifecycle hooks.
 
 ## Local endpoints and ports
 
@@ -28,14 +31,15 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11:
+The following passed on 2026-09-11 after M1.1:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 2 tests passed
+- `npm test -- --runInBand` — 8 tests passed across 3 suites
 - `npm run test:e2e -- --runInBand` — 1 test passed with local test environment variables
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
+- Live Binance connection — received normalized BTC/USDT public trades with no credentials
 
 ## Repository state
 
@@ -47,3 +51,4 @@ M0 files are currently uncommitted relative to the initial commit. Do not discar
 - Jest requires Node's `--experimental-vm-modules` flag because NestJS 12 packages are ESM.
 - The Docker build reported eight high-severity findings in the dependency audit. They have not been automatically changed because `npm audit fix --force` may introduce breaking upgrades; review them separately.
 - A transitive Angular DevKit package recommends Node `24.15.0` or newer while the machine has Node `24.14.1`. Current build, lint, and tests pass, but a Node 24 LTS patch update is advisable.
+- M1.1 intentionally has no automatic WebSocket reconnection. Connection resilience belongs to a separately approved later M1 increment.

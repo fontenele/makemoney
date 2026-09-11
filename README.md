@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. The project is in **M0 — Bootstrap**. It does not connect to Binance, wallets, or real trading.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. The project has completed **M1.1 — Binance public trades**. It connects only to Binance's public BTC/USDT trade stream and has no wallet or trading access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -38,6 +38,12 @@ docker compose up --build
 ```
 
 Verify the complete stack at `http://localhost:3000/health`. A healthy response reports the API, PostgreSQL, and Redis as `up`.
+
+The API also connects to the public Binance `btcusdt@trade` WebSocket stream and writes normalized trade events to its logs:
+
+```bash
+docker compose logs -f api
+```
 
 ## Quality checks
 
