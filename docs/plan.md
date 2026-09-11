@@ -21,6 +21,7 @@ M3.1 Buy Quote:           DONE
 M3.2 Buy Execution:       DONE
 M3.3 Sell Quote:          DONE
 M3.4 Sell Execution:      DONE
+M3.5 Execution History:   DONE
 Next increment:           NOT APPROVED
 ```
 
@@ -1662,7 +1663,7 @@ Roadmap:
 M0 — Bootstrap                    DONE
 M1 — Market Data                  DONE
 M2 — Paper Wallet                 DONE (M2.1–M2.5)
-M3 — Paper Trading                IN PROGRESS (M3.1–M3.4 DONE)
+M3 — Paper Trading                IN PROGRESS (M3.1–M3.5 DONE)
 M3 — Paper Trading                PLANNED
 M4 — Risk Engine                  PLANNED
 M5 — Strategies                   PLANNED
@@ -2182,6 +2183,7 @@ M3.1 Buy Quote:       DONE
 M3.2 Buy Execution:   DONE
 M3.3 Sell Quote:      DONE
 M3.4 Sell Execution:  DONE
+M3.5 Execution History: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS

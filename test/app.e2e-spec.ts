@@ -243,6 +243,101 @@ describe('Application (e2e)', () => {
       prisma.paperExecution.findUnique({ where: { id: idempotencyKey } }),
     ).resolves.toBeNull();
   });
+
+  it('lists bounded buy and sell execution history newest first', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const prisma = app.get(PrismaService);
+    const suffix = Date.now();
+    const buyId = `e2e-history-buy-${suffix}`;
+    const sellId = `e2e-history-sell-${suffix}`;
+    const quotedAt = new Date('2099-01-01T00:00:00.000Z');
+    const receivedAt = new Date('2098-12-31T23:59:59.000Z');
+    const buyExecutedAt = new Date('2099-01-01T00:00:01.000Z');
+    const sellExecutedAt = new Date('2099-01-01T00:00:02.000Z');
+
+    await prisma.paperExecution.createMany({
+      data: [
+        {
+          id: buyId,
+          symbol: 'BTC/USDT',
+          side: 'buy',
+          quantity: '0.001',
+          price: '50000',
+          notional: '50',
+          feeRate: '0.001',
+          fee: '0.05',
+          totalCost: '50.05',
+          quotedAt,
+          marketDataReceivedAt: receivedAt,
+          executedAt: buyExecutedAt,
+        },
+        {
+          id: sellId,
+          symbol: 'BTC/USDT',
+          side: 'sell',
+          quantity: '0.001',
+          price: '51000',
+          notional: '51',
+          feeRate: '0.001',
+          fee: '0.051',
+          netProceeds: '50.949',
+          quotedAt,
+          marketDataReceivedAt: receivedAt,
+          executedAt: sellExecutedAt,
+        },
+      ],
+    });
+
+    try {
+      await request(server)
+        .get('/paper-trading/executions?limit=2')
+        .expect(200)
+        .expect([
+          {
+            id: sellId,
+            symbol: 'BTC/USDT',
+            side: 'sell',
+            quantity: '0.001',
+            price: '51000',
+            notional: '51',
+            feeRate: '0.001',
+            fee: '0.051',
+            quotedAt: quotedAt.toISOString(),
+            marketDataReceivedAt: receivedAt.toISOString(),
+            executedAt: sellExecutedAt.toISOString(),
+            replayed: false,
+            netProceeds: '50.949',
+          },
+          {
+            id: buyId,
+            symbol: 'BTC/USDT',
+            side: 'buy',
+            quantity: '0.001',
+            price: '50000',
+            notional: '50',
+            feeRate: '0.001',
+            fee: '0.05',
+            quotedAt: quotedAt.toISOString(),
+            marketDataReceivedAt: receivedAt.toISOString(),
+            executedAt: buyExecutedAt.toISOString(),
+            replayed: false,
+            totalCost: '50.05',
+          },
+        ]);
+    } finally {
+      await prisma.paperExecution.deleteMany({
+        where: { id: { in: [buyId, sellId] } },
+      });
+    }
+  });
+
+  it('/paper-trading/executions (GET) rejects an invalid limit', () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+
+    return request(server)
+      .get('/paper-trading/executions?limit=101')
+      .expect(400);
+  });
 });
 
 function preparePaperMarket(app: INestApplication): void {

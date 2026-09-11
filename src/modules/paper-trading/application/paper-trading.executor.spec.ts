@@ -105,6 +105,8 @@ function result(replayed: boolean): PaperExecution {
     feeRate: '0.001',
     fee: '0.07777712',
     totalCost: '77.85489712',
+    quotedAt: new Date('2026-09-11T12:00:05.000Z'),
+    marketDataReceivedAt: new Date('2026-09-11T12:00:00.000Z'),
     executedAt: new Date(),
     replayed,
   };
@@ -121,6 +123,8 @@ function sellResult(replayed: boolean): PaperExecution {
     feeRate: '0.001',
     fee: '0.07777711',
     netProceeds: '77.69933289',
+    quotedAt: new Date('2026-09-11T12:00:05.000Z'),
+    marketDataReceivedAt: new Date('2026-09-11T12:00:00.000Z'),
     executedAt: new Date(),
     replayed,
   };
@@ -134,6 +138,7 @@ type MockRepo = {
 function repo(): MockRepo {
   return {
     find: jest.fn<PaperExecutionRepository['find']>(),
+    listRecent: jest.fn<PaperExecutionRepository['listRecent']>(),
     executeBuy: jest.fn<PaperExecutionRepository['executeBuy']>(),
     executeSell: jest.fn<PaperExecutionRepository['executeSell']>(),
   };

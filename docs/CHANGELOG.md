@@ -2,6 +2,19 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M3.5 read-only execution history completed
+
+### Added
+
+- Bounded repository query for recent paper executions ordered by execution time and ID descending.
+- `GET /paper-trading/executions` with a default limit of 50 and validated maximum of 100.
+- Buy/sell response discrimination, canonical decimal strings, and ISO UTC quote, market-data, and execution timestamps.
+- Unit and E2E coverage for defaults, explicit limits, invalid limits, ordering, bounding, and serialization.
+
+### Scope confirmation
+
+- No order mutation endpoint, deletion, cursor pagination, position/PnL model, deeper slippage, strategy, Risk Engine, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M3.4 idempotent paper sell execution completed
 
 ### Added

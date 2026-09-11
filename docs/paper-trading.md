@@ -21,7 +21,7 @@ One PostgreSQL transaction conditionally debits the full USDT cost (notional plu
 
 Persisted quantities and monetary amounts use `DECIMAL(38,18)`. Quote inputs therefore accept at most 18 fractional digits, and calculated notional, fee, and total cost use half-even rounding to that scale. Successful executions and replays emit structured logs.
 
-There is deliberately no HTTP mutation route. Sell execution, positions, realized or unrealized PnL, history queries, multi-level slippage, strategies, the Risk Engine, authenticated providers, and real trading remain deferred.
+There is deliberately no HTTP mutation route. Positions, realized or unrealized PnL, multi-level slippage, strategies, the Risk Engine, authenticated providers, and real trading remain deferred.
 
 ## M3.3 paper market sell quote
 
@@ -37,4 +37,12 @@ M3.4 extends the shared `TradingExecutor` with a discriminated buy/sell intent a
 
 The execution table accepts both sides. Existing buys retain `totalCost`; sells store `netProceeds`. A database constraint requires exactly the settlement field appropriate to the side. Reusing an idempotency key returns the original execution and never mutates balances twice, including concurrent duplicate attempts.
 
-Insufficient BTC and missing balance rows roll back the full transaction. Successful sells and replays emit structured logs. Public order routes, positions, PnL, history queries, strategies, and real trading remain deferred.
+Insufficient BTC and missing balance rows roll back the full transaction. Successful sells and replays emit structured logs. Order mutation routes, positions, PnL, strategies, and real trading remain deferred.
+
+## M3.5 recent execution history
+
+`GET /paper-trading/executions` exposes a read-only audit view of persisted buys and sells, newest first. It returns 50 records by default and accepts an integer `limit` from 1 through 100. Invalid limits return HTTP 400.
+
+Buy records contain `totalCost`; sell records contain `netProceeds`. Financial values remain canonical decimal strings, and quote, market-data receipt, and execution timestamps serialize as ISO UTC values. The history result sets `replayed` to `false` because replay is a property of an execution call, not of the persisted event.
+
+This increment does not expose execution, mutation, deletion, cursor pagination, positions, or PnL.

@@ -40,6 +40,12 @@ The shared executor uses discriminated buy and sell intents. The execution recor
 
 Sell execution uses the same transaction and idempotency guarantees as buying. It conditionally debits sufficient BTC, credits net USDT proceeds, and inserts the sell record atomically. A duplicate key rolls its attempted transaction back before replaying the committed result.
 
+## M3.5 bounded read-only execution history
+
+The first execution-history API is intentionally bounded rather than cursor-paginated. It returns the newest 50 records by default, accepts 1 through 100, and uses execution time plus ID as deterministic descending order. Cursor pagination is deferred until history volume or a client requires it.
+
+The read model exposes all three audit timestamps and side-specific settlement values. It never exposes a write operation; internal execution remains unavailable over HTTP.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

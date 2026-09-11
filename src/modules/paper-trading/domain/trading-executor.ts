@@ -20,6 +20,8 @@ interface PaperExecutionBase {
   notional: string;
   feeRate: string;
   fee: string;
+  quotedAt: Date;
+  marketDataReceivedAt: Date;
   executedAt: Date;
   replayed: boolean;
 }

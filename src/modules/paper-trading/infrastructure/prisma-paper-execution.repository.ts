@@ -15,6 +15,14 @@ export class PrismaPaperExecutionRepository implements PaperExecutionRepository 
     return row ? mapExecution(row, false) : undefined;
   }
 
+  async listRecent(limit: number): Promise<PaperExecution[]> {
+    const rows = await this.prisma.paperExecution.findMany({
+      orderBy: [{ executedAt: 'desc' }, { id: 'desc' }],
+      take: limit,
+    });
+    return rows.map((row) => mapExecution(row, false));
+  }
+
   async executeBuy(
     id: string,
     quote: PaperMarketBuyQuote,
@@ -134,6 +142,8 @@ function mapExecution(
     fee: Prisma.Decimal;
     totalCost: Prisma.Decimal | null;
     netProceeds: Prisma.Decimal | null;
+    quotedAt: Date;
+    marketDataReceivedAt: Date;
     executedAt: Date;
   },
   replayed: boolean,
@@ -148,6 +158,8 @@ function mapExecution(
     notional: row.notional.toFixed(),
     feeRate: row.feeRate.toFixed(),
     fee: row.fee.toFixed(),
+    quotedAt: row.quotedAt,
+    marketDataReceivedAt: row.marketDataReceivedAt,
     executedAt: row.executedAt,
     replayed,
   };

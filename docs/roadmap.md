@@ -34,7 +34,8 @@ No real funds or exchange-account access.
 - **M3.2 — complete:** internal idempotent BTC market-buy execution through a shared executor contract, with atomic PostgreSQL balance mutation and execution persistence.
 - **M3.3 — complete:** internal non-executing BTC market-sell quote using fresh best bid, public pair rules, top-level liquidity, simulated taker fee, and exact net proceeds.
 - **M3.4 — complete:** internal idempotent BTC market-sell execution with atomic BTC debit, net USDT credit, and PostgreSQL execution persistence.
-- Later M3 increments require separate approval for public order APIs, position/PnL modeling, history queries, and deeper slippage modeling.
+- **M3.5 — complete:** bounded read-only HTTP history of recent buy and sell executions, ordered newest first.
+- Later M3 increments require separate approval for order mutation APIs, position/PnL modeling, cursor pagination, and deeper slippage modeling.
 
 ## M4 — Risk Engine — planned
 
