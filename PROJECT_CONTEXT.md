@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, and **M3.1 — Paper Market Buy Quote**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, and **M3.1 through M3.3 — Paper Trading quotes and buy execution**.
 - No next increment is approved. Stop and present a minimal plan before starting more wallet or trading work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -30,7 +30,9 @@ M2.5 persists BTC and USDT paper balances in PostgreSQL with idempotent initiali
 
 M3.1 calculates internal BTC market-buy quotes from fresh best-ask data, pair rules, liquidity, and a configurable simulated taker fee. It does not execute or mutate balances.
 
-Historical market data, BRL conversion, orders, fees, spread/slippage execution modeling, PnL, strategies, authenticated APIs, and execution remain unimplemented and require separately approved milestones.
+M3.2 persists idempotent internal paper buys and mutates BTC/USDT balances atomically. M3.3 calculates non-executing BTC sell quotes from the fresh best bid, including simulated fees and net proceeds.
+
+Historical market data, BRL conversion, sell execution, public order APIs, position/PnL modeling, deeper slippage, strategies, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 

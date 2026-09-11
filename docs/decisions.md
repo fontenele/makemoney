@@ -28,6 +28,12 @@ The PostgreSQL repository performs the sufficient-USDT debit, BTC credit, and ex
 
 Paper balances and executions use `DECIMAL(38,18)`. Quote values are validated to at most 18 fractional digits and calculated values are rounded half-even to the same scale before the transaction, keeping the returned execution and persisted balance mutation consistent.
 
+## M3.3 non-executing market-sell quote
+
+M3.3 mirrors the established buy-quote boundary without widening the executor. A BTC quantity is priced against the fresh best bid and its available top-level quantity. The returned USDT proceeds are gross notional minus the configured simulated taker fee.
+
+The service deliberately does not read the paper wallet or execute a sale. This keeps quote validity dependent only on current public market data and pair rules; sufficient BTC and atomic balance mutation belong to a separately approved sell-execution increment.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

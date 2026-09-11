@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0 through M3.2 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy quoting and idempotent paper execution. No dashboard, public order endpoint, sell execution, strategy, authenticated integration, or real order execution exists.
+M0 through M3.3 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting and idempotent paper buy execution. No dashboard, public order endpoint, sell execution, strategy, authenticated integration, or real order execution exists.
 
 ## Implemented application
 
@@ -44,6 +44,7 @@ M0 through M3.2 are complete in the working tree. M1 provides unauthenticated pu
 - PostgreSQL paper-execution records and atomic USDT debit, BTC credit, and execution insertion.
 - Caller-supplied idempotency keys replay the persisted result without a second balance mutation.
 - Financial values are limited and half-even rounded to the database's 18-decimal scale before persistence.
+- Internal BTC market-sell quote with exact gross notional, simulated taker fee, net proceeds, freshness, pair-rule, and best-bid-liquidity validation.
 
 ## Local endpoints and ports
 
@@ -58,11 +59,11 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M3.2:
+The following passed on 2026-09-11 after M3.3:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 102 tests passed across 19 suites
+- `npm test -- --runInBand` — 113 tests passed across 20 suites
 - `npm run test:e2e -- --runInBand` — 8 tests passed, including execution idempotency and insufficient-funds rollback
 - `npx prisma migrate deploy` — paper-execution migration applied successfully
 - `docker compose config --quiet`
@@ -74,7 +75,7 @@ The following passed on 2026-09-11 after M3.2:
 
 ## Repository state
 
-M0 through M3.1 are committed. M3.2 changes are currently in the working tree.
+M0 through M3.2 are committed. M3.3 changes are currently in the working tree.
 
 ## Known issues and cautions
 

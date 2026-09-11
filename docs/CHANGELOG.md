@@ -2,6 +2,23 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M3.3 paper market sell quote completed
+
+### Added
+
+- Internal BTC/USDT market-sell quote at the fresh best bid.
+- Exact gross notional, simulated taker fee, and net USDT proceeds with 18-decimal half-even rounding.
+- Validation for pair status, quantity rules, minimum notional, freshness, and top-level bid liquidity.
+- Focused financial, rounding, and rejection-path tests plus structured sell-quote logging.
+
+### Changed
+
+- Synchronized the mandatory project context with the already committed M3.2 implementation.
+
+### Scope confirmation
+
+- No balance inspection or mutation, sell execution, persistence change, HTTP route, position/PnL model, strategy, Risk Engine, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M3.2 idempotent paper buy execution completed
 
 ### Added

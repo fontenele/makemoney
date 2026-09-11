@@ -21,4 +21,12 @@ One PostgreSQL transaction conditionally debits the full USDT cost (notional plu
 
 Persisted quantities and monetary amounts use `DECIMAL(38,18)`. Quote inputs therefore accept at most 18 fractional digits, and calculated notional, fee, and total cost use half-even rounding to that scale. Successful executions and replays emit structured logs.
 
-There is deliberately no HTTP mutation route. Sells, positions, realized or unrealized PnL, history queries, multi-level slippage, strategies, the Risk Engine, authenticated providers, and real trading remain deferred.
+There is deliberately no HTTP mutation route. Sell execution, positions, realized or unrealized PnL, history queries, multi-level slippage, strategies, the Risk Engine, authenticated providers, and real trading remain deferred.
+
+## M3.3 paper market sell quote
+
+M3.3 calculates an internal, non-executing BTC/USDT market-sell quote at the latest normalized best bid. It returns BTC quantity, price, gross USDT notional, configured taker fee, net USDT proceeds, quote time, and market-data receipt time.
+
+The quote applies the same availability, freshness, `TRADING` status, quantity range, step-size, minimum-notional, and top-level liquidity rules as buy quoting, using bid-side price and quantity. Values accept at most 18 fractional digits and monetary results use half-even rounding to the persistence scale.
+
+The quote does not inspect or mutate the BTC balance. Sell execution, persistence, public routes, positions, PnL, and deeper order-book slippage remain deferred.
