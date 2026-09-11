@@ -12,7 +12,8 @@ NestJS bootstrap, validated configuration, lint/format tooling, tests, Docker Co
 - **M1.2 — complete:** bounded exponential reconnection for unexpected WebSocket closes, with reset after connection and clean shutdown cancellation.
 - **M1.3 — complete:** Binance public BTC/USDT mini ticker, normalized to the latest price and timestamps. No authentication.
 - **M1.4 — complete:** Binance public BTC/USDT one-minute candle updates with normalized OHLC, time boundaries, and close state. No persistence.
-- Later M1 increments: volume, order book, spread, and pair metadata. These require separate approval.
+- **M1.5 — complete:** base, quote, and taker-buy volume plus trade count exposed on normalized one-minute candles.
+- Later M1 increments: order book, spread, and pair metadata. These require separate approval.
 
 ## M2 — Paper Wallet — planned
 

@@ -6,6 +6,11 @@ export interface MarketCandle {
   highPrice: string;
   lowPrice: string;
   closePrice: string;
+  baseVolume: string;
+  quoteVolume: string;
+  takerBuyBaseVolume: string;
+  takerBuyQuoteVolume: string;
+  tradeCount: number;
   openTime: Date;
   closeTime: Date;
   isClosed: boolean;

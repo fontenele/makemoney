@@ -2,6 +2,24 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M1.5 candle volume completed
+
+### Added
+
+- Base and quote volume on normalized one-minute candles.
+- Taker-buy base and quote volume on normalized one-minute candles.
+- Per-candle trade count.
+- Normalization and structured logging coverage for all new fields.
+
+### Changed
+
+- `MarketCandle` now carries the already validated volume fields from the Binance kline payload.
+- Corrected repository-state documentation after M1.4 was committed.
+
+### Scope confirmation
+
+- No connection, dependency, persistence, aggregation, arithmetic, indicator, order book, spread, authentication, or financial behavior was introduced.
+
 ## 2026-09-11 — M1.4 Binance public one-minute candles completed
 
 ### Added

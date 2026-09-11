@@ -1,8 +1,8 @@
-# Binance Public One-Minute Candles (M1.4)
+# Binance Public One-Minute Candles and Volume (M1.4–M1.5)
 
 ## Scope
 
-M1.4 consumes only live BTC/USDT Spot one-minute candle updates. It does not authenticate, retrieve history, persist data, access an account or wallet, or submit orders.
+M1.4 consumes live BTC/USDT Spot one-minute candle updates. M1.5 exposes the volume and trade-count fields already carried by those updates. Neither increment authenticates, retrieves history, persists data, accesses an account or wallet, or submits orders.
 
 Official reference: [Binance Spot WebSocket Market Streams](https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams#klinecandlestick-streams-for-utc)
 
@@ -28,7 +28,7 @@ The boundary validates the documented kline envelope and nested candle fields, i
 - base, quote, and taker-buy volumes;
 - candle close state.
 
-Malformed JSON, unexpected symbols or intervals, unsafe integers and timestamps, invalid decimal strings, and close times before open times are ignored. Volume and trade metadata are validated but not exposed by the M1.4 domain model.
+Malformed JSON, unexpected symbols or intervals, unsafe integers and timestamps, invalid decimal strings, and close times before open times are ignored. Provider trade IDs remain boundary-only metadata.
 
 ## Internal candle
 
@@ -38,10 +38,13 @@ The normalized `MarketCandle` contains:
 - `symbol`: `BTC/USDT`
 - `interval`: `1m`
 - `openPrice`, `highPrice`, `lowPrice`, and `closePrice`: decimal strings
+- `baseVolume` and `quoteVolume`: decimal strings
+- `takerBuyBaseVolume` and `takerBuyQuoteVolume`: decimal strings
+- `tradeCount`: non-negative safe integer
 - `openTime`, `closeTime`, `eventTime`, and `receivedAt`: `Date`
 - `isClosed`: whether Binance reports the candle as final
 
-No native floating-point conversion is performed. An open candle may be emitted repeatedly as its OHLC values change; `isClosed=true` identifies the final provider update for that minute.
+No native floating-point conversion or volume calculation is performed. An open candle may be emitted repeatedly as its OHLC and volume values change; `isClosed=true` identifies the final provider update for that minute.
 
 ## Reconnection
 

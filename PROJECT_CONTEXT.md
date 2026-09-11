@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1.1 — Binance public BTC/USDT trades**, **M1.2 — WebSocket reconnection**, **M1.3 — Binance public BTC/USDT mini ticker**, and **M1.4 — Binance public BTC/USDT 1m candles**.
+- Completed milestones: **M0 — Bootstrap**, **M1.1 — Binance public BTC/USDT trades**, **M1.2 — WebSocket reconnection**, **M1.3 — Binance public BTC/USDT mini ticker**, **M1.4 — Binance public BTC/USDT 1m candles**, and **M1.5 — candle volume**.
 - No next increment is approved. Stop and present a minimal plan before starting more market-data work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -18,7 +18,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 The current market-data scope receives BTC/USDT public trade, mini ticker, and one-minute candle events from Binance WebSocket, requires no authentication, and normalizes those events into internal domain representations.
 
-Historical candles, exposed volume data, order books, spread, persistence, paper trading, strategies, wallet access, authenticated APIs, and order execution remain unimplemented and require separately approved milestones.
+Historical candles, aggregate volume analytics, order books, spread, persistence, paper trading, strategies, wallet access, authenticated APIs, and order execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 
@@ -36,4 +36,4 @@ Historical candles, exposed volume data, order books, spread, persistence, paper
 - `docs/decisions.md`: durable technical decisions and their reasons.
 - `docs/binance-public-trades.md`: M1.1 stream contract and operation.
 - `docs/binance-public-ticker.md`: M1.3 stream contract and operation.
-- `docs/binance-public-candles.md`: M1.4 stream contract and operation.
+- `docs/binance-public-candles.md`: M1.4–M1.5 candle and volume contract and operation.
