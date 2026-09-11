@@ -29,4 +29,12 @@ M3.3 calculates an internal, non-executing BTC/USDT market-sell quote at the lat
 
 The quote applies the same availability, freshness, `TRADING` status, quantity range, step-size, minimum-notional, and top-level liquidity rules as buy quoting, using bid-side price and quantity. Values accept at most 18 fractional digits and monetary results use half-even rounding to the persistence scale.
 
-The quote does not inspect or mutate the BTC balance. Sell execution, persistence, public routes, positions, PnL, and deeper order-book slippage remain deferred.
+The quote itself does not inspect or mutate the BTC balance. M3.4 consumes it when executing an approved internal sell intent.
+
+## M3.4 idempotent paper sell execution
+
+M3.4 extends the shared `TradingExecutor` with a discriminated buy/sell intent and execution result. A sell regenerates its M3.3 quote at execution time, then performs a sufficient-BTC debit, net-USDT credit, and immutable execution insert in one PostgreSQL transaction.
+
+The execution table accepts both sides. Existing buys retain `totalCost`; sells store `netProceeds`. A database constraint requires exactly the settlement field appropriate to the side. Reusing an idempotency key returns the original execution and never mutates balances twice, including concurrent duplicate attempts.
+
+Insufficient BTC and missing balance rows roll back the full transaction. Successful sells and replays emit structured logs. Public order routes, positions, PnL, history queries, strategies, and real trading remain deferred.

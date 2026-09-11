@@ -34,6 +34,12 @@ M3.3 mirrors the established buy-quote boundary without widening the executor. A
 
 The service deliberately does not read the paper wallet or execute a sale. This keeps quote validity dependent only on current public market data and pair rules; sufficient BTC and atomic balance mutation belong to a separately approved sell-execution increment.
 
+## M3.4 side-specific paper execution settlement
+
+The shared executor uses discriminated buy and sell intents. The execution record retains common price, quantity, notional, and fee fields while enforcing exactly one settlement amount: `totalCost` for a buy or `netProceeds` for a sell. This additive migration preserves every existing buy.
+
+Sell execution uses the same transaction and idempotency guarantees as buying. It conditionally debits sufficient BTC, credits net USDT proceeds, and inserts the sell record atomically. A duplicate key rolls its attempted transaction back before replaying the committed result.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

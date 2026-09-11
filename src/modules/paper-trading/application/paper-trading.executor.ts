@@ -4,23 +4,25 @@ import {
   PaperExecutionRepository,
 } from '../domain/paper-execution-repository';
 import {
-  PaperBuyIntent,
   PaperExecution,
+  PaperOrderIntent,
   TradingExecutor,
 } from '../domain/trading-executor';
 import { PaperMarketBuyQuoteService } from './paper-market-buy-quote.service';
+import { PaperMarketSellQuoteService } from './paper-market-sell-quote.service';
 
 @Injectable()
 export class PaperTradingExecutor implements TradingExecutor {
   private readonly logger = new Logger(PaperTradingExecutor.name);
 
   constructor(
-    private readonly quoteService: PaperMarketBuyQuoteService,
+    private readonly buyQuoteService: PaperMarketBuyQuoteService,
+    private readonly sellQuoteService: PaperMarketSellQuoteService,
     @Inject(PAPER_EXECUTION_REPOSITORY)
     private readonly repository: PaperExecutionRepository,
   ) {}
 
-  async execute(intent: PaperBuyIntent): Promise<PaperExecution> {
+  async execute(intent: PaperOrderIntent): Promise<PaperExecution> {
     validateIntent(intent);
     const existing = await this.repository.find(intent.idempotencyKey);
     if (existing) {
@@ -31,19 +33,30 @@ export class PaperTradingExecutor implements TradingExecutor {
       return { ...existing, replayed: true };
     }
 
-    const quote = this.quoteService.quote(intent.quantity);
-    const execution = await this.repository.executeBuy(
-      intent.idempotencyKey,
-      quote,
-    );
-    this.logger.log({ event: 'paper_trade.buy_executed', ...execution });
+    const execution =
+      intent.side === 'buy'
+        ? await this.repository.executeBuy(
+            intent.idempotencyKey,
+            this.buyQuoteService.quote(intent.quantity),
+          )
+        : await this.repository.executeSell(
+            intent.idempotencyKey,
+            this.sellQuoteService.quote(intent.quantity),
+          );
+    this.logger.log({
+      event: `paper_trade.${execution.side}_executed`,
+      ...execution,
+    });
     return execution;
   }
 }
 
-function validateIntent(intent: PaperBuyIntent): void {
+function validateIntent(intent: PaperOrderIntent): void {
   if (!/^[A-Za-z0-9_-]{1,100}$/.test(intent.idempotencyKey))
     throw new TypeError('Invalid paper execution idempotency key');
-  if (intent.symbol !== 'BTC/USDT' || intent.side !== 'buy')
+  if (
+    intent.symbol !== 'BTC/USDT' ||
+    (intent.side !== 'buy' && intent.side !== 'sell')
+  )
     throw new TypeError('Unsupported paper order');
 }

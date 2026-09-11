@@ -33,6 +33,7 @@ export type PaperExecutionAvgAggregateOutputType = {
   feeRate: runtime.Decimal | null
   fee: runtime.Decimal | null
   totalCost: runtime.Decimal | null
+  netProceeds: runtime.Decimal | null
 }
 
 export type PaperExecutionSumAggregateOutputType = {
@@ -42,6 +43,7 @@ export type PaperExecutionSumAggregateOutputType = {
   feeRate: runtime.Decimal | null
   fee: runtime.Decimal | null
   totalCost: runtime.Decimal | null
+  netProceeds: runtime.Decimal | null
 }
 
 export type PaperExecutionMinAggregateOutputType = {
@@ -54,6 +56,7 @@ export type PaperExecutionMinAggregateOutputType = {
   feeRate: runtime.Decimal | null
   fee: runtime.Decimal | null
   totalCost: runtime.Decimal | null
+  netProceeds: runtime.Decimal | null
   quotedAt: Date | null
   marketDataReceivedAt: Date | null
   executedAt: Date | null
@@ -69,6 +72,7 @@ export type PaperExecutionMaxAggregateOutputType = {
   feeRate: runtime.Decimal | null
   fee: runtime.Decimal | null
   totalCost: runtime.Decimal | null
+  netProceeds: runtime.Decimal | null
   quotedAt: Date | null
   marketDataReceivedAt: Date | null
   executedAt: Date | null
@@ -84,6 +88,7 @@ export type PaperExecutionCountAggregateOutputType = {
   feeRate: number
   fee: number
   totalCost: number
+  netProceeds: number
   quotedAt: number
   marketDataReceivedAt: number
   executedAt: number
@@ -98,6 +103,7 @@ export type PaperExecutionAvgAggregateInputType = {
   feeRate?: true
   fee?: true
   totalCost?: true
+  netProceeds?: true
 }
 
 export type PaperExecutionSumAggregateInputType = {
@@ -107,6 +113,7 @@ export type PaperExecutionSumAggregateInputType = {
   feeRate?: true
   fee?: true
   totalCost?: true
+  netProceeds?: true
 }
 
 export type PaperExecutionMinAggregateInputType = {
@@ -119,6 +126,7 @@ export type PaperExecutionMinAggregateInputType = {
   feeRate?: true
   fee?: true
   totalCost?: true
+  netProceeds?: true
   quotedAt?: true
   marketDataReceivedAt?: true
   executedAt?: true
@@ -134,6 +142,7 @@ export type PaperExecutionMaxAggregateInputType = {
   feeRate?: true
   fee?: true
   totalCost?: true
+  netProceeds?: true
   quotedAt?: true
   marketDataReceivedAt?: true
   executedAt?: true
@@ -149,6 +158,7 @@ export type PaperExecutionCountAggregateInputType = {
   feeRate?: true
   fee?: true
   totalCost?: true
+  netProceeds?: true
   quotedAt?: true
   marketDataReceivedAt?: true
   executedAt?: true
@@ -250,7 +260,8 @@ export type PaperExecutionGroupByOutputType = {
   notional: runtime.Decimal
   feeRate: runtime.Decimal
   fee: runtime.Decimal
-  totalCost: runtime.Decimal
+  totalCost: runtime.Decimal | null
+  netProceeds: runtime.Decimal | null
   quotedAt: Date
   marketDataReceivedAt: Date
   executedAt: Date
@@ -288,7 +299,8 @@ export type PaperExecutionWhereInput = {
   notional?: Prisma.DecimalFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   feeRate?: Prisma.DecimalFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   fee?: Prisma.DecimalFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalCost?: Prisma.DecimalFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalCost?: Prisma.DecimalNullableFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  netProceeds?: Prisma.DecimalNullableFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quotedAt?: Prisma.DateTimeFilter<"PaperExecution"> | Date | string
   marketDataReceivedAt?: Prisma.DateTimeFilter<"PaperExecution"> | Date | string
   executedAt?: Prisma.DateTimeFilter<"PaperExecution"> | Date | string
@@ -303,7 +315,8 @@ export type PaperExecutionOrderByWithRelationInput = {
   notional?: Prisma.SortOrder
   feeRate?: Prisma.SortOrder
   fee?: Prisma.SortOrder
-  totalCost?: Prisma.SortOrder
+  totalCost?: Prisma.SortOrderInput | Prisma.SortOrder
+  netProceeds?: Prisma.SortOrderInput | Prisma.SortOrder
   quotedAt?: Prisma.SortOrder
   marketDataReceivedAt?: Prisma.SortOrder
   executedAt?: Prisma.SortOrder
@@ -321,7 +334,8 @@ export type PaperExecutionWhereUniqueInput = Prisma.AtLeast<{
   notional?: Prisma.DecimalFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   feeRate?: Prisma.DecimalFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   fee?: Prisma.DecimalFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalCost?: Prisma.DecimalFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalCost?: Prisma.DecimalNullableFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  netProceeds?: Prisma.DecimalNullableFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quotedAt?: Prisma.DateTimeFilter<"PaperExecution"> | Date | string
   marketDataReceivedAt?: Prisma.DateTimeFilter<"PaperExecution"> | Date | string
   executedAt?: Prisma.DateTimeFilter<"PaperExecution"> | Date | string
@@ -336,7 +350,8 @@ export type PaperExecutionOrderByWithAggregationInput = {
   notional?: Prisma.SortOrder
   feeRate?: Prisma.SortOrder
   fee?: Prisma.SortOrder
-  totalCost?: Prisma.SortOrder
+  totalCost?: Prisma.SortOrderInput | Prisma.SortOrder
+  netProceeds?: Prisma.SortOrderInput | Prisma.SortOrder
   quotedAt?: Prisma.SortOrder
   marketDataReceivedAt?: Prisma.SortOrder
   executedAt?: Prisma.SortOrder
@@ -359,7 +374,8 @@ export type PaperExecutionScalarWhereWithAggregatesInput = {
   notional?: Prisma.DecimalWithAggregatesFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   feeRate?: Prisma.DecimalWithAggregatesFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   fee?: Prisma.DecimalWithAggregatesFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalCost?: Prisma.DecimalWithAggregatesFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalCost?: Prisma.DecimalNullableWithAggregatesFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  netProceeds?: Prisma.DecimalNullableWithAggregatesFilter<"PaperExecution"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quotedAt?: Prisma.DateTimeWithAggregatesFilter<"PaperExecution"> | Date | string
   marketDataReceivedAt?: Prisma.DateTimeWithAggregatesFilter<"PaperExecution"> | Date | string
   executedAt?: Prisma.DateTimeWithAggregatesFilter<"PaperExecution"> | Date | string
@@ -374,7 +390,8 @@ export type PaperExecutionCreateInput = {
   notional: runtime.Decimal | runtime.DecimalJsLike | number | string
   feeRate: runtime.Decimal | runtime.DecimalJsLike | number | string
   fee: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  netProceeds?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quotedAt: Date | string
   marketDataReceivedAt: Date | string
   executedAt?: Date | string
@@ -389,7 +406,8 @@ export type PaperExecutionUncheckedCreateInput = {
   notional: runtime.Decimal | runtime.DecimalJsLike | number | string
   feeRate: runtime.Decimal | runtime.DecimalJsLike | number | string
   fee: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  netProceeds?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quotedAt: Date | string
   marketDataReceivedAt: Date | string
   executedAt?: Date | string
@@ -404,7 +422,8 @@ export type PaperExecutionUpdateInput = {
   notional?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   feeRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  netProceeds?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quotedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   marketDataReceivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -419,7 +438,8 @@ export type PaperExecutionUncheckedUpdateInput = {
   notional?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   feeRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  netProceeds?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quotedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   marketDataReceivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -434,7 +454,8 @@ export type PaperExecutionCreateManyInput = {
   notional: runtime.Decimal | runtime.DecimalJsLike | number | string
   feeRate: runtime.Decimal | runtime.DecimalJsLike | number | string
   fee: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  netProceeds?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quotedAt: Date | string
   marketDataReceivedAt: Date | string
   executedAt?: Date | string
@@ -449,7 +470,8 @@ export type PaperExecutionUpdateManyMutationInput = {
   notional?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   feeRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  netProceeds?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quotedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   marketDataReceivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -464,7 +486,8 @@ export type PaperExecutionUncheckedUpdateManyInput = {
   notional?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   feeRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  netProceeds?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quotedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   marketDataReceivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -480,6 +503,7 @@ export type PaperExecutionCountOrderByAggregateInput = {
   feeRate?: Prisma.SortOrder
   fee?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
+  netProceeds?: Prisma.SortOrder
   quotedAt?: Prisma.SortOrder
   marketDataReceivedAt?: Prisma.SortOrder
   executedAt?: Prisma.SortOrder
@@ -492,6 +516,7 @@ export type PaperExecutionAvgOrderByAggregateInput = {
   feeRate?: Prisma.SortOrder
   fee?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
+  netProceeds?: Prisma.SortOrder
 }
 
 export type PaperExecutionMaxOrderByAggregateInput = {
@@ -504,6 +529,7 @@ export type PaperExecutionMaxOrderByAggregateInput = {
   feeRate?: Prisma.SortOrder
   fee?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
+  netProceeds?: Prisma.SortOrder
   quotedAt?: Prisma.SortOrder
   marketDataReceivedAt?: Prisma.SortOrder
   executedAt?: Prisma.SortOrder
@@ -519,6 +545,7 @@ export type PaperExecutionMinOrderByAggregateInput = {
   feeRate?: Prisma.SortOrder
   fee?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
+  netProceeds?: Prisma.SortOrder
   quotedAt?: Prisma.SortOrder
   marketDataReceivedAt?: Prisma.SortOrder
   executedAt?: Prisma.SortOrder
@@ -531,6 +558,15 @@ export type PaperExecutionSumOrderByAggregateInput = {
   feeRate?: Prisma.SortOrder
   fee?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
+  netProceeds?: Prisma.SortOrder
+}
+
+export type NullableDecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 
@@ -545,6 +581,7 @@ export type PaperExecutionSelect<ExtArgs extends runtime.Types.Extensions.Intern
   feeRate?: boolean
   fee?: boolean
   totalCost?: boolean
+  netProceeds?: boolean
   quotedAt?: boolean
   marketDataReceivedAt?: boolean
   executedAt?: boolean
@@ -560,6 +597,7 @@ export type PaperExecutionSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   feeRate?: boolean
   fee?: boolean
   totalCost?: boolean
+  netProceeds?: boolean
   quotedAt?: boolean
   marketDataReceivedAt?: boolean
   executedAt?: boolean
@@ -575,6 +613,7 @@ export type PaperExecutionSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   feeRate?: boolean
   fee?: boolean
   totalCost?: boolean
+  netProceeds?: boolean
   quotedAt?: boolean
   marketDataReceivedAt?: boolean
   executedAt?: boolean
@@ -590,12 +629,13 @@ export type PaperExecutionSelectScalar = {
   feeRate?: boolean
   fee?: boolean
   totalCost?: boolean
+  netProceeds?: boolean
   quotedAt?: boolean
   marketDataReceivedAt?: boolean
   executedAt?: boolean
 }
 
-export type PaperExecutionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "symbol" | "side" | "quantity" | "price" | "notional" | "feeRate" | "fee" | "totalCost" | "quotedAt" | "marketDataReceivedAt" | "executedAt", ExtArgs["result"]["paperExecution"]>
+export type PaperExecutionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "symbol" | "side" | "quantity" | "price" | "notional" | "feeRate" | "fee" | "totalCost" | "netProceeds" | "quotedAt" | "marketDataReceivedAt" | "executedAt", ExtArgs["result"]["paperExecution"]>
 
 export type $PaperExecutionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PaperExecution"
@@ -609,7 +649,8 @@ export type $PaperExecutionPayload<ExtArgs extends runtime.Types.Extensions.Inte
     notional: runtime.Decimal
     feeRate: runtime.Decimal
     fee: runtime.Decimal
-    totalCost: runtime.Decimal
+    totalCost: runtime.Decimal | null
+    netProceeds: runtime.Decimal | null
     quotedAt: Date
     marketDataReceivedAt: Date
     executedAt: Date
@@ -1045,6 +1086,7 @@ export interface PaperExecutionFieldRefs {
   readonly feeRate: Prisma.FieldRef<"PaperExecution", 'Decimal'>
   readonly fee: Prisma.FieldRef<"PaperExecution", 'Decimal'>
   readonly totalCost: Prisma.FieldRef<"PaperExecution", 'Decimal'>
+  readonly netProceeds: Prisma.FieldRef<"PaperExecution", 'Decimal'>
   readonly quotedAt: Prisma.FieldRef<"PaperExecution", 'DateTime'>
   readonly marketDataReceivedAt: Prisma.FieldRef<"PaperExecution", 'DateTime'>
   readonly executedAt: Prisma.FieldRef<"PaperExecution", 'DateTime'>

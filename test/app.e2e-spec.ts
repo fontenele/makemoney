@@ -136,6 +136,8 @@ describe('Application (e2e)', () => {
     const afterReplay = await wallet.getBalances();
 
     try {
+      if (first.side !== 'buy' || replay.side !== 'buy')
+        throw new Error('Expected buy executions');
       expect(first.replayed).toBe(false);
       expect(replay).toEqual({ ...first, replayed: true });
       expect(afterReplay).toEqual(afterFirst);
@@ -148,7 +150,7 @@ describe('Application (e2e)', () => {
     } finally {
       await prisma.paperExecution.delete({ where: { id: idempotencyKey } });
       await wallet.debit('BTC', first.quantity);
-      await wallet.credit('USDT', first.totalCost);
+      if (first.side === 'buy') await wallet.credit('USDT', first.totalCost);
     }
   });
 
@@ -168,6 +170,73 @@ describe('Application (e2e)', () => {
         quantity: '0.02',
       }),
     ).rejects.toThrow('Insufficient USDT paper balance');
+
+    await expect(wallet.getBalances()).resolves.toEqual(before);
+    await expect(
+      prisma.paperExecution.findUnique({ where: { id: idempotencyKey } }),
+    ).resolves.toBeNull();
+  });
+
+  it('executes and replays an idempotent paper sell atomically', async () => {
+    preparePaperMarket(app);
+    const executor = app.get(PaperTradingExecutor);
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const idempotencyKey = `e2e-sell-${Date.now()}`;
+    await wallet.credit('BTC', '0.0002');
+    const before = await wallet.getBalances();
+
+    const first = await executor.execute({
+      idempotencyKey,
+      symbol: 'BTC/USDT',
+      side: 'sell',
+      quantity: '0.0002',
+    });
+    const afterFirst = await wallet.getBalances();
+    const replay = await executor.execute({
+      idempotencyKey,
+      symbol: 'BTC/USDT',
+      side: 'sell',
+      quantity: '0.0002',
+    });
+    const afterReplay = await wallet.getBalances();
+
+    try {
+      if (first.side !== 'sell' || replay.side !== 'sell')
+        throw new Error('Expected sell executions');
+      expect(first.replayed).toBe(false);
+      expect(replay).toEqual({ ...first, replayed: true });
+      expect(afterReplay).toEqual(afterFirst);
+      expect(afterFirst.BTC).toBe(
+        new Decimal(before.BTC).minus(first.quantity).toFixed(),
+      );
+      expect(afterFirst.USDT).toBe(
+        new Decimal(before.USDT).plus(first.netProceeds).toFixed(),
+      );
+    } finally {
+      await prisma.paperExecution.delete({ where: { id: idempotencyKey } });
+      await wallet.credit('BTC', first.quantity);
+      if (first.side === 'sell') await wallet.debit('USDT', first.netProceeds);
+      await wallet.debit('BTC', '0.0002');
+    }
+  });
+
+  it('rolls back a paper sell when BTC is insufficient', async () => {
+    preparePaperMarket(app);
+    const executor = app.get(PaperTradingExecutor);
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const idempotencyKey = `e2e-sell-rejected-${Date.now()}`;
+    const before = await wallet.getBalances();
+
+    await expect(
+      executor.execute({
+        idempotencyKey,
+        symbol: 'BTC/USDT',
+        side: 'sell',
+        quantity: '0.0002',
+      }),
+    ).rejects.toThrow('Insufficient BTC paper balance');
 
     await expect(wallet.getBalances()).resolves.toEqual(before);
     await expect(

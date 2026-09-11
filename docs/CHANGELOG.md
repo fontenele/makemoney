@@ -2,6 +2,24 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M3.4 idempotent paper sell execution completed
+
+### Added
+
+- Sell intents and results in the shared trading-executor contract.
+- Additive migration allowing side-specific buy `totalCost` or sell `netProceeds` settlement.
+- Atomic sufficient-BTC debit, net-USDT credit, and sell-execution persistence.
+- Unit and database-backed E2E coverage for sell execution, replay, balance changes, insufficient BTC, and rollback.
+- Structured successful-sell execution logging.
+
+### Changed
+
+- The existing execution repository and mapper now support discriminated buy and sell records while preserving prior buys.
+
+### Scope confirmation
+
+- No HTTP order route, position/PnL model, history query, deeper slippage, strategy, Risk Engine, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M3.3 paper market sell quote completed
 
 ### Added
