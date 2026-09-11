@@ -23,6 +23,13 @@ export class PrismaPaperExecutionRepository implements PaperExecutionRepository 
     return rows.map((row) => mapExecution(row, false));
   }
 
+  async listAllChronological(): Promise<PaperExecution[]> {
+    const rows = await this.prisma.paperExecution.findMany({
+      orderBy: [{ executedAt: 'asc' }, { id: 'asc' }],
+    });
+    return rows.map((row) => mapExecution(row, false));
+  }
+
   async executeBuy(
     id: string,
     quote: PaperMarketBuyQuote,

@@ -324,6 +324,14 @@ describe('Application (e2e)', () => {
             totalCost: '50.05',
           },
         ]);
+      await request(server).get('/paper-trading/position').expect(200).expect({
+        symbol: 'BTC/USDT',
+        quantity: '0',
+        costBasis: '0',
+        averageEntryPrice: null,
+        realizedPnl: '0.899',
+        totalFees: '0.101',
+      });
     } finally {
       await prisma.paperExecution.deleteMany({
         where: { id: { in: [buyId, sellId] } },

@@ -139,6 +139,8 @@ function repo(): MockRepo {
   return {
     find: jest.fn<PaperExecutionRepository['find']>(),
     listRecent: jest.fn<PaperExecutionRepository['listRecent']>(),
+    listAllChronological:
+      jest.fn<PaperExecutionRepository['listAllChronological']>(),
     executeBuy: jest.fn<PaperExecutionRepository['executeBuy']>(),
     executeSell: jest.fn<PaperExecutionRepository['executeSell']>(),
   };

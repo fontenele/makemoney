@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0 through M3.5 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, and read-only execution history. No dashboard, order mutation endpoint, position/PnL model, strategy, authenticated integration, or real order execution exists.
+M0 through M3.6 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, and realized position accounting. No dashboard, order mutation endpoint, unrealized PnL, strategy, authenticated integration, or real order execution exists.
 
 ## Implemented application
 
@@ -49,6 +49,8 @@ M0 through M3.5 are complete in the working tree. M1 provides unauthenticated pu
 - Persisted executions use side-specific settlement fields: `totalCost` for buys and `netProceeds` for sells.
 - Bounded `GET /paper-trading/executions` returns the newest 50 executions by default and accepts a `limit` from 1 through 100.
 - Execution history exposes quote, market-data receipt, and execution timestamps in UTC, with financial values preserved as decimal strings.
+- `GET /paper-trading/position` derives tracked BTC quantity, fee-inclusive cost basis, weighted-average entry price, realized PnL, and accumulated fees from all executions.
+- Position accounting rejects an execution history that sells more BTC than prior tracked buys.
 
 ## Local endpoints and ports
 
@@ -57,6 +59,7 @@ M0 through M3.5 are complete in the working tree. M1 provides unauthenticated pu
 - Paper balances: `http://localhost:3000/paper-wallet/balances`
 - Paper valuation: `http://localhost:3000/paper-wallet/valuation`
 - Paper execution history: `http://localhost:3000/paper-trading/executions`
+- Paper position: `http://localhost:3000/paper-trading/position`
 - PostgreSQL host port: `5433` mapped to container port `5432`
 - Redis host port: `6379`
 
@@ -64,11 +67,11 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M3.5:
+The following passed on 2026-09-11 after M3.6:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 124 tests passed across 22 suites
+- `npm test -- --runInBand` — 130 tests passed across 23 suites
 - `npm run test:e2e -- --runInBand` — 12 tests passed, including bounded buy/sell history and invalid-limit rejection
 - `npx prisma migrate deploy` — paper-sell execution migration applied successfully
 - `docker compose config --quiet`
@@ -81,7 +84,7 @@ The following passed on 2026-09-11 after M3.5:
 
 ## Repository state
 
-M0 through M3.4 are committed. M3.5 changes are currently in the working tree.
+M0 through M3.5 are committed. M3.6 changes are currently in the working tree.
 
 ## Known issues and cautions
 

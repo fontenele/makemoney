@@ -46,6 +46,12 @@ The first execution-history API is intentionally bounded rather than cursor-pagi
 
 The read model exposes all three audit timestamps and side-specific settlement values. It never exposes a write operation; internal execution remains unavailable over HTTP.
 
+## M3.6 derived weighted-average paper position
+
+Position state is derived on demand from immutable executions instead of adding another mutable table. The personal/local workload is currently small enough to favor replayable correctness; incremental persistence can be introduced later with concrete scale evidence.
+
+Buy fees are part of acquisition cost. A sell allocates the current weighted-average cost to its quantity, and realized PnL is net proceeds after sell fee minus that allocated cost. Wallet BTC without a corresponding buy execution has no defensible cost basis, so inconsistent sell history is rejected rather than assigned an invented value.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

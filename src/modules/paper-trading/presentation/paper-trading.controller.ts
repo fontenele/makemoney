@@ -5,10 +5,15 @@ import {
   PaperExecutionHistoryService,
 } from '../application/paper-execution-history.service';
 import { PaperExecution } from '../domain/trading-executor';
+import { PaperPositionService } from '../application/paper-position.service';
+import { PaperPosition } from '../domain/paper-position';
 
 @Controller('paper-trading')
 export class PaperTradingController {
-  constructor(private readonly history: PaperExecutionHistoryService) {}
+  constructor(
+    private readonly history: PaperExecutionHistoryService,
+    private readonly position: PaperPositionService,
+  ) {}
 
   @Get('executions')
   listExecutions(@Query('limit') limit?: string): Promise<PaperExecution[]> {
@@ -24,5 +29,10 @@ export class PaperTradingController {
       throw new BadRequestException('limit must be an integer from 1 to 100');
     }
     return this.history.listRecent(parsedLimit);
+  }
+
+  @Get('position')
+  getPosition(): Promise<PaperPosition> {
+    return this.position.getPosition();
   }
 }

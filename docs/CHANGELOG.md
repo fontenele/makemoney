@@ -2,6 +2,20 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M3.6 position and realized PnL completed
+
+### Added
+
+- Deterministic BTC position calculator over chronological paper executions.
+- Fee-inclusive weighted-average cost basis, average entry price, accumulated fees, and realized PnL.
+- Explicit rejection of sells exceeding execution-tracked BTC quantity.
+- Read-only `GET /paper-trading/position` endpoint.
+- Financial unit coverage for empty and multiple-buy positions, partial profitable sales, full losing closes, fees, and inconsistent history; E2E coverage verifies the HTTP read model.
+
+### Scope confirmation
+
+- No wallet or execution mutation, unrealized PnL, market valuation, ROI, win rate, strategy, Risk Engine, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M3.5 read-only execution history completed
 
 ### Added

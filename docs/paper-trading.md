@@ -46,3 +46,13 @@ Insufficient BTC and missing balance rows roll back the full transaction. Succes
 Buy records contain `totalCost`; sell records contain `netProceeds`. Financial values remain canonical decimal strings, and quote, market-data receipt, and execution timestamps serialize as ISO UTC values. The history result sets `replayed` to `false` because replay is a property of an execution call, not of the persisted event.
 
 This increment does not expose execution, mutation, deletion, cursor pagination, positions, or PnL.
+
+## M3.6 position and realized PnL
+
+`GET /paper-trading/position` folds the complete execution history in chronological order into a BTC position. Buys add their fee-inclusive `totalCost` to cost basis. Sells allocate weighted-average cost proportionally and add `netProceeds - allocatedCost` to realized PnL.
+
+The response contains tracked BTC `quantity`, remaining `costBasis`, `averageEntryPrice`, cumulative `realizedPnl`, and `totalFees`. All calculations use `decimal.js`, 40-digit working precision, 18-decimal half-even rounding, and canonical decimal strings. A fully closed position has zero cost basis and a null average entry price.
+
+The read model rejects histories where a sell exceeds prior execution-tracked purchases. Wallet BTC created outside paper executions is intentionally not assigned an invented acquisition cost. This implementation reads all executions on demand; persistence and incremental aggregation are deferred until scale requires them.
+
+Unrealized PnL, current market value, ROI, win rate, order mutation routes, and strategies remain deferred.
