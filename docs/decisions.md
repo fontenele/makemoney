@@ -26,4 +26,10 @@ M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@
 
 The provider payload is validated and translated at the infrastructure boundary. Price and quantity remain decimal strings to avoid premature floating-point arithmetic. Binance's buyer-maker flag maps to the internal taker side: buyer maker means `sell`; otherwise `buy`.
 
-The `ws` package is the explicit WebSocket transport. Automatic reconnection is deliberately deferred beyond M1.1.
+The `ws` package is the explicit WebSocket transport.
+
+## M1.2 bounded WebSocket reconnection
+
+Unexpected trade-stream closes use exponential backoff starting at one second and capped at 30 seconds. A successful connection resets the retry count. This handles ordinary network interruption and Binance's documented connection lifetime without creating rapid retry loops.
+
+The client owns at most one socket and one reconnect timer. Shutdown marks the client as stopping before closing resources, so close/error events cannot create a new connection. Jitter, application-level heartbeat detection, and circuit breakers are deferred until operational evidence requires them.

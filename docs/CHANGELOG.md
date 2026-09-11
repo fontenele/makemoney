@@ -2,6 +2,25 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M1.2 WebSocket reconnection completed
+
+### Added
+
+- Automatic reconnection after unexpected Binance trade-stream closes.
+- Exponential retry delay starting at one second and capped at 30 seconds.
+- Structured `market.trade.reconnect_scheduled` logs with attempt and delay.
+- Tests for increasing delays, reset after connection, timer cancellation, and shutdown behavior.
+
+### Changed
+
+- Successful WebSocket connections reset the retry sequence.
+- Intentional application shutdown cancels pending retries and never opens a replacement socket.
+- Corrected stale repository-state documentation after M0 and M1.1 were committed.
+
+### Scope confirmation
+
+- No new dependency, market-data type, persistence, authentication, or financial behavior was introduced.
+
 ## 2026-09-11 — M1.1 Binance public trades completed
 
 ### Added

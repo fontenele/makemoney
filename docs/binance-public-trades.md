@@ -1,4 +1,4 @@
-# Binance Public Trades (M1.1)
+# Binance Public Trades (M1.1–M1.2)
 
 ## Scope
 
@@ -14,7 +14,15 @@ Official reference: [Binance Spot WebSocket Market Streams](https://developers.b
 - Configuration: `BINANCE_WS_BASE_URL`
 - Update speed: real time
 
-The client starts with the NestJS market-data module and closes with the module lifecycle. Automatic reconnection is not part of M1.1.
+The client starts with the NestJS market-data module and closes with the module lifecycle.
+
+## Reconnection
+
+Unexpected closes schedule one replacement connection. The delay starts at one second, doubles after each failed connection, and is capped at 30 seconds. A successful `open` event resets the sequence to one second.
+
+Only one active socket or pending reconnect timer is allowed. Intentional shutdown cancels the timer, closes an active or connecting socket, and prevents replacement connections. Scheduled retries use the structured event `market.trade.reconnect_scheduled` with `attempt` and `delayMs` fields.
+
+The client relies on the `ws` library for protocol-level ping/pong handling. Application-level liveness detection and circuit breakers are not part of M1.2.
 
 ## Provider payload
 

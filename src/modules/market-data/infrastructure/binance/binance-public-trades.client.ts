@@ -18,10 +18,15 @@ type WebSocketFactory = (url: string) => WebSocket;
 type Clock = () => Date;
 
 const DECIMAL_PATTERN = /^(0|[1-9]\d*)(\.\d+)?$/;
+const INITIAL_RECONNECT_DELAY_MS = 1_000;
+const MAX_RECONNECT_DELAY_MS = 30_000;
 
 export class BinancePublicTradesClient implements TradeStream {
   private readonly logger = new Logger(BinancePublicTradesClient.name);
   private socket?: WebSocket;
+  private reconnectTimer?: ReturnType<typeof setTimeout>;
+  private reconnectAttempt = 0;
+  private onTrade?: (trade: MarketTrade) => void;
   private stopping = false;
 
   constructor(
@@ -32,39 +37,26 @@ export class BinancePublicTradesClient implements TradeStream {
   ) {}
 
   start(onTrade: (trade: MarketTrade) => void): void {
-    if (this.socket) {
+    this.onTrade = onTrade;
+
+    if (this.socket || this.reconnectTimer) {
       return;
     }
 
     this.stopping = false;
-    const socket = this.createWebSocket(this.buildStreamUrl());
-    this.socket = socket;
-
-    socket.on('open', () => {
-      this.logger.log('Connected to Binance BTC/USDT public trade stream');
-    });
-    socket.on('message', (data: RawData) => {
-      const trade = this.normalize(rawDataToString(data));
-
-      if (trade) {
-        onTrade(trade);
-      }
-    });
-    socket.on('error', (error: Error) => {
-      if (!this.stopping) {
-        this.logger.error('Binance public trade stream error', error.stack);
-      }
-    });
-    socket.on('close', () => {
-      if (this.socket === socket) {
-        this.socket = undefined;
-      }
-      this.logger.warn('Binance public trade stream disconnected');
-    });
+    this.connect();
   }
 
   stop(): void {
     this.stopping = true;
+    this.onTrade = undefined;
+    this.reconnectAttempt = 0;
+
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = undefined;
+    }
+
     const socket = this.socket;
     this.socket = undefined;
 
@@ -101,6 +93,65 @@ export class BinancePublicTradesClient implements TradeStream {
       tradeTime: new Date(payload.T),
       receivedAt: this.clock(),
     };
+  }
+
+  private connect(): void {
+    if (this.stopping || this.socket) {
+      return;
+    }
+
+    const socket = this.createWebSocket(this.buildStreamUrl());
+    this.socket = socket;
+
+    socket.on('open', () => {
+      this.reconnectAttempt = 0;
+      this.logger.log('Connected to Binance BTC/USDT public trade stream');
+    });
+    socket.on('message', (data: RawData) => {
+      const trade = this.normalize(rawDataToString(data));
+
+      if (trade) {
+        this.onTrade?.(trade);
+      }
+    });
+    socket.on('error', (error: Error) => {
+      if (!this.stopping) {
+        this.logger.error('Binance public trade stream error', error.stack);
+      }
+    });
+    socket.on('close', () => {
+      if (this.socket !== socket) {
+        return;
+      }
+
+      this.socket = undefined;
+      this.logger.warn('Binance public trade stream disconnected');
+      this.scheduleReconnect();
+    });
+  }
+
+  private scheduleReconnect(): void {
+    if (this.stopping || this.reconnectTimer) {
+      return;
+    }
+
+    const exponent = Math.min(this.reconnectAttempt, 30);
+    const delayMs = Math.min(
+      INITIAL_RECONNECT_DELAY_MS * 2 ** exponent,
+      MAX_RECONNECT_DELAY_MS,
+    );
+    this.reconnectAttempt += 1;
+
+    this.logger.warn({
+      event: 'market.trade.reconnect_scheduled',
+      attempt: this.reconnectAttempt,
+      delayMs,
+    });
+
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = undefined;
+      this.connect();
+    }, delayMs);
   }
 
   private buildStreamUrl(): string {

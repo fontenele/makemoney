@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap** and **M1.1 — Binance public BTC/USDT trades**.
+- Completed milestones: **M0 — Bootstrap**, **M1.1 — Binance public BTC/USDT trades**, and **M1.2 — WebSocket reconnection**.
 - No next increment is approved. Stop and present a minimal plan before starting more market-data work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -18,7 +18,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 M1.1 receives BTC/USDT public trade events from Binance WebSocket, requires no authentication, and normalizes those events into the internal domain representation.
 
-Ticker streams, candles, order books, persistence, advanced reconnection, paper trading, strategies, wallet access, authenticated APIs, and order execution remain unimplemented and require separately approved milestones.
+Ticker streams, candles, order books, persistence, paper trading, strategies, wallet access, authenticated APIs, and order execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 
