@@ -1,7 +1,11 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import Decimal from 'decimal.js';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { PrismaService } from '../src/infrastructure/database/prisma.service';
+import { LatestPairMetadataService } from '../src/modules/market-data/application/latest-pair-metadata.service';
+import { LatestTopOfBookService } from '../src/modules/market-data/application/latest-top-of-book.service';
 import { LatestMarketPriceService } from '../src/modules/market-data/application/latest-market-price.service';
 import {
   PAIR_METADATA_PROVIDER,
@@ -12,6 +16,7 @@ import {
   TickerStream,
 } from '../src/modules/market-data/domain/ticker-stream';
 import { PaperWalletService } from '../src/modules/paper-wallet/application/paper-wallet.service';
+import { PaperTradingExecutor } from '../src/modules/paper-trading/application/paper-trading.executor';
 
 describe('Application (e2e)', () => {
   let app: INestApplication;
@@ -106,4 +111,95 @@ describe('Application (e2e)', () => {
     await expect(wallet.getBalance('BTC')).resolves.toBe('0.00000001');
     await expect(wallet.debit('BTC', '0.00000001')).resolves.toBe('0');
   });
+
+  it('executes and replays an idempotent paper buy atomically', async () => {
+    preparePaperMarket(app);
+    const executor = app.get(PaperTradingExecutor);
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const idempotencyKey = `e2e-buy-${Date.now()}`;
+    const before = await wallet.getBalances();
+
+    const first = await executor.execute({
+      idempotencyKey,
+      symbol: 'BTC/USDT',
+      side: 'buy',
+      quantity: '0.0001',
+    });
+    const afterFirst = await wallet.getBalances();
+    const replay = await executor.execute({
+      idempotencyKey,
+      symbol: 'BTC/USDT',
+      side: 'buy',
+      quantity: '0.0001',
+    });
+    const afterReplay = await wallet.getBalances();
+
+    try {
+      expect(first.replayed).toBe(false);
+      expect(replay).toEqual({ ...first, replayed: true });
+      expect(afterReplay).toEqual(afterFirst);
+      expect(afterFirst.BTC).toBe(
+        new Decimal(before.BTC).plus(first.quantity).toFixed(),
+      );
+      expect(afterFirst.USDT).toBe(
+        new Decimal(before.USDT).minus(first.totalCost).toFixed(),
+      );
+    } finally {
+      await prisma.paperExecution.delete({ where: { id: idempotencyKey } });
+      await wallet.debit('BTC', first.quantity);
+      await wallet.credit('USDT', first.totalCost);
+    }
+  });
+
+  it('rolls back a paper buy when USDT is insufficient', async () => {
+    preparePaperMarket(app);
+    const executor = app.get(PaperTradingExecutor);
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const idempotencyKey = `e2e-rejected-${Date.now()}`;
+    const before = await wallet.getBalances();
+
+    await expect(
+      executor.execute({
+        idempotencyKey,
+        symbol: 'BTC/USDT',
+        side: 'buy',
+        quantity: '0.02',
+      }),
+    ).rejects.toThrow('Insufficient USDT paper balance');
+
+    await expect(wallet.getBalances()).resolves.toEqual(before);
+    await expect(
+      prisma.paperExecution.findUnique({ where: { id: idempotencyKey } }),
+    ).resolves.toBeNull();
+  });
 });
+
+function preparePaperMarket(app: INestApplication): void {
+  app.get(LatestTopOfBookService).update({
+    provider: 'binance',
+    symbol: 'BTC/USDT',
+    updateId: '1',
+    bidPrice: '49999.99',
+    bidQuantity: '1',
+    askPrice: '50000',
+    askQuantity: '1',
+    receivedAt: new Date(),
+  });
+  app.get(LatestPairMetadataService).update({
+    provider: 'binance',
+    symbol: 'BTC/USDT',
+    status: 'TRADING',
+    baseAsset: 'BTC',
+    quoteAsset: 'USDT',
+    minPrice: '0.01',
+    maxPrice: '1000000',
+    tickSize: '0.01',
+    minQuantity: '0.00001',
+    maxQuantity: '9000',
+    stepSize: '0.00001',
+    minNotional: '5',
+    receivedAt: new Date(),
+  });
+}

@@ -9,4 +9,5 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/PaperBalance'
+export type * from './models/PaperExecution'
 export type * from './commonInputTypes'

@@ -14,3 +14,20 @@ model PaperBalance {
 
   @@map("paper_balances")
 }
+
+model PaperExecution {
+  id                   String   @id @db.VarChar(100)
+  symbol               String   @db.VarChar(20)
+  side                 String   @db.VarChar(10)
+  quantity             Decimal  @db.Decimal(38, 18)
+  price                Decimal  @db.Decimal(38, 18)
+  notional             Decimal  @db.Decimal(38, 18)
+  feeRate              Decimal  @map("fee_rate") @db.Decimal(38, 18)
+  fee                  Decimal  @db.Decimal(38, 18)
+  totalCost            Decimal  @map("total_cost") @db.Decimal(38, 18)
+  quotedAt             DateTime @map("quoted_at")
+  marketDataReceivedAt DateTime @map("market_data_received_at")
+  executedAt           DateTime @default(now()) @map("executed_at")
+
+  @@map("paper_executions")
+}

@@ -44,3 +44,8 @@ export { Prisma }
  * 
  */
 export type PaperBalance = Prisma.PaperBalanceModel
+/**
+ * Model PaperExecution
+ * 
+ */
+export type PaperExecution = Prisma.PaperExecutionModel

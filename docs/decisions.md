@@ -20,6 +20,14 @@ NestJS 12 packages use ESM. Jest runs through Node with `--experimental-vm-modul
 
 External market providers must be encapsulated. Domain objects must not expose provider payload shapes. Strategies will produce signals, the Risk Engine will assess them, and only an executor may eventually submit an order. No executor exists in M0 or M1.1.
 
+## M3.2 atomic and idempotent paper execution
+
+The provider-neutral `TradingExecutor` contract is implemented only by `PaperTradingExecutor`. M3.2 supports a fixed BTC/USDT buy intent and requires a caller-supplied idempotency key. No real executor or authenticated provider is present.
+
+The PostgreSQL repository performs the sufficient-USDT debit, BTC credit, and execution insert in one transaction. The execution ID is the idempotency key. A uniqueness conflict from a concurrent duplicate rolls its transaction back and returns the already committed execution, so balances change at most once.
+
+Paper balances and executions use `DECIMAL(38,18)`. Quote values are validated to at most 18 fractional digits and calculated values are rounded half-even to the same scale before the transaction, keeping the returned execution and persisted balance mutation consistent.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

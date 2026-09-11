@@ -12,7 +12,8 @@ const QuoteDecimal = Decimal.clone({
   toExpNeg: -40,
   toExpPos: 40,
 });
-const DECIMAL_PATTERN = /^(0|[1-9]\d{0,39})(\.\d{1,40})?$/;
+const DECIMAL_PATTERN = /^(0|[1-9]\d{0,19})(\.\d{1,18})?$/;
+const MONEY_SCALE = 18;
 
 export class PaperQuoteRejectedError extends Error {
   constructor(readonly reason: string) {
@@ -80,7 +81,9 @@ export class PaperMarketBuyQuoteService {
     if (quantity.greaterThan(askQuantity))
       throw new PaperQuoteRejectedError('insufficient_top_of_book_liquidity');
 
-    const notional = quantity.times(askPrice);
+    const notional = quantity
+      .times(askPrice)
+      .toDecimalPlaces(MONEY_SCALE, Decimal.ROUND_HALF_EVEN);
     if (notional.lessThan(minNotional))
       throw new PaperQuoteRejectedError('below_min_notional');
 
@@ -91,7 +94,9 @@ export class PaperMarketBuyQuoteService {
     if (feeRate.isNegative() || feeRate.greaterThanOrEqualTo(1))
       throw new PaperQuoteRejectedError('invalid_fee_rate');
 
-    const fee = notional.times(feeRate);
+    const fee = notional
+      .times(feeRate)
+      .toDecimalPlaces(MONEY_SCALE, Decimal.ROUND_HALF_EVEN);
     const quote = {
       symbol: 'BTC/USDT' as const,
       side: 'buy' as const,
@@ -100,7 +105,10 @@ export class PaperMarketBuyQuoteService {
       notional: notional.toFixed(),
       feeRate: feeRate.toFixed(),
       fee: fee.toFixed(),
-      totalCost: notional.plus(fee).toFixed(),
+      totalCost: notional
+        .plus(fee)
+        .toDecimalPlaces(MONEY_SCALE, Decimal.ROUND_HALF_EVEN)
+        .toFixed(),
       quotedAt: now,
       marketDataReceivedAt: book.receivedAt,
     };

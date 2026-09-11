@@ -397,7 +397,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
-  PaperBalance: 'PaperBalance'
+  PaperBalance: 'PaperBalance',
+  PaperExecution: 'PaperExecution'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -413,7 +414,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance"
+    modelProps: "paperBalance" | "paperExecution"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -491,6 +492,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PaperExecution: {
+      payload: Prisma.$PaperExecutionPayload<ExtArgs>
+      fields: Prisma.PaperExecutionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaperExecutionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperExecutionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaperExecutionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperExecutionPayload>
+        }
+        findFirst: {
+          args: Prisma.PaperExecutionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperExecutionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaperExecutionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperExecutionPayload>
+        }
+        findMany: {
+          args: Prisma.PaperExecutionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperExecutionPayload>[]
+        }
+        create: {
+          args: Prisma.PaperExecutionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperExecutionPayload>
+        }
+        createMany: {
+          args: Prisma.PaperExecutionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PaperExecutionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperExecutionPayload>[]
+        }
+        delete: {
+          args: Prisma.PaperExecutionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperExecutionPayload>
+        }
+        update: {
+          args: Prisma.PaperExecutionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperExecutionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PaperExecutionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaperExecutionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PaperExecutionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperExecutionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PaperExecutionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaperExecutionPayload>
+        }
+        aggregate: {
+          args: Prisma.PaperExecutionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaperExecution>
+        }
+        groupBy: {
+          args: Prisma.PaperExecutionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaperExecutionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaperExecutionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaperExecutionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -537,6 +612,24 @@ export const PaperBalanceScalarFieldEnum = {
 } as const
 
 export type PaperBalanceScalarFieldEnum = (typeof PaperBalanceScalarFieldEnum)[keyof typeof PaperBalanceScalarFieldEnum]
+
+
+export const PaperExecutionScalarFieldEnum = {
+  id: 'id',
+  symbol: 'symbol',
+  side: 'side',
+  quantity: 'quantity',
+  price: 'price',
+  notional: 'notional',
+  feeRate: 'feeRate',
+  fee: 'fee',
+  totalCost: 'totalCost',
+  quotedAt: 'quotedAt',
+  marketDataReceivedAt: 'marketDataReceivedAt',
+  executedAt: 'executedAt'
+} as const
+
+export type PaperExecutionScalarFieldEnum = (typeof PaperExecutionScalarFieldEnum)[keyof typeof PaperExecutionScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -768,6 +861,7 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   paperBalance?: Prisma.PaperBalanceOmit
+  paperExecution?: Prisma.PaperExecutionOmit
 }
 
 /* Types for Logging */

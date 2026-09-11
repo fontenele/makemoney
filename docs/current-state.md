@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0 through M3.1 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3.1 provides internal non-executing market-buy quotes. No dashboard, paper order execution, strategy, authenticated integration, or real order execution exists.
+M0 through M3.2 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy quoting and idempotent paper execution. No dashboard, public order endpoint, sell execution, strategy, authenticated integration, or real order execution exists.
 
 ## Implemented application
 
@@ -40,6 +40,10 @@ M0 through M3.1 are complete in the working tree. M1 provides unauthenticated pu
 - PostgreSQL-backed BTC/USDT balances with idempotent initial seeding and atomic decimal credit/debit operations behind a repository contract.
 - Provider-neutral latest top-of-book and pair-metadata retention for downstream paper quotes.
 - Internal BTC market-buy quote with exact notional, simulated taker fee, total cost, freshness, pair-rule, and best-ask-liquidity validation.
+- Shared trading-executor contract with a paper-only BTC/USDT market-buy implementation.
+- PostgreSQL paper-execution records and atomic USDT debit, BTC credit, and execution insertion.
+- Caller-supplied idempotency keys replay the persisted result without a second balance mutation.
+- Financial values are limited and half-even rounded to the database's 18-decimal scale before persistence.
 
 ## Local endpoints and ports
 
@@ -54,23 +58,23 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M3.1:
+The following passed on 2026-09-11 after M3.2:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 98 tests passed across 18 suites
-- `npm run test:e2e -- --runInBand` — 6 tests passed, including persistence across wallet reinitialization
-- `npx prisma migrate deploy` — paper-balance migration applied successfully
+- `npm test -- --runInBand` — 102 tests passed across 19 suites
+- `npm run test:e2e -- --runInBand` — 8 tests passed, including execution idempotency and insufficient-funds rollback
+- `npx prisma migrate deploy` — paper-execution migration applied successfully
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live paper wallet initialization — reported BTC `0` and USDT `1000` from the default configuration
 - Live read-only API — balances returned BTC `0`/USDT `1000`; valuation first returned 503 before a ticker and then 200 with the live BTC/USDT price
-- Live M3.1 bootstrap — paper-trading module started with fee rate `0.001` and 10-second quote freshness while persisted balances remained unchanged
+- Database-backed M3.2 integration — one buy mutated both balances once, replay preserved them, cleanup restored them, and an unaffordable buy left no execution or balance change
 
 ## Repository state
 
-M0 through M2.5 are committed and synchronized with `origin/main`. M3.1 changes are currently in the working tree.
+M0 through M3.1 are committed. M3.2 changes are currently in the working tree.
 
 ## Known issues and cautions
 

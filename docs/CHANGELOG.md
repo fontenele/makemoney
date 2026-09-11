@@ -2,6 +2,21 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M3.2 idempotent paper buy execution completed
+
+### Added
+
+- Shared trading-executor contract and paper-only BTC/USDT buy executor.
+- PostgreSQL paper-execution model and additive migration.
+- Atomic USDT debit, BTC credit, and execution persistence with insufficient-funds rollback.
+- Caller-supplied idempotency keys with safe replay and concurrent duplicate protection.
+- Unit and database-backed E2E coverage for execution, replay, balance changes, rollback, and 18-decimal half-even rounding.
+- Structured successful-execution and replay logging.
+
+### Scope confirmation
+
+- No HTTP mutation route, sell, position/PnL model, history query, deeper slippage, strategy, Risk Engine, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M3.1 paper market buy quote completed
 
 ### Added

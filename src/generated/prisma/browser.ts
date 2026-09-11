@@ -22,3 +22,8 @@ export * from './enums';
  * 
  */
 export type PaperBalance = Prisma.PaperBalanceModel
+/**
+ * Model PaperExecution
+ * 
+ */
+export type PaperExecution = Prisma.PaperExecutionModel

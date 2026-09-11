@@ -23,6 +23,15 @@ describe('PaperMarketBuyQuoteService', () => {
     });
   });
 
+  it('rounds persisted monetary values to 18 decimal places using half-even', () => {
+    const quote = createService({ feeRate: '0.333333333333333333' }).quote(
+      '0.0001',
+    );
+
+    expect(quote.fee).toBe('2.592570666666666664');
+    expect(quote.totalCost).toBe('10.370282666666666664');
+  });
+
   it.each([
     ['0', 'invalid_quantity'],
     ['0.000001', 'below_min_quantity'],
@@ -58,6 +67,7 @@ function createService(
     now?: string;
     metadata?: boolean;
     status?: string;
+    feeRate?: string;
   } = {},
 ): PaperMarketBuyQuoteService {
   const books = new LatestTopOfBookService();
@@ -70,7 +80,7 @@ function createService(
     metadata,
     new ConfigService({
       PAPER_QUOTE_MAX_MARKET_DATA_AGE_MS: 10000,
-      PAPER_TAKER_FEE_RATE: '0.001',
+      PAPER_TAKER_FEE_RATE: options.feeRate ?? '0.001',
     }),
     { now: () => new Date(options.now ?? '2026-09-11T12:00:05.000Z') },
   );

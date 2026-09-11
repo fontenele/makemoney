@@ -13,4 +13,12 @@ Configuration:
 
 Quotes require available normalized top-of-book data and pair metadata, fresh top-of-book data, `TRADING` pair status, valid quantity range and step size, minimum notional, and enough quantity at the best ask. A rejected quote never changes wallet state.
 
-Execution, wallet mutation, sells, multi-level slippage, order history, PnL, HTTP order routes, strategies, and real trading remain deferred.
+## M3.2 idempotent paper buy execution
+
+M3.2 introduces a shared `TradingExecutor` contract and its only implementation, `PaperTradingExecutor`. The internal intent accepts a caller-generated idempotency key, the fixed `BTC/USDT` symbol, the `buy` side, and BTC quantity. It regenerates the M3.1 quote at execution time.
+
+One PostgreSQL transaction conditionally debits the full USDT cost (notional plus fee), credits BTC, and inserts the immutable execution record. Insufficient USDT or a missing balance row rolls back every change. Reusing an idempotency key returns the original persisted execution with `replayed: true`; it never applies the balance changes twice, including concurrent duplicate attempts.
+
+Persisted quantities and monetary amounts use `DECIMAL(38,18)`. Quote inputs therefore accept at most 18 fractional digits, and calculated notional, fee, and total cost use half-even rounding to that scale. Successful executions and replays emit structured logs.
+
+There is deliberately no HTTP mutation route. Sells, positions, realized or unrealized PnL, history queries, multi-level slippage, strategies, the Risk Engine, authenticated providers, and real trading remain deferred.
