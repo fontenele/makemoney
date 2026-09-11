@@ -4,9 +4,11 @@ import { MarketDataModule } from '../market-data/market-data.module';
 import { PaperWalletService } from './application/paper-wallet.service';
 import { PortfolioValuationService } from './application/portfolio-valuation.service';
 import { PaperWallet } from './domain/paper-wallet';
+import { PaperWalletController } from './presentation/paper-wallet.controller';
 
 @Module({
   imports: [MarketDataModule],
+  controllers: [PaperWalletController],
   providers: [
     {
       provide: PaperWallet,

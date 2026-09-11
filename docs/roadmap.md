@@ -22,6 +22,7 @@ NestJS bootstrap, validated configuration, lint/format tooling, tests, Docker Co
 
 - **M2.1 — complete:** in-memory fictional BTC/USDT balances, configurable initial USDT, exact decimal credit/debit operations, balance queries, and insufficient-funds protection.
 - **M2.2 — complete:** in-memory latest BTC/USDT price and exact portfolio valuation in USDT, with an explicit unavailable-price state.
+- **M2.3 — complete:** local read-only HTTP endpoints for paper balances and USDT valuation, returning 503 until a market price is available.
 - Later M2 increments may add portfolio valuation, additional approved assets, and persistence. Each requires a separate plan and approval.
 
 No real funds or exchange-account access.

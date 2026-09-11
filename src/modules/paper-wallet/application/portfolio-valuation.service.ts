@@ -13,6 +13,13 @@ const ValuationDecimal = Decimal.clone({
 
 const POSITIVE_DECIMAL_PATTERN = /^(0|[1-9]\d*)(\.\d+)?$/;
 
+export class MarketPriceUnavailableError extends Error {
+  constructor() {
+    super('BTC/USDT market price is not available yet');
+    this.name = MarketPriceUnavailableError.name;
+  }
+}
+
 @Injectable()
 export class PortfolioValuationService {
   constructor(
@@ -24,7 +31,7 @@ export class PortfolioValuationService {
     const ticker = this.latestMarketPrice.getLatest();
 
     if (!ticker) {
-      throw new Error('BTC/USDT market price is not available yet');
+      throw new MarketPriceUnavailableError();
     }
 
     const btcPrice = parsePositivePrice(ticker.lastPrice);

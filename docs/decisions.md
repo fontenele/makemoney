@@ -88,4 +88,10 @@ There is no HTTP API, portfolio conversion, order model, fee, spread, slippage, 
 
 The market-data module owns a process-local `LatestMarketPriceService`. `PublicTickerService` updates it only with normalized `MarketTicker` values, so paper-wallet code does not depend on Binance payloads or clients. The service is exported as the narrow cross-module dependency used by portfolio valuation.
 
-The portfolio value is quoted only in USDT: `USDT balance + (BTC balance × latest BTC/USDT price)`. The same precision-40, half-even `decimal.js` strategy is used, and results remain canonical decimal strings. Before the first ticker, valuation fails explicitly rather than returning a misleading partial total. Price persistence, staleness rules, BRL conversion, and HTTP exposure are deferred.
+The portfolio value is quoted only in USDT: `USDT balance + (BTC balance × latest BTC/USDT price)`. The same precision-40, half-even `decimal.js` strategy is used, and results remain canonical decimal strings. Before the first ticker, valuation fails explicitly rather than returning a misleading partial total. Price persistence, staleness rules, and BRL conversion are deferred; read-only HTTP exposure follows in M2.3.
+
+## M2.3 read-only portfolio HTTP API
+
+The local API exposes `GET /paper-wallet/balances` and `GET /paper-wallet/valuation`. The controller delegates to existing application services and exposes provider-neutral representations. Only the explicit missing-price domain condition maps to HTTP 503; unexpected errors are not hidden.
+
+No balance mutation route exists. Authentication, persistence, dashboard concerns, and trading actions remain outside M2.3.

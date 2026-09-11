@@ -2,6 +2,24 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M2.3 read-only portfolio API completed
+
+### Added
+
+- `GET /paper-wallet/balances` for fictional BTC and USDT balances.
+- `GET /paper-wallet/valuation` for the latest portfolio value in USDT.
+- HTTP 503 mapping when valuation is requested before the first market price.
+- Controller unit tests and deterministic E2E coverage for balances, unavailable valuation, and available valuation.
+
+### Changed
+
+- The missing-price state now uses a dedicated application error.
+- Project context, roadmap, current state, decisions, paper-wallet guide, keyword map, and plan now reflect M2.3.
+
+### Scope confirmation
+
+- No HTTP mutation, authentication, dashboard, persistence, BRL conversion, order, execution, fee, slippage, PnL, strategy, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M2.2 portfolio valuation completed
 
 ### Added
