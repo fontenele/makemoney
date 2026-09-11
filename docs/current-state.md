@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0 through M2.5 are complete in the working tree, completing M2. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed BTC/USDT wallet, freshness-protected USDT valuation, and local read-only API with no exchange-account access. No dashboard, paper orders, strategy, authenticated integration, or order execution exists.
+M0 through M3.1 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3.1 provides internal non-executing market-buy quotes. No dashboard, paper order execution, strategy, authenticated integration, or real order execution exists.
 
 ## Implemented application
 
@@ -38,6 +38,8 @@ M0 through M2.5 are complete in the working tree, completing M2. M1 provides una
 - Read-only `GET /paper-wallet/balances` and `GET /paper-wallet/valuation` routes; valuation maps the unavailable-price state to HTTP 503.
 - Configurable ten-second price-freshness limit; stale valuation returns HTTP 503 and emits structured age diagnostics.
 - PostgreSQL-backed BTC/USDT balances with idempotent initial seeding and atomic decimal credit/debit operations behind a repository contract.
+- Provider-neutral latest top-of-book and pair-metadata retention for downstream paper quotes.
+- Internal BTC market-buy quote with exact notional, simulated taker fee, total cost, freshness, pair-rule, and best-ask-liquidity validation.
 
 ## Local endpoints and ports
 
@@ -52,11 +54,11 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M2.5:
+The following passed on 2026-09-11 after M3.1:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 88 tests passed across 17 suites
+- `npm test -- --runInBand` — 98 tests passed across 18 suites
 - `npm run test:e2e -- --runInBand` — 6 tests passed, including persistence across wallet reinitialization
 - `npx prisma migrate deploy` — paper-balance migration applied successfully
 - `docker compose config --quiet`
@@ -64,10 +66,11 @@ The following passed on 2026-09-11 after M2.5:
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live paper wallet initialization — reported BTC `0` and USDT `1000` from the default configuration
 - Live read-only API — balances returned BTC `0`/USDT `1000`; valuation first returned 503 before a ticker and then 200 with the live BTC/USDT price
+- Live M3.1 bootstrap — paper-trading module started with fee rate `0.001` and 10-second quote freshness while persisted balances remained unchanged
 
 ## Repository state
 
-M0 through M2.4 are committed and synchronized with `origin/main`. M2.5 changes are currently in the working tree.
+M0 through M2.5 are committed and synchronized with `origin/main`. M3.1 changes are currently in the working tree.
 
 ## Known issues and cautions
 

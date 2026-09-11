@@ -109,3 +109,9 @@ PostgreSQL is the source of truth for paper balances. `paper_balances` stores on
 The domain exposes a `PaperBalanceRepository` contract; its Prisma implementation contains persistence details. Credit and debit use single atomic SQL updates. Debit includes the sufficient-balance condition in the update itself, preventing negative balances and lost-update races. The database also enforces supported assets and non-negative amounts. No transaction-history table is introduced in M2.5.
 
 The local Compose API runs `prisma migrate deploy` before NestJS starts, ensuring a new PostgreSQL volume receives committed migrations without an interactive development migration command.
+
+## M3.1 non-executing market-buy quote
+
+Market data retains the latest normalized top of book and pair metadata in provider-neutral services. The paper-trading module consumes those views without depending on Binance transports or payloads.
+
+A BTC quantity is quoted at the best ask only when the book is fresh, the pair status is `TRADING`, quantity satisfies minimum, maximum, and step-size rules, notional reaches the public minimum, and best-ask quantity is sufficient. `PAPER_TAKER_FEE_RATE` defaults to `0.001` as an explicit simulation assumption. Exact decimal calculation produces notional, fee, and total cost without wallet mutation. Multi-level fills, execution, and account-specific fees are deferred.

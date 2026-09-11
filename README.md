@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. The project has completed **M1 — Market Data** and **M2 — Paper Wallet**. Market feeds are public and unauthenticated; fictional balances persist in PostgreSQL and valuation is freshness-protected, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. The project has completed **M1 — Market Data**, **M2 — Paper Wallet**, and **M3.1 — Paper Market Buy Quote**. Market feeds are public and unauthenticated; quotes and balances are fictional, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 

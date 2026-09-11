@@ -16,5 +16,6 @@ Read `../AGENTS.md`, `../PROJECT_CONTEXT.md`, and `maps.md` before starting a ta
 - `binance-public-top-of-book.md`: M1.6–M1.7 best prices and spread.
 - `binance-pair-metadata.md`: M1.8 public trading rules.
 - `paper-wallet.md`: M2.1 fictional balance domain and operation.
+- `paper-trading.md`: M3 quote and execution boundaries.
 
 Documentation describes the real working tree. Planned behavior must be clearly distinguished from implemented behavior.

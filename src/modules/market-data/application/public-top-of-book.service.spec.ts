@@ -3,6 +3,7 @@ import { MarketTopOfBook } from '../domain/market-top-of-book';
 import { TopOfBookStream } from '../domain/top-of-book-stream';
 import { PublicTopOfBookService } from './public-top-of-book.service';
 import { SpreadCalculator } from './spread-calculator';
+import { LatestTopOfBookService } from './latest-top-of-book.service';
 
 describe('PublicTopOfBookService', () => {
   it('starts and stops the configured stream with the module lifecycle', () => {
@@ -10,7 +11,11 @@ describe('PublicTopOfBookService', () => {
       jest.fn<(handler: (topOfBook: MarketTopOfBook) => void) => void>();
     const stop = jest.fn<() => void>();
     const stream: TopOfBookStream = { start, stop };
-    const service = new PublicTopOfBookService(stream, new SpreadCalculator());
+    const service = new PublicTopOfBookService(
+      stream,
+      new SpreadCalculator(),
+      new LatestTopOfBookService(),
+    );
 
     service.onModuleInit();
     service.onModuleDestroy();
@@ -30,7 +35,8 @@ describe('PublicTopOfBookService', () => {
     };
     const calculator = new SpreadCalculator();
     const calculate = jest.spyOn(calculator, 'calculate');
-    const service = new PublicTopOfBookService(stream, calculator);
+    const latest = new LatestTopOfBookService();
+    const service = new PublicTopOfBookService(stream, calculator, latest);
     const topOfBook: MarketTopOfBook = {
       provider: 'binance',
       symbol: 'BTC/USDT',
@@ -46,5 +52,6 @@ describe('PublicTopOfBookService', () => {
     handler?.(topOfBook);
 
     expect(calculate).toHaveBeenCalledWith(topOfBook);
+    expect(latest.getLatest()).toBe(topOfBook);
   });
 });

@@ -2,6 +2,21 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M3.1 paper market buy quote completed
+
+### Added
+
+- Provider-neutral retention of latest BTC/USDT top-of-book and pair metadata.
+- Internal BTC market-buy quote at the best ask with exact notional, simulated taker fee, and total cost.
+- Configurable fee assumption and market-data freshness limit.
+- Validation for availability, freshness, pair status, quantity bounds, step size, minimum notional, and best-ask liquidity.
+- Focused financial and rejection-path tests plus structured successful-quote logging.
+- M3 paper-trading documentation.
+
+### Scope confirmation
+
+- No execution, balance mutation, HTTP order route, sell, order history, multi-level slippage, PnL, strategy, Risk Engine, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M2.5 paper-wallet persistence completed
 
 ### Added

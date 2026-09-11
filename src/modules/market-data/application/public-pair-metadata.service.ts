@@ -9,6 +9,7 @@ import {
   PAIR_METADATA_PROVIDER,
   PairMetadataProvider,
 } from '../domain/pair-metadata-provider';
+import { LatestPairMetadataService } from './latest-pair-metadata.service';
 
 @Injectable()
 export class PublicPairMetadataService
@@ -20,6 +21,7 @@ export class PublicPairMetadataService
   constructor(
     @Inject(PAIR_METADATA_PROVIDER)
     private readonly pairMetadataProvider: PairMetadataProvider,
+    private readonly latestPairMetadata: LatestPairMetadataService,
   ) {}
 
   onModuleInit(): void {
@@ -40,6 +42,8 @@ export class PublicPairMetadataService
         this.logger.warn('Invalid Binance BTC/USDT pair metadata response');
         return;
       }
+
+      this.latestPairMetadata.update(metadata);
 
       this.logger.log({
         event: 'market.pair_metadata.received',

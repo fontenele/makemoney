@@ -6,6 +6,7 @@ import { RedisModule } from './infrastructure/redis/redis.module';
 import { HealthModule } from './modules/health/health.module';
 import { MarketDataModule } from './modules/market-data/market-data.module';
 import { PaperWalletModule } from './modules/paper-wallet/paper-wallet.module';
+import { PaperTradingModule } from './modules/paper-trading/paper-trading.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PaperWalletModule } from './modules/paper-wallet/paper-wallet.module';
     HealthModule,
     MarketDataModule,
     PaperWalletModule,
+    PaperTradingModule,
   ],
 })
 export class AppModule {}

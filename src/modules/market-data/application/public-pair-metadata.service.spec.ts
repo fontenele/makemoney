@@ -2,6 +2,7 @@ import { jest } from '@jest/globals';
 import { MarketPairMetadata } from '../domain/market-pair-metadata';
 import { PairMetadataProvider } from '../domain/pair-metadata-provider';
 import { PublicPairMetadataService } from './public-pair-metadata.service';
+import { LatestPairMetadataService } from './latest-pair-metadata.service';
 
 describe('PublicPairMetadataService', () => {
   it('loads pair metadata during module initialization', () => {
@@ -24,7 +25,10 @@ describe('PublicPairMetadataService', () => {
     load.mockResolvedValue(metadata);
     const provider: PairMetadataProvider = { load };
 
-    const service = new PublicPairMetadataService(provider);
+    const service = new PublicPairMetadataService(
+      provider,
+      new LatestPairMetadataService(),
+    );
 
     service.onModuleInit();
 
@@ -40,7 +44,10 @@ describe('PublicPairMetadataService', () => {
         .mockRejectedValue(new Error('network unavailable')),
     };
 
-    const service = new PublicPairMetadataService(provider);
+    const service = new PublicPairMetadataService(
+      provider,
+      new LatestPairMetadataService(),
+    );
 
     expect(() => service.onModuleInit()).not.toThrow();
     await Promise.resolve();

@@ -11,6 +11,7 @@ import {
   TopOfBookStream,
 } from '../domain/top-of-book-stream';
 import { SpreadCalculator } from './spread-calculator';
+import { LatestTopOfBookService } from './latest-top-of-book.service';
 
 @Injectable()
 export class PublicTopOfBookService implements OnModuleInit, OnModuleDestroy {
@@ -20,6 +21,7 @@ export class PublicTopOfBookService implements OnModuleInit, OnModuleDestroy {
     @Inject(TOP_OF_BOOK_STREAM)
     private readonly topOfBookStream: TopOfBookStream,
     private readonly spreadCalculator: SpreadCalculator,
+    private readonly latestTopOfBook: LatestTopOfBookService,
   ) {}
 
   onModuleInit(): void {
@@ -31,6 +33,7 @@ export class PublicTopOfBookService implements OnModuleInit, OnModuleDestroy {
   }
 
   private logTopOfBook(topOfBook: MarketTopOfBook): void {
+    this.latestTopOfBook.update(topOfBook);
     this.logger.log({
       event: 'market.top_of_book.received',
       provider: topOfBook.provider,

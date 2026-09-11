@@ -12,6 +12,8 @@ services:
       BINANCE_REST_BASE_URL: https://data-api.binance.vision
       PAPER_INITIAL_USDT_BALANCE: "1000"
       PAPER_VALUATION_MAX_PRICE_AGE_MS: 10000
+      PAPER_QUOTE_MAX_MARKET_DATA_AGE_MS: 10000
+      PAPER_TAKER_FEE_RATE: "0.001"
     command: ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
     ports:
       - "3000:3000"

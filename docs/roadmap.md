@@ -30,7 +30,8 @@ No real funds or exchange-account access.
 
 ## M3 — Paper Trading — planned
 
-Paper execution behind a shared executor contract, using real market prices and realistic fees, spread, slippage, precision, minimum orders, and liquidity constraints.
+- **M3.1 — complete:** internal non-executing BTC market-buy quote using fresh best ask, public pair rules, top-level liquidity, and configurable simulated taker fee.
+- Later M3 increments require separate approval for execution, wallet mutation, sells, history, and deeper slippage modeling.
 
 ## M4 — Risk Engine — planned
 

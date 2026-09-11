@@ -1,0 +1,108 @@
+import { ConfigService } from '@nestjs/config';
+import { LatestPairMetadataService } from '../../market-data/application/latest-pair-metadata.service';
+import { LatestTopOfBookService } from '../../market-data/application/latest-top-of-book.service';
+import { MarketPairMetadata } from '../../market-data/domain/market-pair-metadata';
+import { MarketTopOfBook } from '../../market-data/domain/market-top-of-book';
+import { PaperMarketBuyQuoteService } from './paper-market-buy-quote.service';
+
+describe('PaperMarketBuyQuoteService', () => {
+  it('calculates an exact buy quote at the best ask with fee', () => {
+    const service = createService();
+
+    expect(service.quote('0.001')).toEqual({
+      symbol: 'BTC/USDT',
+      side: 'buy',
+      quantity: '0.001',
+      price: '77777.12',
+      notional: '77.77712',
+      feeRate: '0.001',
+      fee: '0.07777712',
+      totalCost: '77.85489712',
+      quotedAt: new Date('2026-09-11T12:00:05.000Z'),
+      marketDataReceivedAt: new Date('2026-09-11T12:00:00.000Z'),
+    });
+  });
+
+  it.each([
+    ['0', 'invalid_quantity'],
+    ['0.000001', 'below_min_quantity'],
+    ['9000.00001', 'above_max_quantity'],
+    ['0.000011', 'invalid_step_size'],
+    ['2.00001', 'insufficient_top_of_book_liquidity'],
+    ['0.00001', 'below_min_notional'],
+  ])('rejects quantity %s with %s', (quantity, reason) => {
+    expect(() => createService().quote(quantity)).toThrow(reason);
+  });
+
+  it('rejects a stale top of book', () => {
+    expect(() =>
+      createService({ now: '2026-09-11T12:00:10.001Z' }).quote('0.001'),
+    ).toThrow('top_of_book_stale');
+  });
+
+  it('rejects when pair metadata is unavailable', () => {
+    expect(() => createService({ metadata: false }).quote('0.001')).toThrow(
+      'metadata_unavailable',
+    );
+  });
+
+  it('rejects when the pair is not trading', () => {
+    expect(() => createService({ status: 'BREAK' }).quote('0.001')).toThrow(
+      'pair_not_trading',
+    );
+  });
+});
+
+function createService(
+  options: {
+    now?: string;
+    metadata?: boolean;
+    status?: string;
+  } = {},
+): PaperMarketBuyQuoteService {
+  const books = new LatestTopOfBookService();
+  const metadata = new LatestPairMetadataService();
+  books.update(topOfBook());
+  if (options.metadata !== false) metadata.update(pairMetadata(options.status));
+
+  return new PaperMarketBuyQuoteService(
+    books,
+    metadata,
+    new ConfigService({
+      PAPER_QUOTE_MAX_MARKET_DATA_AGE_MS: 10000,
+      PAPER_TAKER_FEE_RATE: '0.001',
+    }),
+    { now: () => new Date(options.now ?? '2026-09-11T12:00:05.000Z') },
+  );
+}
+
+function topOfBook(): MarketTopOfBook {
+  return {
+    provider: 'binance',
+    symbol: 'BTC/USDT',
+    updateId: '1',
+    bidPrice: '77777.11',
+    bidQuantity: '1',
+    askPrice: '77777.12',
+    askQuantity: '2',
+    receivedAt: new Date('2026-09-11T12:00:00.000Z'),
+  };
+}
+
+function pairMetadata(status = 'TRADING'): MarketPairMetadata {
+  return {
+    provider: 'binance',
+    symbol: 'BTC/USDT',
+    status,
+    baseAsset: 'BTC',
+    quoteAsset: 'USDT',
+    minPrice: '0.01',
+    maxPrice: '1000000',
+    tickSize: '0.01',
+    minQuantity: '0.00001',
+    maxQuantity: '9000',
+    stepSize: '0.00001',
+    minNotional: '5',
+    receivedAt: new Date('2026-09-11T11:00:00.000Z'),
+  };
+}

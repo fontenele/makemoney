@@ -23,6 +23,6 @@ import { PaperWalletController } from './presentation/paper-wallet.controller';
     },
     PortfolioValuationService,
   ],
-  exports: [PaperWalletService, PortfolioValuationService],
+  exports: [CLOCK, PaperWalletService, PortfolioValuationService],
 })
 export class PaperWalletModule {}

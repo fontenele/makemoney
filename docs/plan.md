@@ -18,6 +18,7 @@ M2.3 Read-only API:       DONE
 M2.4 Stale Price Guard:   DONE
 M2.5 Persistence:         DONE
 Next increment:           NOT APPROVED
+M3.1 Buy Quote:           DONE
 ```
 
 The detailed sections below preserve the original product plan. For current delivery status and exact increment boundaries, `docs/roadmap.md` and `docs/current-state.md` are authoritative.
@@ -1658,6 +1659,7 @@ Roadmap:
 M0 — Bootstrap                    DONE
 M1 — Market Data                  DONE
 M2 — Paper Wallet                 DONE (M2.1–M2.5)
+M3 — Paper Trading                IN PROGRESS (M3.1 DONE)
 M3 — Paper Trading                PLANNED
 M4 — Risk Engine                  PLANNED
 M5 — Strategies                   PLANNED
@@ -2172,6 +2174,8 @@ M2.2 Valuation:       DONE
 M2.3 Read-only API:   DONE
 M2.4 Stale Guard:     DONE
 M2.5 Persistence:     DONE
+M3 Paper Trading:     IN PROGRESS
+M3.1 Buy Quote:       DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS

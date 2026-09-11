@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, and **M2 — Paper Wallet (M2.1 through M2.5)**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, and **M3.1 — Paper Market Buy Quote**.
 - No next increment is approved. Stop and present a minimal plan before starting more wallet or trading work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -27,6 +27,8 @@ M2.3 exposes balances and valuation through local read-only HTTP endpoints. No w
 M2.4 rejects valuation when the latest ticker is older than the configured freshness limit, which defaults to ten seconds.
 
 M2.5 persists BTC and USDT paper balances in PostgreSQL with idempotent initialization and atomic decimal mutations.
+
+M3.1 calculates internal BTC market-buy quotes from fresh best-ask data, pair rules, liquidity, and a configurable simulated taker fee. It does not execute or mutate balances.
 
 Historical market data, BRL conversion, orders, fees, spread/slippage execution modeling, PnL, strategies, authenticated APIs, and execution remain unimplemented and require separately approved milestones.
 
@@ -51,3 +53,4 @@ Historical market data, BRL conversion, orders, fees, spread/slippage execution 
 - `docs/binance-public-top-of-book.md`: M1.6–M1.7 best bid/ask and spread contract and operation.
 - `docs/binance-pair-metadata.md`: M1.8 public BTC/USDT trading-rule metadata.
 - `docs/paper-wallet.md`: M2.1 fictional wallet configuration and domain behavior.
+- `docs/paper-trading.md`: M3 paper quote and future execution boundaries.
