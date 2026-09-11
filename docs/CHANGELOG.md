@@ -2,6 +2,26 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M2.5 paper-wallet persistence completed
+
+### Added
+
+- Additive Prisma migration for constrained BTC/USDT paper balances using `DECIMAL(38,18)`.
+- Provider-neutral paper-balance repository contract and PostgreSQL/Prisma implementation.
+- Idempotent startup seeding that preserves existing balances.
+- Atomic SQL credit and sufficient-balance debit operations.
+- E2E verification that a persisted balance survives wallet reinitialization, with test cleanup.
+
+### Changed
+
+- Paper-wallet and valuation services now read balances asynchronously from PostgreSQL.
+- Supported balance precision is explicit and validated before persistence.
+- M2 is now complete; project context, roadmap, current state, decisions, guide, keyword map, plan, and README reflect the boundary.
+
+### Scope confirmation
+
+- No transaction history, mutation endpoint, order, paper execution, BRL conversion, fee, slippage, PnL, strategy, authenticated integration, dashboard, or real trading was introduced.
+
 ## 2026-09-11 — M2.4 stale-price protection completed
 
 ### Added

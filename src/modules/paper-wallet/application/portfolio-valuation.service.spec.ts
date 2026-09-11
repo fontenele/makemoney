@@ -1,23 +1,22 @@
-import { LatestMarketPriceService } from '../../market-data/application/latest-market-price.service';
 import { ConfigService } from '@nestjs/config';
-import { PaperWallet } from '../domain/paper-wallet';
+import { LatestMarketPriceService } from '../../market-data/application/latest-market-price.service';
 import { PaperWalletService } from './paper-wallet.service';
 import { PortfolioValuationService } from './portfolio-valuation.service';
 
 describe('PortfolioValuationService', () => {
-  it('rejects valuation before a market price is available', () => {
+  it('rejects valuation before a market price is available', async () => {
     const { service } = createService('1000', '0');
 
-    expect(() => service.getValuation()).toThrow(
+    await expect(service.getValuation()).rejects.toThrow(
       'BTC/USDT market price is not available yet',
     );
   });
 
-  it('values USDT when the BTC balance is zero', () => {
+  it('values USDT when the BTC balance is zero', async () => {
     const { service, prices } = createService('1000', '0');
     prices.update(ticker('77777.12'));
 
-    expect(service.getValuation()).toEqual({
+    await expect(service.getValuation()).resolves.toEqual({
       quoteAsset: 'USDT',
       btcBalance: '0',
       btcPrice: '77777.12',
@@ -28,37 +27,40 @@ describe('PortfolioValuationService', () => {
     });
   });
 
-  it('calculates the total with exact decimal arithmetic', () => {
+  it('calculates the total with exact decimal arithmetic', async () => {
     const { service, prices } = createService('0.1', '0.2');
     prices.update(ticker('0.3'));
 
-    expect(service.getValuation().totalValue).toBe('0.16');
-    expect(service.getValuation().btcValue).toBe('0.06');
+    const valuation = await service.getValuation();
+    expect(valuation.totalValue).toBe('0.16');
+    expect(valuation.btcValue).toBe('0.06');
   });
 
-  it('rejects a price older than the configured maximum age', () => {
+  it('rejects a price older than the configured maximum age', async () => {
     const { service, prices } = createService('1000', '0', 9899);
     prices.update(ticker('77000'));
 
-    expect(() => service.getValuation()).toThrow(
+    await expect(service.getValuation()).rejects.toThrow(
       'BTC/USDT market price is stale (9900ms old; maximum 9899ms)',
     );
   });
 
-  it('accepts a price exactly at the configured maximum age', () => {
+  it('accepts a price exactly at the configured maximum age', async () => {
     const { service, prices } = createService('1000', '0', 9900);
     prices.update(ticker('77000'));
 
-    expect(service.getValuation().btcPrice).toBe('77000');
+    await expect(service.getValuation()).resolves.toMatchObject({
+      btcPrice: '77000',
+    });
   });
 
   it.each(['0', '-1', '1e3', 'NaN'])(
     'rejects invalid market price %s',
-    (price) => {
+    async (price) => {
       const { service, prices } = createService('1000', '0');
       prices.update(ticker(price));
 
-      expect(() => service.getValuation()).toThrow();
+      await expect(service.getValuation()).rejects.toThrow();
     },
   );
 });
@@ -72,9 +74,9 @@ function createService(
   prices: LatestMarketPriceService;
 } {
   const prices = new LatestMarketPriceService();
-  const wallet = new PaperWalletService(
-    new PaperWallet({ BTC: btc, USDT: usdt }),
-  );
+  const wallet = {
+    getBalances: () => Promise.resolve({ BTC: btc, USDT: usdt }),
+  } as PaperWalletService;
 
   return {
     service: new PortfolioValuationService(

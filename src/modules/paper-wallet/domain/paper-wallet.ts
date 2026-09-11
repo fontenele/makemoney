@@ -8,7 +8,7 @@ const WalletDecimal = Decimal.clone({
   toExpPos: 40,
 });
 
-const DECIMAL_PATTERN = /^(0|[1-9]\d*)(\.\d+)?$/;
+const DECIMAL_PATTERN = /^(0|[1-9]\d{0,19})(\.\d{1,18})?$/;
 
 export type PaperWalletBalances = Record<Asset, string>;
 
@@ -35,7 +35,7 @@ export class PaperWallet {
   }
 
   credit(asset: Asset, amount: string): string {
-    const creditAmount = parsePositiveAmount(amount);
+    const creditAmount = new WalletDecimal(normalizePositiveAmount(amount));
     const updatedBalance = this.getDecimalBalance(asset).plus(creditAmount);
 
     this.balances.set(asset, updatedBalance);
@@ -43,7 +43,7 @@ export class PaperWallet {
   }
 
   debit(asset: Asset, amount: string): string {
-    const debitAmount = parsePositiveAmount(amount);
+    const debitAmount = new WalletDecimal(normalizePositiveAmount(amount));
     const currentBalance = this.getDecimalBalance(asset);
 
     if (debitAmount.greaterThan(currentBalance)) {
@@ -66,14 +66,14 @@ export class PaperWallet {
   }
 }
 
-function parsePositiveAmount(value: string): Decimal {
+export function normalizePositiveAmount(value: string): string {
   const amount = parseDecimal(value, 'amount');
 
   if (amount.lessThanOrEqualTo(0)) {
     throw new RangeError('Paper wallet amount must be greater than zero');
   }
 
-  return amount;
+  return amount.toFixed();
 }
 
 function parseDecimal(value: string, label: string): Decimal {

@@ -1,6 +1,6 @@
 # Paper Wallet
 
-M2.1 introduces a fictional, in-memory wallet for the `BTC` and `USDT` assets. M2.2 adds valuation in USDT from the latest normalized BTC/USDT ticker. M2.3 exposes both views through local read-only HTTP endpoints. M2.4 prevents valuation with stale prices. None of these increments connects to an exchange account, holds credentials, or submits orders.
+M2.1 introduces a fictional wallet for the `BTC` and `USDT` assets. M2.2 adds valuation in USDT from the latest normalized BTC/USDT ticker. M2.3 exposes both views through local read-only HTTP endpoints. M2.4 prevents valuation with stale prices. M2.5 persists balances in PostgreSQL. None of these increments connects to an exchange account, holds credentials, or submits orders.
 
 ## Configuration
 
@@ -18,7 +18,9 @@ M2.1 introduces a fictional, in-memory wallet for the `BTC` and `USDT` assets. M
 - A debit larger than the available balance is rejected without mutating state.
 - Only `BTC` and `USDT` are supported.
 
-The wallet is recreated from configuration whenever the application starts. There is no database persistence or HTTP endpoint in M2.1.
+M2.1 originally held balances in memory. M2.5 makes PostgreSQL the balance source of truth. On startup, missing BTC and USDT rows are seeded from configuration without overwriting existing balances. Credits and debits are atomic database updates; insufficient debits do not mutate state.
+
+Database amounts use `DECIMAL(38,18)`, so accepted values have at most 20 integer digits and 18 fractional digits.
 
 ## Portfolio valuation
 
@@ -47,4 +49,4 @@ Startup emits `paper_wallet.initialized`. Successful mutations emit `paper_walle
 
 ## Deferred scope
 
-BRL conversion, fees, spread, slippage, PnL, orders, execution, persistence, additional assets, authenticated access, and dashboard exposure require later approved increments.
+Balance transaction history, BRL conversion, fees, spread, slippage, PnL, orders, execution, additional assets, authenticated access, and dashboard exposure require later approved increments.

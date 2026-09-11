@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. The project has completed **M1 — Market Data** and **M2.1–M2.4 — Paper Wallet**. Market feeds are public and unauthenticated; the wallet and freshness-protected valuation are fictional and in memory, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. The project has completed **M1 — Market Data** and **M2 — Paper Wallet**. Market feeds are public and unauthenticated; fictional balances persist in PostgreSQL and valuation is freshness-protected, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -24,6 +24,7 @@ On Windows PowerShell installations that block `npm.ps1`, use `npm.cmd` without 
 cp .env.example .env
 npm install
 npm run prisma:generate
+npx prisma migrate deploy
 npm run start:dev
 ```
 
@@ -31,7 +32,7 @@ PostgreSQL and Redis must be reachable using the URLs in `.env`.
 
 ## Docker Compose
 
-Start Docker Desktop (or another Docker daemon), then run:
+Start Docker Desktop (or another Docker daemon), then run. The API container applies pending Prisma migrations before starting:
 
 ```bash
 docker compose up --build
@@ -63,4 +64,4 @@ docker compose config
 - `prisma`: database schema and future migrations
 - `test`: end-to-end tests
 
-The paper wallet, latest price, and USDT valuation are process-local and reset at startup. Read-only views are available at `/paper-wallet/balances` and `/paper-wallet/valuation`; no mutation or order route exists.
+Paper balances persist across restarts; the latest price and valuation remain process-local. Read-only views are available at `/paper-wallet/balances` and `/paper-wallet/valuation`; no mutation or order route exists.

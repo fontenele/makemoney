@@ -11,6 +11,7 @@ import {
   TICKER_STREAM,
   TickerStream,
 } from '../src/modules/market-data/domain/ticker-stream';
+import { PaperWalletService } from '../src/modules/paper-wallet/application/paper-wallet.service';
 
 describe('Application (e2e)', () => {
   let app: INestApplication;
@@ -93,5 +94,16 @@ describe('Application (e2e)', () => {
     });
 
     return request(server).get('/paper-wallet/valuation').expect(503);
+  });
+
+  it('preserves a persisted balance across wallet reinitialization', async () => {
+    const wallet = app.get(PaperWalletService);
+
+    await expect(wallet.credit('BTC', '0.00000001')).resolves.toBe(
+      '0.00000001',
+    );
+    await wallet.onModuleInit();
+    await expect(wallet.getBalance('BTC')).resolves.toBe('0.00000001');
+    await expect(wallet.debit('BTC', '0.00000001')).resolves.toBe('0');
   });
 });

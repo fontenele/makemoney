@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { MarketDataModule } from '../market-data/market-data.module';
 import { PaperWalletService } from './application/paper-wallet.service';
 import { PortfolioValuationService } from './application/portfolio-valuation.service';
-import { PaperWallet } from './domain/paper-wallet';
+import { PAPER_BALANCE_REPOSITORY } from './domain/paper-balance-repository';
 import { CLOCK } from './domain/clock';
 import { SystemClock } from './infrastructure/system-clock';
+import { PrismaPaperBalanceRepository } from './infrastructure/prisma-paper-balance.repository';
 import { PaperWalletController } from './presentation/paper-wallet.controller';
 
 @Module({
@@ -13,13 +13,8 @@ import { PaperWalletController } from './presentation/paper-wallet.controller';
   controllers: [PaperWalletController],
   providers: [
     {
-      provide: PaperWallet,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService): PaperWallet =>
-        new PaperWallet({
-          BTC: '0',
-          USDT: config.getOrThrow<string>('PAPER_INITIAL_USDT_BALANCE'),
-        }),
+      provide: PAPER_BALANCE_REPOSITORY,
+      useClass: PrismaPaperBalanceRepository,
     },
     PaperWalletService,
     {

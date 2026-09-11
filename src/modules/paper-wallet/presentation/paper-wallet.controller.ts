@@ -23,14 +23,14 @@ export class PaperWalletController {
   ) {}
 
   @Get('balances')
-  getBalances(): PaperWalletBalances {
+  getBalances(): Promise<PaperWalletBalances> {
     return this.wallet.getBalances();
   }
 
   @Get('valuation')
-  getValuation(): PortfolioValuation {
+  async getValuation(): Promise<PortfolioValuation> {
     try {
-      return this.valuation.getValuation();
+      return await this.valuation.getValuation();
     } catch (error: unknown) {
       if (
         error instanceof MarketPriceUnavailableError ||

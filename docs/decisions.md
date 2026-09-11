@@ -101,3 +101,11 @@ No balance mutation route exists. Authentication, persistence, dashboard concern
 Portfolio valuation accepts a ticker only while its receipt age is at most `PAPER_VALUATION_MAX_PRICE_AGE_MS`, defaulting to 10,000 milliseconds. Age is based on local `receivedAt`, avoiding dependence on provider clock skew. Future receipt timestamps clamp to age zero.
 
 Time enters the valuation service through a small `Clock` port backed by `SystemClock`, allowing exact boundary tests. Missing and stale prices remain distinct application errors but both map to HTTP 503. Structured warnings record the reason and, for stale prices, the observed age and configured limit.
+
+## M2.5 PostgreSQL paper balances
+
+PostgreSQL is the source of truth for paper balances. `paper_balances` stores one constrained row per supported asset with `DECIMAL(38,18)` amounts. Startup uses insert-if-missing semantics, so configured defaults seed a new database without overwriting existing balances.
+
+The domain exposes a `PaperBalanceRepository` contract; its Prisma implementation contains persistence details. Credit and debit use single atomic SQL updates. Debit includes the sufficient-balance condition in the update itself, preventing negative balances and lost-update races. The database also enforces supported assets and non-negative amounts. No transaction-history table is introduced in M2.5.
+
+The local Compose API runs `prisma migrate deploy` before NestJS starts, ensuring a new PostgreSQL volume receives committed migrations without an interactive development migration command.

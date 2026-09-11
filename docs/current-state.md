@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0 through M2.4 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2.1–M2.4 provide a fictional, in-memory BTC/USDT wallet, freshness-protected USDT valuation, and local read-only API with no exchange-account access. No dashboard, persistence, paper orders, strategy, authenticated integration, or order execution exists.
+M0 through M2.5 are complete in the working tree, completing M2. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed BTC/USDT wallet, freshness-protected USDT valuation, and local read-only API with no exchange-account access. No dashboard, paper orders, strategy, authenticated integration, or order execution exists.
 
 ## Implemented application
 
@@ -14,6 +14,7 @@ M0 through M2.4 are complete in the working tree. M1 provides unauthenticated pu
 - Redis client with explicit shutdown lifecycle handling.
 - `GET /health` checks the API, PostgreSQL, and Redis.
 - Docker Compose services for the API, PostgreSQL 17, and Redis 8.
+- The Compose API applies pending Prisma migrations before starting.
 - ESLint, Prettier, Jest unit tests, Jest E2E tests, and TypeScript build scripts.
 - Safe `.env.example`; local `.env` files and generated/build artifacts are ignored by Git.
 - Public Binance Spot `btcusdt@trade` WebSocket consumption through the `ws` transport.
@@ -36,6 +37,7 @@ M0 through M2.4 are complete in the working tree. M1 provides unauthenticated pu
 - Exact USDT portfolio valuation from BTC and USDT balances, with explicit failure before a price is available.
 - Read-only `GET /paper-wallet/balances` and `GET /paper-wallet/valuation` routes; valuation maps the unavailable-price state to HTTP 503.
 - Configurable ten-second price-freshness limit; stale valuation returns HTTP 503 and emits structured age diagnostics.
+- PostgreSQL-backed BTC/USDT balances with idempotent initial seeding and atomic decimal credit/debit operations behind a repository contract.
 
 ## Local endpoints and ports
 
@@ -50,12 +52,13 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M2.4:
+The following passed on 2026-09-11 after M2.5:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 87 tests passed across 17 suites
-- `npm run test:e2e -- --runInBand` — 5 tests passed with local test environment variables
+- `npm test -- --runInBand` — 88 tests passed across 17 suites
+- `npm run test:e2e -- --runInBand` — 6 tests passed, including persistence across wallet reinitialization
+- `npx prisma migrate deploy` — paper-balance migration applied successfully
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
@@ -64,7 +67,7 @@ The following passed on 2026-09-11 after M2.4:
 
 ## Repository state
 
-M0 through M2.3 are committed and synchronized with `origin/main`. M2.4 changes are currently in the working tree.
+M0 through M2.4 are committed and synchronized with `origin/main`. M2.5 changes are currently in the working tree.
 
 ## Known issues and cautions
 

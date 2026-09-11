@@ -6,3 +6,11 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model PaperBalance {
+  asset     String   @id @db.VarChar(10)
+  amount    Decimal  @db.Decimal(38, 18)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("paper_balances")
+}

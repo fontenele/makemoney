@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.10.0",
   "engineVersion": "0edf323efd1d98336f3f0a68684b56f689b900d3",
   "activeProvider": "postgresql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel PaperBalance {\n  asset     String   @id @db.VarChar(10)\n  amount    Decimal  @db.Decimal(38, 18)\n  updatedAt DateTime @updatedAt @map(\"updated_at\")\n\n  @@map(\"paper_balances\")\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -32,10 +32,10 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"PaperBalance\":{\"fields\":[{\"name\":\"asset\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"amount\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"}],\"dbName\":\"paper_balances\",\"schema\":null}},\"enums\":{},\"types\":{}}")
 config.parameterizationSchema = {
-  strings: JSON.parse("[]"),
-  graph: "AAAA"
+  strings: JSON.parse("[\"where\",\"PaperBalance.findUnique\",\"PaperBalance.findUniqueOrThrow\",\"orderBy\",\"cursor\",\"PaperBalance.findFirst\",\"PaperBalance.findFirstOrThrow\",\"PaperBalance.findMany\",\"data\",\"PaperBalance.createOne\",\"PaperBalance.createMany\",\"PaperBalance.createManyAndReturn\",\"PaperBalance.updateOne\",\"PaperBalance.updateMany\",\"PaperBalance.updateManyAndReturn\",\"create\",\"update\",\"PaperBalance.upsertOne\",\"PaperBalance.deleteOne\",\"PaperBalance.deleteMany\",\"having\",\"_count\",\"_avg\",\"_sum\",\"_min\",\"_max\",\"PaperBalance.groupBy\",\"PaperBalance.aggregate\",\"AND\",\"OR\",\"NOT\",\"asset\",\"amount\",\"updatedAt\",\"equals\",\"in\",\"notIn\",\"lt\",\"lte\",\"gt\",\"gte\",\"not\",\"contains\",\"startsWith\",\"endsWith\",\"set\",\"increment\",\"decrement\",\"multiply\",\"divide\"]"),
+  graph: "MAsQBhwAACUAMB0AAAQAEB4AACUAMB8BAAAAASAQACcAISFAACgAIQEAAAABACABAAAAAQAgBhwAACUAMB0AAAQAEB4AACUAMB8BACYAISAQACcAISFAACgAIQADAAAABAAgAwAABQAwBAAAAQAgAwAAAAQAIAMAAAUAMAQAAAEAIAMAAAAEACADAAAFADAEAAABACADHwEAAAABIBAAAAABIUAAAAABAQgAAAkAIAMfAQAAAAEgEAAAAAEhQAAAAAEBCAAACwAwAQgAAAsAMAMfAQAuACEgEAAvACEhQAAwACECAAAAAQAgCAAADgAgAx8BAC4AISAQAC8AISFAADAAIQIAAAAEACAIAAAQACACAAAABAAgCAAAEAAgAwAAAAEAIA8AAAkAIBAAAA4AIAEAAAABACABAAAABAAgBRUAACkAIBYAACoAIBcAAC0AIBgAACwAIBkAACsAIAYcAAAaADAdAAAXABAeAAAaADAfAQAbACEgEAAcACEhQAAdACEDAAAABAAgAwAAFgAwFAAAFwAgAwAAAAQAIAMAAAUAMAQAAAEAIAYcAAAaADAdAAAXABAeAAAaADAfAQAbACEgEAAcACEhQAAdACEOFQAAHwAgGAAAJAAgGQAAJAAgIgEAAAABIwEAAAAEJAEAAAAEJQEAAAABJgEAAAABJwEAAAABKAEAAAABKQEAIwAhKgEAAAABKwEAAAABLAEAAAABDRUAAB8AIBYAACIAIBcAACIAIBgAACIAIBkAACIAICIQAAAAASMQAAAABCQQAAAABCUQAAAAASYQAAAAAScQAAAAASgQAAAAASkQACEAIQsVAAAfACAYAAAgACAZAAAgACAiQAAAAAEjQAAAAAQkQAAAAAQlQAAAAAEmQAAAAAEnQAAAAAEoQAAAAAEpQAAeACELFQAAHwAgGAAAIAAgGQAAIAAgIkAAAAABI0AAAAAEJEAAAAAEJUAAAAABJkAAAAABJ0AAAAABKEAAAAABKUAAHgAhCCICAAAAASMCAAAABCQCAAAABCUCAAAAASYCAAAAAScCAAAAASgCAAAAASkCAB8AIQgiQAAAAAEjQAAAAAQkQAAAAAQlQAAAAAEmQAAAAAEnQAAAAAEoQAAAAAEpQAAgACENFQAAHwAgFgAAIgAgFwAAIgAgGAAAIgAgGQAAIgAgIhAAAAABIxAAAAAEJBAAAAAEJRAAAAABJhAAAAABJxAAAAABKBAAAAABKRAAIQAhCCIQAAAAASMQAAAABCQQAAAABCUQAAAAASYQAAAAAScQAAAAASgQAAAAASkQACIAIQ4VAAAfACAYAAAkACAZAAAkACAiAQAAAAEjAQAAAAQkAQAAAAQlAQAAAAEmAQAAAAEnAQAAAAEoAQAAAAEpAQAjACEqAQAAAAErAQAAAAEsAQAAAAELIgEAAAABIwEAAAAEJAEAAAAEJQEAAAABJgEAAAABJwEAAAABKAEAAAABKQEAJAAhKgEAAAABKwEAAAABLAEAAAABBhwAACUAMB0AAAQAEB4AACUAMB8BACYAISAQACcAISFAACgAIQsiAQAAAAEjAQAAAAQkAQAAAAQlAQAAAAEmAQAAAAEnAQAAAAEoAQAAAAEpAQAkACEqAQAAAAErAQAAAAEsAQAAAAEIIhAAAAABIxAAAAAEJBAAAAAEJRAAAAABJhAAAAABJxAAAAABKBAAAAABKRAAIgAhCCJAAAAAASNAAAAABCRAAAAABCVAAAAAASZAAAAAASdAAAAAAShAAAAAASlAACAAIQAAAAAAAS0BAAAAAQUtEAAAAAEuEAAAAAEvEAAAAAEwEAAAAAExEAAAAAEBLUAAAAABAAAAAAUVAAYWAAcXAAgYAAkZAAoAAAAAAAUVAAYWAAcXAAgYAAkZAAoBAgECAwEFBgEGBwEHCAEJCgEKDAILDQMMDwENEQIOEgQREwESFAETFQIaGAUbGQs"
 }
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
@@ -70,8 +70,8 @@ export interface PrismaClientConstructor {
    * const prisma = new PrismaClient({
    *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
    * })
-   * // Fetch zero or more Users
-   * const users = await prisma.user.findMany()
+   * // Fetch zero or more PaperBalances
+   * const paperBalances = await prisma.paperBalance.findMany()
    * ```
    * 
    * Read more in our [docs](https://pris.ly/d/client).
@@ -94,8 +94,8 @@ export interface PrismaClientConstructor {
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Users
- * const users = await prisma.user.findMany()
+ * // Fetch zero or more PaperBalances
+ * const paperBalances = await prisma.paperBalance.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -188,7 +188,15 @@ export interface PrismaClient<
     extArgs: ExtArgs
   }>>
 
-    
+      /**
+   * `prisma.paperBalance`: Exposes CRUD operations for the **PaperBalance** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PaperBalances
+    * const paperBalances = await prisma.paperBalance.findMany()
+    * ```
+    */
+  get paperBalance(): Prisma.PaperBalanceDelegate<ExtArgs, { omit: OmitOpts }>;
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {

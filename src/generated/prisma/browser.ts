@@ -17,4 +17,8 @@ import * as Prisma from './internal/prismaNamespaceBrowser'
 export { Prisma }
 export * as $Enums from './enums'
 export * from './enums';
-
+/**
+ * Model PaperBalance
+ * 
+ */
+export type PaperBalance = Prisma.PaperBalanceModel

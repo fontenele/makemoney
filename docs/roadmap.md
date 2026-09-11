@@ -18,13 +18,13 @@ NestJS bootstrap, validated configuration, lint/format tooling, tests, Docker Co
 - **M1.8 — complete:** public BTC/USDT pair status and price, quantity, and minimum-notional metadata from Binance exchange information.
 - Further M1 increments require separate evidence and approval. Multi-level depth, historical retrieval, persistence, and metadata refresh or enforcement remain deferred.
 
-## M2 — Paper Wallet — planned
+## M2 — Paper Wallet — complete
 
 - **M2.1 — complete:** in-memory fictional BTC/USDT balances, configurable initial USDT, exact decimal credit/debit operations, balance queries, and insufficient-funds protection.
 - **M2.2 — complete:** in-memory latest BTC/USDT price and exact portfolio valuation in USDT, with an explicit unavailable-price state.
 - **M2.3 — complete:** local read-only HTTP endpoints for paper balances and USDT valuation, returning 503 until a market price is available.
 - **M2.4 — complete:** configurable latest-price freshness enforcement with HTTP 503 and structured diagnostics for stale valuation.
-- Later M2 increments may add portfolio valuation, additional approved assets, and persistence. Each requires a separate plan and approval.
+- **M2.5 — complete:** PostgreSQL persistence for BTC/USDT paper balances with idempotent seeding and atomic decimal credit/debit operations.
 
 No real funds or exchange-account access.
 

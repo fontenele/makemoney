@@ -43,7 +43,7 @@ export class PortfolioValuationService {
     @Inject(CLOCK) private readonly clock: Clock,
   ) {}
 
-  getValuation(): PortfolioValuation {
+  async getValuation(): Promise<PortfolioValuation> {
     const ticker = this.latestMarketPrice.getLatest();
 
     if (!ticker) {
@@ -63,7 +63,7 @@ export class PortfolioValuationService {
     }
 
     const btcPrice = parsePositivePrice(ticker.lastPrice);
-    const balances = this.wallet.getBalances();
+    const balances = await this.wallet.getBalances();
     const btcValue = new ValuationDecimal(balances.BTC).times(btcPrice);
     const totalValue = new ValuationDecimal(balances.USDT).plus(btcValue);
 

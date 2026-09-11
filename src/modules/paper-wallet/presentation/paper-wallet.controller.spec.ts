@@ -10,54 +10,51 @@ import { PortfolioValuation } from '../domain/portfolio-valuation';
 import { PaperWalletController } from './paper-wallet.controller';
 
 describe('PaperWalletController', () => {
-  it('returns paper balances without exposing mutations', () => {
-    const getBalances = jest.fn<() => { BTC: string; USDT: string }>();
-    getBalances.mockReturnValue({ BTC: '0.1', USDT: '900' });
+  it('returns paper balances without exposing mutations', async () => {
+    const getBalances = jest.fn<() => Promise<{ BTC: string; USDT: string }>>();
+    getBalances.mockResolvedValue({ BTC: '0.1', USDT: '900' });
     const controller = createController({ getBalances });
 
-    expect(controller.getBalances()).toEqual({ BTC: '0.1', USDT: '900' });
-  });
-
-  it('returns the current portfolio valuation', () => {
-    const value = valuation();
-    const getValuation = jest.fn<() => PortfolioValuation>();
-    getValuation.mockReturnValue(value);
-    const controller = createController(undefined, { getValuation });
-
-    expect(controller.getValuation()).toBe(value);
-  });
-
-  it('maps only unavailable market price to service unavailable', () => {
-    const getValuation = jest.fn<() => PortfolioValuation>();
-    getValuation.mockImplementation(() => {
-      throw new MarketPriceUnavailableError();
+    await expect(controller.getBalances()).resolves.toEqual({
+      BTC: '0.1',
+      USDT: '900',
     });
+  });
+
+  it('returns the current portfolio valuation', async () => {
+    const value = valuation();
+    const getValuation = jest.fn<() => Promise<PortfolioValuation>>();
+    getValuation.mockResolvedValue(value);
     const controller = createController(undefined, { getValuation });
 
-    expect(() => controller.getValuation()).toThrow(
+    await expect(controller.getValuation()).resolves.toBe(value);
+  });
+
+  it('maps only unavailable market price to service unavailable', async () => {
+    const getValuation = jest.fn<() => Promise<PortfolioValuation>>();
+    getValuation.mockRejectedValue(new MarketPriceUnavailableError());
+    const controller = createController(undefined, { getValuation });
+
+    await expect(controller.getValuation()).rejects.toThrow(
       ServiceUnavailableException,
     );
   });
 
-  it('does not hide unexpected valuation errors', () => {
+  it('does not hide unexpected valuation errors', async () => {
     const unexpected = new Error('unexpected');
-    const getValuation = jest.fn<() => PortfolioValuation>();
-    getValuation.mockImplementation(() => {
-      throw unexpected;
-    });
+    const getValuation = jest.fn<() => Promise<PortfolioValuation>>();
+    getValuation.mockRejectedValue(unexpected);
     const controller = createController(undefined, { getValuation });
 
-    expect(() => controller.getValuation()).toThrow(unexpected);
+    await expect(controller.getValuation()).rejects.toThrow(unexpected);
   });
 
-  it('maps a stale market price to service unavailable', () => {
-    const getValuation = jest.fn<() => PortfolioValuation>();
-    getValuation.mockImplementation(() => {
-      throw new StaleMarketPriceError(10001, 10000);
-    });
+  it('maps a stale market price to service unavailable', async () => {
+    const getValuation = jest.fn<() => Promise<PortfolioValuation>>();
+    getValuation.mockRejectedValue(new StaleMarketPriceError(10001, 10000));
     const controller = createController(undefined, { getValuation });
 
-    expect(() => controller.getValuation()).toThrow(
+    await expect(controller.getValuation()).rejects.toThrow(
       ServiceUnavailableException,
     );
   });

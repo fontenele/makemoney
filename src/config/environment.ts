@@ -25,7 +25,7 @@ const environmentSchema = Joi.object<Environment>({
     .uri({ scheme: ['https'] })
     .default('https://data-api.binance.vision'),
   PAPER_INITIAL_USDT_BALANCE: Joi.string()
-    .pattern(/^(0|[1-9]\d*)(\.\d+)?$/)
+    .pattern(/^(0|[1-9]\d{0,19})(\.\d{1,18})?$/)
     .default('1000'),
   PAPER_VALUATION_MAX_PRICE_AGE_MS: Joi.number()
     .integer()
