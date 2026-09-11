@@ -2,12 +2,15 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PublicCandlesService } from './application/public-candles.service';
 import { PublicTickerService } from './application/public-ticker.service';
+import { PublicTopOfBookService } from './application/public-top-of-book.service';
 import { PublicTradesService } from './application/public-trades.service';
 import { CANDLE_STREAM } from './domain/candle-stream';
 import { TICKER_STREAM } from './domain/ticker-stream';
+import { TOP_OF_BOOK_STREAM } from './domain/top-of-book-stream';
 import { TRADE_STREAM } from './domain/trade-stream';
 import { BinancePublicCandlesClient } from './infrastructure/binance/binance-public-candles.client';
 import { BinancePublicTickerClient } from './infrastructure/binance/binance-public-ticker.client';
+import { BinancePublicTopOfBookClient } from './infrastructure/binance/binance-public-top-of-book.client';
 import { BinancePublicTradesClient } from './infrastructure/binance/binance-public-trades.client';
 
 @Module({
@@ -36,9 +39,18 @@ import { BinancePublicTradesClient } from './infrastructure/binance/binance-publ
           config.getOrThrow<string>('BINANCE_WS_BASE_URL'),
         ),
     },
+    {
+      provide: TOP_OF_BOOK_STREAM,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService): BinancePublicTopOfBookClient =>
+        new BinancePublicTopOfBookClient(
+          config.getOrThrow<string>('BINANCE_WS_BASE_URL'),
+        ),
+    },
     PublicTradesService,
     PublicTickerService,
     PublicCandlesService,
+    PublicTopOfBookService,
   ],
 })
 export class MarketDataModule {}

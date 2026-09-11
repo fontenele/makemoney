@@ -2,6 +2,26 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M1.6 Binance public top of book completed
+
+### Added
+
+- Public, unauthenticated Binance Spot `btcusdt@bookTicker` WebSocket client.
+- Provider-neutral top-of-book stream contract and `MarketTopOfBook` domain type.
+- Best bid and ask prices and quantities, provider update ID, and receipt time.
+- Structured `market.top_of_book.received` and `market.top_of_book.reconnect_scheduled` logs.
+- Unit coverage for normalization, invalid payloads, delivery, lifecycle, reconnection reset, and shutdown cancellation.
+- M1.6 operational and domain documentation.
+
+### Changed
+
+- The market-data module now starts and stops an independent top-of-book stream.
+- Corrected repository-state documentation after M1.5 was committed.
+
+### Scope confirmation
+
+- No dependency, spread calculation, multi-level depth, REST snapshot, persistence, authentication, wallet, strategy, or financial behavior was introduced.
+
 ## 2026-09-11 — M1.5 candle volume completed
 
 ### Added

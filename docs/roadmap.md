@@ -13,7 +13,8 @@ NestJS bootstrap, validated configuration, lint/format tooling, tests, Docker Co
 - **M1.3 — complete:** Binance public BTC/USDT mini ticker, normalized to the latest price and timestamps. No authentication.
 - **M1.4 — complete:** Binance public BTC/USDT one-minute candle updates with normalized OHLC, time boundaries, and close state. No persistence.
 - **M1.5 — complete:** base, quote, and taker-buy volume plus trade count exposed on normalized one-minute candles.
-- Later M1 increments: order book, spread, and pair metadata. These require separate approval.
+- **M1.6 — complete:** Binance public BTC/USDT top of book with normalized best bid and ask prices and quantities.
+- Later M1 increments: spread and pair metadata. Multi-level depth requires separate evidence and approval.
 
 ## M2 — Paper Wallet — planned
 

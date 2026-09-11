@@ -55,3 +55,11 @@ The candle stream uses its own provider-neutral contract, lifecycle service, soc
 M1.5 enriches `MarketCandle` from the existing Binance kline payload instead of adding a connection or provider request. It exposes base volume, quote volume, taker-buy base volume, and taker-buy quote volume as decimal strings, preserving provider precision without native floating-point conversion. Trade count is a validated non-negative safe integer.
 
 The fields represent the current state of the active candle and may change on each update until `isClosed` becomes true. No accumulation, conversion, ratio, indicator, or historical aggregation is performed in M1.5.
+
+## M1.6 public top of book
+
+M1.6 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@bookTicker`. It is public, requires no credentials, and emits changes to the best bid or ask in real time.
+
+The internal `MarketTopOfBook` contains the provider, normalized symbol, provider update ID, best bid price and quantity, best ask price and quantity, and receipt time. Update IDs are strings; all prices and quantities remain decimal strings.
+
+This increment intentionally represents only level one of the book. It does not calculate spread, reconstruct depth, request REST snapshots, or persist updates. The stream has its own provider-neutral contract, lifecycle service, socket, and bounded reconnection policy.
