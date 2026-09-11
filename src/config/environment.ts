@@ -6,6 +6,7 @@ interface Environment {
   DATABASE_URL: string;
   REDIS_URL: string;
   BINANCE_WS_BASE_URL: string;
+  BINANCE_REST_BASE_URL: string;
 }
 
 const environmentSchema = Joi.object<Environment>({
@@ -18,6 +19,9 @@ const environmentSchema = Joi.object<Environment>({
   BINANCE_WS_BASE_URL: Joi.string()
     .uri({ scheme: ['wss'] })
     .default('wss://stream.binance.com:9443'),
+  BINANCE_REST_BASE_URL: Joi.string()
+    .uri({ scheme: ['https'] })
+    .default('https://data-api.binance.vision'),
 }).unknown(true);
 
 export function validateEnvironment(

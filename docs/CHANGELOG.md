@@ -2,6 +2,26 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M1.8 Binance public pair metadata completed
+
+### Added
+
+- Public, unauthenticated Binance Spot BTC/USDT exchange-information request at module startup.
+- Provider-neutral pair-metadata contract with status, assets, price filter, lot-size filter, and minimum notional.
+- HTTPS-only `BINANCE_REST_BASE_URL` configuration with the Binance public-data endpoint as its safe default.
+- Ten-second request timeout, strict payload validation, structured logging, and startup failure isolation.
+- Unit coverage for both supported notional filters, invalid metadata, endpoint construction, HTTP failure, and lifecycle behavior.
+- M1.8 operational and domain documentation.
+
+### Changed
+
+- The market-data module now loads one pair-metadata snapshot independently of the existing live streams.
+- Corrected repository-state documentation after M1.7 was committed.
+
+### Scope confirmation
+
+- No dependency, metadata refresh, cache, persistence, order validation, authentication, wallet, strategy, or order execution was introduced.
+
 ## 2026-09-11 — M1.7 deterministic spread calculation completed
 
 ### Added

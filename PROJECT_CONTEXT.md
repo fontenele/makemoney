@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1.1 — Binance public BTC/USDT trades**, **M1.2 — WebSocket reconnection**, **M1.3 — Binance public BTC/USDT mini ticker**, **M1.4 — Binance public BTC/USDT 1m candles**, **M1.5 — candle volume**, **M1.6 — BTC/USDT top of book**, and **M1.7 — deterministic spread calculation**.
+- Completed milestones: **M0 — Bootstrap**, **M1.1 — Binance public BTC/USDT trades**, **M1.2 — WebSocket reconnection**, **M1.3 — Binance public BTC/USDT mini ticker**, **M1.4 — Binance public BTC/USDT 1m candles**, **M1.5 — candle volume**, **M1.6 — BTC/USDT top of book**, **M1.7 — deterministic spread calculation**, and **M1.8 — BTC/USDT pair metadata**.
 - No next increment is approved. Stop and present a minimal plan before starting more market-data work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -16,9 +16,9 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Immediate boundary
 
-The current market-data scope receives BTC/USDT public trade, mini ticker, one-minute candle, and top-of-book events from Binance WebSocket, requires no authentication, and normalizes those events into internal domain representations.
+The current market-data scope receives BTC/USDT public trade, mini ticker, one-minute candle, and top-of-book events from Binance WebSocket and loads public pair metadata from Binance REST. It requires no authentication and normalizes provider data into internal domain representations.
 
-Historical candles, aggregate volume analytics, pair metadata, multi-level order books, persistence, paper trading, strategies, wallet access, authenticated APIs, and order execution remain unimplemented and require separately approved milestones.
+Historical candles, aggregate volume analytics, metadata refresh and enforcement, multi-level order books, persistence, paper trading, strategies, wallet access, authenticated APIs, and order execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 
@@ -38,3 +38,4 @@ Historical candles, aggregate volume analytics, pair metadata, multi-level order
 - `docs/binance-public-ticker.md`: M1.3 stream contract and operation.
 - `docs/binance-public-candles.md`: M1.4–M1.5 candle and volume contract and operation.
 - `docs/binance-public-top-of-book.md`: M1.6–M1.7 best bid/ask and spread contract and operation.
+- `docs/binance-pair-metadata.md`: M1.8 public BTC/USDT trading-rule metadata.

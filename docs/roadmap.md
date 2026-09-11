@@ -15,7 +15,8 @@ NestJS bootstrap, validated configuration, lint/format tooling, tests, Docker Co
 - **M1.5 — complete:** base, quote, and taker-buy volume plus trade count exposed on normalized one-minute candles.
 - **M1.6 — complete:** Binance public BTC/USDT top of book with normalized best bid and ask prices and quantities.
 - **M1.7 — complete:** deterministic BTC/USDT absolute spread, midpoint, and basis-point calculation using decimal arithmetic.
-- Later M1 increments: pair metadata. Multi-level depth requires separate evidence and approval.
+- **M1.8 — complete:** public BTC/USDT pair status and price, quantity, and minimum-notional metadata from Binance exchange information.
+- Further M1 increments require separate evidence and approval. Multi-level depth, historical retrieval, persistence, and metadata refresh or enforcement remain deferred.
 
 ## M2 — Paper Wallet — planned
 

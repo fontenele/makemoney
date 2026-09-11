@@ -69,3 +69,9 @@ This increment intentionally represents only level one of the book. It does not 
 M1.7 derives spread metrics from each M1.6 top-of-book update without opening another connection. Monetary arithmetic uses a local `decimal.js` constructor configured with precision 40 and half-even rounding; native JavaScript floating-point arithmetic is not used.
 
 Absolute spread is `ask - bid`, midpoint is `(ask + bid) / 2`, and spread basis points are `(absolute spread / midpoint) * 10000`. Absolute spread and midpoint are canonical decimal strings. Basis points are rounded to exactly eight decimal places. Crossed books (`ask < bid`) and non-positive midpoints are rejected; a locked positive book produces zero spread.
+
+## M1.8 public pair metadata
+
+M1.8 uses the public Binance Spot `GET /api/v3/exchangeInfo?symbol=BTCUSDT` endpoint through the public-data base URL `https://data-api.binance.vision`. The application uses Node 24's native `fetch` with a ten-second timeout, so no HTTP dependency is added.
+
+The provider boundary validates the BTC/USDT identity, status, `PRICE_FILTER`, `LOT_SIZE`, and minimum notional from either `MIN_NOTIONAL` or `NOTIONAL`. Financial values remain decimal strings. One snapshot starts loading during module initialization without blocking application startup; failure is logged, and shutdown aborts an in-flight request. Refresh, caching, persistence, and enforcement are deferred.
