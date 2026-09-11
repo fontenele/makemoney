@@ -15,6 +15,7 @@ M2 Paper Wallet:          IN PROGRESS
 M2.1 Paper Wallet Core:   DONE
 M2.2 Portfolio Valuation: DONE
 M2.3 Read-only API:       DONE
+M2.4 Stale Price Guard:   DONE
 Next increment:           NOT APPROVED
 ```
 
@@ -1655,7 +1656,7 @@ Roadmap:
 ```text
 M0 — Bootstrap                    DONE
 M1 — Market Data                  DONE
-M2 — Paper Wallet                 IN PROGRESS (M2.1–M2.3 DONE)
+M2 — Paper Wallet                 IN PROGRESS (M2.1–M2.4 DONE)
 M3 — Paper Trading                PLANNED
 M4 — Risk Engine                  PLANNED
 M5 — Strategies                   PLANNED
@@ -2168,6 +2169,7 @@ M2 Paper Wallet:      IN PROGRESS
 M2.1 Wallet Core:     DONE
 M2.2 Valuation:       DONE
 M2.3 Read-only API:   DONE
+M2.4 Stale Guard:     DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS

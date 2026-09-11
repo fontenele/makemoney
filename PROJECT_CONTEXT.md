@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2.1 — Paper Wallet Core**, **M2.2 — Portfolio Valuation**, and **M2.3 — Read-only Portfolio API**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, and **M2.1 through M2.4 — Paper Wallet**.
 - No next increment is approved. Stop and present a minimal plan before starting more wallet or trading work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -23,6 +23,8 @@ M2.1 adds an in-memory fictional wallet for BTC and USDT with configurable initi
 M2.2 retains the latest normalized BTC/USDT ticker in memory and values the fictional BTC and USDT balances in USDT with exact decimal arithmetic.
 
 M2.3 exposes balances and valuation through local read-only HTTP endpoints. No wallet mutation is exposed.
+
+M2.4 rejects valuation when the latest ticker is older than the configured freshness limit, which defaults to ten seconds.
 
 Historical data, persistence, BRL conversion, orders, fees, spread/slippage execution modeling, PnL, strategies, authenticated APIs, and execution remain unimplemented and require separately approved milestones.
 

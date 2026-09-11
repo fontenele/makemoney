@@ -68,7 +68,7 @@ describe('Application (e2e)', () => {
       symbol: 'BTC/USDT',
       lastPrice: '77777.12',
       eventTime: new Date('2026-09-11T12:00:00.000Z'),
-      receivedAt: new Date('2026-09-11T12:00:00.100Z'),
+      receivedAt: new Date(),
     });
 
     return request(server).get('/paper-wallet/valuation').expect(200).expect({
@@ -80,5 +80,18 @@ describe('Application (e2e)', () => {
       totalValue: '1000',
       pricedAt: '2026-09-11T12:00:00.000Z',
     });
+  });
+
+  it('/paper-wallet/valuation (GET) returns 503 for a stale price', () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    latestMarketPrice.update({
+      provider: 'binance',
+      symbol: 'BTC/USDT',
+      lastPrice: '77777.12',
+      eventTime: new Date('2026-09-11T12:00:00.000Z'),
+      receivedAt: new Date(Date.now() - 10001),
+    });
+
+    return request(server).get('/paper-wallet/valuation').expect(503);
   });
 });

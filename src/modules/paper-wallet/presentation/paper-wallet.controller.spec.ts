@@ -4,6 +4,7 @@ import { PaperWalletService } from '../application/paper-wallet.service';
 import {
   MarketPriceUnavailableError,
   PortfolioValuationService,
+  StaleMarketPriceError,
 } from '../application/portfolio-valuation.service';
 import { PortfolioValuation } from '../domain/portfolio-valuation';
 import { PaperWalletController } from './paper-wallet.controller';
@@ -47,6 +48,18 @@ describe('PaperWalletController', () => {
     const controller = createController(undefined, { getValuation });
 
     expect(() => controller.getValuation()).toThrow(unexpected);
+  });
+
+  it('maps a stale market price to service unavailable', () => {
+    const getValuation = jest.fn<() => PortfolioValuation>();
+    getValuation.mockImplementation(() => {
+      throw new StaleMarketPriceError(10001, 10000);
+    });
+    const controller = createController(undefined, { getValuation });
+
+    expect(() => controller.getValuation()).toThrow(
+      ServiceUnavailableException,
+    );
   });
 });
 

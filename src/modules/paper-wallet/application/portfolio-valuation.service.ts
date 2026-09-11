@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import Decimal from 'decimal.js';
 import { LatestMarketPriceService } from '../../market-data/application/latest-market-price.service';
 import { PortfolioValuation } from '../domain/portfolio-valuation';
+import { CLOCK, Clock } from '../domain/clock';
 import { PaperWalletService } from './paper-wallet.service';
 
 const ValuationDecimal = Decimal.clone({
@@ -20,11 +22,25 @@ export class MarketPriceUnavailableError extends Error {
   }
 }
 
+export class StaleMarketPriceError extends Error {
+  constructor(
+    readonly priceAgeMs: number,
+    readonly maxPriceAgeMs: number,
+  ) {
+    super(
+      `BTC/USDT market price is stale (${priceAgeMs}ms old; maximum ${maxPriceAgeMs}ms)`,
+    );
+    this.name = StaleMarketPriceError.name;
+  }
+}
+
 @Injectable()
 export class PortfolioValuationService {
   constructor(
     private readonly wallet: PaperWalletService,
     private readonly latestMarketPrice: LatestMarketPriceService,
+    private readonly config: ConfigService,
+    @Inject(CLOCK) private readonly clock: Clock,
   ) {}
 
   getValuation(): PortfolioValuation {
@@ -32,6 +48,18 @@ export class PortfolioValuationService {
 
     if (!ticker) {
       throw new MarketPriceUnavailableError();
+    }
+
+    const maxPriceAgeMs = this.config.getOrThrow<number>(
+      'PAPER_VALUATION_MAX_PRICE_AGE_MS',
+    );
+    const priceAgeMs = Math.max(
+      0,
+      this.clock.now().getTime() - ticker.receivedAt.getTime(),
+    );
+
+    if (priceAgeMs > maxPriceAgeMs) {
+      throw new StaleMarketPriceError(priceAgeMs, maxPriceAgeMs);
     }
 
     const btcPrice = parsePositivePrice(ticker.lastPrice);

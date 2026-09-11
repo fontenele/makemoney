@@ -8,6 +8,7 @@ interface Environment {
   BINANCE_WS_BASE_URL: string;
   BINANCE_REST_BASE_URL: string;
   PAPER_INITIAL_USDT_BALANCE: string;
+  PAPER_VALUATION_MAX_PRICE_AGE_MS: number;
 }
 
 const environmentSchema = Joi.object<Environment>({
@@ -26,6 +27,10 @@ const environmentSchema = Joi.object<Environment>({
   PAPER_INITIAL_USDT_BALANCE: Joi.string()
     .pattern(/^(0|[1-9]\d*)(\.\d+)?$/)
     .default('1000'),
+  PAPER_VALUATION_MAX_PRICE_AGE_MS: Joi.number()
+    .integer()
+    .positive()
+    .default(10000),
 }).unknown(true);
 
 export function validateEnvironment(

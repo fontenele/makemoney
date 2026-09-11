@@ -1,4 +1,5 @@
 import { LatestMarketPriceService } from '../../market-data/application/latest-market-price.service';
+import { ConfigService } from '@nestjs/config';
 import { PaperWallet } from '../domain/paper-wallet';
 import { PaperWalletService } from './paper-wallet.service';
 import { PortfolioValuationService } from './portfolio-valuation.service';
@@ -35,6 +36,22 @@ describe('PortfolioValuationService', () => {
     expect(service.getValuation().btcValue).toBe('0.06');
   });
 
+  it('rejects a price older than the configured maximum age', () => {
+    const { service, prices } = createService('1000', '0', 9899);
+    prices.update(ticker('77000'));
+
+    expect(() => service.getValuation()).toThrow(
+      'BTC/USDT market price is stale (9900ms old; maximum 9899ms)',
+    );
+  });
+
+  it('accepts a price exactly at the configured maximum age', () => {
+    const { service, prices } = createService('1000', '0', 9900);
+    prices.update(ticker('77000'));
+
+    expect(service.getValuation().btcPrice).toBe('77000');
+  });
+
   it.each(['0', '-1', '1e3', 'NaN'])(
     'rejects invalid market price %s',
     (price) => {
@@ -49,6 +66,7 @@ describe('PortfolioValuationService', () => {
 function createService(
   usdt: string,
   btc: string,
+  maxPriceAgeMs = 10000,
 ): {
   service: PortfolioValuationService;
   prices: LatestMarketPriceService;
@@ -59,7 +77,12 @@ function createService(
   );
 
   return {
-    service: new PortfolioValuationService(wallet, prices),
+    service: new PortfolioValuationService(
+      wallet,
+      prices,
+      new ConfigService({ PAPER_VALUATION_MAX_PRICE_AGE_MS: maxPriceAgeMs }),
+      { now: () => new Date('2026-09-11T12:00:10.000Z') },
+    ),
     prices,
   };
 }

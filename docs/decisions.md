@@ -95,3 +95,9 @@ The portfolio value is quoted only in USDT: `USDT balance + (BTC balance × late
 The local API exposes `GET /paper-wallet/balances` and `GET /paper-wallet/valuation`. The controller delegates to existing application services and exposes provider-neutral representations. Only the explicit missing-price domain condition maps to HTTP 503; unexpected errors are not hidden.
 
 No balance mutation route exists. Authentication, persistence, dashboard concerns, and trading actions remain outside M2.3.
+
+## M2.4 stale-price protection
+
+Portfolio valuation accepts a ticker only while its receipt age is at most `PAPER_VALUATION_MAX_PRICE_AGE_MS`, defaulting to 10,000 milliseconds. Age is based on local `receivedAt`, avoiding dependence on provider clock skew. Future receipt timestamps clamp to age zero.
+
+Time enters the valuation service through a small `Clock` port backed by `SystemClock`, allowing exact boundary tests. Missing and stale prices remain distinct application errors but both map to HTTP 503. Structured warnings record the reason and, for stale prices, the observed age and configured limit.

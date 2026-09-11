@@ -2,6 +2,25 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M2.4 stale-price protection completed
+
+### Added
+
+- Validated `PAPER_VALUATION_MAX_PRICE_AGE_MS` configuration with a 10-second default.
+- Injectable system-clock boundary for deterministic freshness checks.
+- Dedicated stale-price error with observed age and configured limit.
+- Structured missing/stale valuation warnings.
+- Unit and E2E coverage for stale prices and exact freshness boundaries.
+
+### Changed
+
+- `GET /paper-wallet/valuation` now returns HTTP 503 for stale as well as missing prices.
+- Project context, roadmap, current state, decisions, paper-wallet guide, keyword map, plan, and examples now reflect M2.4.
+
+### Scope confirmation
+
+- No order, paper execution, persistence, BRL conversion, fee, slippage, PnL, strategy, authenticated integration, dashboard, or real trading was introduced.
+
 ## 2026-09-11 — M2.3 read-only portfolio API completed
 
 ### Added

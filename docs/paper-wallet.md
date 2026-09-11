@@ -1,12 +1,13 @@
 # Paper Wallet
 
-M2.1 introduces a fictional, in-memory wallet for the `BTC` and `USDT` assets. M2.2 adds valuation in USDT from the latest normalized BTC/USDT ticker. M2.3 exposes both views through local read-only HTTP endpoints. None of these increments connects to an exchange account, holds credentials, or submits orders.
+M2.1 introduces a fictional, in-memory wallet for the `BTC` and `USDT` assets. M2.2 adds valuation in USDT from the latest normalized BTC/USDT ticker. M2.3 exposes both views through local read-only HTTP endpoints. M2.4 prevents valuation with stale prices. None of these increments connects to an exchange account, holds credentials, or submits orders.
 
 ## Configuration
 
 - `PAPER_INITIAL_USDT_BALANCE` sets the initial USDT balance and defaults to `1000`.
 - The initial BTC balance is `0`.
 - Configuration accepts only plain, non-negative decimal strings. Exponential notation is rejected.
+- `PAPER_VALUATION_MAX_PRICE_AGE_MS` sets the maximum ticker age accepted for valuation and defaults to `10000` milliseconds.
 
 ## Domain behavior
 
@@ -30,11 +31,13 @@ totalValue = usdtBalance + btcValue
 
 The result contains the BTC balance and value, USDT balance, BTC price, total USDT value, and ticker event time. All financial fields are decimal strings and calculations use `decimal.js`. Valuation fails explicitly until the first ticker is available and rejects non-positive or malformed prices.
 
+Valuation also compares the current time with the ticker `receivedAt`. A price older than `PAPER_VALUATION_MAX_PRICE_AGE_MS` is rejected as stale; a price exactly at the limit remains valid. A system-clock adapter keeps this rule deterministic in tests.
+
 ## Read-only HTTP API
 
 - `GET /paper-wallet/balances` returns the current BTC and USDT decimal-string balances.
 - `GET /paper-wallet/valuation` returns the current USDT valuation.
-- Valuation returns HTTP 503 until the first normalized BTC/USDT ticker is available.
+- Valuation returns HTTP 503 until the first normalized BTC/USDT ticker is available or when the retained ticker is stale.
 
 There are no HTTP routes for credit, debit, reset, orders, or any other mutation.
 
@@ -44,4 +47,4 @@ Startup emits `paper_wallet.initialized`. Successful mutations emit `paper_walle
 
 ## Deferred scope
 
-BRL conversion, stale-price policy, fees, spread, slippage, PnL, orders, execution, persistence, additional assets, authenticated access, and dashboard exposure require later approved increments.
+BRL conversion, fees, spread, slippage, PnL, orders, execution, persistence, additional assets, authenticated access, and dashboard exposure require later approved increments.

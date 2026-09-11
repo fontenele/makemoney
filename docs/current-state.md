@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0 through M2.3 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2.1–M2.3 provide a fictional, in-memory BTC/USDT wallet, USDT portfolio valuation, and local read-only API with no exchange-account access. No dashboard, persistence, paper orders, strategy, authenticated integration, or order execution exists.
+M0 through M2.4 are complete in the working tree. M1 provides unauthenticated public BTC/USDT market data. M2.1–M2.4 provide a fictional, in-memory BTC/USDT wallet, freshness-protected USDT valuation, and local read-only API with no exchange-account access. No dashboard, persistence, paper orders, strategy, authenticated integration, or order execution exists.
 
 ## Implemented application
 
@@ -35,6 +35,7 @@ M0 through M2.3 are complete in the working tree. M1 provides unauthenticated pu
 - Process-local retention of the latest normalized BTC/USDT ticker for downstream read models.
 - Exact USDT portfolio valuation from BTC and USDT balances, with explicit failure before a price is available.
 - Read-only `GET /paper-wallet/balances` and `GET /paper-wallet/valuation` routes; valuation maps the unavailable-price state to HTTP 503.
+- Configurable ten-second price-freshness limit; stale valuation returns HTTP 503 and emits structured age diagnostics.
 
 ## Local endpoints and ports
 
@@ -49,12 +50,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M2.3:
+The following passed on 2026-09-11 after M2.4:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 84 tests passed across 17 suites
-- `npm run test:e2e -- --runInBand` — 4 tests passed with local test environment variables
+- `npm test -- --runInBand` — 87 tests passed across 17 suites
+- `npm run test:e2e -- --runInBand` — 5 tests passed with local test environment variables
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
@@ -63,7 +64,7 @@ The following passed on 2026-09-11 after M2.3:
 
 ## Repository state
 
-M0 through M1.8 are committed and synchronized with `origin/main`. M2.1 through M2.3 changes are currently in the working tree.
+M0 through M2.3 are committed and synchronized with `origin/main`. M2.4 changes are currently in the working tree.
 
 ## Known issues and cautions
 
