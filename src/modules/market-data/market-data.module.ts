@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PublicCandlesService } from './application/public-candles.service';
 import { PublicTickerService } from './application/public-ticker.service';
 import { PublicTradesService } from './application/public-trades.service';
+import { CANDLE_STREAM } from './domain/candle-stream';
 import { TICKER_STREAM } from './domain/ticker-stream';
 import { TRADE_STREAM } from './domain/trade-stream';
+import { BinancePublicCandlesClient } from './infrastructure/binance/binance-public-candles.client';
 import { BinancePublicTickerClient } from './infrastructure/binance/binance-public-ticker.client';
 import { BinancePublicTradesClient } from './infrastructure/binance/binance-public-trades.client';
 
@@ -25,8 +28,17 @@ import { BinancePublicTradesClient } from './infrastructure/binance/binance-publ
           config.getOrThrow<string>('BINANCE_WS_BASE_URL'),
         ),
     },
+    {
+      provide: CANDLE_STREAM,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService): BinancePublicCandlesClient =>
+        new BinancePublicCandlesClient(
+          config.getOrThrow<string>('BINANCE_WS_BASE_URL'),
+        ),
+    },
     PublicTradesService,
     PublicTickerService,
+    PublicCandlesService,
   ],
 })
 export class MarketDataModule {}

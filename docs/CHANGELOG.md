@@ -2,6 +2,27 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M1.4 Binance public one-minute candles completed
+
+### Added
+
+- Public, unauthenticated Binance Spot `btcusdt@kline_1m` WebSocket client.
+- Provider-neutral candle stream contract and normalized `MarketCandle` domain type.
+- OHLC decimal strings, UTC candle boundaries, and candle close state.
+- Structured `market.candle.received` and `market.candle.reconnect_scheduled` logs.
+- Unit coverage for normalization, close state, invalid payloads, message delivery, lifecycle, reconnection reset, and shutdown cancellation.
+- M1.4 operational and domain documentation.
+
+### Changed
+
+- The market-data module now starts and stops independent trade, mini ticker, and one-minute candle streams.
+- Corrected repository-state documentation after M1.3 was committed.
+
+### Scope confirmation
+
+- Volume, taker volume, trade IDs, and trade count are validated but not exposed to the domain.
+- No dependency, authentication, persistence, historical retrieval, order book, spread, dashboard, wallet, strategy, or financial behavior was introduced.
+
 ## 2026-09-11 — M1.3 Binance public mini ticker completed
 
 ### Added

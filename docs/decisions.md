@@ -41,3 +41,11 @@ M1.3 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@
 The provider payload is fully validated at the infrastructure boundary, including fields not yet needed by the domain. The internal `MarketTicker` intentionally exposes only provider, symbol, latest price, event time, and receipt time. Volume and rolling-window price statistics remain deferred rather than expanding M1.3.
 
 The ticker has its own provider-neutral stream contract and lifecycle service. Its WebSocket uses the same bounded reconnection policy established in M1.2. A separate socket keeps the existing trade contract stable; connection consolidation is deferred until the number of approved streams makes it concretely useful.
+
+## M1.4 public one-minute candles
+
+M1.4 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@kline_1m`. It is public, requires no credentials, and updates the active UTC one-minute candle approximately every two seconds.
+
+The internal `MarketCandle` exposes OHLC decimal strings, the fixed `1m` interval, open and close timestamps, the provider close-state indicator, event time, and receipt time. The provider's volume, taker volume, trade IDs, and trade count are validated at the boundary but remain outside the domain until an approved volume increment.
+
+The candle stream uses its own provider-neutral contract, lifecycle service, socket, and the bounded reconnection policy established in M1.2. M1.4 provides live updates only; historical retrieval and persistence remain deferred.
