@@ -1,0 +1,48 @@
+# Roadmap
+
+Implementation is incremental. A milestone starts only after the preceding scope is verified and the user approves the next plan.
+
+## M0 — Bootstrap — complete
+
+NestJS bootstrap, validated configuration, lint/format tooling, tests, Docker Compose, PostgreSQL, Redis, Prisma, health checks, and initial documentation.
+
+## M1 — Market Data — planned
+
+- **M1.1:** Binance public BTC/USDT trades over WebSocket, normalized into the internal domain model. No authentication.
+- Later M1 increments: ticker, candles, volume, order book, spread, pair metadata, and production-grade reconnection behavior. These are explicitly excluded from M1.1 unless separately approved.
+
+## M2 — Paper Wallet — planned
+
+Configurable virtual balances and portfolio valuation. No real funds.
+
+## M3 — Paper Trading — planned
+
+Paper execution behind a shared executor contract, using real market prices and realistic fees, spread, slippage, precision, minimum orders, and liquidity constraints.
+
+## M4 — Risk Engine — planned
+
+All strategy signals pass through independent risk assessment before any executor. Position, exposure, loss, liquidity, and safety limits are introduced with focused tests.
+
+## M5 — Strategies — planned
+
+Deterministic, reproducible, measurable strategies that produce signals and never submit orders directly.
+
+## M6 — Backtesting — planned
+
+Historical simulation and metrics including net PnL, fees, ROI, drawdown, profit factor, and expectancy.
+
+## M7 — New Listing Scanner — planned
+
+Collect and statistically analyze newly listed assets without assuming the hypothesis is profitable.
+
+## M8 — Dashboard — planned
+
+Vue 3/Vite interface and market/portfolio visualizations. No dashboard exists yet.
+
+## M9 — Polymarket — planned
+
+Prediction-market support modeled separately from spot crypto semantics.
+
+## M10 — Agentic Wallet / Real Trading — planned
+
+Research current official Binance documentation before design. Real trading requires multiple independent safeguards and explicit user confirmation immediately before the first real order.
