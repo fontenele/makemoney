@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, and **M3.1 through M3.8 — Paper Trading quotes, execution, history, position accounting, and realized performance**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, **M3 — Paper Trading (M3.1 through M3.8)**, and **M4.1 — maximum-order-notional risk rule**.
 - No next increment is approved. Stop and present a minimal plan before starting more wallet or trading work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -40,6 +40,8 @@ M3.7 values an open position at the latest fresh best bid, subtracts the estimat
 
 M3.8 exposes execution counts, net profitable/losing/break-even sell counts, realized win rate, realized PnL, and total execution fees at `GET /paper-trading/performance`.
 
+M4.1 routes every new internal paper execution through an independent risk assessment and rejects quoted gross notionals above the configured safe limit before persistence or balance mutation.
+
 Historical market data, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, strategies, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
@@ -64,3 +66,4 @@ Historical market data, BRL conversion, order mutation APIs, deeper slippage, RO
 - `docs/binance-pair-metadata.md`: M1.8 public BTC/USDT trading-rule metadata.
 - `docs/paper-wallet.md`: M2.1 fictional wallet configuration and domain behavior.
 - `docs/paper-trading.md`: M3 paper quote and future execution boundaries.
+- `docs/risk-engine.md`: M4 risk-assessment contract, rules, and execution boundary.

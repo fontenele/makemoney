@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MarketDataModule } from '../market-data/market-data.module';
 import { PaperWalletModule } from '../paper-wallet/paper-wallet.module';
+import { RiskEngineModule } from '../risk-engine/risk-engine.module';
 import { PaperMarketBuyQuoteService } from './application/paper-market-buy-quote.service';
 import { PaperExecutionHistoryService } from './application/paper-execution-history.service';
 import { PaperPositionService } from './application/paper-position.service';
@@ -12,7 +13,7 @@ import { PrismaPaperExecutionRepository } from './infrastructure/prisma-paper-ex
 import { PaperTradingController } from './presentation/paper-trading.controller';
 
 @Module({
-  imports: [MarketDataModule, PaperWalletModule],
+  imports: [MarketDataModule, PaperWalletModule, RiskEngineModule],
   controllers: [PaperTradingController],
   providers: [
     PaperExecutionHistoryService,

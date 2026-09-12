@@ -2,6 +2,20 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M4.1 maximum-order-notional risk rule completed
+
+### Added
+
+- Provider-neutral `RiskEngine`, risk candidate, and assessment contracts.
+- Configurable `RISK_MAX_ORDER_NOTIONAL_USDT` with a safe default of `100`.
+- Buy/sell maximum-notional assessment between quoting and paper repository mutation.
+- Structured approval/rejection logs and explicit risk-rejection application error.
+- Unit and E2E coverage for exact-boundary approval, above-limit buy/sell rejection, and no mutation on rejection.
+
+### Scope confirmation
+
+- M3 is formally complete at M3.8. No order HTTP route, cumulative exposure, loss limit, strategy, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M3.8 realized performance summary completed
 
 ### Added

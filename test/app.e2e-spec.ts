@@ -161,15 +161,43 @@ describe('Application (e2e)', () => {
     const prisma = app.get(PrismaService);
     const idempotencyKey = `e2e-rejected-${Date.now()}`;
     const before = await wallet.getBalances();
+    const heldUsdt = new Decimal(before.USDT).minus('1').toFixed();
+    await wallet.debit('USDT', heldUsdt);
+
+    try {
+      await expect(
+        executor.execute({
+          idempotencyKey,
+          symbol: 'BTC/USDT',
+          side: 'buy',
+          quantity: '0.0001',
+        }),
+      ).rejects.toThrow('Insufficient USDT paper balance');
+      await expect(
+        prisma.paperExecution.findUnique({ where: { id: idempotencyKey } }),
+      ).resolves.toBeNull();
+    } finally {
+      await wallet.credit('USDT', heldUsdt);
+    }
+    await expect(wallet.getBalances()).resolves.toEqual(before);
+  });
+
+  it('rejects a paper buy above the risk notional limit without mutation', async () => {
+    preparePaperMarket(app);
+    const executor = app.get(PaperTradingExecutor);
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const idempotencyKey = `e2e-risk-rejected-${Date.now()}`;
+    const before = await wallet.getBalances();
 
     await expect(
       executor.execute({
         idempotencyKey,
         symbol: 'BTC/USDT',
         side: 'buy',
-        quantity: '0.02',
+        quantity: '0.0021',
       }),
-    ).rejects.toThrow('Insufficient USDT paper balance');
+    ).rejects.toThrow('Paper order rejected by risk');
 
     await expect(wallet.getBalances()).resolves.toEqual(before);
     await expect(

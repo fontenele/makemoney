@@ -1,5 +1,10 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
+  RISK_ENGINE,
+  RiskAssessment,
+  RiskEngine,
+} from '../../risk-engine/domain/risk-engine';
+import {
   PAPER_EXECUTION_REPOSITORY,
   PaperExecutionRepository,
 } from '../domain/paper-execution-repository';
@@ -20,6 +25,7 @@ export class PaperTradingExecutor implements TradingExecutor {
     private readonly sellQuoteService: PaperMarketSellQuoteService,
     @Inject(PAPER_EXECUTION_REPOSITORY)
     private readonly repository: PaperExecutionRepository,
+    @Inject(RISK_ENGINE) private readonly riskEngine: RiskEngine,
   ) {}
 
   async execute(intent: PaperOrderIntent): Promise<PaperExecution> {
@@ -33,21 +39,52 @@ export class PaperTradingExecutor implements TradingExecutor {
       return { ...existing, replayed: true };
     }
 
-    const execution =
-      intent.side === 'buy'
-        ? await this.repository.executeBuy(
-            intent.idempotencyKey,
-            this.buyQuoteService.quote(intent.quantity),
-          )
-        : await this.repository.executeSell(
-            intent.idempotencyKey,
-            this.sellQuoteService.quote(intent.quantity),
-          );
+    let execution: PaperExecution;
+    if (intent.side === 'buy') {
+      const quote = this.buyQuoteService.quote(intent.quantity);
+      this.assertRiskApproved(intent, quote);
+      execution = await this.repository.executeBuy(
+        intent.idempotencyKey,
+        quote,
+      );
+    } else {
+      const quote = this.sellQuoteService.quote(intent.quantity);
+      this.assertRiskApproved(intent, quote);
+      execution = await this.repository.executeSell(
+        intent.idempotencyKey,
+        quote,
+      );
+    }
     this.logger.log({
       event: `paper_trade.${execution.side}_executed`,
       ...execution,
     });
     return execution;
+  }
+
+  private assertRiskApproved(
+    intent: PaperOrderIntent,
+    quote: { quantity: string; notional: string },
+  ): void {
+    const assessment = this.riskEngine.assess({
+      id: intent.idempotencyKey,
+      symbol: intent.symbol,
+      side: intent.side,
+      quantity: quote.quantity,
+      notional: quote.notional,
+    });
+    if (assessment.decision === 'rejected') {
+      throw new PaperOrderRiskRejectedError(assessment);
+    }
+  }
+}
+
+export class PaperOrderRiskRejectedError extends Error {
+  constructor(
+    readonly assessment: Extract<RiskAssessment, { decision: 'rejected' }>,
+  ) {
+    super(`Paper order rejected by risk: ${assessment.reason}`);
+    this.name = PaperOrderRiskRejectedError.name;
   }
 }
 

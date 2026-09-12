@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { RiskEngine } from '../../risk-engine/domain/risk-engine';
 import { PaperExecutionRepository } from '../domain/paper-execution-repository';
 import { PaperExecution } from '../domain/trading-executor';
 import { PaperMarketBuyQuoteService } from './paper-market-buy-quote.service';
@@ -18,6 +19,7 @@ describe('PaperTradingExecutor', () => {
       quoteService,
       {} as PaperMarketSellQuoteService,
       repository,
+      approvingRiskEngine(),
     );
 
     await expect(executor.execute(intent())).resolves.toBe(execution);
@@ -35,6 +37,7 @@ describe('PaperTradingExecutor', () => {
       quoteService,
       {} as PaperMarketSellQuoteService,
       repository,
+      approvingRiskEngine(),
     );
 
     await expect(executor.execute(intent())).resolves.toMatchObject({
@@ -56,6 +59,7 @@ describe('PaperTradingExecutor', () => {
       {} as PaperMarketBuyQuoteService,
       quoteService,
       repository,
+      approvingRiskEngine(),
     );
 
     await expect(executor.execute(sellIntent())).resolves.toBe(execution);
@@ -68,13 +72,55 @@ describe('PaperTradingExecutor', () => {
       {} as PaperMarketBuyQuoteService,
       {} as PaperMarketSellQuoteService,
       repository,
+      approvingRiskEngine(),
     );
     await expect(
       executor.execute({ ...intent(), idempotencyKey: '' }),
     ).rejects.toThrow('Invalid paper execution idempotency key');
     expect(repository.find).not.toHaveBeenCalled();
   });
+
+  it('rejects a quoted order before balance mutation when risk rejects it', async () => {
+    const quote = {
+      quantity: '0.0021',
+      notional: '105',
+      totalCost: '105.105',
+    } as never;
+    const repository = repo();
+    const riskEngine: RiskEngine = {
+      assess: jest.fn(() => ({
+        decision: 'rejected',
+        rule: 'max_order_notional_usdt',
+        reason: 'max_order_notional_exceeded',
+        notional: '105',
+        limit: '100',
+      })),
+    };
+    const executor = new PaperTradingExecutor(
+      { quote: jest.fn(() => quote) } as unknown as PaperMarketBuyQuoteService,
+      {} as PaperMarketSellQuoteService,
+      repository,
+      riskEngine,
+    );
+
+    await expect(executor.execute(intent())).rejects.toThrow(
+      'Paper order rejected by risk',
+    );
+    expect(repository.executeBuy).not.toHaveBeenCalled();
+    expect(repository.executeSell).not.toHaveBeenCalled();
+  });
 });
+
+function approvingRiskEngine(): RiskEngine {
+  return {
+    assess: jest.fn(() => ({
+      decision: 'approved',
+      rule: 'max_order_notional_usdt',
+      notional: '77.77712',
+      limit: '100',
+    })),
+  };
+}
 
 function intent() {
   return {

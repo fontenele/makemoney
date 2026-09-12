@@ -28,7 +28,7 @@ NestJS bootstrap, validated configuration, lint/format tooling, tests, Docker Co
 
 No real funds or exchange-account access.
 
-## M3 — Paper Trading — in progress
+## M3 — Paper Trading — complete
 
 - **M3.1 — complete:** internal non-executing BTC market-buy quote using fresh best ask, public pair rules, top-level liquidity, and configurable simulated taker fee.
 - **M3.2 — complete:** internal idempotent BTC market-buy execution through a shared executor contract, with atomic PostgreSQL balance mutation and execution persistence.
@@ -40,9 +40,12 @@ No real funds or exchange-account access.
 - **M3.8 — complete:** read-only realized performance summary with execution/outcome counts, win rate, realized PnL, and total fees.
 - Later M3 increments require separate approval for ROI and time-based statistics, order mutation APIs, cursor pagination, and deeper slippage modeling.
 
-## M4 — Risk Engine — planned
+## M4 — Risk Engine — in progress
 
 All strategy signals pass through independent risk assessment before any executor. Position, exposure, loss, liquidity, and safety limits are introduced with focused tests.
+
+- **M4.1 — complete:** provider-neutral risk assessment for every new paper execution with a configurable maximum gross order notional in USDT.
+- Later M4 rules require separate approval for cumulative exposure, position size, loss limits, liquidity, emergency stop, and other safeguards.
 
 ## M5 — Strategies — planned
 

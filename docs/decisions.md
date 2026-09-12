@@ -64,6 +64,12 @@ The first performance summary reuses the position accounting fold so weighted co
 
 Win rate excludes break-even outcomes and is null without a decided outcome. It is exposed as a decimal ratio rounded half-even to eight fractional places. ROI and time-series metrics are deferred because they require an explicit capital-flow and period model.
 
+## M4.1 independent maximum-notional assessment
+
+The paper executor depends on a provider-neutral `RiskEngine` contract. New orders are quoted before assessment because the first rule needs the current gross notional, but repository mutation is impossible until the assessment approves. Persisted idempotent replays bypass reassessment because they do not create a new financial effect.
+
+The initial `RISK_MAX_ORDER_NOTIONAL_USDT` limit defaults to `100`, accepts exact decimal strings, applies equally to buys and sells, and treats the boundary as inclusive. This is one independent guard, not a complete risk system and not sufficient to enable real trading.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.
