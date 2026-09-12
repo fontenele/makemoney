@@ -2,6 +2,19 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M4.3 cumulative BTC position limit completed
+
+### Added
+
+- Validated `RISK_MAX_BTC_POSITION_QUANTITY` configuration with a default of `0.01` BTC.
+- Exact projected-position assessment for new paper buys using the persisted BTC balance.
+- Structured approval/rejection details containing current, projected, and maximum BTC quantities.
+- Unit and E2E coverage for the inclusive boundary, above-limit rejection, sell bypass, precedence, and rejection without mutation.
+
+### Scope confirmation
+
+- No external order route, concurrency-safe exposure transaction, loss limit, strategy, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M4.2 emergency stop completed
 
 ### Added

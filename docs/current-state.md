@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0 through M3 are complete and M4.1–M4.2 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution maximum-notional and emergency-stop rules. No dashboard, order mutation endpoint, strategy, authenticated integration, or real order execution exists.
+M0 through M3 are complete and M4.1–M4.3 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution maximum-notional, emergency-stop, and cumulative BTC-position rules. No dashboard, order mutation endpoint, strategy, authenticated integration, or real order execution exists.
 
 ## Implemented application
 
@@ -57,6 +57,7 @@ M0 through M3 are complete and M4.1–M4.2 are complete. M1 provides unauthentic
 - Every new paper execution is independently assessed against `RISK_MAX_ORDER_NOTIONAL_USDT` after quoting and before repository mutation; the default maximum gross notional is `100` USDT.
 - Risk approvals and rejections emit structured decisions, and rejection leaves balances and execution history unchanged.
 - `RISK_EMERGENCY_STOP` defaults to false; when true it rejects every new paper execution before candidate validation and other risk rules.
+- New paper buys read the persisted BTC balance and reject a projected position above `RISK_MAX_BTC_POSITION_QUANTITY`, which defaults to `0.01`; sells bypass this exposure-increasing rule.
 
 ## Local endpoints and ports
 
@@ -74,12 +75,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M4.2:
+The following passed on 2026-09-11 after M4.3:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 151 tests passed across 27 suites
-- `npm run test:e2e -- --runInBand` — 15 tests passed, including bounded history, realized performance, open-position valuation, insufficient funds, maximum-notional rejection, and emergency-stop rejection without mutation
+- `npm test -- --runInBand` — 154 tests passed across 27 suites
+- `npm run test:e2e -- --runInBand` — 16 tests passed, including bounded history, realized performance, open-position valuation, insufficient funds, maximum-notional rejection, emergency-stop rejection, and cumulative-position rejection without mutation
 - `npx prisma migrate deploy` — paper-sell execution migration applied successfully
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
@@ -91,10 +92,11 @@ The following passed on 2026-09-11 after M4.2:
 
 ## Repository state
 
-M0 through M4.1 are committed. M4.2 changes are currently in the working tree.
+M0 through M4.2 are committed. M4.3 changes are currently in the working tree.
 
 ## Known issues and cautions
 
 - Jest requires Node's `--experimental-vm-modules` flag because NestJS 12 packages are ESM.
 - The Docker build reported eight high-severity findings in the dependency audit. They have not been automatically changed because `npm audit fix --force` may introduce breaking upgrades; review them separately.
 - A transitive Angular DevKit package recommends Node `24.15.0` or newer while the machine has Node `24.14.1`. Current build, lint, and tests pass, but a Node 24 LTS patch update is advisable.
+- M4.3 reads the BTC balance before the execution transaction; atomic exposure enforcement remains required before concurrent or externally writable order submission.

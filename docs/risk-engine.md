@@ -17,3 +17,11 @@ M4.1 does not expose an order route and does not add position, exposure, daily-l
 The emergency-stop rule has precedence over candidate validation and maximum-notional assessment, allowing it to fail closed without depending on other order details. The rejection follows the existing pre-transaction path, so it cannot mutate balances or persist an execution. Idempotent replays remain available because they return an already-persisted result without creating a new financial effect.
 
 M4.2 provides configuration-based process startup/runtime behavior only. It does not expose a control endpoint or persist stop state, and it does not enable any form of real trading.
+
+## M4.3 cumulative BTC position quantity
+
+`RISK_MAX_BTC_POSITION_QUANTITY` is a positive decimal string and defaults to `0.01`. For each new buy, the executor reads the persisted BTC paper balance and supplies it to the provider-neutral risk candidate. The Risk Engine calculates `current BTC + quoted buy quantity` with exact decimal arithmetic and rejects a projected position above the configured limit with rule `max_btc_position_quantity` and reason `max_btc_position_quantity_exceeded`.
+
+The limit boundary is inclusive. Sells bypass this rule because they reduce BTC exposure, while remaining subject to the emergency stop and maximum-order-notional rule. Rule precedence is emergency stop, maximum order notional, then cumulative BTC position. Rejections occur before execution persistence or balance mutation, and idempotent replays remain exempt because they create no new effect.
+
+The current balance read and the later execution transaction are separate operations. This is adequate for the current internal, non-concurrent execution surface, but it is not a concurrency-safe exposure guarantee. Atomic exposure enforcement must be completed before concurrent or externally writable order submission is introduced.

@@ -6,6 +6,7 @@ export interface RiskOrderCandidate {
   side: 'buy' | 'sell';
   quantity: string;
   notional: string;
+  currentPositionQuantity: string;
 }
 
 export type RiskAssessment =
@@ -25,6 +26,21 @@ export type RiskAssessment =
       rule: 'max_order_notional_usdt';
       reason: 'max_order_notional_exceeded';
       notional: string;
+      limit: string;
+    }
+  | {
+      decision: 'approved';
+      rule: 'max_btc_position_quantity';
+      currentQuantity: string;
+      projectedQuantity: string;
+      limit: string;
+    }
+  | {
+      decision: 'rejected';
+      rule: 'max_btc_position_quantity';
+      reason: 'max_btc_position_quantity_exceeded';
+      currentQuantity: string;
+      projectedQuantity: string;
       limit: string;
     };
 

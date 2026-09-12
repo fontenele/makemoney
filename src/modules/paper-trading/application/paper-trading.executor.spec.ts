@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { PaperWalletService } from '../../paper-wallet/application/paper-wallet.service';
 import { RiskEngine } from '../../risk-engine/domain/risk-engine';
 import { PaperExecutionRepository } from '../domain/paper-execution-repository';
 import { PaperExecution } from '../domain/trading-executor';
@@ -20,6 +21,7 @@ describe('PaperTradingExecutor', () => {
       {} as PaperMarketSellQuoteService,
       repository,
       approvingRiskEngine(),
+      wallet(),
     );
 
     await expect(executor.execute(intent())).resolves.toBe(execution);
@@ -38,6 +40,7 @@ describe('PaperTradingExecutor', () => {
       {} as PaperMarketSellQuoteService,
       repository,
       approvingRiskEngine(),
+      wallet(),
     );
 
     await expect(executor.execute(intent())).resolves.toMatchObject({
@@ -60,6 +63,7 @@ describe('PaperTradingExecutor', () => {
       quoteService,
       repository,
       approvingRiskEngine(),
+      wallet(),
     );
 
     await expect(executor.execute(sellIntent())).resolves.toBe(execution);
@@ -73,6 +77,7 @@ describe('PaperTradingExecutor', () => {
       {} as PaperMarketSellQuoteService,
       repository,
       approvingRiskEngine(),
+      wallet(),
     );
     await expect(
       executor.execute({ ...intent(), idempotencyKey: '' }),
@@ -101,6 +106,7 @@ describe('PaperTradingExecutor', () => {
       {} as PaperMarketSellQuoteService,
       repository,
       riskEngine,
+      wallet(),
     );
 
     await expect(executor.execute(intent())).rejects.toThrow(
@@ -120,6 +126,12 @@ function approvingRiskEngine(): RiskEngine {
       limit: '100',
     })),
   };
+}
+
+function wallet(balance = '0'): PaperWalletService {
+  return {
+    getBalance: jest.fn(() => Promise.resolve(balance)),
+  } as unknown as PaperWalletService;
 }
 
 function intent() {

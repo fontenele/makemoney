@@ -234,6 +234,34 @@ describe('Application (e2e)', () => {
     }
   });
 
+  it('rejects a buy above the cumulative BTC position limit without mutation', async () => {
+    preparePaperMarket(app);
+    const executor = app.get(PaperTradingExecutor);
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const config = app.get(ConfigService);
+    const idempotencyKey = `e2e-position-risk-${Date.now()}`;
+    const before = await wallet.getBalances();
+    config.set('RISK_MAX_BTC_POSITION_QUANTITY', '0.00005');
+
+    try {
+      await expect(
+        executor.execute({
+          idempotencyKey,
+          symbol: 'BTC/USDT',
+          side: 'buy',
+          quantity: '0.0001',
+        }),
+      ).rejects.toThrow('max_btc_position_quantity_exceeded');
+      await expect(wallet.getBalances()).resolves.toEqual(before);
+      await expect(
+        prisma.paperExecution.findUnique({ where: { id: idempotencyKey } }),
+      ).resolves.toBeNull();
+    } finally {
+      config.set('RISK_MAX_BTC_POSITION_QUANTITY', '0.01');
+    }
+  });
+
   it('executes and replays an idempotent paper sell atomically', async () => {
     preparePaperMarket(app);
     const executor = app.get(PaperTradingExecutor);

@@ -76,6 +76,12 @@ The emergency stop is evaluated before candidate decimal validation and maximum-
 
 The initial stop is a validated configuration boolean defaulting to false. A persistent, authenticated operator control is deferred; this configuration switch protects paper execution only and is not one of the multiple safeguards eventually required for real trading.
 
+## M4.3 cumulative BTC position limit
+
+The first cumulative exposure rule limits BTC quantity rather than mark-to-market value, avoiding a moving price-dependent boundary. New buys are assessed against the persisted BTC paper balance plus quoted quantity; the configured positive decimal limit defaults to `0.01` BTC and includes the exact boundary. Sells do not increase BTC exposure and therefore bypass this rule after the preceding emergency-stop and maximum-notional checks.
+
+The executor supplies the provider-neutral balance snapshot to the risk candidate, keeping persistence concerns outside the Risk Engine. Reading and mutation are not yet one atomic operation, so concurrent buy attempts could assess the same balance. The project has no external mutation route or concurrent strategy execution today; atomic enforcement is explicitly required before either is added.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

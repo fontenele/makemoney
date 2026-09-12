@@ -42,13 +42,42 @@ export class RiskAssessmentService implements RiskEngine {
       notional: notional.toFixed(),
       limit: limit.toFixed(),
     };
-    const assessment: RiskAssessment = notional.greaterThan(limit)
+    let assessment: RiskAssessment = notional.greaterThan(limit)
       ? {
           decision: 'rejected',
           reason: 'max_order_notional_exceeded',
           ...common,
         }
       : { decision: 'approved', ...common };
+
+    if (assessment.decision === 'approved' && candidate.side === 'buy') {
+      const currentQuantity = nonNegativeDecimal(
+        candidate.currentPositionQuantity,
+        'current position quantity',
+      );
+      const orderQuantity = positiveDecimal(
+        candidate.quantity,
+        'candidate quantity',
+      );
+      const positionLimit = positiveDecimal(
+        this.config.getOrThrow<string>('RISK_MAX_BTC_POSITION_QUANTITY'),
+        'position limit',
+      );
+      const projectedQuantity = currentQuantity.plus(orderQuantity);
+      const positionCommon = {
+        rule: 'max_btc_position_quantity' as const,
+        currentQuantity: currentQuantity.toFixed(),
+        projectedQuantity: projectedQuantity.toFixed(),
+        limit: positionLimit.toFixed(),
+      };
+      assessment = projectedQuantity.greaterThan(positionLimit)
+        ? {
+            decision: 'rejected',
+            reason: 'max_btc_position_quantity_exceeded',
+            ...positionCommon,
+          }
+        : { decision: 'approved', ...positionCommon };
+    }
 
     this.logAssessment(candidate, assessment);
     return assessment;
@@ -74,4 +103,9 @@ function positiveDecimal(value: string, name: string): Decimal {
   const result = new RiskDecimal(value);
   if (result.lessThanOrEqualTo(0)) throw new TypeError(`Invalid ${name}`);
   return result;
+}
+
+function nonNegativeDecimal(value: string, name: string): Decimal {
+  if (!DECIMAL_PATTERN.test(value)) throw new TypeError(`Invalid ${name}`);
+  return new RiskDecimal(value);
 }

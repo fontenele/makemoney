@@ -4,6 +4,7 @@ import {
   RiskAssessment,
   RiskEngine,
 } from '../../risk-engine/domain/risk-engine';
+import { PaperWalletService } from '../../paper-wallet/application/paper-wallet.service';
 import {
   PAPER_EXECUTION_REPOSITORY,
   PaperExecutionRepository,
@@ -26,6 +27,7 @@ export class PaperTradingExecutor implements TradingExecutor {
     @Inject(PAPER_EXECUTION_REPOSITORY)
     private readonly repository: PaperExecutionRepository,
     @Inject(RISK_ENGINE) private readonly riskEngine: RiskEngine,
+    private readonly paperWallet: PaperWalletService,
   ) {}
 
   async execute(intent: PaperOrderIntent): Promise<PaperExecution> {
@@ -42,14 +44,14 @@ export class PaperTradingExecutor implements TradingExecutor {
     let execution: PaperExecution;
     if (intent.side === 'buy') {
       const quote = this.buyQuoteService.quote(intent.quantity);
-      this.assertRiskApproved(intent, quote);
+      await this.assertRiskApproved(intent, quote);
       execution = await this.repository.executeBuy(
         intent.idempotencyKey,
         quote,
       );
     } else {
       const quote = this.sellQuoteService.quote(intent.quantity);
-      this.assertRiskApproved(intent, quote);
+      await this.assertRiskApproved(intent, quote);
       execution = await this.repository.executeSell(
         intent.idempotencyKey,
         quote,
@@ -62,16 +64,19 @@ export class PaperTradingExecutor implements TradingExecutor {
     return execution;
   }
 
-  private assertRiskApproved(
+  private async assertRiskApproved(
     intent: PaperOrderIntent,
     quote: { quantity: string; notional: string },
-  ): void {
+  ): Promise<void> {
+    const currentPositionQuantity =
+      intent.side === 'buy' ? await this.paperWallet.getBalance('BTC') : '0';
     const assessment = this.riskEngine.assess({
       id: intent.idempotencyKey,
       symbol: intent.symbol,
       side: intent.side,
       quantity: quote.quantity,
       notional: quote.notional,
+      currentPositionQuantity,
     });
     if (assessment.decision === 'rejected') {
       throw new PaperOrderRiskRejectedError(assessment);

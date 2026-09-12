@@ -13,6 +13,7 @@ interface Environment {
   PAPER_TAKER_FEE_RATE: string;
   RISK_MAX_ORDER_NOTIONAL_USDT: string;
   RISK_EMERGENCY_STOP: boolean;
+  RISK_MAX_BTC_POSITION_QUANTITY: string;
 }
 
 const environmentSchema = Joi.object<Environment>({
@@ -46,6 +47,9 @@ const environmentSchema = Joi.object<Environment>({
     .pattern(/^[1-9]\d{0,19}(\.\d{1,18})?$/)
     .default('100'),
   RISK_EMERGENCY_STOP: Joi.boolean().default(false),
+  RISK_MAX_BTC_POSITION_QUANTITY: Joi.string()
+    .pattern(/^[1-9]\d{0,19}(\.\d{1,18})?$/)
+    .default('0.01'),
 }).unknown(true);
 
 export function validateEnvironment(
