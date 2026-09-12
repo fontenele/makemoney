@@ -12,6 +12,7 @@ import {
   Strategy,
   StrategyCandle,
 } from '../domain/strategy';
+import { LatestStrategySignalService } from './latest-strategy-signal.service';
 
 const CLOSED_CANDLE_CAPACITY = 6;
 
@@ -27,6 +28,7 @@ export class LiveStrategyEvaluationService
     private readonly candleFeed: MarketCandleFeedService,
     @Inject(MOVING_AVERAGE_CROSSOVER_STRATEGY)
     private readonly strategy: Strategy,
+    private readonly latestSignal: LatestStrategySignalService,
   ) {}
 
   onModuleInit(): void {
@@ -69,6 +71,7 @@ export class LiveStrategyEvaluationService
       candles: [...this.closedCandles],
       evaluatedAt: candle.receivedAt,
     });
+    this.latestSignal.update(signal);
     this.logger.log({
       event: 'strategy.signal_generated',
       ...signal,

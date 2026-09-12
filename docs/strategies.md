@@ -23,3 +23,9 @@ The live strategy evaluator subscribes during the NestJS module lifecycle and re
 Every accepted closed candle triggers one evaluation. The resulting action, reason, periods, averages, latest close time, and evaluation time are written as the structured `strategy.signal_generated` log event. Evaluation time uses the normalized candle receipt time.
 
 This history and every signal are process-local and disappear on restart. M5.2 does not persist data, expose a route, size a position, call the Risk Engine, or submit an order.
+
+## M5.3 latest-signal read model
+
+Every successful live evaluation updates a process-local latest-signal read model. `GET /strategies/signals/latest` exposes that complete signal, including its action, deterministic reason, periods, averages, latest closed-candle time, and evaluation time.
+
+Before the first closed candle is evaluated, the route returns HTTP 503 with reason `strategy_signal_unavailable`. The endpoint is read-only and does not evaluate a strategy on demand. The value disappears on restart and has no connection to position sizing, risk assessment, or execution.

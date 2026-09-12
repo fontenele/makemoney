@@ -4,10 +4,11 @@ import { MarketCandle } from '../../market-data/domain/market-candle';
 import { StrategyInput, StrategySignal } from '../domain/strategy';
 import { LiveStrategyEvaluationService } from './live-strategy-evaluation.service';
 import { MovingAverageCrossoverStrategy } from './moving-average-crossover.strategy';
+import { LatestStrategySignalService } from './latest-strategy-signal.service';
 
 describe('LiveStrategyEvaluationService', () => {
   it('evaluates every new closed candle and retains only six', () => {
-    const { feed, strategy, service } = setup();
+    const { feed, strategy, service, latestSignal } = setup();
     service.onModuleInit();
 
     for (let index = 0; index < 7; index += 1) {
@@ -20,6 +21,9 @@ describe('LiveStrategyEvaluationService', () => {
     expect(latestInput?.candles[0]?.closeTime).toEqual(candle(1).closeTime);
     expect(latestInput?.candles.at(-1)?.closeTime).toEqual(candle(6).closeTime);
     expect(latestInput?.evaluatedAt).toEqual(candle(6).receivedAt);
+    expect(latestSignal.getLatest()).toBe(
+      strategy.analyze.mock.results.at(-1)?.value,
+    );
   });
 
   it('ignores open, duplicate, and out-of-order candles', () => {
@@ -48,7 +52,11 @@ describe('LiveStrategyEvaluationService', () => {
     const feed = new MarketCandleFeedService();
     const strategy = new MovingAverageCrossoverStrategy();
     const analyze = jest.spyOn(strategy, 'analyze');
-    const service = new LiveStrategyEvaluationService(feed, strategy);
+    const service = new LiveStrategyEvaluationService(
+      feed,
+      strategy,
+      new LatestStrategySignalService(),
+    );
     service.onModuleInit();
 
     ['5', '4', '3', '2', '1', '10'].forEach((price, index) =>
@@ -66,6 +74,7 @@ function setup(): {
   feed: MarketCandleFeedService;
   strategy: { analyze: jest.Mock<(input: StrategyInput) => StrategySignal> };
   service: LiveStrategyEvaluationService;
+  latestSignal: LatestStrategySignalService;
 } {
   const feed = new MarketCandleFeedService();
   const analyze = jest.fn<(input: StrategyInput) => StrategySignal>(
@@ -85,10 +94,12 @@ function setup(): {
     }),
   );
   const strategy = { analyze };
+  const latestSignal = new LatestStrategySignalService();
   return {
     feed,
     strategy,
-    service: new LiveStrategyEvaluationService(feed, strategy),
+    latestSignal,
+    service: new LiveStrategyEvaluationService(feed, strategy, latestSignal),
   };
 }
 

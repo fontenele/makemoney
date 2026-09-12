@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5.1 — deterministic moving-average crossover strategy**, and **M5.2 — live closed-candle signal observation**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5.1 — deterministic moving-average crossover strategy**, **M5.2 — live closed-candle signal observation**, and **M5.3 — latest-signal read API**.
 - No next increment is approved. Stop and present a minimal plan before further strategy work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -65,6 +65,8 @@ M4.11 atomically limits distinct approved paper-execution keys in an ephemeral R
 M5.1 defines a provider-neutral strategy contract and a deterministic BTC/USDT moving-average crossover. It evaluates only ordered closed one-minute candles with exact decimal arithmetic and returns buy, sell, or hold without submitting orders.
 
 M5.2 distributes normalized candles through a process-local feed and evaluates M5.1 once for each new closed candle. It retains six closed candles, suppresses duplicate or out-of-order close times, and logs signals without persistence or execution.
+
+M5.3 retains the latest generated signal in memory and exposes it at `GET /strategies/signals/latest`. The route returns 503 before the first evaluation and cannot mutate or execute anything.
 
 Historical market data, signal persistence, position sizing, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

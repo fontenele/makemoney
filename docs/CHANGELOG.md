@@ -2,6 +2,23 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — M5.3 latest-signal API completed
+
+### Added
+
+- Process-local latest-strategy-signal read model updated by every successful live evaluation.
+- Read-only `GET /strategies/signals/latest` endpoint with explicit HTTP 503 before a signal exists.
+- Unit coverage for initial absence, latest-value replacement, live-evaluation integration, and controller responses.
+
+### Changed
+
+- Added the strategy signal endpoint to the root README API route table.
+- Updated project context, roadmap, plan, map, strategy documentation, decisions, and current state for M5.3.
+
+### Scope confirmation
+
+- No signal history or persistence, mutation endpoint, position sizing, risk assessment, order execution, dashboard, exchange authentication, or real trading was introduced.
+
 ## 2026-09-12 — M5.2 live signal observation completed
 
 ### Added

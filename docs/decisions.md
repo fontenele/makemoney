@@ -247,3 +247,7 @@ The first strategy compares previous and current simple moving averages over clo
 Live strategy observation reuses normalized M1 candle events through a small in-process subscription service instead of coupling strategies to Binance or opening another connection. Subscriber errors are logged and isolated from the publisher.
 
 The evaluator keeps only six closed candles, matching the default M5.1 lookback plus its prior comparison point. It ignores open, duplicate, and out-of-order candles and writes signals to structured logs. Process-local observation is intentional for this increment; durable history and execution remain separate future decisions.
+
+## M5.3 latest-signal availability
+
+The live evaluator writes each successful result to a single process-local latest-signal read model. The HTTP layer reads that model without triggering calculation, and returns 503 rather than fabricating a default signal before data arrives. This gives operators and a future dashboard an honest observational surface without introducing persistence or execution coupling.

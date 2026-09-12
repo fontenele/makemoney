@@ -40,6 +40,7 @@ M4.11 Execution Rate Limit: DONE
 M4 Risk Engine:          DONE
 M5.1 MA Crossover:       DONE
 M5.2 Live Signal Observation: DONE
+M5.3 Latest Signal API:   DONE
 Next increment:           NOT APPROVED
 ```
 
@@ -1683,7 +1684,7 @@ M1 — Market Data                  DONE
 M2 — Paper Wallet                 DONE (M2.1–M2.5)
 M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
-M5 — Strategies                   IN PROGRESS (M5.1–M5.2 DONE)
+M5 — Strategies                   IN PROGRESS (M5.1–M5.3 DONE)
 M6 — Backtesting                  PLANNED
 M7 — New Listing Scanner          PLANNED
 M8 — Dashboard                    PLANNED
@@ -2219,6 +2220,7 @@ M4.11 Execution Rate Limit: DONE
 M4 Risk Engine:       DONE
 M5.1 MA Crossover:    DONE
 M5.2 Live Signal Observation: DONE
+M5.3 Latest Signal API: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2237,6 +2239,6 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-No next increment approved after M5.2.
+No next increment approved after M5.3.
 Stop and present a minimal plan before further implementation.
 ```
