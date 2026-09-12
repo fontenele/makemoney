@@ -2,6 +2,19 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — M4.5 daily realized loss limit completed
+
+### Added
+
+- Validated `RISK_MAX_DAILY_REALIZED_LOSS_USDT` configuration with a safe default of `25` USDT.
+- Exact current-UTC-day net realized PnL derived from the complete chronological execution history.
+- Buy-only rejection at the inclusive daily-loss threshold, while sells and idempotent replays remain available.
+- Unit coverage for threshold behavior, profit offsets, UTC rollover, sells, and rule precedence; database-backed E2E coverage verifies rejection without mutation.
+
+### Scope confirmation
+
+- No migration, atomic daily-loss aggregate, unrealized-loss/drawdown rule, stop-loss, order endpoint, strategy, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M4.4 atomic BTC exposure enforcement completed
 
 ### Added

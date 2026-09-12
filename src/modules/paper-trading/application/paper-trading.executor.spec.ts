@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
 import { PaperWalletService } from '../../paper-wallet/application/paper-wallet.service';
+import { Clock } from '../../paper-wallet/domain/clock';
 import { RiskEngine } from '../../risk-engine/domain/risk-engine';
 import { PaperExecutionRepository } from '../domain/paper-execution-repository';
 import { PaperExecution } from '../domain/trading-executor';
@@ -22,6 +23,7 @@ describe('PaperTradingExecutor', () => {
       repository,
       approvingRiskEngine(),
       wallet(),
+      clock(),
     );
 
     await expect(executor.execute(intent())).resolves.toBe(execution);
@@ -41,6 +43,7 @@ describe('PaperTradingExecutor', () => {
       repository,
       approvingRiskEngine(),
       wallet(),
+      clock(),
     );
 
     await expect(executor.execute(intent())).resolves.toMatchObject({
@@ -64,6 +67,7 @@ describe('PaperTradingExecutor', () => {
       repository,
       approvingRiskEngine(),
       wallet(),
+      clock(),
     );
 
     await expect(executor.execute(sellIntent())).resolves.toBe(execution);
@@ -78,6 +82,7 @@ describe('PaperTradingExecutor', () => {
       repository,
       approvingRiskEngine(),
       wallet(),
+      clock(),
     );
     await expect(
       executor.execute({ ...intent(), idempotencyKey: '' }),
@@ -107,6 +112,7 @@ describe('PaperTradingExecutor', () => {
       repository,
       riskEngine,
       wallet(),
+      clock(),
     );
 
     await expect(executor.execute(intent())).rejects.toThrow(
@@ -132,6 +138,10 @@ function wallet(balance = '0'): PaperWalletService {
   return {
     getBalance: jest.fn(() => Promise.resolve(balance)),
   } as unknown as PaperWalletService;
+}
+
+function clock(): Clock {
+  return { now: () => new Date('2026-09-12T12:00:00.000Z') };
 }
 
 function intent() {
@@ -197,8 +207,9 @@ function repo(): MockRepo {
   return {
     find: jest.fn<PaperExecutionRepository['find']>(),
     listRecent: jest.fn<PaperExecutionRepository['listRecent']>(),
-    listAllChronological:
-      jest.fn<PaperExecutionRepository['listAllChronological']>(),
+    listAllChronological: jest.fn<
+      PaperExecutionRepository['listAllChronological']
+    >(() => Promise.resolve([])),
     executeBuy: jest.fn<PaperExecutionRepository['executeBuy']>(),
     executeSell: jest.fn<PaperExecutionRepository['executeSell']>(),
   };

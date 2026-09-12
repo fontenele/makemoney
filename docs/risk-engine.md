@@ -33,3 +33,13 @@ Every buy still passes through the Risk Engine. As a defense in depth, the Postg
 If the condition fails, `PaperPositionLimitExceededError` aborts the transaction. The execution insert and USDT debit are rolled back together, leaving no partial financial effect. A database-backed concurrency test submits two buys for the same remaining capacity and verifies that exactly one execution and one balance mutation survive.
 
 No schema migration, external mutation endpoint, loss rule, strategy, authenticated provider, or real trading is introduced.
+
+## M4.5 daily realized loss limit
+
+`RISK_MAX_DAILY_REALIZED_LOSS_USDT` is a positive decimal string and defaults to `25`. Before assessing a new buy, the executor reconstructs fee-inclusive cost basis from the complete chronological execution history and nets realized PnL from sells executed during the current UTC calendar day. Exact `decimal.js` arithmetic is used throughout.
+
+A buy is rejected with rule `max_daily_realized_loss_usdt` and reason `max_daily_realized_loss_reached` when daily realized PnL is less than or equal to the negative configured limit. Profitable sells offset losing sells within that day. A new UTC day starts at zero while older executions remain available to reconstruct cost basis correctly.
+
+Sells remain available because they reduce exposure and may close a position. Persisted idempotent replays also remain available because they create no new effect. Rule precedence is emergency stop, maximum order notional, daily realized loss, then cumulative BTC position.
+
+The daily PnL is currently a pre-transaction snapshot derived from immutable executions. It is not an atomic reservation, so a concurrent sell and buy may assess different snapshots. Atomic daily-loss state, unrealized-loss/drawdown rules, stop-loss behavior, operator controls, strategies, authenticated providers, and real trading remain deferred.

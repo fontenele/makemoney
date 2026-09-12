@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, **M3 — Paper Trading (M3.1 through M3.8)**, and **M4.1–M4.4 — maximum-order-notional, emergency-stop, cumulative BTC-position, and atomic exposure enforcement**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, **M3 — Paper Trading (M3.1 through M3.8)**, and **M4.1–M4.5 — maximum-order-notional, emergency-stop, cumulative BTC-position, atomic exposure, and daily realized-loss enforcement**.
 - No next increment is approved. Stop and present a minimal plan before starting more wallet or trading work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -47,6 +47,8 @@ M4.2 adds a configuration-based emergency stop that takes precedence over other 
 M4.3 rejects new paper buys whose current BTC balance plus quoted buy quantity would exceed the configured BTC position limit. Sells remain subject to the preceding rules but bypass this exposure-increasing check.
 
 M4.4 enforces the same BTC position limit again in the PostgreSQL balance update, so concurrent buys cannot collectively exceed it and a losing transaction rolls back every financial effect.
+
+M4.5 derives the current UTC day's net realized PnL from the complete execution history and rejects new paper buys once the configured realized-loss limit is reached. Sells and idempotent replays remain available.
 
 Historical market data, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, strategies, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

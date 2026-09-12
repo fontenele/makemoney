@@ -5,6 +5,7 @@ import {
   RiskEngine,
 } from '../../risk-engine/domain/risk-engine';
 import { PaperWalletService } from '../../paper-wallet/application/paper-wallet.service';
+import { CLOCK, Clock } from '../../paper-wallet/domain/clock';
 import {
   PAPER_EXECUTION_REPOSITORY,
   PaperExecutionRepository,
@@ -16,6 +17,7 @@ import {
 } from '../domain/trading-executor';
 import { PaperMarketBuyQuoteService } from './paper-market-buy-quote.service';
 import { PaperMarketSellQuoteService } from './paper-market-sell-quote.service';
+import { calculateDailyRealizedPnl } from './paper-position-calculator';
 
 @Injectable()
 export class PaperTradingExecutor implements TradingExecutor {
@@ -28,6 +30,7 @@ export class PaperTradingExecutor implements TradingExecutor {
     private readonly repository: PaperExecutionRepository,
     @Inject(RISK_ENGINE) private readonly riskEngine: RiskEngine,
     private readonly paperWallet: PaperWalletService,
+    @Inject(CLOCK) private readonly clock: Clock,
   ) {}
 
   async execute(intent: PaperOrderIntent): Promise<PaperExecution> {
@@ -68,8 +71,17 @@ export class PaperTradingExecutor implements TradingExecutor {
     intent: PaperOrderIntent,
     quote: { quantity: string; notional: string },
   ): Promise<void> {
-    const currentPositionQuantity =
-      intent.side === 'buy' ? await this.paperWallet.getBalance('BTC') : '0';
+    const [currentPositionQuantity, dailyRealizedPnl] =
+      intent.side === 'buy'
+        ? await Promise.all([
+            this.paperWallet.getBalance('BTC'),
+            this.repository
+              .listAllChronological()
+              .then((executions) =>
+                calculateDailyRealizedPnl(executions, this.clock.now()),
+              ),
+          ])
+        : ['0', '0'];
     const assessment = this.riskEngine.assess({
       id: intent.idempotencyKey,
       symbol: intent.symbol,
@@ -77,6 +89,7 @@ export class PaperTradingExecutor implements TradingExecutor {
       quantity: quote.quantity,
       notional: quote.notional,
       currentPositionQuantity,
+      dailyRealizedPnl,
     });
     if (assessment.decision === 'rejected') {
       throw new PaperOrderRiskRejectedError(assessment);

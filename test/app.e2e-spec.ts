@@ -268,6 +268,75 @@ describe('Application (e2e)', () => {
     }
   });
 
+  it('rejects a new buy after the UTC daily realized loss limit is reached', async () => {
+    preparePaperMarket(app);
+    const executor = app.get(PaperTradingExecutor);
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const config = app.get(ConfigService);
+    const suffix = Date.now();
+    const buyId = `e2e-daily-loss-buy-${suffix}`;
+    const sellId = `e2e-daily-loss-sell-${suffix}`;
+    const rejectedId = `e2e-daily-loss-rejected-${suffix}`;
+    const before = await wallet.getBalances();
+    const now = new Date();
+    const buyTime = new Date(now.getTime() - 2000);
+    const sellTime = new Date(now.getTime() - 1000);
+    await prisma.paperExecution.createMany({
+      data: [
+        {
+          id: buyId,
+          symbol: 'BTC/USDT',
+          side: 'buy',
+          quantity: '0.0001',
+          price: '50000',
+          notional: '5',
+          feeRate: '0.001',
+          fee: '0.005',
+          totalCost: '5.005',
+          quotedAt: buyTime,
+          marketDataReceivedAt: buyTime,
+          executedAt: buyTime,
+        },
+        {
+          id: sellId,
+          symbol: 'BTC/USDT',
+          side: 'sell',
+          quantity: '0.0001',
+          price: '40000',
+          notional: '4',
+          feeRate: '0.001',
+          fee: '0.004',
+          netProceeds: '3.996',
+          quotedAt: sellTime,
+          marketDataReceivedAt: sellTime,
+          executedAt: sellTime,
+        },
+      ],
+    });
+    config.set('RISK_MAX_DAILY_REALIZED_LOSS_USDT', '1');
+
+    try {
+      await expect(
+        executor.execute({
+          idempotencyKey: rejectedId,
+          symbol: 'BTC/USDT',
+          side: 'buy',
+          quantity: '0.0001',
+        }),
+      ).rejects.toThrow('max_daily_realized_loss_reached');
+      await expect(wallet.getBalances()).resolves.toEqual(before);
+      await expect(
+        prisma.paperExecution.findUnique({ where: { id: rejectedId } }),
+      ).resolves.toBeNull();
+    } finally {
+      config.set('RISK_MAX_DAILY_REALIZED_LOSS_USDT', '25');
+      await prisma.paperExecution.deleteMany({
+        where: { id: { in: [buyId, sellId, rejectedId] } },
+      });
+    }
+  });
+
   it('atomically allows only one of two buys competing for the remaining BTC limit', async () => {
     const repository = app.get<PaperExecutionRepository>(
       PAPER_EXECUTION_REPOSITORY,

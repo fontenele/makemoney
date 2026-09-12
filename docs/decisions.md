@@ -88,6 +88,14 @@ The buy transaction repeats the configured BTC quantity limit as a conditional P
 
 A failed conditional credit throws a specific position-limit error from inside the transaction, rolling back the already-created execution row and USDT debit. No database constraint or migration is needed because the limit remains runtime configuration rather than persisted policy.
 
+## M4.5 derived UTC daily realized-loss guard
+
+The first loss guard uses net realized PnL from sell executions in the current UTC calendar day. It replays the complete execution history so sells made today retain the correct fee-inclusive cost basis even when their buys occurred earlier. Profit offsets loss within the same day, and the inclusive configured threshold defaults to `25` USDT.
+
+Only new buys are blocked because they increase exposure; sells remain available to reduce exposure and realize outcomes. The check follows emergency stop and maximum order notional but precedes the BTC position limit. Persisted idempotent replays bypass it because they add no financial effect.
+
+Derived state avoids a schema change at the current local scale. The tradeoff is that the daily snapshot is not transactionally reserved across a concurrent sell and buy. A concurrency-safe persisted daily-loss aggregate is deferred until a separately approved increment.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

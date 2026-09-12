@@ -30,6 +30,29 @@ export function calculatePaperPosition(
   return calculatePaperExecutionAccounting(executions).position;
 }
 
+export function calculateDailyRealizedPnl(
+  executions: readonly PaperExecution[],
+  now: Date,
+): string {
+  const accounting = calculatePaperExecutionAccounting(executions);
+  const dayStart = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+  );
+  const dayEnd = dayStart + 24 * 60 * 60 * 1000;
+  const sells = executions.filter((execution) => execution.side === 'sell');
+
+  return sells
+    .reduce((total, execution, index) => {
+      const executedAt = execution.executedAt.getTime();
+      return executedAt >= dayStart && executedAt < dayEnd
+        ? rounded(total.plus(accounting.sellPnls[index] ?? '0'))
+        : total;
+    }, new PositionDecimal(0))
+    .toFixed();
+}
+
 export function calculatePaperExecutionAccounting(
   executions: readonly PaperExecution[],
 ): PaperExecutionAccounting {

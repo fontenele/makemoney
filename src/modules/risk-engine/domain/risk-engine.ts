@@ -7,6 +7,7 @@ export interface RiskOrderCandidate {
   quantity: string;
   notional: string;
   currentPositionQuantity: string;
+  dailyRealizedPnl: string;
 }
 
 export type RiskAssessment =
@@ -26,6 +27,13 @@ export type RiskAssessment =
       rule: 'max_order_notional_usdt';
       reason: 'max_order_notional_exceeded';
       notional: string;
+      limit: string;
+    }
+  | {
+      decision: 'rejected';
+      rule: 'max_daily_realized_loss_usdt';
+      reason: 'max_daily_realized_loss_reached';
+      dailyRealizedPnl: string;
       limit: string;
     }
   | {

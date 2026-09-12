@@ -1,10 +1,10 @@
 # Current State
 
-Last validated: 2026-09-11
+Last validated: 2026-09-12
 
 ## Milestone status
 
-M0 through M3 are complete and M4.1–M4.4 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution maximum-notional, emergency-stop, cumulative BTC-position, and atomic exposure protections. No dashboard, order mutation endpoint, strategy, authenticated integration, or real order execution exists.
+M0 through M3 are complete and M4.1–M4.5 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution maximum-notional, emergency-stop, cumulative BTC-position, atomic exposure, and daily realized-loss protections. No dashboard, order mutation endpoint, strategy, authenticated integration, or real order execution exists.
 
 ## Implemented application
 
@@ -59,6 +59,8 @@ M0 through M3 are complete and M4.1–M4.4 are complete. M1 provides unauthentic
 - `RISK_EMERGENCY_STOP` defaults to false; when true it rejects every new paper execution before candidate validation and other risk rules.
 - New paper buys read the persisted BTC balance and reject a projected position above `RISK_MAX_BTC_POSITION_QUANTITY`, which defaults to `0.01`; sells bypass this exposure-increasing rule.
 - The buy transaction conditionally credits BTC only when the resulting persisted balance remains within the same limit, preventing concurrent buys from collectively exceeding it and rolling back all effects on failure.
+- `RISK_MAX_DAILY_REALIZED_LOSS_USDT` defaults to `25`; new buys are rejected once net realized PnL from current-UTC-day sells reaches or exceeds that loss, while sells and idempotent replays remain available.
+- Daily realized PnL replays the full chronological execution history for correct fee-inclusive cost basis and uses exact decimal arithmetic; profitable sells offset losing sells within the day.
 
 ## Local endpoints and ports
 
@@ -76,12 +78,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M4.4:
+The following passed on 2026-09-12 after M4.5:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 154 tests passed across 27 suites
-- `npm run test:e2e -- --runInBand` — 17 tests passed, including bounded history, realized performance, open-position valuation, insufficient funds, risk rejection without mutation, and concurrent atomic exposure enforcement
+- `npm test -- --runInBand` — 160 tests passed across 27 suites
+- `npm run test:e2e -- --runInBand` — 18 tests passed, including daily-loss rejection without mutation and the prior history, performance, valuation, insufficient-funds, and concurrent-exposure scenarios
 - `npx prisma migrate deploy` — paper-sell execution migration applied successfully
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
@@ -93,10 +95,11 @@ The following passed on 2026-09-11 after M4.4:
 
 ## Repository state
 
-M0 through M4.3 are committed. M4.4 changes are currently in the working tree.
+M0 through M4.4 are committed. M4.5 changes are currently in the working tree.
 
 ## Known issues and cautions
 
 - Jest requires Node's `--experimental-vm-modules` flag because NestJS 12 packages are ESM.
 - The Docker build reported eight high-severity findings in the dependency audit. They have not been automatically changed because `npm audit fix --force` may introduce breaking upgrades; review them separately.
 - A transitive Angular DevKit package recommends Node `24.15.0` or newer while the machine has Node `24.14.1`. Current build, lint, and tests pass, but a Node 24 LTS patch update is advisable.
+- Daily realized PnL is a derived pre-transaction snapshot. A concurrent sell and buy can observe different snapshots; atomic daily-loss state is deferred to a separately approved increment.

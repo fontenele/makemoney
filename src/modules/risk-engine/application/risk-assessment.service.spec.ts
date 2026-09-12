@@ -9,6 +9,7 @@ describe('RiskAssessmentService', () => {
     quantity: '0.002',
     notional: '100',
     currentPositionQuantity: '0.003',
+    dailyRealizedPnl: '0',
   };
 
   it('approves an order exactly at the configured limit', () => {
@@ -94,17 +95,65 @@ describe('RiskAssessmentService', () => {
       rule: 'max_order_notional_usdt',
     });
   });
+
+  it('rejects a buy exactly at the daily realized loss limit', () => {
+    expect(
+      service('1000', false, '1', '25').assess({
+        ...candidate,
+        dailyRealizedPnl: '-25',
+      }),
+    ).toEqual({
+      decision: 'rejected',
+      rule: 'max_daily_realized_loss_usdt',
+      reason: 'max_daily_realized_loss_reached',
+      dailyRealizedPnl: '-25',
+      limit: '25',
+    });
+  });
+
+  it('allows a buy while net daily PnL remains above the loss limit', () => {
+    expect(
+      service('1000', false, '1', '25').assess({
+        ...candidate,
+        dailyRealizedPnl: '-24.999',
+      }),
+    ).toMatchObject({ decision: 'approved' });
+  });
+
+  it('allows sells after the daily realized loss limit is reached', () => {
+    expect(
+      service('1000', false, '1', '25').assess({
+        ...candidate,
+        side: 'sell',
+        dailyRealizedPnl: '-30',
+      }),
+    ).toMatchObject({ decision: 'approved' });
+  });
+
+  it('evaluates daily loss before BTC position quantity', () => {
+    expect(
+      service('1000', false, '0.001', '25').assess({
+        ...candidate,
+        dailyRealizedPnl: '-25',
+      }),
+    ).toMatchObject({
+      decision: 'rejected',
+      rule: 'max_daily_realized_loss_usdt',
+    });
+  });
 });
 
 function service(
   limit: string,
   emergencyStop: boolean,
   positionLimit: string,
+  dailyLossLimit = '25',
 ): RiskAssessmentService {
   return new RiskAssessmentService({
     getOrThrow: (key: string) => {
       if (key === 'RISK_EMERGENCY_STOP') return emergencyStop;
       if (key === 'RISK_MAX_BTC_POSITION_QUANTITY') return positionLimit;
+      if (key === 'RISK_MAX_DAILY_REALIZED_LOSS_USDT') return dailyLossLimit;
       return limit;
     },
   } as unknown as ConfigService);

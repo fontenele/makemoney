@@ -51,6 +51,26 @@ export class RiskAssessmentService implements RiskEngine {
       : { decision: 'approved', ...common };
 
     if (assessment.decision === 'approved' && candidate.side === 'buy') {
+      const dailyRealizedPnl = signedDecimal(
+        candidate.dailyRealizedPnl,
+        'daily realized PnL',
+      );
+      const dailyLossLimit = positiveDecimal(
+        this.config.getOrThrow<string>('RISK_MAX_DAILY_REALIZED_LOSS_USDT'),
+        'daily loss limit',
+      );
+      if (dailyRealizedPnl.lessThanOrEqualTo(dailyLossLimit.negated())) {
+        assessment = {
+          decision: 'rejected',
+          rule: 'max_daily_realized_loss_usdt',
+          reason: 'max_daily_realized_loss_reached',
+          dailyRealizedPnl: dailyRealizedPnl.toFixed(),
+          limit: dailyLossLimit.toFixed(),
+        };
+      }
+    }
+
+    if (assessment.decision === 'approved' && candidate.side === 'buy') {
       const currentQuantity = nonNegativeDecimal(
         candidate.currentPositionQuantity,
         'current position quantity',
@@ -107,5 +127,11 @@ function positiveDecimal(value: string, name: string): Decimal {
 
 function nonNegativeDecimal(value: string, name: string): Decimal {
   if (!DECIMAL_PATTERN.test(value)) throw new TypeError(`Invalid ${name}`);
+  return new RiskDecimal(value);
+}
+
+function signedDecimal(value: string, name: string): Decimal {
+  if (!/^-?(0|[1-9]\d{0,19})(\.\d{1,18})?$/.test(value))
+    throw new TypeError(`Invalid ${name}`);
   return new RiskDecimal(value);
 }

@@ -1,5 +1,6 @@
 import { PaperExecution } from '../domain/trading-executor';
 import {
+  calculateDailyRealizedPnl,
   calculatePaperPosition,
   InconsistentPaperExecutionHistoryError,
 } from './paper-position-calculator';
@@ -69,6 +70,36 @@ describe('calculatePaperPosition', () => {
       calculatePaperPosition([sell('s1', '0.001', '50', '0.05')]),
     ).toThrow(InconsistentPaperExecutionHistoryError);
   });
+
+  it('calculates net realized PnL for the current UTC day', () => {
+    const executions = [
+      buy('b1', '0.001', '50', '0.05', '2026-09-11T23:59:59.999Z'),
+      sell('s1', '0.001', '49', '0.049', '2026-09-12T00:00:00.000Z'),
+      buy('b2', '0.001', '50', '0.05', '2026-09-12T12:00:00.000Z'),
+      sell('s2', '0.001', '51', '0.051', '2026-09-12T23:59:59.999Z'),
+    ];
+
+    expect(
+      calculateDailyRealizedPnl(
+        executions,
+        new Date('2026-09-12T15:00:00.000Z'),
+      ),
+    ).toBe('-0.2');
+  });
+
+  it('resets the realized PnL window at the next UTC day', () => {
+    const executions = [
+      buy('b1', '0.001', '50', '0.05', '2026-09-11T12:00:00.000Z'),
+      sell('s1', '0.001', '49', '0.049', '2026-09-12T23:59:59.999Z'),
+    ];
+
+    expect(
+      calculateDailyRealizedPnl(
+        executions,
+        new Date('2026-09-13T00:00:00.000Z'),
+      ),
+    ).toBe('0');
+  });
 });
 
 function buy(
@@ -76,9 +107,10 @@ function buy(
   quantity: string,
   notional: string,
   fee: string,
+  executedAt?: string,
 ): PaperExecution {
   return {
-    ...base(id, quantity, notional, fee),
+    ...base(id, quantity, notional, fee, executedAt),
     side: 'buy',
     totalCost: newNumber(notional, fee, 'plus'),
   };
@@ -89,15 +121,22 @@ function sell(
   quantity: string,
   notional: string,
   fee: string,
+  executedAt?: string,
 ): PaperExecution {
   return {
-    ...base(id, quantity, notional, fee),
+    ...base(id, quantity, notional, fee, executedAt),
     side: 'sell',
     netProceeds: newNumber(notional, fee, 'minus'),
   };
 }
 
-function base(id: string, quantity: string, notional: string, fee: string) {
+function base(
+  id: string,
+  quantity: string,
+  notional: string,
+  fee: string,
+  executedAt?: string,
+) {
   return {
     id,
     symbol: 'BTC/USDT' as const,
@@ -108,7 +147,7 @@ function base(id: string, quantity: string, notional: string, fee: string) {
     fee,
     quotedAt: new Date(0),
     marketDataReceivedAt: new Date(0),
-    executedAt: new Date(0),
+    executedAt: executedAt ? new Date(executedAt) : new Date(0),
     replayed: false,
   };
 }

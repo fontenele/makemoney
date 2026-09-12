@@ -48,7 +48,8 @@ All strategy signals pass through independent risk assessment before any executo
 - **M4.2 — complete:** configuration-based emergency stop that rejects all new paper executions before other risk rules or mutation.
 - **M4.3 — complete:** configurable cumulative BTC position-quantity limit for new paper buys using the persisted BTC balance and exact decimal arithmetic.
 - **M4.4 — complete:** transaction-level enforcement of the BTC position limit so concurrent paper buys cannot collectively exceed it.
-- Later M4 rules require separate approval for loss limits, liquidity, persistent/operator-controlled stop state, and other safeguards.
+- **M4.5 — complete:** configurable daily realized-loss limit that blocks new paper buys at or beyond the threshold using net sell PnL for the current UTC day.
+- Later M4 rules require separate approval for liquidity, persistent/operator-controlled stop state, atomic daily-loss state, and other safeguards.
 
 ## M5 — Strategies — planned
 
