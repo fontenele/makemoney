@@ -16,6 +16,7 @@ interface Environment {
   RISK_MAX_BTC_POSITION_QUANTITY: string;
   RISK_MAX_DAILY_REALIZED_LOSS_USDT: string;
   RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE: string;
+  RISK_CONTROL_TOKEN_SHA256?: string;
 }
 
 const environmentSchema = Joi.object<Environment>({
@@ -58,6 +59,10 @@ const environmentSchema = Joi.object<Environment>({
   RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE: Joi.string()
     .pattern(/^(0\.\d*[1-9]\d*|1(?:\.0+)?)$/)
     .default('0.10'),
+  RISK_CONTROL_TOKEN_SHA256: Joi.string()
+    .empty('')
+    .pattern(/^[a-fA-F0-9]{64}$/)
+    .optional(),
 }).unknown(true);
 
 export function validateEnvironment(

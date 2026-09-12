@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, **M3 — Paper Trading (M3.1 through M3.8)**, and **M4.1–M4.8 — maximum-order-notional, emergency-stop, cumulative BTC-position, atomic exposure, daily realized-loss, atomic daily-loss, persistent emergency-stop, and top-of-book participation controls**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, **M3 — Paper Trading (M3.1 through M3.8)**, and **M4.1–M4.9 — maximum-order-notional, emergency-stop, cumulative BTC-position, atomic exposure, daily realized-loss, atomic daily-loss, persistent emergency-stop, top-of-book participation, and authenticated local risk control**.
 - No next increment is approved. Stop and present a minimal plan before starting more wallet or trading work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -55,6 +55,8 @@ M4.6 serializes paper buy and sell transactions with a PostgreSQL advisory lock 
 M4.7 persists idempotent, append-only emergency-stop changes and exposes local status/control endpoints. The latest event survives restarts and takes precedence over the configuration fallback.
 
 M4.8 limits each new paper order to a configurable share of the best bid or ask quantity used by its quote, defaulting to ten percent and rejecting before financial mutation.
+
+M4.9 restricts the Compose API port to host loopback and protects emergency-stop writes with a fail-closed Bearer-token guard configured only by a SHA-256 digest. The raw token is never stored or logged.
 
 Historical market data, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, strategies, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

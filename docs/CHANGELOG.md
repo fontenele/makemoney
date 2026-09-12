@@ -2,6 +2,22 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — M4.9 authenticated local risk control completed
+
+### Added
+
+- Optional validated `RISK_CONTROL_TOKEN_SHA256` configuration with no credential in examples.
+- Fail-closed Bearer guard for emergency-stop writes using in-memory SHA-256 and constant-time comparison.
+- Unit and E2E coverage for correct, missing, malformed, incorrect, and unconfigured credentials without token disclosure.
+
+### Changed
+
+- Docker Compose now publishes the API only on host loopback at `127.0.0.1:3000`.
+
+### Scope confirmation
+
+- No authentication dependency, account/session system, migration, order endpoint, dashboard, strategy, exchange credential, or real trading was introduced.
+
 ## 2026-09-12 — M4.8 top-of-book participation limit completed
 
 ### Added

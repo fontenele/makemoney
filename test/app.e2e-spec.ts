@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import Decimal from 'decimal.js';
+import { createHash } from 'node:crypto';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/infrastructure/database/prisma.service';
@@ -68,16 +69,36 @@ describe('Application (e2e)', () => {
     const executor = app.get(PaperTradingExecutor);
     const wallet = app.get(PaperWalletService);
     const prisma = app.get(PrismaService);
+    const config = app.get(ConfigService);
     const suffix = Date.now();
     const activateId = `e2e-stop-on-${suffix}`;
     const disableId = `e2e-stop-off-${suffix}`;
     const rejectedOrderId = `e2e-stop-order-${suffix}`;
+    const controlToken = `e2e-control-token-${suffix}`;
+    const controlTokenHash = createHash('sha256')
+      .update(controlToken)
+      .digest('hex');
+    const previousTokenHash = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
     const before = await wallet.getBalances();
 
     try {
+      config.set('RISK_CONTROL_TOKEN_SHA256', '');
       await request(server)
         .put('/risk/emergency-stop')
         .set('Idempotency-Key', activateId)
+        .send({ active: true, reason: 'e2e safety review' })
+        .expect(503);
+      config.set('RISK_CONTROL_TOKEN_SHA256', controlTokenHash);
+      await request(server)
+        .put('/risk/emergency-stop')
+        .set('Idempotency-Key', activateId)
+        .set('Authorization', 'Bearer wrong-token')
+        .send({ active: true, reason: 'e2e safety review' })
+        .expect(401);
+      await request(server)
+        .put('/risk/emergency-stop')
+        .set('Idempotency-Key', activateId)
+        .set('Authorization', `Bearer ${controlToken}`)
         .send({ active: true, reason: 'e2e safety review' })
         .expect(200)
         .expect((response) => {
@@ -92,6 +113,7 @@ describe('Application (e2e)', () => {
       await request(server)
         .put('/risk/emergency-stop')
         .set('Idempotency-Key', activateId)
+        .set('Authorization', `Bearer ${controlToken}`)
         .send({ active: true, reason: 'e2e safety review' })
         .expect(200)
         .expect((response) => {
@@ -100,6 +122,7 @@ describe('Application (e2e)', () => {
       await request(server)
         .put('/risk/emergency-stop')
         .set('Idempotency-Key', activateId)
+        .set('Authorization', `Bearer ${controlToken}`)
         .send({ active: false, reason: 'different change' })
         .expect(409);
 
@@ -133,12 +156,14 @@ describe('Application (e2e)', () => {
       await request(server)
         .put('/risk/emergency-stop')
         .set('Idempotency-Key', disableId)
+        .set('Authorization', `Bearer ${controlToken}`)
         .send({ active: false, reason: 'e2e cleanup' })
         .expect(200)
         .expect((response) => {
           expect((response.body as { active: boolean }).active).toBe(false);
         });
     } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previousTokenHash);
       if (emergencyStop.isActive()) {
         await emergencyStop.change(disableId, false, 'e2e cleanup');
       }

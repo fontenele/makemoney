@@ -120,6 +120,14 @@ The participation rate is configurable, positive, and at most one. Exact decimal
 
 Only top-of-book data is available in the current market-data milestone, so this is an explicit level-one guard rather than an estimate of full-book impact or slippage.
 
+## M4.9 digest-only local control authentication
+
+Emergency-stop writes use a dedicated Bearer token without introducing accounts, sessions, or an authentication dependency. Configuration stores only its SHA-256 digest; the raw token exists only in the request and is compared in constant time using Node's native crypto implementation.
+
+Missing digest configuration disables the write endpoint instead of creating an insecure default. Read-only status remains available. Docker Compose also binds the API to host loopback, providing an independent network boundary for the current local deployment.
+
+This narrow mechanism is appropriate only for the paper-control surface. It must not be reused as sufficient authorization for financial accounts or real execution.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

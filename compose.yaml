@@ -16,7 +16,7 @@ services:
       PAPER_TAKER_FEE_RATE: "0.001"
     command: ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     volumes:
       - .:/app
       - api_node_modules:/app/node_modules

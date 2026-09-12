@@ -6,12 +6,14 @@ import {
   Get,
   Headers,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import {
   EmergencyStopService,
   EmergencyStopState,
 } from '../application/emergency-stop.service';
 import { EmergencyStopIdempotencyConflictError } from '../domain/emergency-stop';
+import { RiskControlAuthGuard } from './risk-control-auth.guard';
 
 @Controller('risk')
 export class RiskControlController {
@@ -23,6 +25,7 @@ export class RiskControlController {
   }
 
   @Put('emergency-stop')
+  @UseGuards(RiskControlAuthGuard)
   async changeEmergencyStop(
     @Headers('idempotency-key') idempotencyKey: string | undefined,
     @Body() body: unknown,

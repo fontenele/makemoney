@@ -73,3 +73,13 @@ For every new order, the Risk Engine calculates `order quantity / available top-
 Rule precedence is emergency stop, maximum order notional, top-of-book participation, daily realized loss for buys, then cumulative BTC position for buys. The earlier quote-level check still rejects quantities above all displayed liquidity; M4.8 adds a conservative participation buffer for both sides.
 
 This rule uses only level-one displayed liquidity. Multi-level depth, market impact, partial fills, and deeper slippage modeling remain deferred.
+
+## M4.9 authenticated local risk control
+
+The Compose API port is bound to `127.0.0.1:3000`, preventing Docker from publishing it on every host interface. `GET /risk/emergency-stop` remains read-only, while `PUT /risk/emergency-stop` additionally requires `Authorization: Bearer <token>`.
+
+The application configuration accepts only `RISK_CONTROL_TOKEN_SHA256`, a 64-character hexadecimal SHA-256 digest. The raw token is supplied only by the caller, hashed in memory, compared with `timingSafeEqual`, and never stored, returned, or logged. `.env.example` contains no credential or usable digest.
+
+When the digest is absent, HTTP writes fail closed with 503. A missing, malformed, or incorrect Bearer token returns 401. Authentication runs before idempotency/body handling, while the M4.7 persistence and audit behavior remains unchanged after successful authentication.
+
+This is defense for a local paper-only control surface. It is not user management, remote authorization, rate limiting, or one of the complete multi-party safeguards required before any future real trading.
