@@ -24,6 +24,7 @@ M3.4 Sell Execution:      DONE
 M3.5 Execution History:   DONE
 M3.6 Position/PnL:        DONE
 M3.7 Unrealized PnL:      DONE
+M3.8 Performance Summary: DONE
 Next increment:           NOT APPROVED
 ```
 
@@ -1665,7 +1666,7 @@ Roadmap:
 M0 — Bootstrap                    DONE
 M1 — Market Data                  DONE
 M2 — Paper Wallet                 DONE (M2.1–M2.5)
-M3 — Paper Trading                IN PROGRESS (M3.1–M3.7 DONE)
+M3 — Paper Trading                IN PROGRESS (M3.1–M3.8 DONE)
 M3 — Paper Trading                PLANNED
 M4 — Risk Engine                  PLANNED
 M5 — Strategies                   PLANNED
@@ -2188,6 +2189,7 @@ M3.4 Sell Execution:  DONE
 M3.5 Execution History: DONE
 M3.6 Position/PnL:     DONE
 M3.7 Unrealized PnL:   DONE
+M3.8 Performance:      DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS

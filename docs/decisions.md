@@ -58,6 +58,12 @@ An open paper position is marked at the normalized best bid because that is the 
 
 The valuation reuses the quote freshness limit and rejects unavailable or stale top-of-book data for open positions. A zero position does not depend on market data. This level-one mark is explicit rather than pretending to model deeper-book liquidity or slippage.
 
+## M3.8 sell-execution performance outcomes
+
+The first performance summary reuses the position accounting fold so weighted cost allocation and realized PnL have one implementation. Each sell execution is classified by its net realized PnL as profitable, losing, or break-even; partial sells therefore remain separate outcomes.
+
+Win rate excludes break-even outcomes and is null without a decided outcome. It is exposed as a decimal ratio rounded half-even to eight fractional places. ROI and time-series metrics are deferred because they require an explicit capital-flow and period model.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

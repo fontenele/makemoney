@@ -339,6 +339,21 @@ describe('Application (e2e)', () => {
         totalPnl: '0.899',
         marketDataReceivedAt: null,
       });
+      await request(server)
+        .get('/paper-trading/performance')
+        .expect(200)
+        .expect({
+          symbol: 'BTC/USDT',
+          executionCount: 2,
+          buyExecutionCount: 1,
+          sellExecutionCount: 1,
+          profitableSellCount: 1,
+          losingSellCount: 0,
+          breakEvenSellCount: 0,
+          winRate: '1',
+          realizedPnl: '0.899',
+          totalFees: '0.101',
+        });
     } finally {
       await prisma.paperExecution.deleteMany({
         where: { id: { in: [buyId, sellId] } },

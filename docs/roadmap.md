@@ -37,7 +37,8 @@ No real funds or exchange-account access.
 - **M3.5 — complete:** bounded read-only HTTP history of recent buy and sell executions, ordered newest first.
 - **M3.6 — complete:** read-only BTC position with fee-inclusive weighted-average cost, accumulated fees, and realized PnL derived from execution history.
 - **M3.7 — complete:** open-position valuation at the fresh best bid, including estimated exit fee, net liquidation value, unrealized PnL, and total PnL.
-- Later M3 increments require separate approval for performance statistics, order mutation APIs, cursor pagination, and deeper slippage modeling.
+- **M3.8 — complete:** read-only realized performance summary with execution/outcome counts, win rate, realized PnL, and total fees.
+- Later M3 increments require separate approval for ROI and time-based statistics, order mutation APIs, cursor pagination, and deeper slippage modeling.
 
 ## M4 — Risk Engine — planned
 

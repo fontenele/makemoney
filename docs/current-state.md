@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0 through M3.7 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, realized position accounting, and net best-bid valuation. No dashboard, order mutation endpoint, strategy, authenticated integration, or real order execution exists.
+M0 through M3.8 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. No dashboard, order mutation endpoint, strategy, authenticated integration, or real order execution exists.
 
 ## Implemented application
 
@@ -53,6 +53,7 @@ M0 through M3.7 are complete. M1 provides unauthenticated public BTC/USDT market
 - Position accounting rejects an execution history that sells more BTC than prior tracked buys.
 - Open BTC positions are valued at a fresh best bid with estimated exit fee, net liquidation value, unrealized PnL, and total PnL; unavailable or stale market data returns HTTP 503.
 - Empty positions expose zero valuation fields without depending on live market data.
+- `GET /paper-trading/performance` reports execution and net sell-outcome counts, realized win rate, realized PnL, and total execution fees from the shared accounting fold.
 
 ## Local endpoints and ports
 
@@ -62,6 +63,7 @@ M0 through M3.7 are complete. M1 provides unauthenticated public BTC/USDT market
 - Paper valuation: `http://localhost:3000/paper-wallet/valuation`
 - Paper execution history: `http://localhost:3000/paper-trading/executions`
 - Paper position: `http://localhost:3000/paper-trading/position`
+- Paper performance: `http://localhost:3000/paper-trading/performance`
 - PostgreSQL host port: `5433` mapped to container port `5432`
 - Redis host port: `6379`
 
@@ -69,12 +71,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M3.7:
+The following passed on 2026-09-11 after M3.8:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 139 tests passed across 25 suites
-- `npm run test:e2e -- --runInBand` — 13 tests passed, including bounded buy/sell history, invalid-limit rejection, and open-position best-bid valuation
+- `npm test -- --runInBand` — 143 tests passed across 26 suites
+- `npm run test:e2e -- --runInBand` — 13 tests passed, including bounded buy/sell history, realized performance, invalid-limit rejection, and open-position best-bid valuation
 - `npx prisma migrate deploy` — paper-sell execution migration applied successfully
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
@@ -86,7 +88,7 @@ The following passed on 2026-09-11 after M3.7:
 
 ## Repository state
 
-M0 through M3.6 are committed. M3.7 changes are currently in the working tree.
+M0 through M3.7 are committed. M3.8 changes are currently in the working tree.
 
 ## Known issues and cautions
 

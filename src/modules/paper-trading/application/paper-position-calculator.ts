@@ -19,13 +19,25 @@ export class InconsistentPaperExecutionHistoryError extends Error {
   }
 }
 
+export interface PaperExecutionAccounting {
+  position: CostBasedPaperPosition;
+  sellPnls: string[];
+}
+
 export function calculatePaperPosition(
   executions: readonly PaperExecution[],
 ): CostBasedPaperPosition {
+  return calculatePaperExecutionAccounting(executions).position;
+}
+
+export function calculatePaperExecutionAccounting(
+  executions: readonly PaperExecution[],
+): PaperExecutionAccounting {
   let quantity = new PositionDecimal(0);
   let costBasis = new PositionDecimal(0);
   let realizedPnl = new PositionDecimal(0);
   let totalFees = new PositionDecimal(0);
+  const sellPnls: string[] = [];
 
   for (const execution of executions) {
     const executionQuantity = new PositionDecimal(execution.quantity);
@@ -44,11 +56,11 @@ export function calculatePaperPosition(
     const allocatedCost = rounded(
       costBasis.times(executionQuantity).dividedBy(quantity),
     );
-    realizedPnl = rounded(
-      realizedPnl.plus(
-        new PositionDecimal(execution.netProceeds).minus(allocatedCost),
-      ),
+    const sellPnl = rounded(
+      new PositionDecimal(execution.netProceeds).minus(allocatedCost),
     );
+    realizedPnl = rounded(realizedPnl.plus(sellPnl));
+    sellPnls.push(sellPnl.toFixed());
     quantity = rounded(quantity.minus(executionQuantity));
     costBasis = quantity.isZero()
       ? new PositionDecimal(0)
@@ -56,14 +68,17 @@ export function calculatePaperPosition(
   }
 
   return {
-    symbol: 'BTC/USDT',
-    quantity: quantity.toFixed(),
-    costBasis: costBasis.toFixed(),
-    averageEntryPrice: quantity.isZero()
-      ? null
-      : rounded(costBasis.dividedBy(quantity)).toFixed(),
-    realizedPnl: realizedPnl.toFixed(),
-    totalFees: totalFees.toFixed(),
+    position: {
+      symbol: 'BTC/USDT',
+      quantity: quantity.toFixed(),
+      costBasis: costBasis.toFixed(),
+      averageEntryPrice: quantity.isZero()
+        ? null
+        : rounded(costBasis.dividedBy(quantity)).toFixed(),
+      realizedPnl: realizedPnl.toFixed(),
+      totalFees: totalFees.toFixed(),
+    },
+    sellPnls,
   };
 }
 

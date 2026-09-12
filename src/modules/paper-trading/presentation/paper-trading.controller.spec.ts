@@ -10,6 +10,7 @@ import {
   PositionMarketDataUnavailableError,
 } from '../application/paper-position.service';
 import { PaperTradingController } from './paper-trading.controller';
+import { PaperTradingPerformanceService } from '../application/paper-trading-performance.service';
 
 describe('PaperTradingController', () => {
   it('uses the default limit when it is omitted', async () => {
@@ -20,6 +21,7 @@ describe('PaperTradingController', () => {
         listRecent,
       } as unknown as PaperExecutionHistoryService,
       {} as PaperPositionService,
+      {} as PaperTradingPerformanceService,
     );
 
     await expect(controller.listExecutions()).resolves.toEqual([]);
@@ -34,6 +36,7 @@ describe('PaperTradingController', () => {
         listRecent,
       } as unknown as PaperExecutionHistoryService,
       {} as PaperPositionService,
+      {} as PaperTradingPerformanceService,
     );
 
     await expect(controller.listExecutions('2')).resolves.toEqual([]);
@@ -46,6 +49,7 @@ describe('PaperTradingController', () => {
         listRecent: jest.fn(),
       } as unknown as PaperExecutionHistoryService,
       {} as PaperPositionService,
+      {} as PaperTradingPerformanceService,
     );
 
     expect(() => controller.listExecutions(limit)).toThrow(BadRequestException);
@@ -72,6 +76,7 @@ describe('PaperTradingController', () => {
     const controller = new PaperTradingController(
       {} as PaperExecutionHistoryService,
       { getPosition } as unknown as PaperPositionService,
+      {} as PaperTradingPerformanceService,
     );
 
     await expect(controller.getPosition()).resolves.toBe(position);
@@ -86,10 +91,36 @@ describe('PaperTradingController', () => {
     const controller = new PaperTradingController(
       {} as PaperExecutionHistoryService,
       { getPosition } as unknown as PaperPositionService,
+      {} as PaperTradingPerformanceService,
     );
 
     await expect(controller.getPosition()).rejects.toThrow(
       ServiceUnavailableException,
     );
+  });
+
+  it('returns the calculated paper-trading performance', async () => {
+    const performance = {
+      symbol: 'BTC/USDT' as const,
+      executionCount: 2,
+      buyExecutionCount: 1,
+      sellExecutionCount: 1,
+      profitableSellCount: 1,
+      losingSellCount: 0,
+      breakEvenSellCount: 0,
+      winRate: '1',
+      realizedPnl: '0.899',
+      totalFees: '0.101',
+    };
+    const getPerformance =
+      jest.fn<PaperTradingPerformanceService['getPerformance']>();
+    getPerformance.mockResolvedValue(performance);
+    const controller = new PaperTradingController(
+      {} as PaperExecutionHistoryService,
+      {} as PaperPositionService,
+      { getPerformance } as unknown as PaperTradingPerformanceService,
+    );
+
+    await expect(controller.getPerformance()).resolves.toBe(performance);
   });
 });

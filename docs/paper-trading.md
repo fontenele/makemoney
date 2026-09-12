@@ -64,3 +64,11 @@ For an open position, `GET /paper-trading/position` uses the latest fresh normal
 The response also exposes the market-data receipt timestamp used for the calculation. An empty position returns null market data and zero current-value fields without requiring a live book. An open position returns HTTP 503 when top-of-book data is unavailable or older than `PAPER_QUOTE_MAX_MARKET_DATA_AGE_MS`.
 
 This remains a level-one estimate. It does not verify that the full position fits at the displayed bid and does not model multi-level slippage. ROI, win rate, order mutation routes, strategies, and real trading remain deferred.
+
+## M3.8 realized performance summary
+
+`GET /paper-trading/performance` folds the complete execution history through the same accounting calculation used by the position endpoint. It returns total, buy, and sell execution counts; profitable, losing, and break-even sell counts; realized win rate; realized PnL; and accumulated execution fees.
+
+Each sell outcome uses its net proceeds after exit fee minus its allocated fee-inclusive weighted-average cost. Win rate is a decimal ratio of profitable sells to profitable plus losing sells. Break-even sells are reported but excluded from that denominator; win rate is null when there are no profitable or losing sells.
+
+The summary is realized-only and requires no current market data. A sell execution is the current outcome unit, including partial sells. ROI, daily/period grouping, drawdown, profit factor, expectancy, order mutation routes, and strategies remain deferred.

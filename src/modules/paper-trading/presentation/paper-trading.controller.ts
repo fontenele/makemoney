@@ -17,12 +17,15 @@ import {
   PositionMarketDataUnavailableError,
 } from '../application/paper-position.service';
 import { PaperPosition } from '../domain/paper-position';
+import { PaperTradingPerformanceService } from '../application/paper-trading-performance.service';
+import { PaperTradingPerformance } from '../domain/paper-trading-performance';
 
 @Controller('paper-trading')
 export class PaperTradingController {
   constructor(
     private readonly history: PaperExecutionHistoryService,
     private readonly position: PaperPositionService,
+    private readonly performance: PaperTradingPerformanceService,
   ) {}
 
   @Get('executions')
@@ -62,5 +65,10 @@ export class PaperTradingController {
       }
       throw error;
     }
+  }
+
+  @Get('performance')
+  getPerformance(): Promise<PaperTradingPerformance> {
+    return this.performance.getPerformance();
   }
 }

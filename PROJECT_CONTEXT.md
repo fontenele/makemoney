@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, and **M3.1 through M3.7 — Paper Trading quotes, execution, history, and position accounting**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, and **M3.1 through M3.8 — Paper Trading quotes, execution, history, position accounting, and realized performance**.
 - No next increment is approved. Stop and present a minimal plan before starting more wallet or trading work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -38,7 +38,9 @@ M3.6 derives the BTC position, fee-inclusive weighted-average cost, total fees, 
 
 M3.7 values an open position at the latest fresh best bid, subtracts the estimated taker fee, and exposes gross market value, net liquidation value, unrealized PnL, and total PnL through the same read-only endpoint.
 
-Historical market data, BRL conversion, order mutation APIs, deeper slippage, ROI and performance statistics, strategies, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
+M3.8 exposes execution counts, net profitable/losing/break-even sell counts, realized win rate, realized PnL, and total execution fees at `GET /paper-trading/performance`.
+
+Historical market data, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, strategies, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 

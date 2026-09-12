@@ -2,6 +2,19 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M3.8 realized performance summary completed
+
+### Added
+
+- Shared execution-accounting fold for position and performance read models.
+- Profitable, losing, and break-even sell classification using net realized PnL.
+- Realized win rate excluding break-even outcomes, plus execution counts, realized PnL, and total fees.
+- Read-only `GET /paper-trading/performance` endpoint with unit and E2E coverage.
+
+### Scope confirmation
+
+- No ROI, time-based metrics, drawdown, order mutation, strategy, Risk Engine, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M3.7 unrealized position valuation completed
 
 ### Added
