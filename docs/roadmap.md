@@ -47,7 +47,8 @@ All strategy signals pass through independent risk assessment before any executo
 - **M4.1 — complete:** provider-neutral risk assessment for every new paper execution with a configurable maximum gross order notional in USDT.
 - **M4.2 — complete:** configuration-based emergency stop that rejects all new paper executions before other risk rules or mutation.
 - **M4.3 — complete:** configurable cumulative BTC position-quantity limit for new paper buys using the persisted BTC balance and exact decimal arithmetic.
-- Later M4 rules require separate approval for concurrency-safe exposure enforcement, loss limits, liquidity, persistent/operator-controlled stop state, and other safeguards.
+- **M4.4 — complete:** transaction-level enforcement of the BTC position limit so concurrent paper buys cannot collectively exceed it.
+- Later M4 rules require separate approval for loss limits, liquidity, persistent/operator-controlled stop state, and other safeguards.
 
 ## M5 — Strategies — planned
 

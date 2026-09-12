@@ -2,6 +2,18 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M4.4 atomic BTC exposure enforcement completed
+
+### Added
+
+- Transaction-level conditional BTC credit using the existing configured position limit.
+- Specific atomic position-limit error that aborts and rolls back the entire buy transaction.
+- Database-backed concurrency coverage proving that only one of two competing buys can consume the same remaining exposure capacity.
+
+### Scope confirmation
+
+- The Risk Engine remains mandatory before persistence. No migration, order endpoint, loss rule, strategy, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M4.3 cumulative BTC position limit completed
 
 ### Added

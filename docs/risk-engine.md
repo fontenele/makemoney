@@ -24,4 +24,12 @@ M4.2 provides configuration-based process startup/runtime behavior only. It does
 
 The limit boundary is inclusive. Sells bypass this rule because they reduce BTC exposure, while remaining subject to the emergency stop and maximum-order-notional rule. Rule precedence is emergency stop, maximum order notional, then cumulative BTC position. Rejections occur before execution persistence or balance mutation, and idempotent replays remain exempt because they create no new effect.
 
-The current balance read and the later execution transaction are separate operations. This is adequate for the current internal, non-concurrent execution surface, but it is not a concurrency-safe exposure guarantee. Atomic exposure enforcement must be completed before concurrent or externally writable order submission is introduced.
+The application-level balance read and risk assessment remain useful for early rejection and structured decisions. M4.4 adds the transaction-level guarantee required for concurrent attempts.
+
+## M4.4 atomic BTC exposure enforcement
+
+Every buy still passes through the Risk Engine. As a defense in depth, the PostgreSQL transaction also applies `RISK_MAX_BTC_POSITION_QUANTITY` directly in the conditional BTC balance update. PostgreSQL's row locking serializes competing updates, and the update succeeds only when the resulting balance is within the inclusive limit.
+
+If the condition fails, `PaperPositionLimitExceededError` aborts the transaction. The execution insert and USDT debit are rolled back together, leaving no partial financial effect. A database-backed concurrency test submits two buys for the same remaining capacity and verifies that exactly one execution and one balance mutation survive.
+
+No schema migration, external mutation endpoint, loss rule, strategy, authenticated provider, or real trading is introduced.

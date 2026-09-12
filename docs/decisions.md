@@ -80,7 +80,13 @@ The initial stop is a validated configuration boolean defaulting to false. A per
 
 The first cumulative exposure rule limits BTC quantity rather than mark-to-market value, avoiding a moving price-dependent boundary. New buys are assessed against the persisted BTC paper balance plus quoted quantity; the configured positive decimal limit defaults to `0.01` BTC and includes the exact boundary. Sells do not increase BTC exposure and therefore bypass this rule after the preceding emergency-stop and maximum-notional checks.
 
-The executor supplies the provider-neutral balance snapshot to the risk candidate, keeping persistence concerns outside the Risk Engine. Reading and mutation are not yet one atomic operation, so concurrent buy attempts could assess the same balance. The project has no external mutation route or concurrent strategy execution today; atomic enforcement is explicitly required before either is added.
+The executor supplies the provider-neutral balance snapshot to the risk candidate, keeping persistence concerns outside the Risk Engine. M4.4 supplements that early assessment with an atomic persistence guard.
+
+## M4.4 transaction-level exposure defense
+
+The buy transaction repeats the configured BTC quantity limit as a conditional PostgreSQL update. This is intentional defense in depth: the Risk Engine owns the explainable pre-execution decision, while the repository owns the final concurrency guarantee at the mutation boundary. PostgreSQL row locking ensures that competing balance updates cannot both approve against the same prior amount.
+
+A failed conditional credit throws a specific position-limit error from inside the transaction, rolling back the already-created execution row and USDT debit. No database constraint or migration is needed because the limit remains runtime configuration rather than persisted policy.
 
 ## M1.1 raw trade stream
 

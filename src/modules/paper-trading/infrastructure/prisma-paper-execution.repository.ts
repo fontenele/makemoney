@@ -1,14 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Prisma } from '../../../generated/prisma/client';
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
-import { PaperExecutionRepository } from '../domain/paper-execution-repository';
+import {
+  PaperExecutionRepository,
+  PaperPositionLimitExceededError,
+} from '../domain/paper-execution-repository';
 import { PaperMarketBuyQuote } from '../domain/paper-market-buy-quote';
 import { PaperMarketSellQuote } from '../domain/paper-market-sell-quote';
 import { PaperExecution } from '../domain/trading-executor';
 
 @Injectable()
 export class PrismaPaperExecutionRepository implements PaperExecutionRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+  ) {}
 
   async find(id: string): Promise<PaperExecution | undefined> {
     const row = await this.prisma.paperExecution.findUnique({ where: { id } });
@@ -34,6 +41,9 @@ export class PrismaPaperExecutionRepository implements PaperExecutionRepository 
     id: string,
     quote: PaperMarketBuyQuote,
   ): Promise<PaperExecution> {
+    const positionLimit = this.config.getOrThrow<string>(
+      'RISK_MAX_BTC_POSITION_QUANTITY',
+    );
     try {
       return await this.prisma.$transaction(async (tx) => {
         const row = await tx.paperExecution.create({
@@ -66,9 +76,11 @@ export class PrismaPaperExecutionRepository implements PaperExecutionRepository 
           SET "amount" = "amount" + CAST(${quote.quantity} AS DECIMAL(38,18)),
               "updated_at" = CURRENT_TIMESTAMP
           WHERE "asset" = 'BTC'
+            AND "amount" + CAST(${quote.quantity} AS DECIMAL(38,18))
+              <= CAST(${positionLimit} AS DECIMAL(38,18))
         `;
         if (credited !== 1)
-          throw new Error('BTC paper balance is not initialized');
+          throw new PaperPositionLimitExceededError(positionLimit);
         return mapExecution(row, false);
       });
     } catch (error: unknown) {

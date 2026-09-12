@@ -11,3 +11,10 @@ export interface PaperExecutionRepository {
   executeBuy(id: string, quote: PaperMarketBuyQuote): Promise<PaperExecution>;
   executeSell(id: string, quote: PaperMarketSellQuote): Promise<PaperExecution>;
 }
+
+export class PaperPositionLimitExceededError extends RangeError {
+  constructor(readonly limit: string) {
+    super('Atomic BTC paper position limit exceeded');
+    this.name = PaperPositionLimitExceededError.name;
+  }
+}

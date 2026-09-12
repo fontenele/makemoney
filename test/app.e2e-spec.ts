@@ -18,6 +18,12 @@ import {
 } from '../src/modules/market-data/domain/ticker-stream';
 import { PaperWalletService } from '../src/modules/paper-wallet/application/paper-wallet.service';
 import { PaperTradingExecutor } from '../src/modules/paper-trading/application/paper-trading.executor';
+import {
+  PAPER_EXECUTION_REPOSITORY,
+  PaperExecutionRepository,
+  PaperPositionLimitExceededError,
+} from '../src/modules/paper-trading/domain/paper-execution-repository';
+import { PaperMarketBuyQuote } from '../src/modules/paper-trading/domain/paper-market-buy-quote';
 
 describe('Application (e2e)', () => {
   let app: INestApplication;
@@ -258,6 +264,72 @@ describe('Application (e2e)', () => {
         prisma.paperExecution.findUnique({ where: { id: idempotencyKey } }),
       ).resolves.toBeNull();
     } finally {
+      config.set('RISK_MAX_BTC_POSITION_QUANTITY', '0.01');
+    }
+  });
+
+  it('atomically allows only one of two buys competing for the remaining BTC limit', async () => {
+    const repository = app.get<PaperExecutionRepository>(
+      PAPER_EXECUTION_REPOSITORY,
+    );
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const config = app.get(ConfigService);
+    const before = await wallet.getBalances();
+    const quantity = '0.0001';
+    const totalCost = '5.005';
+    const positionLimit = new Decimal(before.BTC).plus(quantity).toFixed();
+    const firstId = `e2e-atomic-position-a-${Date.now()}`;
+    const secondId = `e2e-atomic-position-b-${Date.now()}`;
+    const quotedAt = new Date();
+    const quote = (id: string): [string, PaperMarketBuyQuote] => [
+      id,
+      {
+        symbol: 'BTC/USDT',
+        side: 'buy',
+        quantity,
+        price: '50000',
+        notional: '5',
+        feeRate: '0.001',
+        fee: '0.005',
+        totalCost,
+        quotedAt,
+        marketDataReceivedAt: quotedAt,
+      },
+    ];
+    config.set('RISK_MAX_BTC_POSITION_QUANTITY', positionLimit);
+
+    try {
+      const results = await Promise.allSettled([
+        repository.executeBuy(...quote(firstId)),
+        repository.executeBuy(...quote(secondId)),
+      ]);
+      const fulfilled = results.filter(
+        (result) => result.status === 'fulfilled',
+      );
+      const rejected = results.filter((result) => result.status === 'rejected');
+
+      expect(fulfilled).toHaveLength(1);
+      expect(rejected).toHaveLength(1);
+      expect(rejected[0]?.reason).toBeInstanceOf(
+        PaperPositionLimitExceededError,
+      );
+      await expect(wallet.getBalances()).resolves.toEqual({
+        BTC: positionLimit,
+        USDT: new Decimal(before.USDT).minus(totalCost).toFixed(),
+      });
+      await expect(
+        prisma.paperExecution.count({
+          where: { id: { in: [firstId, secondId] } },
+        }),
+      ).resolves.toBe(1);
+    } finally {
+      await prisma.paperExecution.deleteMany({
+        where: { id: { in: [firstId, secondId] } },
+      });
+      const current = await wallet.getBalances();
+      if (current.BTC !== before.BTC) await wallet.debit('BTC', quantity);
+      if (current.USDT !== before.USDT) await wallet.credit('USDT', totalCost);
       config.set('RISK_MAX_BTC_POSITION_QUANTITY', '0.01');
     }
   });
