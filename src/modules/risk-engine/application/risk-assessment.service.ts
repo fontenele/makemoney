@@ -22,6 +22,16 @@ export class RiskAssessmentService implements RiskEngine {
   constructor(private readonly config: ConfigService) {}
 
   assess(candidate: RiskOrderCandidate): RiskAssessment {
+    if (this.config.getOrThrow<boolean>('RISK_EMERGENCY_STOP')) {
+      const assessment: RiskAssessment = {
+        decision: 'rejected',
+        rule: 'emergency_stop',
+        reason: 'emergency_stop_active',
+      };
+      this.logAssessment(candidate, assessment);
+      return assessment;
+    }
+
     const notional = positiveDecimal(candidate.notional, 'candidate notional');
     const limitValue = this.config.getOrThrow<string>(
       'RISK_MAX_ORDER_NOTIONAL_USDT',
@@ -40,6 +50,14 @@ export class RiskAssessmentService implements RiskEngine {
         }
       : { decision: 'approved', ...common };
 
+    this.logAssessment(candidate, assessment);
+    return assessment;
+  }
+
+  private logAssessment(
+    candidate: RiskOrderCandidate,
+    assessment: RiskAssessment,
+  ): void {
     this.logger.log({
       event: 'risk.order_assessed',
       candidateId: candidate.id,
@@ -48,7 +66,6 @@ export class RiskAssessmentService implements RiskEngine {
       quantity: candidate.quantity,
       ...assessment,
     });
-    return assessment;
   }
 }
 

@@ -4,7 +4,7 @@ Last validated: 2026-09-11
 
 ## Milestone status
 
-M0 through M3 are complete and M4.1 is complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4.1 adds the first independent pre-execution risk rule. No dashboard, order mutation endpoint, strategy, authenticated integration, or real order execution exists.
+M0 through M3 are complete and M4.1–M4.2 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution maximum-notional and emergency-stop rules. No dashboard, order mutation endpoint, strategy, authenticated integration, or real order execution exists.
 
 ## Implemented application
 
@@ -56,6 +56,7 @@ M0 through M3 are complete and M4.1 is complete. M1 provides unauthenticated pub
 - `GET /paper-trading/performance` reports execution and net sell-outcome counts, realized win rate, realized PnL, and total execution fees from the shared accounting fold.
 - Every new paper execution is independently assessed against `RISK_MAX_ORDER_NOTIONAL_USDT` after quoting and before repository mutation; the default maximum gross notional is `100` USDT.
 - Risk approvals and rejections emit structured decisions, and rejection leaves balances and execution history unchanged.
+- `RISK_EMERGENCY_STOP` defaults to false; when true it rejects every new paper execution before candidate validation and other risk rules.
 
 ## Local endpoints and ports
 
@@ -73,12 +74,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-11 after M4.1:
+The following passed on 2026-09-11 after M4.2:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 148 tests passed across 27 suites
-- `npm run test:e2e -- --runInBand` — 14 tests passed, including bounded history, realized performance, open-position valuation, insufficient funds, and risk rejection without mutation
+- `npm test -- --runInBand` — 151 tests passed across 27 suites
+- `npm run test:e2e -- --runInBand` — 15 tests passed, including bounded history, realized performance, open-position valuation, insufficient funds, maximum-notional rejection, and emergency-stop rejection without mutation
 - `npx prisma migrate deploy` — paper-sell execution migration applied successfully
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
@@ -90,7 +91,7 @@ The following passed on 2026-09-11 after M4.1:
 
 ## Repository state
 
-M0 through M3.8 are committed. M4.1 changes are currently in the working tree.
+M0 through M4.1 are committed. M4.2 changes are currently in the working tree.
 
 ## Known issues and cautions
 

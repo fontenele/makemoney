@@ -27,6 +27,7 @@ M3.7 Unrealized PnL:      DONE
 M3.8 Performance Summary: DONE
 M3 Paper Trading:        DONE
 M4.1 Max Order Notional: DONE
+M4.2 Emergency Stop:     DONE
 Next increment:           NOT APPROVED
 ```
 
@@ -1669,7 +1670,7 @@ M0 — Bootstrap                    DONE
 M1 — Market Data                  DONE
 M2 — Paper Wallet                 DONE (M2.1–M2.5)
 M3 — Paper Trading                DONE (M3.1–M3.8)
-M4 — Risk Engine                  IN PROGRESS (M4.1 DONE)
+M4 — Risk Engine                  IN PROGRESS (M4.1–M4.2 DONE)
 M5 — Strategies                   PLANNED
 M6 — Backtesting                  PLANNED
 M7 — New Listing Scanner          PLANNED
@@ -2193,6 +2194,7 @@ M3.7 Unrealized PnL:   DONE
 M3.8 Performance:      DONE
 M3 Paper Trading:      DONE
 M4.1 Max Notional:     DONE
+M4.2 Emergency Stop:   DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS

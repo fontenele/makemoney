@@ -2,6 +2,19 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M4.2 emergency stop completed
+
+### Added
+
+- Validated `RISK_EMERGENCY_STOP` configuration with a default of `false`.
+- Highest-precedence rejection of every new buy or sell while the stop is active.
+- Structured `emergency_stop` / `emergency_stop_active` risk decisions.
+- Unit and E2E coverage for inactive behavior, buy/sell rejection, rule precedence, and rejection without mutation.
+
+### Scope confirmation
+
+- No control endpoint, persisted stop state, order route, strategy, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M4.1 maximum-order-notional risk rule completed
 
 ### Added

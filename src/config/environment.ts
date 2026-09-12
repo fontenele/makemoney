@@ -12,6 +12,7 @@ interface Environment {
   PAPER_QUOTE_MAX_MARKET_DATA_AGE_MS: number;
   PAPER_TAKER_FEE_RATE: string;
   RISK_MAX_ORDER_NOTIONAL_USDT: string;
+  RISK_EMERGENCY_STOP: boolean;
 }
 
 const environmentSchema = Joi.object<Environment>({
@@ -44,6 +45,7 @@ const environmentSchema = Joi.object<Environment>({
   RISK_MAX_ORDER_NOTIONAL_USDT: Joi.string()
     .pattern(/^[1-9]\d{0,19}(\.\d{1,18})?$/)
     .default('100'),
+  RISK_EMERGENCY_STOP: Joi.boolean().default(false),
 }).unknown(true);
 
 export function validateEnvironment(

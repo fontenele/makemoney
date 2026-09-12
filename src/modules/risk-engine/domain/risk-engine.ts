@@ -10,6 +10,11 @@ export interface RiskOrderCandidate {
 
 export type RiskAssessment =
   | {
+      decision: 'rejected';
+      rule: 'emergency_stop';
+      reason: 'emergency_stop_active';
+    }
+  | {
       decision: 'approved';
       rule: 'max_order_notional_usdt';
       notional: string;

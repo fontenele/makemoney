@@ -9,3 +9,11 @@ Every new internal paper execution is quoted first and then assessed by the prov
 Each assessment produces a structured log containing the candidate ID, symbol, side, quantity, decision, rule, quoted notional, and configured limit. A rejection raises an application error before transaction access, so it cannot change paper balances or create an execution.
 
 M4.1 does not expose an order route and does not add position, exposure, daily-loss, liquidity, stop-loss, strategy, authenticated-provider, or real-trading rules.
+
+## M4.2 emergency stop
+
+`RISK_EMERGENCY_STOP` is a validated boolean and defaults to `false`. When true, the Risk Engine rejects every new buy or sell candidate with rule `emergency_stop` and reason `emergency_stop_active`.
+
+The emergency-stop rule has precedence over candidate validation and maximum-notional assessment, allowing it to fail closed without depending on other order details. The rejection follows the existing pre-transaction path, so it cannot mutate balances or persist an execution. Idempotent replays remain available because they return an already-persisted result without creating a new financial effect.
+
+M4.2 provides configuration-based process startup/runtime behavior only. It does not expose a control endpoint or persist stop state, and it does not enable any form of real trading.

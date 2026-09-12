@@ -70,6 +70,12 @@ The paper executor depends on a provider-neutral `RiskEngine` contract. New orde
 
 The initial `RISK_MAX_ORDER_NOTIONAL_USDT` limit defaults to `100`, accepts exact decimal strings, applies equally to buys and sells, and treats the boundary as inclusive. This is one independent guard, not a complete risk system and not sufficient to enable real trading.
 
+## M4.2 emergency-stop precedence
+
+The emergency stop is evaluated before candidate decimal validation and maximum-notional assessment. When active, it returns one deterministic rejection without depending on market-derived order details. This makes the operational intent unambiguous and keeps mutation unreachable.
+
+The initial stop is a validated configuration boolean defaulting to false. A persistent, authenticated operator control is deferred; this configuration switch protects paper execution only and is not one of the multiple safeguards eventually required for real trading.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

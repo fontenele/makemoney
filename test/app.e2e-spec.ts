@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import Decimal from 'decimal.js';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
@@ -203,6 +204,34 @@ describe('Application (e2e)', () => {
     await expect(
       prisma.paperExecution.findUnique({ where: { id: idempotencyKey } }),
     ).resolves.toBeNull();
+  });
+
+  it('rejects new paper executions while the emergency stop is active', async () => {
+    preparePaperMarket(app);
+    const executor = app.get(PaperTradingExecutor);
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const config = app.get(ConfigService);
+    const idempotencyKey = `e2e-emergency-stop-${Date.now()}`;
+    const before = await wallet.getBalances();
+    config.set('RISK_EMERGENCY_STOP', true);
+
+    try {
+      await expect(
+        executor.execute({
+          idempotencyKey,
+          symbol: 'BTC/USDT',
+          side: 'buy',
+          quantity: '0.0001',
+        }),
+      ).rejects.toThrow('emergency_stop_active');
+      await expect(wallet.getBalances()).resolves.toEqual(before);
+      await expect(
+        prisma.paperExecution.findUnique({ where: { id: idempotencyKey } }),
+      ).resolves.toBeNull();
+    } finally {
+      config.set('RISK_EMERGENCY_STOP', false);
+    }
   });
 
   it('executes and replays an idempotent paper sell atomically', async () => {
