@@ -6,6 +6,7 @@ import { PaperExecutionRepository } from '../domain/paper-execution-repository';
 import { PaperExecution } from '../domain/trading-executor';
 import { PaperMarketBuyQuoteService } from './paper-market-buy-quote.service';
 import { PaperMarketSellQuoteService } from './paper-market-sell-quote.service';
+import { PaperPositionService } from './paper-position.service';
 import { PaperTradingExecutor } from './paper-trading.executor';
 
 describe('PaperTradingExecutor', () => {
@@ -24,6 +25,7 @@ describe('PaperTradingExecutor', () => {
       approvingRiskEngine(),
       wallet(),
       clock(),
+      positionService(),
     );
 
     await expect(executor.execute(intent())).resolves.toBe(execution);
@@ -48,6 +50,7 @@ describe('PaperTradingExecutor', () => {
       approvingRiskEngine(),
       wallet(),
       clock(),
+      positionService(),
     );
 
     await expect(executor.execute(intent())).resolves.toMatchObject({
@@ -72,6 +75,7 @@ describe('PaperTradingExecutor', () => {
       approvingRiskEngine(),
       wallet(),
       clock(),
+      positionService(),
     );
 
     await expect(executor.execute(sellIntent())).resolves.toBe(execution);
@@ -87,6 +91,7 @@ describe('PaperTradingExecutor', () => {
       approvingRiskEngine(),
       wallet(),
       clock(),
+      positionService(),
     );
     await expect(
       executor.execute({ ...intent(), idempotencyKey: '' }),
@@ -117,6 +122,7 @@ describe('PaperTradingExecutor', () => {
       riskEngine,
       wallet(),
       clock(),
+      positionService(),
     );
 
     await expect(executor.execute(intent())).rejects.toThrow(
@@ -124,6 +130,70 @@ describe('PaperTradingExecutor', () => {
     );
     expect(repository.executeBuy).not.toHaveBeenCalled();
     expect(repository.executeSell).not.toHaveBeenCalled();
+  });
+
+  it('supplies the current unrealized PnL when assessing a buy', async () => {
+    const quote = {
+      quantity: '0.001',
+      topOfBookAvailableQuantity: '1',
+      notional: '77.77712',
+      totalCost: '77.85489712',
+    } as never;
+    const repository = repo();
+    repository.executeBuy.mockResolvedValue(result(false));
+    const assess = jest.fn<RiskEngine['assess']>(() => ({
+      decision: 'approved',
+      rule: 'max_order_notional_usdt',
+      notional: '77.77712',
+      limit: '100',
+    }));
+    const riskEngine: RiskEngine = { assess };
+    const executor = new PaperTradingExecutor(
+      { quote: jest.fn(() => quote) } as unknown as PaperMarketBuyQuoteService,
+      {} as PaperMarketSellQuoteService,
+      repository,
+      riskEngine,
+      wallet('0.002'),
+      clock(),
+      positionService('-12.5'),
+    );
+
+    await executor.execute(intent());
+
+    expect(assess).toHaveBeenCalledWith(
+      expect.objectContaining({
+        currentPositionQuantity: '0.002',
+        unrealizedPnl: '-12.5',
+      }),
+    );
+  });
+
+  it('does not mutate when open-position market data is unavailable', async () => {
+    const quote = {
+      quantity: '0.001',
+      topOfBookAvailableQuantity: '1',
+      notional: '77.77712',
+    } as never;
+    const repository = repo();
+    const unavailablePosition = {
+      getPosition: jest.fn(() =>
+        Promise.reject(new Error('Market data is unavailable')),
+      ),
+    } as unknown as PaperPositionService;
+    const executor = new PaperTradingExecutor(
+      { quote: jest.fn(() => quote) } as unknown as PaperMarketBuyQuoteService,
+      {} as PaperMarketSellQuoteService,
+      repository,
+      approvingRiskEngine(),
+      wallet('0.002'),
+      clock(),
+      unavailablePosition,
+    );
+
+    await expect(executor.execute(intent())).rejects.toThrow(
+      'Market data is unavailable',
+    );
+    expect(repository.executeBuy).not.toHaveBeenCalled();
   });
 });
 
@@ -146,6 +216,12 @@ function wallet(balance = '0'): PaperWalletService {
 
 function clock(): Clock {
   return { now: () => new Date('2026-09-12T12:00:00.000Z') };
+}
+
+function positionService(unrealizedPnl = '0'): PaperPositionService {
+  return {
+    getPosition: jest.fn(() => Promise.resolve({ unrealizedPnl })),
+  } as unknown as PaperPositionService;
 }
 
 function intent() {

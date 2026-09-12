@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, **M3 — Paper Trading (M3.1 through M3.8)**, and **M4.1–M4.9 — maximum-order-notional, emergency-stop, cumulative BTC-position, atomic exposure, daily realized-loss, atomic daily-loss, persistent emergency-stop, top-of-book participation, and authenticated local risk control**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, **M3 — Paper Trading (M3.1 through M3.8)**, and **M4.1–M4.10 — maximum-order-notional, emergency-stop, cumulative BTC-position, atomic exposure, daily realized-loss, atomic daily-loss, persistent emergency-stop, top-of-book participation, authenticated local risk control, and unrealized-loss protection**.
 - No next increment is approved. Stop and present a minimal plan before starting more wallet or trading work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -57,6 +57,8 @@ M4.7 persists idempotent, append-only emergency-stop changes and exposes local s
 M4.8 limits each new paper order to a configurable share of the best bid or ask quantity used by its quote, defaulting to ten percent and rejecting before financial mutation.
 
 M4.9 restricts the Compose API port to host loopback and protects emergency-stop writes with a fail-closed Bearer-token guard configured only by a SHA-256 digest. The raw token is never stored or logged.
+
+M4.10 rejects new paper buys when the existing open BTC position's net unrealized PnL reaches the configured loss limit. It reuses fresh best-bid valuation including the estimated exit fee; sells and idempotent replays remain available.
 
 Historical market data, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, strategies, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

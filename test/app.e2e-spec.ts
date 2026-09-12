@@ -491,6 +491,56 @@ describe('Application (e2e)', () => {
     }
   });
 
+  it('rejects a new buy at the net unrealized loss limit without mutation', async () => {
+    preparePaperMarket(app);
+    const executor = app.get(PaperTradingExecutor);
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const config = app.get(ConfigService);
+    const suffix = Date.now();
+    const historicalBuyId = `e2e-unrealized-loss-history-${suffix}`;
+    const rejectedId = `e2e-unrealized-loss-rejected-${suffix}`;
+    const before = await wallet.getBalances();
+    const now = new Date();
+    await prisma.paperExecution.create({
+      data: {
+        id: historicalBuyId,
+        symbol: 'BTC/USDT',
+        side: 'buy',
+        quantity: '0.0001',
+        price: '100000',
+        notional: '10',
+        feeRate: '0.001',
+        fee: '0.01',
+        totalCost: '10.01',
+        quotedAt: now,
+        marketDataReceivedAt: now,
+        executedAt: now,
+      },
+    });
+    config.set('RISK_MAX_UNREALIZED_LOSS_USDT', '5');
+
+    try {
+      await expect(
+        executor.execute({
+          idempotencyKey: rejectedId,
+          symbol: 'BTC/USDT',
+          side: 'buy',
+          quantity: '0.0001',
+        }),
+      ).rejects.toThrow('max_unrealized_loss_reached');
+      await expect(wallet.getBalances()).resolves.toEqual(before);
+      await expect(
+        prisma.paperExecution.findUnique({ where: { id: rejectedId } }),
+      ).resolves.toBeNull();
+    } finally {
+      config.set('RISK_MAX_UNREALIZED_LOSS_USDT', '25');
+      await prisma.paperExecution.deleteMany({
+        where: { id: { in: [historicalBuyId, rejectedId] } },
+      });
+    }
+  });
+
   it('atomically allows only one of two buys competing for the remaining BTC limit', async () => {
     const repository = app.get<PaperExecutionRepository>(
       PAPER_EXECUTION_REPOSITORY,

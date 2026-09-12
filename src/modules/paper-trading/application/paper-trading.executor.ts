@@ -17,6 +17,7 @@ import {
 } from '../domain/trading-executor';
 import { PaperMarketBuyQuoteService } from './paper-market-buy-quote.service';
 import { PaperMarketSellQuoteService } from './paper-market-sell-quote.service';
+import { PaperPositionService } from './paper-position.service';
 import { calculateDailyRealizedPnl } from './paper-position-calculator';
 
 @Injectable()
@@ -31,6 +32,7 @@ export class PaperTradingExecutor implements TradingExecutor {
     @Inject(RISK_ENGINE) private readonly riskEngine: RiskEngine,
     private readonly paperWallet: PaperWalletService,
     @Inject(CLOCK) private readonly clock: Clock,
+    private readonly positionService: PaperPositionService,
   ) {}
 
   async execute(intent: PaperOrderIntent): Promise<PaperExecution> {
@@ -76,7 +78,7 @@ export class PaperTradingExecutor implements TradingExecutor {
       topOfBookAvailableQuantity: string;
     },
   ): Promise<void> {
-    const [currentPositionQuantity, dailyRealizedPnl] =
+    const [currentPositionQuantity, dailyRealizedPnl, unrealizedPnl] =
       intent.side === 'buy'
         ? await Promise.all([
             this.paperWallet.getBalance('BTC'),
@@ -85,8 +87,11 @@ export class PaperTradingExecutor implements TradingExecutor {
               .then((executions) =>
                 calculateDailyRealizedPnl(executions, this.clock.now()),
               ),
+            this.positionService
+              .getPosition()
+              .then((position) => position.unrealizedPnl),
           ])
-        : ['0', '0'];
+        : ['0', '0', '0'];
     const assessment = this.riskEngine.assess({
       id: intent.idempotencyKey,
       symbol: intent.symbol,
@@ -96,6 +101,7 @@ export class PaperTradingExecutor implements TradingExecutor {
       notional: quote.notional,
       currentPositionQuantity,
       dailyRealizedPnl,
+      unrealizedPnl,
     });
     if (assessment.decision === 'rejected') {
       throw new PaperOrderRiskRejectedError(assessment);

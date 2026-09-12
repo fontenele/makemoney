@@ -2,6 +2,19 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — M4.10 unrealized loss limit completed
+
+### Added
+
+- Validated `RISK_MAX_UNREALIZED_LOSS_USDT` configuration with a default of `25` USDT.
+- Provider-neutral risk rejection for new buys at or beyond the existing position's net unrealized-loss boundary.
+- Focused tests for the inclusive boundary, smaller loss, profit, sell exemption, rule precedence, candidate integration, and unavailable market data.
+
+### Changed
+
+- New paper buys reuse the fresh best-bid, estimated-exit-fee position valuation before risk approval.
+- Updated project context, roadmap, plan, map, risk documentation, decisions, and current-state evidence for M4.10.
+
 ## 2026-09-12 — M4.9 authenticated local risk control completed
 
 ### Added

@@ -105,6 +105,26 @@ export class RiskAssessmentService implements RiskEngine {
     }
 
     if (assessment.decision === 'approved' && candidate.side === 'buy') {
+      const unrealizedPnl = signedDecimal(
+        candidate.unrealizedPnl,
+        'unrealized PnL',
+      );
+      const unrealizedLossLimit = positiveDecimal(
+        this.config.getOrThrow<string>('RISK_MAX_UNREALIZED_LOSS_USDT'),
+        'unrealized loss limit',
+      );
+      if (unrealizedPnl.lessThanOrEqualTo(unrealizedLossLimit.negated())) {
+        assessment = {
+          decision: 'rejected',
+          rule: 'max_unrealized_loss_usdt',
+          reason: 'max_unrealized_loss_reached',
+          unrealizedPnl: unrealizedPnl.toFixed(),
+          limit: unrealizedLossLimit.toFixed(),
+        };
+      }
+    }
+
+    if (assessment.decision === 'approved' && candidate.side === 'buy') {
       const currentQuantity = nonNegativeDecimal(
         candidate.currentPositionQuantity,
         'current position quantity',

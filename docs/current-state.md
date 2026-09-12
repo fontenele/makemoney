@@ -4,7 +4,7 @@ Last validated: 2026-09-12
 
 ## Milestone status
 
-M0 through M3 are complete and M4.1–M4.9 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution limits, atomic exposure/daily-loss enforcement, persistent emergency-stop control, conservative liquidity participation, and authenticated local control writes. No dashboard, order mutation endpoint, strategy, authenticated exchange integration, or real order execution exists.
+M0 through M3 are complete and M4.1–M4.10 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution limits, atomic exposure/daily-loss enforcement, persistent emergency-stop control, conservative liquidity participation, authenticated local control writes, and unrealized-loss protection for new buys. No dashboard, order mutation endpoint, strategy, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -67,6 +67,8 @@ M0 through M3 are complete and M4.1–M4.9 are complete. M1 provides unauthentic
 - Every quote carries its best-side available quantity; `RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE` defaults to `0.10` and rejects larger buy or sell participation before persistence.
 - Emergency-stop writes require a Bearer token matching optional `RISK_CONTROL_TOKEN_SHA256`; absent configuration disables writes, and the raw token is never stored or logged.
 - Compose publishes API port 3000 only on host loopback.
+- `RISK_MAX_UNREALIZED_LOSS_USDT` defaults to `25`; a new buy is rejected when the existing open position's net unrealized PnL reaches that negative boundary, while sells and replays remain available.
+- Unrealized-loss assessment reuses the fresh best-bid position valuation, including estimated exit fees; missing or stale market data for an open position fails before execution mutation.
 
 ## Local endpoints and ports
 
@@ -85,12 +87,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-12 after M4.9:
+The following passed on 2026-09-12 after M4.10:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 179 tests passed across 30 suites
-- `npm run test:e2e -- --runInBand` — 21 tests passed, including authenticated/fail-closed emergency-stop control and the prior liquidity, risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
+- `npm test -- --runInBand` — 187 tests passed across 30 suites
+- `npm run test:e2e -- --runInBand` — 22 tests passed, including unrealized-loss rejection, authenticated/fail-closed emergency-stop control, and the prior liquidity, risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
 - `npx prisma migrate deploy` — all four migrations applied, including `risk_control_events`
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
@@ -102,7 +104,7 @@ The following passed on 2026-09-12 after M4.9:
 
 ## Repository state
 
-M0 through M4.8 are committed. M4.9 changes are currently in the working tree.
+M0 through M4.9 are committed. M4.10 changes are currently in the working tree.
 
 ## Known issues and cautions
 

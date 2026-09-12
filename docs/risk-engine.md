@@ -83,3 +83,11 @@ The application configuration accepts only `RISK_CONTROL_TOKEN_SHA256`, a 64-cha
 When the digest is absent, HTTP writes fail closed with 503. A missing, malformed, or incorrect Bearer token returns 401. Authentication runs before idempotency/body handling, while the M4.7 persistence and audit behavior remains unchanged after successful authentication.
 
 This is defense for a local paper-only control surface. It is not user management, remote authorization, rate limiting, or one of the complete multi-party safeguards required before any future real trading.
+
+## M4.10 unrealized loss limit
+
+`RISK_MAX_UNREALIZED_LOSS_USDT` is a positive decimal string and defaults to `25`. Before assessing a new paper buy, the executor obtains the existing execution-tracked BTC position through the same valuation used by `GET /paper-trading/position`: fresh best bid, simulated exit fee, and fee-inclusive remaining cost basis. Exact decimal arithmetic produces net unrealized PnL.
+
+When that PnL is less than or equal to the negative configured limit, the Risk Engine rejects the buy with rule `max_unrealized_loss_usdt` and reason `max_unrealized_loss_reached`. An empty, profitable, or smaller-loss position remains eligible for the later rules. Sells and persisted idempotent replays remain available because they reduce exposure or create no new financial effect.
+
+Rule precedence is emergency stop, maximum order notional, top-of-book participation, daily realized loss, unrealized loss, then cumulative BTC position. An open position without fresh market data fails before risk approval and before persistence. This is a current-snapshot entry guard, not a persistent drawdown metric, automatic stop-loss, liquidation mechanism, or transaction-level guarantee against market-price movement.

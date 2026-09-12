@@ -128,6 +128,12 @@ Missing digest configuration disables the write endpoint instead of creating an 
 
 This narrow mechanism is appropriate only for the paper-control surface. It must not be reused as sufficient authorization for financial accounts or real execution.
 
+## M4.10 reuse net position valuation for unrealized-loss risk
+
+The unrealized-loss guard reuses `PaperPositionService` instead of introducing a second PnL formula. The assessed value therefore matches the read-only position endpoint and includes the existing fresh best-bid check, estimated taker exit fee, and fee-inclusive cost basis.
+
+The rule blocks only exposure-increasing buys at an inclusive configurable USDT loss boundary. Sells remain available. This is deliberately a pre-execution snapshot: market prices are external and cannot be locked transactionally, while the existing database rules continue to protect persistent balance, exposure, and realized-loss invariants.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

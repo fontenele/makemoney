@@ -12,6 +12,7 @@ describe('RiskAssessmentService', () => {
     notional: '100',
     currentPositionQuantity: '0.003',
     dailyRealizedPnl: '0',
+    unrealizedPnl: '0',
   };
 
   it('approves an order exactly at the configured limit', () => {
@@ -187,6 +188,74 @@ describe('RiskAssessmentService', () => {
       rule: 'max_daily_realized_loss_usdt',
     });
   });
+
+  it('rejects a buy exactly at the unrealized loss limit', () => {
+    expect(
+      service('1000', false, '1', '25', '10').assess({
+        ...candidate,
+        unrealizedPnl: '-10',
+      }),
+    ).toEqual({
+      decision: 'rejected',
+      rule: 'max_unrealized_loss_usdt',
+      reason: 'max_unrealized_loss_reached',
+      unrealizedPnl: '-10',
+      limit: '10',
+    });
+  });
+
+  it('allows a buy while unrealized loss remains below the limit', () => {
+    expect(
+      service('1000', false, '1', '25', '10').assess({
+        ...candidate,
+        unrealizedPnl: '-9.999',
+      }),
+    ).toMatchObject({ decision: 'approved' });
+  });
+
+  it('allows a buy while the open position has unrealized profit', () => {
+    expect(
+      service('1000', false, '1', '25', '10').assess({
+        ...candidate,
+        unrealizedPnl: '10',
+      }),
+    ).toMatchObject({ decision: 'approved' });
+  });
+
+  it('allows sells after the unrealized loss limit is reached', () => {
+    expect(
+      service('1000', false, '1', '25', '10').assess({
+        ...candidate,
+        side: 'sell',
+        unrealizedPnl: '-20',
+      }),
+    ).toMatchObject({ decision: 'approved' });
+  });
+
+  it('evaluates daily realized loss before unrealized loss', () => {
+    expect(
+      service('1000', false, '1', '25', '10').assess({
+        ...candidate,
+        dailyRealizedPnl: '-25',
+        unrealizedPnl: '-10',
+      }),
+    ).toMatchObject({
+      decision: 'rejected',
+      rule: 'max_daily_realized_loss_usdt',
+    });
+  });
+
+  it('evaluates unrealized loss before BTC position quantity', () => {
+    expect(
+      service('1000', false, '0.001', '25', '10').assess({
+        ...candidate,
+        unrealizedPnl: '-10',
+      }),
+    ).toMatchObject({
+      decision: 'rejected',
+      rule: 'max_unrealized_loss_usdt',
+    });
+  });
 });
 
 function service(
@@ -194,6 +263,7 @@ function service(
   emergencyStop: boolean,
   positionLimit: string,
   dailyLossLimit = '25',
+  unrealizedLossLimit = '25',
 ): RiskAssessmentService {
   return new RiskAssessmentService(
     {
@@ -201,6 +271,7 @@ function service(
         if (key === 'RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE') return '0.1';
         if (key === 'RISK_MAX_BTC_POSITION_QUANTITY') return positionLimit;
         if (key === 'RISK_MAX_DAILY_REALIZED_LOSS_USDT') return dailyLossLimit;
+        if (key === 'RISK_MAX_UNREALIZED_LOSS_USDT') return unrealizedLossLimit;
         return limit;
       },
     } as unknown as ConfigService,

@@ -15,6 +15,7 @@ interface Environment {
   RISK_EMERGENCY_STOP: boolean;
   RISK_MAX_BTC_POSITION_QUANTITY: string;
   RISK_MAX_DAILY_REALIZED_LOSS_USDT: string;
+  RISK_MAX_UNREALIZED_LOSS_USDT: string;
   RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE: string;
   RISK_CONTROL_TOKEN_SHA256?: string;
 }
@@ -54,6 +55,9 @@ const environmentSchema = Joi.object<Environment>({
     .pattern(/^[1-9]\d{0,19}(\.\d{1,18})?$/)
     .default('0.01'),
   RISK_MAX_DAILY_REALIZED_LOSS_USDT: Joi.string()
+    .pattern(/^[1-9]\d{0,19}(\.\d{1,18})?$/)
+    .default('25'),
+  RISK_MAX_UNREALIZED_LOSS_USDT: Joi.string()
     .pattern(/^[1-9]\d{0,19}(\.\d{1,18})?$/)
     .default('25'),
   RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE: Joi.string()
