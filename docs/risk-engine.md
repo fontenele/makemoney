@@ -42,4 +42,14 @@ A buy is rejected with rule `max_daily_realized_loss_usdt` and reason `max_daily
 
 Sells remain available because they reduce exposure and may close a position. Persisted idempotent replays also remain available because they create no new effect. Rule precedence is emergency stop, maximum order notional, daily realized loss, then cumulative BTC position.
 
-The daily PnL is currently a pre-transaction snapshot derived from immutable executions. It is not an atomic reservation, so a concurrent sell and buy may assess different snapshots. Atomic daily-loss state, unrealized-loss/drawdown rules, stop-loss behavior, operator controls, strategies, authenticated providers, and real trading remain deferred.
+The application-level daily PnL snapshot remains useful for early, explainable rejection. M4.6 adds the transaction-level concurrency guarantee.
+
+## M4.6 atomic daily realized-loss enforcement
+
+Every paper buy and sell transaction acquires the same PostgreSQL transaction-scoped advisory lock before inserting an execution or mutating balances. This establishes one database serialization order for financial effects without adding a table or migration.
+
+After acquiring the lock, a buy reloads the complete chronological execution history and recalculates the current UTC day's net realized PnL using the M4.5 accounting rule. If the inclusive configured loss threshold is already reached, `PaperDailyLossLimitReachedError` aborts the transaction before the execution insert or either balance update. A sell remains permitted, but its committed outcome is necessarily visible to the next serialized buy.
+
+The provider-neutral Risk Engine remains the first assessment boundary and idempotent replays remain outside new financial effects. A database-backed concurrency test holds the advisory lock, queues a losing sell before a buy, then verifies the sell commits and the buy is rejected without mutation.
+
+The lock is intentionally process-independent but global to the current paper-execution workload. Per-portfolio locking, persistent operator controls, unrealized-loss/drawdown rules, stop-loss behavior, strategies, authenticated providers, and real trading remain deferred.

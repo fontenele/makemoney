@@ -8,7 +8,11 @@ export interface PaperExecutionRepository {
   find(id: string): Promise<PaperExecution | undefined>;
   listRecent(limit: number): Promise<PaperExecution[]>;
   listAllChronological(): Promise<PaperExecution[]>;
-  executeBuy(id: string, quote: PaperMarketBuyQuote): Promise<PaperExecution>;
+  executeBuy(
+    id: string,
+    quote: PaperMarketBuyQuote,
+    assessedAt?: Date,
+  ): Promise<PaperExecution>;
   executeSell(id: string, quote: PaperMarketSellQuote): Promise<PaperExecution>;
 }
 
@@ -16,5 +20,15 @@ export class PaperPositionLimitExceededError extends RangeError {
   constructor(readonly limit: string) {
     super('Atomic BTC paper position limit exceeded');
     this.name = PaperPositionLimitExceededError.name;
+  }
+}
+
+export class PaperDailyLossLimitReachedError extends RangeError {
+  constructor(
+    readonly dailyRealizedPnl: string,
+    readonly limit: string,
+  ) {
+    super('Atomic paper daily realized loss limit reached');
+    this.name = PaperDailyLossLimitReachedError.name;
   }
 }

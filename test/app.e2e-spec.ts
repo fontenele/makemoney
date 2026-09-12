@@ -20,10 +20,12 @@ import { PaperWalletService } from '../src/modules/paper-wallet/application/pape
 import { PaperTradingExecutor } from '../src/modules/paper-trading/application/paper-trading.executor';
 import {
   PAPER_EXECUTION_REPOSITORY,
+  PaperDailyLossLimitReachedError,
   PaperExecutionRepository,
   PaperPositionLimitExceededError,
 } from '../src/modules/paper-trading/domain/paper-execution-repository';
 import { PaperMarketBuyQuote } from '../src/modules/paper-trading/domain/paper-market-buy-quote';
+import { PaperMarketSellQuote } from '../src/modules/paper-trading/domain/paper-market-sell-quote';
 
 describe('Application (e2e)', () => {
   let app: INestApplication;
@@ -49,7 +51,7 @@ describe('Application (e2e)', () => {
     app = moduleRef.createNestApplication();
     await app.init();
     latestMarketPrice = app.get(LatestMarketPriceService);
-  });
+  }, 30_000);
 
   afterAll(async () => app.close());
 
@@ -403,6 +405,120 @@ describe('Application (e2e)', () => {
     }
   });
 
+  it('atomically observes a concurrent realized loss before accepting a new buy', async () => {
+    const repository = app.get<PaperExecutionRepository>(
+      PAPER_EXECUTION_REPOSITORY,
+    );
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const config = app.get(ConfigService);
+    const before = await wallet.getBalances();
+    const suffix = Date.now();
+    const historicalBuyId = `e2e-atomic-loss-history-${suffix}`;
+    const sellId = `e2e-atomic-loss-sell-${suffix}`;
+    const rejectedBuyId = `e2e-atomic-loss-buy-${suffix}`;
+    const now = new Date();
+    const quantity = '0.0001';
+    const sellQuote: PaperMarketSellQuote = {
+      symbol: 'BTC/USDT',
+      side: 'sell',
+      quantity,
+      price: '40000',
+      notional: '4',
+      feeRate: '0.001',
+      fee: '0.004',
+      netProceeds: '3.996',
+      quotedAt: now,
+      marketDataReceivedAt: now,
+    };
+    const buyQuote: PaperMarketBuyQuote = {
+      symbol: 'BTC/USDT',
+      side: 'buy',
+      quantity,
+      price: '50000',
+      notional: '5',
+      feeRate: '0.001',
+      fee: '0.005',
+      totalCost: '5.005',
+      quotedAt: now,
+      marketDataReceivedAt: now,
+    };
+    await prisma.paperExecution.create({
+      data: {
+        id: historicalBuyId,
+        symbol: 'BTC/USDT',
+        side: 'buy',
+        quantity,
+        price: '50000',
+        notional: '5',
+        feeRate: '0.001',
+        fee: '0.005',
+        totalCost: '5.005',
+        quotedAt: now,
+        marketDataReceivedAt: now,
+        executedAt: now,
+      },
+    });
+    await wallet.credit('BTC', quantity);
+    config.set('RISK_MAX_DAILY_REALIZED_LOSS_USDT', '1');
+
+    let releaseLock = () => undefined;
+    let confirmLock = () => undefined;
+    const lockHeld = new Promise<void>((resolve) => (confirmLock = resolve));
+    const lockRelease = new Promise<void>((resolve) => (releaseLock = resolve));
+    const holder = prisma.$transaction(
+      async (tx) => {
+        await tx.$queryRaw`
+          SELECT 1 AS locked
+          FROM (SELECT pg_advisory_xact_lock(20260912, 1)) AS financial_lock
+        `;
+        confirmLock();
+        await lockRelease;
+      },
+      { timeout: 10_000 },
+    );
+
+    try {
+      await lockHeld;
+      const sell = repository.executeSell(sellId, sellQuote);
+      await waitForAdvisoryWaiter(prisma);
+      const buy = repository.executeBuy(rejectedBuyId, buyQuote, now).then(
+        (value) => ({ value, error: undefined }),
+        (error: unknown) => ({ value: undefined, error }),
+      );
+      releaseLock();
+      await holder;
+
+      await expect(sell).resolves.toMatchObject({ id: sellId, side: 'sell' });
+      const buyResult = await buy;
+      expect(buyResult.value).toBeUndefined();
+      expect(buyResult.error).toBeInstanceOf(PaperDailyLossLimitReachedError);
+      await expect(
+        prisma.paperExecution.findUnique({ where: { id: rejectedBuyId } }),
+      ).resolves.toBeNull();
+    } finally {
+      releaseLock();
+      await holder.catch(() => undefined);
+      config.set('RISK_MAX_DAILY_REALIZED_LOSS_USDT', '25');
+      await prisma.paperExecution.deleteMany({
+        where: {
+          id: { in: [historicalBuyId, sellId, rejectedBuyId] },
+        },
+      });
+      const current = await wallet.getBalances();
+      const btcDifference = new Decimal(current.BTC).minus(before.BTC);
+      const usdtDifference = new Decimal(current.USDT).minus(before.USDT);
+      if (btcDifference.greaterThan(0))
+        await wallet.debit('BTC', btcDifference.toFixed());
+      if (btcDifference.lessThan(0))
+        await wallet.credit('BTC', btcDifference.negated().toFixed());
+      if (usdtDifference.greaterThan(0))
+        await wallet.debit('USDT', usdtDifference.toFixed());
+      if (usdtDifference.lessThan(0))
+        await wallet.credit('USDT', usdtDifference.negated().toFixed());
+    }
+  });
+
   it('executes and replays an idempotent paper sell atomically', async () => {
     preparePaperMarket(app);
     const executor = app.get(PaperTradingExecutor);
@@ -675,4 +791,17 @@ function preparePaperMarket(app: INestApplication): void {
     minNotional: '5',
     receivedAt: new Date(),
   });
+}
+
+async function waitForAdvisoryWaiter(prisma: PrismaService): Promise<void> {
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    const [result] = await prisma.$queryRaw<Array<{ count: number }>>`
+      SELECT COUNT(*)::int AS count
+      FROM pg_locks
+      WHERE locktype = 'advisory' AND granted = false
+    `;
+    if ((result?.count ?? 0) > 0) return;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  throw new Error('Timed out waiting for the paper-trading advisory lock');
 }

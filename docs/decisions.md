@@ -94,7 +94,15 @@ The first loss guard uses net realized PnL from sell executions in the current U
 
 Only new buys are blocked because they increase exposure; sells remain available to reduce exposure and realize outcomes. The check follows emergency stop and maximum order notional but precedes the BTC position limit. Persisted idempotent replays bypass it because they add no financial effect.
 
-Derived state avoids a schema change at the current local scale. The tradeoff is that the daily snapshot is not transactionally reserved across a concurrent sell and buy. A concurrency-safe persisted daily-loss aggregate is deferred until a separately approved increment.
+Derived state avoids a schema change at the current local scale. M4.6 addresses concurrent execution ordering without introducing a persisted aggregate.
+
+## M4.6 advisory-lock serialization for paper financial effects
+
+Paper buy and sell transactions acquire one fixed PostgreSQL transaction-scoped advisory lock. The lock is released automatically on commit or rollback and works across application processes. A buy then derives daily realized PnL from executions visible inside its transaction, so a preceding serialized sell cannot be missed.
+
+This preserves immutable execution history as the accounting source of truth and avoids a speculative daily-aggregate table. One global paper-execution lock is acceptable for the current single-portfolio local workload; partitioned lock keys can be introduced only if multiple portfolios or measured throughput require them.
+
+The application Risk Engine still performs the explainable early check. The repository repeats only the invariant needed at the mutation boundary, following the same defense-in-depth split used by M4.4.
 
 ## M1.1 raw trade stream
 

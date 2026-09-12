@@ -2,6 +2,23 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — M4.6 atomic daily-loss enforcement completed
+
+### Added
+
+- PostgreSQL transaction-scoped advisory-lock serialization for paper buys and sells.
+- In-transaction reconstruction and enforcement of the current UTC daily realized-loss limit before buy mutation.
+- Specific atomic daily-loss error with rollback before any execution or balance effect.
+- Database-backed concurrency coverage proving a queued losing sell is visible to the following buy.
+
+### Changed
+
+- The E2E application bootstrap has an explicit 30-second hook timeout for reliable startup on the local resource-constrained environment.
+
+### Scope confirmation
+
+- No migration, persisted aggregate, external order endpoint, strategy, authenticated integration, or real trading was introduced.
+
 ## 2026-09-12 — M4.5 daily realized loss limit completed
 
 ### Added

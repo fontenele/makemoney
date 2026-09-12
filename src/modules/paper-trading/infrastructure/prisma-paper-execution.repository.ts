@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import Decimal from 'decimal.js';
 import { Prisma } from '../../../generated/prisma/client';
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
+import { calculateDailyRealizedPnl } from '../application/paper-position-calculator';
 import {
+  PaperDailyLossLimitReachedError,
   PaperExecutionRepository,
   PaperPositionLimitExceededError,
 } from '../domain/paper-execution-repository';
@@ -40,12 +43,34 @@ export class PrismaPaperExecutionRepository implements PaperExecutionRepository 
   async executeBuy(
     id: string,
     quote: PaperMarketBuyQuote,
+    assessedAt: Date = new Date(),
   ): Promise<PaperExecution> {
     const positionLimit = this.config.getOrThrow<string>(
       'RISK_MAX_BTC_POSITION_QUANTITY',
     );
+    const dailyLossLimit = this.config.getOrThrow<string>(
+      'RISK_MAX_DAILY_REALIZED_LOSS_USDT',
+    );
     try {
       return await this.prisma.$transaction(async (tx) => {
+        await lockFinancialExecutions(tx);
+        const executions = await tx.paperExecution.findMany({
+          orderBy: [{ executedAt: 'asc' }, { id: 'asc' }],
+        });
+        const dailyRealizedPnl = calculateDailyRealizedPnl(
+          executions.map((execution) => mapExecution(execution, false)),
+          assessedAt,
+        );
+        if (
+          new Decimal(dailyRealizedPnl).lessThanOrEqualTo(
+            new Decimal(dailyLossLimit).negated(),
+          )
+        ) {
+          throw new PaperDailyLossLimitReachedError(
+            dailyRealizedPnl,
+            dailyLossLimit,
+          );
+        }
         const row = await tx.paperExecution.create({
           data: {
             id,
@@ -101,6 +126,7 @@ export class PrismaPaperExecutionRepository implements PaperExecutionRepository 
   ): Promise<PaperExecution> {
     try {
       return await this.prisma.$transaction(async (tx) => {
+        await lockFinancialExecutions(tx);
         const row = await tx.paperExecution.create({
           data: {
             id,
@@ -147,6 +173,15 @@ export class PrismaPaperExecutionRepository implements PaperExecutionRepository 
       throw error;
     }
   }
+}
+
+async function lockFinancialExecutions(
+  tx: Prisma.TransactionClient,
+): Promise<void> {
+  await tx.$queryRaw`
+    SELECT 1 AS locked
+    FROM (SELECT pg_advisory_xact_lock(20260912, 1)) AS financial_lock
+  `;
 }
 
 function mapExecution(

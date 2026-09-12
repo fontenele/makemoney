@@ -27,7 +27,11 @@ describe('PaperTradingExecutor', () => {
     );
 
     await expect(executor.execute(intent())).resolves.toBe(execution);
-    expect(repository.executeBuy).toHaveBeenCalledWith('order-1', quote);
+    expect(repository.executeBuy).toHaveBeenCalledWith(
+      'order-1',
+      quote,
+      new Date('2026-09-12T12:00:00.000Z'),
+    );
   });
 
   it('replays an existing execution without quoting or mutating', async () => {

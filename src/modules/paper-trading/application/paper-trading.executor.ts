@@ -51,6 +51,7 @@ export class PaperTradingExecutor implements TradingExecutor {
       execution = await this.repository.executeBuy(
         intent.idempotencyKey,
         quote,
+        this.clock.now(),
       );
     } else {
       const quote = this.sellQuoteService.quote(intent.quantity);
