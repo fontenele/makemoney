@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js';
-import { PaperPosition } from '../domain/paper-position';
+import { CostBasedPaperPosition } from './paper-position-valuation';
 import { PaperExecution } from '../domain/trading-executor';
 
 const PositionDecimal = Decimal.clone({
@@ -21,7 +21,7 @@ export class InconsistentPaperExecutionHistoryError extends Error {
 
 export function calculatePaperPosition(
   executions: readonly PaperExecution[],
-): PaperPosition {
+): CostBasedPaperPosition {
   let quantity = new PositionDecimal(0);
   let costBasis = new PositionDecimal(0);
   let realizedPnl = new PositionDecimal(0);

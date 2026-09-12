@@ -56,3 +56,11 @@ The response contains tracked BTC `quantity`, remaining `costBasis`, `averageEnt
 The read model rejects histories where a sell exceeds prior execution-tracked purchases. Wallet BTC created outside paper executions is intentionally not assigned an invented acquisition cost. This implementation reads all executions on demand; persistence and incremental aggregation are deferred until scale requires them.
 
 Unrealized PnL, current market value, ROI, win rate, order mutation routes, and strategies remain deferred.
+
+## M3.7 unrealized and total PnL
+
+For an open position, `GET /paper-trading/position` uses the latest fresh normalized best bid as its mark price. Gross market value is quantity multiplied by that bid. An estimated exit fee uses the configured simulated taker-fee rate, and net liquidation value is gross value minus that fee. Unrealized PnL is net liquidation value minus the fee-inclusive remaining cost basis; total PnL is realized plus unrealized PnL.
+
+The response also exposes the market-data receipt timestamp used for the calculation. An empty position returns null market data and zero current-value fields without requiring a live book. An open position returns HTTP 503 when top-of-book data is unavailable or older than `PAPER_QUOTE_MAX_MARKET_DATA_AGE_MS`.
+
+This remains a level-one estimate. It does not verify that the full position fits at the displayed bid and does not model multi-level slippage. ROI, win rate, order mutation routes, strategies, and real trading remain deferred.

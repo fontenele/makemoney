@@ -36,7 +36,8 @@ No real funds or exchange-account access.
 - **M3.4 — complete:** internal idempotent BTC market-sell execution with atomic BTC debit, net USDT credit, and PostgreSQL execution persistence.
 - **M3.5 — complete:** bounded read-only HTTP history of recent buy and sell executions, ordered newest first.
 - **M3.6 — complete:** read-only BTC position with fee-inclusive weighted-average cost, accumulated fees, and realized PnL derived from execution history.
-- Later M3 increments require separate approval for unrealized PnL, order mutation APIs, cursor pagination, and deeper slippage modeling.
+- **M3.7 — complete:** open-position valuation at the fresh best bid, including estimated exit fee, net liquidation value, unrealized PnL, and total PnL.
+- Later M3 increments require separate approval for performance statistics, order mutation APIs, cursor pagination, and deeper slippage modeling.
 
 ## M4 — Risk Engine — planned
 

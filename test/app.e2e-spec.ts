@@ -331,6 +331,13 @@ describe('Application (e2e)', () => {
         averageEntryPrice: null,
         realizedPnl: '0.899',
         totalFees: '0.101',
+        markPrice: null,
+        grossMarketValue: '0',
+        estimatedExitFee: '0',
+        netLiquidationValue: '0',
+        unrealizedPnl: '0',
+        totalPnl: '0.899',
+        marketDataReceivedAt: null,
       });
     } finally {
       await prisma.paperExecution.deleteMany({
@@ -345,6 +352,59 @@ describe('Application (e2e)', () => {
     return request(server)
       .get('/paper-trading/executions?limit=101')
       .expect(400);
+  });
+
+  it('/paper-trading/position (GET) values an open position at the fresh best bid', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const prisma = app.get(PrismaService);
+    const id = `e2e-open-position-${Date.now()}`;
+    const receivedAt = new Date();
+    app.get(LatestTopOfBookService).update({
+      provider: 'binance',
+      symbol: 'BTC/USDT',
+      updateId: 'position',
+      bidPrice: '49999.99',
+      bidQuantity: '1',
+      askPrice: '50000',
+      askQuantity: '1',
+      receivedAt,
+    });
+    await prisma.paperExecution.create({
+      data: {
+        id,
+        symbol: 'BTC/USDT',
+        side: 'buy',
+        quantity: '0.001',
+        price: '50000',
+        notional: '50',
+        feeRate: '0.001',
+        fee: '0.05',
+        totalCost: '50.05',
+        quotedAt: receivedAt,
+        marketDataReceivedAt: receivedAt,
+        executedAt: receivedAt,
+      },
+    });
+
+    try {
+      await request(server).get('/paper-trading/position').expect(200).expect({
+        symbol: 'BTC/USDT',
+        quantity: '0.001',
+        costBasis: '50.05',
+        averageEntryPrice: '50050',
+        realizedPnl: '0',
+        totalFees: '0.05',
+        markPrice: '49999.99',
+        grossMarketValue: '49.99999',
+        estimatedExitFee: '0.04999999',
+        netLiquidationValue: '49.94999001',
+        unrealizedPnl: '-0.10000999',
+        totalPnl: '-0.10000999',
+        marketDataReceivedAt: receivedAt.toISOString(),
+      });
+    } finally {
+      await prisma.paperExecution.delete({ where: { id } });
+    }
   });
 });
 

@@ -1,7 +1,14 @@
-import { BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { jest } from '@jest/globals';
 import { PaperExecutionHistoryService } from '../application/paper-execution-history.service';
-import { PaperPositionService } from '../application/paper-position.service';
+import {
+  PaperPositionService,
+  PositionMarketDataStaleError,
+  PositionMarketDataUnavailableError,
+} from '../application/paper-position.service';
 import { PaperTradingController } from './paper-trading.controller';
 
 describe('PaperTradingController', () => {
@@ -52,6 +59,13 @@ describe('PaperTradingController', () => {
       averageEntryPrice: '50050',
       realizedPnl: '0',
       totalFees: '0.05',
+      markPrice: '51000',
+      grossMarketValue: '51',
+      estimatedExitFee: '0.051',
+      netLiquidationValue: '50.949',
+      unrealizedPnl: '0.899',
+      totalPnl: '0.899',
+      marketDataReceivedAt: new Date(0),
     };
     const getPosition = jest.fn<PaperPositionService['getPosition']>();
     getPosition.mockResolvedValue(position);
@@ -61,5 +75,21 @@ describe('PaperTradingController', () => {
     );
 
     await expect(controller.getPosition()).resolves.toBe(position);
+  });
+
+  it.each([
+    new PositionMarketDataUnavailableError(),
+    new PositionMarketDataStaleError(10001, 10000),
+  ])('maps position market-data errors to HTTP 503', async (error) => {
+    const getPosition = jest.fn<PaperPositionService['getPosition']>();
+    getPosition.mockRejectedValue(error);
+    const controller = new PaperTradingController(
+      {} as PaperExecutionHistoryService,
+      { getPosition } as unknown as PaperPositionService,
+    );
+
+    await expect(controller.getPosition()).rejects.toThrow(
+      ServiceUnavailableException,
+    );
   });
 });

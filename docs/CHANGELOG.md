@@ -2,6 +2,19 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-11 — M3.7 unrealized position valuation completed
+
+### Added
+
+- Fresh best-bid marking for open BTC paper positions.
+- Gross market value, estimated exit fee, net liquidation value, unrealized PnL, total PnL, and market-data timestamp on the position response.
+- HTTP 503 diagnostics for unavailable or stale top-of-book data when a position is open.
+- Unit and E2E coverage for profitable, losing, empty, unavailable, and stale valuation paths.
+
+### Scope confirmation
+
+- No wallet mutation, order endpoint, deeper-book slippage, performance statistics, strategy, Risk Engine, authenticated integration, or real trading was introduced.
+
 ## 2026-09-11 — M3.6 position and realized PnL completed
 
 ### Added

@@ -52,6 +52,12 @@ Position state is derived on demand from immutable executions instead of adding 
 
 Buy fees are part of acquisition cost. A sell allocates the current weighted-average cost to its quantity, and realized PnL is net proceeds after sell fee minus that allocated cost. Wallet BTC without a corresponding buy execution has no defensible cost basis, so inconsistent sell history is rejected rather than assigned an invented value.
 
+## M3.7 net best-bid position valuation
+
+An open paper position is marked at the normalized best bid because that is the immediately relevant side for a hypothetical sale. Unrealized PnL uses estimated net liquidation proceeds after the configured taker fee, keeping both entry and hypothetical exit fees in the economic result.
+
+The valuation reuses the quote freshness limit and rejects unavailable or stale top-of-book data for open positions. A zero position does not depend on market data. This level-one mark is explicit rather than pretending to model deeper-book liquidity or slippage.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

@@ -1,11 +1,21 @@
-import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Query,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import {
   DEFAULT_EXECUTION_HISTORY_LIMIT,
   MAX_EXECUTION_HISTORY_LIMIT,
   PaperExecutionHistoryService,
 } from '../application/paper-execution-history.service';
 import { PaperExecution } from '../domain/trading-executor';
-import { PaperPositionService } from '../application/paper-position.service';
+import {
+  PaperPositionService,
+  PositionMarketDataStaleError,
+  PositionMarketDataUnavailableError,
+} from '../application/paper-position.service';
 import { PaperPosition } from '../domain/paper-position';
 
 @Controller('paper-trading')
@@ -32,7 +42,25 @@ export class PaperTradingController {
   }
 
   @Get('position')
-  getPosition(): Promise<PaperPosition> {
-    return this.position.getPosition();
+  async getPosition(): Promise<PaperPosition> {
+    try {
+      return await this.position.getPosition();
+    } catch (error) {
+      if (error instanceof PositionMarketDataUnavailableError) {
+        throw new ServiceUnavailableException({
+          message: error.message,
+          reason: 'top_of_book_unavailable',
+        });
+      }
+      if (error instanceof PositionMarketDataStaleError) {
+        throw new ServiceUnavailableException({
+          message: error.message,
+          reason: 'top_of_book_stale',
+          ageMs: error.ageMs,
+          maxAgeMs: error.maxAgeMs,
+        });
+      }
+      throw error;
+    }
   }
 }
