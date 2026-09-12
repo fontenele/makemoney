@@ -2,6 +2,19 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — M4.11 execution rate limit completed
+
+### Added
+
+- Validated `RISK_MAX_EXECUTIONS_PER_WINDOW` and `RISK_EXECUTION_WINDOW_MS` configuration, defaulting to 10 distinct approved execution keys per 60 seconds.
+- Redis-backed atomic fixed-window permits with idempotency-aware duplicate handling and structured permit/rejection diagnostics.
+- Unit and Redis-backed E2E coverage for the inclusive limit, concurrent excess, duplicate keys, expiration, replay bypass, and fail-closed errors.
+
+### Changed
+
+- Every newly approved paper buy or sell now obtains a rate-limit permit before PostgreSQL financial mutation.
+- Updated project context, roadmap, plan, map, risk documentation, decisions, and current-state evidence for M4.11.
+
 ## 2026-09-12 — M4.10 unrealized loss limit completed
 
 ### Added

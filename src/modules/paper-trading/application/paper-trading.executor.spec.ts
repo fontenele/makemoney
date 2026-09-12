@@ -2,6 +2,7 @@ import { jest } from '@jest/globals';
 import { PaperWalletService } from '../../paper-wallet/application/paper-wallet.service';
 import { Clock } from '../../paper-wallet/domain/clock';
 import { RiskEngine } from '../../risk-engine/domain/risk-engine';
+import { ExecutionRateLimiter } from '../../risk-engine/domain/execution-rate-limiter';
 import { PaperExecutionRepository } from '../domain/paper-execution-repository';
 import { PaperExecution } from '../domain/trading-executor';
 import { PaperMarketBuyQuoteService } from './paper-market-buy-quote.service';
@@ -26,6 +27,7 @@ describe('PaperTradingExecutor', () => {
       wallet(),
       clock(),
       positionService(),
+      rateLimiter(),
     );
 
     await expect(executor.execute(intent())).resolves.toBe(execution);
@@ -43,6 +45,10 @@ describe('PaperTradingExecutor', () => {
     } as unknown as PaperMarketBuyQuoteService;
     const repository = repo();
     repository.find.mockResolvedValue(result(false));
+    const consume = jest.fn<ExecutionRateLimiter['consume']>(() =>
+      Promise.resolve({ count: 1, limit: 10, retryAfterMs: 60000 }),
+    );
+    const limiter: ExecutionRateLimiter = { consume };
     const executor = new PaperTradingExecutor(
       quoteService,
       {} as PaperMarketSellQuoteService,
@@ -51,6 +57,7 @@ describe('PaperTradingExecutor', () => {
       wallet(),
       clock(),
       positionService(),
+      limiter,
     );
 
     await expect(executor.execute(intent())).resolves.toMatchObject({
@@ -58,6 +65,7 @@ describe('PaperTradingExecutor', () => {
     });
     expect(quote).not.toHaveBeenCalled();
     expect(repository.executeBuy).not.toHaveBeenCalled();
+    expect(consume).not.toHaveBeenCalled();
   });
 
   it('quotes and atomically delegates a new paper sell', async () => {
@@ -76,6 +84,7 @@ describe('PaperTradingExecutor', () => {
       wallet(),
       clock(),
       positionService(),
+      rateLimiter(),
     );
 
     await expect(executor.execute(sellIntent())).resolves.toBe(execution);
@@ -92,6 +101,7 @@ describe('PaperTradingExecutor', () => {
       wallet(),
       clock(),
       positionService(),
+      rateLimiter(),
     );
     await expect(
       executor.execute({ ...intent(), idempotencyKey: '' }),
@@ -123,6 +133,7 @@ describe('PaperTradingExecutor', () => {
       wallet(),
       clock(),
       positionService(),
+      rateLimiter(),
     );
 
     await expect(executor.execute(intent())).rejects.toThrow(
@@ -156,6 +167,7 @@ describe('PaperTradingExecutor', () => {
       wallet('0.002'),
       clock(),
       positionService('-12.5'),
+      rateLimiter(),
     );
 
     await executor.execute(intent());
@@ -188,10 +200,38 @@ describe('PaperTradingExecutor', () => {
       wallet('0.002'),
       clock(),
       unavailablePosition,
+      rateLimiter(),
     );
 
     await expect(executor.execute(intent())).rejects.toThrow(
       'Market data is unavailable',
+    );
+    expect(repository.executeBuy).not.toHaveBeenCalled();
+  });
+
+  it('does not mutate when the execution rate limiter rejects', async () => {
+    const quote = {
+      quantity: '0.001',
+      topOfBookAvailableQuantity: '1',
+      notional: '77.77712',
+    } as never;
+    const repository = repo();
+    const limiter: ExecutionRateLimiter = {
+      consume: jest.fn(() => Promise.reject(new Error('rate limit exceeded'))),
+    };
+    const executor = new PaperTradingExecutor(
+      { quote: jest.fn(() => quote) } as unknown as PaperMarketBuyQuoteService,
+      {} as PaperMarketSellQuoteService,
+      repository,
+      approvingRiskEngine(),
+      wallet(),
+      clock(),
+      positionService(),
+      limiter,
+    );
+
+    await expect(executor.execute(intent())).rejects.toThrow(
+      'rate limit exceeded',
     );
     expect(repository.executeBuy).not.toHaveBeenCalled();
   });
@@ -222,6 +262,14 @@ function positionService(unrealizedPnl = '0'): PaperPositionService {
   return {
     getPosition: jest.fn(() => Promise.resolve({ unrealizedPnl })),
   } as unknown as PaperPositionService;
+}
+
+function rateLimiter(): ExecutionRateLimiter {
+  return {
+    consume: jest.fn(() =>
+      Promise.resolve({ count: 1, limit: 10, retryAfterMs: 60000 }),
+    ),
+  };
 }
 
 function intent() {

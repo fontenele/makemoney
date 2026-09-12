@@ -18,6 +18,8 @@ interface Environment {
   RISK_MAX_UNREALIZED_LOSS_USDT: string;
   RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE: string;
   RISK_CONTROL_TOKEN_SHA256?: string;
+  RISK_MAX_EXECUTIONS_PER_WINDOW: number;
+  RISK_EXECUTION_WINDOW_MS: number;
 }
 
 const environmentSchema = Joi.object<Environment>({
@@ -67,6 +69,8 @@ const environmentSchema = Joi.object<Environment>({
     .empty('')
     .pattern(/^[a-fA-F0-9]{64}$/)
     .optional(),
+  RISK_MAX_EXECUTIONS_PER_WINDOW: Joi.number().integer().positive().default(10),
+  RISK_EXECUTION_WINDOW_MS: Joi.number().integer().positive().default(60000),
 }).unknown(true);
 
 export function validateEnvironment(

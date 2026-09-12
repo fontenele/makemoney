@@ -54,6 +54,7 @@ All strategy signals pass through independent risk assessment before any executo
 - **M4.8 — complete:** configurable maximum share of displayed top-of-book liquidity for every new paper buy and sell.
 - **M4.9 — complete:** fail-closed Bearer authentication for emergency-stop writes plus loopback-only Compose API exposure.
 - **M4.10 — complete:** configurable net unrealized-loss limit for an existing open BTC position, blocking new buys while preserving sells and replays.
+- **M4.11 — complete:** Redis-backed atomic fixed-window limit for distinct approved paper executions, with idempotency awareness and fail-closed behavior.
 - Later M4 safeguards require separate evidence, a minimal plan, and approval.
 
 ## M5 — Strategies — planned

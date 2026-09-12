@@ -28,6 +28,12 @@ import {
 import { PaperMarketBuyQuote } from '../src/modules/paper-trading/domain/paper-market-buy-quote';
 import { PaperMarketSellQuote } from '../src/modules/paper-trading/domain/paper-market-sell-quote';
 import { EmergencyStopService } from '../src/modules/risk-engine/application/emergency-stop.service';
+import {
+  EXECUTION_RATE_LIMITER,
+  ExecutionRateLimiter,
+} from '../src/modules/risk-engine/domain/execution-rate-limiter';
+import { REDIS_CLIENT } from '../src/infrastructure/redis/redis.constants';
+import Redis from 'ioredis';
 
 describe('Application (e2e)', () => {
   let app: INestApplication;
@@ -52,6 +58,7 @@ describe('Application (e2e)', () => {
 
     app = moduleRef.createNestApplication();
     await app.init();
+    app.get(ConfigService).set('RISK_MAX_EXECUTIONS_PER_WINDOW', 1000);
     latestMarketPrice = app.get(LatestMarketPriceService);
   }, 30_000);
 
@@ -61,6 +68,49 @@ describe('Application (e2e)', () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
 
     return request(server).get('/health').expect(200);
+  });
+
+  it('atomically limits distinct approved execution keys in Redis', async () => {
+    const limiter = app.get<ExecutionRateLimiter>(EXECUTION_RATE_LIMITER);
+    const redis = app.get<Redis>(REDIS_CLIENT);
+    const config = app.get(ConfigService);
+    const key = 'risk:paper-execution:fixed-window';
+    const suffix = Date.now();
+    config.set('RISK_MAX_EXECUTIONS_PER_WINDOW', 2);
+    config.set('RISK_EXECUTION_WINDOW_MS', 50);
+    await redis.del(key);
+
+    try {
+      const results = await Promise.allSettled([
+        limiter.consume(`e2e-rate-a-${suffix}`),
+        limiter.consume(`e2e-rate-b-${suffix}`),
+        limiter.consume(`e2e-rate-c-${suffix}`),
+      ]);
+      expect(
+        results.filter(({ status }) => status === 'fulfilled'),
+      ).toHaveLength(2);
+      expect(
+        results.filter(({ status }) => status === 'rejected'),
+      ).toHaveLength(1);
+
+      await expect(
+        limiter.consume(`e2e-rate-a-${suffix}`),
+      ).resolves.toMatchObject({
+        count: 2,
+        limit: 2,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 75));
+      await expect(
+        limiter.consume(`e2e-rate-new-${suffix}`),
+      ).resolves.toMatchObject({
+        count: 1,
+        limit: 2,
+      });
+    } finally {
+      await redis.del(key);
+      config.set('RISK_MAX_EXECUTIONS_PER_WINDOW', 1000);
+      config.set('RISK_EXECUTION_WINDOW_MS', 60000);
+    }
   });
 
   it('persists and idempotently controls the paper emergency stop', async () => {

@@ -4,7 +4,7 @@ Last validated: 2026-09-12
 
 ## Milestone status
 
-M0 through M3 are complete and M4.1–M4.10 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution limits, atomic exposure/daily-loss enforcement, persistent emergency-stop control, conservative liquidity participation, authenticated local control writes, and unrealized-loss protection for new buys. No dashboard, order mutation endpoint, strategy, authenticated exchange integration, or real order execution exists.
+M0 through M3 are complete and M4.1–M4.11 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution limits, atomic exposure/daily-loss enforcement, persistent emergency-stop control, conservative liquidity participation, authenticated local control writes, unrealized-loss protection, and Redis-backed execution rate limiting. No dashboard, order mutation endpoint, strategy, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -69,6 +69,7 @@ M0 through M3 are complete and M4.1–M4.10 are complete. M1 provides unauthenti
 - Compose publishes API port 3000 only on host loopback.
 - `RISK_MAX_UNREALIZED_LOSS_USDT` defaults to `25`; a new buy is rejected when the existing open position's net unrealized PnL reaches that negative boundary, while sells and replays remain available.
 - Unrealized-loss assessment reuses the fresh best-bid position valuation, including estimated exit fees; missing or stale market data for an open position fails before execution mutation.
+- Distinct approved paper execution keys share an atomic Redis fixed-window limit of 10 per 60 seconds by default; duplicates share a slot, persisted replays bypass it, and Redis failure blocks new mutation.
 
 ## Local endpoints and ports
 
@@ -87,12 +88,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-12 after M4.10:
+The following passed on 2026-09-12 after M4.11:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 187 tests passed across 30 suites
-- `npm run test:e2e -- --runInBand` — 22 tests passed, including unrealized-loss rejection, authenticated/fail-closed emergency-stop control, and the prior liquidity, risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
+- `npm test -- --runInBand` — 192 tests passed across 31 suites
+- `npm run test:e2e -- --runInBand` — 23 tests passed, including atomic Redis rate limiting, unrealized-loss rejection, authenticated/fail-closed emergency-stop control, and the prior liquidity, risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
 - `npx prisma migrate deploy` — all four migrations applied, including `risk_control_events`
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
@@ -104,7 +105,7 @@ The following passed on 2026-09-12 after M4.10:
 
 ## Repository state
 
-M0 through M4.9 are committed. M4.10 changes are currently in the working tree.
+M0 through M4.10 are committed. M4.11 changes are currently in the working tree.
 
 ## Known issues and cautions
 

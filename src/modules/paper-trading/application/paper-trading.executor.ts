@@ -19,6 +19,10 @@ import { PaperMarketBuyQuoteService } from './paper-market-buy-quote.service';
 import { PaperMarketSellQuoteService } from './paper-market-sell-quote.service';
 import { PaperPositionService } from './paper-position.service';
 import { calculateDailyRealizedPnl } from './paper-position-calculator';
+import {
+  EXECUTION_RATE_LIMITER,
+  ExecutionRateLimiter,
+} from '../../risk-engine/domain/execution-rate-limiter';
 
 @Injectable()
 export class PaperTradingExecutor implements TradingExecutor {
@@ -33,6 +37,8 @@ export class PaperTradingExecutor implements TradingExecutor {
     private readonly paperWallet: PaperWalletService,
     @Inject(CLOCK) private readonly clock: Clock,
     private readonly positionService: PaperPositionService,
+    @Inject(EXECUTION_RATE_LIMITER)
+    private readonly executionRateLimiter: ExecutionRateLimiter,
   ) {}
 
   async execute(intent: PaperOrderIntent): Promise<PaperExecution> {
@@ -50,6 +56,7 @@ export class PaperTradingExecutor implements TradingExecutor {
     if (intent.side === 'buy') {
       const quote = this.buyQuoteService.quote(intent.quantity);
       await this.assertRiskApproved(intent, quote);
+      await this.executionRateLimiter.consume(intent.idempotencyKey);
       execution = await this.repository.executeBuy(
         intent.idempotencyKey,
         quote,
@@ -58,6 +65,7 @@ export class PaperTradingExecutor implements TradingExecutor {
     } else {
       const quote = this.sellQuoteService.quote(intent.quantity);
       await this.assertRiskApproved(intent, quote);
+      await this.executionRateLimiter.consume(intent.idempotencyKey);
       execution = await this.repository.executeSell(
         intent.idempotencyKey,
         quote,

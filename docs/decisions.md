@@ -134,6 +134,12 @@ The unrealized-loss guard reuses `PaperPositionService` instead of introducing a
 
 The rule blocks only exposure-increasing buys at an inclusive configurable USDT loss boundary. Sells remain available. This is deliberately a pre-execution snapshot: market prices are external and cannot be locked transactionally, while the existing database rules continue to protect persistent balance, exposure, and realized-loss invariants.
 
+## M4.11 Redis fixed-window execution permits
+
+Approved new paper executions use a Redis hash and one Lua script to atomically enforce a shared buy/sell fixed-window limit. Hash fields are caller idempotency keys, so concurrent duplicates share one slot; the key TTL bounds memory and starts when the first permit is issued.
+
+The permit occurs after deterministic risk assessment and before PostgreSQL mutation. Redis is intentionally fail-closed and ephemeral: losing a counter may begin a fresh window, but it cannot alter financial history, while Redis unavailability cannot silently bypass the safeguard. A consumed permit is not refunded after a later execution failure, favoring bounded activity over throughput.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

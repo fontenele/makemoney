@@ -91,3 +91,11 @@ This is defense for a local paper-only control surface. It is not user managemen
 When that PnL is less than or equal to the negative configured limit, the Risk Engine rejects the buy with rule `max_unrealized_loss_usdt` and reason `max_unrealized_loss_reached`. An empty, profitable, or smaller-loss position remains eligible for the later rules. Sells and persisted idempotent replays remain available because they reduce exposure or create no new financial effect.
 
 Rule precedence is emergency stop, maximum order notional, top-of-book participation, daily realized loss, unrealized loss, then cumulative BTC position. An open position without fresh market data fails before risk approval and before persistence. This is a current-snapshot entry guard, not a persistent drawdown metric, automatic stop-loss, liquidation mechanism, or transaction-level guarantee against market-price movement.
+
+## M4.11 approved execution rate limit
+
+`RISK_MAX_EXECUTIONS_PER_WINDOW` is a positive integer defaulting to `10`, and `RISK_EXECUTION_WINDOW_MS` is a positive integer defaulting to `60000`. After all existing synchronous risk rules approve a new buy or sell, the executor must obtain a Redis-backed permit before entering the PostgreSQL execution transaction.
+
+A single Lua script atomically tracks distinct idempotency keys in an expiring Redis hash. The first permitted key starts the fixed window. Up to the inclusive configured count is allowed; a new key above the limit raises `ExecutionRateLimitExceededError` with the current count, limit, and remaining window time. A concurrent repeat of an already-counted key does not consume a second slot, and a persisted replay bypasses quoting, risk assessment, and rate limiting entirely.
+
+Redis is appropriate because the window is ephemeral safety state, not a permanent financial record. Redis errors or malformed script responses raise `ExecutionRateLimiterUnavailableError` and fail closed before balance or execution mutation. A permit can be consumed even if later PostgreSQL execution fails; this conservative behavior avoids opening retry bursts. This does not add an HTTP order route, distributed portfolio identities, strategies, or real execution.

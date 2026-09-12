@@ -6,6 +6,8 @@ import { RISK_ENGINE } from './domain/risk-engine';
 import { PrismaEmergencyStopRepository } from './infrastructure/prisma-emergency-stop.repository';
 import { RiskControlController } from './presentation/risk-control.controller';
 import { RiskControlAuthGuard } from './presentation/risk-control-auth.guard';
+import { EXECUTION_RATE_LIMITER } from './domain/execution-rate-limiter';
+import { RedisExecutionRateLimiterService } from './application/redis-execution-rate-limiter.service';
 
 @Module({
   controllers: [RiskControlController],
@@ -18,7 +20,12 @@ import { RiskControlAuthGuard } from './presentation/risk-control-auth.guard';
     },
     RiskAssessmentService,
     { provide: RISK_ENGINE, useExisting: RiskAssessmentService },
+    RedisExecutionRateLimiterService,
+    {
+      provide: EXECUTION_RATE_LIMITER,
+      useExisting: RedisExecutionRateLimiterService,
+    },
   ],
-  exports: [RISK_ENGINE, EmergencyStopService],
+  exports: [RISK_ENGINE, EXECUTION_RATE_LIMITER, EmergencyStopService],
 })
 export class RiskEngineModule {}
