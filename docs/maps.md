@@ -6,9 +6,10 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | --- | --- | --- |
 | context, scope, safety, rules | `../PROJECT_CONTEXT.md`, `../AGENTS.md` | — |
 | current status, verification, known issues | `current-state.md`, `CHANGELOG.md` | — |
-| milestones, next work, M1, M2, M3, M3.1, M3.2, M3.3, M3.4, M3.5, M3.6, M3.7, M3.8, M4, M4.1, M4.2, M4.3, M4.4, M4.5, M4.6, M4.7, M4.8, M4.9, M4.10, M4.11, original plan | `roadmap.md`, `plan.md`, `../PROJECT_CONTEXT.md` | — |
+| milestones, next work, M1, M2, M3, M4, M5, M5.1, original plan | `roadmap.md`, `plan.md`, `../PROJECT_CONTEXT.md` | — |
 | decisions, ports, ESM, Prisma | `decisions.md` | `../package.json`, `../tsconfig.json`, `../compose.yaml` |
 | bootstrap, NestJS, modules | `current-state.md` | `../src/main.ts`, `../src/app.module.ts` |
+| API, HTTP, routes, endpoints, controllers | `../README.md`, `current-state.md` | `../src/modules/*/presentation` |
 | configuration, environment, secrets | `../AGENTS.md`, `current-state.md` | `../src/config/environment.ts`, `../.env.example` |
 | PostgreSQL, Prisma, database | `decisions.md` | `../prisma/schema.prisma`, `../prisma.config.ts`, `../src/infrastructure/database` |
 | Redis, cache, lifecycle | `current-state.md` | `../src/infrastructure/redis` |
@@ -22,7 +23,8 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | time-based performance, ROI, drawdown, profit factor, expectancy, order mutation API, cursor pagination, deeper slippage | `paper-trading.md`, `roadmap.md`, `../AGENTS.md` | Not implemented; later M3 increments |
 | risk, Risk Engine, risk assessment, maximum order notional, max notional, emergency stop, kill switch, persistent stop, operator control, authenticated control, Bearer token, token hash, SHA-256, loopback, risk control event, audit trail, Idempotency-Key, cumulative BTC position, atomic exposure, concurrency-safe exposure, daily realized loss, atomic daily loss, unrealized loss, net liquidation value, liquidity participation, rate limiting, fixed window, execution permit, Redis Lua, fail closed, top-of-book share, best bid quantity, best ask quantity, advisory lock, transaction serialization, UTC day, net realized PnL, position quantity, order candidate, approval, rejection, RISK_MAX_ORDER_NOTIONAL_USDT, RISK_EMERGENCY_STOP, RISK_MAX_BTC_POSITION_QUANTITY, RISK_MAX_DAILY_REALIZED_LOSS_USDT, RISK_MAX_UNREALIZED_LOSS_USDT, RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE, RISK_CONTROL_TOKEN_SHA256, RISK_MAX_EXECUTIONS_PER_WINDOW, RISK_EXECUTION_WINDOW_MS | `risk-engine.md`, `roadmap.md`, `decisions.md`, `../AGENTS.md` | `../src/modules/risk-engine`, `../src/modules/paper-trading/application/paper-trading.executor.ts`, `../src/modules/paper-trading/application/paper-position.service.ts`, `../src/modules/paper-trading/application/paper-position-calculator.ts`, `../src/modules/paper-trading/infrastructure/prisma-paper-execution.repository.ts`, `../src/config/environment.ts`, `../src/infrastructure/redis` |
 | persistent drawdown | `risk-engine.md`, `roadmap.md`, `../AGENTS.md` | Not implemented; later M4 increments |
-| strategies, signals, backtest | `roadmap.md`, `../AGENTS.md` | Not implemented; M5–M6 |
+| strategies, signals, moving average, crossover, closed candles, buy signal, sell signal, hold signal | `strategies.md`, `roadmap.md`, `decisions.md`, `../AGENTS.md` | `../src/modules/strategies` |
+| backtest, historical strategy evaluation | `roadmap.md`, `../AGENTS.md` | Not implemented; M6 |
 | Polymarket | `roadmap.md`, `../AGENTS.md` | Not implemented; M9 |
 | Agentic Wallet, real trading, orders | `roadmap.md`, `../AGENTS.md` | Not implemented; M10 |
 

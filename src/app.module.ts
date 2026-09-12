@@ -7,6 +7,7 @@ import { HealthModule } from './modules/health/health.module';
 import { MarketDataModule } from './modules/market-data/market-data.module';
 import { PaperWalletModule } from './modules/paper-wallet/paper-wallet.module';
 import { PaperTradingModule } from './modules/paper-trading/paper-trading.module';
+import { StrategiesModule } from './modules/strategies/strategies.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { PaperTradingModule } from './modules/paper-trading/paper-trading.module
     MarketDataModule,
     PaperWalletModule,
     PaperTradingModule,
+    StrategiesModule,
   ],
 })
 export class AppModule {}

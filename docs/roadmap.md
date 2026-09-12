@@ -40,7 +40,7 @@ No real funds or exchange-account access.
 - **M3.8 — complete:** read-only realized performance summary with execution/outcome counts, win rate, realized PnL, and total fees.
 - Later M3 increments require separate approval for ROI and time-based statistics, order mutation APIs, cursor pagination, and deeper slippage modeling.
 
-## M4 — Risk Engine — in progress
+## M4 — Risk Engine — complete
 
 All strategy signals pass through independent risk assessment before any executor. Position, exposure, loss, liquidity, and safety limits are introduced with focused tests.
 
@@ -57,9 +57,12 @@ All strategy signals pass through independent risk assessment before any executo
 - **M4.11 — complete:** Redis-backed atomic fixed-window limit for distinct approved paper executions, with idempotency awareness and fail-closed behavior.
 - Later M4 safeguards require separate evidence, a minimal plan, and approval.
 
-## M5 — Strategies — planned
+## M5 — Strategies — in progress
 
 Deterministic, reproducible, measurable strategies that produce signals and never submit orders directly.
+
+- **M5.1 — complete:** provider-neutral strategy contract and deterministic BTC/USDT moving-average crossover over ordered closed one-minute candles, using exact decimal arithmetic and producing buy, sell, or hold signals without execution.
+- Live candle wiring, signal persistence, position sizing, execution integration, and additional strategies require separate approval.
 
 ## M6 — Backtesting — planned
 

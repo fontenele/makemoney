@@ -8,8 +8,8 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, **M3 — Paper Trading (M3.1 through M3.8)**, and **M4.1–M4.11 — maximum-order-notional, emergency-stop, cumulative BTC-position, atomic exposure, daily realized-loss, atomic daily-loss, persistent emergency-stop, top-of-book participation, authenticated local risk control, unrealized-loss protection, and execution rate limiting**.
-- No next increment is approved. Stop and present a minimal plan before starting more wallet or trading work.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, and **M5.1 — deterministic moving-average crossover strategy**.
+- No next increment is approved. Stop and present a minimal plan before further strategy work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -62,7 +62,9 @@ M4.10 rejects new paper buys when the existing open BTC position's net unrealize
 
 M4.11 atomically limits distinct approved paper-execution keys in an ephemeral Redis fixed window. Persisted replays and concurrent duplicate keys do not consume another slot, and Redis failure blocks new execution before financial mutation.
 
-Historical market data, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, strategies, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
+M5.1 defines a provider-neutral strategy contract and a deterministic BTC/USDT moving-average crossover. It evaluates only ordered closed one-minute candles with exact decimal arithmetic and returns buy, sell, or hold without submitting orders.
+
+Historical market data, live strategy orchestration, signal persistence, position sizing, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 
@@ -87,3 +89,4 @@ Historical market data, BRL conversion, order mutation APIs, deeper slippage, RO
 - `docs/paper-wallet.md`: M2.1 fictional wallet configuration and domain behavior.
 - `docs/paper-trading.md`: M3 paper quote and future execution boundaries.
 - `docs/risk-engine.md`: M4 risk-assessment contract, rules, and execution boundary.
+- `docs/strategies.md`: M5.1 strategy contract, crossover semantics, and isolation boundary.

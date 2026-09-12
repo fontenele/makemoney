@@ -2,6 +2,32 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — API route index documented
+
+### Changed
+
+- Added every existing HTTP method and route to the root README, including parameters, availability conditions, and emergency-stop write requirements.
+- Added a permanent project rule requiring the README route table to remain synchronized with controller changes.
+- Added API and controller navigation keywords to the project map.
+
+## 2026-09-12 — M5.1 moving-average crossover completed
+
+### Added
+
+- Provider-neutral strategy input, strategy, and signal contracts.
+- Deterministic BTC/USDT moving-average crossover over ordered closed one-minute candles with exact decimal averages.
+- Focused tests for buy, sell, hold, equality, incomplete candles, insufficient history, ordering, invalid prices, and invalid periods.
+- Strategy documentation and project-map navigation.
+
+### Changed
+
+- Registered the isolated strategies module in the modular monolith.
+- Marked M4 complete and M5.1 complete across project status and planning documents.
+
+### Scope confirmation
+
+- No strategy was connected to live data, position sizing, the Risk Engine, an executor, persistence, HTTP, dashboard, authenticated exchange access, or real trading.
+
 ## 2026-09-12 — M4.11 execution rate limit completed
 
 ### Added

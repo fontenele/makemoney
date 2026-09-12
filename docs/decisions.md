@@ -235,3 +235,9 @@ The local Compose API runs `prisma migrate deploy` before NestJS starts, ensurin
 Market data retains the latest normalized top of book and pair metadata in provider-neutral services. The paper-trading module consumes those views without depending on Binance transports or payloads.
 
 A BTC quantity is quoted at the best ask only when the book is fresh, the pair status is `TRADING`, quantity satisfies minimum, maximum, and step-size rules, notional reaches the public minimum, and best-ask quantity is sufficient. `PAPER_TAKER_FEE_RATE` defaults to `0.001` as an explicit simulation assumption. Exact decimal calculation produces notional, fee, and total cost without wallet mutation. Multi-level fills, execution, and account-specific fees are deferred.
+
+## M5.1 deterministic strategy boundary
+
+Strategies are pure signal producers behind a provider-neutral contract. Their candle input contains only normalized domain fields and deliberately excludes provider payloads. A strategy has no dependency on a wallet, the Risk Engine, or an executor, preserving the rule that signals cannot submit orders.
+
+The first strategy compares previous and current simple moving averages over closed candles. Equality belongs to the pre-cross side, so equality followed by divergence produces exactly one deterministic crossover. Decimal prices never pass through native floating-point arithmetic. The 3/5 defaults are construction policy, while the implementation validates any explicitly supplied positive integer periods with `shortPeriod < longPeriod`.

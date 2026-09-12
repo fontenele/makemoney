@@ -6,6 +6,7 @@
 - Consult the relevant documents linked by `docs/maps.md` before changing a subsystem.
 - Update `docs/current-state.md` and `docs/CHANGELOG.md` when a milestone or meaningful project behavior changes.
 - Keep plans and delivered scope synchronized in `docs/roadmap.md`; do not mark work complete before verification.
+- Keep the API route table in the root `README.md` synchronized whenever a route, method, access requirement, or public parameter is added or changed.
 
 ## Scope and delivery
 

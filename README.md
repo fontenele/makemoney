@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. The project has completed **M1 — Market Data**, **M2 — Paper Wallet**, and **M3.1 — Paper Market Buy Quote**. Market feeds are public and unauthenticated; quotes and balances are fictional, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M4 and M5.1 are complete. Market feeds are public and unauthenticated; trades and balances are fictional, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -46,6 +46,23 @@ The API connects to public Binance BTC/USDT trade, mini ticker, one-minute candl
 docker compose logs -f api
 ```
 
+## API routes
+
+Local base URL: `http://localhost:3000`. Docker Compose publishes it on host loopback only.
+
+| Method | Route | Purpose | Access and parameters |
+| --- | --- | --- | --- |
+| `GET` | `/health` | API, PostgreSQL, and Redis health | Local, read-only |
+| `GET` | `/paper-wallet/balances` | Current fictional BTC and USDT balances | Local, read-only |
+| `GET` | `/paper-wallet/valuation` | Fictional portfolio valuation in USDT | Local, read-only; returns `503` without a fresh market price |
+| `GET` | `/paper-trading/executions` | Recent fictional executions, newest first | Local, read-only; optional `limit=1..100`, default `50` |
+| `GET` | `/paper-trading/position` | BTC position, cost basis, fees, and PnL | Local, read-only; an open position requires fresh top-of-book data |
+| `GET` | `/paper-trading/performance` | Realized paper-trading performance summary | Local, read-only |
+| `GET` | `/risk/emergency-stop` | Current emergency-stop state | Local, read-only |
+| `PUT` | `/risk/emergency-stop` | Change the paper-trading emergency stop | Requires configured Bearer token, `Idempotency-Key`, and JSON `{ "active": boolean, "reason": string }` |
+
+There are no public balance-mutation, order-submission, strategy, dashboard, exchange-account, or real-trading routes.
+
 ## Quality checks
 
 ```bash
@@ -64,4 +81,4 @@ docker compose config
 - `prisma`: database schema and future migrations
 - `test`: end-to-end tests
 
-Paper balances persist across restarts; the latest price and valuation remain process-local. Read-only views are available at `/paper-wallet/balances` and `/paper-wallet/valuation`; no mutation or order route exists.
+Paper balances persist across restarts; the latest market data and valuation remain process-local.

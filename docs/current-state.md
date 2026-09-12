@@ -4,7 +4,7 @@ Last validated: 2026-09-12
 
 ## Milestone status
 
-M0 through M3 are complete and M4.1–M4.11 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution limits, atomic exposure/daily-loss enforcement, persistent emergency-stop control, conservative liquidity participation, authenticated local control writes, unrealized-loss protection, and Redis-backed execution rate limiting. No dashboard, order mutation endpoint, strategy, authenticated exchange integration, or real order execution exists.
+M0 through M4 are complete and M5.1 is complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5.1 provides a deterministic moving-average crossover that only produces signals. No dashboard, order mutation endpoint, live strategy orchestration, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -70,6 +70,8 @@ M0 through M3 are complete and M4.1–M4.11 are complete. M1 provides unauthenti
 - `RISK_MAX_UNREALIZED_LOSS_USDT` defaults to `25`; a new buy is rejected when the existing open position's net unrealized PnL reaches that negative boundary, while sells and replays remain available.
 - Unrealized-loss assessment reuses the fresh best-bid position valuation, including estimated exit fees; missing or stale market data for an open position fails before execution mutation.
 - Distinct approved paper execution keys share an atomic Redis fixed-window limit of 10 per 60 seconds by default; duplicates share a slot, persisted replays bypass it, and Redis failure blocks new mutation.
+- A provider-neutral strategy contract accepts ordered one-minute candle projections and returns deterministic buy, sell, or hold signals without submitting orders.
+- The M5.1 moving-average crossover uses only closed candles, exact decimal averages, explicit equality semantics, and defaults to 3/5 periods.
 
 ## Local endpoints and ports
 
