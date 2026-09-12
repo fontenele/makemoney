@@ -101,6 +101,7 @@ export class PaperMarketBuyQuoteService {
       symbol: 'BTC/USDT' as const,
       side: 'buy' as const,
       quantity: quantity.toFixed(),
+      topOfBookAvailableQuantity: askQuantity.toFixed(),
       price: askPrice.toFixed(),
       notional: notional.toFixed(),
       feeRate: feeRate.toFixed(),

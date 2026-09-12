@@ -5,12 +5,20 @@ export interface RiskOrderCandidate {
   symbol: 'BTC/USDT';
   side: 'buy' | 'sell';
   quantity: string;
+  topOfBookAvailableQuantity: string;
   notional: string;
   currentPositionQuantity: string;
   dailyRealizedPnl: string;
 }
 
 export type RiskAssessment =
+  | {
+      decision: 'rejected';
+      rule: 'max_top_of_book_participation_rate';
+      reason: 'top_of_book_participation_exceeded';
+      participationRate: string;
+      limit: string;
+    }
   | {
       decision: 'rejected';
       rule: 'emergency_stop';

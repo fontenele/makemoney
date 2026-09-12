@@ -4,7 +4,7 @@ Last validated: 2026-09-12
 
 ## Milestone status
 
-M0 through M3 are complete and M4.1–M4.7 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution limits, atomic exposure/daily-loss enforcement, and persistent emergency-stop control. No dashboard, order mutation endpoint, strategy, authenticated integration, or real order execution exists.
+M0 through M3 are complete and M4.1–M4.8 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution limits, atomic exposure/daily-loss enforcement, persistent emergency-stop control, and conservative liquidity participation. No dashboard, order mutation endpoint, strategy, authenticated integration, or real order execution exists.
 
 ## Implemented application
 
@@ -64,6 +64,7 @@ M0 through M3 are complete and M4.1–M4.7 are complete. M1 provides unauthentic
 - Paper buy and sell transactions share a PostgreSQL advisory lock; each buy repeats the daily-loss calculation inside the serialized transaction before any persistence or balance mutation.
 - Append-only emergency-stop events persist active state, reason, idempotency key, and change time; the latest event is restored at startup and overrides the configuration fallback.
 - Local `GET /risk/emergency-stop` and `PUT /risk/emergency-stop` expose status and idempotent paper-only control, including HTTP 409 for conflicting key reuse.
+- Every quote carries its best-side available quantity; `RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE` defaults to `0.10` and rejects larger buy or sell participation before persistence.
 
 ## Local endpoints and ports
 
@@ -82,12 +83,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-12 after M4.7:
+The following passed on 2026-09-12 after M4.8:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 169 tests passed across 29 suites
-- `npm run test:e2e -- --runInBand` — 20 tests passed, including persistent/idempotent emergency-stop control and the prior risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
+- `npm test -- --runInBand` — 173 tests passed across 29 suites
+- `npm run test:e2e -- --runInBand` — 21 tests passed, including top-of-book participation rejection without mutation and the prior risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
 - `npx prisma migrate deploy` — all four migrations applied, including `risk_control_events`
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
@@ -99,7 +100,7 @@ The following passed on 2026-09-12 after M4.7:
 
 ## Repository state
 
-M0 through M4.6 are committed. M4.7 changes are currently in the working tree.
+M0 through M4.7 are committed. M4.8 changes are currently in the working tree.
 
 ## Known issues and cautions
 

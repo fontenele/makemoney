@@ -2,6 +2,19 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — M4.8 top-of-book participation limit completed
+
+### Added
+
+- Validated `RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE` configuration with a default of `0.10`.
+- Best-side available quantity carried from each provider-neutral quote into risk assessment.
+- Exact buy/sell participation calculation and structured rejection above the inclusive limit.
+- Unit coverage for both sides, exact boundary, and precedence; E2E coverage verifies rejection without execution or balance mutation.
+
+### Scope confirmation
+
+- No migration, multi-level order book, partial-fill, market-impact, deeper-slippage, order endpoint, strategy, authenticated integration, or real trading was introduced.
+
 ## 2026-09-12 — M4.7 persistent emergency-stop control completed
 
 ### Added

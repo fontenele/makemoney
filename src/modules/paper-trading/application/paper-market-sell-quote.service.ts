@@ -104,6 +104,7 @@ export class PaperMarketSellQuoteService {
       symbol: 'BTC/USDT' as const,
       side: 'sell' as const,
       quantity: quantity.toFixed(),
+      topOfBookAvailableQuantity: bidQuantity.toFixed(),
       price: bidPrice.toFixed(),
       notional: notional.toFixed(),
       feeRate: feeRate.toFixed(),

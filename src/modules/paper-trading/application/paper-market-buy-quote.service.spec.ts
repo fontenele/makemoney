@@ -13,6 +13,7 @@ describe('PaperMarketBuyQuoteService', () => {
       symbol: 'BTC/USDT',
       side: 'buy',
       quantity: '0.001',
+      topOfBookAvailableQuantity: '2',
       price: '77777.12',
       notional: '77.77712',
       feeRate: '0.001',

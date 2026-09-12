@@ -2,6 +2,7 @@ export interface PaperMarketBuyQuote {
   symbol: 'BTC/USDT';
   side: 'buy';
   quantity: string;
+  topOfBookAvailableQuantity: string;
   price: string;
   notional: string;
   feeRate: string;

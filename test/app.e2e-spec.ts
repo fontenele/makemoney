@@ -95,7 +95,7 @@ describe('Application (e2e)', () => {
         .send({ active: true, reason: 'e2e safety review' })
         .expect(200)
         .expect((response) => {
-          expect(response.body.replayed).toBe(true);
+          expect((response.body as { replayed: boolean }).replayed).toBe(true);
         });
       await request(server)
         .put('/risk/emergency-stop')
@@ -136,7 +136,7 @@ describe('Application (e2e)', () => {
         .send({ active: false, reason: 'e2e cleanup' })
         .expect(200)
         .expect((response) => {
-          expect(response.body.active).toBe(false);
+          expect((response.body as { active: boolean }).active).toBe(false);
         });
     } finally {
       if (emergencyStop.isActive()) {
@@ -304,6 +304,38 @@ describe('Application (e2e)', () => {
     ).resolves.toBeNull();
   });
 
+  it('rejects excessive top-of-book participation without mutation', async () => {
+    preparePaperMarket(app);
+    const executor = app.get(PaperTradingExecutor);
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const idempotencyKey = `e2e-liquidity-risk-${Date.now()}`;
+    const before = await wallet.getBalances();
+    app.get(LatestTopOfBookService).update({
+      provider: 'binance',
+      symbol: 'BTC/USDT',
+      updateId: 'liquidity-risk',
+      bidPrice: '49999.99',
+      bidQuantity: '1',
+      askPrice: '50000',
+      askQuantity: '0.0005',
+      receivedAt: new Date(),
+    });
+
+    await expect(
+      executor.execute({
+        idempotencyKey,
+        symbol: 'BTC/USDT',
+        side: 'buy',
+        quantity: '0.0001',
+      }),
+    ).rejects.toThrow('top_of_book_participation_exceeded');
+    await expect(wallet.getBalances()).resolves.toEqual(before);
+    await expect(
+      prisma.paperExecution.findUnique({ where: { id: idempotencyKey } }),
+    ).resolves.toBeNull();
+  });
+
   it('rejects new paper executions while the emergency stop is active', async () => {
     preparePaperMarket(app);
     const executor = app.get(PaperTradingExecutor);
@@ -454,6 +486,7 @@ describe('Application (e2e)', () => {
         symbol: 'BTC/USDT',
         side: 'buy',
         quantity,
+        topOfBookAvailableQuantity: '1',
         price: '50000',
         notional: '5',
         feeRate: '0.001',
@@ -518,6 +551,7 @@ describe('Application (e2e)', () => {
       symbol: 'BTC/USDT',
       side: 'sell',
       quantity,
+      topOfBookAvailableQuantity: '1',
       price: '40000',
       notional: '4',
       feeRate: '0.001',
@@ -530,6 +564,7 @@ describe('Application (e2e)', () => {
       symbol: 'BTC/USDT',
       side: 'buy',
       quantity,
+      topOfBookAvailableQuantity: '1',
       price: '50000',
       notional: '5',
       feeRate: '0.001',

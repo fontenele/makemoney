@@ -70,7 +70,11 @@ export class PaperTradingExecutor implements TradingExecutor {
 
   private async assertRiskApproved(
     intent: PaperOrderIntent,
-    quote: { quantity: string; notional: string },
+    quote: {
+      quantity: string;
+      notional: string;
+      topOfBookAvailableQuantity: string;
+    },
   ): Promise<void> {
     const [currentPositionQuantity, dailyRealizedPnl] =
       intent.side === 'buy'
@@ -88,6 +92,7 @@ export class PaperTradingExecutor implements TradingExecutor {
       symbol: intent.symbol,
       side: intent.side,
       quantity: quote.quantity,
+      topOfBookAvailableQuantity: quote.topOfBookAvailableQuantity,
       notional: quote.notional,
       currentPositionQuantity,
       dailyRealizedPnl,

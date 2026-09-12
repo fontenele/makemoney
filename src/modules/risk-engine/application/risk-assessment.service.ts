@@ -54,6 +54,36 @@ export class RiskAssessmentService implements RiskEngine {
         }
       : { decision: 'approved', ...common };
 
+    if (assessment.decision === 'approved') {
+      const quantity = positiveDecimal(
+        candidate.quantity,
+        'candidate quantity',
+      );
+      const availableQuantity = positiveDecimal(
+        candidate.topOfBookAvailableQuantity,
+        'top-of-book available quantity',
+      );
+      const participationLimit = positiveDecimal(
+        this.config.getOrThrow<string>(
+          'RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE',
+        ),
+        'top-of-book participation limit',
+      );
+      if (participationLimit.greaterThan(1)) {
+        throw new TypeError('Invalid top-of-book participation limit');
+      }
+      const participationRate = quantity.dividedBy(availableQuantity);
+      if (participationRate.greaterThan(participationLimit)) {
+        assessment = {
+          decision: 'rejected',
+          rule: 'max_top_of_book_participation_rate',
+          reason: 'top_of_book_participation_exceeded',
+          participationRate: participationRate.toFixed(),
+          limit: participationLimit.toFixed(),
+        };
+      }
+    }
+
     if (assessment.decision === 'approved' && candidate.side === 'buy') {
       const dailyRealizedPnl = signedDecimal(
         candidate.dailyRealizedPnl,

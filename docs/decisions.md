@@ -112,6 +112,14 @@ The application loads that state into memory during module initialization so the
 
 The first control API is intentionally local and paper-only. It requires a reason and idempotency key but adds no remote authentication or claim that this single control is sufficient for real trading.
 
+## M4.8 conservative level-one liquidity participation
+
+The Risk Engine limits order quantity as a share of the exact best bid or ask quantity used to produce the quote. This is distinct from the quote service's feasibility check: feasibility allows up to all displayed quantity, while the risk rule defaults to a conservative ten percent.
+
+The participation rate is configurable, positive, and at most one. Exact decimal division avoids native floating-point behavior, and equality is permitted. The rule applies symmetrically to buys and sells after maximum-notional assessment and before side-specific loss or exposure checks.
+
+Only top-of-book data is available in the current market-data milestone, so this is an explicit level-one guard rather than an estimate of full-book impact or slippage.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

@@ -8,6 +8,7 @@ describe('RiskAssessmentService', () => {
     symbol: 'BTC/USDT' as const,
     side: 'buy' as const,
     quantity: '0.002',
+    topOfBookAvailableQuantity: '1',
     notional: '100',
     currentPositionQuantity: '0.003',
     dailyRealizedPnl: '0',
@@ -112,6 +113,50 @@ describe('RiskAssessmentService', () => {
     });
   });
 
+  it.each(['buy', 'sell'] as const)(
+    'rejects a %s above the top-of-book participation limit',
+    (side) => {
+      expect(
+        service('1000', false, '1').assess({
+          ...candidate,
+          side,
+          quantity: '0.1001',
+          topOfBookAvailableQuantity: '1',
+        }),
+      ).toEqual({
+        decision: 'rejected',
+        rule: 'max_top_of_book_participation_rate',
+        reason: 'top_of_book_participation_exceeded',
+        participationRate: '0.1001',
+        limit: '0.1',
+      });
+    },
+  );
+
+  it('allows the exact top-of-book participation boundary', () => {
+    expect(
+      service('1000', false, '1').assess({
+        ...candidate,
+        quantity: '0.1',
+        topOfBookAvailableQuantity: '1',
+      }),
+    ).toMatchObject({ decision: 'approved' });
+  });
+
+  it('evaluates top-of-book participation before daily loss', () => {
+    expect(
+      service('1000', false, '1').assess({
+        ...candidate,
+        quantity: '0.2',
+        topOfBookAvailableQuantity: '1',
+        dailyRealizedPnl: '-25',
+      }),
+    ).toMatchObject({
+      decision: 'rejected',
+      rule: 'max_top_of_book_participation_rate',
+    });
+  });
+
   it('allows a buy while net daily PnL remains above the loss limit', () => {
     expect(
       service('1000', false, '1', '25').assess({
@@ -153,6 +198,7 @@ function service(
   return new RiskAssessmentService(
     {
       getOrThrow: (key: string) => {
+        if (key === 'RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE') return '0.1';
         if (key === 'RISK_MAX_BTC_POSITION_QUANTITY') return positionLimit;
         if (key === 'RISK_MAX_DAILY_REALIZED_LOSS_USDT') return dailyLossLimit;
         return limit;

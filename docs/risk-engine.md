@@ -63,3 +63,13 @@ Emergency-stop changes are stored as immutable `risk_control_events`. Each event
 The in-memory state gives the synchronous Risk Engine an immediately available highest-precedence decision after persistence succeeds. Activating the stop rejects all new paper buys and sells before candidate validation or financial mutation. Existing execution replays remain available.
 
 These endpoints control only the local paper executor. They do not provide remote authentication, authorization, real-trading safeguards, an order endpoint, or a dashboard.
+
+## M4.8 top-of-book participation limit
+
+`RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE` is a positive decimal no greater than one and defaults to `0.10`. Buy quotes carry the best-ask quantity and sell quotes carry the best-bid quantity from the same fresh provider-neutral snapshot used for pricing.
+
+For every new order, the Risk Engine calculates `order quantity / available top-of-book quantity` with exact `decimal.js` arithmetic. The configured boundary is inclusive. A larger share is rejected with rule `max_top_of_book_participation_rate` and reason `top_of_book_participation_exceeded` before repository access or balance mutation.
+
+Rule precedence is emergency stop, maximum order notional, top-of-book participation, daily realized loss for buys, then cumulative BTC position for buys. The earlier quote-level check still rejects quantities above all displayed liquidity; M4.8 adds a conservative participation buffer for both sides.
+
+This rule uses only level-one displayed liquidity. Multi-level depth, market impact, partial fills, and deeper slippage modeling remain deferred.
