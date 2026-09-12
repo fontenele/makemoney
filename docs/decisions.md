@@ -241,3 +241,9 @@ A BTC quantity is quoted at the best ask only when the book is fresh, the pair s
 Strategies are pure signal producers behind a provider-neutral contract. Their candle input contains only normalized domain fields and deliberately excludes provider payloads. A strategy has no dependency on a wallet, the Risk Engine, or an executor, preserving the rule that signals cannot submit orders.
 
 The first strategy compares previous and current simple moving averages over closed candles. Equality belongs to the pre-cross side, so equality followed by divergence produces exactly one deterministic crossover. Decimal prices never pass through native floating-point arithmetic. The 3/5 defaults are construction policy, while the implementation validates any explicitly supplied positive integer periods with `shortPeriod < longPeriod`.
+
+## M5.2 process-local candle feed
+
+Live strategy observation reuses normalized M1 candle events through a small in-process subscription service instead of coupling strategies to Binance or opening another connection. Subscriber errors are logged and isolated from the publisher.
+
+The evaluator keeps only six closed candles, matching the default M5.1 lookback plus its prior comparison point. It ignores open, duplicate, and out-of-order candles and writes signals to structured logs. Process-local observation is intentional for this increment; durable history and execution remain separate future decisions.

@@ -13,3 +13,13 @@ The moving-average crossover uses only candles whose `isClosed` value is true. W
 Prices and averages use `decimal.js`; native floating-point monetary arithmetic is not used. Signals record the action, deterministic reason, periods, previous/current averages, evaluation time, and latest closed-candle time. Invalid periods, candle identity, timestamps, ordering, and closed-candle prices fail explicitly.
 
 M5.1 does not subscribe to live candles, retain history, persist signals, size positions, execute orders, expose HTTP routes, backtest, or provide a dashboard. Those require separate increments.
+
+## M5.2 live signal observation
+
+The normalized market-data candle service publishes every received candle to a process-local, provider-neutral feed. Subscribers are isolated so one failing observer does not interrupt another or the Binance stream.
+
+The live strategy evaluator subscribes during the NestJS module lifecycle and retains at most the latest six closed candles, the exact history required by the default 3/5 crossover. Open candles do not trigger evaluation. Duplicate or older close times are ignored with a structured diagnostic, preventing repeated signals after provider duplication or reordering.
+
+Every accepted closed candle triggers one evaluation. The resulting action, reason, periods, averages, latest close time, and evaluation time are written as the structured `strategy.signal_generated` log event. Evaluation time uses the normalized candle receipt time.
+
+This history and every signal are process-local and disappear on restart. M5.2 does not persist data, expose a route, size a position, call the Risk Engine, or submit an order.

@@ -2,6 +2,24 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — M5.2 live signal observation completed
+
+### Added
+
+- Process-local provider-neutral candle feed with subscriber isolation.
+- Lifecycle-managed live strategy evaluator with a six-candle closed-history bound.
+- Structured signal logs and diagnostics for duplicate or out-of-order closed candles.
+- Focused tests for publication, subscriber failure, lifecycle, open-candle exclusion, bounded retention, ordering, deduplication, and live crossover generation.
+
+### Changed
+
+- Normalized public candles now enter the internal feed before their existing market-data log.
+- Updated project context, roadmap, plan, map, strategy documentation, decisions, and current-state evidence for M5.2.
+
+### Scope confirmation
+
+- No persistence, API route, dashboard, position sizing, Risk Engine call, executor call, exchange authentication, or real trading was introduced.
+
 ## 2026-09-12 — API route index documented
 
 ### Changed

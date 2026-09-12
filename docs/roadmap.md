@@ -62,7 +62,8 @@ All strategy signals pass through independent risk assessment before any executo
 Deterministic, reproducible, measurable strategies that produce signals and never submit orders directly.
 
 - **M5.1 — complete:** provider-neutral strategy contract and deterministic BTC/USDT moving-average crossover over ordered closed one-minute candles, using exact decimal arithmetic and producing buy, sell, or hold signals without execution.
-- Live candle wiring, signal persistence, position sizing, execution integration, and additional strategies require separate approval.
+- **M5.2 — complete:** process-local normalized candle feed and bounded live evaluation of the M5.1 strategy once per new closed candle, with duplicate/out-of-order suppression and structured signal logs.
+- Signal persistence, position sizing, execution integration, and additional strategies require separate approval.
 
 ## M6 — Backtesting — planned
 

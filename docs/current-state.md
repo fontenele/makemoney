@@ -4,7 +4,7 @@ Last validated: 2026-09-12
 
 ## Milestone status
 
-M0 through M4 are complete and M5.1 is complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5.1 provides a deterministic moving-average crossover that only produces signals. No dashboard, order mutation endpoint, live strategy orchestration, authenticated exchange integration, or real order execution exists.
+M0 through M4 and M5.1–M5.2 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a deterministic moving-average crossover and process-local observation of its live signals. No dashboard, order mutation endpoint, signal persistence, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -72,6 +72,8 @@ M0 through M4 are complete and M5.1 is complete. M1 provides unauthenticated pub
 - Distinct approved paper execution keys share an atomic Redis fixed-window limit of 10 per 60 seconds by default; duplicates share a slot, persisted replays bypass it, and Redis failure blocks new mutation.
 - A provider-neutral strategy contract accepts ordered one-minute candle projections and returns deterministic buy, sell, or hold signals without submitting orders.
 - The M5.1 moving-average crossover uses only closed candles, exact decimal averages, explicit equality semantics, and defaults to 3/5 periods.
+- Normalized candles are distributed through an in-process feed whose subscriber failures are isolated from the market-data stream.
+- M5.2 retains six closed candles, evaluates once per new close, suppresses duplicate/out-of-order closes, and emits structured signals only to application logs.
 
 ## Local endpoints and ports
 
@@ -90,14 +92,19 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-12 after M4.11:
+The following passed on 2026-09-12 after M5.2:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 192 tests passed across 31 suites
+- `npm run format:check`
+- `npm test -- --runInBand` — 213 tests passed across 34 suites
+- `docker compose config --quiet`
+- `git diff --check`
+
+The most recent database-backed integration validation was completed after M4.11:
+
 - `npm run test:e2e -- --runInBand` — 23 tests passed, including atomic Redis rate limiting, unrealized-loss rejection, authenticated/fail-closed emergency-stop control, and the prior liquidity, risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
 - `npx prisma migrate deploy` — all four migrations applied, including `risk_control_events`
-- `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live paper wallet initialization — reported BTC `0` and USDT `1000` from the default configuration
@@ -107,7 +114,7 @@ The following passed on 2026-09-12 after M4.11:
 
 ## Repository state
 
-M0 through M4.10 are committed. M4.11 changes are currently in the working tree.
+M0 through M5.1 are committed. M5.2 changes are currently in the working tree.
 
 ## Known issues and cautions
 

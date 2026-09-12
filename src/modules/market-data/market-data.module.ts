@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PublicCandlesService } from './application/public-candles.service';
+import { MarketCandleFeedService } from './application/market-candle-feed.service';
 import { LatestMarketPriceService } from './application/latest-market-price.service';
 import { LatestPairMetadataService } from './application/latest-pair-metadata.service';
 import { LatestTopOfBookService } from './application/latest-top-of-book.service';
@@ -63,9 +64,11 @@ import { BinancePublicTradesClient } from './infrastructure/binance/binance-publ
         ),
     },
     PublicTradesService,
+    MarketCandleFeedService,
     LatestMarketPriceService,
     LatestPairMetadataService,
     LatestTopOfBookService,
+    MarketCandleFeedService,
     PublicTickerService,
     PublicCandlesService,
     PublicPairMetadataService,

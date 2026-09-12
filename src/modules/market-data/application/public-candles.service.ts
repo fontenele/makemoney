@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { CANDLE_STREAM, CandleStream } from '../domain/candle-stream';
 import { MarketCandle } from '../domain/market-candle';
+import { MarketCandleFeedService } from './market-candle-feed.service';
 
 @Injectable()
 export class PublicCandlesService implements OnModuleInit, OnModuleDestroy {
@@ -14,17 +15,19 @@ export class PublicCandlesService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     @Inject(CANDLE_STREAM) private readonly candleStream: CandleStream,
+    private readonly candleFeed: MarketCandleFeedService,
   ) {}
 
   onModuleInit(): void {
-    this.candleStream.start((candle) => this.logCandle(candle));
+    this.candleStream.start((candle) => this.handleCandle(candle));
   }
 
   onModuleDestroy(): void {
     this.candleStream.stop();
   }
 
-  private logCandle(candle: MarketCandle): void {
+  private handleCandle(candle: MarketCandle): void {
+    this.candleFeed.publish(candle);
     this.logger.log({
       event: 'market.candle.received',
       provider: candle.provider,

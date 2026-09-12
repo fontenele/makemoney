@@ -1,3 +1,7 @@
+export const MOVING_AVERAGE_CROSSOVER_STRATEGY = Symbol(
+  'MOVING_AVERAGE_CROSSOVER_STRATEGY',
+);
+
 export type StrategyAction = 'buy' | 'sell' | 'hold';
 
 export interface StrategyCandle {
