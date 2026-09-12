@@ -104,6 +104,14 @@ This preserves immutable execution history as the accounting source of truth and
 
 The application Risk Engine still performs the explainable early check. The repository repeats only the invariant needed at the mutation boundary, following the same defense-in-depth split used by M4.4.
 
+## M4.7 append-only emergency-stop control
+
+Emergency-stop persistence uses events rather than one mutable row. This preserves an audit trail naturally and makes idempotency explicit through the event's caller-supplied primary key. The most recent database timestamp and ID determine current state.
+
+The application loads that state into memory during module initialization so the existing synchronous Risk Engine contract remains small and deterministic. A control change updates memory only after database persistence succeeds. Persisted state overrides the configuration fallback, including an explicit persisted deactivation after a configuration-based initial stop.
+
+The first control API is intentionally local and paper-only. It requires a reason and idempotency key but adds no remote authentication or claim that this single control is sufficient for real trading.
+
 ## M1.1 raw trade stream
 
 M1.1 uses the Binance Spot raw stream `wss://stream.binance.com:9443/ws/btcusdt@trade`, as documented by the official Binance WebSocket Market Streams reference on 2026-09-11. It requires no authentication.

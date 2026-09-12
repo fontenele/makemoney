@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config';
+import { EmergencyStopService } from './emergency-stop.service';
 import { RiskAssessmentService } from './risk-assessment.service';
 
 describe('RiskAssessmentService', () => {
@@ -149,12 +150,14 @@ function service(
   positionLimit: string,
   dailyLossLimit = '25',
 ): RiskAssessmentService {
-  return new RiskAssessmentService({
-    getOrThrow: (key: string) => {
-      if (key === 'RISK_EMERGENCY_STOP') return emergencyStop;
-      if (key === 'RISK_MAX_BTC_POSITION_QUANTITY') return positionLimit;
-      if (key === 'RISK_MAX_DAILY_REALIZED_LOSS_USDT') return dailyLossLimit;
-      return limit;
-    },
-  } as unknown as ConfigService);
+  return new RiskAssessmentService(
+    {
+      getOrThrow: (key: string) => {
+        if (key === 'RISK_MAX_BTC_POSITION_QUANTITY') return positionLimit;
+        if (key === 'RISK_MAX_DAILY_REALIZED_LOSS_USDT') return dailyLossLimit;
+        return limit;
+      },
+    } as unknown as ConfigService,
+    { isActive: () => emergencyStop } as EmergencyStopService,
+  );
 }

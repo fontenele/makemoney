@@ -53,3 +53,13 @@ After acquiring the lock, a buy reloads the complete chronological execution his
 The provider-neutral Risk Engine remains the first assessment boundary and idempotent replays remain outside new financial effects. A database-backed concurrency test holds the advisory lock, queues a losing sell before a buy, then verifies the sell commits and the buy is rejected without mutation.
 
 The lock is intentionally process-independent but global to the current paper-execution workload. Per-portfolio locking, persistent operator controls, unrealized-loss/drawdown rules, stop-loss behavior, strategies, authenticated providers, and real trading remain deferred.
+
+## M4.7 persistent local emergency-stop control
+
+Emergency-stop changes are stored as immutable `risk_control_events`. Each event contains a caller-supplied idempotency key, the active state, a required operational reason, and a database timestamp. The latest event by timestamp and ID is loaded on startup and takes precedence over `RISK_EMERGENCY_STOP`; configuration is used only when no persisted event exists.
+
+`GET /risk/emergency-stop` returns the current state and its source. `PUT /risk/emergency-stop` requires an `Idempotency-Key` header plus `{ "active": boolean, "reason": string }`. Repeating the same key and payload returns the original event with `replayed: true`; reusing the key for a different change returns HTTP 409. Invalid keys or bodies return HTTP 400.
+
+The in-memory state gives the synchronous Risk Engine an immediately available highest-precedence decision after persistence succeeds. Activating the stop rejects all new paper buys and sells before candidate validation or financial mutation. Existing execution replays remain available.
+
+These endpoints control only the local paper executor. They do not provide remote authentication, authorization, real-trading safeguards, an order endpoint, or a dashboard.

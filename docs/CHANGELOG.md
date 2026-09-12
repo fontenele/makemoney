@@ -2,6 +2,20 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — M4.7 persistent emergency-stop control completed
+
+### Added
+
+- Append-only `risk_control_events` migration and Prisma model.
+- Restart-safe emergency-stop state with configuration fallback when no event exists.
+- Local `GET /risk/emergency-stop` and idempotent `PUT /risk/emergency-stop` endpoints.
+- Required operational reasons, structured state/change logs, replay responses, and conflict detection for reused keys with different payloads.
+- Unit and database-backed E2E coverage for fallback, reload, activation, deactivation, idempotency, conflict, precedence, and rejection without financial mutation.
+
+### Scope confirmation
+
+- The control is local and paper-only. No remote authentication, order endpoint, dashboard, strategy, authenticated market integration, or real trading was introduced.
+
 ## 2026-09-12 — M4.6 atomic daily-loss enforcement completed
 
 ### Added

@@ -26,6 +26,7 @@ import {
 } from '../src/modules/paper-trading/domain/paper-execution-repository';
 import { PaperMarketBuyQuote } from '../src/modules/paper-trading/domain/paper-market-buy-quote';
 import { PaperMarketSellQuote } from '../src/modules/paper-trading/domain/paper-market-sell-quote';
+import { EmergencyStopService } from '../src/modules/risk-engine/application/emergency-stop.service';
 
 describe('Application (e2e)', () => {
   let app: INestApplication;
@@ -59,6 +60,95 @@ describe('Application (e2e)', () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
 
     return request(server).get('/health').expect(200);
+  });
+
+  it('persists and idempotently controls the paper emergency stop', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const emergencyStop = app.get(EmergencyStopService);
+    const executor = app.get(PaperTradingExecutor);
+    const wallet = app.get(PaperWalletService);
+    const prisma = app.get(PrismaService);
+    const suffix = Date.now();
+    const activateId = `e2e-stop-on-${suffix}`;
+    const disableId = `e2e-stop-off-${suffix}`;
+    const rejectedOrderId = `e2e-stop-order-${suffix}`;
+    const before = await wallet.getBalances();
+
+    try {
+      await request(server)
+        .put('/risk/emergency-stop')
+        .set('Idempotency-Key', activateId)
+        .send({ active: true, reason: 'e2e safety review' })
+        .expect(200)
+        .expect((response) => {
+          expect(response.body).toMatchObject({
+            active: true,
+            source: 'persisted',
+            changeId: activateId,
+            reason: 'e2e safety review',
+            replayed: false,
+          });
+        });
+      await request(server)
+        .put('/risk/emergency-stop')
+        .set('Idempotency-Key', activateId)
+        .send({ active: true, reason: 'e2e safety review' })
+        .expect(200)
+        .expect((response) => {
+          expect(response.body.replayed).toBe(true);
+        });
+      await request(server)
+        .put('/risk/emergency-stop')
+        .set('Idempotency-Key', activateId)
+        .send({ active: false, reason: 'different change' })
+        .expect(409);
+
+      await emergencyStop.onModuleInit();
+      await request(server)
+        .get('/risk/emergency-stop')
+        .expect(200)
+        .expect((response) => {
+          expect(response.body).toMatchObject({
+            active: true,
+            source: 'persisted',
+            changeId: activateId,
+            replayed: false,
+          });
+        });
+
+      preparePaperMarket(app);
+      await expect(
+        executor.execute({
+          idempotencyKey: rejectedOrderId,
+          symbol: 'BTC/USDT',
+          side: 'buy',
+          quantity: '0.0001',
+        }),
+      ).rejects.toThrow('emergency_stop_active');
+      await expect(wallet.getBalances()).resolves.toEqual(before);
+      await expect(
+        prisma.paperExecution.findUnique({ where: { id: rejectedOrderId } }),
+      ).resolves.toBeNull();
+
+      await request(server)
+        .put('/risk/emergency-stop')
+        .set('Idempotency-Key', disableId)
+        .send({ active: false, reason: 'e2e cleanup' })
+        .expect(200)
+        .expect((response) => {
+          expect(response.body.active).toBe(false);
+        });
+    } finally {
+      if (emergencyStop.isActive()) {
+        await emergencyStop.change(disableId, false, 'e2e cleanup');
+      }
+      await prisma.riskControlEvent.deleteMany({
+        where: { id: { in: [activateId, disableId] } },
+      });
+      await prisma.paperExecution.deleteMany({
+        where: { id: rejectedOrderId },
+      });
+    }
   });
 
   it('/paper-wallet/balances (GET)', () => {
@@ -219,10 +309,12 @@ describe('Application (e2e)', () => {
     const executor = app.get(PaperTradingExecutor);
     const wallet = app.get(PaperWalletService);
     const prisma = app.get(PrismaService);
-    const config = app.get(ConfigService);
+    const emergencyStop = app.get(EmergencyStopService);
     const idempotencyKey = `e2e-emergency-stop-${Date.now()}`;
+    const activateId = `${idempotencyKey}-on`;
+    const disableId = `${idempotencyKey}-off`;
     const before = await wallet.getBalances();
-    config.set('RISK_EMERGENCY_STOP', true);
+    await emergencyStop.change(activateId, true, 'e2e rejection check');
 
     try {
       await expect(
@@ -238,7 +330,10 @@ describe('Application (e2e)', () => {
         prisma.paperExecution.findUnique({ where: { id: idempotencyKey } }),
       ).resolves.toBeNull();
     } finally {
-      config.set('RISK_EMERGENCY_STOP', false);
+      await emergencyStop.change(disableId, false, 'e2e cleanup');
+      await prisma.riskControlEvent.deleteMany({
+        where: { id: { in: [activateId, disableId] } },
+      });
     }
   });
 

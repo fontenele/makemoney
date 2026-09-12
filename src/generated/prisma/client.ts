@@ -49,3 +49,8 @@ export type PaperBalance = Prisma.PaperBalanceModel
  * 
  */
 export type PaperExecution = Prisma.PaperExecutionModel
+/**
+ * Model RiskControlEvent
+ * 
+ */
+export type RiskControlEvent = Prisma.RiskControlEventModel

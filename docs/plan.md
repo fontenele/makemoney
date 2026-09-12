@@ -32,6 +32,7 @@ M4.3 BTC Position Limit: DONE
 M4.4 Atomic Exposure:    DONE
 M4.5 Daily Loss Limit:   DONE
 M4.6 Atomic Daily Loss:  DONE
+M4.7 Persistent Stop:    DONE
 Next increment:           NOT APPROVED
 ```
 
@@ -1674,7 +1675,7 @@ M0 — Bootstrap                    DONE
 M1 — Market Data                  DONE
 M2 — Paper Wallet                 DONE (M2.1–M2.5)
 M3 — Paper Trading                DONE (M3.1–M3.8)
-M4 — Risk Engine                  IN PROGRESS (M4.1–M4.6 DONE)
+M4 — Risk Engine                  IN PROGRESS (M4.1–M4.7 DONE)
 M5 — Strategies                   PLANNED
 M6 — Backtesting                  PLANNED
 M7 — New Listing Scanner          PLANNED
@@ -2203,6 +2204,7 @@ M4.3 BTC Position Limit: DONE
 M4.4 Atomic Exposure:  DONE
 M4.5 Daily Loss Limit: DONE
 M4.6 Atomic Daily Loss: DONE
+M4.7 Persistent Stop: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS

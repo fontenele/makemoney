@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, **M3 — Paper Trading (M3.1 through M3.8)**, and **M4.1–M4.6 — maximum-order-notional, emergency-stop, cumulative BTC-position, atomic exposure, daily realized-loss, and atomic daily-loss enforcement**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data (M1.1 through M1.8)**, **M2 — Paper Wallet (M2.1 through M2.5)**, **M3 — Paper Trading (M3.1 through M3.8)**, and **M4.1–M4.7 — maximum-order-notional, emergency-stop, cumulative BTC-position, atomic exposure, daily realized-loss, atomic daily-loss, and persistent emergency-stop control**.
 - No next increment is approved. Stop and present a minimal plan before starting more wallet or trading work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -51,6 +51,8 @@ M4.4 enforces the same BTC position limit again in the PostgreSQL balance update
 M4.5 derives the current UTC day's net realized PnL from the complete execution history and rejects new paper buys once the configured realized-loss limit is reached. Sells and idempotent replays remain available.
 
 M4.6 serializes paper buy and sell transactions with a PostgreSQL advisory lock and repeats the daily realized-loss check inside the buy transaction, closing the concurrent sell/buy snapshot gap without a schema change.
+
+M4.7 persists idempotent, append-only emergency-stop changes and exposes local status/control endpoints. The latest event survives restarts and takes precedence over the configuration fallback.
 
 Historical market data, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, strategies, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

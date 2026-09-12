@@ -4,7 +4,7 @@ Last validated: 2026-09-12
 
 ## Milestone status
 
-M0 through M3 are complete and M4.1–M4.6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution maximum-notional, emergency-stop, cumulative BTC-position, atomic exposure, daily realized-loss, and transaction-level daily-loss protections. No dashboard, order mutation endpoint, strategy, authenticated integration, or real order execution exists.
+M0 through M3 are complete and M4.1–M4.7 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal buy/sell quoting, idempotent paper execution, read-only history, position valuation, and realized performance measurement. M4 adds independent pre-execution limits, atomic exposure/daily-loss enforcement, and persistent emergency-stop control. No dashboard, order mutation endpoint, strategy, authenticated integration, or real order execution exists.
 
 ## Implemented application
 
@@ -62,6 +62,8 @@ M0 through M3 are complete and M4.1–M4.6 are complete. M1 provides unauthentic
 - `RISK_MAX_DAILY_REALIZED_LOSS_USDT` defaults to `25`; new buys are rejected once net realized PnL from current-UTC-day sells reaches or exceeds that loss, while sells and idempotent replays remain available.
 - Daily realized PnL replays the full chronological execution history for correct fee-inclusive cost basis and uses exact decimal arithmetic; profitable sells offset losing sells within the day.
 - Paper buy and sell transactions share a PostgreSQL advisory lock; each buy repeats the daily-loss calculation inside the serialized transaction before any persistence or balance mutation.
+- Append-only emergency-stop events persist active state, reason, idempotency key, and change time; the latest event is restored at startup and overrides the configuration fallback.
+- Local `GET /risk/emergency-stop` and `PUT /risk/emergency-stop` expose status and idempotent paper-only control, including HTTP 409 for conflicting key reuse.
 
 ## Local endpoints and ports
 
@@ -72,6 +74,7 @@ M0 through M3 are complete and M4.1–M4.6 are complete. M1 provides unauthentic
 - Paper execution history: `http://localhost:3000/paper-trading/executions`
 - Paper position: `http://localhost:3000/paper-trading/position`
 - Paper performance: `http://localhost:3000/paper-trading/performance`
+- Emergency-stop status/control: `http://localhost:3000/risk/emergency-stop`
 - PostgreSQL host port: `5433` mapped to container port `5432`
 - Redis host port: `6379`
 
@@ -79,13 +82,13 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-12 after M4.6:
+The following passed on 2026-09-12 after M4.7:
 
 - `npm run build`
 - `npm run lint`
-- `npm test -- --runInBand` — 160 tests passed across 27 suites
-- `npm run test:e2e -- --runInBand` — 19 tests passed, including serialized sell/buy daily-loss enforcement and the prior daily-loss, history, performance, valuation, insufficient-funds, and concurrent-exposure scenarios
-- `npx prisma migrate deploy` — paper-sell execution migration applied successfully
+- `npm test -- --runInBand` — 169 tests passed across 29 suites
+- `npm run test:e2e -- --runInBand` — 20 tests passed, including persistent/idempotent emergency-stop control and the prior risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
+- `npx prisma migrate deploy` — all four migrations applied, including `risk_control_events`
 - `docker compose config --quiet`
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
@@ -96,7 +99,7 @@ The following passed on 2026-09-12 after M4.6:
 
 ## Repository state
 
-M0 through M4.5 are committed. M4.6 changes are currently in the working tree.
+M0 through M4.6 are committed. M4.7 changes are currently in the working tree.
 
 ## Known issues and cautions
 

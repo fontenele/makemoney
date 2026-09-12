@@ -52,7 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   PaperBalance: 'PaperBalance',
-  PaperExecution: 'PaperExecution'
+  PaperExecution: 'PaperExecution',
+  RiskControlEvent: 'RiskControlEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -97,6 +98,17 @@ export const PaperExecutionScalarFieldEnum = {
 } as const
 
 export type PaperExecutionScalarFieldEnum = (typeof PaperExecutionScalarFieldEnum)[keyof typeof PaperExecutionScalarFieldEnum]
+
+
+export const RiskControlEventScalarFieldEnum = {
+  id: 'id',
+  control: 'control',
+  active: 'active',
+  reason: 'reason',
+  changedAt: 'changedAt'
+} as const
+
+export type RiskControlEventScalarFieldEnum = (typeof RiskControlEventScalarFieldEnum)[keyof typeof RiskControlEventScalarFieldEnum]
 
 
 export const SortOrder = {

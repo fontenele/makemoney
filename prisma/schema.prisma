@@ -32,3 +32,14 @@ model PaperExecution {
 
   @@map("paper_executions")
 }
+
+model RiskControlEvent {
+  id        String   @id @db.VarChar(100)
+  control   String   @db.VarChar(50)
+  active    Boolean
+  reason    String   @db.VarChar(200)
+  changedAt DateTime @default(now()) @map("changed_at")
+
+  @@index([control, changedAt, id])
+  @@map("risk_control_events")
+}

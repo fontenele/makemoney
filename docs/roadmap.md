@@ -50,7 +50,8 @@ All strategy signals pass through independent risk assessment before any executo
 - **M4.4 — complete:** transaction-level enforcement of the BTC position limit so concurrent paper buys cannot collectively exceed it.
 - **M4.5 — complete:** configurable daily realized-loss limit that blocks new paper buys at or beyond the threshold using net sell PnL for the current UTC day.
 - **M4.6 — complete:** transaction-level daily-loss enforcement that serializes paper executions and recalculates realized PnL before a buy can mutate balances.
-- Later M4 rules require separate approval for liquidity, persistent/operator-controlled stop state, and other safeguards.
+- **M4.7 — complete:** append-only persisted emergency-stop control with local read/write endpoints, idempotent changes, reasons, and restart-safe state.
+- Later M4 rules require separate approval for liquidity, authenticated operator control, and other safeguards.
 
 ## M5 — Strategies — planned
 

@@ -398,7 +398,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   PaperBalance: 'PaperBalance',
-  PaperExecution: 'PaperExecution'
+  PaperExecution: 'PaperExecution',
+  RiskControlEvent: 'RiskControlEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -414,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -566,6 +567,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RiskControlEvent: {
+      payload: Prisma.$RiskControlEventPayload<ExtArgs>
+      fields: Prisma.RiskControlEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RiskControlEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskControlEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RiskControlEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskControlEventPayload>
+        }
+        findFirst: {
+          args: Prisma.RiskControlEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskControlEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RiskControlEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskControlEventPayload>
+        }
+        findMany: {
+          args: Prisma.RiskControlEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskControlEventPayload>[]
+        }
+        create: {
+          args: Prisma.RiskControlEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskControlEventPayload>
+        }
+        createMany: {
+          args: Prisma.RiskControlEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RiskControlEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskControlEventPayload>[]
+        }
+        delete: {
+          args: Prisma.RiskControlEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskControlEventPayload>
+        }
+        update: {
+          args: Prisma.RiskControlEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskControlEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.RiskControlEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RiskControlEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RiskControlEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskControlEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.RiskControlEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskControlEventPayload>
+        }
+        aggregate: {
+          args: Prisma.RiskControlEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRiskControlEvent>
+        }
+        groupBy: {
+          args: Prisma.RiskControlEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RiskControlEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RiskControlEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RiskControlEventCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -631,6 +706,17 @@ export const PaperExecutionScalarFieldEnum = {
 } as const
 
 export type PaperExecutionScalarFieldEnum = (typeof PaperExecutionScalarFieldEnum)[keyof typeof PaperExecutionScalarFieldEnum]
+
+
+export const RiskControlEventScalarFieldEnum = {
+  id: 'id',
+  control: 'control',
+  active: 'active',
+  reason: 'reason',
+  changedAt: 'changedAt'
+} as const
+
+export type RiskControlEventScalarFieldEnum = (typeof RiskControlEventScalarFieldEnum)[keyof typeof RiskControlEventScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -702,6 +788,13 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -871,6 +964,7 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   paperBalance?: Prisma.PaperBalanceOmit
   paperExecution?: Prisma.PaperExecutionOmit
+  riskControlEvent?: Prisma.RiskControlEventOmit
 }
 
 /* Types for Logging */

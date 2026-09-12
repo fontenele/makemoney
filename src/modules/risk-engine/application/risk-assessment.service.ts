@@ -6,6 +6,7 @@ import {
   RiskEngine,
   RiskOrderCandidate,
 } from '../domain/risk-engine';
+import { EmergencyStopService } from './emergency-stop.service';
 
 const RiskDecimal = Decimal.clone({
   precision: 40,
@@ -19,10 +20,13 @@ const DECIMAL_PATTERN = /^(0|[1-9]\d{0,19})(\.\d{1,18})?$/;
 export class RiskAssessmentService implements RiskEngine {
   private readonly logger = new Logger(RiskAssessmentService.name);
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(
+    private readonly config: ConfigService,
+    private readonly emergencyStop: EmergencyStopService,
+  ) {}
 
   assess(candidate: RiskOrderCandidate): RiskAssessment {
-    if (this.config.getOrThrow<boolean>('RISK_EMERGENCY_STOP')) {
+    if (this.emergencyStop.isActive()) {
       const assessment: RiskAssessment = {
         decision: 'rejected',
         rule: 'emergency_stop',
