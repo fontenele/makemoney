@@ -14,6 +14,7 @@ import { HistoricalCandle } from '../domain/historical-candle';
 import { BacktestPerformanceCalculator } from './backtest-performance-calculator';
 import { BacktestEndingValuationCalculator } from './backtest-ending-valuation-calculator';
 import { BacktestEquityCalculator } from './backtest-equity-calculator';
+import { BacktestTimeMetricsCalculator } from './backtest-time-metrics-calculator';
 
 const SimulationDecimal = Decimal.clone({
   precision: 40,
@@ -29,6 +30,7 @@ export class BacktestTradeSimulator {
     private readonly performanceCalculator: BacktestPerformanceCalculator,
     private readonly endingValuationCalculator: BacktestEndingValuationCalculator,
     private readonly equityCalculator: BacktestEquityCalculator,
+    private readonly timeMetricsCalculator: BacktestTimeMetricsCalculator,
   ) {}
 
   simulate(
@@ -144,6 +146,11 @@ export class BacktestTradeSimulator {
         totalRoi: totalNetReturn.dividedBy(initialCapital).toFixed(),
       },
       equity,
+      timeMetrics: this.timeMetricsCalculator.calculate(
+        candles,
+        closedTrades,
+        openPosition,
+      ),
       fills,
       closedTrades,
       performance: this.performanceCalculator.calculate(

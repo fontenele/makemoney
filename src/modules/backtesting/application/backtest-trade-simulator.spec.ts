@@ -8,12 +8,14 @@ import { BacktestPerformanceCalculator } from './backtest-performance-calculator
 import { BacktestEndingValuationCalculator } from './backtest-ending-valuation-calculator';
 import { BacktestRealizedDrawdownCalculator } from './backtest-realized-drawdown-calculator';
 import { BacktestEquityCalculator } from './backtest-equity-calculator';
+import { BacktestTimeMetricsCalculator } from './backtest-time-metrics-calculator';
 
 describe('BacktestTradeSimulator', () => {
   const simulator = new BacktestTradeSimulator(
     new BacktestPerformanceCalculator(new BacktestRealizedDrawdownCalculator()),
     new BacktestEndingValuationCalculator(),
     new BacktestEquityCalculator(),
+    new BacktestTimeMetricsCalculator(),
   );
 
   it('fills signals only at the following candle open and includes fees', () => {
@@ -101,6 +103,18 @@ describe('BacktestTradeSimulator', () => {
     expect(result.equity.curve.at(-1)?.equityUsdt).toBe(
       result.capital.finalEquityUsdt,
     );
+    expect(result.timeMetrics).toMatchObject({
+      periodDurationMs: 179_999,
+      timeInMarketMs: 60_000,
+      closedTradeHoldingDurations: [
+        {
+          enteredAt: candles[1]?.openTime,
+          exitedAt: candles[2]?.openTime,
+          durationMs: 60_000,
+        },
+      ],
+      averageClosedTradeHoldingDurationMs: '60000',
+    });
   });
 
   it('keeps a final open position explicit', () => {
@@ -146,6 +160,11 @@ describe('BacktestTradeSimulator', () => {
     expect(result.equity.curve.at(-1)?.equityUsdt).toBe(
       result.capital.finalEquityUsdt,
     );
+    expect(result.timeMetrics).toMatchObject({
+      periodDurationMs: 119_999,
+      timeInMarketMs: 59_999,
+      averageClosedTradeHoldingDurationMs: null,
+    });
   });
 
   it('ignores buys while long and sells while flat', () => {

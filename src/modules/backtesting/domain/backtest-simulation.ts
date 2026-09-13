@@ -2,6 +2,7 @@ import { BacktestResult } from './backtest';
 import { BacktestPerformance } from './backtest-performance';
 import { BacktestEndingValuation } from './backtest-valuation';
 import { BacktestEquityResult } from './backtest-equity';
+import { BacktestTimeMetrics } from './backtest-time-metrics';
 
 interface BacktestFillBase {
   side: 'buy' | 'sell';
@@ -65,6 +66,7 @@ export interface BacktestSimulationResult {
   slippageRate: string;
   capital: BacktestCapitalResult;
   equity: BacktestEquityResult;
+  timeMetrics: BacktestTimeMetrics;
   fills: BacktestFill[];
   closedTrades: BacktestClosedTrade[];
   performance: BacktestPerformance;

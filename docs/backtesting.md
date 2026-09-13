@@ -143,8 +143,20 @@ M6.11 makes the next-candle-open execution assumption more conservative through 
 - Zero spread and slippage preserve the preceding execution behavior.
 - All arithmetic uses precision-40 `decimal.js` and produces decimal strings.
 
+## M6.12 time and exposure metrics
+
+M6.12 derives deterministic time-based measurements from the historical period and the existing immutable trade ledger.
+
+- The tested period starts at the first candle open and ends at the final candle close.
+- Each closed trade records entry-to-exit holding duration in milliseconds.
+- Total time in market sums every closed holding interval and, when present, the ending open position from entry through the final candle close.
+- Exposure rate divides total time in market by tested-period duration using precision-40 decimal arithmetic.
+- Average closed-trade holding duration includes only closed trades and remains a decimal string so fractional averages are not rounded away.
+- Empty input exposes null period boundaries, zero durations, and null ratios. A zero-duration supplied period also has a null exposure rate.
+- The calculator rejects negative, unsafe, or collectively impossible time intervals.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, liquidity, minimum-order and precision rules, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, liquidity, minimum-order and precision rules, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.

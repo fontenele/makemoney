@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-13 — M6.12 time and exposure metrics completed
+
+### Added
+
+- Tested-period duration from the first historical candle open through the final candle close.
+- Per-closed-trade holding durations, total time in market, decimal exposure rate, and average closed-trade holding duration.
+- Ending open-position exposure measured through the final candle close and explicit null states for undefined ratios or absent samples.
+- Isolated temporal calculator with four focused tests for empty, closed, open, and invalid intervals, plus simulator integration assertions.
+- The full suite now contains 291 tests across 46 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No annualization, Sharpe or Sortino ratio, liquidity, pair-rule enforcement, variable sizing, route, persistence, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.11 deterministic spread and slippage completed
 
 ### Added

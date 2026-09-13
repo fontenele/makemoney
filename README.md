@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M5 and M6.1–M6.11 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical capital, fills, equity, statistics, and balances are fictional, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M5 and M6.1–M6.12 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical capital, fills, equity, statistics, and balances are fictional, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 

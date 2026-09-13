@@ -335,3 +335,9 @@ Absolute and percentage maxima are reported independently because changing equit
 The simulator accepts a full spread rate and a separate slippage rate instead of inferring either from historical OHLCV candles. Each side pays half the spread plus the full adverse slippage: buys execute above and sells below the next candle's opening reference price. Keeping both the reference and effective price in every fill makes the assumption auditable.
 
 The effective price remains the single source for notionals, fees, affordability, cash, PnL, ROI, and equity. This avoids a parallel cost deduction that could diverge from the ledger. Rates are explicit, deterministic decimal strings; combined impact must keep the sell price positive.
+
+## M6.12 ledger-derived temporal exposure
+
+Time metrics are derived from candle and fill timestamps rather than accumulated inside signal processing. The tested interval runs from the first candle open through the final candle close. Closed exposure runs from each entry fill to its corresponding exit fill, while an ending open position remains exposed through the tested-period end.
+
+Durations are exact safe integer milliseconds. Ratios and averages use precision-40 decimal arithmetic; undefined ratios and samples are represented as `null` instead of a misleading zero. This measurement does not introduce annualization, risk-adjusted return, or a new execution assumption.

@@ -99,6 +99,7 @@ function buyFill(candle: HistoricalCandle, price: string): BacktestBuyFill {
   return {
     side: 'buy',
     quantity: '1',
+    referencePrice: price,
     price,
     notional: price,
     feeRate: '0',
@@ -113,6 +114,7 @@ function sellFill(candle: HistoricalCandle, price: string): BacktestSellFill {
   return {
     side: 'sell',
     quantity: '1',
+    referencePrice: price,
     price,
     notional: price,
     feeRate: '0',
