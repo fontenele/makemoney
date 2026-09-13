@@ -5,12 +5,14 @@ import {
   BacktestBuyFill,
   BacktestClosedTrade,
   BacktestFill,
+  BacktestOpenPosition,
   BacktestSellFill,
   BacktestSimulationConfiguration,
   BacktestSimulationResult,
 } from '../domain/backtest-simulation';
 import { HistoricalCandle } from '../domain/historical-candle';
 import { BacktestPerformanceCalculator } from './backtest-performance-calculator';
+import { BacktestEndingValuationCalculator } from './backtest-ending-valuation-calculator';
 
 const SimulationDecimal = Decimal.clone({
   precision: 40,
@@ -24,6 +26,7 @@ const DECIMAL_PATTERN = /^(?:0|[1-9]\d*)(?:\.\d+)?$/;
 export class BacktestTradeSimulator {
   constructor(
     private readonly performanceCalculator: BacktestPerformanceCalculator,
+    private readonly endingValuationCalculator: BacktestEndingValuationCalculator,
   ) {}
 
   simulate(
@@ -73,6 +76,14 @@ export class BacktestTradeSimulator {
     }
 
     const terminalSignal = signals.at(-1);
+    const openPosition: BacktestOpenPosition | null = entry
+      ? { entry, quantity: entry.quantity, costBasis: entry.totalCost }
+      : null;
+    const endingValuation = this.endingValuationCalculator.calculate(
+      openPosition,
+      candles.at(-1),
+      feeRate.toFixed(),
+    );
     return {
       symbol: 'BTC/USDT',
       executionModel: 'next_candle_open',
@@ -80,10 +91,13 @@ export class BacktestTradeSimulator {
       feeRate: feeRate.toFixed(),
       fills,
       closedTrades,
-      performance: this.performanceCalculator.calculate(fills, closedTrades),
-      openPosition: entry
-        ? { entry, quantity: entry.quantity, costBasis: entry.totalCost }
-        : null,
+      performance: this.performanceCalculator.calculate(
+        fills,
+        closedTrades,
+        endingValuation,
+      ),
+      openPosition,
+      endingValuation,
       ignoredBuySignalCount,
       ignoredSellSignalCount,
       unfilledTerminalSignalCount:

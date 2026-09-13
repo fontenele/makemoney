@@ -299,3 +299,9 @@ The first model is deliberately one fixed-quantity long position. It applies an 
 Backtest performance is derived from the simulator's immutable fill ledger and closed trades rather than being accumulated independently during signal handling. This keeps execution semantics as the source of truth and makes the summary reproducible.
 
 Win rate includes every closed trade in its denominator and is `null` when none exist. Gross loss is exposed as a positive magnitude, while realized net PnL retains its sign. Total fees include all fills, including an ending open entry, but no value or PnL is assigned to that open position without a separately approved mark-to-market rule.
+
+## M6.6 final-close valuation without synthetic execution
+
+An ending open position is marked using the final supplied candle's close, which is known at the backtest boundary and requires no external price lookup. The configured taker fee estimates liquidation cost, so unrealized PnL is net of both the actual simulated entry fee and the hypothetical exit fee.
+
+Valuation remains separate from execution: no sell fill or closed trade is invented. A flat ending state has a `null` valuation and unrealized PnL, while total net PnL remains equal to realized net PnL.

@@ -76,7 +76,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.3 — complete:** provider-neutral complete historical OHLCV candles with exact decimal preservation, coherent high/low validation, and explicit strategy-input projection while retaining execution-ready fields.
 - **M6.4 — complete:** deterministic historical-only long-position simulation with explicit fixed quantity and taker fee, next-candle-open hypothetical fills, an ordered ledger, per-trade net PnL, ignored-signal counts, and explicit open-position state.
 - **M6.5 — complete:** deterministic aggregate realized performance with fill and outcome counts, nullable win rate, gross profit, absolute gross loss, realized net PnL, and all simulated fill fees.
-- Later M6 increments require separate approval for historical-data persistence or pagination, mark-to-market valuation, variable sizing, spread, slippage, liquidity and pair-rule modeling, ROI, drawdown, profit factor, expectancy, optimization, or API exposure.
+- **M6.6 — complete:** deterministic final-close valuation of an ending open position with estimated exit fee, net liquidation value, unrealized net PnL, and combined total net PnL without a synthetic exit.
+- Later M6 increments require separate approval for historical-data persistence or pagination, intraperiod equity curves, variable sizing, spread, slippage, liquidity and pair-rule modeling, ROI, drawdown, profit factor, expectancy, optimization, or API exposure.
 
 ## M7 — New Listing Scanner — planned
 

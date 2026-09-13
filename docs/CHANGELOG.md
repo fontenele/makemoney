@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-13 — M6.6 ending open-position valuation completed
+
+### Added
+
+- Deterministic final-close valuation for an ending historical open position without creating a synthetic sell.
+- Mark time and price, gross market value, estimated exit fee, net liquidation value, and unrealized net PnL.
+- Combined total net PnL across realized and unrealized results, with explicit nullable unrealized state when flat.
+- Precision-40 `decimal.js` coverage for profitable, losing, absent, and arbitrary-precision ending valuations.
+- Four focused tests plus simulator integration coverage; the full suite now contains 271 tests across 43 suites.
+- Synchronized backtesting documentation, project context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No synthetic exit, intraperiod equity curve, ROI, drawdown, profit factor, expectancy, route, persistence, spread, slippage, liquidity model, pair-rule enforcement, variable sizing, wallet access, order execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.5 aggregate realized performance completed
 
 ### Added

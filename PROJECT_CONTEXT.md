@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.5 — deterministic replay, historical long-only simulation, and realized performance metrics**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.6 — deterministic replay, historical long-only simulation, and ending performance valuation**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -83,6 +83,8 @@ M6.3 preserves the complete provider-neutral historical OHLCV candle, including 
 M6.4 separately consumes replayed signals and complete candles to create research-only hypothetical fills at the following candle's open. It models one fixed-quantity long position, explicit taker fees, fee-inclusive entry cost, net exit proceeds, and net PnL per closed trade with exact decimal arithmetic. It exposes ignored redundant signals, terminal signals without a future candle, and an open ending position. It creates no order and cannot reach a wallet, executor, operational Risk Engine, or exchange account.
 
 M6.5 derives aggregate realized performance directly from the M6.4 ledger and closed trades. It reports fill and outcome counts, nullable realized win rate, gross profit, absolute gross loss, realized net PnL, and all simulated fill fees, including the entry fee of an ending open position. It deliberately excludes unrealized valuation and mark-to-market assumptions.
+
+M6.6 values an ending open position at the final historical candle close without creating a synthetic sell. It estimates the exit fee and exposes gross market value, net liquidation value, unrealized net PnL, and total net PnL with exact decimal arithmetic. A simulation ending flat has no ending valuation.
 
 Historical market data, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

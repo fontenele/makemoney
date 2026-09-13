@@ -5,6 +5,7 @@ import {
   BacktestClosedTrade,
   BacktestFill,
 } from '../domain/backtest-simulation';
+import { BacktestEndingValuation } from '../domain/backtest-valuation';
 
 const PerformanceDecimal = Decimal.clone({
   precision: 40,
@@ -18,6 +19,7 @@ export class BacktestPerformanceCalculator {
   calculate(
     fills: readonly BacktestFill[],
     closedTrades: readonly BacktestClosedTrade[],
+    endingValuation: BacktestEndingValuation | null = null,
   ): BacktestPerformance {
     let profitableTradeCount = 0;
     let losingTradeCount = 0;
@@ -61,6 +63,10 @@ export class BacktestPerformanceCalculator {
       grossProfit: grossProfit.toFixed(),
       grossLoss: grossLoss.toFixed(),
       realizedNetPnl: realizedNetPnl.toFixed(),
+      unrealizedNetPnl: endingValuation?.unrealizedNetPnl ?? null,
+      totalNetPnl: realizedNetPnl
+        .plus(endingValuation?.unrealizedNetPnl ?? 0)
+        .toFixed(),
       totalFees: totalFees.toFixed(),
     };
   }

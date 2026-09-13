@@ -19,6 +19,8 @@ describe('BacktestPerformanceCalculator', () => {
       grossProfit: '0',
       grossLoss: '0',
       realizedNetPnl: '0',
+      unrealizedNetPnl: null,
+      totalNetPnl: '0',
       totalFees: '0',
     });
   });
@@ -42,6 +44,8 @@ describe('BacktestPerformanceCalculator', () => {
       grossProfit: '4.25',
       grossLoss: '1.5',
       realizedNetPnl: '2.75',
+      unrealizedNetPnl: null,
+      totalNetPnl: '2.75',
       totalFees: '0.3',
     });
   });

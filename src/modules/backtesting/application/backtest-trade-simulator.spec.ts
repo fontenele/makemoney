@@ -5,10 +5,12 @@ import {
 import { HistoricalCandle } from '../domain/historical-candle';
 import { BacktestTradeSimulator } from './backtest-trade-simulator';
 import { BacktestPerformanceCalculator } from './backtest-performance-calculator';
+import { BacktestEndingValuationCalculator } from './backtest-ending-valuation-calculator';
 
 describe('BacktestTradeSimulator', () => {
   const simulator = new BacktestTradeSimulator(
     new BacktestPerformanceCalculator(),
+    new BacktestEndingValuationCalculator(),
   );
 
   it('fills signals only at the following candle open and includes fees', () => {
@@ -54,6 +56,8 @@ describe('BacktestTradeSimulator', () => {
       grossProfit: '3.85',
       grossLoss: '0',
       realizedNetPnl: '3.85',
+      unrealizedNetPnl: null,
+      totalNetPnl: '3.85',
       totalFees: '1.15',
     });
     expect(result.openPosition).toBeNull();
@@ -72,6 +76,19 @@ describe('BacktestTradeSimulator', () => {
       costBasis: '10.1101',
     });
     expect(result.closedTrades).toEqual([]);
+    expect(result.endingValuation).toEqual({
+      markedAt: candles[1]?.closeTime,
+      markPrice: '101',
+      grossMarketValue: '10.1',
+      estimatedExitFee: '0.0101',
+      netLiquidationValue: '10.0899',
+      unrealizedNetPnl: '-0.0202',
+    });
+    expect(result.performance).toMatchObject({
+      realizedNetPnl: '0',
+      unrealizedNetPnl: '-0.0202',
+      totalNetPnl: '-0.0202',
+    });
   });
 
   it('ignores buys while long and sells while flat', () => {

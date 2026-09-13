@@ -50,6 +50,7 @@ M6.2 Historical Candles:   DONE
 M6.3 Complete OHLCV Model: DONE
 M6.4 Long-only Simulation: DONE
 M6.5 Realized Performance: DONE
+M6.6 Ending Valuation:     DONE
 Next increment:           NOT APPROVED
 ```
 
@@ -1694,7 +1695,7 @@ M2 — Paper Wallet                 DONE (M2.1–M2.5)
 M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
-M6 — Backtesting                  IN PROGRESS (M6.1–M6.5 DONE)
+M6 — Backtesting                  IN PROGRESS (M6.1–M6.6 DONE)
 M7 — New Listing Scanner          PLANNED
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
@@ -2239,6 +2240,7 @@ M6.2 Historical Candles: DONE
 M6.3 Complete OHLCV Model: DONE
 M6.4 Long-only Simulation: DONE
 M6.5 Realized Performance: DONE
+M6.6 Ending Valuation: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2257,6 +2259,6 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-No next increment approved after M6.5.
+No next increment approved after M6.6.
 Stop and present a minimal plan before further backtesting implementation.
 ```

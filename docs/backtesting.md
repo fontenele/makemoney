@@ -68,8 +68,21 @@ M6.5 adds a deterministic performance summary derived only from the M6.4 fill le
 
 The performance block does not value an open position and therefore does not imply unrealized PnL, equity, or return.
 
+## M6.6 ending open-position valuation
+
+M6.6 marks an ending open position at the close price and close time of the final supplied historical candle. The position remains open; valuation never appends a synthetic sell fill or closed trade.
+
+- Gross market value is final close price multiplied by position quantity.
+- Estimated exit fee applies the configured taker fee rate to gross market value.
+- Net liquidation value is gross market value less the estimated exit fee.
+- Unrealized net PnL is net liquidation value less the fee-inclusive entry cost basis.
+- Total net PnL combines realized and unrealized net PnL; when the simulation ends flat, unrealized net PnL and ending valuation are `null`, while total net PnL equals realized net PnL.
+- Every calculation uses precision-40 `decimal.js` and produces decimal strings.
+
+This is a deterministic end-of-period research valuation based only on supplied historical data. It does not query a current external price.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Mark-to-market valuation, spread, slippage, liquidity, minimum-order and precision rules, variable sizing, Risk Engine modeling, ROI, drawdown, profit factor, expectancy, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
+Intraperiod equity curves, spread, slippage, liquidity, minimum-order and precision rules, variable sizing, Risk Engine modeling, ROI, drawdown, profit factor, expectancy, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.

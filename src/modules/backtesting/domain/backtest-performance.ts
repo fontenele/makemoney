@@ -8,5 +8,7 @@ export interface BacktestPerformance {
   grossProfit: string;
   grossLoss: string;
   realizedNetPnl: string;
+  unrealizedNetPnl: string | null;
+  totalNetPnl: string;
   totalFees: string;
 }

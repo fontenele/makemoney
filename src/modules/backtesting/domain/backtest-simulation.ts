@@ -1,5 +1,6 @@
 import { BacktestResult } from './backtest';
 import { BacktestPerformance } from './backtest-performance';
+import { BacktestEndingValuation } from './backtest-valuation';
 
 interface BacktestFillBase {
   side: 'buy' | 'sell';
@@ -50,6 +51,7 @@ export interface BacktestSimulationResult {
   closedTrades: BacktestClosedTrade[];
   performance: BacktestPerformance;
   openPosition: BacktestOpenPosition | null;
+  endingValuation: BacktestEndingValuation | null;
   ignoredBuySignalCount: number;
   ignoredSellSignalCount: number;
   unfilledTerminalSignalCount: number;
