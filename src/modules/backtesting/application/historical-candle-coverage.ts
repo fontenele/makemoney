@@ -6,23 +6,32 @@ const ONE_MINUTE_MS = 60_000;
 
 @Injectable()
 export class HistoricalCandleCoverage {
-  isComplete(
-    request: HistoricalCandleRequest,
-    candles: readonly HistoricalCandle[],
-  ): boolean {
+  expectedOpenTimes(request: HistoricalCandleRequest): number[] {
     const firstOpenTime =
       Math.ceil(request.startTime.getTime() / ONE_MINUTE_MS) * ONE_MINUTE_MS;
     const endTime = request.endTime.getTime();
 
     if (firstOpenTime > endTime) {
-      return candles.length === 0;
+      return [];
     }
 
     const availableSlots =
       Math.floor((endTime - firstOpenTime) / ONE_MINUTE_MS) + 1;
     const expectedCount = Math.min(availableSlots, request.limit);
 
-    if (candles.length !== expectedCount) {
+    return Array.from(
+      { length: expectedCount },
+      (_, index) => firstOpenTime + index * ONE_MINUTE_MS,
+    );
+  }
+
+  isComplete(
+    request: HistoricalCandleRequest,
+    candles: readonly HistoricalCandle[],
+  ): boolean {
+    const expectedOpenTimes = this.expectedOpenTimes(request);
+
+    if (candles.length !== expectedOpenTimes.length) {
       return false;
     }
 
@@ -30,7 +39,7 @@ export class HistoricalCandleCoverage {
       (candle, index) =>
         candle.symbol === request.symbol &&
         candle.interval === request.interval &&
-        candle.openTime.getTime() === firstOpenTime + index * ONE_MINUTE_MS,
+        candle.openTime.getTime() === expectedOpenTimes[index],
     );
   }
 }

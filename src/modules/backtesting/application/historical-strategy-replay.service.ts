@@ -17,6 +17,13 @@ import {
 import { StrategyReplayService } from './strategy-replay.service';
 import { BacktestTradeSimulator } from './backtest-trade-simulator';
 import { HistoricalCandleCoverage } from './historical-candle-coverage';
+import { HistoricalCandleGapPlanner } from './historical-candle-gap-planner';
+
+export class IncompleteHistoricalCandleCoverageError extends Error {
+  constructor() {
+    super('Historical candle coverage remains incomplete after gap loading');
+  }
+}
 
 @Injectable()
 export class HistoricalStrategyReplayService {
@@ -28,6 +35,7 @@ export class HistoricalStrategyReplayService {
     @Inject(HISTORICAL_CANDLE_REPOSITORY)
     private readonly candleRepository: HistoricalCandleRepository,
     private readonly candleCoverage: HistoricalCandleCoverage,
+    private readonly gapPlanner: HistoricalCandleGapPlanner,
   ) {}
 
   async run(
@@ -98,8 +106,37 @@ export class HistoricalStrategyReplayService {
       return storedCandles;
     }
 
-    const candles = await this.candleProvider.load(request, signal);
-    await this.candleRepository.saveMany(candles);
+    const gaps = this.gapPlanner.plan(request, storedCandles);
+    const fetchedCandles: HistoricalCandle[] = [];
+    for (const gap of gaps) {
+      fetchedCandles.push(...(await this.candleProvider.load(gap, signal)));
+    }
+
+    const candles = this.mergeCandles(storedCandles, fetchedCandles);
+    if (!this.candleCoverage.isComplete(request, candles)) {
+      throw new IncompleteHistoricalCandleCoverageError();
+    }
+
+    await this.candleRepository.saveMany(fetchedCandles);
     return candles;
+  }
+
+  private mergeCandles(
+    storedCandles: readonly HistoricalCandle[],
+    fetchedCandles: readonly HistoricalCandle[],
+  ): HistoricalCandle[] {
+    const candlesByOpenTime = new Map<number, HistoricalCandle>();
+    for (const candle of [...storedCandles, ...fetchedCandles]) {
+      const openTime = candle.openTime.getTime();
+      if (candlesByOpenTime.has(openTime)) {
+        throw new Error(
+          'Historical candle sources contain duplicate identities',
+        );
+      }
+      candlesByOpenTime.set(openTime, candle);
+    }
+    return [...candlesByOpenTime.values()].sort(
+      (left, right) => left.openTime.getTime() - right.openTime.getTime(),
+    );
   }
 }

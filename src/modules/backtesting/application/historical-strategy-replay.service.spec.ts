@@ -7,10 +7,14 @@ import {
   HistoricalCandleProvider,
   HistoricalCandleRequest,
 } from '../domain/historical-candle-provider';
-import { HistoricalStrategyReplayService } from './historical-strategy-replay.service';
+import {
+  HistoricalStrategyReplayService,
+  IncompleteHistoricalCandleCoverageError,
+} from './historical-strategy-replay.service';
 import { StrategyReplayService } from './strategy-replay.service';
 import { BacktestTradeSimulator } from './backtest-trade-simulator';
 import { HistoricalCandleCoverage } from './historical-candle-coverage';
+import { HistoricalCandleGapPlanner } from './historical-candle-gap-planner';
 
 describe('HistoricalStrategyReplayService', () => {
   it('reuses a complete stored range without loading or rewriting it', async () => {
@@ -30,6 +34,7 @@ describe('HistoricalStrategyReplayService', () => {
         findRange: jest.fn(() => Promise.resolve(candles)),
       },
       new HistoricalCandleCoverage(),
+      new HistoricalCandleGapPlanner(new HistoricalCandleCoverage()),
     );
     const request: HistoricalCandleRequest = {
       symbol: 'BTC/USDT',
@@ -42,6 +47,100 @@ describe('HistoricalStrategyReplayService', () => {
     await expect(service.run(request)).resolves.toBe(result);
     expect(load).not.toHaveBeenCalled();
     expect(saveMany).not.toHaveBeenCalled();
+  });
+
+  it('loads only contiguous gaps and persists their merged fetched batch once', async () => {
+    const stored = [candle(), candleAt('2026-09-12T12:03:00.000Z')];
+    const firstGap = [
+      candleAt('2026-09-12T12:01:00.000Z'),
+      candleAt('2026-09-12T12:02:00.000Z'),
+    ];
+    const secondGap = [
+      candleAt('2026-09-12T12:04:00.000Z'),
+      candleAt('2026-09-12T12:05:00.000Z'),
+    ];
+    const load = jest
+      .fn<HistoricalCandleProvider['load']>()
+      .mockResolvedValueOnce(firstGap)
+      .mockResolvedValueOnce(secondGap);
+    const saveMany = jest.fn(() => Promise.resolve());
+    const replay = { signals: [] } as unknown as BacktestResult;
+    const replayRun = jest.fn(() => replay);
+    const service = new HistoricalStrategyReplayService(
+      { load },
+      { run: replayRun } as unknown as StrategyReplayService,
+      { simulate: jest.fn() } as unknown as BacktestTradeSimulator,
+      { saveMany, findRange: jest.fn(() => Promise.resolve(stored)) },
+      new HistoricalCandleCoverage(),
+      new HistoricalCandleGapPlanner(new HistoricalCandleCoverage()),
+    );
+    const request: HistoricalCandleRequest = {
+      symbol: 'BTC/USDT',
+      interval: '1m',
+      startTime: new Date('2026-09-12T12:00:00.000Z'),
+      endTime: new Date('2026-09-12T12:05:00.000Z'),
+      limit: 6,
+    };
+    const signal = new AbortController().signal;
+
+    await expect(service.run(request, signal)).resolves.toBe(replay);
+    expect(load.mock.calls).toEqual([
+      [
+        {
+          ...request,
+          startTime: firstGap[0].openTime,
+          endTime: firstGap[1].openTime,
+          limit: 2,
+        },
+        signal,
+      ],
+      [
+        {
+          ...request,
+          startTime: secondGap[0].openTime,
+          endTime: secondGap[1].openTime,
+          limit: 2,
+        },
+        signal,
+      ],
+    ]);
+    expect(saveMany).toHaveBeenCalledTimes(1);
+    expect(saveMany).toHaveBeenCalledWith([...firstGap, ...secondGap]);
+    expect(replayRun).toHaveBeenCalledWith(
+      [stored[0], ...firstGap, stored[1], ...secondGap].map((value) => ({
+        symbol: value.symbol,
+        interval: value.interval,
+        closePrice: value.closePrice,
+        openTime: value.openTime,
+        closeTime: value.closeTime,
+        isClosed: value.isClosed,
+      })),
+    );
+  });
+
+  it('fails before persistence and replay when a fetched gap stays incomplete', async () => {
+    const saveMany = jest.fn(() => Promise.resolve());
+    const replay = jest.fn();
+    const service = new HistoricalStrategyReplayService(
+      { load: jest.fn(() => Promise.resolve([candle()])) },
+      { run: replay } as unknown as StrategyReplayService,
+      { simulate: jest.fn() } as unknown as BacktestTradeSimulator,
+      { saveMany, findRange: jest.fn(() => Promise.resolve([])) },
+      new HistoricalCandleCoverage(),
+      new HistoricalCandleGapPlanner(new HistoricalCandleCoverage()),
+    );
+
+    await expect(
+      service.run({
+        symbol: 'BTC/USDT',
+        interval: '1m',
+        startTime: new Date('2026-09-12T12:00:00.000Z'),
+        endTime: new Date('2026-09-12T12:01:00.000Z'),
+        limit: 2,
+      }),
+    ).rejects.toBeInstanceOf(IncompleteHistoricalCandleCoverageError);
+    expect(saveMany).not.toHaveBeenCalled();
+    expect(replay).not.toHaveBeenCalled();
   });
 
   it('loads normalized candles and delegates deterministic replay', async () => {
@@ -58,7 +157,7 @@ describe('HistoricalStrategyReplayService', () => {
     } as unknown as BacktestTradeSimulator;
     const candleRepository: HistoricalCandleRepository = {
       saveMany: jest.fn(() => Promise.resolve()),
-      findRange: jest.fn(() => Promise.resolve(candles)),
+      findRange: jest.fn(() => Promise.resolve([])),
     };
     const service = new HistoricalStrategyReplayService(
       provider,
@@ -66,13 +165,14 @@ describe('HistoricalStrategyReplayService', () => {
       tradeSimulator,
       candleRepository,
       new HistoricalCandleCoverage(),
+      new HistoricalCandleGapPlanner(new HistoricalCandleCoverage()),
     );
     const request: HistoricalCandleRequest = {
       symbol: 'BTC/USDT',
       interval: '1m',
       startTime: new Date('2026-09-12T12:00:00.000Z'),
-      endTime: new Date('2026-09-12T12:01:00.000Z'),
-      limit: 2,
+      endTime: new Date('2026-09-12T12:00:00.000Z'),
+      limit: 1,
     };
     const signal = new AbortController().signal;
 
@@ -113,7 +213,7 @@ describe('HistoricalStrategyReplayService', () => {
     } as unknown as BacktestTradeSimulator;
     const candleRepository: HistoricalCandleRepository = {
       saveMany: jest.fn(() => Promise.resolve()),
-      findRange: jest.fn(() => Promise.resolve(candles)),
+      findRange: jest.fn(() => Promise.resolve([])),
     };
     const service = new HistoricalStrategyReplayService(
       provider,
@@ -121,13 +221,14 @@ describe('HistoricalStrategyReplayService', () => {
       tradeSimulator,
       candleRepository,
       new HistoricalCandleCoverage(),
+      new HistoricalCandleGapPlanner(new HistoricalCandleCoverage()),
     );
     const request: HistoricalCandleRequest = {
       symbol: 'BTC/USDT',
       interval: '1m',
       startTime: new Date('2026-09-12T12:00:00.000Z'),
-      endTime: new Date('2026-09-12T12:01:00.000Z'),
-      limit: 2,
+      endTime: new Date('2026-09-12T12:00:00.000Z'),
+      limit: 1,
     };
     const configuration = {
       quantity: '0.001',
@@ -187,6 +288,7 @@ describe('HistoricalStrategyReplayService', () => {
       tradeSimulator,
       candleRepository,
       new HistoricalCandleCoverage(),
+      new HistoricalCandleGapPlanner(new HistoricalCandleCoverage()),
     );
     const request: HistoricalCandleRequest = {
       symbol: 'BTC/USDT',
@@ -224,7 +326,7 @@ describe('HistoricalStrategyReplayService', () => {
     } as unknown as BacktestTradeSimulator;
     const candleRepository: HistoricalCandleRepository = {
       saveMany: jest.fn(() => Promise.reject(persistenceError)),
-      findRange: jest.fn(() => Promise.resolve(candles)),
+      findRange: jest.fn(() => Promise.resolve([])),
     };
     const service = new HistoricalStrategyReplayService(
       provider,
@@ -232,13 +334,14 @@ describe('HistoricalStrategyReplayService', () => {
       tradeSimulator,
       candleRepository,
       new HistoricalCandleCoverage(),
+      new HistoricalCandleGapPlanner(new HistoricalCandleCoverage()),
     );
     const request: HistoricalCandleRequest = {
       symbol: 'BTC/USDT',
       interval: '1m',
       startTime: new Date('2026-09-12T12:00:00.000Z'),
-      endTime: new Date('2026-09-12T12:01:00.000Z'),
-      limit: 2,
+      endTime: new Date('2026-09-12T12:00:00.000Z'),
+      limit: 1,
     };
 
     await expect(service.run(request)).rejects.toBe(persistenceError);

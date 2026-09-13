@@ -93,7 +93,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.20 — complete:** serializable write-through PostgreSQL persistence for validated closed historical candles, with exact text decimals, idempotent identities, conflict detection, and replay blocked until durable storage succeeds.
 - **M6.21 — complete:** explicit stored-only replay and simulation over bounded chronological PostgreSQL reads, with strict persisted-row validation and no Binance fallback or completeness claim.
 - **M6.22 — complete:** deterministic all-or-nothing stored-range coverage lets standard replay and simulation bypass Binance on a complete cache hit; incomplete ranges use the existing full remote load and write-through.
-- Later M6 increments require separate approval for partial gap filling or mixed-source merging, cache refresh, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, optimization, or API exposure.
+- **M6.23 — complete:** contiguous missing one-minute ranges load sequentially from Binance, merge with validated stored candles only under complete coverage, and persist as one transactional fetched batch before replay.
+- Later M6 increments require separate approval for cache refresh or expiry, overwriting stored candles, parallel gap loading, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, optimization, or API exposure.
 
 ## M7 — New Listing Scanner — planned
 

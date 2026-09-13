@@ -275,8 +275,20 @@ M6.22 makes the standard historical replay and simulation paths cache-first with
 - Explicit `runStored` operations remain stored-only and continue to replay the actual stored subset without completeness inference.
 - Partial gap downloads, stored/remote merging, refresh or expiry policy, a new route, and schema changes are not introduced.
 
+## M6.23 sequential historical gap filling
+
+M6.23 narrows a cache miss to the exact missing portions of the expected one-minute sequence.
+
+- Missing minute identities are grouped into maximal contiguous bounded requests.
+- Gap requests run sequentially through the existing Binance pagination, retry, cancellation, and circuit-breaker behavior.
+- Stored candles and fetched gaps are merged chronologically without duplicate identities.
+- The merged result must prove exact complete coverage before persistence or replay; incomplete provider results fail explicitly.
+- All fetched gap candles are persisted together through one existing transactional `saveMany` call after coverage succeeds.
+- A complete cache hit still performs no network call or write, while explicit stored-only methods retain their prior behavior.
+- Stored candle refresh, conflict overwrite, parallel gap requests, new symbols or intervals, routes, and schema changes are not introduced.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, automatic historical cache selection and gap filling, shared or persisted circuit state, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.

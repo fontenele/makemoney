@@ -401,3 +401,9 @@ The stored operation returns exactly the valid rows found. It neither treats abs
 Automatic reuse is limited to ranges whose expected one-minute identities can be proven from the request. The coverage calculation aligns the first expected open upward to the next epoch minute, enumerates through the inclusive end, applies the request limit, and requires an exact chronological identity match.
 
 Incomplete coverage reloads the entire bounded request through the existing resilient Binance adapter and write-through path. This deliberately avoids mixed-source reconciliation and partial gap fetching until their conflict, refresh, and audit semantics are separately designed. Corrupt persisted rows remain visible errors rather than being masked as cache misses.
+
+## M6.23 complete-only stored and remote gap merge
+
+Expected minute identities are compared with validated stored identities, and consecutive absences become the smallest deterministic set of bounded remote requests. Requests remain sequential so they reuse the adapter's established circuit and cancellation behavior without introducing concurrency policy.
+
+Fetched gaps are held in memory until their union with stored candles proves the original request's exact coverage. Only then are all fetched candles passed to one serializable repository batch and the merged sequence replayed. Missing provider data, duplicate cross-source identities, and persistence failure all stop before replay; refresh and overwrite semantics remain deliberately absent.

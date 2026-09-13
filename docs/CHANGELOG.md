@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-13 — M6.23 sequential historical gap filling completed
+
+### Added
+
+- Deterministic planner that groups missing expected minute identities into contiguous bounded historical requests.
+- Focused coverage for multiple gaps, cache completeness, single-batch persistence, and incomplete provider recovery.
+
+### Changed
+
+- Cache misses now load only missing historical ranges sequentially instead of reloading the complete request.
+- Stored and fetched candles are merged only when they form the exact complete request sequence; incomplete recovery and duplicate identities fail before persistence or replay.
+- All fetched gaps persist through one existing transactional repository call.
+- Synchronized backtesting documentation, project context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Verification
+
+- 351 unit tests passed across 52 suites; 27 E2E tests passed across 2 suites.
+- Lint, formatting check, TypeScript build, Compose validation, and diff whitespace validation passed.
+- No refresh, overwrite, parallel loading, route, migration, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.22 automatic complete-range cache reuse completed
 
 ### Added

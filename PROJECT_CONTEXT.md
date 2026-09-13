@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.22 — deterministic replay, resilient durable historical loading, stored replay, automatic complete-range cache reuse, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.23 — deterministic replay, resilient durable historical loading, stored replay, gap-aware cache reuse, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -118,7 +118,9 @@ M6.21 adds explicit internal stored-only replay and simulation paths. The reposi
 
 M6.22 makes the existing remote replay and simulation paths cache-first. A pure coverage check derives the exact minute-aligned sequence implied by the bounded request; complete stored ranges bypass Binance and persistence, while any missing or displaced minute falls back to the existing full remote load and write-through. Stored-only operations remain unchanged.
 
-Partial gap filling, mixed-source merging, cache refresh, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
+M6.23 replaces full-range cache misses with sequential loading of only contiguous missing minute ranges. Fetched gaps are combined with stored candles only after exact complete coverage is proven, and all fetched candles persist through one existing transactional batch before replay. Incomplete recovery fails explicitly.
+
+Cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 
