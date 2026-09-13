@@ -329,3 +329,9 @@ Final equity combines remaining cash with the fee-adjusted final-close liquidati
 The equity curve is reconstructed from immutable fills rather than maintained as a second execution state. Fills at a candle open are applied before marking that candle's close, preserving the simulator's causal ordering. Open BTC is valued net of the estimated exit fee.
 
 Absolute and percentage maxima are reported independently because changing equity peaks can make their deepest points differ. Initial capital is the baseline peak, and the final curve value must reconcile with the capital summary's final equity.
+
+## M6.11 explicit adverse spread and slippage
+
+The simulator accepts a full spread rate and a separate slippage rate instead of inferring either from historical OHLCV candles. Each side pays half the spread plus the full adverse slippage: buys execute above and sells below the next candle's opening reference price. Keeping both the reference and effective price in every fill makes the assumption auditable.
+
+The effective price remains the single source for notionals, fees, affordability, cash, PnL, ROI, and equity. This avoids a parallel cost deduction that could diverge from the ledger. Rates are explicit, deterministic decimal strings; combined impact must keep the sell price positive.

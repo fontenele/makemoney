@@ -38,6 +38,12 @@ export class BacktestTradeSimulator {
   ): BacktestSimulationResult {
     const quantity = this.positiveDecimal(configuration.quantity, 'quantity');
     const feeRate = this.feeRate(configuration.feeRate);
+    const spreadRate = this.rate(configuration.spreadRate, 'spreadRate');
+    const slippageRate = this.rate(configuration.slippageRate, 'slippageRate');
+    const adversePriceImpactRate = spreadRate.dividedBy(2).plus(slippageRate);
+    if (adversePriceImpactRate.greaterThanOrEqualTo(1)) {
+      throw new Error('Invalid backtest combined price impact');
+    }
     const initialCapital = this.positiveDecimal(
       configuration.initialCapitalUsdt,
       'initialCapitalUsdt',
@@ -62,7 +68,13 @@ export class BacktestTradeSimulator {
           ignoredBuySignalCount += 1;
           continue;
         }
-        const candidateEntry = this.buyFill(candle, signal, quantity, feeRate);
+        const candidateEntry = this.buyFill(
+          candle,
+          signal,
+          quantity,
+          feeRate,
+          adversePriceImpactRate,
+        );
         if (new SimulationDecimal(candidateEntry.totalCost).greaterThan(cash)) {
           insufficientCapitalBuySignalCount += 1;
           continue;
@@ -77,7 +89,13 @@ export class BacktestTradeSimulator {
         ignoredSellSignalCount += 1;
         continue;
       }
-      const exit = this.sellFill(candle, signal, quantity, feeRate);
+      const exit = this.sellFill(
+        candle,
+        signal,
+        quantity,
+        feeRate,
+        adversePriceImpactRate,
+      );
       cash = cash.plus(exit.netProceeds);
       fills.push(exit);
       closedTrades.push({
@@ -115,6 +133,8 @@ export class BacktestTradeSimulator {
       executionModel: 'next_candle_open',
       quantity: quantity.toFixed(),
       feeRate: feeRate.toFixed(),
+      spreadRate: spreadRate.toFixed(),
+      slippageRate: slippageRate.toFixed(),
       capital: {
         initialCapitalUsdt: initialCapital.toFixed(),
         finalCashUsdt: cash.toFixed(),
@@ -146,13 +166,18 @@ export class BacktestTradeSimulator {
     signal: StrategySignal,
     quantity: Decimal,
     feeRate: Decimal,
+    adversePriceImpactRate: Decimal,
   ): BacktestBuyFill {
-    const price = new SimulationDecimal(candle.openPrice);
+    const referencePrice = new SimulationDecimal(candle.openPrice);
+    const price = referencePrice.times(
+      new SimulationDecimal(1).plus(adversePriceImpactRate),
+    );
     const notional = price.times(quantity);
     const fee = notional.times(feeRate);
     return {
       side: 'buy',
       quantity: quantity.toFixed(),
+      referencePrice: referencePrice.toFixed(),
       price: price.toFixed(),
       notional: notional.toFixed(),
       feeRate: feeRate.toFixed(),
@@ -168,13 +193,18 @@ export class BacktestTradeSimulator {
     signal: StrategySignal,
     quantity: Decimal,
     feeRate: Decimal,
+    adversePriceImpactRate: Decimal,
   ): BacktestSellFill {
-    const price = new SimulationDecimal(candle.openPrice);
+    const referencePrice = new SimulationDecimal(candle.openPrice);
+    const price = referencePrice.times(
+      new SimulationDecimal(1).minus(adversePriceImpactRate),
+    );
     const notional = price.times(quantity);
     const fee = notional.times(feeRate);
     return {
       side: 'sell',
       quantity: quantity.toFixed(),
+      referencePrice: referencePrice.toFixed(),
       price: price.toFixed(),
       notional: notional.toFixed(),
       feeRate: feeRate.toFixed(),
@@ -225,5 +255,16 @@ export class BacktestTradeSimulator {
       throw new Error('Invalid backtest feeRate');
     }
     return feeRate;
+  }
+
+  private rate(value: string, name: string): Decimal {
+    if (!DECIMAL_PATTERN.test(value)) {
+      throw new Error(`Invalid backtest ${name}`);
+    }
+    const rate = new SimulationDecimal(value);
+    if (rate.greaterThanOrEqualTo(1)) {
+      throw new Error(`Invalid backtest ${name}`);
+    }
+    return rate;
   }
 }

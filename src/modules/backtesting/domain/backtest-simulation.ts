@@ -6,6 +6,7 @@ import { BacktestEquityResult } from './backtest-equity';
 interface BacktestFillBase {
   side: 'buy' | 'sell';
   quantity: string;
+  referencePrice: string;
   price: string;
   notional: string;
   feeRate: string;
@@ -41,6 +42,8 @@ export interface BacktestOpenPosition {
 export interface BacktestSimulationConfiguration {
   quantity: string;
   feeRate: string;
+  spreadRate: string;
+  slippageRate: string;
   initialCapitalUsdt: string;
 }
 
@@ -58,6 +61,8 @@ export interface BacktestSimulationResult {
   executionModel: 'next_candle_open';
   quantity: string;
   feeRate: string;
+  spreadRate: string;
+  slippageRate: string;
   capital: BacktestCapitalResult;
   equity: BacktestEquityResult;
   fills: BacktestFill[];

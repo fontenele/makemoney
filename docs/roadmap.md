@@ -81,7 +81,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.8 — complete:** chronological realized PnL curve and maximum absolute realized drawdown with explicit start, trough, and observed recovery timestamps.
 - **M6.9 — complete:** explicit simulated initial capital, cash sufficiency, ending equity, net return, and total ROI without borrowing, negative cash, or variable quantity.
 - **M6.10 — complete:** candle-close fee-adjusted equity curve with separately measured maximum absolute and percentage drawdowns, causal fill ordering, and final-equity reconciliation.
-- Later M6 increments require separate approval for historical-data persistence or pagination, intracandle equity paths, variable sizing, spread, slippage, liquidity and pair-rule modeling, optimization, or API exposure.
+- **M6.11 — complete:** explicit deterministic spread and slippage applied adversely to hypothetical buy and sell prices, with auditable reference prices and downstream capital/performance reconciliation.
+- Later M6 increments require separate approval for historical-data persistence or pagination, intracandle equity paths, variable sizing, liquidity and pair-rule modeling, optimization, or API exposure.
 
 ## M7 — New Listing Scanner — planned
 

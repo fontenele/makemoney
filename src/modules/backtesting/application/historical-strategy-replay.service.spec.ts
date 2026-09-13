@@ -83,6 +83,8 @@ describe('HistoricalStrategyReplayService', () => {
     const configuration = {
       quantity: '0.001',
       feeRate: '0.001',
+      spreadRate: '0',
+      slippageRate: '0',
       initialCapitalUsdt: '1000',
     };
 

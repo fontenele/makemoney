@@ -131,8 +131,20 @@ M6.10 reconstructs the capital state from the hypothetical fill ledger and recor
 - The last equity point reconciles exactly with the M6.9 final equity.
 - All arithmetic uses precision-40 `decimal.js`.
 
+## M6.11 deterministic spread and slippage
+
+M6.11 makes the next-candle-open execution assumption more conservative through two explicit non-negative simulation inputs: the full spread rate and the adverse slippage rate.
+
+- Each fill retains the candle open as `referencePrice` and exposes the adjusted executable value as `price`.
+- A buy price is the reference price multiplied by `1 + spreadRate / 2 + slippageRate`.
+- A sell price is the reference price multiplied by `1 - spreadRate / 2 - slippageRate`.
+- Rates must each be below one, and their combined adverse price impact must remain below one so sell prices stay positive.
+- Fees and notionals use the adjusted price. Buy affordability, cash, closed-trade PnL, ending capital, ROI, and equity therefore inherit the modeled costs without parallel accounting.
+- Zero spread and slippage preserve the preceding execution behavior.
+- All arithmetic uses precision-40 `decimal.js` and produces decimal strings.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, spread, slippage, liquidity, minimum-order and precision rules, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, liquidity, minimum-order and precision rules, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.

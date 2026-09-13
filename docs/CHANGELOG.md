@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-13 — M6.11 deterministic spread and slippage completed
+
+### Added
+
+- Required explicit full-spread and slippage rates for historical simulation, validated as non-negative decimal inputs.
+- Adverse effective execution pricing at the next candle open: half-spread plus slippage above reference for buys and below reference for sells.
+- Auditable fill-level reference and effective prices, with effective prices feeding notionals, fees, affordability, cash, PnL, ROI, and equity.
+- Focused tests for symmetric price impact, downstream reconciliation, configuration boundaries, and a buy made unaffordable by execution costs.
+- The full suite now contains 287 tests across 45 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No live spread lookup, stochastic or volume-dependent slippage, liquidity, pair-rule rounding, variable sizing, route, persistence, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.10 candle-close equity and drawdown completed
 
 ### Added

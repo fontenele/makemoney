@@ -25,7 +25,13 @@ describe('BacktestTradeSimulator', () => {
         signal(candles[1], 'sell'),
         signal(candles[2]),
       ],
-      { quantity: '0.5', feeRate: '0.01', initialCapitalUsdt: '100' },
+      {
+        quantity: '0.5',
+        feeRate: '0.01',
+        spreadRate: '0',
+        slippageRate: '0',
+        initialCapitalUsdt: '100',
+      },
     );
 
     expect(result.fills).toEqual([
@@ -102,7 +108,13 @@ describe('BacktestTradeSimulator', () => {
     const result = simulator.simulate(
       candles,
       [signal(candles[0], 'buy'), signal(candles[1])],
-      { quantity: '0.1', feeRate: '0.001', initialCapitalUsdt: '100' },
+      {
+        quantity: '0.1',
+        feeRate: '0.001',
+        spreadRate: '0',
+        slippageRate: '0',
+        initialCapitalUsdt: '100',
+      },
     );
 
     expect(result.openPosition).toMatchObject({
@@ -148,7 +160,13 @@ describe('BacktestTradeSimulator', () => {
     const result = simulator.simulate(
       candles,
       candles.map((value, index) => signal(value, actions[index])),
-      { quantity: '1', feeRate: '0', initialCapitalUsdt: '1000' },
+      {
+        quantity: '1',
+        feeRate: '0',
+        spreadRate: '0',
+        slippageRate: '0',
+        initialCapitalUsdt: '1000',
+      },
     );
 
     expect(result.ignoredSellSignalCount).toBe(1);
@@ -161,6 +179,8 @@ describe('BacktestTradeSimulator', () => {
     const result = simulator.simulate(candles, [signal(candles[0], 'buy')], {
       quantity: '1',
       feeRate: '0',
+      spreadRate: '0',
+      slippageRate: '0',
       initialCapitalUsdt: '1000',
     });
 
@@ -173,6 +193,8 @@ describe('BacktestTradeSimulator', () => {
     const configuration = {
       quantity: '0.1234567890123456789',
       feeRate: '0.0001',
+      spreadRate: '0',
+      slippageRate: '0',
       initialCapitalUsdt: '1000',
     };
 
@@ -193,12 +215,128 @@ describe('BacktestTradeSimulator', () => {
     );
   });
 
+  it('applies half the spread and slippage adversely to both fill sides', () => {
+    const candles = [candle(0, '100'), candle(1, '100'), candle(2, '100')];
+    const result = simulator.simulate(
+      candles,
+      [
+        signal(candles[0], 'buy'),
+        signal(candles[1], 'sell'),
+        signal(candles[2]),
+      ],
+      {
+        quantity: '1',
+        feeRate: '0',
+        spreadRate: '0.02',
+        slippageRate: '0.005',
+        initialCapitalUsdt: '1000',
+      },
+    );
+
+    expect(result).toMatchObject({
+      spreadRate: '0.02',
+      slippageRate: '0.005',
+      capital: {
+        finalCashUsdt: '997',
+        finalEquityUsdt: '997',
+        totalNetReturnUsdt: '-3',
+        totalRoi: '-0.003',
+      },
+    });
+    expect(result.fills).toEqual([
+      expect.objectContaining({
+        side: 'buy',
+        referencePrice: '100',
+        price: '101.5',
+        totalCost: '101.5',
+      }),
+      expect.objectContaining({
+        side: 'sell',
+        referencePrice: '100',
+        price: '98.5',
+        netProceeds: '98.5',
+      }),
+    ]);
+    expect(result.closedTrades[0]?.netPnl).toBe('-3');
+    expect(result.equity.curve.at(-1)?.equityUsdt).toBe('997');
+  });
+
+  it('rejects a buy made unaffordable by spread and slippage', () => {
+    const candles = [candle(0, '100'), candle(1, '100')];
+    const result = simulator.simulate(
+      candles,
+      [signal(candles[0], 'buy'), signal(candles[1])],
+      {
+        quantity: '1',
+        feeRate: '0',
+        spreadRate: '0.02',
+        slippageRate: '0.005',
+        initialCapitalUsdt: '101',
+      },
+    );
+
+    expect(result.fills).toEqual([]);
+    expect(result.insufficientCapitalBuySignalCount).toBe(1);
+    expect(result.capital.finalEquityUsdt).toBe('101');
+  });
+
   it.each([
-    { quantity: '0', feeRate: '0.001', initialCapitalUsdt: '1000' },
-    { quantity: '-1', feeRate: '0.001', initialCapitalUsdt: '1000' },
-    { quantity: '1', feeRate: '-0.1', initialCapitalUsdt: '1000' },
-    { quantity: '1', feeRate: '1', initialCapitalUsdt: '1000' },
-    { quantity: '1', feeRate: '0', initialCapitalUsdt: '0' },
+    {
+      quantity: '0',
+      feeRate: '0.001',
+      spreadRate: '0',
+      slippageRate: '0',
+      initialCapitalUsdt: '1000',
+    },
+    {
+      quantity: '-1',
+      feeRate: '0.001',
+      spreadRate: '0',
+      slippageRate: '0',
+      initialCapitalUsdt: '1000',
+    },
+    {
+      quantity: '1',
+      feeRate: '-0.1',
+      spreadRate: '0',
+      slippageRate: '0',
+      initialCapitalUsdt: '1000',
+    },
+    {
+      quantity: '1',
+      feeRate: '1',
+      spreadRate: '0',
+      slippageRate: '0',
+      initialCapitalUsdt: '1000',
+    },
+    {
+      quantity: '1',
+      feeRate: '0',
+      spreadRate: '0',
+      slippageRate: '0',
+      initialCapitalUsdt: '0',
+    },
+    {
+      quantity: '1',
+      feeRate: '0',
+      spreadRate: '-0.1',
+      slippageRate: '0',
+      initialCapitalUsdt: '1000',
+    },
+    {
+      quantity: '1',
+      feeRate: '0',
+      spreadRate: '0',
+      slippageRate: '1',
+      initialCapitalUsdt: '1000',
+    },
+    {
+      quantity: '1',
+      feeRate: '0',
+      spreadRate: '0.8',
+      slippageRate: '0.6',
+      initialCapitalUsdt: '1000',
+    },
   ])('rejects invalid simulation configuration', (configuration) => {
     expect(() => simulator.simulate([], [], configuration)).toThrow();
   });
@@ -212,6 +350,8 @@ describe('BacktestTradeSimulator', () => {
       simulator.simulate(candles, [mismatched], {
         quantity: '1',
         feeRate: '0',
+        spreadRate: '0',
+        slippageRate: '0',
         initialCapitalUsdt: '1000',
       }),
     ).toThrow('Backtest candle and signal timeline is inconsistent');
@@ -222,7 +362,13 @@ describe('BacktestTradeSimulator', () => {
     const result = simulator.simulate(
       candles,
       [signal(candles[0], 'buy'), signal(candles[1])],
-      { quantity: '1', feeRate: '0.001', initialCapitalUsdt: '100' },
+      {
+        quantity: '1',
+        feeRate: '0.001',
+        spreadRate: '0',
+        slippageRate: '0',
+        initialCapitalUsdt: '100',
+      },
     );
 
     expect(result.fills).toEqual([]);
