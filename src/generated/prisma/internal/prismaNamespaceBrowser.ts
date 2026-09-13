@@ -54,7 +54,8 @@ export const ModelName = {
   PaperBalance: 'PaperBalance',
   PaperExecution: 'PaperExecution',
   RiskControlEvent: 'RiskControlEvent',
-  StrategySignal: 'StrategySignal'
+  StrategySignal: 'StrategySignal',
+  HistoricalCandleRecord: 'HistoricalCandleRecord'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -129,6 +130,27 @@ export const StrategySignalScalarFieldEnum = {
 } as const
 
 export type StrategySignalScalarFieldEnum = (typeof StrategySignalScalarFieldEnum)[keyof typeof StrategySignalScalarFieldEnum]
+
+
+export const HistoricalCandleRecordScalarFieldEnum = {
+  symbol: 'symbol',
+  interval: 'interval',
+  openTime: 'openTime',
+  closeTime: 'closeTime',
+  openPrice: 'openPrice',
+  highPrice: 'highPrice',
+  lowPrice: 'lowPrice',
+  closePrice: 'closePrice',
+  baseVolume: 'baseVolume',
+  quoteVolume: 'quoteVolume',
+  takerBuyBaseVolume: 'takerBuyBaseVolume',
+  takerBuyQuoteVolume: 'takerBuyQuoteVolume',
+  tradeCount: 'tradeCount',
+  isClosed: 'isClosed',
+  createdAt: 'createdAt'
+} as const
+
+export type HistoricalCandleRecordScalarFieldEnum = (typeof HistoricalCandleRecordScalarFieldEnum)[keyof typeof HistoricalCandleRecordScalarFieldEnum]
 
 
 export const SortOrder = {

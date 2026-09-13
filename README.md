@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M5 and M6.1–M6.19 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical capital, fills, equity, statistics, and balances are fictional, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M5 and M6.1–M6.20 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -83,4 +83,4 @@ docker compose config
 - `prisma`: database schema and future migrations
 - `test`: end-to-end tests
 
-Paper balances and strategy signals persist across restarts; the latest market data and valuation remain process-local.
+Paper balances, strategy signals, and loaded historical candles persist across restarts; the latest live market data and valuation remain process-local.

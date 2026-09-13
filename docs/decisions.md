@@ -383,3 +383,9 @@ The default backoff is 500 milliseconds before the second attempt and one second
 The historical circuit counts only page failures that remain transient after all bounded retries. Three such failures open it for 30 seconds. This separates provider availability from invalid requests, permanent client errors, malformed data, and user cancellation, none of which indicate a transient outage suitable for circuit state.
 
 After cooldown, one in-process half-open probe owns provider access so concurrent callers cannot create a recovery stampede. Success resets the circuit; failure starts a fresh open interval. State intentionally remains local to the adapter instance: distributed coordination, persistence, operator controls, and public configuration require separate evidence.
+
+## M6.20 exact immutable historical candle persistence
+
+Validated closed candles are written through to PostgreSQL before replay. Symbol, interval, and open time form the natural composite primary key. Decimal values use text columns because the provider boundary deliberately preserves arbitrary valid decimal precision; choosing a fixed database scale would silently weaken that contract. Database checks constrain the supported identity, closed state, time ordering, and non-negative trade count.
+
+The repository uses a serializable transaction: insert missing identities without overwriting, reload the complete batch, and compare every persisted market field. Identical replays are idempotent, while any content drift on an existing identity aborts the whole transaction. Replay continues from the freshly fetched batch so persistence does not yet imply cache completeness, gap detection, or offline availability.

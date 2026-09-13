@@ -238,8 +238,21 @@ M6.19 prevents repeated historical Binance calls after the provider has remained
 - Caller cancellation, invalid local requests, permanent HTTP 4xx responses other than 429, and malformed successful payloads neither open nor advance the circuit.
 - Circuit state is process-local to the historical Binance client and uses the existing injected clock for deterministic boundaries.
 
+## M6.20 durable historical candle write-through
+
+M6.20 persists a successfully loaded historical batch in PostgreSQL before allowing deterministic replay or simulation to consume it.
+
+- `historical_candles` uses symbol, interval, and open time as its composite primary identity and chronological index.
+- Only normalized closed `BTC/USDT` one-minute candles cross the repository boundary.
+- OHLC and volume decimals remain their exact validated strings in `TEXT` columns, avoiding fixed-scale truncation or native floating-point conversion.
+- Trade count uses a non-negative PostgreSQL `BIGINT`; UTC boundaries retain millisecond precision.
+- Batch persistence runs in a serializable transaction, inserts missing identities, then reloads and compares every requested field before commit.
+- Repeating identical candles is idempotent. Any existing identity with different content raises an explicit conflict and rolls back new rows from the same batch.
+- Persistence failure stops replay and simulation; neither result is produced from a batch that failed durable storage.
+- Replay still consumes the freshly loaded validated batch. Stored-range reads, completeness inference, gap filling, and offline operation are not introduced.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, shared or persisted circuit state, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical cache reads and gap filling, shared or persisted circuit state, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.

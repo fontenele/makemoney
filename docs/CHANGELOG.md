@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-13 — M6.20 historical candle persistence completed
+
+### Added
+
+- PostgreSQL `historical_candles` storage keyed by symbol, interval, and open time, with closed-state, identity, time, and trade-count constraints.
+- Exact textual persistence for validated OHLC and volume decimals without floating-point or fixed-scale loss.
+- Provider-neutral historical-candle repository with serializable batch writes, duplicate skipping, complete post-write comparison, and explicit conflict rejection.
+- Write-through orchestration that blocks replay and simulation until the complete freshly loaded batch persists successfully.
+- Unit coverage for mapping, idempotency, conflicts, empty batches, and persistence-before-replay behavior.
+- PostgreSQL integration coverage for exact idempotent storage and whole-batch rollback on identity conflict.
+- The full unit suite now contains 338 tests across 50 suites; 26 E2E tests pass across 2 suites with the documented safe process-only environment override.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No stored-range reads, cache-first behavior, gap filling, candle deletion, result persistence, route, new market, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.19 historical provider circuit breaker completed
 
 ### Added

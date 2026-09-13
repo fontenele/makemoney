@@ -400,7 +400,8 @@ export const ModelName = {
   PaperBalance: 'PaperBalance',
   PaperExecution: 'PaperExecution',
   RiskControlEvent: 'RiskControlEvent',
-  StrategySignal: 'StrategySignal'
+  StrategySignal: 'StrategySignal',
+  HistoricalCandleRecord: 'HistoricalCandleRecord'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -716,6 +717,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    HistoricalCandleRecord: {
+      payload: Prisma.$HistoricalCandleRecordPayload<ExtArgs>
+      fields: Prisma.HistoricalCandleRecordFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.HistoricalCandleRecordFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HistoricalCandleRecordPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.HistoricalCandleRecordFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HistoricalCandleRecordPayload>
+        }
+        findFirst: {
+          args: Prisma.HistoricalCandleRecordFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HistoricalCandleRecordPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.HistoricalCandleRecordFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HistoricalCandleRecordPayload>
+        }
+        findMany: {
+          args: Prisma.HistoricalCandleRecordFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HistoricalCandleRecordPayload>[]
+        }
+        create: {
+          args: Prisma.HistoricalCandleRecordCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HistoricalCandleRecordPayload>
+        }
+        createMany: {
+          args: Prisma.HistoricalCandleRecordCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.HistoricalCandleRecordCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HistoricalCandleRecordPayload>[]
+        }
+        delete: {
+          args: Prisma.HistoricalCandleRecordDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HistoricalCandleRecordPayload>
+        }
+        update: {
+          args: Prisma.HistoricalCandleRecordUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HistoricalCandleRecordPayload>
+        }
+        deleteMany: {
+          args: Prisma.HistoricalCandleRecordDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.HistoricalCandleRecordUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.HistoricalCandleRecordUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HistoricalCandleRecordPayload>[]
+        }
+        upsert: {
+          args: Prisma.HistoricalCandleRecordUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HistoricalCandleRecordPayload>
+        }
+        aggregate: {
+          args: Prisma.HistoricalCandleRecordAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateHistoricalCandleRecord>
+        }
+        groupBy: {
+          args: Prisma.HistoricalCandleRecordGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HistoricalCandleRecordGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.HistoricalCandleRecordCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HistoricalCandleRecordCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -813,6 +888,27 @@ export const StrategySignalScalarFieldEnum = {
 export type StrategySignalScalarFieldEnum = (typeof StrategySignalScalarFieldEnum)[keyof typeof StrategySignalScalarFieldEnum]
 
 
+export const HistoricalCandleRecordScalarFieldEnum = {
+  symbol: 'symbol',
+  interval: 'interval',
+  openTime: 'openTime',
+  closeTime: 'closeTime',
+  openPrice: 'openPrice',
+  highPrice: 'highPrice',
+  lowPrice: 'lowPrice',
+  closePrice: 'closePrice',
+  baseVolume: 'baseVolume',
+  quoteVolume: 'quoteVolume',
+  takerBuyBaseVolume: 'takerBuyBaseVolume',
+  takerBuyQuoteVolume: 'takerBuyQuoteVolume',
+  tradeCount: 'tradeCount',
+  isClosed: 'isClosed',
+  createdAt: 'createdAt'
+} as const
+
+export type HistoricalCandleRecordScalarFieldEnum = (typeof HistoricalCandleRecordScalarFieldEnum)[keyof typeof HistoricalCandleRecordScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -903,6 +999,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt'
+ */
+export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt[]'
+ */
+export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
     
 
 
@@ -1074,6 +1184,7 @@ export type GlobalOmitConfig = {
   paperExecution?: Prisma.PaperExecutionOmit
   riskControlEvent?: Prisma.RiskControlEventOmit
   strategySignal?: Prisma.StrategySignalOmit
+  historicalCandleRecord?: Prisma.HistoricalCandleRecordOmit
 }
 
 /* Types for Logging */

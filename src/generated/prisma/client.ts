@@ -59,3 +59,8 @@ export type RiskControlEvent = Prisma.RiskControlEventModel
  * 
  */
 export type StrategySignal = Prisma.StrategySignalModel
+/**
+ * Model HistoricalCandleRecord
+ * 
+ */
+export type HistoricalCandleRecord = Prisma.HistoricalCandleRecordModel

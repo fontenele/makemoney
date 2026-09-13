@@ -13,7 +13,9 @@ import { BacktestFillPriceCalculator } from './application/backtest-fill-price-c
 import { BacktestLiquidityCalculator } from './application/backtest-liquidity-calculator';
 import { StrategyReplayService } from './application/strategy-replay.service';
 import { HISTORICAL_CANDLE_PROVIDER } from './domain/historical-candle-provider';
+import { HISTORICAL_CANDLE_REPOSITORY } from './domain/historical-candle-repository';
 import { BinanceHistoricalCandlesClient } from './infrastructure/binance/binance-historical-candles.client';
+import { PrismaHistoricalCandleRepository } from './infrastructure/prisma-historical-candle.repository';
 
 @Module({
   imports: [StrategiesModule],
@@ -25,6 +27,10 @@ import { BinanceHistoricalCandlesClient } from './infrastructure/binance/binance
         new BinanceHistoricalCandlesClient(
           config.getOrThrow<string>('BINANCE_REST_BASE_URL'),
         ),
+    },
+    {
+      provide: HISTORICAL_CANDLE_REPOSITORY,
+      useClass: PrismaHistoricalCandleRepository,
     },
     StrategyReplayService,
     BacktestPerformanceCalculator,

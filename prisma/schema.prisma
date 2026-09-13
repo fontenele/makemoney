@@ -63,3 +63,24 @@ model StrategySignal {
   @@index([evaluatedAt, id])
   @@map("strategy_signals")
 }
+
+model HistoricalCandleRecord {
+  symbol              String   @db.VarChar(20)
+  interval            String   @db.VarChar(10)
+  openTime            DateTime @map("open_time")
+  closeTime           DateTime @map("close_time")
+  openPrice           String   @map("open_price") @db.Text
+  highPrice           String   @map("high_price") @db.Text
+  lowPrice            String   @map("low_price") @db.Text
+  closePrice          String   @map("close_price") @db.Text
+  baseVolume          String   @map("base_volume") @db.Text
+  quoteVolume         String   @map("quote_volume") @db.Text
+  takerBuyBaseVolume  String   @map("taker_buy_base_volume") @db.Text
+  takerBuyQuoteVolume String   @map("taker_buy_quote_volume") @db.Text
+  tradeCount          BigInt   @map("trade_count")
+  isClosed            Boolean  @map("is_closed")
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  @@id([symbol, interval, openTime])
+  @@map("historical_candles")
+}

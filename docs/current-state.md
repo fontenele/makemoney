@@ -4,7 +4,7 @@ Last validated: 2026-09-13
 
 ## Milestone status
 
-M0 through M5 and M6.1–M6.19 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient bounded paginated historical loading, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M5 and M6.1–M6.20 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -86,6 +86,8 @@ M0 through M5 and M6.1–M6.19 are complete. M1 provides unauthenticated public 
 - Historical requests are capped at 10,000 candles and 10,000 minutes; the Binance adapter loads sequential pages of at most 1,000 and stops on an empty or partial page.
 - Every historical page retains strict payload, range, OHLCV, ordering, open-candle, timeout, and cancellation validation, and the accumulated result remains bounded by the caller's total limit.
 - Each historical page has at most three attempts for network, HTTP 429, or HTTP 5xx failures, with cancelable bounded backoff or `Retry-After`; permanent HTTP 4xx and invalid successful payloads fail immediately.
+- Three exhausted transient historical pages open a process-local 30-second circuit; open calls fail before HTTP and only one half-open recovery probe may run.
+- Completely loaded closed-candle batches persist transactionally in PostgreSQL before replay or simulation, with exact textual decimals, idempotent composite identities, and rollback on conflicting content.
 - Three exhausted transient historical-page failures open a process-local circuit for 30 seconds; it fails fast while open and permits one concurrent half-open recovery probe before closing or reopening.
 - Candles whose close time has not passed are excluded, and the historical orchestration service delegates the remaining normalized projections directly to deterministic replay.
 - M6.2 adds no route, persistence, pagination, retry policy, trade simulation, financial metric, wallet access, or execution.
@@ -129,19 +131,19 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-13 after M6.19:
+The following passed on 2026-09-13 after M6.20:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 333 tests passed across 49 suites
+- `npm test -- --runInBand` — 338 tests passed across 50 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
-The most recent database-backed integration validation was repeated after M6.4:
+The most recent database-backed integration validation was repeated after M6.20:
 
-- `npm run test:e2e -- --runInBand` — 24 tests passed, including idempotent strategy-signal persistence and reads plus the prior Redis rate limiting, unrealized-loss, authenticated control, liquidity, risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
-- `npx prisma migrate deploy` — all six migrations applied, including `strategy_signals` and its precision expansion
+- `$env:RISK_MAX_BTC_POSITION_QUANTITY='1'; npm run test:e2e -- --runInBand` — 26 tests passed across 2 suites, including exact idempotent historical-candle storage and transactional conflict rollback plus all prior integration scenarios
+- `npx prisma migrate deploy` — all seven migrations applied, including exact historical candle storage
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live Binance historical-candle smoke test — the public market-data-only kline endpoint returned ordered BTCUSDT one-minute rows with the documented 12 fields and no credentials
@@ -152,10 +154,11 @@ The most recent database-backed integration validation was repeated after M6.4:
 
 ## Repository state
 
-M0 through M6.18 are committed. M6.19 changes are currently in the working tree.
+M0 through M6.19 are committed. M6.20 changes are currently in the working tree.
 
 ## Known issues and cautions
 
+- The local `.env` currently sets `RISK_MAX_BTC_POSITION_QUANTITY=0.01`, which the existing canonical positive-decimal validator rejects. Complete E2E validation used a process-only value of `1`; the local file was not modified and application startup will require correcting that local setting.
 - Jest requires Node's `--experimental-vm-modules` flag because NestJS 12 packages are ESM.
 - The Docker build reported eight high-severity findings in the dependency audit. They have not been automatically changed because `npm audit fix --force` may introduce breaking upgrades; review them separately.
 - A transitive Angular DevKit package recommends Node `24.15.0` or newer while the machine has Node `24.14.1`. Current build, lint, and tests pass, but a Node 24 LTS patch update is advisable.
