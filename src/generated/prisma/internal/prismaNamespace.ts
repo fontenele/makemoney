@@ -401,7 +401,8 @@ export const ModelName = {
   PaperExecution: 'PaperExecution',
   RiskControlEvent: 'RiskControlEvent',
   StrategySignal: 'StrategySignal',
-  HistoricalCandleRecord: 'HistoricalCandleRecord'
+  HistoricalCandleRecord: 'HistoricalCandleRecord',
+  BacktestRun: 'BacktestRun'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -791,6 +792,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    BacktestRun: {
+      payload: Prisma.$BacktestRunPayload<ExtArgs>
+      fields: Prisma.BacktestRunFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BacktestRunFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BacktestRunFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>
+        }
+        findFirst: {
+          args: Prisma.BacktestRunFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BacktestRunFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>
+        }
+        findMany: {
+          args: Prisma.BacktestRunFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>[]
+        }
+        create: {
+          args: Prisma.BacktestRunCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>
+        }
+        createMany: {
+          args: Prisma.BacktestRunCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BacktestRunCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>[]
+        }
+        delete: {
+          args: Prisma.BacktestRunDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>
+        }
+        update: {
+          args: Prisma.BacktestRunUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>
+        }
+        deleteMany: {
+          args: Prisma.BacktestRunDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BacktestRunUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BacktestRunUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>[]
+        }
+        upsert: {
+          args: Prisma.BacktestRunUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BacktestRunPayload>
+        }
+        aggregate: {
+          args: Prisma.BacktestRunAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBacktestRun>
+        }
+        groupBy: {
+          args: Prisma.BacktestRunGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BacktestRunGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BacktestRunCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BacktestRunCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -909,12 +984,31 @@ export const HistoricalCandleRecordScalarFieldEnum = {
 export type HistoricalCandleRecordScalarFieldEnum = (typeof HistoricalCandleRecordScalarFieldEnum)[keyof typeof HistoricalCandleRecordScalarFieldEnum]
 
 
+export const BacktestRunScalarFieldEnum = {
+  id: 'id',
+  idempotencyKey: 'idempotencyKey',
+  requestFingerprint: 'requestFingerprint',
+  request: 'request',
+  result: 'result',
+  createdAt: 'createdAt'
+} as const
+
+export type BacktestRunScalarFieldEnum = (typeof BacktestRunScalarFieldEnum)[keyof typeof BacktestRunScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -931,6 +1025,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -1013,6 +1116,20 @@ export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
  * Reference to a field of type 'BigInt[]'
  */
 export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -1185,6 +1302,7 @@ export type GlobalOmitConfig = {
   riskControlEvent?: Prisma.RiskControlEventOmit
   strategySignal?: Prisma.StrategySignalOmit
   historicalCandleRecord?: Prisma.HistoricalCandleRecordOmit
+  backtestRun?: Prisma.BacktestRunOmit
 }
 
 /* Types for Logging */

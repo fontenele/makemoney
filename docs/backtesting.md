@@ -311,6 +311,18 @@ M6.25 exposes the complete research-only simulation through `POST /backtesting/s
 - HTTP 400 represents invalid public input. Operational loading or persistence failure returns a sanitized HTTP 503.
 - The route does not persist simulation results and cannot access the paper wallet, operational Risk Engine, executor, exchange account, or real funds.
 
+## M6.26 immutable persisted simulation runs
+
+M6.26 adds `POST /backtesting/runs` as the explicit durable counterpart to the unchanged ephemeral simulation route.
+
+- The route requires a validated `Idempotency-Key` and the exact M6.25 body.
+- A SHA-256 fingerprint covers the normalized historical request and complete explicit configuration.
+- An existing matching key returns its stored request/result without candle loading or recalculation and marks `replayed: true`; different content returns HTTP 409.
+- New runs calculate first and persist the complete JSON-safe request and result with a UUID and UTC creation time. Dates become ISO UTC strings and financial decimals remain strings.
+- PostgreSQL enforces unique idempotency keys; a concurrent matching insert resolves to the winner, while conflicting reuse fails explicitly.
+- Persistence failure returns no saved-run response. Runs are immutable and have no update or delete operation.
+- Retrieval and bounded listing are not introduced yet.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.

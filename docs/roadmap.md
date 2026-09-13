@@ -96,7 +96,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.23 — complete:** contiguous missing one-minute ranges load sequentially from Binance, merge with validated stored candles only under complete coverage, and persist as one transactional fetched batch before replay.
 - **M6.24 — complete:** local bounded `POST /backtesting/replay` exposes deterministic BTC/USDT one-minute signal replay with strict UTC input, explicit HTTP failures, and no financial execution path.
 - **M6.25 — complete:** local bounded `POST /backtesting/simulate` exposes the complete research simulator only after strict pre-load validation of every explicit financial assumption and execution rule.
-- Later M6 increments require separate approval for result persistence, cache refresh or expiry, overwriting stored candles, parallel gap loading, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, or optimization.
+- **M6.26 — complete:** idempotent `POST /backtesting/runs` persists immutable complete request/result JSON snapshots with UUID identity, UTC creation time, fingerprint conflict detection, and exact decimal strings.
+- Later M6 increments require separate approval for run retrieval/listing/deletion, cache refresh or expiry, overwriting stored candles, parallel gap loading, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, or optimization.
 
 ## M7 — New Listing Scanner — planned
 

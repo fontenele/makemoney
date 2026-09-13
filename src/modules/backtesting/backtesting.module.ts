@@ -20,6 +20,9 @@ import { HistoricalCandleCoverage } from './application/historical-candle-covera
 import { HistoricalCandleGapPlanner } from './application/historical-candle-gap-planner';
 import { BacktestingController } from './presentation/backtesting.controller';
 import { BacktestSimulationRequestValidator } from './application/backtest-simulation-request-validator';
+import { BacktestRunService } from './application/backtest-run.service';
+import { BACKTEST_RUN_REPOSITORY } from './domain/backtest-run';
+import { PrismaBacktestRunRepository } from './infrastructure/prisma-backtest-run.repository';
 
 @Module({
   imports: [StrategiesModule],
@@ -37,6 +40,10 @@ import { BacktestSimulationRequestValidator } from './application/backtest-simul
       provide: HISTORICAL_CANDLE_REPOSITORY,
       useClass: PrismaHistoricalCandleRepository,
     },
+    {
+      provide: BACKTEST_RUN_REPOSITORY,
+      useClass: PrismaBacktestRunRepository,
+    },
     StrategyReplayService,
     BacktestPerformanceCalculator,
     BacktestRealizedDrawdownCalculator,
@@ -49,6 +56,7 @@ import { BacktestSimulationRequestValidator } from './application/backtest-simul
     HistoricalCandleCoverage,
     HistoricalCandleGapPlanner,
     BacktestSimulationRequestValidator,
+    BacktestRunService,
     BacktestTradeSimulator,
     HistoricalStrategyReplayService,
   ],

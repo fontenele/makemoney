@@ -39,6 +39,7 @@ import { StrategySignalReadModelService } from '../src/modules/strategies/applic
 import { HistoricalStrategyReplayService } from '../src/modules/backtesting/application/historical-strategy-replay.service';
 import { BacktestResult } from '../src/modules/backtesting/domain/backtest';
 import { HistoricalBacktestSimulationResult } from '../src/modules/backtesting/domain/backtest-simulation';
+import { BacktestRunService } from '../src/modules/backtesting/application/backtest-run.service';
 
 describe('Application (e2e)', () => {
   let app: INestApplication;
@@ -48,6 +49,15 @@ describe('Application (e2e)', () => {
   );
   const runHistoricalSimulation = jest.fn(() =>
     Promise.resolve(historicalSimulationResult()),
+  );
+  const createBacktestRun = jest.fn(() =>
+    Promise.resolve({
+      id: '00000000-0000-0000-0000-000000000001',
+      createdAt: new Date('2026-09-13T20:30:00.000Z'),
+      replayed: false,
+      request: {},
+      result: {},
+    }),
   );
 
   beforeAll(async () => {
@@ -70,6 +80,8 @@ describe('Application (e2e)', () => {
         run: runHistoricalReplay,
         runSimulation: runHistoricalSimulation,
       })
+      .overrideProvider(BacktestRunService)
+      .useValue({ create: createBacktestRun })
       .compile();
 
     app = moduleRef.createNestApplication();
@@ -125,6 +137,29 @@ describe('Application (e2e)', () => {
         endTime: new Date(body.endTime),
         limit: body.limit,
       },
+      body.configuration,
+    );
+  });
+
+  it('/backtesting/runs (POST) persists an idempotent research run', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const body = historicalSimulationRequest();
+
+    await request(server)
+      .post('/backtesting/runs')
+      .set('Idempotency-Key', 'e2e-backtest-run')
+      .send(body)
+      .expect(200)
+      .expect({
+        id: '00000000-0000-0000-0000-000000000001',
+        createdAt: '2026-09-13T20:30:00.000Z',
+        replayed: false,
+        request: {},
+        result: {},
+      });
+    expect(createBacktestRun).toHaveBeenCalledWith(
+      'e2e-backtest-run',
+      expect.objectContaining({ symbol: 'BTC/USDT', interval: '1m', limit: 2 }),
       body.configuration,
     );
   });

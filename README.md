@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M5 and M6.1–M6.25 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M5 and M6.1–M6.26 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -64,6 +64,7 @@ Local base URL: `http://localhost:3000`. Docker Compose publishes it on host loo
 | `GET` | `/strategies/signals/latest` | Latest persisted moving-average crossover signal | Local, read-only; returns `503` before the first persisted evaluation |
 | `POST` | `/backtesting/replay` | Run deterministic BTC/USDT one-minute historical signal replay | Local, research-only; JSON body `{ "startTime": UTC ISO string, "endTime": UTC ISO string, "limit": 1..10000 }`; may cache public candles; returns `400` for invalid input and `503` when unavailable |
 | `POST` | `/backtesting/simulate` | Run complete fictional BTC/USDT historical simulation | Local, research-only; replay fields plus mandatory `configuration` containing decimal-string `quantity`, `feeRate`, `spreadRate`, `slippageRate`, `maximumVolumeParticipationRate`, `initialCapitalUsdt`, and complete `executionRules`; returns `400` for invalid input and `503` when unavailable |
+| `POST` | `/backtesting/runs` | Run and persist an immutable fictional simulation snapshot | Same body as `/backtesting/simulate`; requires `Idempotency-Key`; identical replay returns the stored run, conflicting reuse returns `409`, and operational failure returns `503` |
 
 There are no public balance-mutation, order-submission, strategy-mutation, dashboard, exchange-account, or real-trading routes.
 

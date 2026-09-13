@@ -8,6 +8,7 @@ import { HistoricalStrategyReplayService } from '../application/historical-strat
 import { BacktestingController } from './backtesting.controller';
 import { BacktestSimulationRequestValidator } from '../application/backtest-simulation-request-validator';
 import { BacktestExecutionRulesValidator } from '../application/backtest-execution-rules-validator';
+import { BacktestRunService } from '../application/backtest-run.service';
 
 describe('BacktestingController', () => {
   it('runs fixed BTC/USDT one-minute replay for a valid bounded request', async () => {
@@ -121,6 +122,7 @@ function controllerWith(
     new BacktestSimulationRequestValidator(
       new BacktestExecutionRulesValidator(),
     ),
+    { create: jest.fn() } as unknown as BacktestRunService,
   );
 }
 

@@ -1714,7 +1714,7 @@ M2 — Paper Wallet                 DONE (M2.1–M2.5)
 M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
-M6 — Backtesting                  IN PROGRESS (M6.1–M6.25 DONE)
+M6 — Backtesting                  IN PROGRESS (M6.1–M6.26 DONE)
 M7 — New Listing Scanner          PLANNED
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
@@ -2279,6 +2279,7 @@ M6.22 Complete-Range Cache: DONE
 M6.23 Historical Gap Fill: DONE
 M6.24 Replay API: DONE
 M6.25 Simulation API: DONE
+M6.26 Persisted Simulation Runs: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2297,6 +2298,6 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-No next increment approved after M6.25.
+No next increment approved after M6.26.
 Stop and present a minimal plan before further backtesting implementation.
 ```

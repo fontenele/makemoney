@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-13 — M6.26 immutable simulation-run persistence completed
+
+### Added
+
+- `POST /backtesting/runs` with the same strict fictional simulation request as the ephemeral route and a required `Idempotency-Key` header.
+- Immutable PostgreSQL snapshots containing a UUID, UTC creation time, normalized complete request, and complete JSON-safe simulation result with decimal strings preserved exactly.
+- Canonical SHA-256 request fingerprints, replay without recalculation for identical requests, and HTTP 409 conflict detection for mismatched key reuse.
+- Unit, HTTP E2E, and PostgreSQL-backed integration coverage for creation, exact replay, serialization, and conflicts.
+
+### Changed
+
+- Registered the backtest-run repository and application service while leaving `POST /backtesting/simulate` unchanged.
+- Added the route to the root README and synchronized backtesting documentation, project context, roadmap, plan, map, decisions, changelog, and current state.
+
+### Verification
+
+- 375 unit tests passed across 55 suites; 32 E2E tests passed across 3 suites.
+- Prisma generation and deployment of all eight migrations, lint, formatting check, TypeScript build, Compose validation, and diff whitespace validation passed.
+- No run retrieval/list/delete route, operational wallet mutation, strategy execution, exchange authentication, order submission, or real trading was introduced.
+
 ## 2026-09-13 — M6.25 local historical simulation API completed
 
 ### Added

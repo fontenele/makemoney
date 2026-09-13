@@ -42,3 +42,8 @@ export type StrategySignal = Prisma.StrategySignalModel
  * 
  */
 export type HistoricalCandleRecord = Prisma.HistoricalCandleRecordModel
+/**
+ * Model BacktestRun
+ * 
+ */
+export type BacktestRun = Prisma.BacktestRunModel

@@ -419,3 +419,9 @@ Input contract failures are client errors. Loading, persistence, completeness, a
 The simulation endpoint accepts no server defaults for financial assumptions. Every cost, capital, liquidity, quantity, precision, and price constraint is explicit in the request, keeping results reproducible and preventing current live exchange metadata from silently changing historical research.
 
 A dedicated application validator reuses the execution-rule validator and checks the remaining configuration before historical orchestration begins. This avoids network and cache work for invalid experiments and lets the HTTP layer distinguish client configuration errors from sanitized operational unavailability. The endpoint invokes only the existing hypothetical simulator and has no operational trading dependency.
+
+## M6.26 immutable JSON simulation snapshots with idempotency
+
+Durable runs use a separate endpoint so ephemeral simulation semantics remain stable. The normalized request and complete result are stored as PostgreSQL JSONB: this preserves the evolving nested research artifact without converting decimal strings to floating point, while a UUID and creation timestamp provide stable identity.
+
+The caller-supplied idempotency key is unique and paired with a SHA-256 request fingerprint. A pre-read avoids repeat computation in the normal replay path; the database constraint resolves races after concurrent computation. Matching races return the winner, conflicting content raises an explicit conflict, and stored runs are never overwritten.

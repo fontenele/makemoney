@@ -2,6 +2,8 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ConflictException,
+  Headers,
   HttpCode,
   HttpStatus,
   Post,
@@ -15,6 +17,11 @@ import {
   HistoricalBacktestSimulationResult,
 } from '../domain/backtest-simulation';
 import { HistoricalCandleRequest } from '../domain/historical-candle-provider';
+import { BacktestRunIdempotencyConflictError } from '../domain/backtest-run';
+import {
+  BacktestRunResponse,
+  BacktestRunService,
+} from '../application/backtest-run.service';
 
 const MAX_CANDLE_LIMIT = 10_000;
 const MAX_RANGE_MS = MAX_CANDLE_LIMIT * 60_000;
@@ -24,6 +31,7 @@ export class BacktestingController {
   constructor(
     private readonly replay: HistoricalStrategyReplayService,
     private readonly simulationValidator: BacktestSimulationRequestValidator,
+    private readonly runs: BacktestRunService,
   ) {}
 
   @Post('replay')
@@ -52,6 +60,27 @@ export class BacktestingController {
       throw new ServiceUnavailableException({
         message: 'Historical simulation is currently unavailable',
         reason: 'historical_simulation_unavailable',
+      });
+    }
+  }
+
+  @Post('runs')
+  @HttpCode(HttpStatus.OK)
+  async createRun(
+    @Headers('idempotency-key') idempotencyKey: string | undefined,
+    @Body() body: unknown,
+  ): Promise<BacktestRunResponse> {
+    const key = validIdempotencyKey(idempotencyKey);
+    const { request, configuration } = this.validSimulationRequest(body);
+    try {
+      return await this.runs.create(key, request, configuration);
+    } catch (error: unknown) {
+      if (error instanceof BacktestRunIdempotencyConflictError) {
+        throw new ConflictException(error.message);
+      }
+      throw new ServiceUnavailableException({
+        message: 'Backtest run could not be persisted',
+        reason: 'backtest_run_unavailable',
       });
     }
   }
@@ -87,6 +116,13 @@ export class BacktestingController {
       );
     }
   }
+}
+
+function validIdempotencyKey(value: string | undefined): string {
+  if (!value || !/^[A-Za-z0-9_-]{1,100}$/.test(value)) {
+    throw new BadRequestException('Invalid Idempotency-Key header');
+  }
+  return value;
 }
 
 function validReplayRequest(value: unknown): HistoricalCandleRequest {
