@@ -47,6 +47,66 @@ describe('BinanceHistoricalCandlesClient', () => {
     expect(httpClient.mock.calls[0]?.[1]?.signal).toBeInstanceOf(AbortSignal);
   });
 
+  it('loads a bounded range across multiple Binance pages', async () => {
+    const pagedRequest: HistoricalCandleRequest = {
+      ...request,
+      endTime: new Date(request.startTime.getTime() + 1_000 * 60_000),
+      limit: 1_001,
+    };
+    const httpClient =
+      jest.fn<(input: string, init?: RequestInit) => Promise<Response>>();
+    httpClient
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify(
+            Array.from({ length: 1_000 }, (_, index) => kline(index)),
+          ),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([kline(1_000)]), { status: 200 }),
+      );
+    const client = new BinanceHistoricalCandlesClient(
+      'https://data-api.binance.vision',
+      httpClient,
+      () => new Date(pagedRequest.endTime.getTime() + 60_000),
+    );
+
+    const candles = await client.load(pagedRequest);
+
+    expect(candles).toHaveLength(1_001);
+    expect(candles[0]?.openTime).toEqual(pagedRequest.startTime);
+    expect(candles.at(-1)?.openTime).toEqual(pagedRequest.endTime);
+    expect(httpClient).toHaveBeenCalledTimes(2);
+    expect(httpClient.mock.calls[0]?.[0]).toContain('limit=1000');
+    expect(httpClient.mock.calls[1]?.[0]).toContain(
+      `startTime=${pagedRequest.endTime.getTime()}`,
+    );
+    expect(httpClient.mock.calls[1]?.[0]).toContain('limit=1');
+  });
+
+  it('stops pagination when Binance returns an empty page', async () => {
+    const pagedRequest: HistoricalCandleRequest = {
+      ...request,
+      endTime: new Date(request.startTime.getTime() + 1_000 * 60_000),
+      limit: 1_001,
+    };
+    const httpClient =
+      jest.fn<(input: string, init?: RequestInit) => Promise<Response>>();
+    httpClient.mockResolvedValueOnce(
+      new Response(JSON.stringify([]), { status: 200 }),
+    );
+    const client = new BinanceHistoricalCandlesClient(
+      'https://data-api.binance.vision',
+      httpClient,
+      () => new Date(pagedRequest.endTime.getTime() + 60_000),
+    );
+
+    await expect(client.load(pagedRequest)).resolves.toHaveLength(0);
+    expect(httpClient).toHaveBeenCalledTimes(1);
+  });
+
   it('discards a candle whose close time has not passed', () => {
     const client = new BinanceHistoricalCandlesClient(
       'https://data-api.binance.vision',
@@ -109,11 +169,14 @@ describe('BinanceHistoricalCandlesClient', () => {
 
   it.each([
     { ...request, limit: 0 },
-    { ...request, limit: 1001 },
-    { ...request, endTime: request.startTime },
+    { ...request, limit: 10_001 },
     {
       ...request,
-      endTime: new Date(request.startTime.getTime() + 1_001 * 60_000),
+      endTime: new Date(request.startTime.getTime() - 1),
+    },
+    {
+      ...request,
+      endTime: new Date(request.startTime.getTime() + 10_001 * 60_000),
     },
   ])('rejects an invalid or excessive request', (invalidRequest) => {
     const client = new BinanceHistoricalCandlesClient(

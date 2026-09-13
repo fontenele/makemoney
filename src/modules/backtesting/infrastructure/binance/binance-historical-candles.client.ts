@@ -11,7 +11,8 @@ type Clock = () => Date;
 const DECIMAL_PATTERN = /^(0|[1-9]\d*)(\.\d+)?$/;
 const REQUEST_TIMEOUT_MS = 10_000;
 const ONE_MINUTE_MS = 60_000;
-export const MAX_HISTORICAL_CANDLE_LIMIT = 1_000;
+export const MAX_HISTORICAL_CANDLE_PAGE_LIMIT = 1_000;
+export const MAX_HISTORICAL_CANDLE_LIMIT = 10_000;
 
 export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider {
   constructor(
@@ -25,6 +26,58 @@ export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider 
     signal?: AbortSignal,
   ): Promise<HistoricalCandle[]> {
     this.validateRequest(request);
+    const candles: HistoricalCandle[] = [];
+    let nextStartTime = request.startTime.getTime();
+
+    while (
+      candles.length < request.limit &&
+      nextStartTime <= request.endTime.getTime()
+    ) {
+      const pageRequest: HistoricalCandleRequest = {
+        ...request,
+        startTime: new Date(nextStartTime),
+        limit: Math.min(
+          MAX_HISTORICAL_CANDLE_PAGE_LIMIT,
+          request.limit - candles.length,
+        ),
+      };
+      const page = await this.loadPage(pageRequest, signal);
+      if (page.length === 0) {
+        break;
+      }
+
+      const previousCandle = candles.at(-1);
+      if (
+        previousCandle &&
+        page[0].openTime.getTime() <= previousCandle.openTime.getTime()
+      ) {
+        throw new Error(
+          'Binance historical candle pages must be uniquely ordered',
+        );
+      }
+      candles.push(...page);
+
+      const lastOpenTime = page.at(-1)!.openTime.getTime();
+      const advancedStartTime = lastOpenTime + ONE_MINUTE_MS;
+      if (
+        !Number.isSafeInteger(advancedStartTime) ||
+        advancedStartTime <= nextStartTime
+      ) {
+        throw new Error('Binance historical candle pagination did not advance');
+      }
+      nextStartTime = advancedStartTime;
+      if (page.length < pageRequest.limit) {
+        break;
+      }
+    }
+
+    return candles;
+  }
+
+  private async loadPage(
+    request: HistoricalCandleRequest,
+    signal?: AbortSignal,
+  ): Promise<HistoricalCandle[]> {
     const timeoutSignal = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
     const response = await this.httpClient(this.buildUrl(request), {
       headers: { accept: 'application/json' },
@@ -46,7 +99,11 @@ export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider 
     request: HistoricalCandleRequest,
   ): HistoricalCandle[] {
     this.validateRequest(request);
-    if (!Array.isArray(payload) || payload.length > request.limit) {
+    if (
+      request.limit > MAX_HISTORICAL_CANDLE_PAGE_LIMIT ||
+      !Array.isArray(payload) ||
+      payload.length > request.limit
+    ) {
       throw new Error('Invalid Binance historical candles payload');
     }
 
@@ -133,7 +190,7 @@ export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider 
       !Number.isSafeInteger(startTime) ||
       !Number.isSafeInteger(endTime) ||
       startTime < 0 ||
-      endTime <= startTime ||
+      endTime < startTime ||
       !Number.isInteger(request.limit) ||
       request.limit < 1 ||
       request.limit > MAX_HISTORICAL_CANDLE_LIMIT ||

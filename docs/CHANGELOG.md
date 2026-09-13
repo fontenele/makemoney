@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-13 — M6.17 bounded historical pagination completed
+
+### Added
+
+- Provider-neutral historical requests for up to 10,000 BTC/USDT one-minute candles and a matching 10,000-minute maximum span.
+- Sequential Binance retrieval using pages of at most 1,000 candles and the remaining caller limit.
+- Deterministic cursor advancement from the last validated open time, with terminal empty and partial-page handling.
+- Focused coverage for multi-page aggregation, page limits, cursor construction, empty termination, and the expanded safety ceiling.
+- The full suite now contains 325 tests across 49 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No persistence, cache, retry/rate-limit policy, parallel requests, new symbol or interval, API route, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.16 causal volume participation completed
 
 ### Added

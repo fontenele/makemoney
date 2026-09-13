@@ -20,7 +20,8 @@ M6.2 adds a provider-neutral historical-candle source and a Binance Spot impleme
 
 - Requests are fixed to `BTC/USDT` and `1m`.
 - Start and end times are mandatory, ordered UTC timestamps.
-- Limit is mandatory from 1 through 1,000, and one request may span at most 1,000 minutes.
+- Total limit is mandatory from 1 through 10,000, and one request may span at most 10,000 minutes.
+- The Binance adapter retrieves sequential pages of at most 1,000 candles and advances from the last accepted candle's next one-minute open time.
 - The client uses a ten-second timeout and supports caller cancellation.
 - Every returned 12-field kline is validated at the Binance boundary.
 - A response exceeding the requested limit, returning an out-of-range candle, or containing duplicate/out-of-order close times is rejected.
@@ -201,8 +202,19 @@ M6.16 adds a required maximum volume-participation rate greater than zero and no
 - Accepted fills retain `liquidityReferenceCandleCloseTime`, `liquidityReferenceBaseVolume`, and `maximumLiquidityFillQuantity` for audit.
 - Validation and multiplication use precision-40 `decimal.js`; no partial fill or variable sizing is inferred.
 
+## M6.17 bounded historical pagination
+
+M6.17 expands one provider-neutral historical request to at most 10,000 BTC/USDT one-minute candles while preserving Binance's 1,000-row page boundary.
+
+- Each page is requested sequentially with its own maximum of 1,000 rows and the remaining total limit.
+- The next page begins exactly one minute after the last accepted open time, guaranteeing deterministic forward progress.
+- Empty and partial pages terminate retrieval instead of repeating or inventing data.
+- Existing strict payload, range, OHLCV, ordering, open-candle, timeout, and caller-cancellation validation applies independently to every page.
+- The accumulated result never exceeds the caller's total limit and reaches replay only after pagination completes.
+- No persistence, cache, retry/rate-limit policy, new interval, symbol, or HTTP route is introduced.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, provider retry/rate-limit policy, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.

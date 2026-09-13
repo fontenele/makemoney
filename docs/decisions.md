@@ -280,7 +280,7 @@ The output is deliberately a signal timeline with period and action counts, not 
 
 Historical input is obtained through a provider-neutral contract whose first adapter uses Binance Spot's public `GET /api/v3/klines` on the market-data-only REST host. The request is deliberately one bounded BTC/USDT one-minute range: limit 1–1,000 and maximum span 1,000 minutes. This avoids implicit pagination, unbounded downloads, credentials, and persistence in the first retrieval increment.
 
-The adapter strictly validates every kline and response ordering, rejects provider drift rather than guessing, and removes any candle whose close time has not passed. Only the strategy candle projection enters replay. Provider retries, multi-request pagination, caching, storage, API exposure, and financial simulation remain deferred.
+The adapter strictly validates every kline and response ordering, rejects provider drift rather than guessing, and removes any candle whose close time has not passed. Only the strategy candle projection enters replay. At M6.2, provider retries, multi-request pagination, caching, storage, API exposure, and financial simulation remained deferred; M6.17 later introduced bounded pagination only.
 
 ## M6.3 complete provider-neutral historical candles
 
@@ -365,3 +365,9 @@ Out-of-range candidates remain unfilled and preserve state. Range validation pre
 Historical liquidity uses the fully closed signal candle's base volume rather than the following execution candle's volume. The next candle is known only as the execution-time price source, so consuming its completed volume would introduce future information. A required positive rate no greater than one converts the causal volume proxy into a maximum executable quantity.
 
 The fixed quantity remains all-or-none: exceeding the limit rejects the candidate without mutating state. Accepted fills retain the reference candle close, reference base volume, and calculated maximum quantity so the assumption is reproducible. Order-book depth, partial fills, and variable sizing remain separate future concerns.
+
+## M6.17 bounded adapter-owned historical pagination
+
+The provider-neutral request retains one total limit while the Binance adapter owns its provider-specific 1,000-row paging restriction. The total is capped at 10,000 candles and 10,000 minutes so callers gain useful research depth without enabling unbounded network or memory consumption.
+
+Pages are sequential because each cursor depends on the last validated open time. An empty or partial page is terminal; a full page advances by exactly one interval. Existing per-page normalization remains the trust boundary, and the complete bounded collection is returned only after loading finishes. Persistence, retries, rate-limit backoff, and concurrency are deliberately separate decisions.

@@ -87,7 +87,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.14 — complete:** explicit tick-size precision with conservative side-aware rounding, auditable pre-rounding prices, final-price financial accounting, and non-positive sell rejection.
 - **M6.15 — complete:** explicit inclusive minimum/maximum executable-price filters with validated ranges, dedicated unfilled accounting, and state preservation.
 - **M6.16 — complete:** causal all-or-none volume participation using only the fully closed signal candle, with explicit rate validation, auditable limits, dedicated unfilled accounting, and state preservation.
-- Later M6 increments require separate approval for historical-data persistence or pagination, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, optimization, or API exposure.
+- **M6.17 — complete:** bounded multi-request historical loading up to 10,000 candles through sequential Binance pages of at most 1,000, with deterministic progress, cancellation, and page-level validation.
+- Later M6 increments require separate approval for historical-data persistence, provider retry/rate-limit policy, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, optimization, or API exposure.
 
 ## M7 — New Listing Scanner — planned
 

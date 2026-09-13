@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.16 — deterministic replay, capital-constrained historical simulation, execution costs and constraints, equity, and performance measurement**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.17 — deterministic replay, bounded paginated historical loading, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -106,7 +106,9 @@ M6.15 adds explicit positive minimum and maximum prices to the historical rule s
 
 M6.16 requires an explicit positive maximum volume-participation rate and caps each all-or-none hypothetical fill against the fully closed signal candle's base volume. It never reads the following execution candle's volume, preserving causal replay. Liquidity rejection has dedicated accounting, preserves state, and accepted fills retain the reference volume and calculated maximum quantity for audit.
 
-Historical market-data persistence and pagination, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
+M6.17 raises the provider-neutral historical request ceiling to 10,000 BTC/USDT one-minute candles while the Binance adapter performs sequential pages of at most 1,000. Pagination advances from the last accepted open time, stops on an empty or partial page, validates every page, preserves cancellation, and returns only the globally bounded ordered result to replay.
+
+Historical market-data persistence, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, provider retry or rate-limit policy, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 
