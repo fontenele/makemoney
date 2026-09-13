@@ -10,6 +10,7 @@ import {
   BacktestSimulationResult,
 } from '../domain/backtest-simulation';
 import { HistoricalCandle } from '../domain/historical-candle';
+import { BacktestPerformanceCalculator } from './backtest-performance-calculator';
 
 const SimulationDecimal = Decimal.clone({
   precision: 40,
@@ -21,6 +22,10 @@ const DECIMAL_PATTERN = /^(?:0|[1-9]\d*)(?:\.\d+)?$/;
 
 @Injectable()
 export class BacktestTradeSimulator {
+  constructor(
+    private readonly performanceCalculator: BacktestPerformanceCalculator,
+  ) {}
+
   simulate(
     candles: readonly HistoricalCandle[],
     signals: readonly StrategySignal[],
@@ -75,6 +80,7 @@ export class BacktestTradeSimulator {
       feeRate: feeRate.toFixed(),
       fills,
       closedTrades,
+      performance: this.performanceCalculator.calculate(fills, closedTrades),
       openPosition: entry
         ? { entry, quantity: entry.quantity, costBasis: entry.totalCost }
         : null,

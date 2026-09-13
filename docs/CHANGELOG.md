@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-13 — M6.5 aggregate realized performance completed
+
+### Added
+
+- Deterministic performance calculator derived from hypothetical fills and closed trades.
+- Fill and closed-trade totals, profitable/losing/break-even counts, and nullable realized win rate.
+- Gross profit, absolute gross loss, realized net PnL, and total fees using precision-40 `decimal.js` arithmetic.
+- Explicit fee accounting for an ending open entry without introducing unrealized valuation.
+- Three focused calculator tests plus simulator integration coverage; the full suite now contains 267 tests across 42 suites.
+- Synchronized backtesting documentation, project context, roadmap, plan, map, changelog, and current state.
+
+### Scope boundaries
+
+- No mark-to-market valuation, unrealized PnL, ROI, drawdown, profit factor, expectancy, route, persistence, spread, slippage, liquidity model, pair-rule enforcement, variable sizing, wallet access, order execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.4 deterministic long-only simulation completed
 
 ### Added

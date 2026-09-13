@@ -1,0 +1,67 @@
+import { Injectable } from '@nestjs/common';
+import Decimal from 'decimal.js';
+import { BacktestPerformance } from '../domain/backtest-performance';
+import {
+  BacktestClosedTrade,
+  BacktestFill,
+} from '../domain/backtest-simulation';
+
+const PerformanceDecimal = Decimal.clone({
+  precision: 40,
+  rounding: Decimal.ROUND_HALF_EVEN,
+  toExpNeg: -40,
+  toExpPos: 40,
+});
+
+@Injectable()
+export class BacktestPerformanceCalculator {
+  calculate(
+    fills: readonly BacktestFill[],
+    closedTrades: readonly BacktestClosedTrade[],
+  ): BacktestPerformance {
+    let profitableTradeCount = 0;
+    let losingTradeCount = 0;
+    let breakEvenTradeCount = 0;
+    let grossProfit = new PerformanceDecimal(0);
+    let grossLoss = new PerformanceDecimal(0);
+    let realizedNetPnl = new PerformanceDecimal(0);
+
+    for (const trade of closedTrades) {
+      const netPnl = new PerformanceDecimal(trade.netPnl);
+      realizedNetPnl = realizedNetPnl.plus(netPnl);
+      if (netPnl.greaterThan(0)) {
+        profitableTradeCount += 1;
+        grossProfit = grossProfit.plus(netPnl);
+      } else if (netPnl.lessThan(0)) {
+        losingTradeCount += 1;
+        grossLoss = grossLoss.plus(netPnl.abs());
+      } else {
+        breakEvenTradeCount += 1;
+      }
+    }
+
+    const closedTradeCount = closedTrades.length;
+    const totalFees = fills.reduce(
+      (total, fill) => total.plus(fill.fee),
+      new PerformanceDecimal(0),
+    );
+
+    return {
+      fillCount: fills.length,
+      closedTradeCount,
+      profitableTradeCount,
+      losingTradeCount,
+      breakEvenTradeCount,
+      winRate:
+        closedTradeCount === 0
+          ? null
+          : new PerformanceDecimal(profitableTradeCount)
+              .dividedBy(closedTradeCount)
+              .toFixed(),
+      grossProfit: grossProfit.toFixed(),
+      grossLoss: grossLoss.toFixed(),
+      realizedNetPnl: realizedNetPnl.toFixed(),
+      totalFees: totalFees.toFixed(),
+    };
+  }
+}

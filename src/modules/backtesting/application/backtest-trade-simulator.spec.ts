@@ -4,9 +4,12 @@ import {
 } from '../../strategies/domain/strategy';
 import { HistoricalCandle } from '../domain/historical-candle';
 import { BacktestTradeSimulator } from './backtest-trade-simulator';
+import { BacktestPerformanceCalculator } from './backtest-performance-calculator';
 
 describe('BacktestTradeSimulator', () => {
-  const simulator = new BacktestTradeSimulator();
+  const simulator = new BacktestTradeSimulator(
+    new BacktestPerformanceCalculator(),
+  );
 
   it('fills signals only at the following candle open and includes fees', () => {
     const candles = [candle(0, '100'), candle(1, '110'), candle(2, '120')];
@@ -41,6 +44,18 @@ describe('BacktestTradeSimulator', () => {
       }),
     ]);
     expect(result.closedTrades[0]?.netPnl).toBe('3.85');
+    expect(result.performance).toEqual({
+      fillCount: 2,
+      closedTradeCount: 1,
+      profitableTradeCount: 1,
+      losingTradeCount: 0,
+      breakEvenTradeCount: 0,
+      winRate: '1',
+      grossProfit: '3.85',
+      grossLoss: '0',
+      realizedNetPnl: '3.85',
+      totalFees: '1.15',
+    });
     expect(result.openPosition).toBeNull();
   });
 

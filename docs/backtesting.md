@@ -55,8 +55,21 @@ M6.4 adds an internal, historical-only simulator that consumes the replay timeli
 
 These are research-only hypothetical fills. They do not create an order, call an executor, mutate a wallet, use the operational Risk Engine, or access an exchange account.
 
+## M6.5 aggregate realized performance
+
+M6.5 adds a deterministic performance summary derived only from the M6.4 fill ledger and closed trades.
+
+- Fill and closed-trade totals make the measurement population explicit.
+- Profitable, losing, and break-even closed trades are counted from net PnL after entry and exit fees.
+- Realized win rate is profitable closed trades divided by all closed trades, or `null` when no trade is closed.
+- Gross profit sums positive net PnL; gross loss is the absolute sum of negative net PnL; realized net PnL sums every closed trade.
+- Total fees include every hypothetical fill, including an entry fill belonging to an ending open position.
+- All arithmetic uses precision-40 `decimal.js` and returns decimal strings.
+
+The performance block does not value an open position and therefore does not imply unrealized PnL, equity, or return.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Aggregate performance metrics, mark-to-market valuation, spread, slippage, liquidity, minimum-order and precision rules, variable sizing, Risk Engine modeling, ROI, drawdown, profit factor, expectancy, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
+Mark-to-market valuation, spread, slippage, liquidity, minimum-order and precision rules, variable sizing, Risk Engine modeling, ROI, drawdown, profit factor, expectancy, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.

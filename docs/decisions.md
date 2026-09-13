@@ -293,3 +293,9 @@ The orchestration service explicitly projects the full candle into the existing 
 Historical simulation is a separate consumer of strategy output. A signal evaluated at a candle close may fill only at the following candle's open, preventing same-close execution and making the causal delay explicit in the ledger. A final non-hold signal is reported as unfilled because no future price exists.
 
 The first model is deliberately one fixed-quantity long position. It applies an explicit taker fee to entry and exit notionals and computes fee-inclusive cost, net proceeds, and per-trade net PnL with precision-40 decimal arithmetic. Redundant actions are counted rather than inventing pyramiding or short selling, and an ending position remains open. These objects are hypothetical research records, not orders; no wallet, executor, operational risk state, or exchange integration is invoked.
+
+## M6.5 realized-only performance boundary
+
+Backtest performance is derived from the simulator's immutable fill ledger and closed trades rather than being accumulated independently during signal handling. This keeps execution semantics as the source of truth and makes the summary reproducible.
+
+Win rate includes every closed trade in its denominator and is `null` when none exist. Gross loss is exposed as a positive magnitude, while realized net PnL retains its sign. Total fees include all fills, including an ending open entry, but no value or PnL is assigned to that open position without a separately approved mark-to-market rule.
