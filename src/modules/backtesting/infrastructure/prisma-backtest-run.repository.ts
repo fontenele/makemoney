@@ -12,6 +12,11 @@ import {
 export class PrismaBacktestRunRepository implements BacktestRunRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findById(id: string): Promise<BacktestRun | undefined> {
+    const run = await this.prisma.backtestRun.findUnique({ where: { id } });
+    return run ? mapRun(run) : undefined;
+  }
+
   async findByIdempotencyKey(key: string): Promise<BacktestRun | undefined> {
     const run = await this.prisma.backtestRun.findUnique({
       where: { idempotencyKey: key },

@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-13 — M6.27 immutable simulation-run retrieval completed
+
+### Added
+
+- Read-only `GET /backtesting/runs/:id` returning one complete immutable simulation snapshot by UUID.
+- Explicit HTTP 400 for malformed UUIDs, 404 for absent runs, and sanitized 503 for operational lookup failures.
+- Unit, HTTP E2E, and PostgreSQL-backed repository coverage for exact retrieval, absence, validation, and failure mapping.
+
+### Changed
+
+- Extended the backtest-run repository and application service with direct primary-key lookup while keeping persistence metadata private.
+- Added the route to the root README and synchronized backtesting documentation, project context, roadmap, plan, map, decisions, changelog, and current state.
+
+### Verification
+
+- 381 unit tests passed across 55 suites; 34 E2E tests passed across 3 suites.
+- Lint, formatting check, TypeScript build, Compose validation, and diff whitespace validation passed.
+- No recalculation, Binance access, listing, pagination, deletion, update, financial mutation, exchange authentication, order submission, or real trading was introduced.
+
 ## 2026-09-13 — M6.26 immutable simulation-run persistence completed
 
 ### Added

@@ -3,9 +3,12 @@ import {
   Body,
   Controller,
   ConflictException,
+  Get,
   Headers,
   HttpCode,
   HttpStatus,
+  NotFoundException,
+  Param,
   Post,
   ServiceUnavailableException,
 } from '@nestjs/common';
@@ -21,6 +24,7 @@ import { BacktestRunIdempotencyConflictError } from '../domain/backtest-run';
 import {
   BacktestRunResponse,
   BacktestRunService,
+  StoredBacktestRunResponse,
 } from '../application/backtest-run.service';
 
 const MAX_CANDLE_LIMIT = 10_000;
@@ -85,6 +89,26 @@ export class BacktestingController {
     }
   }
 
+  @Get('runs/:id')
+  async getRun(@Param('id') id: string): Promise<StoredBacktestRunResponse> {
+    const validId = validUuid(id);
+    try {
+      const run = await this.runs.findById(validId);
+      if (!run) {
+        throw new NotFoundException('Backtest run was not found');
+      }
+      return run;
+    } catch (error: unknown) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new ServiceUnavailableException({
+        message: 'Backtest run is currently unavailable',
+        reason: 'backtest_run_unavailable',
+      });
+    }
+  }
+
   private validSimulationRequest(value: unknown): {
     request: HistoricalCandleRequest;
     configuration: BacktestSimulationConfiguration;
@@ -116,6 +140,17 @@ export class BacktestingController {
       );
     }
   }
+}
+
+function validUuid(value: string): string {
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      value,
+    )
+  ) {
+    throw new BadRequestException('Invalid backtest run id');
+  }
+  return value;
 }
 
 function validIdempotencyKey(value: string | undefined): string {

@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.26 — deterministic replay, resilient durable historical loading, stored replay, gap-aware cache reuse, replay and simulation APIs, immutable simulation-run persistence, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.27 — deterministic replay, resilient durable historical loading, stored replay, gap-aware cache reuse, replay and simulation APIs, immutable simulation-run persistence and retrieval, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -125,6 +125,8 @@ M6.24 exposes deterministic historical signal replay through local `POST /backte
 M6.25 exposes the complete research-only simulator through local `POST /backtesting/simulate`. Its strict explicit configuration is validated before historical loading and includes fixed quantity, fees, spread, slippage, volume participation, initial fictional capital, and a provider-neutral execution-rule snapshot. It cannot mutate the paper wallet or submit an order.
 
 M6.26 adds immutable PostgreSQL simulation-run snapshots through `POST /backtesting/runs`. A required idempotency key and canonical request fingerprint replay identical requests without recalculation, reject conflicting reuse, and preserve the complete serialized request and result with exact decimal strings and UTC dates.
+
+M6.27 exposes one stored simulation snapshot by UUID through read-only `GET /backtesting/runs/:id`. Retrieval returns only the immutable public artifact, never recalculates or contacts Binance, and distinguishes invalid identity, absence, and operational failure.
 
 Run retrieval/listing/deletion, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

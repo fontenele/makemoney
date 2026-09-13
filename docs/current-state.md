@@ -4,7 +4,7 @@ Last validated: 2026-09-13
 
 ## Milestone status
 
-M0 through M5 and M6.1–M6.26 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, immutable idempotent simulation-run persistence, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M5 and M6.1–M6.27 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, immutable idempotent simulation-run persistence and retrieval, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -94,6 +94,7 @@ M0 through M5 and M6.1–M6.26 are complete. M1 provides unauthenticated public 
 - Local `POST /backtesting/replay` accepts a strict bounded UTC range and exposes deterministic signal replay while retaining fixed BTC/USDT one-minute identity and no financial execution access.
 - Local `POST /backtesting/simulate` validates every explicit fictional financial assumption before historical loading and exposes the complete deterministic simulation result without mutating operational financial state.
 - Local `POST /backtesting/runs` requires an idempotency key and persists the complete normalized request and serialized simulation result as an immutable PostgreSQL JSON snapshot. Identical replay returns the original UUID and creation time without recalculation; conflicting key reuse returns HTTP 409.
+- Read-only `GET /backtesting/runs/:id` retrieves one immutable snapshot by UUID without recalculation or market-data access and exposes explicit invalid, absent, and unavailable states.
 - Three exhausted transient historical-page failures open a process-local circuit for 30 seconds; it fails fast while open and permits one concurrent half-open recovery probe before closing or reopening.
 - Candles whose close time has not passed are excluded, and the historical orchestration service delegates the remaining normalized projections directly to deterministic replay.
 - M6.2 adds no route, persistence, pagination, retry policy, trade simulation, financial metric, wallet access, or execution.
@@ -133,6 +134,7 @@ M0 through M5 and M6.1–M6.26 are complete. M1 provides unauthenticated public 
 - Historical signal replay: `POST http://localhost:3000/backtesting/replay`
 - Historical fictional simulation: `POST http://localhost:3000/backtesting/simulate`
 - Persisted historical simulation run: `POST http://localhost:3000/backtesting/runs`
+- Stored historical simulation run: `GET http://localhost:3000/backtesting/runs/:id`
 - PostgreSQL host port: `5433` mapped to container port `5432`
 - Redis host port: `6379`
 
@@ -140,18 +142,18 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-13 after M6.26:
+The following passed on 2026-09-13 after M6.27:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 375 tests passed across 55 suites
+- `npm test -- --runInBand` — 381 tests passed across 55 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
-The most recent database-backed integration validation was repeated after M6.26:
+The most recent database-backed integration validation was repeated after M6.27:
 
-- `$env:RISK_MAX_BTC_POSITION_QUANTITY='1'; npm run test:e2e -- --runInBand` — 32 tests passed across 3 suites, including strict replay and simulation HTTP contracts, immutable idempotent simulation-run snapshots, conflict detection, bounded chronological stored-candle reads, exact candle storage, transactional conflict rollback, and all prior integration scenarios
+- `$env:RISK_MAX_BTC_POSITION_QUANTITY='1'; npm run test:e2e -- --runInBand` — 34 tests passed across 3 suites, including immutable run lookup by UUID, strict replay and simulation HTTP contracts, immutable idempotent simulation-run snapshots, conflict detection, bounded chronological stored-candle reads, exact candle storage, transactional conflict rollback, and all prior integration scenarios
 - `npx prisma migrate deploy` — all eight migrations applied, including immutable backtest-run storage
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
@@ -163,7 +165,7 @@ The most recent database-backed integration validation was repeated after M6.26:
 
 ## Repository state
 
-M0 through M6.25 are committed. M6.26 changes are currently in the working tree.
+M0 through M6.26 are committed. M6.27 changes are currently in the working tree.
 
 ## Known issues and cautions
 

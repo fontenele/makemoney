@@ -425,3 +425,9 @@ A dedicated application validator reuses the execution-rule validator and checks
 Durable runs use a separate endpoint so ephemeral simulation semantics remain stable. The normalized request and complete result are stored as PostgreSQL JSONB: this preserves the evolving nested research artifact without converting decimal strings to floating point, while a UUID and creation timestamp provide stable identity.
 
 The caller-supplied idempotency key is unique and paired with a SHA-256 request fingerprint. A pre-read avoids repeat computation in the normal replay path; the database constraint resolves races after concurrent computation. Matching races return the winner, conflicting content raises an explicit conflict, and stored runs are never overwritten.
+
+## M6.27 direct immutable run lookup
+
+The first read operation is deliberately a primary-key lookup rather than a list. UUID validation occurs at the HTTP boundary, while absence remains distinct from database unavailability. The public response excludes idempotency keys and request fingerprints because those fields support persistence coordination rather than interpretation of the research result.
+
+Retrieval returns the stored JSON snapshot exactly and cannot invoke simulation or market-data loading. This creates the smallest useful read contract for later local tooling without introducing pagination, retention, deletion, or mutable run lifecycle semantics.

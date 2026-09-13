@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { jest } from '@jest/globals';
@@ -11,6 +12,54 @@ import { BacktestExecutionRulesValidator } from '../application/backtest-executi
 import { BacktestRunService } from '../application/backtest-run.service';
 
 describe('BacktestingController', () => {
+  it('returns a stored backtest run by UUID', async () => {
+    const id = '00000000-0000-4000-8000-000000000001';
+    const stored = {
+      id,
+      createdAt: new Date('2026-09-13T20:30:00.000Z'),
+      request: {},
+      result: {},
+    };
+    const controller = controllerWith(
+      {},
+      {
+        findById: jest.fn(() => Promise.resolve(stored)),
+      },
+    );
+    await expect(controller.getRun(id)).resolves.toBe(stored);
+  });
+
+  it('rejects an invalid run UUID before repository access', async () => {
+    const findById = jest.fn();
+    const controller = controllerWith({}, { findById });
+    await expect(controller.getRun('not-a-uuid')).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+    expect(findById).not.toHaveBeenCalled();
+  });
+
+  it('returns not found for an absent run', async () => {
+    const controller = controllerWith(
+      {},
+      {
+        findById: jest.fn(() => Promise.resolve(undefined)),
+      },
+    );
+    await expect(
+      controller.getRun('00000000-0000-4000-8000-000000000001'),
+    ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('sanitizes an operational run lookup failure', async () => {
+    const controller = controllerWith(
+      {},
+      { findById: jest.fn(() => Promise.reject(new Error('database'))) },
+    );
+    await expect(
+      controller.getRun('00000000-0000-4000-8000-000000000001'),
+    ).rejects.toBeInstanceOf(ServiceUnavailableException);
+  });
+
   it('runs fixed BTC/USDT one-minute replay for a valid bounded request', async () => {
     const result = { candleCount: 1 } as BacktestResult;
     const run = jest.fn(() => Promise.resolve(result));
@@ -116,13 +165,14 @@ describe('BacktestingController', () => {
 
 function controllerWith(
   service: Partial<HistoricalStrategyReplayService>,
+  runs: Partial<BacktestRunService> = {},
 ): BacktestingController {
   return new BacktestingController(
     service as HistoricalStrategyReplayService,
     new BacktestSimulationRequestValidator(
       new BacktestExecutionRulesValidator(),
     ),
-    { create: jest.fn() } as unknown as BacktestRunService,
+    { create: jest.fn(), findById: jest.fn(), ...runs } as BacktestRunService,
   );
 }
 

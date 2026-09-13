@@ -7,6 +7,31 @@ import { HistoricalStrategyReplayService } from './historical-strategy-replay.se
 import { BacktestRunService } from './backtest-run.service';
 
 describe('BacktestRunService', () => {
+  it('returns a stored run by id without exposing persistence metadata', async () => {
+    const existing = storedRun();
+    const service = new BacktestRunService(
+      {} as HistoricalStrategyReplayService,
+      repositoryWith({
+        findById: jest.fn(() => Promise.resolve(existing)),
+      }),
+    );
+
+    await expect(service.findById(existing.id)).resolves.toEqual({
+      id: existing.id,
+      createdAt: existing.createdAt,
+      request: existing.request,
+      result: existing.result,
+    });
+  });
+
+  it('returns undefined when a stored run does not exist', async () => {
+    const service = new BacktestRunService(
+      {} as HistoricalStrategyReplayService,
+      repositoryWith(),
+    );
+    await expect(service.findById(storedRun().id)).resolves.toBeUndefined();
+  });
+
   it('returns an identical existing run without recalculating', async () => {
     const existing = storedRun();
     const repository = repositoryWith({
@@ -75,6 +100,7 @@ function repositoryWith(
   change: Partial<BacktestRunRepository> = {},
 ): BacktestRunRepository {
   return {
+    findById: jest.fn(() => Promise.resolve(undefined)),
     findByIdempotencyKey: jest.fn(() => Promise.resolve(undefined)),
     create: jest.fn<BacktestRunRepository['create']>((run) =>
       Promise.resolve({

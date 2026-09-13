@@ -59,6 +59,14 @@ describe('Application (e2e)', () => {
       result: {},
     }),
   );
+  const findBacktestRun = jest.fn(() =>
+    Promise.resolve({
+      id: '00000000-0000-4000-8000-000000000001',
+      createdAt: new Date('2026-09-13T20:30:00.000Z'),
+      request: { symbol: 'BTC/USDT' },
+      result: { totalNetReturnUsdt: '1.25' },
+    }),
+  );
 
   beforeAll(async () => {
     const pairMetadataProvider: PairMetadataProvider = {
@@ -81,7 +89,7 @@ describe('Application (e2e)', () => {
         runSimulation: runHistoricalSimulation,
       })
       .overrideProvider(BacktestRunService)
-      .useValue({ create: createBacktestRun })
+      .useValue({ create: createBacktestRun, findById: findBacktestRun })
       .compile();
 
     app = moduleRef.createNestApplication();
@@ -162,6 +170,22 @@ describe('Application (e2e)', () => {
       expect.objectContaining({ symbol: 'BTC/USDT', interval: '1m', limit: 2 }),
       body.configuration,
     );
+  });
+
+  it('/backtesting/runs/:id (GET) returns an immutable stored run', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const id = '00000000-0000-4000-8000-000000000001';
+
+    await request(server)
+      .get(`/backtesting/runs/${id}`)
+      .expect(200)
+      .expect({
+        id,
+        createdAt: '2026-09-13T20:30:00.000Z',
+        request: { symbol: 'BTC/USDT' },
+        result: { totalNetReturnUsdt: '1.25' },
+      });
+    expect(findBacktestRun).toHaveBeenCalledWith(id);
   });
 
   it('persists strategy signals idempotently and serves them after memory-independent reads', async () => {

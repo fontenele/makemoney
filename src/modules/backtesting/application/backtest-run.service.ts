@@ -19,6 +19,8 @@ export interface BacktestRunResponse {
   result: JsonValue;
 }
 
+export type StoredBacktestRunResponse = Omit<BacktestRunResponse, 'replayed'>;
+
 @Injectable()
 export class BacktestRunService {
   constructor(
@@ -26,6 +28,14 @@ export class BacktestRunService {
     @Inject(BACKTEST_RUN_REPOSITORY)
     private readonly repository: BacktestRunRepository,
   ) {}
+
+  async findById(id: string): Promise<StoredBacktestRunResponse | undefined> {
+    const run = await this.repository.findById(id);
+    if (!run) {
+      return undefined;
+    }
+    return storedResponse(run);
+  }
 
   async create(
     idempotencyKey: string,
@@ -62,6 +72,15 @@ export class BacktestRunService {
     });
     return response(created.run, created.replayed);
   }
+}
+
+function storedResponse(run: BacktestRun): StoredBacktestRunResponse {
+  return {
+    id: run.id,
+    createdAt: run.createdAt,
+    request: run.request,
+    result: run.result,
+  };
 }
 
 function response(run: BacktestRun, replayed: boolean): BacktestRunResponse {

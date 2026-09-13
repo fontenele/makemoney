@@ -38,9 +38,16 @@ describe('Backtest run persistence (e2e)', () => {
 
     expect(first.replayed).toBe(false);
     expect(replay).toEqual({ run: first.run, replayed: true });
+    await expect(repository.findById(first.run.id)).resolves.toEqual(first.run);
     await expect(
       prisma.backtestRun.count({ where: { idempotencyKey: key } }),
     ).resolves.toBe(1);
+  });
+
+  it('returns undefined for an unknown UUID', async () => {
+    await expect(
+      repository.findById('00000000-0000-4000-8000-000000000099'),
+    ).resolves.toBeUndefined();
   });
 
   it('rejects conflicting idempotency-key reuse', async () => {

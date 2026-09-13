@@ -323,6 +323,16 @@ M6.26 adds `POST /backtesting/runs` as the explicit durable counterpart to the u
 - Persistence failure returns no saved-run response. Runs are immutable and have no update or delete operation.
 - Retrieval and bounded listing are not introduced yet.
 
+## M6.27 immutable run retrieval
+
+M6.27 adds read-only `GET /backtesting/runs/:id` for one previously persisted simulation snapshot.
+
+- The path identity must be a canonical-shape UUID; malformed values fail before repository access.
+- A successful response contains only `id`, `createdAt`, `request`, and `result`; internal idempotency and fingerprint fields remain private.
+- Retrieval reads PostgreSQL directly and never recalculates, loads candles, contacts Binance, or mutates the stored artifact.
+- Missing runs return HTTP 404, invalid UUIDs return HTTP 400, and operational database failures return a sanitized HTTP 503.
+- Listing, pagination, filtering, update, and deletion are not introduced.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.

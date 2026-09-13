@@ -13,6 +13,7 @@ export interface BacktestRun {
 }
 
 export interface BacktestRunRepository {
+  findById(id: string): Promise<BacktestRun | undefined>;
   findByIdempotencyKey(key: string): Promise<BacktestRun | undefined>;
   create(
     run: Omit<BacktestRun, 'id' | 'createdAt'>,
