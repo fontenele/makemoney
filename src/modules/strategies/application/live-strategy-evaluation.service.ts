@@ -69,7 +69,16 @@ export class LiveStrategyEvaluationService
       candles: [...this.closedCandles],
       evaluatedAt: candle.receivedAt,
     });
-    this.signalReadModel.record(signal);
+    void this.signalReadModel.record(signal).catch((error: unknown) => {
+      this.logger.error({
+        event: 'strategy.signal_persistence_failed',
+        strategy: signal.strategy,
+        symbol: signal.symbol,
+        latestCandleCloseTime:
+          signal.latestCandleCloseTime?.toISOString() ?? null,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    });
     this.logger.log({
       event: 'strategy.signal_generated',
       ...signal,

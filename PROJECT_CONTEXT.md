@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, and **M5.1–M5.5 — deterministic moving-average strategy observation and read APIs**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, and **M5.1–M5.6 — deterministic moving-average strategy observation, persistence, and read APIs**.
 - No next increment is approved. Stop and present a minimal plan before further strategy work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -72,7 +72,9 @@ M5.4 configures the moving-average periods at startup with validated, bounded po
 
 M5.5 retains at most 100 generated signals in process memory and exposes them newest first at `GET /strategies/signals`, with an optional limit from 1 through 100 and a default of 50. The existing latest-signal route reads the same model.
 
-Historical market data, signal persistence, position sizing, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
+M5.6 persists generated signals in PostgreSQL with idempotency by strategy, symbol, and candle close time. Recent and latest routes now read durable data and survive restarts; persistence failure is logged without creating any execution path.
+
+Historical market data, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 

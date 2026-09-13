@@ -1,49 +1,45 @@
 import { ServiceUnavailableException } from '@nestjs/common';
 import { StrategySignalReadModelService } from '../application/strategy-signal-read-model.service';
 import { StrategySignal } from '../domain/strategy';
+import { StrategySignalRepository } from '../domain/strategy-signal-repository';
 import { StrategiesController } from './strategies.controller';
 
 describe('StrategiesController', () => {
-  it('returns service unavailable before a live signal exists', () => {
-    const controller = new StrategiesController(
-      new StrategySignalReadModelService(),
-    );
+  it('returns service unavailable before a persisted signal exists', async () => {
+    const controller = new StrategiesController(createSignalReadModel());
 
-    expect(() => controller.getLatestSignal()).toThrow(
+    await expect(controller.getLatestSignal()).rejects.toThrow(
       ServiceUnavailableException,
     );
   });
 
-  it('returns the latest live signal', () => {
-    const latest = new StrategySignalReadModelService();
+  it('returns the latest persisted signal', async () => {
+    const latest = createSignalReadModel();
     const value = signal();
-    latest.record(value);
+    await latest.record(value);
     const controller = new StrategiesController(latest);
 
-    expect(controller.getLatestSignal()).toBe(value);
+    await expect(controller.getLatestSignal()).resolves.toBe(value);
   });
 
-  it('returns recent signals using the default or requested limit', () => {
-    const signals = new StrategySignalReadModelService();
+  it('returns recent signals using the default or requested limit', async () => {
+    const signals = createSignalReadModel();
     for (let index = 0; index < 51; index += 1) {
-      signals.record(signal(index));
+      await signals.record(signal(index));
     }
     const controller = new StrategiesController(signals);
 
-    expect(controller.listSignals()).toHaveLength(50);
-    expect(controller.listSignals().at(-1)?.evaluatedAt).toEqual(
-      signal(1).evaluatedAt,
-    );
-    expect(controller.listSignals('1')).toEqual([signal(50)]);
-    expect(controller.listSignals('100')).toHaveLength(51);
+    const defaultHistory = await controller.listSignals();
+    expect(defaultHistory).toHaveLength(50);
+    expect(defaultHistory.at(-1)?.evaluatedAt).toEqual(signal(1).evaluatedAt);
+    await expect(controller.listSignals('1')).resolves.toEqual([signal(50)]);
+    await expect(controller.listSignals('100')).resolves.toHaveLength(51);
   });
 
   it.each(['0', '-1', '1.5', 'abc', '101'])(
     'rejects invalid history limit %s',
     (limit) => {
-      const controller = new StrategiesController(
-        new StrategySignalReadModelService(),
-      );
+      const controller = new StrategiesController(createSignalReadModel());
 
       expect(() => controller.listSignals(limit)).toThrow(
         'limit must be an integer from 1 to 100',
@@ -51,6 +47,19 @@ describe('StrategiesController', () => {
     },
   );
 });
+
+function createSignalReadModel(): StrategySignalReadModelService {
+  const values: StrategySignal[] = [];
+  const repository: StrategySignalRepository = {
+    save: (value) => {
+      values.push(value);
+      return Promise.resolve(value);
+    },
+    getLatest: () => Promise.resolve(values.at(-1)),
+    listRecent: (limit) => Promise.resolve(values.slice(-limit).reverse()),
+  };
+  return new StrategySignalReadModelService(repository);
+}
 
 function signal(index = 0): StrategySignal {
   return {

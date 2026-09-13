@@ -6,6 +6,8 @@ import { LiveStrategyEvaluationService } from './application/live-strategy-evalu
 import { MOVING_AVERAGE_CROSSOVER_STRATEGY } from './domain/strategy';
 import { StrategySignalReadModelService } from './application/strategy-signal-read-model.service';
 import { StrategiesController } from './presentation/strategies.controller';
+import { STRATEGY_SIGNAL_REPOSITORY } from './domain/strategy-signal-repository';
+import { PrismaStrategySignalRepository } from './infrastructure/prisma-strategy-signal.repository';
 
 @Module({
   imports: [MarketDataModule],
@@ -22,6 +24,10 @@ import { StrategiesController } from './presentation/strategies.controller';
     },
     LiveStrategyEvaluationService,
     StrategySignalReadModelService,
+    {
+      provide: STRATEGY_SIGNAL_REPOSITORY,
+      useClass: PrismaStrategySignalRepository,
+    },
   ],
   exports: [MOVING_AVERAGE_CROSSOVER_STRATEGY],
 })

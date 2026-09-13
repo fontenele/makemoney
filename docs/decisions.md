@@ -263,3 +263,9 @@ The strategy contract declares its required candle count. This keeps the evaluat
 Live evaluations are recorded once in a shared process-local read model used by both recent-history and latest-signal queries. A fixed capacity of 100 prevents unbounded memory growth; reads return newest first, default to 50, and accept no more than the retained capacity. Empty history is a valid list response, while the existing latest route keeps its explicit unavailable response.
 
 This is an operational observation surface, not durable strategy research data. PostgreSQL persistence, cursor pagination, filters, aggregates, sizing, risk assessment, and execution remain deferred.
+
+## M5.6 idempotent durable signals
+
+Strategy signals are persisted behind a provider-neutral repository. The database identity is the combination of strategy, symbol, and latest closed-candle time, preventing duplicate rows when a candle is processed again after delivery duplication or restart. A conflict returns the original row and never overwrites historical parameters or calculations.
+
+Recent and latest queries read PostgreSQL directly rather than rebuilding an in-memory cache. Decimal averages use `DECIMAL(65,40)` to preserve the strategy's precision and map back to canonical strings. Persistence errors are logged and isolated from the market-data subscriber; signals still have no path to an executor.

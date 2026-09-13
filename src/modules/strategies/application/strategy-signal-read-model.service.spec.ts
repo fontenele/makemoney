@@ -1,48 +1,30 @@
+import { jest } from '@jest/globals';
 import { StrategySignal } from '../domain/strategy';
-import {
-  MAX_STRATEGY_SIGNAL_HISTORY_LIMIT,
-  StrategySignalReadModelService,
-} from './strategy-signal-read-model.service';
+import { StrategySignalRepository } from '../domain/strategy-signal-repository';
+import { StrategySignalReadModelService } from './strategy-signal-read-model.service';
 
 describe('StrategySignalReadModelService', () => {
-  it('starts without a latest signal or history', () => {
-    const service = new StrategySignalReadModelService();
+  it('delegates persistence and reads to the repository', async () => {
+    const value = signal();
+    const save = jest.fn(() => Promise.resolve(value));
+    const getLatest = jest.fn(() => Promise.resolve(value));
+    const listRecent = jest.fn(() => Promise.resolve([value]));
+    const repository: StrategySignalRepository = {
+      save,
+      getLatest,
+      listRecent,
+    };
+    const service = new StrategySignalReadModelService(repository);
 
-    expect(service.getLatest()).toBeUndefined();
-    expect(service.listRecent(50)).toEqual([]);
-  });
-
-  it('returns the latest signal and recent history newest first', () => {
-    const service = new StrategySignalReadModelService();
-    const first = signal(1);
-    const second = signal(2);
-    const latest = signal(3);
-    service.record(first);
-    service.record(second);
-    service.record(latest);
-
-    expect(service.getLatest()).toBe(latest);
-    expect(service.listRecent(2)).toEqual([latest, second]);
-  });
-
-  it('discards the oldest signals beyond the fixed capacity', () => {
-    const service = new StrategySignalReadModelService();
-    for (
-      let index = 0;
-      index <= MAX_STRATEGY_SIGNAL_HISTORY_LIMIT;
-      index += 1
-    ) {
-      service.record(signal(index));
-    }
-
-    const history = service.listRecent(MAX_STRATEGY_SIGNAL_HISTORY_LIMIT);
-    expect(history).toHaveLength(MAX_STRATEGY_SIGNAL_HISTORY_LIMIT);
-    expect(history.at(-1)?.evaluatedAt).toEqual(signal(1).evaluatedAt);
+    await expect(service.record(value)).resolves.toBe(value);
+    await expect(service.getLatest()).resolves.toBe(value);
+    await expect(service.listRecent(25)).resolves.toEqual([value]);
+    expect(save).toHaveBeenCalledWith(value);
+    expect(listRecent).toHaveBeenCalledWith(25);
   });
 });
 
-function signal(index: number): StrategySignal {
-  const evaluatedAt = new Date(Date.UTC(2026, 8, 12, 12, index));
+function signal(): StrategySignal {
   return {
     strategy: 'moving_average_crossover',
     symbol: 'BTC/USDT',
@@ -54,7 +36,7 @@ function signal(index: number): StrategySignal {
     previousLongAverage: '100',
     currentShortAverage: '100',
     currentLongAverage: '100',
-    latestCandleCloseTime: new Date(evaluatedAt.getTime() - 1),
-    evaluatedAt,
+    latestCandleCloseTime: new Date('2026-09-12T12:00:59.999Z'),
+    evaluatedAt: new Date('2026-09-12T12:01:00.100Z'),
   };
 }

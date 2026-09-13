@@ -399,7 +399,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   PaperBalance: 'PaperBalance',
   PaperExecution: 'PaperExecution',
-  RiskControlEvent: 'RiskControlEvent'
+  RiskControlEvent: 'RiskControlEvent',
+  StrategySignal: 'StrategySignal'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -641,6 +642,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    StrategySignal: {
+      payload: Prisma.$StrategySignalPayload<ExtArgs>
+      fields: Prisma.StrategySignalFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StrategySignalFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StrategySignalPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StrategySignalFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StrategySignalPayload>
+        }
+        findFirst: {
+          args: Prisma.StrategySignalFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StrategySignalPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StrategySignalFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StrategySignalPayload>
+        }
+        findMany: {
+          args: Prisma.StrategySignalFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StrategySignalPayload>[]
+        }
+        create: {
+          args: Prisma.StrategySignalCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StrategySignalPayload>
+        }
+        createMany: {
+          args: Prisma.StrategySignalCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StrategySignalCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StrategySignalPayload>[]
+        }
+        delete: {
+          args: Prisma.StrategySignalDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StrategySignalPayload>
+        }
+        update: {
+          args: Prisma.StrategySignalUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StrategySignalPayload>
+        }
+        deleteMany: {
+          args: Prisma.StrategySignalDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StrategySignalUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StrategySignalUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StrategySignalPayload>[]
+        }
+        upsert: {
+          args: Prisma.StrategySignalUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StrategySignalPayload>
+        }
+        aggregate: {
+          args: Prisma.StrategySignalAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStrategySignal>
+        }
+        groupBy: {
+          args: Prisma.StrategySignalGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StrategySignalGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StrategySignalCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StrategySignalCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -717,6 +792,25 @@ export const RiskControlEventScalarFieldEnum = {
 } as const
 
 export type RiskControlEventScalarFieldEnum = (typeof RiskControlEventScalarFieldEnum)[keyof typeof RiskControlEventScalarFieldEnum]
+
+
+export const StrategySignalScalarFieldEnum = {
+  id: 'id',
+  strategy: 'strategy',
+  symbol: 'symbol',
+  action: 'action',
+  reason: 'reason',
+  shortPeriod: 'shortPeriod',
+  longPeriod: 'longPeriod',
+  previousShortAverage: 'previousShortAverage',
+  previousLongAverage: 'previousLongAverage',
+  currentShortAverage: 'currentShortAverage',
+  currentLongAverage: 'currentLongAverage',
+  latestCandleCloseTime: 'latestCandleCloseTime',
+  evaluatedAt: 'evaluatedAt'
+} as const
+
+export type StrategySignalScalarFieldEnum = (typeof StrategySignalScalarFieldEnum)[keyof typeof StrategySignalScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -809,6 +903,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -965,6 +1073,7 @@ export type GlobalOmitConfig = {
   paperBalance?: Prisma.PaperBalanceOmit
   paperExecution?: Prisma.PaperExecutionOmit
   riskControlEvent?: Prisma.RiskControlEventOmit
+  strategySignal?: Prisma.StrategySignalOmit
 }
 
 /* Types for Logging */

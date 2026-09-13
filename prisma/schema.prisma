@@ -43,3 +43,23 @@ model RiskControlEvent {
   @@index([control, changedAt, id])
   @@map("risk_control_events")
 }
+
+model StrategySignal {
+  id                      String    @id @default(uuid()) @db.Uuid
+  strategy                String    @db.VarChar(100)
+  symbol                  String    @db.VarChar(20)
+  action                  String    @db.VarChar(10)
+  reason                  String    @db.VarChar(100)
+  shortPeriod             Int       @map("short_period")
+  longPeriod              Int       @map("long_period")
+  previousShortAverage    Decimal?  @map("previous_short_average") @db.Decimal(65, 40)
+  previousLongAverage     Decimal?  @map("previous_long_average") @db.Decimal(65, 40)
+  currentShortAverage     Decimal?  @map("current_short_average") @db.Decimal(65, 40)
+  currentLongAverage      Decimal?  @map("current_long_average") @db.Decimal(65, 40)
+  latestCandleCloseTime   DateTime? @map("latest_candle_close_time")
+  evaluatedAt             DateTime  @map("evaluated_at")
+
+  @@unique([strategy, symbol, latestCandleCloseTime])
+  @@index([evaluatedAt, id])
+  @@map("strategy_signals")
+}

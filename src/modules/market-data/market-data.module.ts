@@ -68,7 +68,6 @@ import { BinancePublicTradesClient } from './infrastructure/binance/binance-publ
     LatestMarketPriceService,
     LatestPairMetadataService,
     LatestTopOfBookService,
-    MarketCandleFeedService,
     PublicTickerService,
     PublicCandlesService,
     PublicPairMetadataService,
@@ -79,6 +78,7 @@ import { BinancePublicTradesClient } from './infrastructure/binance/binance-publ
     LatestMarketPriceService,
     LatestPairMetadataService,
     LatestTopOfBookService,
+    MarketCandleFeedService,
   ],
 })
 export class MarketDataModule {}

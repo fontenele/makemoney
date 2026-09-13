@@ -1,25 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { StrategySignal } from '../domain/strategy';
+import {
+  STRATEGY_SIGNAL_REPOSITORY,
+  StrategySignalRepository,
+} from '../domain/strategy-signal-repository';
 
 export const DEFAULT_STRATEGY_SIGNAL_HISTORY_LIMIT = 50;
 export const MAX_STRATEGY_SIGNAL_HISTORY_LIMIT = 100;
 
 @Injectable()
 export class StrategySignalReadModelService {
-  private readonly signals: StrategySignal[] = [];
+  constructor(
+    @Inject(STRATEGY_SIGNAL_REPOSITORY)
+    private readonly repository: StrategySignalRepository,
+  ) {}
 
-  record(signal: StrategySignal): void {
-    this.signals.push(signal);
-    if (this.signals.length > MAX_STRATEGY_SIGNAL_HISTORY_LIMIT) {
-      this.signals.shift();
-    }
+  record(signal: StrategySignal): Promise<StrategySignal> {
+    return this.repository.save(signal);
   }
 
-  getLatest(): StrategySignal | undefined {
-    return this.signals.at(-1);
+  getLatest(): Promise<StrategySignal | undefined> {
+    return this.repository.getLatest();
   }
 
-  listRecent(limit: number): StrategySignal[] {
-    return this.signals.slice(-limit).reverse();
+  listRecent(limit: number): Promise<StrategySignal[]> {
+    return this.repository.listRecent(limit);
   }
 }

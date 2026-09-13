@@ -11,4 +11,5 @@
 export type * from './models/PaperBalance'
 export type * from './models/PaperExecution'
 export type * from './models/RiskControlEvent'
+export type * from './models/StrategySignal'
 export type * from './commonInputTypes'

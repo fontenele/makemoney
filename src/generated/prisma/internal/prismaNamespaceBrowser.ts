@@ -53,7 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   PaperBalance: 'PaperBalance',
   PaperExecution: 'PaperExecution',
-  RiskControlEvent: 'RiskControlEvent'
+  RiskControlEvent: 'RiskControlEvent',
+  StrategySignal: 'StrategySignal'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -109,6 +110,25 @@ export const RiskControlEventScalarFieldEnum = {
 } as const
 
 export type RiskControlEventScalarFieldEnum = (typeof RiskControlEventScalarFieldEnum)[keyof typeof RiskControlEventScalarFieldEnum]
+
+
+export const StrategySignalScalarFieldEnum = {
+  id: 'id',
+  strategy: 'strategy',
+  symbol: 'symbol',
+  action: 'action',
+  reason: 'reason',
+  shortPeriod: 'shortPeriod',
+  longPeriod: 'longPeriod',
+  previousShortAverage: 'previousShortAverage',
+  previousLongAverage: 'previousLongAverage',
+  currentShortAverage: 'currentShortAverage',
+  currentLongAverage: 'currentLongAverage',
+  latestCandleCloseTime: 'latestCandleCloseTime',
+  evaluatedAt: 'evaluatedAt'
+} as const
+
+export type StrategySignalScalarFieldEnum = (typeof StrategySignalScalarFieldEnum)[keyof typeof StrategySignalScalarFieldEnum]
 
 
 export const SortOrder = {

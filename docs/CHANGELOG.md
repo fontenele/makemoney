@@ -2,6 +2,25 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — M5.6 strategy signal persistence completed
+
+### Added
+
+- Additive `strategy_signals` PostgreSQL migrations with precision-preserving decimal average fields, chronological index, and unique strategy/symbol/candle-close identity.
+- Provider-neutral signal repository and Prisma adapter for idempotent writes plus recent/latest reads.
+- Database-backed E2E coverage for duplicate suppression, ordering, decimal serialization, and both signal endpoints.
+
+### Changed
+
+- Live evaluation now persists every generated signal and logs structured persistence failures.
+- Existing recent and latest signal routes now query PostgreSQL and survive restarts without changing their HTTP contracts.
+- Exported the process-local candle feed from the market-data module, fixing full NestJS application dependency resolution discovered by E2E validation.
+- Synchronized README routes, project context, roadmap, plan, map, strategy documentation, decisions, and current state.
+
+### Scope confirmation
+
+- No cursor pagination, filters, statistics, historical candle storage, backtesting, position sizing, risk assessment, execution integration, new strategy, or real trading was introduced.
+
 ## 2026-09-12 — M5.5 recent signal history completed
 
 ### Added

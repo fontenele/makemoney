@@ -17,7 +17,7 @@ export class StrategiesController {
   constructor(private readonly signals: StrategySignalReadModelService) {}
 
   @Get('signals')
-  listSignals(@Query('limit') limit?: string): StrategySignal[] {
+  listSignals(@Query('limit') limit?: string): Promise<StrategySignal[]> {
     if (limit === undefined) {
       return this.signals.listRecent(DEFAULT_STRATEGY_SIGNAL_HISTORY_LIMIT);
     }
@@ -32,8 +32,8 @@ export class StrategiesController {
   }
 
   @Get('signals/latest')
-  getLatestSignal(): StrategySignal {
-    const signal = this.signals.getLatest();
+  async getLatestSignal(): Promise<StrategySignal> {
+    const signal = await this.signals.getLatest();
     if (!signal) {
       throw new ServiceUnavailableException({
         message: 'No strategy signal is available yet',

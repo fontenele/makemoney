@@ -5,9 +5,10 @@ import { StrategyInput, StrategySignal } from '../domain/strategy';
 import { LiveStrategyEvaluationService } from './live-strategy-evaluation.service';
 import { MovingAverageCrossoverStrategy } from './moving-average-crossover.strategy';
 import { StrategySignalReadModelService } from './strategy-signal-read-model.service';
+import { StrategySignalRepository } from '../domain/strategy-signal-repository';
 
 describe('LiveStrategyEvaluationService', () => {
-  it('evaluates every new closed candle and retains only six', () => {
+  it('evaluates every new closed candle and retains only six', async () => {
     const { feed, strategy, service, signalReadModel } = setup();
     service.onModuleInit();
 
@@ -21,7 +22,7 @@ describe('LiveStrategyEvaluationService', () => {
     expect(latestInput?.candles[0]?.closeTime).toEqual(candle(1).closeTime);
     expect(latestInput?.candles.at(-1)?.closeTime).toEqual(candle(6).closeTime);
     expect(latestInput?.evaluatedAt).toEqual(candle(6).receivedAt);
-    expect(signalReadModel.getLatest()).toBe(
+    await expect(signalReadModel.getLatest()).resolves.toBe(
       strategy.analyze.mock.results.at(-1)?.value,
     );
   });
@@ -68,7 +69,7 @@ describe('LiveStrategyEvaluationService', () => {
     const service = new LiveStrategyEvaluationService(
       feed,
       strategy,
-      new StrategySignalReadModelService(),
+      createSignalReadModel(),
     );
     service.onModuleInit();
 
@@ -110,13 +111,26 @@ function setup(requiredCandleCount = 6): {
     }),
   );
   const strategy = { requiredCandleCount, analyze };
-  const signalReadModel = new StrategySignalReadModelService();
+  const signalReadModel = createSignalReadModel();
   return {
     feed,
     strategy,
     signalReadModel,
     service: new LiveStrategyEvaluationService(feed, strategy, signalReadModel),
   };
+}
+
+function createSignalReadModel(): StrategySignalReadModelService {
+  let latest: StrategySignal | undefined;
+  const repository: StrategySignalRepository = {
+    save: (value) => {
+      latest = value;
+      return Promise.resolve(value);
+    },
+    getLatest: () => Promise.resolve(latest),
+    listRecent: () => Promise.resolve(latest ? [latest] : []),
+  };
+  return new StrategySignalReadModelService(repository);
 }
 
 function candle(

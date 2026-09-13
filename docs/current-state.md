@@ -4,7 +4,7 @@ Last validated: 2026-09-12
 
 ## Milestone status
 
-M0 through M4 and M5.1–M5.5 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, process-local observation, and read-only access to its latest and recent signals. No dashboard, order mutation endpoint, signal persistence, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M4 and M5.1–M5.6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -76,7 +76,9 @@ M0 through M4 and M5.1–M5.5 are complete. M1 provides unauthenticated public B
 - M5.2 retains six closed candles, evaluates once per new close, suppresses duplicate/out-of-order closes, and emits structured signals only to application logs.
 - The latest generated strategy signal is retained in memory and exposed at `GET /strategies/signals/latest`; absence maps explicitly to HTTP 503.
 - Moving-average periods are startup-configurable through validated positive integers with 3/5 defaults, a maximum of 1,000, and `short < long`; live retention follows the strategy's declared requirement.
-- A unified process-local read model retains at most 100 generated signals; `GET /strategies/signals` returns them newest first with an optional `limit` from 1 through 100 and a default of 50.
+- `GET /strategies/signals` returns persisted signals newest first with an optional `limit` from 1 through 100 and a default of 50.
+- Generated signals persist idempotently in PostgreSQL by strategy, symbol, and candle close time; recent and latest reads survive application restarts.
+- Strategy averages use database decimal columns and persistence failures produce structured errors without invoking any trading behavior.
 
 ## Local endpoints and ports
 
@@ -97,19 +99,19 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-12 after M5.5:
+The following passed on 2026-09-12 after M5.6:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 233 tests passed across 37 suites
+- `npm test -- --runInBand` — 231 tests passed across 37 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
 The most recent database-backed integration validation was completed after M4.11:
 
-- `npm run test:e2e -- --runInBand` — 23 tests passed, including atomic Redis rate limiting, unrealized-loss rejection, authenticated/fail-closed emergency-stop control, and the prior liquidity, risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
-- `npx prisma migrate deploy` — all four migrations applied, including `risk_control_events`
+- `npm run test:e2e -- --runInBand` — 24 tests passed, including idempotent strategy-signal persistence and reads plus the prior Redis rate limiting, unrealized-loss, authenticated control, liquidity, risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
+- `npx prisma migrate deploy` — all six migrations applied, including `strategy_signals` and its precision expansion
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live paper wallet initialization — reported BTC `0` and USDT `1000` from the default configuration
@@ -119,7 +121,7 @@ The most recent database-backed integration validation was completed after M4.11
 
 ## Repository state
 
-M0 through M5.4 are committed. M5.5 changes are currently in the working tree.
+M0 through M5.5 are committed. M5.6 changes are currently in the working tree.
 
 ## Known issues and cautions
 

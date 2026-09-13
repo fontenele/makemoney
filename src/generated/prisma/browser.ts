@@ -32,3 +32,8 @@ export type PaperExecution = Prisma.PaperExecutionModel
  * 
  */
 export type RiskControlEvent = Prisma.RiskControlEventModel
+/**
+ * Model StrategySignal
+ * 
+ */
+export type StrategySignal = Prisma.StrategySignalModel

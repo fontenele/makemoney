@@ -34,6 +34,7 @@ import {
 } from '../src/modules/risk-engine/domain/execution-rate-limiter';
 import { REDIS_CLIENT } from '../src/infrastructure/redis/redis.constants';
 import Redis from 'ioredis';
+import { StrategySignalReadModelService } from '../src/modules/strategies/application/strategy-signal-read-model.service';
 
 describe('Application (e2e)', () => {
   let app: INestApplication;
@@ -68,6 +69,68 @@ describe('Application (e2e)', () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
 
     return request(server).get('/health').expect(200);
+  });
+
+  it('persists strategy signals idempotently and serves them after memory-independent reads', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const prisma = app.get(PrismaService);
+    const signals = app.get(StrategySignalReadModelService);
+    const suffix = Date.now() % 1000;
+    const firstCloseTime = new Date(
+      `2099-01-01T00:00:00.${String(suffix).padStart(3, '0')}Z`,
+    );
+    const secondCloseTime = new Date(firstCloseTime.getTime() + 60_000);
+    const makeSignal = (
+      latestCandleCloseTime: Date,
+      action: 'hold' | 'buy',
+    ) => ({
+      strategy: 'moving_average_crossover' as const,
+      symbol: 'BTC/USDT' as const,
+      action,
+      reason:
+        action === 'buy'
+          ? ('bullish_moving_average_crossover' as const)
+          : ('no_moving_average_crossover' as const),
+      shortPeriod: 3,
+      longPeriod: 5,
+      previousShortAverage: '9',
+      previousLongAverage: '10',
+      currentShortAverage:
+        action === 'buy' ? '11.123456789012345678901234567890123456789' : '10',
+      currentLongAverage: '10',
+      latestCandleCloseTime,
+      evaluatedAt: new Date(latestCandleCloseTime.getTime() + 100),
+    });
+    const first = makeSignal(firstCloseTime, 'hold');
+    const latest = makeSignal(secondCloseTime, 'buy');
+
+    try {
+      await signals.record(first);
+      await signals.record(first);
+      await signals.record(latest);
+
+      await expect(
+        prisma.strategySignal.count({
+          where: {
+            latestCandleCloseTime: { in: [firstCloseTime, secondCloseTime] },
+          },
+        }),
+      ).resolves.toBe(2);
+      await request(server)
+        .get('/strategies/signals?limit=2')
+        .expect(200)
+        .expect([serializeSignal(latest), serializeSignal(first)]);
+      await request(server)
+        .get('/strategies/signals/latest')
+        .expect(200)
+        .expect(serializeSignal(latest));
+    } finally {
+      await prisma.strategySignal.deleteMany({
+        where: {
+          latestCandleCloseTime: { in: [firstCloseTime, secondCloseTime] },
+        },
+      });
+    }
   });
 
   it('atomically limits distinct approved execution keys in Redis', async () => {
@@ -1046,6 +1109,27 @@ function preparePaperMarket(app: INestApplication): void {
     minNotional: '5',
     receivedAt: new Date(),
   });
+}
+
+function serializeSignal(signal: {
+  strategy: 'moving_average_crossover';
+  symbol: 'BTC/USDT';
+  action: 'hold' | 'buy';
+  reason: 'no_moving_average_crossover' | 'bullish_moving_average_crossover';
+  shortPeriod: number;
+  longPeriod: number;
+  previousShortAverage: string;
+  previousLongAverage: string;
+  currentShortAverage: string;
+  currentLongAverage: string;
+  latestCandleCloseTime: Date;
+  evaluatedAt: Date;
+}) {
+  return {
+    ...signal,
+    latestCandleCloseTime: signal.latestCandleCloseTime.toISOString(),
+    evaluatedAt: signal.evaluatedAt.toISOString(),
+  };
 }
 
 async function waitForAdvisoryWaiter(prisma: PrismaService): Promise<void> {
