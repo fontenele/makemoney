@@ -6,10 +6,11 @@ import { HistoricalCandle } from '../domain/historical-candle';
 import { BacktestTradeSimulator } from './backtest-trade-simulator';
 import { BacktestPerformanceCalculator } from './backtest-performance-calculator';
 import { BacktestEndingValuationCalculator } from './backtest-ending-valuation-calculator';
+import { BacktestRealizedDrawdownCalculator } from './backtest-realized-drawdown-calculator';
 
 describe('BacktestTradeSimulator', () => {
   const simulator = new BacktestTradeSimulator(
-    new BacktestPerformanceCalculator(),
+    new BacktestPerformanceCalculator(new BacktestRealizedDrawdownCalculator()),
     new BacktestEndingValuationCalculator(),
   );
 
@@ -61,6 +62,21 @@ describe('BacktestTradeSimulator', () => {
       averageLosingTradeNetPnl: null,
       expectancy: '3.85',
       profitFactor: null,
+      realizedPnlCurve: [
+        {
+          exitedAt: candles[2]?.openTime,
+          tradeNetPnl: '3.85',
+          cumulativeRealizedNetPnl: '3.85',
+          peakRealizedNetPnl: '3.85',
+          drawdown: '0',
+        },
+      ],
+      maximumRealizedDrawdown: {
+        amount: '0',
+        startedAt: null,
+        troughAt: null,
+        recoveredAt: null,
+      },
       unrealizedNetPnl: null,
       totalNetPnl: '3.85',
       totalFees: '1.15',

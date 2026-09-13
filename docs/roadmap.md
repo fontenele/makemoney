@@ -78,7 +78,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.5 — complete:** deterministic aggregate realized performance with fill and outcome counts, nullable win rate, gross profit, absolute gross loss, realized net PnL, and all simulated fill fees.
 - **M6.6 — complete:** deterministic final-close valuation of an ending open position with estimated exit fee, net liquidation value, unrealized net PnL, and combined total net PnL without a synthetic exit.
 - **M6.7 — complete:** deterministic closed-trade average PnL, winning and losing averages, expectancy, and profit factor with explicit null states for absent samples or denominators.
-- Later M6 increments require separate approval for historical-data persistence or pagination, intraperiod equity curves, variable sizing, spread, slippage, liquidity and pair-rule modeling, ROI, drawdown, optimization, or API exposure.
+- **M6.8 — complete:** chronological realized PnL curve and maximum absolute realized drawdown with explicit start, trough, and observed recovery timestamps.
+- Later M6 increments require separate approval for historical-data persistence or pagination, intraperiod equity curves, variable sizing, spread, slippage, liquidity and pair-rule modeling, ROI, percentage drawdown, optimization, or API exposure.
 
 ## M7 — New Listing Scanner — planned
 

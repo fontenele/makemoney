@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.7 — deterministic replay, historical simulation, valuation, and closed-trade statistics**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.8 — deterministic replay, historical simulation, performance, and realized drawdown**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -87,6 +87,8 @@ M6.5 derives aggregate realized performance directly from the M6.4 ledger and cl
 M6.6 values an ending open position at the final historical candle close without creating a synthetic sell. It estimates the exit fee and exposes gross market value, net liquidation value, unrealized net PnL, and total net PnL with exact decimal arithmetic. A simulation ending flat has no ending valuation.
 
 M6.7 measures closed-trade quality with average net PnL, average profitable and losing results, expectancy, and profit factor. Statistics are nullable when their required sample or denominator is absent, and an ending open position never enters the sample.
+
+M6.8 builds a chronological realized PnL curve at trade exits and measures maximum absolute realized drawdown from the zero baseline or a prior peak. It exposes drawdown start, trough, and recovery when observed. Open-position valuation does not enter this realized-only curve.
 
 Historical market data, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-13 — M6.8 realized PnL curve and drawdown completed
+
+### Added
+
+- Chronological trade-exit curve with trade net PnL, cumulative realized net PnL, running peak, and absolute drawdown.
+- Maximum realized drawdown amount with start, trough, and optional recovery timestamps.
+- Zero-baseline handling for an initial losing trade and explicit empty results without closed trades.
+- Three focused tests covering empty, consecutive-loss, recovery, new-peak, break-even, and arbitrary-precision behavior.
+- The full suite now contains 276 tests across 44 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No intraperiod or unrealized equity curve, percentage drawdown, ROI, initial capital, route, persistence, spread, slippage, liquidity model, wallet access, order execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.7 closed-trade quality statistics completed
 
 ### Added

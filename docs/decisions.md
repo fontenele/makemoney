@@ -311,3 +311,9 @@ Valuation remains separate from execution: no sell fill or closed trade is inven
 Closed-trade statistics use net PnL after simulated fees and never include an ending open position. Expectancy is the arithmetic mean of all closed-trade outcomes, including break-even results. Losing averages are positive magnitudes to align with gross loss and make ratios readable.
 
 Undefined samples are represented as `null`: no closed trades means no average or expectancy, no winners means no winning average, and no losers means neither a losing average nor a finite profit factor. This avoids presenting zero or infinity as measured evidence.
+
+## M6.8 realized-only absolute drawdown
+
+The first backtest drawdown measure follows cumulative net PnL only at closed-trade exits. Its initial peak is zero, allowing an initial losing trade to create drawdown without inventing capital. Each point retains the running peak and absolute USDT distance below it.
+
+Maximum drawdown records when the decline first appeared, its deepest observed exit, and when the relevant prior peak was regained. Open-position valuation and intraperiod candle movement remain excluded, so this metric is explicitly realized-only and not a full equity drawdown.

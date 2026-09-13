@@ -4,9 +4,12 @@ import {
   BacktestSellFill,
 } from '../domain/backtest-simulation';
 import { BacktestPerformanceCalculator } from './backtest-performance-calculator';
+import { BacktestRealizedDrawdownCalculator } from './backtest-realized-drawdown-calculator';
 
 describe('BacktestPerformanceCalculator', () => {
-  const calculator = new BacktestPerformanceCalculator();
+  const calculator = new BacktestPerformanceCalculator(
+    new BacktestRealizedDrawdownCalculator(),
+  );
 
   it('returns an explicit empty performance result', () => {
     expect(calculator.calculate([], [])).toEqual({
@@ -24,6 +27,13 @@ describe('BacktestPerformanceCalculator', () => {
       averageLosingTradeNetPnl: null,
       expectancy: null,
       profitFactor: null,
+      realizedPnlCurve: [],
+      maximumRealizedDrawdown: {
+        amount: '0',
+        startedAt: null,
+        troughAt: null,
+        recoveredAt: null,
+      },
       unrealizedNetPnl: null,
       totalNetPnl: '0',
       totalFees: '0',
@@ -39,7 +49,10 @@ describe('BacktestPerformanceCalculator', () => {
       trade(entry, exit, '0'),
     ];
 
-    expect(calculator.calculate([entry, exit], trades)).toEqual({
+    const result = calculator.calculate([entry, exit], trades);
+    const { realizedPnlCurve, maximumRealizedDrawdown, ...summary } = result;
+
+    expect(summary).toEqual({
       fillCount: 2,
       closedTradeCount: 3,
       profitableTradeCount: 1,
@@ -58,6 +71,8 @@ describe('BacktestPerformanceCalculator', () => {
       totalNetPnl: '2.75',
       totalFees: '0.3',
     });
+    expect(realizedPnlCurve).toHaveLength(3);
+    expect(maximumRealizedDrawdown.amount).toBe('1.5');
   });
 
   it('includes the fee of an open entry without realizing PnL', () => {

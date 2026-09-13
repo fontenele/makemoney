@@ -1,3 +1,8 @@
+import {
+  BacktestMaximumRealizedDrawdown,
+  BacktestRealizedPnlPoint,
+} from './backtest-drawdown';
+
 export interface BacktestPerformance {
   fillCount: number;
   closedTradeCount: number;
@@ -13,6 +18,8 @@ export interface BacktestPerformance {
   averageLosingTradeNetPnl: string | null;
   expectancy: string | null;
   profitFactor: string | null;
+  realizedPnlCurve: BacktestRealizedPnlPoint[];
+  maximumRealizedDrawdown: BacktestMaximumRealizedDrawdown;
   unrealizedNetPnl: string | null;
   totalNetPnl: string;
   totalFees: string;

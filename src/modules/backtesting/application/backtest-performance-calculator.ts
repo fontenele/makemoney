@@ -6,6 +6,7 @@ import {
   BacktestFill,
 } from '../domain/backtest-simulation';
 import { BacktestEndingValuation } from '../domain/backtest-valuation';
+import { BacktestRealizedDrawdownCalculator } from './backtest-realized-drawdown-calculator';
 
 const PerformanceDecimal = Decimal.clone({
   precision: 40,
@@ -16,6 +17,10 @@ const PerformanceDecimal = Decimal.clone({
 
 @Injectable()
 export class BacktestPerformanceCalculator {
+  constructor(
+    private readonly drawdownCalculator: BacktestRealizedDrawdownCalculator,
+  ) {}
+
   calculate(
     fills: readonly BacktestFill[],
     closedTrades: readonly BacktestClosedTrade[],
@@ -51,6 +56,7 @@ export class BacktestPerformanceCalculator {
       closedTradeCount === 0
         ? null
         : realizedNetPnl.dividedBy(closedTradeCount).toFixed();
+    const realizedDrawdown = this.drawdownCalculator.calculate(closedTrades);
 
     return {
       fillCount: fills.length,
@@ -80,6 +86,8 @@ export class BacktestPerformanceCalculator {
       profitFactor: grossLoss.isZero()
         ? null
         : grossProfit.dividedBy(grossLoss).toFixed(),
+      realizedPnlCurve: realizedDrawdown.curve,
+      maximumRealizedDrawdown: realizedDrawdown.maximumDrawdown,
       unrealizedNetPnl: endingValuation?.unrealizedNetPnl ?? null,
       totalNetPnl: realizedNetPnl
         .plus(endingValuation?.unrealizedNetPnl ?? 0)

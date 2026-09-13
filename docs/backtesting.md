@@ -93,8 +93,19 @@ M6.7 derives additional statistics exclusively from closed-trade net PnL.
 - Ending open positions do not enter these closed-trade statistics.
 - All results remain deterministic precision-40 decimal strings.
 
+## M6.8 realized PnL curve and drawdown
+
+M6.8 creates one chronological curve point for every closed trade at its exit time.
+
+- Each point records trade net PnL, cumulative realized net PnL, the running realized peak, and absolute drawdown from that peak.
+- The zero baseline participates as the initial peak, so a loss on the first closed trade is measurable.
+- Maximum realized drawdown exposes its absolute USDT amount, start time, trough time, and recovery time when the prior peak is regained.
+- An unrecovered drawdown has a `null` recovery time; no closed trades produce an empty curve and a zero maximum with null timestamps.
+- Open-position and intraperiod unrealized results do not enter this realized-only curve.
+- All arithmetic uses precision-40 `decimal.js`.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intraperiod equity curves, spread, slippage, liquidity, minimum-order and precision rules, variable sizing, Risk Engine modeling, ROI, drawdown, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
+Intraperiod equity curves, percentage drawdown, spread, slippage, liquidity, minimum-order and precision rules, variable sizing, Risk Engine modeling, ROI, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
