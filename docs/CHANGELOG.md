@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-13 — M6.19 historical provider circuit breaker completed
+
+### Added
+
+- Process-local circuit state for exhausted transient Binance historical-page failures.
+- Three-failure opening threshold, 30-second fail-fast interval, and one concurrent half-open recovery probe.
+- Success-driven reset and probe-failure reopening without repeating already accepted historical pages.
+- Explicit exclusion of caller cancellation, invalid requests, permanent HTTP responses, and invalid successful payloads from failure accounting.
+- Deterministic tests for opening, fail-fast behavior, recovery, single-probe concurrency, reopening, and excluded failures.
+- The full suite now contains 333 tests across 49 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No Redis coordination, persistence, operator route, public configuration, metrics endpoint, parallel paging, cache, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.18 resilient historical page loading completed
 
 ### Added

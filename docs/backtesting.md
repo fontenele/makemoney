@@ -226,8 +226,20 @@ M6.18 makes each sequential Binance page tolerant of transient availability fail
 - Successful malformed payloads still fail validation immediately and are never treated as transient transport failures.
 - Retry state is isolated per page; pagination remains sequential and already accepted pages are not requested again.
 
+## M6.19 process-local historical circuit breaker
+
+M6.19 prevents repeated historical Binance calls after the provider has remained unavailable through complete page-level retry cycles.
+
+- Three transient page failures that exhaust all M6.18 attempts open the circuit.
+- While open, requests fail before HTTP for 30 seconds.
+- At the cooldown boundary, only one concurrent half-open page probe may call the provider; other callers continue to fail fast.
+- A successful probe closes the circuit and clears the failure count. An exhausted probe reopens it for a new 30-second interval.
+- Any successful page also resets prior consecutive transient-page failures while the circuit is closed.
+- Caller cancellation, invalid local requests, permanent HTTP 4xx responses other than 429, and malformed successful payloads neither open nor advance the circuit.
+- Circuit state is process-local to the historical Binance client and uses the existing injected clock for deterministic boundaries.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, circuit breaking, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, shared or persisted circuit state, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.

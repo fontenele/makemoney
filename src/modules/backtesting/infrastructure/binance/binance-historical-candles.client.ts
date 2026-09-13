@@ -15,10 +15,16 @@ const ONE_MINUTE_MS = 60_000;
 const MAX_PAGE_ATTEMPTS = 3;
 const INITIAL_RETRY_DELAY_MS = 500;
 const MAX_RETRY_AFTER_MS = 30_000;
+const CIRCUIT_FAILURE_THRESHOLD = 3;
+const CIRCUIT_OPEN_DURATION_MS = 30_000;
 export const MAX_HISTORICAL_CANDLE_PAGE_LIMIT = 1_000;
 export const MAX_HISTORICAL_CANDLE_LIMIT = 10_000;
 
 export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider {
+  private consecutiveTransientPageFailures = 0;
+  private circuitOpenedAtMs: number | null = null;
+  private halfOpenProbeInFlight = false;
+
   constructor(
     private readonly baseUrl: string,
     private readonly httpClient: HttpClient = fetch,
@@ -83,6 +89,27 @@ export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider 
     request: HistoricalCandleRequest,
     signal?: AbortSignal,
   ): Promise<HistoricalCandle[]> {
+    const isHalfOpenProbe = this.acquireCircuitPermission();
+    try {
+      const page = await this.requestPageWithRetries(request, signal);
+      this.recordPageSuccess();
+      return page;
+    } catch (error) {
+      if (error instanceof TransientHistoricalPageError) {
+        this.recordTransientPageFailure();
+      }
+      throw error;
+    } finally {
+      if (isHalfOpenProbe) {
+        this.halfOpenProbeInFlight = false;
+      }
+    }
+  }
+
+  private async requestPageWithRetries(
+    request: HistoricalCandleRequest,
+    signal?: AbortSignal,
+  ): Promise<HistoricalCandle[]> {
     for (let attempt = 1; attempt <= MAX_PAGE_ATTEMPTS; attempt += 1) {
       let response: Response;
       try {
@@ -94,8 +121,11 @@ export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider 
             : timeoutSignal,
         });
       } catch (error) {
-        if (signal?.aborted || attempt === MAX_PAGE_ATTEMPTS) {
+        if (signal?.aborted) {
           throw error;
+        }
+        if (attempt === MAX_PAGE_ATTEMPTS) {
+          throw transientPageError(error);
         }
         await this.sleeper(this.retryDelay(null, attempt), signal);
         continue;
@@ -106,6 +136,11 @@ export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider 
           !isRetryableStatus(response.status) ||
           attempt === MAX_PAGE_ATTEMPTS
         ) {
+          if (isRetryableStatus(response.status)) {
+            throw new TransientHistoricalPageError(
+              `Binance historical candles request failed: ${response.status}`,
+            );
+          }
           throw new Error(
             `Binance historical candles request failed: ${response.status}`,
           );
@@ -122,6 +157,36 @@ export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider 
     }
 
     throw new Error('Binance historical candle retry state is invalid');
+  }
+
+  private acquireCircuitPermission(): boolean {
+    if (this.circuitOpenedAtMs === null) {
+      return false;
+    }
+
+    const elapsedMs = this.clock().getTime() - this.circuitOpenedAtMs;
+    if (elapsedMs < CIRCUIT_OPEN_DURATION_MS || this.halfOpenProbeInFlight) {
+      throw new Error('Binance historical candles circuit is open');
+    }
+
+    this.halfOpenProbeInFlight = true;
+    return true;
+  }
+
+  private recordPageSuccess(): void {
+    this.consecutiveTransientPageFailures = 0;
+    this.circuitOpenedAtMs = null;
+  }
+
+  private recordTransientPageFailure(): void {
+    this.consecutiveTransientPageFailures += 1;
+    if (
+      this.halfOpenProbeInFlight ||
+      this.consecutiveTransientPageFailures >= CIRCUIT_FAILURE_THRESHOLD
+    ) {
+      this.consecutiveTransientPageFailures = CIRCUIT_FAILURE_THRESHOLD;
+      this.circuitOpenedAtMs = this.clock().getTime();
+    }
   }
 
   private retryDelay(retryAfter: string | null, attempt: number): number {
@@ -328,6 +393,17 @@ function isCoherentOhlcv(
 
 function isRetryableStatus(status: number): boolean {
   return status === 429 || (status >= 500 && status <= 599);
+}
+
+class TransientHistoricalPageError extends Error {}
+
+function transientPageError(error: unknown): TransientHistoricalPageError {
+  return new TransientHistoricalPageError(
+    error instanceof Error
+      ? error.message
+      : 'Binance historical candles request failed',
+    { cause: error },
+  );
 }
 
 function abortableSleep(delayMs: number, signal?: AbortSignal): Promise<void> {

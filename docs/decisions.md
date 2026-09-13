@@ -377,3 +377,9 @@ Pages are sequential because each cursor depends on the last validated open time
 Historical retries belong inside the Binance adapter because HTTP status semantics and `Retry-After` are provider-transport concerns. Each page gets no more than three total attempts. Network failures, rate limiting, and server failures retry; permanent client responses and invalid successful payloads do not.
 
 The default backoff is 500 milliseconds before the second attempt and one second before the third. A valid provider delay takes precedence but cannot exceed 30 seconds. Waiting is injected for deterministic tests and receives the caller's abort signal. Retry state resets for each page and never restarts previously accepted pagination work.
+
+## M6.19 process-local provider circuit
+
+The historical circuit counts only page failures that remain transient after all bounded retries. Three such failures open it for 30 seconds. This separates provider availability from invalid requests, permanent client errors, malformed data, and user cancellation, none of which indicate a transient outage suitable for circuit state.
+
+After cooldown, one in-process half-open probe owns provider access so concurrent callers cannot create a recovery stampede. Success resets the circuit; failure starts a fresh open interval. State intentionally remains local to the adapter instance: distributed coordination, persistence, operator controls, and public configuration require separate evidence.

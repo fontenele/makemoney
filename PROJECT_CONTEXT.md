@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.18 — deterministic replay, resilient bounded historical loading, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.19 — deterministic replay, resilient bounded historical loading, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -110,7 +110,9 @@ M6.17 raises the provider-neutral historical request ceiling to 10,000 BTC/USDT 
 
 M6.18 gives each historical Binance page at most three total attempts for network failures, HTTP 429, and HTTP 5xx. Retry waits use bounded exponential backoff or a valid provider `Retry-After` capped at 30 seconds, remain caller-cancelable, and never retry permanent HTTP 4xx responses or malformed successful payloads.
 
-Historical market-data persistence, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, circuit breaking, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
+M6.19 adds a process-local historical Binance circuit breaker. Three page failures that exhaust M6.18 retries open it for 30 seconds; calls fail before HTTP while open, and only one half-open probe may run after cooldown. Probe success closes and resets the circuit, while probe failure reopens it. Cancellation, permanent HTTP responses, invalid requests, and invalid successful payloads do not count.
+
+Historical market-data persistence, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, shared or persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 

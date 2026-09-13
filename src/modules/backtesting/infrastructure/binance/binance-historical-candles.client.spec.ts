@@ -268,6 +268,153 @@ describe('BinanceHistoricalCandlesClient', () => {
     ]);
   });
 
+  it('opens after three exhausted pages and closes after a successful probe', async () => {
+    let currentTime = now;
+    let providerAvailable = false;
+    const httpClient =
+      jest.fn<(input: string, init?: RequestInit) => Promise<Response>>();
+    httpClient.mockImplementation(() =>
+      Promise.resolve(
+        providerAvailable
+          ? new Response(JSON.stringify([kline(0)]), { status: 200 })
+          : new Response(null, { status: 503 }),
+      ),
+    );
+    const sleeper =
+      jest.fn<(delayMs: number, signal?: AbortSignal) => Promise<void>>();
+    sleeper.mockResolvedValue();
+    const client = new BinanceHistoricalCandlesClient(
+      'https://data-api.binance.vision',
+      httpClient,
+      () => currentTime,
+      sleeper,
+    );
+
+    for (let failure = 0; failure < 3; failure += 1) {
+      await expect(client.load(request)).rejects.toThrow(
+        'Binance historical candles request failed: 503',
+      );
+    }
+    expect(httpClient).toHaveBeenCalledTimes(9);
+
+    await expect(client.load(request)).rejects.toThrow(
+      'Binance historical candles circuit is open',
+    );
+    expect(httpClient).toHaveBeenCalledTimes(9);
+
+    currentTime = new Date(now.getTime() + 30_000);
+    providerAvailable = true;
+    await expect(client.load(request)).resolves.toHaveLength(1);
+    await expect(client.load(request)).resolves.toHaveLength(1);
+    expect(httpClient).toHaveBeenCalledTimes(11);
+  });
+
+  it('allows only one concurrent half-open probe', async () => {
+    let currentTime = now;
+    let resolveProbe: ((response: Response) => void) | undefined;
+    let probePending = false;
+    const httpClient =
+      jest.fn<(input: string, init?: RequestInit) => Promise<Response>>();
+    httpClient.mockImplementation(() => {
+      if (probePending) {
+        return new Promise<Response>((resolve) => {
+          resolveProbe = resolve;
+        });
+      }
+      return Promise.resolve(new Response(null, { status: 503 }));
+    });
+    const sleeper =
+      jest.fn<(delayMs: number, signal?: AbortSignal) => Promise<void>>();
+    sleeper.mockResolvedValue();
+    const client = new BinanceHistoricalCandlesClient(
+      'https://data-api.binance.vision',
+      httpClient,
+      () => currentTime,
+      sleeper,
+    );
+
+    for (let failure = 0; failure < 3; failure += 1) {
+      await expect(client.load(request)).rejects.toThrow();
+    }
+    currentTime = new Date(now.getTime() + 30_000);
+    probePending = true;
+    const probe = client.load(request);
+
+    await expect(client.load(request)).rejects.toThrow(
+      'Binance historical candles circuit is open',
+    );
+    resolveProbe?.(new Response(JSON.stringify([kline(0)]), { status: 200 }));
+    await expect(probe).resolves.toHaveLength(1);
+  });
+
+  it('reopens the circuit when the half-open probe exhausts retries', async () => {
+    let currentTime = now;
+    const httpClient =
+      jest.fn<(input: string, init?: RequestInit) => Promise<Response>>();
+    httpClient.mockImplementation(() =>
+      Promise.resolve(new Response(null, { status: 503 })),
+    );
+    const sleeper =
+      jest.fn<(delayMs: number, signal?: AbortSignal) => Promise<void>>();
+    sleeper.mockResolvedValue();
+    const client = new BinanceHistoricalCandlesClient(
+      'https://data-api.binance.vision',
+      httpClient,
+      () => currentTime,
+      sleeper,
+    );
+
+    for (let failure = 0; failure < 3; failure += 1) {
+      await expect(client.load(request)).rejects.toThrow();
+    }
+    currentTime = new Date(now.getTime() + 30_000);
+    await expect(client.load(request)).rejects.toThrow(
+      'Binance historical candles request failed: 503',
+    );
+    expect(httpClient).toHaveBeenCalledTimes(12);
+
+    await expect(client.load(request)).rejects.toThrow(
+      'Binance historical candles circuit is open',
+    );
+    expect(httpClient).toHaveBeenCalledTimes(12);
+  });
+
+  it('does not count permanent responses or invalid payloads toward the circuit', async () => {
+    const httpClient =
+      jest.fn<(input: string, init?: RequestInit) => Promise<Response>>();
+    httpClient
+      .mockResolvedValueOnce(new Response(null, { status: 400 }))
+      .mockResolvedValueOnce(new Response(null, { status: 400 }))
+      .mockResolvedValueOnce(new Response(null, { status: 400 }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([['invalid']]), { status: 200 }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([['invalid']]), { status: 200 }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([['invalid']]), { status: 200 }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([kline(0)]), { status: 200 }),
+      );
+    const sleeper =
+      jest.fn<(delayMs: number, signal?: AbortSignal) => Promise<void>>();
+    const client = new BinanceHistoricalCandlesClient(
+      'https://data-api.binance.vision',
+      httpClient,
+      () => now,
+      sleeper,
+    );
+
+    for (let failure = 0; failure < 6; failure += 1) {
+      await expect(client.load(request)).rejects.toThrow();
+    }
+    await expect(client.load(request)).resolves.toHaveLength(1);
+    expect(httpClient).toHaveBeenCalledTimes(7);
+    expect(sleeper).not.toHaveBeenCalled();
+  });
+
   it('propagates caller cancellation during a retry delay', async () => {
     const controller = new AbortController();
     const cancellation = new Error('cancelled');
