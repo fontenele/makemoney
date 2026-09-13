@@ -41,5 +41,6 @@ export interface StrategySignal {
 }
 
 export interface Strategy {
+  readonly requiredCandleCount: number;
   analyze(input: StrategyInput): StrategySignal;
 }

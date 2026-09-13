@@ -38,6 +38,19 @@ describe('LiveStrategyEvaluationService', () => {
     expect(strategy.analyze).toHaveBeenCalledTimes(1);
   });
 
+  it('bounds history to the strategy declared requirement', () => {
+    const { feed, strategy, service } = setup(3);
+    service.onModuleInit();
+
+    for (let index = 0; index < 5; index += 1) {
+      feed.publish(candle(index));
+    }
+
+    const latestInput = strategy.analyze.mock.calls.at(-1)?.[0];
+    expect(latestInput?.candles).toHaveLength(3);
+    expect(latestInput?.candles[0]?.closeTime).toEqual(candle(2).closeTime);
+  });
+
   it('stops receiving candles on module destruction', () => {
     const { feed, strategy, service } = setup();
     service.onModuleInit();
@@ -70,9 +83,12 @@ describe('LiveStrategyEvaluationService', () => {
   });
 });
 
-function setup(): {
+function setup(requiredCandleCount = 6): {
   feed: MarketCandleFeedService;
-  strategy: { analyze: jest.Mock<(input: StrategyInput) => StrategySignal> };
+  strategy: {
+    requiredCandleCount: number;
+    analyze: jest.Mock<(input: StrategyInput) => StrategySignal>;
+  };
   service: LiveStrategyEvaluationService;
   latestSignal: LatestStrategySignalService;
 } {
@@ -93,7 +109,7 @@ function setup(): {
       evaluatedAt: input.evaluatedAt,
     }),
   );
-  const strategy = { analyze };
+  const strategy = { requiredCandleCount, analyze };
   const latestSignal = new LatestStrategySignalService();
   return {
     feed,

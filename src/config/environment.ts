@@ -20,6 +20,8 @@ interface Environment {
   RISK_CONTROL_TOKEN_SHA256?: string;
   RISK_MAX_EXECUTIONS_PER_WINDOW: number;
   RISK_EXECUTION_WINDOW_MS: number;
+  STRATEGY_MA_SHORT_PERIOD: number;
+  STRATEGY_MA_LONG_PERIOD: number;
 }
 
 const environmentSchema = Joi.object<Environment>({
@@ -71,7 +73,19 @@ const environmentSchema = Joi.object<Environment>({
     .optional(),
   RISK_MAX_EXECUTIONS_PER_WINDOW: Joi.number().integer().positive().default(10),
   RISK_EXECUTION_WINDOW_MS: Joi.number().integer().positive().default(60000),
-}).unknown(true);
+  STRATEGY_MA_SHORT_PERIOD: Joi.number().integer().min(1).max(1000).default(3),
+  STRATEGY_MA_LONG_PERIOD: Joi.number().integer().min(1).max(1000).default(5),
+})
+  .custom((value: Environment, helpers) => {
+    if (value.STRATEGY_MA_SHORT_PERIOD >= value.STRATEGY_MA_LONG_PERIOD) {
+      return helpers.message({
+        custom:
+          'STRATEGY_MA_SHORT_PERIOD must be less than STRATEGY_MA_LONG_PERIOD',
+      });
+    }
+    return value;
+  }, 'moving-average period relationship')
+  .unknown(true);
 
 export function validateEnvironment(
   config: Record<string, unknown>,

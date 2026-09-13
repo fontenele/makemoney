@@ -251,3 +251,9 @@ The evaluator keeps only six closed candles, matching the default M5.1 lookback 
 ## M5.3 latest-signal availability
 
 The live evaluator writes each successful result to a single process-local latest-signal read model. The HTTP layer reads that model without triggering calculation, and returns 503 rather than fabricating a default signal before data arrives. This gives operators and a future dashboard an honest observational surface without introducing persistence or execution coupling.
+
+## M5.4 bounded startup parameters
+
+Moving-average periods are validated with the rest of the environment and injected when the strategy provider is created. Defaults remain 3/5. Both values are capped at 1,000 and must satisfy `short < long`, preventing invalid calculations and unbounded live history.
+
+The strategy contract declares its required candle count. This keeps the evaluator independent of concrete period values and ensures its process-local buffer changes consistently with configuration. Runtime mutation and automatic optimization remain outside this decision.

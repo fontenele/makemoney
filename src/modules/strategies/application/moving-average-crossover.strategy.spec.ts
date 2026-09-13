@@ -24,6 +24,12 @@ const analyze = (prices: readonly string[], isClosed?: readonly boolean[]) =>
   });
 
 describe('MovingAverageCrossoverStrategy', () => {
+  it('declares the closed-candle history required by its periods', () => {
+    expect(new MovingAverageCrossoverStrategy(10, 30).requiredCandleCount).toBe(
+      31,
+    );
+  });
+
   it('emits buy when the short average crosses above the long average', () => {
     const signal = analyze(['3', '2', '1', '4']);
 

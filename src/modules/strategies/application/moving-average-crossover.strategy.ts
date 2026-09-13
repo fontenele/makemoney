@@ -13,6 +13,8 @@ const StrategyDecimal = Decimal.clone({
 });
 
 export class MovingAverageCrossoverStrategy implements Strategy {
+  readonly requiredCandleCount: number;
+
   constructor(
     private readonly shortPeriod = 3,
     private readonly longPeriod = 5,
@@ -27,6 +29,7 @@ export class MovingAverageCrossoverStrategy implements Strategy {
         'Moving-average periods must be positive safe integers and shortPeriod must be less than longPeriod',
       );
     }
+    this.requiredCandleCount = longPeriod + 1;
   }
 
   analyze(input: StrategyInput): StrategySignal {

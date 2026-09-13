@@ -14,8 +14,6 @@ import {
 } from '../domain/strategy';
 import { LatestStrategySignalService } from './latest-strategy-signal.service';
 
-const CLOSED_CANDLE_CAPACITY = 6;
-
 @Injectable()
 export class LiveStrategyEvaluationService
   implements OnModuleInit, OnModuleDestroy
@@ -62,7 +60,7 @@ export class LiveStrategyEvaluationService
     }
 
     this.closedCandles.push(this.toStrategyCandle(candle));
-    if (this.closedCandles.length > CLOSED_CANDLE_CAPACITY) {
+    if (this.closedCandles.length > this.strategy.requiredCandleCount) {
       this.closedCandles.shift();
     }
 

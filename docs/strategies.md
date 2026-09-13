@@ -18,7 +18,7 @@ M5.1 does not subscribe to live candles, retain history, persist signals, size p
 
 The normalized market-data candle service publishes every received candle to a process-local, provider-neutral feed. Subscribers are isolated so one failing observer does not interrupt another or the Binance stream.
 
-The live strategy evaluator subscribes during the NestJS module lifecycle and retains at most the latest six closed candles, the exact history required by the default 3/5 crossover. Open candles do not trigger evaluation. Duplicate or older close times are ignored with a structured diagnostic, preventing repeated signals after provider duplication or reordering.
+The live strategy evaluator subscribes during the NestJS module lifecycle and retains only the closed-candle count declared by the strategy. Open candles do not trigger evaluation. Duplicate or older close times are ignored with a structured diagnostic, preventing repeated signals after provider duplication or reordering.
 
 Every accepted closed candle triggers one evaluation. The resulting action, reason, periods, averages, latest close time, and evaluation time are written as the structured `strategy.signal_generated` log event. Evaluation time uses the normalized candle receipt time.
 
@@ -29,3 +29,11 @@ This history and every signal are process-local and disappear on restart. M5.2 d
 Every successful live evaluation updates a process-local latest-signal read model. `GET /strategies/signals/latest` exposes that complete signal, including its action, deterministic reason, periods, averages, latest closed-candle time, and evaluation time.
 
 Before the first closed candle is evaluated, the route returns HTTP 503 with reason `strategy_signal_unavailable`. The endpoint is read-only and does not evaluate a strategy on demand. The value disappears on restart and has no connection to position sizing, risk assessment, or execution.
+
+## M5.4 configurable moving-average periods
+
+`STRATEGY_MA_SHORT_PERIOD` and `STRATEGY_MA_LONG_PERIOD` configure the crossover at startup and default to 3 and 5. Both values must be positive integers no greater than 1,000, and the short period must be strictly smaller than the long period. Invalid combinations fail startup configuration validation.
+
+The strategy declares `longPeriod + 1` as its required candle count, covering the current long average and its previous comparison. The live evaluator derives its bounded in-memory retention directly from this declaration. Signals and the latest-signal endpoint expose the effective configured periods.
+
+Configuration changes require an application restart. There is no runtime mutation endpoint, hot reload, parameter persistence, or automatic parameter optimization.

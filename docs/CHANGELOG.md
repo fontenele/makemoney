@@ -2,6 +2,23 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — M5.4 configurable moving-average periods completed
+
+### Added
+
+- Validated `STRATEGY_MA_SHORT_PERIOD` and `STRATEGY_MA_LONG_PERIOD` startup configuration with 3/5 defaults, positive-integer constraints, a 1,000 maximum, and strict `short < long` validation.
+- Strategy-declared required candle count used by live retention.
+- Focused tests for defaults, custom values, invalid relationships, numeric bounds, declared history, and dynamic retention.
+
+### Changed
+
+- The NestJS strategy provider now constructs the moving-average crossover from validated configuration.
+- Updated `.env.example`, project context, roadmap, plan, map, strategy documentation, decisions, and current state for M5.4.
+
+### Scope confirmation
+
+- No runtime configuration mutation, route, hot reload, optimization, persistence, position sizing, risk assessment, execution, or real trading was introduced.
+
 ## 2026-09-12 — M5.3 latest-signal API completed
 
 ### Added
