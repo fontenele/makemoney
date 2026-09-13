@@ -65,7 +65,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M5.2 — complete:** process-local normalized candle feed and bounded live evaluation of the M5.1 strategy once per new closed candle, with duplicate/out-of-order suppression and structured signal logs.
 - **M5.3 — complete:** process-local latest-signal read model exposed through a local read-only HTTP endpoint, with an explicit unavailable state before the first evaluation.
 - **M5.4 — complete:** startup-validated moving-average periods with safe 3/5 defaults and bounded live history derived from the configured strategy requirement.
-- Signal persistence/history, position sizing, execution integration, and additional strategies require separate approval.
+- **M5.5 — complete:** bounded process-local history of the latest 100 generated signals, exposed newest first through a read-only API with validated limits.
+- Signal persistence, durable or cursor-paginated history, position sizing, execution integration, and additional strategies require separate approval.
 
 ## M6 — Backtesting — planned
 

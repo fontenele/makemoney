@@ -37,3 +37,9 @@ Before the first closed candle is evaluated, the route returns HTTP 503 with rea
 The strategy declares `longPeriod + 1` as its required candle count, covering the current long average and its previous comparison. The live evaluator derives its bounded in-memory retention directly from this declaration. Signals and the latest-signal endpoint expose the effective configured periods.
 
 Configuration changes require an application restart. There is no runtime mutation endpoint, hot reload, parameter persistence, or automatic parameter optimization.
+
+## M5.5 recent signal history
+
+Each successful live evaluation is recorded once in a shared process-local read model. It retains at most 100 signals, discarding the oldest when capacity is exceeded. `GET /strategies/signals` returns the retained signals newest first and accepts an optional integer `limit` from 1 through 100; the default is 50. Before the first evaluation it returns an empty list.
+
+`GET /strategies/signals/latest` reads the same model and preserves its HTTP 503 unavailable state before the first evaluation. Both endpoints are read-only. The history disappears on restart and does not add signal persistence, filters, cursor pagination, statistics, position sizing, risk assessment, or execution.

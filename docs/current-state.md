@@ -4,7 +4,7 @@ Last validated: 2026-09-12
 
 ## Milestone status
 
-M0 through M4 and M5.1–M5.4 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, process-local observation, and read-only access to its latest signal. No dashboard, order mutation endpoint, signal persistence, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M4 and M5.1–M5.5 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, process-local observation, and read-only access to its latest and recent signals. No dashboard, order mutation endpoint, signal persistence, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -76,6 +76,7 @@ M0 through M4 and M5.1–M5.4 are complete. M1 provides unauthenticated public B
 - M5.2 retains six closed candles, evaluates once per new close, suppresses duplicate/out-of-order closes, and emits structured signals only to application logs.
 - The latest generated strategy signal is retained in memory and exposed at `GET /strategies/signals/latest`; absence maps explicitly to HTTP 503.
 - Moving-average periods are startup-configurable through validated positive integers with 3/5 defaults, a maximum of 1,000, and `short < long`; live retention follows the strategy's declared requirement.
+- A unified process-local read model retains at most 100 generated signals; `GET /strategies/signals` returns them newest first with an optional `limit` from 1 through 100 and a default of 50.
 
 ## Local endpoints and ports
 
@@ -88,6 +89,7 @@ M0 through M4 and M5.1–M5.4 are complete. M1 provides unauthenticated public B
 - Paper performance: `http://localhost:3000/paper-trading/performance`
 - Emergency-stop status/control: `http://localhost:3000/risk/emergency-stop`
 - Latest strategy signal: `http://localhost:3000/strategies/signals/latest`
+- Recent strategy signals: `http://localhost:3000/strategies/signals`
 - PostgreSQL host port: `5433` mapped to container port `5432`
 - Redis host port: `6379`
 
@@ -95,12 +97,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-12 after M5.4:
+The following passed on 2026-09-12 after M5.5:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 226 tests passed across 37 suites
+- `npm test -- --runInBand` — 233 tests passed across 37 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -117,7 +119,7 @@ The most recent database-backed integration validation was completed after M4.11
 
 ## Repository state
 
-M0 through M5.3 are committed. M5.4 changes are currently in the working tree.
+M0 through M5.4 are committed. M5.5 changes are currently in the working tree.
 
 ## Known issues and cautions
 

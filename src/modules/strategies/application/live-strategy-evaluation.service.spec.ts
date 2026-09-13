@@ -4,11 +4,11 @@ import { MarketCandle } from '../../market-data/domain/market-candle';
 import { StrategyInput, StrategySignal } from '../domain/strategy';
 import { LiveStrategyEvaluationService } from './live-strategy-evaluation.service';
 import { MovingAverageCrossoverStrategy } from './moving-average-crossover.strategy';
-import { LatestStrategySignalService } from './latest-strategy-signal.service';
+import { StrategySignalReadModelService } from './strategy-signal-read-model.service';
 
 describe('LiveStrategyEvaluationService', () => {
   it('evaluates every new closed candle and retains only six', () => {
-    const { feed, strategy, service, latestSignal } = setup();
+    const { feed, strategy, service, signalReadModel } = setup();
     service.onModuleInit();
 
     for (let index = 0; index < 7; index += 1) {
@@ -21,7 +21,7 @@ describe('LiveStrategyEvaluationService', () => {
     expect(latestInput?.candles[0]?.closeTime).toEqual(candle(1).closeTime);
     expect(latestInput?.candles.at(-1)?.closeTime).toEqual(candle(6).closeTime);
     expect(latestInput?.evaluatedAt).toEqual(candle(6).receivedAt);
-    expect(latestSignal.getLatest()).toBe(
+    expect(signalReadModel.getLatest()).toBe(
       strategy.analyze.mock.results.at(-1)?.value,
     );
   });
@@ -68,7 +68,7 @@ describe('LiveStrategyEvaluationService', () => {
     const service = new LiveStrategyEvaluationService(
       feed,
       strategy,
-      new LatestStrategySignalService(),
+      new StrategySignalReadModelService(),
     );
     service.onModuleInit();
 
@@ -90,7 +90,7 @@ function setup(requiredCandleCount = 6): {
     analyze: jest.Mock<(input: StrategyInput) => StrategySignal>;
   };
   service: LiveStrategyEvaluationService;
-  latestSignal: LatestStrategySignalService;
+  signalReadModel: StrategySignalReadModelService;
 } {
   const feed = new MarketCandleFeedService();
   const analyze = jest.fn<(input: StrategyInput) => StrategySignal>(
@@ -110,12 +110,12 @@ function setup(requiredCandleCount = 6): {
     }),
   );
   const strategy = { requiredCandleCount, analyze };
-  const latestSignal = new LatestStrategySignalService();
+  const signalReadModel = new StrategySignalReadModelService();
   return {
     feed,
     strategy,
-    latestSignal,
-    service: new LiveStrategyEvaluationService(feed, strategy, latestSignal),
+    signalReadModel,
+    service: new LiveStrategyEvaluationService(feed, strategy, signalReadModel),
   };
 }
 

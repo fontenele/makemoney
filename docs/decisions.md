@@ -257,3 +257,9 @@ The live evaluator writes each successful result to a single process-local lates
 Moving-average periods are validated with the rest of the environment and injected when the strategy provider is created. Defaults remain 3/5. Both values are capped at 1,000 and must satisfy `short < long`, preventing invalid calculations and unbounded live history.
 
 The strategy contract declares its required candle count. This keeps the evaluator independent of concrete period values and ensures its process-local buffer changes consistently with configuration. Runtime mutation and automatic optimization remain outside this decision.
+
+## M5.5 unified bounded signal read model
+
+Live evaluations are recorded once in a shared process-local read model used by both recent-history and latest-signal queries. A fixed capacity of 100 prevents unbounded memory growth; reads return newest first, default to 50, and accept no more than the retained capacity. Empty history is a valid list response, while the existing latest route keeps its explicit unavailable response.
+
+This is an operational observation surface, not durable strategy research data. PostgreSQL persistence, cursor pagination, filters, aggregates, sizing, risk assessment, and execution remain deferred.

@@ -4,7 +4,7 @@ import { MovingAverageCrossoverStrategy } from './application/moving-average-cro
 import { MarketDataModule } from '../market-data/market-data.module';
 import { LiveStrategyEvaluationService } from './application/live-strategy-evaluation.service';
 import { MOVING_AVERAGE_CROSSOVER_STRATEGY } from './domain/strategy';
-import { LatestStrategySignalService } from './application/latest-strategy-signal.service';
+import { StrategySignalReadModelService } from './application/strategy-signal-read-model.service';
 import { StrategiesController } from './presentation/strategies.controller';
 
 @Module({
@@ -21,7 +21,7 @@ import { StrategiesController } from './presentation/strategies.controller';
         ),
     },
     LiveStrategyEvaluationService,
-    LatestStrategySignalService,
+    StrategySignalReadModelService,
   ],
   exports: [MOVING_AVERAGE_CROSSOVER_STRATEGY],
 })

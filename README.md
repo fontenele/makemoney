@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M4 and M5.1–M5.4 are complete. Market feeds are public and unauthenticated; trades and balances are fictional, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M4 and M5.1–M5.5 are complete. Market feeds are public and unauthenticated; trades and balances are fictional, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -60,6 +60,7 @@ Local base URL: `http://localhost:3000`. Docker Compose publishes it on host loo
 | `GET` | `/paper-trading/performance` | Realized paper-trading performance summary | Local, read-only |
 | `GET` | `/risk/emergency-stop` | Current emergency-stop state | Local, read-only |
 | `PUT` | `/risk/emergency-stop` | Change the paper-trading emergency stop | Requires configured Bearer token, `Idempotency-Key`, and JSON `{ "active": boolean, "reason": string }` |
+| `GET` | `/strategies/signals` | Recent process-local moving-average crossover signals, newest first | Local, read-only; optional `limit=1..100`, default `50` |
 | `GET` | `/strategies/signals/latest` | Latest process-local moving-average crossover signal | Local, read-only; returns `503` before the first closed-candle evaluation |
 
 There are no public balance-mutation, order-submission, strategy-mutation, dashboard, exchange-account, or real-trading routes.

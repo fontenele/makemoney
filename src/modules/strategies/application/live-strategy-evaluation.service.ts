@@ -12,7 +12,7 @@ import {
   Strategy,
   StrategyCandle,
 } from '../domain/strategy';
-import { LatestStrategySignalService } from './latest-strategy-signal.service';
+import { StrategySignalReadModelService } from './strategy-signal-read-model.service';
 
 @Injectable()
 export class LiveStrategyEvaluationService
@@ -26,7 +26,7 @@ export class LiveStrategyEvaluationService
     private readonly candleFeed: MarketCandleFeedService,
     @Inject(MOVING_AVERAGE_CROSSOVER_STRATEGY)
     private readonly strategy: Strategy,
-    private readonly latestSignal: LatestStrategySignalService,
+    private readonly signalReadModel: StrategySignalReadModelService,
   ) {}
 
   onModuleInit(): void {
@@ -69,7 +69,7 @@ export class LiveStrategyEvaluationService
       candles: [...this.closedCandles],
       evaluatedAt: candle.receivedAt,
     });
-    this.latestSignal.update(signal);
+    this.signalReadModel.record(signal);
     this.logger.log({
       event: 'strategy.signal_generated',
       ...signal,

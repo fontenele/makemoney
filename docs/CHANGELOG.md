@@ -2,6 +2,23 @@
 
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
+## 2026-09-12 — M5.5 recent signal history completed
+
+### Added
+
+- Bounded process-local retention of the latest 100 generated strategy signals.
+- Read-only `GET /strategies/signals` history, newest first, with a validated optional limit from 1 through 100 and a default of 50.
+- Focused tests for empty history, ordering, latest consistency, requested limits, invalid limits, and oldest-entry eviction.
+
+### Changed
+
+- The existing latest-signal endpoint and live evaluator now share one signal read model, so each evaluation is stored only once.
+- Added the recent-signals endpoint to the root README API route table and synchronized project context, roadmap, plan, map, strategy documentation, decisions, and current state.
+
+### Scope confirmation
+
+- No PostgreSQL signal persistence, cursor pagination, filters, statistics, position sizing, risk assessment, execution, backtesting, or real trading was introduced.
+
 ## 2026-09-12 — M5.4 configurable moving-average periods completed
 
 ### Added
