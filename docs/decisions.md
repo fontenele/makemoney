@@ -413,3 +413,9 @@ Fetched gaps are held in memory until their union with stored candles proves the
 Historical replay is exposed as POST because it initiates bounded computation and may populate the public-candle cache, even though it cannot mutate financial state. The public contract fixes BTC/USDT and one minute and accepts only canonical UTC boundaries plus the existing bounded limit, avoiding provider-specific or speculative options.
 
 Input contract failures are client errors. Loading, persistence, completeness, and replay failures map to one sanitized unavailable response so provider or database details do not cross the HTTP boundary. Financial simulation remains internal until its larger configuration contract receives separate approval.
+
+## M6.25 validate simulation assumptions before market-data loading
+
+The simulation endpoint accepts no server defaults for financial assumptions. Every cost, capital, liquidity, quantity, precision, and price constraint is explicit in the request, keeping results reproducible and preventing current live exchange metadata from silently changing historical research.
+
+A dedicated application validator reuses the execution-rule validator and checks the remaining configuration before historical orchestration begins. This avoids network and cache work for invalid experiments and lets the HTTP layer distinguish client configuration errors from sanitized operational unavailability. The endpoint invokes only the existing hypothetical simulator and has no operational trading dependency.

@@ -19,6 +19,7 @@ import { PrismaHistoricalCandleRepository } from './infrastructure/prisma-histor
 import { HistoricalCandleCoverage } from './application/historical-candle-coverage';
 import { HistoricalCandleGapPlanner } from './application/historical-candle-gap-planner';
 import { BacktestingController } from './presentation/backtesting.controller';
+import { BacktestSimulationRequestValidator } from './application/backtest-simulation-request-validator';
 
 @Module({
   imports: [StrategiesModule],
@@ -47,6 +48,7 @@ import { BacktestingController } from './presentation/backtesting.controller';
     BacktestLiquidityCalculator,
     HistoricalCandleCoverage,
     HistoricalCandleGapPlanner,
+    BacktestSimulationRequestValidator,
     BacktestTradeSimulator,
     HistoricalStrategyReplayService,
   ],

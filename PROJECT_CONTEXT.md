@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.24 — deterministic replay, resilient durable historical loading, stored replay, gap-aware cache reuse, replay API, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.25 — deterministic replay, resilient durable historical loading, stored replay, gap-aware cache reuse, replay and simulation APIs, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -122,7 +122,9 @@ M6.23 replaces full-range cache misses with sequential loading of only contiguou
 
 M6.24 exposes deterministic historical signal replay through local `POST /backtesting/replay`. The strict body supplies UTC start/end timestamps and a 1–10,000 limit while symbol and interval remain fixed to BTC/USDT one minute. It may populate the public-candle cache but has no wallet, order, or execution access.
 
-Simulation API exposure, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
+M6.25 exposes the complete research-only simulator through local `POST /backtesting/simulate`. Its strict explicit configuration is validated before historical loading and includes fixed quantity, fees, spread, slippage, volume participation, initial fictional capital, and a provider-neutral execution-rule snapshot. It cannot mutate the paper wallet or submit an order.
+
+Result persistence, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 

@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-13 — M6.25 local historical simulation API completed
+
+### Added
+
+- Local `POST /backtesting/simulate` exposing the complete deterministic fictional simulation result.
+- Strict pre-load validator for the full configuration and execution-rule snapshot, including semantic decimal, rate, range, impact, and step checks.
+- Controller and E2E coverage for valid simulation mapping, pre-load rejection, sanitized operational failure, and response exposure.
+
+### Changed
+
+- Registered the simulation validator and documented every required configuration group in the root README API table.
+- Synchronized backtesting documentation, project context, roadmap, plan, map, decisions, changelog, and current state.
+
+### Verification
+
+- 372 unit tests passed across 54 suites; 29 E2E tests passed across 2 suites.
+- Lint, formatting check, TypeScript build, Compose validation, and diff whitespace validation passed.
+- No result persistence, paper-wallet mutation, operational Risk Engine access, order submission, exchange authentication, or real trading was introduced.
+
 ## 2026-09-13 — M6.24 local historical replay API completed
 
 ### Added

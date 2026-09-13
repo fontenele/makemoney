@@ -38,12 +38,16 @@ import Redis from 'ioredis';
 import { StrategySignalReadModelService } from '../src/modules/strategies/application/strategy-signal-read-model.service';
 import { HistoricalStrategyReplayService } from '../src/modules/backtesting/application/historical-strategy-replay.service';
 import { BacktestResult } from '../src/modules/backtesting/domain/backtest';
+import { HistoricalBacktestSimulationResult } from '../src/modules/backtesting/domain/backtest-simulation';
 
 describe('Application (e2e)', () => {
   let app: INestApplication;
   let latestMarketPrice: LatestMarketPriceService;
   const runHistoricalReplay = jest.fn(() =>
     Promise.resolve(historicalReplayResult()),
+  );
+  const runHistoricalSimulation = jest.fn(() =>
+    Promise.resolve(historicalSimulationResult()),
   );
 
   beforeAll(async () => {
@@ -62,7 +66,10 @@ describe('Application (e2e)', () => {
       .overrideProvider(TICKER_STREAM)
       .useValue(tickerStream)
       .overrideProvider(HistoricalStrategyReplayService)
-      .useValue({ run: runHistoricalReplay })
+      .useValue({
+        run: runHistoricalReplay,
+        runSimulation: runHistoricalSimulation,
+      })
       .compile();
 
     app = moduleRef.createNestApplication();
@@ -99,6 +106,27 @@ describe('Application (e2e)', () => {
       endTime: new Date(body.endTime),
       limit: 1,
     });
+  });
+
+  it('/backtesting/simulate (POST) exposes explicit research simulation', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const body = historicalSimulationRequest();
+
+    await request(server)
+      .post('/backtesting/simulate')
+      .send(body)
+      .expect(200)
+      .expect(historicalSimulationResult());
+    expect(runHistoricalSimulation).toHaveBeenCalledWith(
+      {
+        symbol: 'BTC/USDT',
+        interval: '1m',
+        startTime: new Date(body.startTime),
+        endTime: new Date(body.endTime),
+        limit: body.limit,
+      },
+      body.configuration,
+    );
   });
 
   it('persists strategy signals idempotently and serves them after memory-independent reads', async () => {
@@ -1125,6 +1153,42 @@ function historicalReplayResult(): BacktestResult {
     sellSignalCount: 0,
     holdSignalCount: 0,
     signals: [],
+  };
+}
+
+function historicalSimulationResult(): HistoricalBacktestSimulationResult {
+  return {
+    replay: {
+      ...historicalReplayResult(),
+      startedAt: null,
+      endedAt: null,
+    },
+    simulation: { fixture: 'research-only' },
+  } as unknown as HistoricalBacktestSimulationResult;
+}
+
+function historicalSimulationRequest() {
+  return {
+    startTime: '2026-09-01T00:00:00.000Z',
+    endTime: '2026-09-01T00:01:00.000Z',
+    limit: 2,
+    configuration: {
+      quantity: '0.001',
+      feeRate: '0.001',
+      spreadRate: '0.0002',
+      slippageRate: '0.0001',
+      maximumVolumeParticipationRate: '0.1',
+      initialCapitalUsdt: '1000',
+      executionRules: {
+        minQuantity: '0.00001',
+        maxQuantity: '1000',
+        stepSize: '0.00001',
+        minNotional: '5',
+        tickSize: '0.01',
+        minPrice: '0.01',
+        maxPrice: '1000000',
+      },
+    },
   };
 }
 

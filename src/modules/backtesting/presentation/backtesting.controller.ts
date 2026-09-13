@@ -8,7 +8,12 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { HistoricalStrategyReplayService } from '../application/historical-strategy-replay.service';
+import { BacktestSimulationRequestValidator } from '../application/backtest-simulation-request-validator';
 import { BacktestResult } from '../domain/backtest';
+import {
+  BacktestSimulationConfiguration,
+  HistoricalBacktestSimulationResult,
+} from '../domain/backtest-simulation';
 import { HistoricalCandleRequest } from '../domain/historical-candle-provider';
 
 const MAX_CANDLE_LIMIT = 10_000;
@@ -16,7 +21,10 @@ const MAX_RANGE_MS = MAX_CANDLE_LIMIT * 60_000;
 
 @Controller('backtesting')
 export class BacktestingController {
-  constructor(private readonly replay: HistoricalStrategyReplayService) {}
+  constructor(
+    private readonly replay: HistoricalStrategyReplayService,
+    private readonly simulationValidator: BacktestSimulationRequestValidator,
+  ) {}
 
   @Post('replay')
   @HttpCode(HttpStatus.OK)
@@ -29,6 +37,54 @@ export class BacktestingController {
         message: 'Historical replay is currently unavailable',
         reason: 'historical_replay_unavailable',
       });
+    }
+  }
+
+  @Post('simulate')
+  @HttpCode(HttpStatus.OK)
+  async runSimulation(
+    @Body() body: unknown,
+  ): Promise<HistoricalBacktestSimulationResult> {
+    const { request, configuration } = this.validSimulationRequest(body);
+    try {
+      return await this.replay.runSimulation(request, configuration);
+    } catch {
+      throw new ServiceUnavailableException({
+        message: 'Historical simulation is currently unavailable',
+        reason: 'historical_simulation_unavailable',
+      });
+    }
+  }
+
+  private validSimulationRequest(value: unknown): {
+    request: HistoricalCandleRequest;
+    configuration: BacktestSimulationConfiguration;
+  } {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      throw new BadRequestException('Invalid historical simulation request');
+    }
+    const body = value as Record<string, unknown>;
+    const allowedFields = ['startTime', 'endTime', 'limit', 'configuration'];
+    if (
+      Object.keys(body).length !== allowedFields.length ||
+      Object.keys(body).some((key) => !allowedFields.includes(key))
+    ) {
+      throw new BadRequestException('Invalid historical simulation request');
+    }
+    const request = validReplayRequest({
+      startTime: body.startTime,
+      endTime: body.endTime,
+      limit: body.limit,
+    });
+    try {
+      return {
+        request,
+        configuration: this.simulationValidator.validate(body.configuration),
+      };
+    } catch {
+      throw new BadRequestException(
+        'Invalid backtest simulation configuration',
+      );
     }
   }
 }

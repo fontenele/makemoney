@@ -299,8 +299,20 @@ M6.24 exposes the signal-only historical replay through `POST /backtesting/repla
 - The endpoint may persist public historical candles as cache data but cannot access a wallet, order executor, Risk Engine, exchange account, or real funds.
 - Financial simulation configuration and results remain internal and are not exposed by this route.
 
+## M6.25 local historical simulation API
+
+M6.25 exposes the complete research-only simulation through `POST /backtesting/simulate`.
+
+- The top-level request contains exactly the M6.24 UTC range and limit fields plus `configuration`.
+- Configuration requires exactly fixed quantity, fee rate, full spread rate, slippage rate, maximum volume-participation rate, initial fictional USDT capital, and the complete execution-rule snapshot.
+- Execution rules require minimum and maximum quantity, step size, minimum notional, tick size, and minimum and maximum price as decimal strings.
+- A dedicated validator checks shape, unknown fields, bounded decimal-string length and grammar, positivity and rate bounds, combined adverse price impact, quantity ranges, and step alignment before any candle lookup or Binance request.
+- Valid requests reuse the same cache and sequential gap loading and return replay, hypothetical fills and trades, performance, ending valuation, capital, ROI, equity and drawdowns, time metrics, and unfilled-signal accounting.
+- HTTP 400 represents invalid public input. Operational loading or persistence failure returns a sanitized HTTP 503.
+- The route does not persist simulation results and cannot access the paper wallet, operational Risk Engine, executor, exchange account, or real funds.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, parameter optimization, and simulation API exposure remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, result persistence, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, and parameter optimization remain deferred and require separate approval.
