@@ -4,7 +4,7 @@ Last validated: 2026-09-12
 
 ## Milestone status
 
-M0 through M5 and M6.1–M6.3 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay and bounded complete public historical candles. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M5 and M6.1–M6.4 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, bounded complete historical candles, and historical-only long simulation. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -89,6 +89,9 @@ M0 through M5 and M6.1–M6.3 are complete. M1 provides unauthenticated public B
 - Historical candles retain exact OHLC prices, base and quote volumes, taker-buy volumes, trade count, close state, and UTC boundaries in a provider-neutral model.
 - Historical price and volume coherence is validated through `decimal.js`; values are never converted to native floating point and arbitrary decimal precision is preserved.
 - Historical replay explicitly projects only the strategy fields, while full candles remain available for a future separately approved execution model.
+- Historical simulation consumes signals separately and creates hypothetical fills only at the following candle open, preserving an inspectable no-lookahead delay.
+- The first simulator models one fixed-quantity long position, explicit taker fees, fee-inclusive entry cost, net exit proceeds, per-trade net PnL, ignored redundant signals, terminal unfilled signals, and an explicit ending position.
+- Simulation arithmetic uses precision-40 `decimal.js`; the simulator creates no order and cannot reach a wallet, executor, operational Risk Engine, or exchange account.
 
 ## Local endpoints and ports
 
@@ -109,16 +112,16 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-12 after M6.3:
+The following passed on 2026-09-13 after M6.4:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 253 tests passed across 40 suites
+- `npm test -- --runInBand` — 264 tests passed across 41 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
-The most recent database-backed integration validation was repeated after M6.3:
+The most recent database-backed integration validation was repeated after M6.4:
 
 - `npm run test:e2e -- --runInBand` — 24 tests passed, including idempotent strategy-signal persistence and reads plus the prior Redis rate limiting, unrealized-loss, authenticated control, liquidity, risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
 - `npx prisma migrate deploy` — all six migrations applied, including `strategy_signals` and its precision expansion
@@ -132,7 +135,7 @@ The most recent database-backed integration validation was repeated after M6.3:
 
 ## Repository state
 
-M0 through M6.2 are committed. M6.3 changes are currently in the working tree.
+M0 through M6.3 are committed. M6.4 changes are currently in the working tree.
 
 ## Known issues and cautions
 

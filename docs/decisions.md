@@ -287,3 +287,9 @@ The adapter strictly validates every kline and response ordering, rejects provid
 The historical provider returns a backtesting-owned full candle rather than the narrower strategy input. OHLC, volumes, taker-buy volumes, and trade count are preserved exactly, while positive prices, non-negative volumes, and high/low coherence are enforced with `decimal.js`. This prevents native floating-point loss and makes invalid market history fail before research calculations.
 
 The orchestration service explicitly projects the full candle into the existing strategy contract, maintaining strategy isolation. Retaining open price and the remaining market fields prepares an evidence-based boundary for a future next-candle execution model without implementing trades or financial claims in M6.3.
+
+## M6.4 causal historical fill model
+
+Historical simulation is a separate consumer of strategy output. A signal evaluated at a candle close may fill only at the following candle's open, preventing same-close execution and making the causal delay explicit in the ledger. A final non-hold signal is reported as unfilled because no future price exists.
+
+The first model is deliberately one fixed-quantity long position. It applies an explicit taker fee to entry and exit notionals and computes fee-inclusive cost, net proceeds, and per-trade net PnL with precision-40 decimal arithmetic. Redundant actions are counted rather than inventing pyramiding or short selling, and an ending position remains open. These objects are hypothetical research records, not orders; no wallet, executor, operational risk state, or exchange integration is invoked.

@@ -40,8 +40,23 @@ M6.3 preserves each validated kline as a provider-neutral `HistoricalCandle` ins
 - Historical replay explicitly projects only symbol, interval, close price, boundaries, and close state into the strategy contract.
 - The complete candle remains available to a future separately approved simulator, including a possible next-candle-open execution model.
 
+## M6.4 deterministic long-only simulation
+
+M6.4 adds an internal, historical-only simulator that consumes the replay timeline separately from the strategy. A non-hold signal generated at one candle close can create a hypothetical fill only at the next candle open. A terminal signal without another candle remains explicitly unfilled.
+
+- The model holds at most one long BTC position.
+- Buy while flat opens the position; sell while long closes it.
+- Repeated buys while long and sells while flat are counted and ignored.
+- BTC quantity and taker fee rate are explicit simulation inputs. Quantity must be positive; fee rate must be at least zero and below one.
+- Entry and exit notional, fee, total entry cost, net exit proceeds, and each closed trade's net PnL use precision-40 `decimal.js` arithmetic.
+- The ordered fill ledger records signal and fill times, making the causal delay inspectable.
+- Any remaining position exposes its entry and fee-inclusive cost basis instead of being silently closed.
+- Historical orchestration loads candles once and returns both the original replay and simulation result.
+
+These are research-only hypothetical fills. They do not create an order, call an executor, mutate a wallet, use the operational Risk Engine, or access an exchange account.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Trade simulation, next-candle execution, fills, fees, spread, slippage, minimum-order rules, PnL, ROI, drawdown, profit factor, expectancy, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
+Aggregate performance metrics, mark-to-market valuation, spread, slippage, liquidity, minimum-order and precision rules, variable sizing, Risk Engine modeling, ROI, drawdown, profit factor, expectancy, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.

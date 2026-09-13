@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-13 — M6.4 deterministic long-only simulation completed
+
+### Added
+
+- Historical-only simulator consuming candles and strategy signals through a separate application boundary.
+- Causal next-candle-open hypothetical fills, including explicit handling of terminal signals with no future candle.
+- Fixed BTC quantity, explicit taker fee rate, exact notionals, entry cost, net exit proceeds, and per-closed-trade net PnL through precision-40 `decimal.js` arithmetic.
+- Ordered buy/sell fill ledger, one-position long state, ignored redundant signal counts, and explicit ending open position.
+- Historical orchestration that loads candles once and returns replay and simulation results together.
+- Eleven focused tests for causality, fee-inclusive PnL, open positions, redundant actions, terminal signals, arbitrary precision, invalid configuration, inconsistent timelines, and orchestration.
+- Synchronized backtesting documentation, project context, README status, roadmap, plan, map, decisions, and current state.
+
+### Scope boundaries
+
+- No real or paper order, wallet mutation, executor call, operational Risk Engine call, exchange-account access, route, persistence, aggregate metric, spread, slippage, liquidity model, pair-rule enforcement, variable sizing, or real trading was introduced.
+
 ## 2026-09-12 — M6.3 complete historical candle model completed
 
 ### Added

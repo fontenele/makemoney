@@ -74,7 +74,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.1 — complete:** deterministic, provider-neutral replay of supplied ordered closed candles through the configured strategy, with strict input validation, bounded no-lookahead evaluation, and an ordered signal timeline plus action counts.
 - **M6.2 — complete:** bounded public Binance Spot historical BTC/USDT one-minute candle loading behind a provider-neutral contract, strict payload validation, open-candle exclusion, cancellation, and direct internal replay integration.
 - **M6.3 — complete:** provider-neutral complete historical OHLCV candles with exact decimal preservation, coherent high/low validation, and explicit strategy-input projection while retaining execution-ready fields.
-- Later M6 increments require separate approval for historical-data persistence or multi-request pagination, trade/fill simulation, fees, spread, slippage, PnL, ROI, drawdown, profit factor, expectancy, optimization, or API exposure.
+- **M6.4 — complete:** deterministic historical-only long-position simulation with explicit fixed quantity and taker fee, next-candle-open hypothetical fills, an ordered ledger, per-trade net PnL, ignored-signal counts, and explicit open-position state.
+- Later M6 increments require separate approval for historical-data persistence or pagination, aggregate metrics, mark-to-market valuation, variable sizing, spread, slippage, liquidity and pair-rule modeling, ROI, drawdown, profit factor, expectancy, optimization, or API exposure.
 
 ## M7 — New Listing Scanner — planned
 
