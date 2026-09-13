@@ -1,4 +1,5 @@
-import { StrategyCandle } from '../../../strategies/domain/strategy';
+import Decimal from 'decimal.js';
+import { HistoricalCandle } from '../../domain/historical-candle';
 import {
   HistoricalCandleProvider,
   HistoricalCandleRequest,
@@ -22,7 +23,7 @@ export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider 
   async load(
     request: HistoricalCandleRequest,
     signal?: AbortSignal,
-  ): Promise<StrategyCandle[]> {
+  ): Promise<HistoricalCandle[]> {
     this.validateRequest(request);
     const timeoutSignal = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
     const response = await this.httpClient(this.buildUrl(request), {
@@ -43,7 +44,7 @@ export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider 
   normalize(
     payload: unknown,
     request: HistoricalCandleRequest,
-  ): StrategyCandle[] {
+  ): HistoricalCandle[] {
     this.validateRequest(request);
     if (!Array.isArray(payload) || payload.length > request.limit) {
       throw new Error('Invalid Binance historical candles payload');
@@ -66,23 +67,57 @@ export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider 
   private normalizeRow(
     value: unknown,
     request: HistoricalCandleRequest,
-  ): StrategyCandle {
+  ): HistoricalCandle {
     if (!isKline(value)) {
       throw new Error('Invalid Binance historical candle');
     }
 
-    const [openTime, , , , closePrice, , closeTime] = value;
+    const [
+      openTime,
+      openPrice,
+      highPrice,
+      lowPrice,
+      closePrice,
+      baseVolume,
+      closeTime,
+      quoteVolume,
+      tradeCount,
+      takerBuyBaseVolume,
+      takerBuyQuoteVolume,
+    ] = value;
     if (
       openTime < request.startTime.getTime() ||
       openTime > request.endTime.getTime()
     ) {
       throw new Error('Binance historical candle is outside requested range');
     }
+    if (
+      !isCoherentOhlcv(
+        openPrice,
+        highPrice,
+        lowPrice,
+        closePrice,
+        baseVolume,
+        quoteVolume,
+        takerBuyBaseVolume,
+        takerBuyQuoteVolume,
+      )
+    ) {
+      throw new Error('Invalid Binance historical candle OHLCV');
+    }
 
     return {
       symbol: 'BTC/USDT',
       interval: '1m',
+      openPrice,
+      highPrice,
+      lowPrice,
       closePrice,
+      baseVolume,
+      quoteVolume,
+      takerBuyBaseVolume,
+      takerBuyQuoteVolume,
+      tradeCount,
       openTime: new Date(openTime),
       closeTime: new Date(closeTime),
       isClosed: true,
@@ -165,4 +200,26 @@ function isNonNegativeInteger(value: unknown): value is number {
 
 function isDecimal(value: unknown): value is string {
   return typeof value === 'string' && DECIMAL_PATTERN.test(value);
+}
+
+function isCoherentOhlcv(
+  openPrice: string,
+  highPrice: string,
+  lowPrice: string,
+  closePrice: string,
+  ...volumes: string[]
+): boolean {
+  const open = new Decimal(openPrice);
+  const high = new Decimal(highPrice);
+  const low = new Decimal(lowPrice);
+  const close = new Decimal(closePrice);
+  return (
+    open.isPositive() &&
+    high.isPositive() &&
+    low.isPositive() &&
+    close.isPositive() &&
+    high.greaterThanOrEqualTo(Decimal.max(open, low, close)) &&
+    low.lessThanOrEqualTo(Decimal.min(open, high, close)) &&
+    volumes.every((volume) => new Decimal(volume).greaterThanOrEqualTo(0))
+  );
 }

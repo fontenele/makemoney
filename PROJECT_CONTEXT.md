@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.2 — deterministic replay with bounded public historical candles**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.3 — deterministic replay with bounded complete historical candles**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -77,6 +77,8 @@ M5.6 persists generated signals in PostgreSQL with idempotency by strategy, symb
 M6.1 replays a caller-supplied sequence of normalized closed BTC/USDT one-minute candles through the configured strategy. It validates chronological uniqueness and evaluates candle by candle with bounded history, so future candles are never exposed. The deterministic result contains the ordered signal timeline and buy, sell, and hold counts; it performs no trade simulation, financial calculation, data retrieval, persistence, or execution.
 
 M6.2 loads one bounded UTC range of public Binance Spot BTC/USDT one-minute klines behind a provider-neutral contract and passes normalized closed candles to M6.1. Requests and payloads are strictly validated, the limit and time span are capped at 1,000, and the current open candle is excluded. It adds no persistence, HTTP route, trade simulation, or execution.
+
+M6.3 preserves the complete provider-neutral historical OHLCV candle, including taker-buy volumes and trade count. Positive-price, non-negative-volume, and high/low coherence rules use exact decimal arithmetic. Historical replay projects only the required close-price view into the strategy, leaving the complete candle available for a future separately approved execution model.
 
 Historical market data, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

@@ -1,4 +1,4 @@
-import { StrategyCandle } from '../../strategies/domain/strategy';
+import { HistoricalCandle } from './historical-candle';
 
 export const HISTORICAL_CANDLE_PROVIDER = Symbol('HISTORICAL_CANDLE_PROVIDER');
 
@@ -14,5 +14,5 @@ export interface HistoricalCandleProvider {
   load(
     request: HistoricalCandleRequest,
     signal?: AbortSignal,
-  ): Promise<StrategyCandle[]>;
+  ): Promise<HistoricalCandle[]>;
 }

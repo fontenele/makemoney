@@ -28,7 +28,15 @@ describe('BinanceHistoricalCandlesClient', () => {
       expect.objectContaining({
         symbol: 'BTC/USDT',
         interval: '1m',
+        openPrice: '99',
+        highPrice: '102',
+        lowPrice: '98',
         closePrice: '100',
+        baseVolume: '1.5',
+        quoteVolume: '150',
+        takerBuyBaseVolume: '0.75',
+        takerBuyQuoteVolume: '75',
+        tradeCount: 10,
         isClosed: true,
       }),
       expect.objectContaining({ closePrice: '101', isClosed: true }),
@@ -47,6 +55,43 @@ describe('BinanceHistoricalCandlesClient', () => {
     );
 
     expect(client.normalize([kline(0), kline(1)], request)).toHaveLength(1);
+  });
+
+  it('preserves arbitrary decimal precision without native-number conversion', () => {
+    const precise = kline(0);
+    precise[1] = '99999.12345678901234567890123456789';
+    precise[2] = '100001.12345678901234567890123456789';
+    precise[3] = '99998.12345678901234567890123456789';
+    precise[4] = '100000.12345678901234567890123456789';
+    const client = new BinanceHistoricalCandlesClient(
+      'https://data-api.binance.vision',
+      fetch,
+      () => now,
+    );
+
+    expect(client.normalize([precise], request)[0]).toMatchObject({
+      openPrice: precise[1],
+      highPrice: precise[2],
+      lowPrice: precise[3],
+      closePrice: precise[4],
+    });
+  });
+
+  it.each([
+    { field: 2, value: '97' },
+    { field: 3, value: '103' },
+    { field: 1, value: '0' },
+    { field: 5, value: '-1' },
+  ])('rejects incoherent OHLCV at field $field', ({ field, value }) => {
+    const invalid = kline(0);
+    invalid[field] = value;
+    const client = new BinanceHistoricalCandlesClient(
+      'https://data-api.binance.vision',
+      fetch,
+      () => now,
+    );
+
+    expect(() => client.normalize([invalid], request)).toThrow();
   });
 
   it.each([[[['invalid']]], [[kline(1), kline(0)]], [[kline(0), kline(0)]]])(

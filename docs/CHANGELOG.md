@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-12 — M6.3 complete historical candle model completed
+
+### Added
+
+- Provider-neutral `HistoricalCandle` model retaining exact OHLC prices, base and quote volumes, taker-buy volumes, trade count, close state, and UTC boundaries.
+- Exact `decimal.js` validation for positive prices, non-negative volumes, coherent highs and lows, and arbitrary-precision preservation.
+- Explicit full-candle-to-strategy projection so strategies receive only their existing close-price contract.
+- Five additional focused tests for complete normalization, precision preservation, invalid price/volume, incoherent high/low data, and projection isolation.
+- Synchronized backtesting documentation, project context, README status, roadmap, plan, map, decisions, and current state.
+
+### Scope boundaries
+
+- No trade simulation, next-candle execution, fee, spread, slippage, sizing, PnL, metric, route, persistence, credential, wallet access, or real trading was introduced.
+
 ## 2026-09-12 — M6.2 public historical candle loading completed
 
 ### Added

@@ -281,3 +281,9 @@ The output is deliberately a signal timeline with period and action counts, not 
 Historical input is obtained through a provider-neutral contract whose first adapter uses Binance Spot's public `GET /api/v3/klines` on the market-data-only REST host. The request is deliberately one bounded BTC/USDT one-minute range: limit 1–1,000 and maximum span 1,000 minutes. This avoids implicit pagination, unbounded downloads, credentials, and persistence in the first retrieval increment.
 
 The adapter strictly validates every kline and response ordering, rejects provider drift rather than guessing, and removes any candle whose close time has not passed. Only the strategy candle projection enters replay. Provider retries, multi-request pagination, caching, storage, API exposure, and financial simulation remain deferred.
+
+## M6.3 complete provider-neutral historical candles
+
+The historical provider returns a backtesting-owned full candle rather than the narrower strategy input. OHLC, volumes, taker-buy volumes, and trade count are preserved exactly, while positive prices, non-negative volumes, and high/low coherence are enforced with `decimal.js`. This prevents native floating-point loss and makes invalid market history fail before research calculations.
+
+The orchestration service explicitly projects the full candle into the existing strategy contract, maintaining strategy isolation. Retaining open price and the remaining market fields prepares an evidence-based boundary for a future next-candle execution model without implementing trades or financial claims in M6.3.

@@ -20,6 +20,15 @@ export class HistoricalStrategyReplayService {
     signal?: AbortSignal,
   ): Promise<BacktestResult> {
     const candles = await this.candleProvider.load(request, signal);
-    return this.replayService.run(candles);
+    return this.replayService.run(
+      candles.map((candle) => ({
+        symbol: candle.symbol,
+        interval: candle.interval,
+        closePrice: candle.closePrice,
+        openTime: candle.openTime,
+        closeTime: candle.closeTime,
+        isClosed: candle.isClosed,
+      })),
+    );
   }
 }

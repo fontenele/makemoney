@@ -29,8 +29,19 @@ M6.2 adds a provider-neutral historical-candle source and a Binance Spot impleme
 
 This follows Binance's official [Spot REST kline contract](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#klinecandlestick-data) and [market-data-only host guidance](https://github.com/binance/binance-spot-api-docs/blob/master/faqs/market_data_only.md).
 
+## M6.3 complete historical candle model
+
+M6.3 preserves each validated kline as a provider-neutral `HistoricalCandle` instead of discarding all fields except the strategy projection. The model retains OHLC prices, base and quote volumes, taker-buy volumes, trade count, close state, and UTC boundaries as exact strings and timestamps.
+
+- Prices must be positive and volumes must be non-negative canonical decimals.
+- High must be at least every other OHLC price; low must be at most every other OHLC price.
+- Coherence checks use `decimal.js`; values never pass through native floating-point arithmetic.
+- Arbitrary decimal precision is preserved exactly as received.
+- Historical replay explicitly projects only symbol, interval, close price, boundaries, and close state into the strategy contract.
+- The complete candle remains available to a future separately approved simulator, including a possible next-candle-open execution model.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Trade simulation, fills, fees, spread, slippage, minimum-order rules, PnL, ROI, drawdown, profit factor, expectancy, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
+Trade simulation, next-candle execution, fills, fees, spread, slippage, minimum-order rules, PnL, ROI, drawdown, profit factor, expectancy, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
