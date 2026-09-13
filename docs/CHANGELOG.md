@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-12 — M6.1 deterministic strategy replay completed
+
+### Added
+
+- Provider-neutral backtesting module and internal replay service for supplied closed BTC/USDT one-minute candles.
+- Strict symbol, interval, close-state, timestamp, ordering, and duplicate validation.
+- Candle-by-candle evaluation with strategy-declared bounded history and no exposure to future candles.
+- Deterministic ordered signal timeline with evaluated period and buy, sell, and hold counts.
+- Six focused tests covering empty input, deterministic output, bounded no-lookahead behavior, open candles, out-of-order candles, and duplicates.
+- `docs/backtesting.md` and synchronized project status, roadmap, plan, map, decisions, current state, and README.
+
+### Scope boundaries
+
+- No HTTP route, historical-data retrieval or persistence, trade/fill simulation, fees, spread, slippage, PnL, ROI, drawdown, profit factor, expectancy, optimization, wallet access, execution, authenticated exchange integration, or real trading was introduced.
+
 All notable working-tree changes are recorded here. Dates use `YYYY-MM-DD`.
 
 ## 2026-09-12 — M5.6 strategy signal persistence completed

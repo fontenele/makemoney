@@ -8,8 +8,8 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, and **M5.1–M5.6 — deterministic moving-average strategy observation, persistence, and read APIs**.
-- No next increment is approved. Stop and present a minimal plan before further strategy work.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1 — deterministic strategy replay**.
+- No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -74,6 +74,8 @@ M5.5 retains at most 100 generated signals in process memory and exposes them ne
 
 M5.6 persists generated signals in PostgreSQL with idempotency by strategy, symbol, and candle close time. Recent and latest routes now read durable data and survive restarts; persistence failure is logged without creating any execution path.
 
+M6.1 replays a caller-supplied sequence of normalized closed BTC/USDT one-minute candles through the configured strategy. It validates chronological uniqueness and evaluates candle by candle with bounded history, so future candles are never exposed. The deterministic result contains the ordered signal timeline and buy, sell, and hold counts; it performs no trade simulation, financial calculation, data retrieval, persistence, or execution.
+
 Historical market data, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
@@ -100,3 +102,4 @@ Historical market data, cursor-paginated signal history, position sizing, BRL co
 - `docs/paper-trading.md`: M3 paper quote and future execution boundaries.
 - `docs/risk-engine.md`: M4 risk-assessment contract, rules, and execution boundary.
 - `docs/strategies.md`: M5.1 strategy contract, crossover semantics, and isolation boundary.
+- `docs/backtesting.md`: M6.1 deterministic replay contract, no-lookahead boundary, result, and deferred scope.

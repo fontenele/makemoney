@@ -57,7 +57,7 @@ All strategy signals pass through independent risk assessment before any executo
 - **M4.11 — complete:** Redis-backed atomic fixed-window limit for distinct approved paper executions, with idempotency awareness and fail-closed behavior.
 - Later M4 safeguards require separate evidence, a minimal plan, and approval.
 
-## M5 — Strategies — in progress
+## M5 — Strategies — complete
 
 Deterministic, reproducible, measurable strategies that produce signals and never submit orders directly.
 
@@ -69,9 +69,10 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M5.6 — complete:** idempotent PostgreSQL persistence for live signals, with restart-safe recent and latest read APIs.
 - Cursor-paginated history, filters, position sizing, execution integration, and additional strategies require separate approval.
 
-## M6 — Backtesting — planned
+## M6 — Backtesting — in progress
 
-Historical simulation and metrics including net PnL, fees, ROI, drawdown, profit factor, and expectancy.
+- **M6.1 — complete:** deterministic, provider-neutral replay of supplied ordered closed candles through the configured strategy, with strict input validation, bounded no-lookahead evaluation, and an ordered signal timeline plus action counts.
+- Later M6 increments require separate approval for historical-data acquisition or persistence, trade/fill simulation, fees, spread, slippage, PnL, ROI, drawdown, profit factor, expectancy, optimization, or API exposure.
 
 ## M7 — New Listing Scanner — planned
 

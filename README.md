@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M4 and M5.1–M5.6 are complete. Market feeds are public and unauthenticated; trades and balances are fictional, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M5 and M6.1 are complete. Market feeds are public and unauthenticated; trades and balances are fictional, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 

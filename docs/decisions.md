@@ -269,3 +269,9 @@ This is an operational observation surface, not durable strategy research data. 
 Strategy signals are persisted behind a provider-neutral repository. The database identity is the combination of strategy, symbol, and latest closed-candle time, preventing duplicate rows when a candle is processed again after delivery duplication or restart. A conflict returns the original row and never overwrites historical parameters or calculations.
 
 Recent and latest queries read PostgreSQL directly rather than rebuilding an in-memory cache. Decimal averages use `DECIMAL(65,40)` to preserve the strategy's precision and map back to canonical strings. Persistence errors are logged and isolated from the market-data subscriber; signals still have no path to an executor.
+
+## M6.1 deterministic no-lookahead replay
+
+Backtesting begins with an internal provider-neutral runner over caller-supplied normalized candles. The runner validates closed BTC/USDT one-minute input with strictly increasing unique close times, then evaluates the configured strategy once per candle using only the bounded history available at that point. Setting evaluation time to the candle close makes identical input deterministic and prevents wall-clock variance.
+
+The output is deliberately a signal timeline with period and action counts, not a trading-performance claim. Historical retrieval and storage, fills, fees, spread, slippage, financial metrics, optimization, HTTP exposure, and any execution path remain separate decisions.

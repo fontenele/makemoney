@@ -4,7 +4,7 @@ Last validated: 2026-09-12
 
 ## Milestone status
 
-M0 through M4 and M5.1–M5.6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M5 and M6.1 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6.1 adds deterministic no-lookahead replay of supplied historical candles. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -79,6 +79,9 @@ M0 through M4 and M5.1–M5.6 are complete. M1 provides unauthenticated public B
 - `GET /strategies/signals` returns persisted signals newest first with an optional `limit` from 1 through 100 and a default of 50.
 - Generated signals persist idempotently in PostgreSQL by strategy, symbol, and candle close time; recent and latest reads survive application restarts.
 - Strategy averages use database decimal columns and persistence failures produce structured errors without invoking any trading behavior.
+- An internal provider-neutral replay service validates supplied closed BTC/USDT one-minute candles and evaluates the configured strategy once per candle.
+- Replay uses only the current and prior bounded history, sets evaluation time to the candle close, and returns a deterministic ordered signal timeline with buy, sell, and hold counts.
+- M6.1 does not retrieve or persist historical candles, expose an HTTP route, simulate trades or fills, calculate financial performance, or access an executor.
 
 ## Local endpoints and ports
 
@@ -99,16 +102,16 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-12 after M5.6:
+The following passed on 2026-09-12 after M6.1:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 231 tests passed across 37 suites
+- `npm test -- --runInBand` — 237 tests passed across 38 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
-The most recent database-backed integration validation was completed after M4.11:
+The most recent database-backed integration validation was repeated after M6.1:
 
 - `npm run test:e2e -- --runInBand` — 24 tests passed, including idempotent strategy-signal persistence and reads plus the prior Redis rate limiting, unrealized-loss, authenticated control, liquidity, risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
 - `npx prisma migrate deploy` — all six migrations applied, including `strategy_signals` and its precision expansion
@@ -121,7 +124,7 @@ The most recent database-backed integration validation was completed after M4.11
 
 ## Repository state
 
-M0 through M5.5 are committed. M5.6 changes are currently in the working tree.
+M0 through M5.6 are committed. M6.1 changes are currently in the working tree.
 
 ## Known issues and cautions
 
