@@ -104,8 +104,22 @@ M6.8 creates one chronological curve point for every closed trade at its exit ti
 - Open-position and intraperiod unrealized results do not enter this realized-only curve.
 - All arithmetic uses precision-40 `decimal.js`.
 
+## M6.9 simulated capital and total ROI
+
+M6.9 introduces an explicit positive initial USDT capital into the internal simulation configuration and maintains a deterministic cash balance.
+
+- A buy debits its complete fee-inclusive entry cost and is not filled when available cash is insufficient.
+- An unfilled insufficient-capital buy is counted separately from a redundant buy while already long.
+- A sell credits its net proceeds after the simulated exit fee.
+- Cash cannot become negative, and the fixed BTC quantity remains unchanged between trades.
+- Final equity is final cash plus the ending position's net liquidation value, or final cash alone when flat.
+- Total net return is final equity less initial capital; total ROI is that return divided by initial capital.
+- Every capital value and ratio uses precision-40 `decimal.js` and is returned as a decimal string.
+
+This capital ledger is local historical research state. It does not use or mutate the paper wallet.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intraperiod equity curves, percentage drawdown, spread, slippage, liquidity, minimum-order and precision rules, variable sizing, Risk Engine modeling, ROI, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
+Intraperiod equity curves, percentage drawdown, spread, slippage, liquidity, minimum-order and precision rules, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.

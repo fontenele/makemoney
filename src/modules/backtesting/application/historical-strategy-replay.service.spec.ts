@@ -80,7 +80,11 @@ describe('HistoricalStrategyReplayService', () => {
       endTime: new Date('2026-09-12T12:01:00.000Z'),
       limit: 2,
     };
-    const configuration = { quantity: '0.001', feeRate: '0.001' };
+    const configuration = {
+      quantity: '0.001',
+      feeRate: '0.001',
+      initialCapitalUsdt: '1000',
+    };
 
     await expect(
       service.runSimulation(request, configuration),

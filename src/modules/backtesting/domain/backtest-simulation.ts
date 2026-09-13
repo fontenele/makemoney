@@ -40,6 +40,16 @@ export interface BacktestOpenPosition {
 export interface BacktestSimulationConfiguration {
   quantity: string;
   feeRate: string;
+  initialCapitalUsdt: string;
+}
+
+export interface BacktestCapitalResult {
+  initialCapitalUsdt: string;
+  finalCashUsdt: string;
+  endingPositionNetValueUsdt: string;
+  finalEquityUsdt: string;
+  totalNetReturnUsdt: string;
+  totalRoi: string;
 }
 
 export interface BacktestSimulationResult {
@@ -47,6 +57,7 @@ export interface BacktestSimulationResult {
   executionModel: 'next_candle_open';
   quantity: string;
   feeRate: string;
+  capital: BacktestCapitalResult;
   fills: BacktestFill[];
   closedTrades: BacktestClosedTrade[];
   performance: BacktestPerformance;
@@ -54,6 +65,7 @@ export interface BacktestSimulationResult {
   endingValuation: BacktestEndingValuation | null;
   ignoredBuySignalCount: number;
   ignoredSellSignalCount: number;
+  insufficientCapitalBuySignalCount: number;
   unfilledTerminalSignalCount: number;
 }
 

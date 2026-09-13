@@ -36,6 +36,10 @@ export class BacktestTradeSimulator {
   ): BacktestSimulationResult {
     const quantity = this.positiveDecimal(configuration.quantity, 'quantity');
     const feeRate = this.feeRate(configuration.feeRate);
+    const initialCapital = this.positiveDecimal(
+      configuration.initialCapitalUsdt,
+      'initialCapitalUsdt',
+    );
     this.validateTimeline(candles, signals);
 
     const fills: BacktestFill[] = [];
@@ -43,6 +47,8 @@ export class BacktestTradeSimulator {
     let entry: BacktestBuyFill | null = null;
     let ignoredBuySignalCount = 0;
     let ignoredSellSignalCount = 0;
+    let insufficientCapitalBuySignalCount = 0;
+    let cash = initialCapital;
 
     for (let index = 1; index < candles.length; index += 1) {
       const signal = signals[index - 1];
@@ -54,7 +60,13 @@ export class BacktestTradeSimulator {
           ignoredBuySignalCount += 1;
           continue;
         }
-        entry = this.buyFill(candle, signal, quantity, feeRate);
+        const candidateEntry = this.buyFill(candle, signal, quantity, feeRate);
+        if (new SimulationDecimal(candidateEntry.totalCost).greaterThan(cash)) {
+          insufficientCapitalBuySignalCount += 1;
+          continue;
+        }
+        entry = candidateEntry;
+        cash = cash.minus(entry.totalCost);
         fills.push(entry);
         continue;
       }
@@ -64,6 +76,7 @@ export class BacktestTradeSimulator {
         continue;
       }
       const exit = this.sellFill(candle, signal, quantity, feeRate);
+      cash = cash.plus(exit.netProceeds);
       fills.push(exit);
       closedTrades.push({
         entry,
@@ -84,11 +97,24 @@ export class BacktestTradeSimulator {
       candles.at(-1),
       feeRate.toFixed(),
     );
+    const endingPositionNetValue = new SimulationDecimal(
+      endingValuation?.netLiquidationValue ?? 0,
+    );
+    const finalEquity = cash.plus(endingPositionNetValue);
+    const totalNetReturn = finalEquity.minus(initialCapital);
     return {
       symbol: 'BTC/USDT',
       executionModel: 'next_candle_open',
       quantity: quantity.toFixed(),
       feeRate: feeRate.toFixed(),
+      capital: {
+        initialCapitalUsdt: initialCapital.toFixed(),
+        finalCashUsdt: cash.toFixed(),
+        endingPositionNetValueUsdt: endingPositionNetValue.toFixed(),
+        finalEquityUsdt: finalEquity.toFixed(),
+        totalNetReturnUsdt: totalNetReturn.toFixed(),
+        totalRoi: totalNetReturn.dividedBy(initialCapital).toFixed(),
+      },
       fills,
       closedTrades,
       performance: this.performanceCalculator.calculate(
@@ -100,6 +126,7 @@ export class BacktestTradeSimulator {
       endingValuation,
       ignoredBuySignalCount,
       ignoredSellSignalCount,
+      insufficientCapitalBuySignalCount,
       unfilledTerminalSignalCount:
         terminalSignal && terminalSignal.action !== 'hold' ? 1 : 0,
     };

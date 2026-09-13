@@ -23,7 +23,7 @@ describe('BacktestTradeSimulator', () => {
         signal(candles[1], 'sell'),
         signal(candles[2]),
       ],
-      { quantity: '0.5', feeRate: '0.01' },
+      { quantity: '0.5', feeRate: '0.01', initialCapitalUsdt: '100' },
     );
 
     expect(result.fills).toEqual([
@@ -82,6 +82,14 @@ describe('BacktestTradeSimulator', () => {
       totalFees: '1.15',
     });
     expect(result.openPosition).toBeNull();
+    expect(result.capital).toEqual({
+      initialCapitalUsdt: '100',
+      finalCashUsdt: '103.85',
+      endingPositionNetValueUsdt: '0',
+      finalEquityUsdt: '103.85',
+      totalNetReturnUsdt: '3.85',
+      totalRoi: '0.0385',
+    });
   });
 
   it('keeps a final open position explicit', () => {
@@ -89,7 +97,7 @@ describe('BacktestTradeSimulator', () => {
     const result = simulator.simulate(
       candles,
       [signal(candles[0], 'buy'), signal(candles[1])],
-      { quantity: '0.1', feeRate: '0.001' },
+      { quantity: '0.1', feeRate: '0.001', initialCapitalUsdt: '100' },
     );
 
     expect(result.openPosition).toMatchObject({
@@ -110,6 +118,14 @@ describe('BacktestTradeSimulator', () => {
       unrealizedNetPnl: '-0.0202',
       totalNetPnl: '-0.0202',
     });
+    expect(result.capital).toEqual({
+      initialCapitalUsdt: '100',
+      finalCashUsdt: '89.8899',
+      endingPositionNetValueUsdt: '10.0899',
+      finalEquityUsdt: '99.9798',
+      totalNetReturnUsdt: '-0.0202',
+      totalRoi: '-0.000202',
+    });
   });
 
   it('ignores buys while long and sells while flat', () => {
@@ -124,7 +140,7 @@ describe('BacktestTradeSimulator', () => {
     const result = simulator.simulate(
       candles,
       candles.map((value, index) => signal(value, actions[index])),
-      { quantity: '1', feeRate: '0' },
+      { quantity: '1', feeRate: '0', initialCapitalUsdt: '1000' },
     );
 
     expect(result.ignoredSellSignalCount).toBe(1);
@@ -137,6 +153,7 @@ describe('BacktestTradeSimulator', () => {
     const result = simulator.simulate(candles, [signal(candles[0], 'buy')], {
       quantity: '1',
       feeRate: '0',
+      initialCapitalUsdt: '1000',
     });
 
     expect(result.fills).toEqual([]);
@@ -148,6 +165,7 @@ describe('BacktestTradeSimulator', () => {
     const configuration = {
       quantity: '0.1234567890123456789',
       feeRate: '0.0001',
+      initialCapitalUsdt: '1000',
     };
 
     const first = simulator.simulate(
@@ -168,10 +186,11 @@ describe('BacktestTradeSimulator', () => {
   });
 
   it.each([
-    { quantity: '0', feeRate: '0.001' },
-    { quantity: '-1', feeRate: '0.001' },
-    { quantity: '1', feeRate: '-0.1' },
-    { quantity: '1', feeRate: '1' },
+    { quantity: '0', feeRate: '0.001', initialCapitalUsdt: '1000' },
+    { quantity: '-1', feeRate: '0.001', initialCapitalUsdt: '1000' },
+    { quantity: '1', feeRate: '-0.1', initialCapitalUsdt: '1000' },
+    { quantity: '1', feeRate: '1', initialCapitalUsdt: '1000' },
+    { quantity: '1', feeRate: '0', initialCapitalUsdt: '0' },
   ])('rejects invalid simulation configuration', (configuration) => {
     expect(() => simulator.simulate([], [], configuration)).toThrow();
   });
@@ -185,8 +204,28 @@ describe('BacktestTradeSimulator', () => {
       simulator.simulate(candles, [mismatched], {
         quantity: '1',
         feeRate: '0',
+        initialCapitalUsdt: '1000',
       }),
     ).toThrow('Backtest candle and signal timeline is inconsistent');
+  });
+
+  it('rejects a hypothetical buy without enough cash', () => {
+    const candles = [candle(0, '100'), candle(1, '101')];
+    const result = simulator.simulate(
+      candles,
+      [signal(candles[0], 'buy'), signal(candles[1])],
+      { quantity: '1', feeRate: '0.001', initialCapitalUsdt: '100' },
+    );
+
+    expect(result.fills).toEqual([]);
+    expect(result.openPosition).toBeNull();
+    expect(result.insufficientCapitalBuySignalCount).toBe(1);
+    expect(result.capital).toMatchObject({
+      finalCashUsdt: '100',
+      finalEquityUsdt: '100',
+      totalNetReturnUsdt: '0',
+      totalRoi: '0',
+    });
   });
 });
 

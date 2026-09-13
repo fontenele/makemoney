@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-13 — M6.9 simulated capital and total ROI completed
+
+### Added
+
+- Required positive initial USDT capital and deterministic non-negative cash accounting.
+- Fee-inclusive buy debits, net sell credits, and explicit counting of buy signals rejected for insufficient capital.
+- Final cash, ending position net value, final equity, total net return, and total ROI using precision-40 `decimal.js`.
+- Tests for profitable and open-position outcomes, insufficient capital, invalid capital, fees, and deterministic precision.
+- The full suite now contains 278 tests across 44 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No borrowing, negative cash, reinvestment, variable sizing, percentage drawdown, intraperiod equity curve, route, persistence, wallet mutation, order execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.8 realized PnL curve and drawdown completed
 
 ### Added

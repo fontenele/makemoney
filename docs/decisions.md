@@ -317,3 +317,9 @@ Undefined samples are represented as `null`: no closed trades means no average o
 The first backtest drawdown measure follows cumulative net PnL only at closed-trade exits. Its initial peak is zero, allowing an initial losing trade to create drawdown without inventing capital. Each point retains the running peak and absolute USDT distance below it.
 
 Maximum drawdown records when the decline first appeared, its deepest observed exit, and when the relevant prior peak was regained. Open-position valuation and intraperiod candle movement remain excluded, so this metric is explicitly realized-only and not a full equity drawdown.
+
+## M6.9 explicit capital before ROI
+
+ROI is introduced only with an explicit positive initial USDT capital. The simulator owns a research-only cash ledger: fee-inclusive buys debit cash, net sell proceeds credit it, and unaffordable buys remain unfilled and separately counted. Negative cash and borrowing are impossible.
+
+Final equity combines remaining cash with the fee-adjusted final-close liquidation value of an open position. Total return and ROI therefore reconcile with the existing total net PnL while leaving quantity fixed and avoiding implicit reinvestment.
