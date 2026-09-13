@@ -47,6 +47,10 @@ export class BacktestPerformanceCalculator {
       (total, fill) => total.plus(fill.fee),
       new PerformanceDecimal(0),
     );
+    const averageNetPnlPerClosedTrade =
+      closedTradeCount === 0
+        ? null
+        : realizedNetPnl.dividedBy(closedTradeCount).toFixed();
 
     return {
       fillCount: fills.length,
@@ -63,6 +67,19 @@ export class BacktestPerformanceCalculator {
       grossProfit: grossProfit.toFixed(),
       grossLoss: grossLoss.toFixed(),
       realizedNetPnl: realizedNetPnl.toFixed(),
+      averageNetPnlPerClosedTrade,
+      averageProfitableTradeNetPnl:
+        profitableTradeCount === 0
+          ? null
+          : grossProfit.dividedBy(profitableTradeCount).toFixed(),
+      averageLosingTradeNetPnl:
+        losingTradeCount === 0
+          ? null
+          : grossLoss.dividedBy(losingTradeCount).toFixed(),
+      expectancy: averageNetPnlPerClosedTrade,
+      profitFactor: grossLoss.isZero()
+        ? null
+        : grossProfit.dividedBy(grossLoss).toFixed(),
       unrealizedNetPnl: endingValuation?.unrealizedNetPnl ?? null,
       totalNetPnl: realizedNetPnl
         .plus(endingValuation?.unrealizedNetPnl ?? 0)

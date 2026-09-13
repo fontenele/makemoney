@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-13 — M6.7 closed-trade quality statistics completed
+
+### Added
+
+- Average net PnL per closed trade, average profitable result, and absolute average losing result.
+- Net expectancy per closed trade and profit factor based on fee-inclusive simulated outcomes.
+- Explicit nullable results when the required sample or denominator does not exist.
+- Coverage for empty, mixed, profitable-only, losing-only, break-even, and arbitrary-precision statistics.
+- Two focused tests; the full suite now contains 273 tests across 43 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No open-position inclusion in closed-trade statistics, ROI, equity curve, drawdown, Sharpe ratio, annualization, route, persistence, spread, slippage, liquidity model, wallet access, order execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.6 ending open-position valuation completed
 
 ### Added

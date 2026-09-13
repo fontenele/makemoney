@@ -19,6 +19,11 @@ describe('BacktestPerformanceCalculator', () => {
       grossProfit: '0',
       grossLoss: '0',
       realizedNetPnl: '0',
+      averageNetPnlPerClosedTrade: null,
+      averageProfitableTradeNetPnl: null,
+      averageLosingTradeNetPnl: null,
+      expectancy: null,
+      profitFactor: null,
       unrealizedNetPnl: null,
       totalNetPnl: '0',
       totalFees: '0',
@@ -44,6 +49,11 @@ describe('BacktestPerformanceCalculator', () => {
       grossProfit: '4.25',
       grossLoss: '1.5',
       realizedNetPnl: '2.75',
+      averageNetPnlPerClosedTrade: '0.9166666666666666666666666666666666666667',
+      averageProfitableTradeNetPnl: '4.25',
+      averageLosingTradeNetPnl: '1.5',
+      expectancy: '0.9166666666666666666666666666666666666667',
+      profitFactor: '2.833333333333333333333333333333333333333',
       unrealizedNetPnl: null,
       totalNetPnl: '2.75',
       totalFees: '0.3',
@@ -59,6 +69,37 @@ describe('BacktestPerformanceCalculator', () => {
       winRate: null,
       realizedNetPnl: '0',
       totalFees: '0.123456789012345678901234567890123456789',
+    });
+  });
+
+  it('returns null ratios when there are only profitable trades', () => {
+    const entry = buyFill('0');
+    const exit = sellFill('0');
+
+    expect(
+      calculator.calculate([entry, exit], [trade(entry, exit, '2')]),
+    ).toMatchObject({
+      averageNetPnlPerClosedTrade: '2',
+      averageProfitableTradeNetPnl: '2',
+      averageLosingTradeNetPnl: null,
+      expectancy: '2',
+      profitFactor: null,
+    });
+  });
+
+  it('calculates losing-only and arbitrary-precision statistics', () => {
+    const entry = buyFill('0');
+    const exit = sellFill('0');
+    const loss = '-0.123456789012345678901234567890123456789';
+
+    expect(
+      calculator.calculate([entry, exit], [trade(entry, exit, loss)]),
+    ).toMatchObject({
+      averageNetPnlPerClosedTrade: loss,
+      averageProfitableTradeNetPnl: null,
+      averageLosingTradeNetPnl: loss.slice(1),
+      expectancy: loss,
+      profitFactor: '0',
     });
   });
 });

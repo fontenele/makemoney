@@ -8,6 +8,11 @@ export interface BacktestPerformance {
   grossProfit: string;
   grossLoss: string;
   realizedNetPnl: string;
+  averageNetPnlPerClosedTrade: string | null;
+  averageProfitableTradeNetPnl: string | null;
+  averageLosingTradeNetPnl: string | null;
+  expectancy: string | null;
+  profitFactor: string | null;
   unrealizedNetPnl: string | null;
   totalNetPnl: string;
   totalFees: string;

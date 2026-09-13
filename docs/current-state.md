@@ -4,7 +4,7 @@ Last validated: 2026-09-13
 
 ## Milestone status
 
-M0 through M5 and M6.1–M6.6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, bounded complete historical candles, historical-only long simulation, aggregate performance, and final-close valuation. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M5 and M6.1–M6.7 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, bounded complete historical candles, historical-only long simulation, valuation, and closed-trade statistics. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -95,6 +95,7 @@ M0 through M5 and M6.1–M6.6 are complete. M1 provides unauthenticated public B
 - Every simulation now includes deterministic fill and closed-trade counts, profitable/losing/break-even counts, nullable realized win rate, gross profit, absolute gross loss, realized net PnL, and total fill fees.
 - Performance metrics use precision-40 `decimal.js`, and fees from an ending open entry are counted.
 - An ending open position is valued at the final historical candle close with an estimated exit fee, net liquidation value, unrealized net PnL, and combined total net PnL; no synthetic exit is recorded.
+- Closed-trade performance includes average net PnL, average winning and losing results, expectancy, and profit factor with explicit null states for missing statistical samples.
 
 ## Local endpoints and ports
 
@@ -115,12 +116,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-13 after M6.6:
+The following passed on 2026-09-13 after M6.7:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 271 tests passed across 43 suites
+- `npm test -- --runInBand` — 273 tests passed across 43 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -138,7 +139,7 @@ The most recent database-backed integration validation was repeated after M6.4:
 
 ## Repository state
 
-M0 through M6.5 are committed. M6.6 changes are currently in the working tree.
+M0 through M6.6 are committed. M6.7 changes are currently in the working tree.
 
 ## Known issues and cautions
 

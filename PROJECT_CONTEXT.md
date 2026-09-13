@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.6 — deterministic replay, historical long-only simulation, and ending performance valuation**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.7 — deterministic replay, historical simulation, valuation, and closed-trade statistics**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -85,6 +85,8 @@ M6.4 separately consumes replayed signals and complete candles to create researc
 M6.5 derives aggregate realized performance directly from the M6.4 ledger and closed trades. It reports fill and outcome counts, nullable realized win rate, gross profit, absolute gross loss, realized net PnL, and all simulated fill fees, including the entry fee of an ending open position. It deliberately excludes unrealized valuation and mark-to-market assumptions.
 
 M6.6 values an ending open position at the final historical candle close without creating a synthetic sell. It estimates the exit fee and exposes gross market value, net liquidation value, unrealized net PnL, and total net PnL with exact decimal arithmetic. A simulation ending flat has no ending valuation.
+
+M6.7 measures closed-trade quality with average net PnL, average profitable and losing results, expectancy, and profit factor. Statistics are nullable when their required sample or denominator is absent, and an ending open position never enters the sample.
 
 Historical market data, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

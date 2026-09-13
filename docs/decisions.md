@@ -305,3 +305,9 @@ Win rate includes every closed trade in its denominator and is `null` when none 
 An ending open position is marked using the final supplied candle's close, which is known at the backtest boundary and requires no external price lookup. The configured taker fee estimates liquidation cost, so unrealized PnL is net of both the actual simulated entry fee and the hypothetical exit fee.
 
 Valuation remains separate from execution: no sell fill or closed trade is invented. A flat ending state has a `null` valuation and unrealized PnL, while total net PnL remains equal to realized net PnL.
+
+## M6.7 explicit statistical nullability
+
+Closed-trade statistics use net PnL after simulated fees and never include an ending open position. Expectancy is the arithmetic mean of all closed-trade outcomes, including break-even results. Losing averages are positive magnitudes to align with gross loss and make ratios readable.
+
+Undefined samples are represented as `null`: no closed trades means no average or expectancy, no winners means no winning average, and no losers means neither a losing average nor a finite profit factor. This avoids presenting zero or infinity as measured evidence.

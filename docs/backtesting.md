@@ -81,8 +81,20 @@ M6.6 marks an ending open position at the close price and close time of the fina
 
 This is a deterministic end-of-period research valuation based only on supplied historical data. It does not query a current external price.
 
+## M6.7 closed-trade quality statistics
+
+M6.7 derives additional statistics exclusively from closed-trade net PnL.
+
+- Average net PnL per closed trade and expectancy are realized net PnL divided by all closed trades.
+- Average profitable trade uses only positive outcomes; average losing trade is the absolute average magnitude of negative outcomes.
+- Profit factor is gross profit divided by absolute gross loss.
+- A metric is `null` when its required sample is empty or its denominator is zero. Profit factor is therefore `null` when no losing trade exists.
+- Break-even trades participate in the overall average and expectancy but not the winning or losing averages.
+- Ending open positions do not enter these closed-trade statistics.
+- All results remain deterministic precision-40 decimal strings.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intraperiod equity curves, spread, slippage, liquidity, minimum-order and precision rules, variable sizing, Risk Engine modeling, ROI, drawdown, profit factor, expectancy, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
+Intraperiod equity curves, spread, slippage, liquidity, minimum-order and precision rules, variable sizing, Risk Engine modeling, ROI, drawdown, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
