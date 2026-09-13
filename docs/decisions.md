@@ -389,3 +389,9 @@ After cooldown, one in-process half-open probe owns provider access so concurren
 Validated closed candles are written through to PostgreSQL before replay. Symbol, interval, and open time form the natural composite primary key. Decimal values use text columns because the provider boundary deliberately preserves arbitrary valid decimal precision; choosing a fixed database scale would silently weaken that contract. Database checks constrain the supported identity, closed state, time ordering, and non-negative trade count.
 
 The repository uses a serializable transaction: insert missing identities without overwriting, reload the complete batch, and compare every persisted market field. Identical replays are idempotent, while any content drift on an existing identity aborts the whole transaction. Replay continues from the freshly fetched batch so persistence does not yet imply cache completeness, gap detection, or offline availability.
+
+## M6.21 explicit stored source without completeness inference
+
+Stored replay is a separate application operation rather than an automatic fallback. Its repository query uses inclusive open-time bounds, deterministic ascending order, and the existing 10,000-candle limit. Persisted rows cross the domain boundary only after the same identity, time, OHLCV, decimal, and safe-integer invariants are re-established.
+
+The stored operation returns exactly the valid rows found. It neither treats absence as proof of market inactivity nor silently contacts Binance, so callers cannot mistake a partial cache for a complete requested market interval. Automatic source selection requires separately designed gap and completeness semantics.

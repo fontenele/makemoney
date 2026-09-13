@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.20 — deterministic replay, resilient durable historical loading, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.21 — deterministic replay, resilient durable historical loading and stored replay, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -114,7 +114,9 @@ M6.19 adds a process-local historical Binance circuit breaker. Three page failur
 
 M6.20 persists each completely loaded, normalized closed-candle batch in PostgreSQL before replay or simulation begins. The composite symbol/interval/open-time identity is idempotent only for exact content; conflicting content aborts the serializable transaction. Decimal fields remain exact validated text, and the freshly loaded batch still drives replay without cache reads.
 
-Historical cache reads and gap filling, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
+M6.21 adds explicit internal stored-only replay and simulation paths. The repository reads BTC/USDT one-minute rows chronologically within the same bounded request contract and validates every persisted field before mapping it back to the domain. Stored paths never call Binance, never fall back silently, and operate only on the records actually found without claiming range completeness.
+
+Automatic cache selection and gap filling, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 

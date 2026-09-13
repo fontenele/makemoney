@@ -3,6 +3,12 @@ import { Prisma } from '../../../generated/prisma/client';
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
 import { HistoricalCandle } from '../domain/historical-candle';
 import { HistoricalCandleRepository } from '../domain/historical-candle-repository';
+import { HistoricalCandleRequest } from '../domain/historical-candle-provider';
+import Decimal from 'decimal.js';
+
+const DECIMAL_PATTERN = /^(0|[1-9]\d*)(\.\d+)?$/;
+const MAX_HISTORICAL_CANDLE_LIMIT = 10_000;
+const ONE_MINUTE_MS = 60_000;
 
 @Injectable()
 export class PrismaHistoricalCandleRepository implements HistoricalCandleRepository {
@@ -38,6 +44,22 @@ export class PrismaHistoricalCandleRepository implements HistoricalCandleReposit
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
+  }
+
+  async findRange(
+    request: HistoricalCandleRequest,
+  ): Promise<HistoricalCandle[]> {
+    validateRequest(request);
+    const rows = await this.prisma.historicalCandleRecord.findMany({
+      where: {
+        symbol: request.symbol,
+        interval: request.interval,
+        openTime: { gte: request.startTime, lte: request.endTime },
+      },
+      orderBy: { openTime: 'asc' },
+      take: request.limit,
+    });
+    return rows.map(toCandle);
   }
 }
 
@@ -94,4 +116,85 @@ interface PersistedCandleRow {
   takerBuyQuoteVolume: string;
   tradeCount: bigint;
   isClosed: boolean;
+}
+
+function toCandle(row: PersistedCandleRow): HistoricalCandle {
+  if (
+    row.symbol !== 'BTC/USDT' ||
+    row.interval !== '1m' ||
+    !row.isClosed ||
+    !Number.isSafeInteger(Number(row.tradeCount)) ||
+    row.tradeCount < 0n ||
+    row.closeTime.getTime() <= row.openTime.getTime() ||
+    !isCoherentOhlcv(row)
+  ) {
+    throw new Error('Invalid persisted historical candle');
+  }
+
+  return {
+    symbol: row.symbol,
+    interval: row.interval,
+    openPrice: row.openPrice,
+    highPrice: row.highPrice,
+    lowPrice: row.lowPrice,
+    closePrice: row.closePrice,
+    baseVolume: row.baseVolume,
+    quoteVolume: row.quoteVolume,
+    takerBuyBaseVolume: row.takerBuyBaseVolume,
+    takerBuyQuoteVolume: row.takerBuyQuoteVolume,
+    tradeCount: Number(row.tradeCount),
+    openTime: row.openTime,
+    closeTime: row.closeTime,
+    isClosed: true,
+  };
+}
+
+function validateRequest(request: HistoricalCandleRequest): void {
+  const startTime = request.startTime.getTime();
+  const endTime = request.endTime.getTime();
+  if (
+    request.symbol !== 'BTC/USDT' ||
+    request.interval !== '1m' ||
+    !Number.isSafeInteger(startTime) ||
+    !Number.isSafeInteger(endTime) ||
+    startTime < 0 ||
+    endTime < startTime ||
+    !Number.isInteger(request.limit) ||
+    request.limit < 1 ||
+    request.limit > MAX_HISTORICAL_CANDLE_LIMIT ||
+    endTime - startTime > MAX_HISTORICAL_CANDLE_LIMIT * ONE_MINUTE_MS
+  ) {
+    throw new Error('Invalid persisted historical candle request');
+  }
+}
+
+function isCoherentOhlcv(row: PersistedCandleRow): boolean {
+  const decimalValues = [
+    row.openPrice,
+    row.highPrice,
+    row.lowPrice,
+    row.closePrice,
+    row.baseVolume,
+    row.quoteVolume,
+    row.takerBuyBaseVolume,
+    row.takerBuyQuoteVolume,
+  ];
+  if (!decimalValues.every((value) => DECIMAL_PATTERN.test(value))) {
+    return false;
+  }
+
+  const open = new Decimal(row.openPrice);
+  const high = new Decimal(row.highPrice);
+  const low = new Decimal(row.lowPrice);
+  const close = new Decimal(row.closePrice);
+  const volumes = decimalValues.slice(4).map((value) => new Decimal(value));
+  return (
+    open.isPositive() &&
+    high.isPositive() &&
+    low.isPositive() &&
+    close.isPositive() &&
+    high.greaterThanOrEqualTo(Decimal.max(open, low, close)) &&
+    low.lessThanOrEqualTo(Decimal.min(open, high, close)) &&
+    volumes.every((volume) => volume.greaterThanOrEqualTo(0))
+  );
 }

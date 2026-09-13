@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
 import { BacktestResult } from '../domain/backtest';
+import { BacktestSimulationConfiguration } from '../domain/backtest-simulation';
 import { HistoricalCandle } from '../domain/historical-candle';
 import { HistoricalCandleRepository } from '../domain/historical-candle-repository';
 import {
@@ -25,6 +26,7 @@ describe('HistoricalStrategyReplayService', () => {
     } as unknown as BacktestTradeSimulator;
     const candleRepository: HistoricalCandleRepository = {
       saveMany: jest.fn(() => Promise.resolve()),
+      findRange: jest.fn(() => Promise.resolve(candles)),
     };
     const service = new HistoricalStrategyReplayService(
       provider,
@@ -78,6 +80,7 @@ describe('HistoricalStrategyReplayService', () => {
     } as unknown as BacktestTradeSimulator;
     const candleRepository: HistoricalCandleRepository = {
       saveMany: jest.fn(() => Promise.resolve()),
+      findRange: jest.fn(() => Promise.resolve(candles)),
     };
     const service = new HistoricalStrategyReplayService(
       provider,
@@ -125,6 +128,53 @@ describe('HistoricalStrategyReplayService', () => {
     ).toEqual([candles, replay.signals, configuration]);
   });
 
+  it('replays and simulates stored candles without loading Binance', async () => {
+    const candles: HistoricalCandle[] = [candle()];
+    const replay = { signals: [] } as unknown as BacktestResult;
+    const simulation = { fills: [] } as never;
+    const load = jest.fn(() => Promise.resolve(candles));
+    const provider: HistoricalCandleProvider = { load };
+    const replayRun = jest.fn(() => replay);
+    const replayService = {
+      run: replayRun,
+    } as unknown as StrategyReplayService;
+    const simulate = jest.fn(() => simulation);
+    const tradeSimulator = {
+      simulate,
+    } as unknown as BacktestTradeSimulator;
+    const findRange = jest.fn(() => Promise.resolve(candles));
+    const candleRepository: HistoricalCandleRepository = {
+      saveMany: jest.fn(() => Promise.resolve()),
+      findRange,
+    };
+    const service = new HistoricalStrategyReplayService(
+      provider,
+      replayService,
+      tradeSimulator,
+      candleRepository,
+    );
+    const request: HistoricalCandleRequest = {
+      symbol: 'BTC/USDT',
+      interval: '1m',
+      startTime: new Date('2026-09-12T12:00:00.000Z'),
+      endTime: new Date('2026-09-12T12:01:00.000Z'),
+      limit: 2,
+    };
+    const configuration = {} as BacktestSimulationConfiguration;
+
+    await expect(service.runStored(request)).resolves.toBe(replay);
+    await expect(
+      service.runStoredSimulation(request, configuration),
+    ).resolves.toEqual({ replay, simulation });
+    expect(findRange.mock.calls).toEqual([[request], [request]]);
+    expect(load).not.toHaveBeenCalled();
+    expect(simulate).toHaveBeenCalledWith(
+      candles,
+      replay.signals,
+      configuration,
+    );
+  });
+
   it('does not replay or simulate when persistence fails', async () => {
     const candles: HistoricalCandle[] = [candle()];
     const persistenceError = new Error('persistence failed');
@@ -139,6 +189,7 @@ describe('HistoricalStrategyReplayService', () => {
     } as unknown as BacktestTradeSimulator;
     const candleRepository: HistoricalCandleRepository = {
       saveMany: jest.fn(() => Promise.reject(persistenceError)),
+      findRange: jest.fn(() => Promise.resolve(candles)),
     };
     const service = new HistoricalStrategyReplayService(
       provider,

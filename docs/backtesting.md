@@ -251,8 +251,20 @@ M6.20 persists a successfully loaded historical batch in PostgreSQL before allow
 - Persistence failure stops replay and simulation; neither result is produced from a batch that failed durable storage.
 - Replay still consumes the freshly loaded validated batch. Stored-range reads, completeness inference, gap filling, and offline operation are not introduced.
 
+## M6.21 explicit stored-only replay
+
+M6.21 adds separate internal replay and simulation methods whose only candle source is PostgreSQL.
+
+- The repository accepts the same bounded BTC/USDT one-minute range and limit contract used by remote historical loading.
+- Rows are queried by inclusive open-time boundaries, ordered ascending, and capped at the caller's limit.
+- Every row is revalidated for supported identity, closed state, safe trade count, time ordering, canonical decimal syntax, positive coherent OHLC, and non-negative volumes.
+- Exact textual decimals map back to the provider-neutral `HistoricalCandle` without numeric conversion.
+- `runStored` and `runStoredSimulation` never call the Binance provider and do not perform another write-through.
+- Missing rows and time gaps are neither invented nor fetched. Replay uses the ordered subset actually returned, and its period/count fields describe that observed subset.
+- Remote write-through methods remain unchanged and explicit; no automatic source selection is introduced.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical cache reads and gap filling, shared or persisted circuit state, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, automatic historical cache selection and gap filling, shared or persisted circuit state, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.

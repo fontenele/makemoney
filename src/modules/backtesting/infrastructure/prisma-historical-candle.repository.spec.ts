@@ -51,6 +51,50 @@ describe('PrismaHistoricalCandleRepository', () => {
     await expect(repository.saveMany([])).resolves.toBeUndefined();
     expect(mocks.prismaTransaction).not.toHaveBeenCalled();
   });
+
+  it('reads an exact chronological bounded range', async () => {
+    const first = candle();
+    const second: HistoricalCandle = {
+      ...first,
+      openTime: new Date(first.openTime.getTime() + 60_000),
+      closeTime: new Date(first.closeTime.getTime() + 60_000),
+      closePrice: '100001.12345678901234567890123456789',
+    };
+    const { repository, mocks } = setup([toRow(first), toRow(second)]);
+    const request = historicalRequest();
+
+    await expect(repository.findRange(request)).resolves.toEqual([
+      first,
+      second,
+    ]);
+    expect(mocks.findMany).toHaveBeenCalledWith({
+      where: {
+        symbol: 'BTC/USDT',
+        interval: '1m',
+        openTime: { gte: request.startTime, lte: request.endTime },
+      },
+      orderBy: { openTime: 'asc' },
+      take: request.limit,
+    });
+  });
+
+  it('rejects invalid stored-range requests before querying', async () => {
+    const { repository, mocks } = setup([]);
+
+    await expect(
+      repository.findRange({ ...historicalRequest(), limit: 10_001 }),
+    ).rejects.toThrow('Invalid persisted historical candle request');
+    expect(mocks.findMany).not.toHaveBeenCalled();
+  });
+
+  it('rejects invalid persisted candle content', async () => {
+    const invalid = { ...toRow(candle()), isClosed: false };
+    const { repository } = setup([invalid]);
+
+    await expect(repository.findRange(historicalRequest())).rejects.toThrow(
+      'Invalid persisted historical candle',
+    );
+  });
 });
 
 interface StoredRow {
@@ -85,11 +129,23 @@ function setup(rows: StoredRow[]) {
   );
   const prisma = {
     $transaction: prismaTransaction,
+    historicalCandleRecord: transaction.historicalCandleRecord,
   } as unknown as PrismaService;
 
   return {
     repository: new PrismaHistoricalCandleRepository(prisma),
     mocks: { createMany, findMany, prismaTransaction },
+  };
+}
+
+function historicalRequest() {
+  const value = candle();
+  return {
+    symbol: 'BTC/USDT' as const,
+    interval: '1m' as const,
+    startTime: value.openTime,
+    endTime: new Date(value.openTime.getTime() + 60_000),
+    limit: 2,
   };
 }
 

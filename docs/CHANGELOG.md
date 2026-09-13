@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-13 — M6.21 stored historical replay completed
+
+### Added
+
+- Bounded chronological `findRange` reads on the provider-neutral historical-candle repository.
+- Strict reconstruction of persisted candles with identity, closed-state, timestamp, safe trade-count, decimal, volume, and OHLC validation.
+- Explicit internal stored-only replay and simulation operations that never invoke Binance or repeat write-through persistence.
+- Unit coverage for range queries, mapping, invalid requests, invalid rows, stored replay, and provider isolation.
+- PostgreSQL integration coverage for chronological ordering and result limits over persisted candles.
+- The full unit suite now contains 342 tests across 50 suites; 27 E2E tests pass across 2 suites with the documented safe process-only environment override.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No automatic cache selection, fallback, gap filling, completeness claim, route, migration, candle mutation/deletion, result persistence, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.20 historical candle persistence completed
 
 ### Added

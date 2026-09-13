@@ -53,6 +53,27 @@ export class HistoricalStrategyReplayService {
     };
   }
 
+  async runStored(request: HistoricalCandleRequest): Promise<BacktestResult> {
+    const candles = await this.candleRepository.findRange(request);
+    return this.replay(candles);
+  }
+
+  async runStoredSimulation(
+    request: HistoricalCandleRequest,
+    configuration: BacktestSimulationConfiguration,
+  ): Promise<HistoricalBacktestSimulationResult> {
+    const candles = await this.candleRepository.findRange(request);
+    const replay = this.replay(candles);
+    return {
+      replay,
+      simulation: this.tradeSimulator.simulate(
+        candles,
+        replay.signals,
+        configuration,
+      ),
+    };
+  }
+
   private replay(candles: readonly HistoricalCandle[]): BacktestResult {
     return this.replayService.run(
       candles.map((candle) => ({

@@ -20,13 +20,27 @@ describe('Historical candle persistence (e2e)', () => {
 
   beforeEach(async () => {
     await prisma.historicalCandleRecord.deleteMany({
-      where: { symbol: 'BTC/USDT', interval: '1m', openTime },
+      where: {
+        symbol: 'BTC/USDT',
+        interval: '1m',
+        openTime: {
+          gte: openTime,
+          lte: new Date(openTime.getTime() + 2 * 60_000),
+        },
+      },
     });
   });
 
   afterAll(async () => {
     await prisma.historicalCandleRecord.deleteMany({
-      where: { symbol: 'BTC/USDT', interval: '1m', openTime },
+      where: {
+        symbol: 'BTC/USDT',
+        interval: '1m',
+        openTime: {
+          gte: openTime,
+          lte: new Date(openTime.getTime() + 2 * 60_000),
+        },
+      },
     });
     await prisma.onModuleDestroy();
   });
@@ -73,7 +87,38 @@ describe('Historical candle persistence (e2e)', () => {
       }),
     ).resolves.toBe(0);
   });
+
+  it('reads stored candles chronologically within the requested limit', async () => {
+    const first = candle();
+    const second = shiftedCandle(first, 1);
+    const third = shiftedCandle(first, 2);
+    await repository.saveMany([third, first, second]);
+
+    const rows = await repository.findRange({
+      symbol: 'BTC/USDT',
+      interval: '1m',
+      startTime: first.openTime,
+      endTime: third.openTime,
+      limit: 2,
+    });
+
+    expect(rows.map((row) => row.openTime)).toEqual([
+      first.openTime,
+      second.openTime,
+    ]);
+  });
 });
+
+function shiftedCandle(
+  value: HistoricalCandle,
+  minuteOffset: number,
+): HistoricalCandle {
+  return {
+    ...value,
+    openTime: new Date(value.openTime.getTime() + minuteOffset * 60_000),
+    closeTime: new Date(value.closeTime.getTime() + minuteOffset * 60_000),
+  };
+}
 
 function candle(): HistoricalCandle {
   return {
