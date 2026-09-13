@@ -11,6 +11,7 @@ import { BacktestEquityCalculator } from './backtest-equity-calculator';
 import { BacktestTimeMetricsCalculator } from './backtest-time-metrics-calculator';
 import { BacktestExecutionRulesValidator } from './backtest-execution-rules-validator';
 import { BacktestFillPriceCalculator } from './backtest-fill-price-calculator';
+import { BacktestLiquidityCalculator } from './backtest-liquidity-calculator';
 
 const EXECUTION_RULES = {
   minQuantity: '0.00001',
@@ -30,6 +31,7 @@ describe('BacktestTradeSimulator', () => {
     new BacktestTimeMetricsCalculator(),
     new BacktestExecutionRulesValidator(),
     new BacktestFillPriceCalculator(),
+    new BacktestLiquidityCalculator(),
   );
 
   it('fills signals only at the following candle open and includes fees', () => {
@@ -46,6 +48,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0.01',
         spreadRate: '0',
         slippageRate: '0',
+        maximumVolumeParticipationRate: '1',
         executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '100',
       },
@@ -142,6 +145,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0.001',
         spreadRate: '0',
         slippageRate: '0',
+        maximumVolumeParticipationRate: '1',
         executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '100',
       },
@@ -200,6 +204,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0',
         slippageRate: '0',
+        maximumVolumeParticipationRate: '1',
         executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '1000',
       },
@@ -217,6 +222,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0',
       spreadRate: '0',
       slippageRate: '0',
+      maximumVolumeParticipationRate: '1',
       executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     });
@@ -232,6 +238,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0.0001',
       spreadRate: '0',
       slippageRate: '0',
+      maximumVolumeParticipationRate: '1',
       executionRules: {
         ...EXECUTION_RULES,
         stepSize: '0.1234567890123456789',
@@ -270,6 +277,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0.02',
         slippageRate: '0.005',
+        maximumVolumeParticipationRate: '1',
         executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '1000',
       },
@@ -313,6 +321,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0.02',
         slippageRate: '0.005',
+        maximumVolumeParticipationRate: '1',
         executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '101',
       },
@@ -329,6 +338,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0.001',
       spreadRate: '0',
       slippageRate: '0',
+      maximumVolumeParticipationRate: '1',
       executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
@@ -337,6 +347,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0.001',
       spreadRate: '0',
       slippageRate: '0',
+      maximumVolumeParticipationRate: '1',
       executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
@@ -345,6 +356,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '-0.1',
       spreadRate: '0',
       slippageRate: '0',
+      maximumVolumeParticipationRate: '1',
       executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
@@ -353,6 +365,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '1',
       spreadRate: '0',
       slippageRate: '0',
+      maximumVolumeParticipationRate: '1',
       executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
@@ -361,6 +374,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0',
       spreadRate: '0',
       slippageRate: '0',
+      maximumVolumeParticipationRate: '1',
       executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '0',
     },
@@ -369,6 +383,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0',
       spreadRate: '-0.1',
       slippageRate: '0',
+      maximumVolumeParticipationRate: '1',
       executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
@@ -377,6 +392,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0',
       spreadRate: '0',
       slippageRate: '1',
+      maximumVolumeParticipationRate: '1',
       executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
@@ -385,6 +401,25 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0',
       spreadRate: '0.8',
       slippageRate: '0.6',
+      maximumVolumeParticipationRate: '1',
+      executionRules: EXECUTION_RULES,
+      initialCapitalUsdt: '1000',
+    },
+    {
+      quantity: '1',
+      feeRate: '0',
+      spreadRate: '0',
+      slippageRate: '0',
+      maximumVolumeParticipationRate: '0',
+      executionRules: EXECUTION_RULES,
+      initialCapitalUsdt: '1000',
+    },
+    {
+      quantity: '1',
+      feeRate: '0',
+      spreadRate: '0',
+      slippageRate: '0',
+      maximumVolumeParticipationRate: '1.0001',
       executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
@@ -403,6 +438,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0',
         slippageRate: '0',
+        maximumVolumeParticipationRate: '1',
         executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '1000',
       }),
@@ -419,6 +455,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0.001',
         spreadRate: '0',
         slippageRate: '0',
+        maximumVolumeParticipationRate: '1',
         executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '100',
       },
@@ -445,6 +482,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0',
         slippageRate: '0',
+        maximumVolumeParticipationRate: '1',
         initialCapitalUsdt: '100',
         executionRules: { ...EXECUTION_RULES, minNotional: '5' },
       },
@@ -470,6 +508,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0',
         slippageRate: '0',
+        maximumVolumeParticipationRate: '1',
         initialCapitalUsdt: '1000',
         executionRules: { ...EXECUTION_RULES, minNotional: '50' },
       },
@@ -497,6 +536,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0.00246',
         slippageRate: '0',
+        maximumVolumeParticipationRate: '1',
         initialCapitalUsdt: '1000',
         executionRules: { ...EXECUTION_RULES, tickSize: '0.05' },
       },
@@ -536,6 +576,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0',
         slippageRate: '0.5',
+        maximumVolumeParticipationRate: '1',
         initialCapitalUsdt: '1000',
         executionRules: { ...EXECUTION_RULES, tickSize: '0.01' },
       },
@@ -557,6 +598,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0',
         slippageRate: '0',
+        maximumVolumeParticipationRate: '1',
         initialCapitalUsdt: '1000',
         executionRules: { ...EXECUTION_RULES, maxPrice: '100' },
       },
@@ -582,6 +624,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0',
         slippageRate: '0',
+        maximumVolumeParticipationRate: '1',
         initialCapitalUsdt: '1000',
         executionRules: { ...EXECUTION_RULES, minPrice: '50' },
       },
@@ -594,9 +637,69 @@ describe('BacktestTradeSimulator', () => {
     expect(result.minimumNotionalUnfilledSignalCount).toBe(0);
     expect(result.capital.finalCashUsdt).toBe('900');
   });
+
+  it('rejects a buy using only the closed signal candle volume', () => {
+    const candles = [candle(0, '100', '0.5'), candle(1, '100', '100')];
+    const result = simulator.simulate(
+      candles,
+      [signal(candles[0], 'buy'), signal(candles[1])],
+      {
+        quantity: '1',
+        feeRate: '0',
+        spreadRate: '0',
+        slippageRate: '0',
+        maximumVolumeParticipationRate: '1',
+        initialCapitalUsdt: '1000',
+        executionRules: EXECUTION_RULES,
+      },
+    );
+
+    expect(result.fills).toEqual([]);
+    expect(result.liquidityUnfilledSignalCount).toBe(1);
+    expect(result.capital.finalCashUsdt).toBe('1000');
+  });
+
+  it('keeps a position open when causal reference volume cannot support the sell', () => {
+    const candles = [
+      candle(0, '100', '1'),
+      candle(1, '100', '0.5'),
+      candle(2, '100', '100'),
+    ];
+    const result = simulator.simulate(
+      candles,
+      [
+        signal(candles[0], 'buy'),
+        signal(candles[1], 'sell'),
+        signal(candles[2]),
+      ],
+      {
+        quantity: '1',
+        feeRate: '0',
+        spreadRate: '0',
+        slippageRate: '0',
+        maximumVolumeParticipationRate: '1',
+        initialCapitalUsdt: '1000',
+        executionRules: EXECUTION_RULES,
+      },
+    );
+
+    expect(result.fills).toHaveLength(1);
+    expect(result.fills[0]).toMatchObject({
+      side: 'buy',
+      liquidityReferenceCandleCloseTime: candles[0]?.closeTime,
+      liquidityReferenceBaseVolume: '1',
+      maximumLiquidityFillQuantity: '1',
+    });
+    expect(result.openPosition).not.toBeNull();
+    expect(result.liquidityUnfilledSignalCount).toBe(1);
+  });
 });
 
-function candle(index: number, openPrice: string): HistoricalCandle {
+function candle(
+  index: number,
+  openPrice: string,
+  baseVolume = '1',
+): HistoricalCandle {
   const openTime = new Date(Date.UTC(2026, 8, 13, 12, index));
   return {
     symbol: 'BTC/USDT',
@@ -605,7 +708,7 @@ function candle(index: number, openPrice: string): HistoricalCandle {
     highPrice: openPrice,
     lowPrice: openPrice,
     closePrice: openPrice,
-    baseVolume: '1',
+    baseVolume,
     quoteVolume: '100',
     takerBuyBaseVolume: '0.5',
     takerBuyQuoteVolume: '50',

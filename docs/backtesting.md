@@ -189,8 +189,20 @@ M6.15 completes the provider-neutral historical price-filter snapshot with manda
 - Price-range approval precedes minimum-notional validation, keeping rejection categories deterministic and mutually ordered.
 - The normalized range is returned with the complete execution-rule snapshot and comparisons use precision-40 `decimal.js`.
 
+## M6.16 causal volume participation
+
+M6.16 adds a required maximum volume-participation rate greater than zero and no greater than one. Each hypothetical fill is all-or-none and uses only information available when its signal was produced.
+
+- Maximum fill quantity equals the fully closed signal candle's `baseVolume` multiplied by the configured participation rate.
+- The following execution candle supplies the opening reference price but its volume is never inspected, preventing lookahead.
+- Equality at the calculated limit is accepted; positive fixed quantity against zero reference volume is rejected.
+- A rejected buy preserves cash and a rejected sell preserves the open position so a later signal may still close it.
+- Rejections increment `liquidityUnfilledSignalCount` and do not enter fill, performance, equity, or exposure ledgers.
+- Accepted fills retain `liquidityReferenceCandleCloseTime`, `liquidityReferenceBaseVolume`, and `maximumLiquidityFillQuantity` for audit.
+- Validation and multiplication use precision-40 `decimal.js`; no partial fill or variable sizing is inferred.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.

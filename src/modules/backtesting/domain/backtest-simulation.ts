@@ -14,6 +14,9 @@ interface BacktestFillBase {
   notional: string;
   feeRate: string;
   fee: string;
+  liquidityReferenceCandleCloseTime: Date;
+  liquidityReferenceBaseVolume: string;
+  maximumLiquidityFillQuantity: string;
   signalTime: Date;
   filledAt: Date;
 }
@@ -47,6 +50,7 @@ export interface BacktestSimulationConfiguration {
   feeRate: string;
   spreadRate: string;
   slippageRate: string;
+  maximumVolumeParticipationRate: string;
   initialCapitalUsdt: string;
   executionRules: BacktestExecutionRules;
 }
@@ -67,6 +71,7 @@ export interface BacktestSimulationResult {
   feeRate: string;
   spreadRate: string;
   slippageRate: string;
+  maximumVolumeParticipationRate: string;
   executionRules: BacktestExecutionRules;
   capital: BacktestCapitalResult;
   equity: BacktestEquityResult;
@@ -82,6 +87,7 @@ export interface BacktestSimulationResult {
   minimumNotionalUnfilledSignalCount: number;
   pricePrecisionUnfilledSignalCount: number;
   priceRangeUnfilledSignalCount: number;
+  liquidityUnfilledSignalCount: number;
   unfilledTerminalSignalCount: number;
 }
 

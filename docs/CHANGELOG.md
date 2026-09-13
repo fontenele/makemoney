@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-13 — M6.16 causal volume participation completed
+
+### Added
+
+- Required positive maximum volume-participation rate no greater than one for historical simulation.
+- Causal all-or-none liquidity limit based exclusively on the fully closed signal candle's base volume, without reading execution-candle volume.
+- Dedicated `liquidityUnfilledSignalCount` with cash and position preservation for rejected buys and sells.
+- Auditable fill fields for the liquidity reference candle close, reference base volume, and calculated maximum fill quantity.
+- Focused tests for inclusive limits, zero volume, arbitrary decimal precision, causal rejection, sell-state preservation, and configuration validation.
+- The full suite now contains 323 tests across 49 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No partial fills, variable sizing, order-book/depth model, route, persistence, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.15 executable price range completed
 
 ### Added

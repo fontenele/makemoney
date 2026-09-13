@@ -359,3 +359,9 @@ The executable price is the sole source for notional and every downstream financ
 Minimum and maximum prices belong to the explicit historical rule snapshot and are evaluated against the final tick-aligned executable price. Both boundaries are inclusive, matching filter semantics without coupling replay to a current provider response.
 
 Out-of-range candidates remain unfilled and preserve state. Range validation precedes minimum-notional validation so each potential fill has a stable primary rejection category, while valid fills continue to use the same immutable-ledger accounting.
+
+## M6.16 causal closed-candle volume proxy
+
+Historical liquidity uses the fully closed signal candle's base volume rather than the following execution candle's volume. The next candle is known only as the execution-time price source, so consuming its completed volume would introduce future information. A required positive rate no greater than one converts the causal volume proxy into a maximum executable quantity.
+
+The fixed quantity remains all-or-none: exceeding the limit rejects the candidate without mutating state. Accepted fills retain the reference candle close, reference base volume, and calculated maximum quantity so the assumption is reproducible. Order-book depth, partial fills, and variable sizing remain separate future concerns.

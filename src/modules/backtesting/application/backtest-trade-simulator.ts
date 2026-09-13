@@ -17,6 +17,8 @@ import { BacktestEquityCalculator } from './backtest-equity-calculator';
 import { BacktestTimeMetricsCalculator } from './backtest-time-metrics-calculator';
 import { BacktestExecutionRulesValidator } from './backtest-execution-rules-validator';
 import { BacktestFillPriceCalculator } from './backtest-fill-price-calculator';
+import { BacktestLiquidityCalculator } from './backtest-liquidity-calculator';
+import { BacktestLiquidityAssessment } from '../domain/backtest-liquidity';
 
 const SimulationDecimal = Decimal.clone({
   precision: 40,
@@ -35,6 +37,7 @@ export class BacktestTradeSimulator {
     private readonly timeMetricsCalculator: BacktestTimeMetricsCalculator,
     private readonly executionRulesValidator: BacktestExecutionRulesValidator,
     private readonly fillPriceCalculator: BacktestFillPriceCalculator,
+    private readonly liquidityCalculator: BacktestLiquidityCalculator,
   ) {}
 
   simulate(
@@ -46,6 +49,9 @@ export class BacktestTradeSimulator {
     const feeRate = this.feeRate(configuration.feeRate);
     const spreadRate = this.rate(configuration.spreadRate, 'spreadRate');
     const slippageRate = this.rate(configuration.slippageRate, 'slippageRate');
+    const maximumVolumeParticipationRate = this.participationRate(
+      configuration.maximumVolumeParticipationRate,
+    );
     const adversePriceImpactRate = spreadRate.dividedBy(2).plus(slippageRate);
     if (adversePriceImpactRate.greaterThanOrEqualTo(1)) {
       throw new Error('Invalid backtest combined price impact');
@@ -69,16 +75,33 @@ export class BacktestTradeSimulator {
     let minimumNotionalUnfilledSignalCount = 0;
     let pricePrecisionUnfilledSignalCount = 0;
     let priceRangeUnfilledSignalCount = 0;
+    let liquidityUnfilledSignalCount = 0;
     let cash = initialCapital;
 
     for (let index = 1; index < candles.length; index += 1) {
       const signal = signals[index - 1];
       const candle = candles[index];
-      if (!signal || !candle || signal.action === 'hold') continue;
+      const liquidityReferenceCandle = candles[index - 1];
+      if (
+        !signal ||
+        !candle ||
+        !liquidityReferenceCandle ||
+        signal.action === 'hold'
+      )
+        continue;
 
       if (signal.action === 'buy') {
         if (entry) {
           ignoredBuySignalCount += 1;
+          continue;
+        }
+        const liquidity = this.liquidityCalculator.calculate(
+          quantity.toFixed(),
+          liquidityReferenceCandle,
+          maximumVolumeParticipationRate.toFixed(),
+        );
+        if (!liquidity.permitted) {
+          liquidityUnfilledSignalCount += 1;
           continue;
         }
         const candidateEntry = this.buyFill(
@@ -88,6 +111,7 @@ export class BacktestTradeSimulator {
           feeRate,
           adversePriceImpactRate,
           executionRules.tickSize,
+          liquidity,
         );
         if (!candidateEntry) {
           pricePrecisionUnfilledSignalCount += 1;
@@ -126,6 +150,15 @@ export class BacktestTradeSimulator {
         ignoredSellSignalCount += 1;
         continue;
       }
+      const liquidity = this.liquidityCalculator.calculate(
+        quantity.toFixed(),
+        liquidityReferenceCandle,
+        maximumVolumeParticipationRate.toFixed(),
+      );
+      if (!liquidity.permitted) {
+        liquidityUnfilledSignalCount += 1;
+        continue;
+      }
       const exit = this.sellFill(
         candle,
         signal,
@@ -133,6 +166,7 @@ export class BacktestTradeSimulator {
         feeRate,
         adversePriceImpactRate,
         executionRules.tickSize,
+        liquidity,
       );
       if (!exit) {
         pricePrecisionUnfilledSignalCount += 1;
@@ -196,6 +230,7 @@ export class BacktestTradeSimulator {
       feeRate: feeRate.toFixed(),
       spreadRate: spreadRate.toFixed(),
       slippageRate: slippageRate.toFixed(),
+      maximumVolumeParticipationRate: maximumVolumeParticipationRate.toFixed(),
       executionRules,
       capital: {
         initialCapitalUsdt: initialCapital.toFixed(),
@@ -226,6 +261,7 @@ export class BacktestTradeSimulator {
       minimumNotionalUnfilledSignalCount,
       pricePrecisionUnfilledSignalCount,
       priceRangeUnfilledSignalCount,
+      liquidityUnfilledSignalCount,
       unfilledTerminalSignalCount:
         terminalSignal && terminalSignal.action !== 'hold' ? 1 : 0,
     };
@@ -238,6 +274,7 @@ export class BacktestTradeSimulator {
     feeRate: Decimal,
     adversePriceImpactRate: Decimal,
     tickSize: string,
+    liquidity: BacktestLiquidityAssessment,
   ): BacktestBuyFill | null {
     const fillPrice = this.fillPriceCalculator.calculate(
       'buy',
@@ -258,6 +295,9 @@ export class BacktestTradeSimulator {
       notional: notional.toFixed(),
       feeRate: feeRate.toFixed(),
       fee: fee.toFixed(),
+      liquidityReferenceCandleCloseTime: liquidity.referenceCandleCloseTime,
+      liquidityReferenceBaseVolume: liquidity.referenceBaseVolume,
+      maximumLiquidityFillQuantity: liquidity.maximumFillQuantity,
       totalCost: notional.plus(fee).toFixed(),
       signalTime: signal.evaluatedAt,
       filledAt: candle.openTime,
@@ -271,6 +311,7 @@ export class BacktestTradeSimulator {
     feeRate: Decimal,
     adversePriceImpactRate: Decimal,
     tickSize: string,
+    liquidity: BacktestLiquidityAssessment,
   ): BacktestSellFill | null {
     const fillPrice = this.fillPriceCalculator.calculate(
       'sell',
@@ -291,6 +332,9 @@ export class BacktestTradeSimulator {
       notional: notional.toFixed(),
       feeRate: feeRate.toFixed(),
       fee: fee.toFixed(),
+      liquidityReferenceCandleCloseTime: liquidity.referenceCandleCloseTime,
+      liquidityReferenceBaseVolume: liquidity.referenceBaseVolume,
+      maximumLiquidityFillQuantity: liquidity.maximumFillQuantity,
       netProceeds: notional.minus(fee).toFixed(),
       signalTime: signal.evaluatedAt,
       filledAt: candle.openTime,
@@ -346,6 +390,17 @@ export class BacktestTradeSimulator {
     const rate = new SimulationDecimal(value);
     if (rate.greaterThanOrEqualTo(1)) {
       throw new Error(`Invalid backtest ${name}`);
+    }
+    return rate;
+  }
+
+  private participationRate(value: string): Decimal {
+    if (!DECIMAL_PATTERN.test(value)) {
+      throw new Error('Invalid backtest maximumVolumeParticipationRate');
+    }
+    const rate = new SimulationDecimal(value);
+    if (!rate.greaterThan(0) || rate.greaterThan(1)) {
+      throw new Error('Invalid backtest maximumVolumeParticipationRate');
     }
     return rate;
   }

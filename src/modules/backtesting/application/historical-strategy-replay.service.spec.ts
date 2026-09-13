@@ -85,6 +85,7 @@ describe('HistoricalStrategyReplayService', () => {
       feeRate: '0.001',
       spreadRate: '0',
       slippageRate: '0',
+      maximumVolumeParticipationRate: '1',
       initialCapitalUsdt: '1000',
       executionRules: {
         minQuantity: '0.00001',
