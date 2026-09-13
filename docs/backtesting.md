@@ -118,8 +118,21 @@ M6.9 introduces an explicit positive initial USDT capital into the internal simu
 
 This capital ledger is local historical research state. It does not use or mutate the paper wallet.
 
+## M6.10 candle-close equity curve and drawdown
+
+M6.10 reconstructs the capital state from the hypothetical fill ledger and records one equity point at every historical candle close.
+
+- Fills at a candle open update cash and BTC quantity before that candle's close is marked.
+- Open BTC is valued at the close price less the configured estimated exit fee; a flat state has zero position value.
+- Each point exposes mark time and price, cash, open quantity, net position value, equity, running peak, absolute drawdown, and drawdown rate.
+- Initial capital is the first peak, allowing the first marked loss to produce a drawdown.
+- Maximum absolute and maximum percentage drawdowns are retained separately because they need not occur at the same trough.
+- Each maximum exposes its amount, rate, start, trough, and recovery when its prior peak is regained.
+- The last equity point reconciles exactly with the M6.9 final equity.
+- All arithmetic uses precision-40 `decimal.js`.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intraperiod equity curves, percentage drawdown, spread, slippage, liquidity, minimum-order and precision rules, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, spread, slippage, liquidity, minimum-order and precision rules, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.

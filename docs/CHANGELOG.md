@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-13 — M6.10 candle-close equity and drawdown completed
+
+### Added
+
+- Ledger-derived equity point for every historical candle close with cash, BTC quantity, fee-adjusted position value, equity, peak, and drawdown.
+- Causal application of opening fills before the same candle's closing valuation.
+- Separate maximum absolute and percentage drawdown summaries with start, trough, and optional recovery timestamps.
+- Exact reconciliation between the final curve point and the M6.9 final equity.
+- Four focused tests for no-trade periods, open and closed positions, recovery, fees, and arbitrary precision.
+- The full suite now contains 282 tests across 45 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No intracandle path, variable sizing, reinvestment, Sharpe or Sortino ratio, annualization, route, persistence, spread, slippage, liquidity model, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.9 simulated capital and total ROI completed
 
 ### Added

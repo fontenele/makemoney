@@ -1,6 +1,7 @@
 import { BacktestResult } from './backtest';
 import { BacktestPerformance } from './backtest-performance';
 import { BacktestEndingValuation } from './backtest-valuation';
+import { BacktestEquityResult } from './backtest-equity';
 
 interface BacktestFillBase {
   side: 'buy' | 'sell';
@@ -58,6 +59,7 @@ export interface BacktestSimulationResult {
   quantity: string;
   feeRate: string;
   capital: BacktestCapitalResult;
+  equity: BacktestEquityResult;
   fills: BacktestFill[];
   closedTrades: BacktestClosedTrade[];
   performance: BacktestPerformance;

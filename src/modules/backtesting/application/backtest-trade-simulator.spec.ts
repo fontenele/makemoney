@@ -7,11 +7,13 @@ import { BacktestTradeSimulator } from './backtest-trade-simulator';
 import { BacktestPerformanceCalculator } from './backtest-performance-calculator';
 import { BacktestEndingValuationCalculator } from './backtest-ending-valuation-calculator';
 import { BacktestRealizedDrawdownCalculator } from './backtest-realized-drawdown-calculator';
+import { BacktestEquityCalculator } from './backtest-equity-calculator';
 
 describe('BacktestTradeSimulator', () => {
   const simulator = new BacktestTradeSimulator(
     new BacktestPerformanceCalculator(new BacktestRealizedDrawdownCalculator()),
     new BacktestEndingValuationCalculator(),
+    new BacktestEquityCalculator(),
   );
 
   it('fills signals only at the following candle open and includes fees', () => {
@@ -90,6 +92,9 @@ describe('BacktestTradeSimulator', () => {
       totalNetReturnUsdt: '3.85',
       totalRoi: '0.0385',
     });
+    expect(result.equity.curve.at(-1)?.equityUsdt).toBe(
+      result.capital.finalEquityUsdt,
+    );
   });
 
   it('keeps a final open position explicit', () => {
@@ -126,6 +131,9 @@ describe('BacktestTradeSimulator', () => {
       totalNetReturnUsdt: '-0.0202',
       totalRoi: '-0.000202',
     });
+    expect(result.equity.curve.at(-1)?.equityUsdt).toBe(
+      result.capital.finalEquityUsdt,
+    );
   });
 
   it('ignores buys while long and sells while flat', () => {

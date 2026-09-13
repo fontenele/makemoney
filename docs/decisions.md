@@ -323,3 +323,9 @@ Maximum drawdown records when the decline first appeared, its deepest observed e
 ROI is introduced only with an explicit positive initial USDT capital. The simulator owns a research-only cash ledger: fee-inclusive buys debit cash, net sell proceeds credit it, and unaffordable buys remain unfilled and separately counted. Negative cash and borrowing are impossible.
 
 Final equity combines remaining cash with the fee-adjusted final-close liquidation value of an open position. Total return and ROI therefore reconcile with the existing total net PnL while leaving quantity fixed and avoiding implicit reinvestment.
+
+## M6.10 ledger-derived candle-close equity
+
+The equity curve is reconstructed from immutable fills rather than maintained as a second execution state. Fills at a candle open are applied before marking that candle's close, preserving the simulator's causal ordering. Open BTC is valued net of the estimated exit fee.
+
+Absolute and percentage maxima are reported independently because changing equity peaks can make their deepest points differ. Initial capital is the baseline peak, and the final curve value must reconcile with the capital summary's final equity.

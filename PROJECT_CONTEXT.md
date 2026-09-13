@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.9 — deterministic replay, capital-constrained historical simulation, and performance measurement**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.10 — deterministic replay, capital-constrained historical simulation, equity, and performance measurement**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -91,6 +91,8 @@ M6.7 measures closed-trade quality with average net PnL, average profitable and 
 M6.8 builds a chronological realized PnL curve at trade exits and measures maximum absolute realized drawdown from the zero baseline or a prior peak. It exposes drawdown start, trough, and recovery when observed. Open-position valuation does not enter this realized-only curve.
 
 M6.9 requires explicit positive initial USDT capital, maintains a cash ledger, rejects hypothetical buys whose fee-inclusive cost exceeds available cash, and exposes final cash, ending position net value, final equity, net return, and ROI. Quantity remains fixed and no borrowing or negative cash is allowed.
+
+M6.10 reconstructs cash and position from the fill ledger at every historical candle, applies opening fills before that candle's closing mark, and exposes a fee-adjusted equity curve. It measures maximum absolute and percentage equity drawdowns with start, trough, and observed recovery, and reconciles the last point with final equity.
 
 Historical market data, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, deeper slippage, ROI and time-based performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

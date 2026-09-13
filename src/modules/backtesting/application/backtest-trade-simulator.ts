@@ -13,6 +13,7 @@ import {
 import { HistoricalCandle } from '../domain/historical-candle';
 import { BacktestPerformanceCalculator } from './backtest-performance-calculator';
 import { BacktestEndingValuationCalculator } from './backtest-ending-valuation-calculator';
+import { BacktestEquityCalculator } from './backtest-equity-calculator';
 
 const SimulationDecimal = Decimal.clone({
   precision: 40,
@@ -27,6 +28,7 @@ export class BacktestTradeSimulator {
   constructor(
     private readonly performanceCalculator: BacktestPerformanceCalculator,
     private readonly endingValuationCalculator: BacktestEndingValuationCalculator,
+    private readonly equityCalculator: BacktestEquityCalculator,
   ) {}
 
   simulate(
@@ -102,6 +104,12 @@ export class BacktestTradeSimulator {
     );
     const finalEquity = cash.plus(endingPositionNetValue);
     const totalNetReturn = finalEquity.minus(initialCapital);
+    const equity = this.equityCalculator.calculate(
+      candles,
+      fills,
+      initialCapital.toFixed(),
+      feeRate.toFixed(),
+    );
     return {
       symbol: 'BTC/USDT',
       executionModel: 'next_candle_open',
@@ -115,6 +123,7 @@ export class BacktestTradeSimulator {
         totalNetReturnUsdt: totalNetReturn.toFixed(),
         totalRoi: totalNetReturn.dividedBy(initialCapital).toFixed(),
       },
+      equity,
       fills,
       closedTrades,
       performance: this.performanceCalculator.calculate(
