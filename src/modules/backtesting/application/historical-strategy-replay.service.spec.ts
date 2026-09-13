@@ -10,8 +10,40 @@ import {
 import { HistoricalStrategyReplayService } from './historical-strategy-replay.service';
 import { StrategyReplayService } from './strategy-replay.service';
 import { BacktestTradeSimulator } from './backtest-trade-simulator';
+import { HistoricalCandleCoverage } from './historical-candle-coverage';
 
 describe('HistoricalStrategyReplayService', () => {
+  it('reuses a complete stored range without loading or rewriting it', async () => {
+    const candles = [candle(), candleAt('2026-09-12T12:01:00.000Z')];
+    const result = { candleCount: 2 } as BacktestResult;
+    const load = jest.fn(() => Promise.resolve(candles));
+    const saveMany = jest.fn(() => Promise.resolve());
+    const replayService = {
+      run: jest.fn(() => result),
+    } as unknown as StrategyReplayService;
+    const service = new HistoricalStrategyReplayService(
+      { load },
+      replayService,
+      { simulate: jest.fn() } as unknown as BacktestTradeSimulator,
+      {
+        saveMany,
+        findRange: jest.fn(() => Promise.resolve(candles)),
+      },
+      new HistoricalCandleCoverage(),
+    );
+    const request: HistoricalCandleRequest = {
+      symbol: 'BTC/USDT',
+      interval: '1m',
+      startTime: new Date('2026-09-12T12:00:00.000Z'),
+      endTime: new Date('2026-09-12T12:01:00.000Z'),
+      limit: 2,
+    };
+
+    await expect(service.run(request)).resolves.toBe(result);
+    expect(load).not.toHaveBeenCalled();
+    expect(saveMany).not.toHaveBeenCalled();
+  });
+
   it('loads normalized candles and delegates deterministic replay', async () => {
     const candles: HistoricalCandle[] = [candle()];
     const result = { candleCount: 1 } as BacktestResult;
@@ -33,6 +65,7 @@ describe('HistoricalStrategyReplayService', () => {
       replayService,
       tradeSimulator,
       candleRepository,
+      new HistoricalCandleCoverage(),
     );
     const request: HistoricalCandleRequest = {
       symbol: 'BTC/USDT',
@@ -87,6 +120,7 @@ describe('HistoricalStrategyReplayService', () => {
       replayService,
       tradeSimulator,
       candleRepository,
+      new HistoricalCandleCoverage(),
     );
     const request: HistoricalCandleRequest = {
       symbol: 'BTC/USDT',
@@ -152,6 +186,7 @@ describe('HistoricalStrategyReplayService', () => {
       replayService,
       tradeSimulator,
       candleRepository,
+      new HistoricalCandleCoverage(),
     );
     const request: HistoricalCandleRequest = {
       symbol: 'BTC/USDT',
@@ -196,6 +231,7 @@ describe('HistoricalStrategyReplayService', () => {
       replayService,
       tradeSimulator,
       candleRepository,
+      new HistoricalCandleCoverage(),
     );
     const request: HistoricalCandleRequest = {
       symbol: 'BTC/USDT',
@@ -228,4 +264,11 @@ function candle(): HistoricalCandle {
     closeTime: new Date('2026-09-12T12:00:59.999Z'),
     isClosed: true,
   };
+}
+
+function candleAt(openTime: string): HistoricalCandle {
+  const value = candle();
+  value.openTime = new Date(openTime);
+  value.closeTime = new Date(value.openTime.getTime() + 59_999);
+  return value;
 }

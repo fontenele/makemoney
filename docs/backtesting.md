@@ -263,6 +263,18 @@ M6.21 adds separate internal replay and simulation methods whose only candle sou
 - Missing rows and time gaps are neither invented nor fetched. Replay uses the ordered subset actually returned, and its period/count fields describe that observed subset.
 - Remote write-through methods remain unchanged and explicit; no automatic source selection is introduced.
 
+## M6.22 automatic complete-range cache reuse
+
+M6.22 makes the standard historical replay and simulation paths cache-first without combining partial sources.
+
+- The expected sequence begins at the first epoch-aligned one-minute open at or after `startTime`, ends no later than the inclusive `endTime`, and is capped by the request limit.
+- A stored range is complete only when its count and every chronological open time exactly match that sequence.
+- A complete cache hit bypasses both Binance and another persistence write.
+- Any missing, displaced, or incomplete minute causes the existing full request to load from Binance and persist before replay.
+- Invalid persisted rows still fail at the repository boundary and are never hidden by remote fallback.
+- Explicit `runStored` operations remain stored-only and continue to replay the actual stored subset without completeness inference.
+- Partial gap downloads, stored/remote merging, refresh or expiry policy, a new route, and schema changes are not introduced.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.

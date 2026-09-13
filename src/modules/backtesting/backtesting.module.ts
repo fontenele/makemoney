@@ -16,6 +16,7 @@ import { HISTORICAL_CANDLE_PROVIDER } from './domain/historical-candle-provider'
 import { HISTORICAL_CANDLE_REPOSITORY } from './domain/historical-candle-repository';
 import { BinanceHistoricalCandlesClient } from './infrastructure/binance/binance-historical-candles.client';
 import { PrismaHistoricalCandleRepository } from './infrastructure/prisma-historical-candle.repository';
+import { HistoricalCandleCoverage } from './application/historical-candle-coverage';
 
 @Module({
   imports: [StrategiesModule],
@@ -41,6 +42,7 @@ import { PrismaHistoricalCandleRepository } from './infrastructure/prisma-histor
     BacktestExecutionRulesValidator,
     BacktestFillPriceCalculator,
     BacktestLiquidityCalculator,
+    HistoricalCandleCoverage,
     BacktestTradeSimulator,
     HistoricalStrategyReplayService,
   ],

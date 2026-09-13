@@ -395,3 +395,9 @@ The repository uses a serializable transaction: insert missing identities withou
 Stored replay is a separate application operation rather than an automatic fallback. Its repository query uses inclusive open-time bounds, deterministic ascending order, and the existing 10,000-candle limit. Persisted rows cross the domain boundary only after the same identity, time, OHLCV, decimal, and safe-integer invariants are re-established.
 
 The stored operation returns exactly the valid rows found. It neither treats absence as proof of market inactivity nor silently contacts Binance, so callers cannot mistake a partial cache for a complete requested market interval. Automatic source selection requires separately designed gap and completeness semantics.
+
+## M6.22 all-or-nothing historical cache selection
+
+Automatic reuse is limited to ranges whose expected one-minute identities can be proven from the request. The coverage calculation aligns the first expected open upward to the next epoch minute, enumerates through the inclusive end, applies the request limit, and requires an exact chronological identity match.
+
+Incomplete coverage reloads the entire bounded request through the existing resilient Binance adapter and write-through path. This deliberately avoids mixed-source reconciliation and partial gap fetching until their conflict, refresh, and audit semantics are separately designed. Corrupt persisted rows remain visible errors rather than being masked as cache misses.

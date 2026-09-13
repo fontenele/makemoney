@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-13 — M6.22 automatic complete-range cache reuse completed
+
+### Added
+
+- Pure minute-aligned historical coverage calculation bounded by the inclusive request range and limit.
+- Focused tests for complete, limited, missing, displaced, and truncated stored sequences.
+
+### Changed
+
+- Standard historical replay and simulation now read PostgreSQL first, bypassing Binance and persistence on a proven complete cache hit.
+- Incomplete coverage falls back to the existing full remote load and transactional write-through; explicit stored-only methods remain unchanged.
+- Synchronized backtesting documentation, project context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Verification
+
+- 347 unit tests passed across 51 suites; 27 E2E tests passed across 2 suites.
+- Lint, formatting check, TypeScript build, Compose validation, and diff whitespace validation passed.
+- No partial gap download, mixed-source merge, refresh policy, route, migration, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.21 stored historical replay completed
 
 ### Added

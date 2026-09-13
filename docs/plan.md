@@ -66,6 +66,7 @@ M6.18 Historical Retry:      DONE
 M6.19 Historical Circuit:    DONE
 M6.20 Candle Persistence:    DONE
 M6.21 Stored Replay:         DONE
+M6.22 Complete-Range Cache:  DONE
 Next increment:           NOT APPROVED
 ```
 
@@ -1710,7 +1711,7 @@ M2 — Paper Wallet                 DONE (M2.1–M2.5)
 M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
-M6 — Backtesting                  IN PROGRESS (M6.1–M6.21 DONE)
+M6 — Backtesting                  IN PROGRESS (M6.1–M6.22 DONE)
 M7 — New Listing Scanner          PLANNED
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
@@ -2271,6 +2272,7 @@ M6.18 Historical Retry: DONE
 M6.19 Historical Circuit: DONE
 M6.20 Candle Persistence: DONE
 M6.21 Stored Replay: DONE
+M6.22 Complete-Range Cache: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2289,6 +2291,6 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-No next increment approved after M6.21.
+No next increment approved after M6.22.
 Stop and present a minimal plan before further backtesting implementation.
 ```

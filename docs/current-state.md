@@ -4,7 +4,7 @@ Last validated: 2026-09-13
 
 ## Milestone status
 
-M0 through M5 and M6.1–M6.21 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading and explicit stored-only replay, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M5 and M6.1–M6.22 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, automatic complete-range cache reuse, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -89,6 +89,7 @@ M0 through M5 and M6.1–M6.21 are complete. M1 provides unauthenticated public 
 - Three exhausted transient historical pages open a process-local 30-second circuit; open calls fail before HTTP and only one half-open recovery probe may run.
 - Completely loaded closed-candle batches persist transactionally in PostgreSQL before replay or simulation, with exact textual decimals, idempotent composite identities, and rollback on conflicting content.
 - Stored-only replay and simulation query validated PostgreSQL candles chronologically within bounded ranges and never call Binance, infer completeness, or fill gaps.
+- Standard historical replay and simulation now query PostgreSQL first and bypass Binance plus write-through only when every expected minute-aligned candle identity is present; incomplete ranges reload and persist the full request remotely.
 - Three exhausted transient historical-page failures open a process-local circuit for 30 seconds; it fails fast while open and permits one concurrent half-open recovery probe before closing or reopening.
 - Candles whose close time has not passed are excluded, and the historical orchestration service delegates the remaining normalized projections directly to deterministic replay.
 - M6.2 adds no route, persistence, pagination, retry policy, trade simulation, financial metric, wallet access, or execution.
@@ -132,16 +133,16 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-13 after M6.21:
+The following passed on 2026-09-13 after M6.22:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 342 tests passed across 50 suites
+- `npm test -- --runInBand` — 347 tests passed across 51 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
-The most recent database-backed integration validation was repeated after M6.21:
+The most recent database-backed integration validation was repeated after M6.22:
 
 - `$env:RISK_MAX_BTC_POSITION_QUANTITY='1'; npm run test:e2e -- --runInBand` — 27 tests passed across 2 suites, including bounded chronological stored-candle reads plus exact idempotent storage, transactional conflict rollback, and all prior integration scenarios
 - `npx prisma migrate deploy` — all seven migrations applied, including exact historical candle storage
@@ -155,7 +156,7 @@ The most recent database-backed integration validation was repeated after M6.21:
 
 ## Repository state
 
-M0 through M6.20 are committed. M6.21 changes are currently in the working tree.
+M0 through M6.21 are committed. M6.22 changes are currently in the working tree.
 
 ## Known issues and cautions
 

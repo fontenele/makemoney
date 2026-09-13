@@ -16,6 +16,7 @@ import {
 } from '../domain/historical-candle-provider';
 import { StrategyReplayService } from './strategy-replay.service';
 import { BacktestTradeSimulator } from './backtest-trade-simulator';
+import { HistoricalCandleCoverage } from './historical-candle-coverage';
 
 @Injectable()
 export class HistoricalStrategyReplayService {
@@ -26,6 +27,7 @@ export class HistoricalStrategyReplayService {
     private readonly tradeSimulator: BacktestTradeSimulator,
     @Inject(HISTORICAL_CANDLE_REPOSITORY)
     private readonly candleRepository: HistoricalCandleRepository,
+    private readonly candleCoverage: HistoricalCandleCoverage,
   ) {}
 
   async run(
@@ -91,6 +93,11 @@ export class HistoricalStrategyReplayService {
     request: HistoricalCandleRequest,
     signal?: AbortSignal,
   ): Promise<HistoricalCandle[]> {
+    const storedCandles = await this.candleRepository.findRange(request);
+    if (this.candleCoverage.isComplete(request, storedCandles)) {
+      return storedCandles;
+    }
+
     const candles = await this.candleProvider.load(request, signal);
     await this.candleRepository.saveMany(candles);
     return candles;

@@ -92,7 +92,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.19 — complete:** process-local historical-provider circuit breaker with a three-failure threshold, 30-second open interval, fail-fast behavior, and one concurrent half-open recovery probe.
 - **M6.20 — complete:** serializable write-through PostgreSQL persistence for validated closed historical candles, with exact text decimals, idempotent identities, conflict detection, and replay blocked until durable storage succeeds.
 - **M6.21 — complete:** explicit stored-only replay and simulation over bounded chronological PostgreSQL reads, with strict persisted-row validation and no Binance fallback or completeness claim.
-- Later M6 increments require separate approval for automatic cache selection and gap filling, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, optimization, or API exposure.
+- **M6.22 — complete:** deterministic all-or-nothing stored-range coverage lets standard replay and simulation bypass Binance on a complete cache hit; incomplete ranges use the existing full remote load and write-through.
+- Later M6 increments require separate approval for partial gap filling or mixed-source merging, cache refresh, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, optimization, or API exposure.
 
 ## M7 — New Listing Scanner — planned
 
