@@ -18,6 +18,8 @@ const EXECUTION_RULES = {
   stepSize: '0.00001',
   minNotional: '0.00001',
   tickSize: '0.0000000000000000001',
+  minPrice: '0.0000000000000000001',
+  maxPrice: '1000000000',
 };
 
 describe('BacktestTradeSimulator', () => {
@@ -543,6 +545,54 @@ describe('BacktestTradeSimulator', () => {
     expect(result.openPosition).not.toBeNull();
     expect(result.pricePrecisionUnfilledSignalCount).toBe(1);
     expect(result.minimumNotionalUnfilledSignalCount).toBe(0);
+  });
+
+  it('leaves a buy above the maximum executable price unfilled', () => {
+    const candles = [candle(0, '101'), candle(1, '101')];
+    const result = simulator.simulate(
+      candles,
+      [signal(candles[0], 'buy'), signal(candles[1])],
+      {
+        quantity: '1',
+        feeRate: '0',
+        spreadRate: '0',
+        slippageRate: '0',
+        initialCapitalUsdt: '1000',
+        executionRules: { ...EXECUTION_RULES, maxPrice: '100' },
+      },
+    );
+
+    expect(result.fills).toEqual([]);
+    expect(result.priceRangeUnfilledSignalCount).toBe(1);
+    expect(result.capital.finalCashUsdt).toBe('1000');
+    expect(result.capital.finalEquityUsdt).toBe('1000');
+  });
+
+  it('keeps the position open when a sell is below the minimum price', () => {
+    const candles = [candle(0, '100'), candle(1, '100'), candle(2, '49')];
+    const result = simulator.simulate(
+      candles,
+      [
+        signal(candles[0], 'buy'),
+        signal(candles[1], 'sell'),
+        signal(candles[2]),
+      ],
+      {
+        quantity: '1',
+        feeRate: '0',
+        spreadRate: '0',
+        slippageRate: '0',
+        initialCapitalUsdt: '1000',
+        executionRules: { ...EXECUTION_RULES, minPrice: '50' },
+      },
+    );
+
+    expect(result.fills.map((fill) => fill.side)).toEqual(['buy']);
+    expect(result.closedTrades).toEqual([]);
+    expect(result.openPosition).not.toBeNull();
+    expect(result.priceRangeUnfilledSignalCount).toBe(1);
+    expect(result.minimumNotionalUnfilledSignalCount).toBe(0);
+    expect(result.capital.finalCashUsdt).toBe('900');
   });
 });
 

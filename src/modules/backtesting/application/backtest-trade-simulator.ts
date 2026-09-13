@@ -68,6 +68,7 @@ export class BacktestTradeSimulator {
     let insufficientCapitalBuySignalCount = 0;
     let minimumNotionalUnfilledSignalCount = 0;
     let pricePrecisionUnfilledSignalCount = 0;
+    let priceRangeUnfilledSignalCount = 0;
     let cash = initialCapital;
 
     for (let index = 1; index < candles.length; index += 1) {
@@ -90,6 +91,16 @@ export class BacktestTradeSimulator {
         );
         if (!candidateEntry) {
           pricePrecisionUnfilledSignalCount += 1;
+          continue;
+        }
+        if (
+          !this.executionRulesValidator.isPriceWithinRange(
+            candidateEntry.price,
+            executionRules.minPrice,
+            executionRules.maxPrice,
+          )
+        ) {
+          priceRangeUnfilledSignalCount += 1;
           continue;
         }
         if (
@@ -125,6 +136,16 @@ export class BacktestTradeSimulator {
       );
       if (!exit) {
         pricePrecisionUnfilledSignalCount += 1;
+        continue;
+      }
+      if (
+        !this.executionRulesValidator.isPriceWithinRange(
+          exit.price,
+          executionRules.minPrice,
+          executionRules.maxPrice,
+        )
+      ) {
+        priceRangeUnfilledSignalCount += 1;
         continue;
       }
       if (
@@ -204,6 +225,7 @@ export class BacktestTradeSimulator {
       insufficientCapitalBuySignalCount,
       minimumNotionalUnfilledSignalCount,
       pricePrecisionUnfilledSignalCount,
+      priceRangeUnfilledSignalCount,
       unfilledTerminalSignalCount:
         terminalSignal && terminalSignal.action !== 'hold' ? 1 : 0,
     };

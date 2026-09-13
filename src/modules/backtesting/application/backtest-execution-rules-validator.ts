@@ -21,10 +21,15 @@ export class BacktestExecutionRulesValidator {
     const stepSize = this.positive(rules.stepSize, 'stepSize');
     const minNotional = this.positive(rules.minNotional, 'minNotional');
     const tickSize = this.positive(rules.tickSize, 'tickSize');
+    const minPrice = this.positive(rules.minPrice, 'minPrice');
+    const maxPrice = this.positive(rules.maxPrice, 'maxPrice');
     const quantity = this.positive(quantityValue, 'quantity');
 
     if (maxQuantity.lessThan(minQuantity)) {
       throw new Error('Invalid backtest quantity range');
+    }
+    if (maxPrice.lessThan(minPrice)) {
+      throw new Error('Invalid backtest price range');
     }
     if (quantity.lessThan(minQuantity) || quantity.greaterThan(maxQuantity)) {
       throw new Error('Backtest quantity is outside execution limits');
@@ -39,7 +44,20 @@ export class BacktestExecutionRulesValidator {
       stepSize: stepSize.toFixed(),
       minNotional: minNotional.toFixed(),
       tickSize: tickSize.toFixed(),
+      minPrice: minPrice.toFixed(),
+      maxPrice: maxPrice.toFixed(),
     };
+  }
+
+  isPriceWithinRange(
+    price: string,
+    minPrice: string,
+    maxPrice: string,
+  ): boolean {
+    const value = new RulesDecimal(price);
+    return (
+      value.greaterThanOrEqualTo(minPrice) && value.lessThanOrEqualTo(maxPrice)
+    );
   }
 
   meetsMinimumNotional(notional: string, minNotional: string): boolean {

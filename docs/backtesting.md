@@ -178,8 +178,19 @@ M6.14 adds mandatory positive tick size to the historical execution-rule snapsho
 - A sell whose downward rounding reaches zero remains unfilled, preserves the position, and increments `pricePrecisionUnfilledSignalCount`.
 - Tick validation and quantization use precision-40 `decimal.js`; no native floating-point financial arithmetic is introduced.
 
+## M6.15 executable price range
+
+M6.15 completes the provider-neutral historical price-filter snapshot with mandatory positive minimum and maximum prices.
+
+- Minimum price must not exceed maximum price; incoherent configuration fails before simulation state is created.
+- The final tick-aligned executable price is checked against both inclusive boundaries.
+- A buy outside the range leaves cash unchanged. A sell outside the range preserves the existing position so a later valid signal may close it.
+- Rejected potential fills increment `priceRangeUnfilledSignalCount` and do not enter fill, performance, equity, or exposure ledgers.
+- Price-range approval precedes minimum-notional validation, keeping rejection categories deterministic and mutually ordered.
+- The normalized range is returned with the complete execution-rule snapshot and comparisons use precision-40 `decimal.js`.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, liquidity, price range filters, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.

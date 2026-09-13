@@ -81,6 +81,7 @@ export interface BacktestSimulationResult {
   insufficientCapitalBuySignalCount: number;
   minimumNotionalUnfilledSignalCount: number;
   pricePrecisionUnfilledSignalCount: number;
+  priceRangeUnfilledSignalCount: number;
   unfilledTerminalSignalCount: number;
 }
 

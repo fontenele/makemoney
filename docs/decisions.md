@@ -353,3 +353,9 @@ Fixed quantity must satisfy range and exact step-size constraints before simulat
 The historical rule snapshot now includes tick size. After adverse spread and slippage, buy prices round upward and sell prices round downward. This prevents precision normalization from accidentally improving a simulated execution. Reference, adjusted, and executable prices remain separately inspectable in each fill.
 
 The executable price is the sole source for notional and every downstream financial result. Minimum notional is deliberately checked afterward. A sell floored to zero is not executable and preserves the open position instead of manufacturing an invalid fill.
+
+## M6.15 inclusive historical price limits
+
+Minimum and maximum prices belong to the explicit historical rule snapshot and are evaluated against the final tick-aligned executable price. Both boundaries are inclusive, matching filter semantics without coupling replay to a current provider response.
+
+Out-of-range candidates remain unfilled and preserve state. Range validation precedes minimum-notional validation so each potential fill has a stable primary rejection category, while valid fills continue to use the same immutable-ledger accounting.

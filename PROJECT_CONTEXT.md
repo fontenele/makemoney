@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.14 — deterministic replay, capital-constrained historical simulation, execution costs and constraints, equity, and performance measurement**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.15 — deterministic replay, capital-constrained historical simulation, execution costs and constraints, equity, and performance measurement**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -102,7 +102,9 @@ M6.13 requires an explicit provider-neutral historical execution-rule snapshot w
 
 M6.14 extends that snapshot with tick size and rounds post-spread/slippage prices conservatively: buys upward and sells downward. Fills retain reference, pre-rounding adjusted, and final executable prices; all financial results use the final price, and a sell rounded to zero remains unfilled.
 
-Historical market-data persistence and pagination, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, price range filters, liquidity execution modeling, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
+M6.15 adds explicit positive minimum and maximum prices to the historical rule snapshot. A tick-aligned potential fill outside the inclusive range remains unfilled with dedicated accounting and no capital, position, or ledger mutation; minimum notional is evaluated only after the price range passes.
+
+Historical market-data persistence and pagination, cursor-paginated signal history, position sizing, BRL conversion, order mutation APIs, liquidity execution modeling, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 

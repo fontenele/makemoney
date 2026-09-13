@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-13 — M6.15 executable price range completed
+
+### Added
+
+- Mandatory positive minimum and maximum prices in the provider-neutral historical execution-rule snapshot.
+- Early validation of coherent price ranges and inclusive exact-decimal boundary checks on final tick-aligned prices.
+- Dedicated `priceRangeUnfilledSignalCount` with cash and position preservation for rejected buys and sells.
+- Deterministic validation order placing price range before minimum notional, plus focused boundary and simulator-state tests.
+- The full suite now contains 315 tests across 48 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No live metadata dependency, liquidity, partial fill, variable sizing, route, persistence, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.14 price precision completed
 
 ### Added

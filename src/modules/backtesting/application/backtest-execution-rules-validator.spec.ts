@@ -8,6 +8,8 @@ describe('BacktestExecutionRulesValidator', () => {
     stepSize: '0.001',
     minNotional: '5',
     tickSize: '0.01',
+    minPrice: '0.01',
+    maxPrice: '1000000',
   };
 
   it('normalizes valid rules and an aligned quantity', () => {
@@ -17,6 +19,8 @@ describe('BacktestExecutionRulesValidator', () => {
       stepSize: '0.001',
       minNotional: '5',
       tickSize: '0.01',
+      minPrice: '0.01',
+      maxPrice: '1000000',
     });
   });
 
@@ -41,6 +45,8 @@ describe('BacktestExecutionRulesValidator', () => {
     { ...rules, stepSize: '-0.001' },
     { ...rules, minNotional: 'not-a-decimal' },
     { ...rules, tickSize: '0' },
+    { ...rules, minPrice: '0' },
+    { ...rules, maxPrice: '0.001' },
   ])('rejects invalid or incoherent execution rules', (invalidRules) => {
     expect(() => validator.validate(invalidRules, '0.01')).toThrow();
   });
@@ -58,5 +64,12 @@ describe('BacktestExecutionRulesValidator', () => {
         '5.000000000000000000000000000000000000001',
       ),
     ).toBe(false);
+  });
+
+  it('treats both price boundaries as inclusive', () => {
+    expect(validator.isPriceWithinRange('0.01', '0.01', '100')).toBe(true);
+    expect(validator.isPriceWithinRange('100', '0.01', '100')).toBe(true);
+    expect(validator.isPriceWithinRange('0.009', '0.01', '100')).toBe(false);
+    expect(validator.isPriceWithinRange('100.001', '0.01', '100')).toBe(false);
   });
 });
