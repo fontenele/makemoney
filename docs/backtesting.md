@@ -155,8 +155,20 @@ M6.12 derives deterministic time-based measurements from the historical period a
 - Empty input exposes null period boundaries, zero durations, and null ratios. A zero-duration supplied period also has a null exposure rate.
 - The calculator rejects negative, unsafe, or collectively impossible time intervals.
 
+## M6.13 quantity and minimum-order constraints
+
+M6.13 requires each historical simulation to carry a provider-neutral execution-rule snapshot rather than consulting current exchange metadata during replay.
+
+- Minimum quantity, maximum quantity, step size, and minimum notional are mandatory positive decimal strings.
+- The fixed simulation quantity must remain within the inclusive range and divide exactly by the step size; invalid configuration fails before any financial state is created.
+- Every potential buy and sell checks its effective-price notional against the configured minimum before becoming a fill.
+- A below-minimum buy leaves cash and position unchanged. A below-minimum sell leaves the existing position open so a later valid sell signal may still close it.
+- Rejections share an explicit `minimumNotionalUnfilledSignalCount` and never enter fill, performance, equity, or exposure ledgers.
+- Rules are returned with the simulation result, making the research assumption reproducible and inspectable.
+- Validation and comparisons use precision-40 `decimal.js`; quantity is never silently rounded.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, liquidity, minimum-order and precision rules, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, liquidity, price tick rounding, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.

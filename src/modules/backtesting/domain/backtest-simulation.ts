@@ -3,6 +3,7 @@ import { BacktestPerformance } from './backtest-performance';
 import { BacktestEndingValuation } from './backtest-valuation';
 import { BacktestEquityResult } from './backtest-equity';
 import { BacktestTimeMetrics } from './backtest-time-metrics';
+import { BacktestExecutionRules } from './backtest-execution-rules';
 
 interface BacktestFillBase {
   side: 'buy' | 'sell';
@@ -46,6 +47,7 @@ export interface BacktestSimulationConfiguration {
   spreadRate: string;
   slippageRate: string;
   initialCapitalUsdt: string;
+  executionRules: BacktestExecutionRules;
 }
 
 export interface BacktestCapitalResult {
@@ -64,6 +66,7 @@ export interface BacktestSimulationResult {
   feeRate: string;
   spreadRate: string;
   slippageRate: string;
+  executionRules: BacktestExecutionRules;
   capital: BacktestCapitalResult;
   equity: BacktestEquityResult;
   timeMetrics: BacktestTimeMetrics;
@@ -75,6 +78,7 @@ export interface BacktestSimulationResult {
   ignoredBuySignalCount: number;
   ignoredSellSignalCount: number;
   insufficientCapitalBuySignalCount: number;
+  minimumNotionalUnfilledSignalCount: number;
   unfilledTerminalSignalCount: number;
 }
 

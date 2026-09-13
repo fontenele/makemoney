@@ -8,6 +8,7 @@ import { BacktestEndingValuationCalculator } from './application/backtest-ending
 import { BacktestRealizedDrawdownCalculator } from './application/backtest-realized-drawdown-calculator';
 import { BacktestEquityCalculator } from './application/backtest-equity-calculator';
 import { BacktestTimeMetricsCalculator } from './application/backtest-time-metrics-calculator';
+import { BacktestExecutionRulesValidator } from './application/backtest-execution-rules-validator';
 import { StrategyReplayService } from './application/strategy-replay.service';
 import { HISTORICAL_CANDLE_PROVIDER } from './domain/historical-candle-provider';
 import { BinanceHistoricalCandlesClient } from './infrastructure/binance/binance-historical-candles.client';
@@ -29,6 +30,7 @@ import { BinanceHistoricalCandlesClient } from './infrastructure/binance/binance
     BacktestEndingValuationCalculator,
     BacktestEquityCalculator,
     BacktestTimeMetricsCalculator,
+    BacktestExecutionRulesValidator,
     BacktestTradeSimulator,
     HistoricalStrategyReplayService,
   ],

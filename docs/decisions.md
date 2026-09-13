@@ -341,3 +341,9 @@ The effective price remains the single source for notionals, fees, affordability
 Time metrics are derived from candle and fill timestamps rather than accumulated inside signal processing. The tested interval runs from the first candle open through the final candle close. Closed exposure runs from each entry fill to its corresponding exit fill, while an ending open position remains exposed through the tested-period end.
 
 Durations are exact safe integer milliseconds. Ratios and averages use precision-40 decimal arithmetic; undefined ratios and samples are represented as `null` instead of a misleading zero. This measurement does not introduce annualization, risk-adjusted return, or a new execution assumption.
+
+## M6.13 explicit historical execution-rule snapshot
+
+Backtests carry their own provider-neutral minimum/maximum quantity, step size, and minimum-notional snapshot. They do not query current Binance metadata, because doing so would make an old replay depend on mutable present-day rules. The complete normalized snapshot is returned with the result for reproducibility.
+
+Fixed quantity must satisfy range and exact step-size constraints before simulation. Minimum notional is assessed per potential fill using its effective post-spread/slippage price. Failed buys preserve cash; failed sells preserve the open position; neither enters downstream ledgers. Quantity is rejected rather than silently rounded.

@@ -9,6 +9,14 @@ import { BacktestEndingValuationCalculator } from './backtest-ending-valuation-c
 import { BacktestRealizedDrawdownCalculator } from './backtest-realized-drawdown-calculator';
 import { BacktestEquityCalculator } from './backtest-equity-calculator';
 import { BacktestTimeMetricsCalculator } from './backtest-time-metrics-calculator';
+import { BacktestExecutionRulesValidator } from './backtest-execution-rules-validator';
+
+const EXECUTION_RULES = {
+  minQuantity: '0.00001',
+  maxQuantity: '1000',
+  stepSize: '0.00001',
+  minNotional: '0.00001',
+};
 
 describe('BacktestTradeSimulator', () => {
   const simulator = new BacktestTradeSimulator(
@@ -16,6 +24,7 @@ describe('BacktestTradeSimulator', () => {
     new BacktestEndingValuationCalculator(),
     new BacktestEquityCalculator(),
     new BacktestTimeMetricsCalculator(),
+    new BacktestExecutionRulesValidator(),
   );
 
   it('fills signals only at the following candle open and includes fees', () => {
@@ -32,6 +41,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0.01',
         spreadRate: '0',
         slippageRate: '0',
+        executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '100',
       },
     );
@@ -127,6 +137,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0.001',
         spreadRate: '0',
         slippageRate: '0',
+        executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '100',
       },
     );
@@ -184,6 +195,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0',
         slippageRate: '0',
+        executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '1000',
       },
     );
@@ -200,6 +212,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0',
       spreadRate: '0',
       slippageRate: '0',
+      executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     });
 
@@ -214,6 +227,10 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0.0001',
       spreadRate: '0',
       slippageRate: '0',
+      executionRules: {
+        ...EXECUTION_RULES,
+        stepSize: '0.1234567890123456789',
+      },
       initialCapitalUsdt: '1000',
     };
 
@@ -248,6 +265,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0.02',
         slippageRate: '0.005',
+        executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '1000',
       },
     );
@@ -290,6 +308,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0.02',
         slippageRate: '0.005',
+        executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '101',
       },
     );
@@ -305,6 +324,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0.001',
       spreadRate: '0',
       slippageRate: '0',
+      executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
     {
@@ -312,6 +332,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0.001',
       spreadRate: '0',
       slippageRate: '0',
+      executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
     {
@@ -319,6 +340,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '-0.1',
       spreadRate: '0',
       slippageRate: '0',
+      executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
     {
@@ -326,6 +348,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '1',
       spreadRate: '0',
       slippageRate: '0',
+      executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
     {
@@ -333,6 +356,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0',
       spreadRate: '0',
       slippageRate: '0',
+      executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '0',
     },
     {
@@ -340,6 +364,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0',
       spreadRate: '-0.1',
       slippageRate: '0',
+      executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
     {
@@ -347,6 +372,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0',
       spreadRate: '0',
       slippageRate: '1',
+      executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
     {
@@ -354,6 +380,7 @@ describe('BacktestTradeSimulator', () => {
       feeRate: '0',
       spreadRate: '0.8',
       slippageRate: '0.6',
+      executionRules: EXECUTION_RULES,
       initialCapitalUsdt: '1000',
     },
   ])('rejects invalid simulation configuration', (configuration) => {
@@ -371,6 +398,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0',
         spreadRate: '0',
         slippageRate: '0',
+        executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '1000',
       }),
     ).toThrow('Backtest candle and signal timeline is inconsistent');
@@ -386,6 +414,7 @@ describe('BacktestTradeSimulator', () => {
         feeRate: '0.001',
         spreadRate: '0',
         slippageRate: '0',
+        executionRules: EXECUTION_RULES,
         initialCapitalUsdt: '100',
       },
     );
@@ -399,6 +428,54 @@ describe('BacktestTradeSimulator', () => {
       totalNetReturnUsdt: '0',
       totalRoi: '0',
     });
+  });
+
+  it('leaves a below-minimum-notional buy unfilled', () => {
+    const candles = [candle(0, '4'), candle(1, '4')];
+    const result = simulator.simulate(
+      candles,
+      [signal(candles[0], 'buy'), signal(candles[1])],
+      {
+        quantity: '1',
+        feeRate: '0',
+        spreadRate: '0',
+        slippageRate: '0',
+        initialCapitalUsdt: '100',
+        executionRules: { ...EXECUTION_RULES, minNotional: '5' },
+      },
+    );
+
+    expect(result.fills).toEqual([]);
+    expect(result.minimumNotionalUnfilledSignalCount).toBe(1);
+    expect(result.insufficientCapitalBuySignalCount).toBe(0);
+    expect(result.capital.finalEquityUsdt).toBe('100');
+  });
+
+  it('keeps the position open when a sell is below minimum notional', () => {
+    const candles = [candle(0, '100'), candle(1, '100'), candle(2, '40')];
+    const result = simulator.simulate(
+      candles,
+      [
+        signal(candles[0], 'buy'),
+        signal(candles[1], 'sell'),
+        signal(candles[2]),
+      ],
+      {
+        quantity: '1',
+        feeRate: '0',
+        spreadRate: '0',
+        slippageRate: '0',
+        initialCapitalUsdt: '1000',
+        executionRules: { ...EXECUTION_RULES, minNotional: '50' },
+      },
+    );
+
+    expect(result.fills.map((fill) => fill.side)).toEqual(['buy']);
+    expect(result.closedTrades).toEqual([]);
+    expect(result.openPosition).not.toBeNull();
+    expect(result.minimumNotionalUnfilledSignalCount).toBe(1);
+    expect(result.capital.finalCashUsdt).toBe('900');
+    expect(result.capital.finalEquityUsdt).toBe('940');
   });
 });
 

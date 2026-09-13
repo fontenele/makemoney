@@ -86,6 +86,12 @@ describe('HistoricalStrategyReplayService', () => {
       spreadRate: '0',
       slippageRate: '0',
       initialCapitalUsdt: '1000',
+      executionRules: {
+        minQuantity: '0.00001',
+        maxQuantity: '1000',
+        stepSize: '0.00001',
+        minNotional: '0.00001',
+      },
     };
 
     await expect(

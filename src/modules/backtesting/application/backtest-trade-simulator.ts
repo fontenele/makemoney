@@ -15,6 +15,7 @@ import { BacktestPerformanceCalculator } from './backtest-performance-calculator
 import { BacktestEndingValuationCalculator } from './backtest-ending-valuation-calculator';
 import { BacktestEquityCalculator } from './backtest-equity-calculator';
 import { BacktestTimeMetricsCalculator } from './backtest-time-metrics-calculator';
+import { BacktestExecutionRulesValidator } from './backtest-execution-rules-validator';
 
 const SimulationDecimal = Decimal.clone({
   precision: 40,
@@ -31,6 +32,7 @@ export class BacktestTradeSimulator {
     private readonly endingValuationCalculator: BacktestEndingValuationCalculator,
     private readonly equityCalculator: BacktestEquityCalculator,
     private readonly timeMetricsCalculator: BacktestTimeMetricsCalculator,
+    private readonly executionRulesValidator: BacktestExecutionRulesValidator,
   ) {}
 
   simulate(
@@ -50,6 +52,10 @@ export class BacktestTradeSimulator {
       configuration.initialCapitalUsdt,
       'initialCapitalUsdt',
     );
+    const executionRules = this.executionRulesValidator.validate(
+      configuration.executionRules,
+      quantity.toFixed(),
+    );
     this.validateTimeline(candles, signals);
 
     const fills: BacktestFill[] = [];
@@ -58,6 +64,7 @@ export class BacktestTradeSimulator {
     let ignoredBuySignalCount = 0;
     let ignoredSellSignalCount = 0;
     let insufficientCapitalBuySignalCount = 0;
+    let minimumNotionalUnfilledSignalCount = 0;
     let cash = initialCapital;
 
     for (let index = 1; index < candles.length; index += 1) {
@@ -77,6 +84,15 @@ export class BacktestTradeSimulator {
           feeRate,
           adversePriceImpactRate,
         );
+        if (
+          !this.executionRulesValidator.meetsMinimumNotional(
+            candidateEntry.notional,
+            executionRules.minNotional,
+          )
+        ) {
+          minimumNotionalUnfilledSignalCount += 1;
+          continue;
+        }
         if (new SimulationDecimal(candidateEntry.totalCost).greaterThan(cash)) {
           insufficientCapitalBuySignalCount += 1;
           continue;
@@ -98,6 +114,15 @@ export class BacktestTradeSimulator {
         feeRate,
         adversePriceImpactRate,
       );
+      if (
+        !this.executionRulesValidator.meetsMinimumNotional(
+          exit.notional,
+          executionRules.minNotional,
+        )
+      ) {
+        minimumNotionalUnfilledSignalCount += 1;
+        continue;
+      }
       cash = cash.plus(exit.netProceeds);
       fills.push(exit);
       closedTrades.push({
@@ -137,6 +162,7 @@ export class BacktestTradeSimulator {
       feeRate: feeRate.toFixed(),
       spreadRate: spreadRate.toFixed(),
       slippageRate: slippageRate.toFixed(),
+      executionRules,
       capital: {
         initialCapitalUsdt: initialCapital.toFixed(),
         finalCashUsdt: cash.toFixed(),
@@ -163,6 +189,7 @@ export class BacktestTradeSimulator {
       ignoredBuySignalCount,
       ignoredSellSignalCount,
       insufficientCapitalBuySignalCount,
+      minimumNotionalUnfilledSignalCount,
       unfilledTerminalSignalCount:
         terminalSignal && terminalSignal.action !== 'hold' ? 1 : 0,
     };

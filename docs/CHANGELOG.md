@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-13 — M6.13 quantity and minimum-order constraints completed
+
+### Added
+
+- Required provider-neutral historical execution-rule snapshot with minimum/maximum quantity, step size, and minimum notional.
+- Early exact-decimal validation of the fixed quantity against range and step-size constraints without silent rounding.
+- Per-potential-fill minimum-notional enforcement using effective post-cost price, with dedicated unfilled-signal accounting and no state mutation.
+- Returned normalized rule snapshot for reproducible simulations and tests for boundary, precision, buy-rejection, and sell-rejection behavior.
+- The full suite now contains 302 tests across 47 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No price tick rounding, live metadata dependency, liquidity, partial fill, variable sizing, route, persistence, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.12 time and exposure metrics completed
 
 ### Added

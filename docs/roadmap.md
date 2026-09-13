@@ -83,7 +83,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.10 — complete:** candle-close fee-adjusted equity curve with separately measured maximum absolute and percentage drawdowns, causal fill ordering, and final-equity reconciliation.
 - **M6.11 — complete:** explicit deterministic spread and slippage applied adversely to hypothetical buy and sell prices, with auditable reference prices and downstream capital/performance reconciliation.
 - **M6.12 — complete:** deterministic tested-period duration, closed-trade holding durations, total time in market, exposure rate, and average holding duration, including ending open exposure.
-- Later M6 increments require separate approval for historical-data persistence or pagination, intracandle equity paths, variable sizing, liquidity and pair-rule modeling, optimization, or API exposure.
+- **M6.13 — complete:** explicit provider-neutral quantity limits, exact step-size validation, and per-fill minimum-notional enforcement with rejected-signal accounting.
+- Later M6 increments require separate approval for historical-data persistence or pagination, intracandle equity paths, variable sizing, price tick rounding, liquidity modeling, optimization, or API exposure.
 
 ## M7 — New Listing Scanner — planned
 
