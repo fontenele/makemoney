@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-12 — M6.2 public historical candle loading completed
+
+### Added
+
+- Provider-neutral historical-candle request and provider contracts.
+- Public Binance Spot `GET /api/v3/klines` adapter using the configured market-data-only REST host without authentication.
+- Mandatory bounded BTC/USDT one-minute requests with a 1–1,000 result limit and maximum 1,000-minute range.
+- Ten-second request timeout, caller cancellation, strict 12-field payload validation, range checks, response-size enforcement, and duplicate/out-of-order rejection.
+- Open-candle exclusion based on close time and direct internal delegation from historical loading to deterministic M6.1 replay.
+- Eleven focused tests across the provider adapter and orchestration service.
+- Synchronized backtesting documentation, project context, README status, roadmap, plan, map, decisions, and current state.
+
+### Scope boundaries
+
+- No API route, database migration, historical persistence, pagination across requests, retries, trade/fill simulation, fees, spread, slippage, financial metrics, optimization, wallet access, execution, credentials, or real trading was introduced.
+
 ## 2026-09-12 — M6.1 deterministic strategy replay completed
 
 ### Added

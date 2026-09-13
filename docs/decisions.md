@@ -275,3 +275,9 @@ Recent and latest queries read PostgreSQL directly rather than rebuilding an in-
 Backtesting begins with an internal provider-neutral runner over caller-supplied normalized candles. The runner validates closed BTC/USDT one-minute input with strictly increasing unique close times, then evaluates the configured strategy once per candle using only the bounded history available at that point. Setting evaluation time to the candle close makes identical input deterministic and prevents wall-clock variance.
 
 The output is deliberately a signal timeline with period and action counts, not a trading-performance claim. Historical retrieval and storage, fills, fees, spread, slippage, financial metrics, optimization, HTTP exposure, and any execution path remain separate decisions.
+
+## M6.2 bounded public historical source
+
+Historical input is obtained through a provider-neutral contract whose first adapter uses Binance Spot's public `GET /api/v3/klines` on the market-data-only REST host. The request is deliberately one bounded BTC/USDT one-minute range: limit 1–1,000 and maximum span 1,000 minutes. This avoids implicit pagination, unbounded downloads, credentials, and persistence in the first retrieval increment.
+
+The adapter strictly validates every kline and response ordering, rejects provider drift rather than guessing, and removes any candle whose close time has not passed. Only the strategy candle projection enters replay. Provider retries, multi-request pagination, caching, storage, API exposure, and financial simulation remain deferred.

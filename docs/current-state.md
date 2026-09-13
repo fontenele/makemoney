@@ -4,7 +4,7 @@ Last validated: 2026-09-12
 
 ## Milestone status
 
-M0 through M5 and M6.1 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6.1 adds deterministic no-lookahead replay of supplied historical candles. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M5 and M6.1–M6.2 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay and bounded public historical-candle loading. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -82,6 +82,10 @@ M0 through M5 and M6.1 are complete. M1 provides unauthenticated public BTC/USDT
 - An internal provider-neutral replay service validates supplied closed BTC/USDT one-minute candles and evaluates the configured strategy once per candle.
 - Replay uses only the current and prior bounded history, sets evaluation time to the candle close, and returns a deterministic ordered signal timeline with buy, sell, and hold counts.
 - M6.1 does not retrieve or persist historical candles, expose an HTTP route, simulate trades or fills, calculate financial performance, or access an executor.
+- A provider-neutral historical source loads one bounded public Binance Spot BTC/USDT one-minute range through `GET /api/v3/klines` without credentials.
+- Historical requests are capped at 1,000 candles and 1,000 minutes; strict response validation rejects malformed, excessive, out-of-range, duplicate, or out-of-order data.
+- Candles whose close time has not passed are excluded, and the historical orchestration service delegates the remaining normalized projections directly to deterministic replay.
+- M6.2 adds no route, persistence, pagination, retry policy, trade simulation, financial metric, wallet access, or execution.
 
 ## Local endpoints and ports
 
@@ -102,21 +106,22 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-12 after M6.1:
+The following passed on 2026-09-12 after M6.2:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 237 tests passed across 38 suites
+- `npm test -- --runInBand` — 248 tests passed across 40 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
-The most recent database-backed integration validation was repeated after M6.1:
+The most recent database-backed integration validation was repeated after M6.2:
 
 - `npm run test:e2e -- --runInBand` — 24 tests passed, including idempotent strategy-signal persistence and reads plus the prior Redis rate limiting, unrealized-loss, authenticated control, liquidity, risk, history, performance, valuation, insufficient-funds, and concurrency scenarios
 - `npx prisma migrate deploy` — all six migrations applied, including `strategy_signals` and its precision expansion
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
+- Live Binance historical-candle smoke test — the public market-data-only kline endpoint returned ordered BTCUSDT one-minute rows with the documented 12 fields and no credentials
 - Live paper wallet initialization — reported BTC `0` and USDT `1000` from the default configuration
 - Live read-only API — balances returned BTC `0`/USDT `1000`; valuation first returned 503 before a ticker and then 200 with the live BTC/USDT price
 - Database-backed M3.2 integration — one buy mutated both balances once, replay preserved them, cleanup restored them, and an unaffordable buy left no execution or balance change
@@ -124,7 +129,7 @@ The most recent database-backed integration validation was repeated after M6.1:
 
 ## Repository state
 
-M0 through M5.6 are committed. M6.1 changes are currently in the working tree.
+M0 through M6.1 are committed. M6.2 changes are currently in the working tree.
 
 ## Known issues and cautions
 

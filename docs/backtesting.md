@@ -14,8 +14,23 @@ M6.1 introduces a provider-neutral, deterministic strategy replay boundary. It a
 
 The runner is an internal application service. M6.1 adds no HTTP route and does not fetch or persist historical market data.
 
+## M6.2 public historical candle loading
+
+M6.2 adds a provider-neutral historical-candle source and a Binance Spot implementation backed by public `GET /api/v3/klines`. It uses the existing `BINANCE_REST_BASE_URL`, requires no API key, and delegates normalized output directly to the M6.1 replay runner.
+
+- Requests are fixed to `BTC/USDT` and `1m`.
+- Start and end times are mandatory, ordered UTC timestamps.
+- Limit is mandatory from 1 through 1,000, and one request may span at most 1,000 minutes.
+- The client uses a ten-second timeout and supports caller cancellation.
+- Every returned 12-field kline is validated at the Binance boundary.
+- A response exceeding the requested limit, returning an out-of-range candle, or containing duplicate/out-of-order close times is rejected.
+- Candles whose close time has not passed are discarded before replay.
+- Only the strategy projection (close price, time boundaries, and closed state) crosses into the backtesting domain.
+
+This follows Binance's official [Spot REST kline contract](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#klinecandlestick-data) and [market-data-only host guidance](https://github.com/binance/binance-spot-api-docs/blob/master/faqs/market_data_only.md).
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Trade simulation, fills, fees, spread, slippage, minimum-order rules, PnL, ROI, drawdown, profit factor, expectancy, historical-data ingestion, persistence, parameter optimization, and API exposure remain deferred and require separate approval.
+Trade simulation, fills, fees, spread, slippage, minimum-order rules, PnL, ROI, drawdown, profit factor, expectancy, historical-data persistence, multi-request pagination, parameter optimization, and API exposure remain deferred and require separate approval.
