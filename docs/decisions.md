@@ -407,3 +407,9 @@ Incomplete coverage reloads the entire bounded request through the existing resi
 Expected minute identities are compared with validated stored identities, and consecutive absences become the smallest deterministic set of bounded remote requests. Requests remain sequential so they reuse the adapter's established circuit and cancellation behavior without introducing concurrency policy.
 
 Fetched gaps are held in memory until their union with stored candles proves the original request's exact coverage. Only then are all fetched candles passed to one serializable repository batch and the merged sequence replayed. Missing provider data, duplicate cross-source identities, and persistence failure all stop before replay; refresh and overwrite semantics remain deliberately absent.
+
+## M6.24 strict local replay command endpoint
+
+Historical replay is exposed as POST because it initiates bounded computation and may populate the public-candle cache, even though it cannot mutate financial state. The public contract fixes BTC/USDT and one minute and accepts only canonical UTC boundaries plus the existing bounded limit, avoiding provider-specific or speculative options.
+
+Input contract failures are client errors. Loading, persistence, completeness, and replay failures map to one sanitized unavailable response so provider or database details do not cross the HTTP boundary. Financial simulation remains internal until its larger configuration contract receives separate approval.

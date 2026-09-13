@@ -94,7 +94,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.21 — complete:** explicit stored-only replay and simulation over bounded chronological PostgreSQL reads, with strict persisted-row validation and no Binance fallback or completeness claim.
 - **M6.22 — complete:** deterministic all-or-nothing stored-range coverage lets standard replay and simulation bypass Binance on a complete cache hit; incomplete ranges use the existing full remote load and write-through.
 - **M6.23 — complete:** contiguous missing one-minute ranges load sequentially from Binance, merge with validated stored candles only under complete coverage, and persist as one transactional fetched batch before replay.
-- Later M6 increments require separate approval for cache refresh or expiry, overwriting stored candles, parallel gap loading, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, optimization, or API exposure.
+- **M6.24 — complete:** local bounded `POST /backtesting/replay` exposes deterministic BTC/USDT one-minute signal replay with strict UTC input, explicit HTTP failures, and no financial execution path.
+- Later M6 increments require separate approval for simulation API exposure, cache refresh or expiry, overwriting stored candles, parallel gap loading, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, or optimization.
 
 ## M7 — New Listing Scanner — planned
 

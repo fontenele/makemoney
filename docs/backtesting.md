@@ -287,8 +287,20 @@ M6.23 narrows a cache miss to the exact missing portions of the expected one-min
 - A complete cache hit still performs no network call or write, while explicit stored-only methods retain their prior behavior.
 - Stored candle refresh, conflict overwrite, parallel gap requests, new symbols or intervals, routes, and schema changes are not introduced.
 
+## M6.24 local historical replay API
+
+M6.24 exposes the signal-only historical replay through `POST /backtesting/replay`.
+
+- The JSON body accepts exactly `startTime`, `endTime`, and `limit`; unknown fields are rejected.
+- Timestamps must be canonical millisecond-precision ISO 8601 UTC strings, ordered within 10,000 minutes.
+- `limit` is an integer from 1 through 10,000. Symbol and interval remain fixed internally to `BTC/USDT` and `1m`.
+- Valid requests use the complete cache and sequential gap-loading behavior established through M6.23.
+- The route returns HTTP 200 with the deterministic signal timeline and counts, HTTP 400 for invalid input, and HTTP 503 without leaking internal provider or persistence details when replay is unavailable.
+- The endpoint may persist public historical candles as cache data but cannot access a wallet, order executor, Risk Engine, exchange account, or real funds.
+- Financial simulation configuration and results remain internal and are not exposed by this route.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, parameter optimization, and simulation API exposure remain deferred and require separate approval.

@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-13 — M6.24 local historical replay API completed
+
+### Added
+
+- Local `POST /backtesting/replay` for bounded deterministic BTC/USDT one-minute signal replay.
+- Strict canonical UTC timestamp, range, limit, shape, and unknown-field validation.
+- Controller and E2E coverage for request mapping, response serialization, invalid input, and sanitized operational failure.
+
+### Changed
+
+- Registered the backtesting presentation controller and documented the route in the root README API table.
+- Synchronized backtesting documentation, project context, roadmap, plan, map, decisions, changelog, and current state.
+
+### Verification
+
+- 359 unit tests passed across 53 suites; 28 E2E tests passed across 2 suites.
+- Lint, formatting check, TypeScript build, Compose validation, and diff whitespace validation passed.
+- No simulation API, result persistence, wallet access, signal execution, exchange authentication, or real trading was introduced.
+
 ## 2026-09-13 — M6.23 sequential historical gap filling completed
 
 ### Added

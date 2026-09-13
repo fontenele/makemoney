@@ -1,4 +1,5 @@
 import { INestApplication } from '@nestjs/common';
+import { jest } from '@jest/globals';
 import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import Decimal from 'decimal.js';
@@ -35,10 +36,15 @@ import {
 import { REDIS_CLIENT } from '../src/infrastructure/redis/redis.constants';
 import Redis from 'ioredis';
 import { StrategySignalReadModelService } from '../src/modules/strategies/application/strategy-signal-read-model.service';
+import { HistoricalStrategyReplayService } from '../src/modules/backtesting/application/historical-strategy-replay.service';
+import { BacktestResult } from '../src/modules/backtesting/domain/backtest';
 
 describe('Application (e2e)', () => {
   let app: INestApplication;
   let latestMarketPrice: LatestMarketPriceService;
+  const runHistoricalReplay = jest.fn(() =>
+    Promise.resolve(historicalReplayResult()),
+  );
 
   beforeAll(async () => {
     const pairMetadataProvider: PairMetadataProvider = {
@@ -55,6 +61,8 @@ describe('Application (e2e)', () => {
       .useValue(pairMetadataProvider)
       .overrideProvider(TICKER_STREAM)
       .useValue(tickerStream)
+      .overrideProvider(HistoricalStrategyReplayService)
+      .useValue({ run: runHistoricalReplay })
       .compile();
 
     app = moduleRef.createNestApplication();
@@ -69,6 +77,28 @@ describe('Application (e2e)', () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
 
     return request(server).get('/health').expect(200);
+  });
+
+  it('/backtesting/replay (POST) exposes bounded deterministic replay', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const body = {
+      startTime: '2026-09-01T00:00:00.000Z',
+      endTime: '2026-09-01T00:00:00.000Z',
+      limit: 1,
+    };
+
+    await request(server)
+      .post('/backtesting/replay')
+      .send(body)
+      .expect(200)
+      .expect(serializeHistoricalReplayResult(historicalReplayResult()));
+    expect(runHistoricalReplay).toHaveBeenCalledWith({
+      symbol: 'BTC/USDT',
+      interval: '1m',
+      startTime: new Date(body.startTime),
+      endTime: new Date(body.endTime),
+      limit: 1,
+    });
   });
 
   it('persists strategy signals idempotently and serves them after memory-independent reads', async () => {
@@ -1082,6 +1112,29 @@ describe('Application (e2e)', () => {
     }
   });
 });
+
+function historicalReplayResult(): BacktestResult {
+  return {
+    symbol: 'BTC/USDT',
+    interval: '1m',
+    candleCount: 1,
+    startedAt: new Date('2026-09-01T00:00:00.000Z'),
+    endedAt: new Date('2026-09-01T00:00:59.999Z'),
+    signalCount: 0,
+    buySignalCount: 0,
+    sellSignalCount: 0,
+    holdSignalCount: 0,
+    signals: [],
+  };
+}
+
+function serializeHistoricalReplayResult(value: BacktestResult) {
+  return {
+    ...value,
+    startedAt: value.startedAt?.toISOString() ?? null,
+    endedAt: value.endedAt?.toISOString() ?? null,
+  };
+}
 
 function preparePaperMarket(app: INestApplication): void {
   app.get(LatestTopOfBookService).update({

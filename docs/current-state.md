@@ -4,7 +4,7 @@ Last validated: 2026-09-13
 
 ## Milestone status
 
-M0 through M5 and M6.1–M6.23 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M5 and M6.1–M6.24 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, a local replay API, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -91,6 +91,7 @@ M0 through M5 and M6.1–M6.23 are complete. M1 provides unauthenticated public 
 - Stored-only replay and simulation query validated PostgreSQL candles chronologically within bounded ranges and never call Binance, infer completeness, or fill gaps.
 - Standard historical replay and simulation query PostgreSQL first and bypass Binance plus write-through when every expected minute-aligned candle identity is present.
 - Incomplete cache coverage is now split into contiguous minute gaps loaded sequentially; stored and fetched candles reach replay only after complete merged coverage, and fetched gaps persist in one transaction.
+- Local `POST /backtesting/replay` accepts a strict bounded UTC range and exposes deterministic signal replay while retaining fixed BTC/USDT one-minute identity and no financial execution access.
 - Three exhausted transient historical-page failures open a process-local circuit for 30 seconds; it fails fast while open and permits one concurrent half-open recovery probe before closing or reopening.
 - Candles whose close time has not passed are excluded, and the historical orchestration service delegates the remaining normalized projections directly to deterministic replay.
 - M6.2 adds no route, persistence, pagination, retry policy, trade simulation, financial metric, wallet access, or execution.
@@ -127,6 +128,7 @@ M0 through M5 and M6.1–M6.23 are complete. M1 provides unauthenticated public 
 - Emergency-stop status/control: `http://localhost:3000/risk/emergency-stop`
 - Latest strategy signal: `http://localhost:3000/strategies/signals/latest`
 - Recent strategy signals: `http://localhost:3000/strategies/signals`
+- Historical signal replay: `POST http://localhost:3000/backtesting/replay`
 - PostgreSQL host port: `5433` mapped to container port `5432`
 - Redis host port: `6379`
 
@@ -134,18 +136,18 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-13 after M6.23:
+The following passed on 2026-09-13 after M6.24:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 351 tests passed across 52 suites
+- `npm test -- --runInBand` — 359 tests passed across 53 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
-The most recent database-backed integration validation was repeated after M6.23:
+The most recent database-backed integration validation was repeated after M6.24:
 
-- `$env:RISK_MAX_BTC_POSITION_QUANTITY='1'; npm run test:e2e -- --runInBand` — 27 tests passed across 2 suites, including bounded chronological stored-candle reads plus exact idempotent storage, transactional conflict rollback, and all prior integration scenarios
+- `$env:RISK_MAX_BTC_POSITION_QUANTITY='1'; npm run test:e2e -- --runInBand` — 28 tests passed across 2 suites, including the strict replay HTTP contract, bounded chronological stored-candle reads, exact idempotent storage, transactional conflict rollback, and all prior integration scenarios
 - `npx prisma migrate deploy` — all seven migrations applied, including exact historical candle storage
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
@@ -157,7 +159,7 @@ The most recent database-backed integration validation was repeated after M6.23:
 
 ## Repository state
 
-M0 through M6.22 are committed. M6.23 changes are currently in the working tree.
+M0 through M6.23 are committed. M6.24 changes are currently in the working tree.
 
 ## Known issues and cautions
 

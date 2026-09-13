@@ -18,9 +18,11 @@ import { BinanceHistoricalCandlesClient } from './infrastructure/binance/binance
 import { PrismaHistoricalCandleRepository } from './infrastructure/prisma-historical-candle.repository';
 import { HistoricalCandleCoverage } from './application/historical-candle-coverage';
 import { HistoricalCandleGapPlanner } from './application/historical-candle-gap-planner';
+import { BacktestingController } from './presentation/backtesting.controller';
 
 @Module({
   imports: [StrategiesModule],
+  controllers: [BacktestingController],
   providers: [
     {
       provide: HISTORICAL_CANDLE_PROVIDER,
