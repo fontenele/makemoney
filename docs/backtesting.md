@@ -213,8 +213,21 @@ M6.17 expands one provider-neutral historical request to at most 10,000 BTC/USDT
 - The accumulated result never exceeds the caller's total limit and reaches replay only after pagination completes.
 - No persistence, cache, retry/rate-limit policy, new interval, symbol, or HTTP route is introduced.
 
+## M6.18 bounded historical retry
+
+M6.18 makes each sequential Binance page tolerant of transient availability failures without making historical loading unbounded.
+
+- A page receives at most three total HTTP attempts.
+- Network failures, HTTP 429, and HTTP 5xx are retryable; other HTTP 4xx responses fail immediately.
+- Default waits grow from 500 milliseconds to one second between the three attempts.
+- A valid delta-seconds or HTTP-date `Retry-After` value replaces the default delay and is capped at 30 seconds.
+- Retry waiting receives the caller's abort signal, so cancellation stops both an in-flight request and a pending delay.
+- Every attempt receives its own ten-second request timeout.
+- Successful malformed payloads still fail validation immediately and are never treated as transient transport failures.
+- Retry state is isolated per page; pagination remains sequential and already accepted pages are not requested again.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, provider retry/rate-limit policy, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, circuit breaking, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.

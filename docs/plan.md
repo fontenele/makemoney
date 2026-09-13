@@ -62,6 +62,7 @@ M6.14 Price Precision:       DONE
 M6.15 Price Range:           DONE
 M6.16 Causal Liquidity:      DONE
 M6.17 Historical Pagination: DONE
+M6.18 Historical Retry:      DONE
 Next increment:           NOT APPROVED
 ```
 
@@ -1706,7 +1707,7 @@ M2 — Paper Wallet                 DONE (M2.1–M2.5)
 M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
-M6 — Backtesting                  IN PROGRESS (M6.1–M6.17 DONE)
+M6 — Backtesting                  IN PROGRESS (M6.1–M6.18 DONE)
 M7 — New Listing Scanner          PLANNED
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
@@ -2263,6 +2264,7 @@ M6.14 Price Precision: DONE
 M6.15 Price Range: DONE
 M6.16 Causal Liquidity: DONE
 M6.17 Historical Pagination: DONE
+M6.18 Historical Retry: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2281,6 +2283,6 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-No next increment approved after M6.17.
+No next increment approved after M6.18.
 Stop and present a minimal plan before further backtesting implementation.
 ```

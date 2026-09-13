@@ -7,10 +7,14 @@ import {
 
 type HttpClient = (input: string, init?: RequestInit) => Promise<Response>;
 type Clock = () => Date;
+type Sleeper = (delayMs: number, signal?: AbortSignal) => Promise<void>;
 
 const DECIMAL_PATTERN = /^(0|[1-9]\d*)(\.\d+)?$/;
 const REQUEST_TIMEOUT_MS = 10_000;
 const ONE_MINUTE_MS = 60_000;
+const MAX_PAGE_ATTEMPTS = 3;
+const INITIAL_RETRY_DELAY_MS = 500;
+const MAX_RETRY_AFTER_MS = 30_000;
 export const MAX_HISTORICAL_CANDLE_PAGE_LIMIT = 1_000;
 export const MAX_HISTORICAL_CANDLE_LIMIT = 10_000;
 
@@ -19,6 +23,7 @@ export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider 
     private readonly baseUrl: string,
     private readonly httpClient: HttpClient = fetch,
     private readonly clock: Clock = () => new Date(),
+    private readonly sleeper: Sleeper = abortableSleep,
   ) {}
 
   async load(
@@ -78,20 +83,60 @@ export class BinanceHistoricalCandlesClient implements HistoricalCandleProvider 
     request: HistoricalCandleRequest,
     signal?: AbortSignal,
   ): Promise<HistoricalCandle[]> {
-    const timeoutSignal = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
-    const response = await this.httpClient(this.buildUrl(request), {
-      headers: { accept: 'application/json' },
-      signal: signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal,
-    });
+    for (let attempt = 1; attempt <= MAX_PAGE_ATTEMPTS; attempt += 1) {
+      let response: Response;
+      try {
+        const timeoutSignal = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+        response = await this.httpClient(this.buildUrl(request), {
+          headers: { accept: 'application/json' },
+          signal: signal
+            ? AbortSignal.any([signal, timeoutSignal])
+            : timeoutSignal,
+        });
+      } catch (error) {
+        if (signal?.aborted || attempt === MAX_PAGE_ATTEMPTS) {
+          throw error;
+        }
+        await this.sleeper(this.retryDelay(null, attempt), signal);
+        continue;
+      }
 
-    if (!response.ok) {
-      throw new Error(
-        `Binance historical candles request failed: ${response.status}`,
-      );
+      if (!response.ok) {
+        if (
+          !isRetryableStatus(response.status) ||
+          attempt === MAX_PAGE_ATTEMPTS
+        ) {
+          throw new Error(
+            `Binance historical candles request failed: ${response.status}`,
+          );
+        }
+        await this.sleeper(
+          this.retryDelay(response.headers.get('retry-after'), attempt),
+          signal,
+        );
+        continue;
+      }
+
+      const payload: unknown = JSON.parse(await response.text());
+      return this.normalize(payload, request);
     }
 
-    const payload: unknown = JSON.parse(await response.text());
-    return this.normalize(payload, request);
+    throw new Error('Binance historical candle retry state is invalid');
+  }
+
+  private retryDelay(retryAfter: string | null, attempt: number): number {
+    if (retryAfter !== null) {
+      const seconds =
+        retryAfter.trim() === '' ? Number.NaN : Number(retryAfter);
+      const retryAt = Date.parse(retryAfter);
+      const delayMs = Number.isFinite(seconds)
+        ? seconds * 1_000
+        : retryAt - this.clock().getTime();
+      if (Number.isFinite(delayMs) && delayMs >= 0) {
+        return Math.min(delayMs, MAX_RETRY_AFTER_MS);
+      }
+    }
+    return INITIAL_RETRY_DELAY_MS * 2 ** (attempt - 1);
   }
 
   normalize(
@@ -279,4 +324,33 @@ function isCoherentOhlcv(
     low.lessThanOrEqualTo(Decimal.min(open, high, close)) &&
     volumes.every((volume) => new Decimal(volume).greaterThanOrEqualTo(0))
   );
+}
+
+function isRetryableStatus(status: number): boolean {
+  return status === 429 || (status >= 500 && status <= 599);
+}
+
+function abortableSleep(delayMs: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(abortReason(signal));
+      return;
+    }
+
+    const onAbort = () => {
+      clearTimeout(timeout);
+      reject(abortReason(signal));
+    };
+    const timeout = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, delayMs);
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
+function abortReason(signal?: AbortSignal): Error {
+  return signal?.reason instanceof Error
+    ? signal.reason
+    : new Error('Historical candle request aborted');
 }

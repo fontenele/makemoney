@@ -88,7 +88,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.15 — complete:** explicit inclusive minimum/maximum executable-price filters with validated ranges, dedicated unfilled accounting, and state preservation.
 - **M6.16 — complete:** causal all-or-none volume participation using only the fully closed signal candle, with explicit rate validation, auditable limits, dedicated unfilled accounting, and state preservation.
 - **M6.17 — complete:** bounded multi-request historical loading up to 10,000 candles through sequential Binance pages of at most 1,000, with deterministic progress, cancellation, and page-level validation.
-- Later M6 increments require separate approval for historical-data persistence, provider retry/rate-limit policy, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, optimization, or API exposure.
+- **M6.18 — complete:** bounded per-page retry for network failures, rate limiting, and server errors, with cancelable exponential or provider-directed delay and no retry of permanent responses.
+- Later M6 increments require separate approval for historical-data persistence, circuit breaking, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, optimization, or API exposure.
 
 ## M7 — New Listing Scanner — planned
 

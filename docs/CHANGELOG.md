@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-13 — M6.18 resilient historical page loading completed
+
+### Added
+
+- At most three total attempts for each Binance historical page when network, HTTP 429, or HTTP 5xx failures occur.
+- Bounded 500 ms and 1 s exponential retry waits plus valid `Retry-After` support capped at 30 seconds.
+- Caller-cancelable waiting and a fresh ten-second timeout for every HTTP attempt.
+- Immediate failure for permanent HTTP client responses and malformed successful payloads.
+- Deterministic injected-wait tests covering recovery, exhaustion, rate-limit delay, permanent failure, and cancellation.
+- The full suite now contains 329 tests across 49 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No circuit breaker, parallel paging, persistence, cache, resumable job, route, public configuration, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.17 bounded historical pagination completed
 
 ### Added

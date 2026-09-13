@@ -371,3 +371,9 @@ The fixed quantity remains all-or-none: exceeding the limit rejects the candidat
 The provider-neutral request retains one total limit while the Binance adapter owns its provider-specific 1,000-row paging restriction. The total is capped at 10,000 candles and 10,000 minutes so callers gain useful research depth without enabling unbounded network or memory consumption.
 
 Pages are sequential because each cursor depends on the last validated open time. An empty or partial page is terminal; a full page advances by exactly one interval. Existing per-page normalization remains the trust boundary, and the complete bounded collection is returned only after loading finishes. Persistence, retries, rate-limit backoff, and concurrency are deliberately separate decisions.
+
+## M6.18 page-local transient retry
+
+Historical retries belong inside the Binance adapter because HTTP status semantics and `Retry-After` are provider-transport concerns. Each page gets no more than three total attempts. Network failures, rate limiting, and server failures retry; permanent client responses and invalid successful payloads do not.
+
+The default backoff is 500 milliseconds before the second attempt and one second before the third. A valid provider delay takes precedence but cannot exceed 30 seconds. Waiting is injected for deterministic tests and receives the caller's abort signal. Retry state resets for each page and never restarts previously accepted pagination work.

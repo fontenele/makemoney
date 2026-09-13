@@ -188,18 +188,132 @@ describe('BinanceHistoricalCandlesClient', () => {
     );
   });
 
-  it('throws when Binance returns a non-success response', async () => {
+  it('retries network failures with bounded exponential delays', async () => {
     const httpClient =
       jest.fn<(input: string, init?: RequestInit) => Promise<Response>>();
-    httpClient.mockResolvedValue(new Response(null, { status: 429 }));
+    httpClient
+      .mockRejectedValueOnce(new TypeError('network unavailable'))
+      .mockRejectedValueOnce(new TypeError('network unavailable'))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([kline(0)]), { status: 200 }),
+      );
+    const sleeper =
+      jest.fn<(delayMs: number, signal?: AbortSignal) => Promise<void>>();
+    sleeper.mockResolvedValue();
     const client = new BinanceHistoricalCandlesClient(
       'https://data-api.binance.vision',
       httpClient,
+      () => now,
+      sleeper,
+    );
+
+    await expect(client.load(request)).resolves.toHaveLength(1);
+    expect(httpClient).toHaveBeenCalledTimes(3);
+    expect(sleeper.mock.calls).toEqual([
+      [500, undefined],
+      [1_000, undefined],
+    ]);
+  });
+
+  it('honors Retry-After for rate limiting with a safe delay cap', async () => {
+    const httpClient =
+      jest.fn<(input: string, init?: RequestInit) => Promise<Response>>();
+    httpClient
+      .mockResolvedValueOnce(
+        new Response(null, {
+          status: 429,
+          headers: { 'retry-after': '60' },
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([kline(0)]), { status: 200 }),
+      );
+    const sleeper =
+      jest.fn<(delayMs: number, signal?: AbortSignal) => Promise<void>>();
+    sleeper.mockResolvedValue();
+    const client = new BinanceHistoricalCandlesClient(
+      'https://data-api.binance.vision',
+      httpClient,
+      () => now,
+      sleeper,
+    );
+
+    await expect(client.load(request)).resolves.toHaveLength(1);
+    expect(sleeper).toHaveBeenCalledWith(30_000, undefined);
+  });
+
+  it('fails after three transient HTTP attempts', async () => {
+    const httpClient =
+      jest.fn<(input: string, init?: RequestInit) => Promise<Response>>();
+    httpClient.mockImplementation(() =>
+      Promise.resolve(new Response(null, { status: 503 })),
+    );
+    const sleeper =
+      jest.fn<(delayMs: number, signal?: AbortSignal) => Promise<void>>();
+    sleeper.mockResolvedValue();
+    const client = new BinanceHistoricalCandlesClient(
+      'https://data-api.binance.vision',
+      httpClient,
+      () => now,
+      sleeper,
     );
 
     await expect(client.load(request)).rejects.toThrow(
-      'Binance historical candles request failed: 429',
+      'Binance historical candles request failed: 503',
     );
+    expect(httpClient).toHaveBeenCalledTimes(3);
+    expect(sleeper.mock.calls).toEqual([
+      [500, undefined],
+      [1_000, undefined],
+    ]);
+  });
+
+  it('propagates caller cancellation during a retry delay', async () => {
+    const controller = new AbortController();
+    const cancellation = new Error('cancelled');
+    const httpClient =
+      jest.fn<(input: string, init?: RequestInit) => Promise<Response>>();
+    httpClient.mockRejectedValue(new TypeError('network unavailable'));
+    const sleeper = jest.fn(
+      (delayMs: number, signal?: AbortSignal): Promise<void> => {
+        void delayMs;
+        void signal;
+        controller.abort(cancellation);
+        return Promise.reject(cancellation);
+      },
+    );
+    const client = new BinanceHistoricalCandlesClient(
+      'https://data-api.binance.vision',
+      httpClient,
+      () => now,
+      sleeper,
+    );
+
+    await expect(client.load(request, controller.signal)).rejects.toBe(
+      cancellation,
+    );
+    expect(httpClient).toHaveBeenCalledTimes(1);
+    expect(sleeper).toHaveBeenCalledWith(500, controller.signal);
+  });
+
+  it('does not retry a permanent client response', async () => {
+    const httpClient =
+      jest.fn<(input: string, init?: RequestInit) => Promise<Response>>();
+    httpClient.mockResolvedValue(new Response(null, { status: 400 }));
+    const sleeper =
+      jest.fn<(delayMs: number, signal?: AbortSignal) => Promise<void>>();
+    const client = new BinanceHistoricalCandlesClient(
+      'https://data-api.binance.vision',
+      httpClient,
+      () => now,
+      sleeper,
+    );
+
+    await expect(client.load(request)).rejects.toThrow(
+      'Binance historical candles request failed: 400',
+    );
+    expect(httpClient).toHaveBeenCalledTimes(1);
+    expect(sleeper).not.toHaveBeenCalled();
   });
 });
 
