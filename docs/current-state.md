@@ -4,7 +4,7 @@ Last validated: 2026-09-13
 
 ## Milestone status
 
-M0 through M5 and M6.1–M6.13 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, capital-constrained historical simulation, explicit fill costs and order constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M5 and M6.1–M6.14 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, capital-constrained historical simulation, explicit fill costs, precision and order constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -102,6 +102,7 @@ M0 through M5 and M6.1–M6.13 are complete. M1 provides unauthenticated public 
 - Historical fills retain the next-candle open as their reference price and apply half the explicit full spread plus explicit slippage adversely to effective buy and sell prices; all downstream fees, capital, PnL, ROI, and equity use those effective prices.
 - Historical simulations expose tested-period duration, each closed-trade holding duration, total time in market, exposure rate, and average closed-trade holding duration; an ending open position is measured through the final candle close.
 - Historical simulations require explicit provider-neutral minimum/maximum quantity, step-size, and minimum-notional rules; invalid fixed quantity fails early and below-minimum potential fills remain unfilled with dedicated accounting.
+- Historical execution rules now include tick size; post-impact buys round upward and sells downward, while fills retain reference, adjusted, and executable prices and every downstream financial calculation uses the executable value.
 
 ## Local endpoints and ports
 
@@ -122,12 +123,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-13 after M6.13:
+The following passed on 2026-09-13 after M6.14:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 302 tests passed across 47 suites
+- `npm test -- --runInBand` — 310 tests passed across 48 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -145,7 +146,7 @@ The most recent database-backed integration validation was repeated after M6.4:
 
 ## Repository state
 
-M0 through M6.12 are committed. M6.13 changes are currently in the working tree.
+M0 through M6.13 are committed. M6.14 changes are currently in the working tree.
 
 ## Known issues and cautions
 

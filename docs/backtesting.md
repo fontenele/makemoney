@@ -167,8 +167,19 @@ M6.13 requires each historical simulation to carry a provider-neutral execution-
 - Rules are returned with the simulation result, making the research assumption reproducible and inspectable.
 - Validation and comparisons use precision-40 `decimal.js`; quantity is never silently rounded.
 
+## M6.14 price precision
+
+M6.14 adds mandatory positive tick size to the historical execution-rule snapshot and quantizes every post-impact price before creating a fill.
+
+- Each potential fill retains the candle-open `referencePrice`, post-spread/slippage `adjustedPrice`, and tick-aligned executable `price`.
+- Buy prices round upward to the next tick and sell prices round downward, preserving a conservative adverse assumption on both sides.
+- Prices already aligned to the tick remain unchanged.
+- Notional, fee, affordability, minimum-notional checks, capital, PnL, ROI, and equity use only the final executable price.
+- A sell whose downward rounding reaches zero remains unfilled, preserves the position, and increments `pricePrecisionUnfilledSignalCount`.
+- Tick validation and quantization use precision-40 `decimal.js`; no native floating-point financial arithmetic is introduced.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, liquidity, price tick rounding, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.
+Intracandle equity paths, liquidity, price range filters, partial fills, variable sizing or reinvestment, Risk Engine modeling, historical-data persistence, multi-request pagination, risk-adjusted or annualized metrics, parameter optimization, and API exposure remain deferred and require separate approval.

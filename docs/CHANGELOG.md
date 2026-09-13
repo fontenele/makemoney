@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-13 — M6.14 price precision completed
+
+### Added
+
+- Mandatory positive tick size in each provider-neutral historical execution-rule snapshot.
+- Isolated side-aware fill-price calculator retaining reference, post-impact adjusted, and final executable prices.
+- Conservative exact-decimal quantization: buys round upward and sells downward, with all downstream financial calculations using the final price.
+- Explicit accounting for sells whose tick flooring reaches zero, preserving the open position without creating a fill.
+- Focused tests for both sides, aligned prices, zero flooring, arbitrary precision, financial reconciliation, and rule validation.
+- The full suite now contains 310 tests across 48 suites.
+- Synchronized backtesting documentation, context, roadmap, plan, map, decisions, README, changelog, and current state.
+
+### Scope boundaries
+
+- No price range filter, live metadata dependency, liquidity, partial fill, variable sizing, route, persistence, wallet access, execution, or real trading was introduced.
+
 ## 2026-09-13 — M6.13 quantity and minimum-order constraints completed
 
 ### Added

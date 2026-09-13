@@ -7,6 +7,7 @@ describe('BacktestExecutionRulesValidator', () => {
     maxQuantity: '10',
     stepSize: '0.001',
     minNotional: '5',
+    tickSize: '0.01',
   };
 
   it('normalizes valid rules and an aligned quantity', () => {
@@ -15,6 +16,7 @@ describe('BacktestExecutionRulesValidator', () => {
       maxQuantity: '10',
       stepSize: '0.001',
       minNotional: '5',
+      tickSize: '0.01',
     });
   });
 
@@ -38,6 +40,7 @@ describe('BacktestExecutionRulesValidator', () => {
     { ...rules, maxQuantity: '0.0001' },
     { ...rules, stepSize: '-0.001' },
     { ...rules, minNotional: 'not-a-decimal' },
+    { ...rules, tickSize: '0' },
   ])('rejects invalid or incoherent execution rules', (invalidRules) => {
     expect(() => validator.validate(invalidRules, '0.01')).toThrow();
   });

@@ -20,6 +20,7 @@ export class BacktestExecutionRulesValidator {
     const maxQuantity = this.positive(rules.maxQuantity, 'maxQuantity');
     const stepSize = this.positive(rules.stepSize, 'stepSize');
     const minNotional = this.positive(rules.minNotional, 'minNotional');
+    const tickSize = this.positive(rules.tickSize, 'tickSize');
     const quantity = this.positive(quantityValue, 'quantity');
 
     if (maxQuantity.lessThan(minQuantity)) {
@@ -37,6 +38,7 @@ export class BacktestExecutionRulesValidator {
       maxQuantity: maxQuantity.toFixed(),
       stepSize: stepSize.toFixed(),
       minNotional: minNotional.toFixed(),
+      tickSize: tickSize.toFixed(),
     };
   }
 

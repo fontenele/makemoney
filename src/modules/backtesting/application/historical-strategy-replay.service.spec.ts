@@ -91,6 +91,7 @@ describe('HistoricalStrategyReplayService', () => {
         maxQuantity: '1000',
         stepSize: '0.00001',
         minNotional: '0.00001',
+        tickSize: '0.00000001',
       },
     };
 

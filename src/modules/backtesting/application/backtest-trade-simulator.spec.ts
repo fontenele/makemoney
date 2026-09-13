@@ -10,12 +10,14 @@ import { BacktestRealizedDrawdownCalculator } from './backtest-realized-drawdown
 import { BacktestEquityCalculator } from './backtest-equity-calculator';
 import { BacktestTimeMetricsCalculator } from './backtest-time-metrics-calculator';
 import { BacktestExecutionRulesValidator } from './backtest-execution-rules-validator';
+import { BacktestFillPriceCalculator } from './backtest-fill-price-calculator';
 
 const EXECUTION_RULES = {
   minQuantity: '0.00001',
   maxQuantity: '1000',
   stepSize: '0.00001',
   minNotional: '0.00001',
+  tickSize: '0.0000000000000000001',
 };
 
 describe('BacktestTradeSimulator', () => {
@@ -25,6 +27,7 @@ describe('BacktestTradeSimulator', () => {
     new BacktestEquityCalculator(),
     new BacktestTimeMetricsCalculator(),
     new BacktestExecutionRulesValidator(),
+    new BacktestFillPriceCalculator(),
   );
 
   it('fills signals only at the following candle open and includes fees', () => {
@@ -476,6 +479,70 @@ describe('BacktestTradeSimulator', () => {
     expect(result.minimumNotionalUnfilledSignalCount).toBe(1);
     expect(result.capital.finalCashUsdt).toBe('900');
     expect(result.capital.finalEquityUsdt).toBe('940');
+  });
+
+  it('uses adverse tick-rounded prices throughout financial results', () => {
+    const candles = [candle(0, '100'), candle(1, '100'), candle(2, '100')];
+    const result = simulator.simulate(
+      candles,
+      [
+        signal(candles[0], 'buy'),
+        signal(candles[1], 'sell'),
+        signal(candles[2]),
+      ],
+      {
+        quantity: '1',
+        feeRate: '0',
+        spreadRate: '0.00246',
+        slippageRate: '0',
+        initialCapitalUsdt: '1000',
+        executionRules: { ...EXECUTION_RULES, tickSize: '0.05' },
+      },
+    );
+
+    expect(result.fills).toEqual([
+      expect.objectContaining({
+        side: 'buy',
+        referencePrice: '100',
+        adjustedPrice: '100.123',
+        price: '100.15',
+        notional: '100.15',
+      }),
+      expect.objectContaining({
+        side: 'sell',
+        referencePrice: '100',
+        adjustedPrice: '99.877',
+        price: '99.85',
+        notional: '99.85',
+      }),
+    ]);
+    expect(result.closedTrades[0]?.netPnl).toBe('-0.3');
+    expect(result.capital.finalEquityUsdt).toBe('999.7');
+  });
+
+  it('leaves a position open when sell tick flooring reaches zero', () => {
+    const candles = [candle(0, '1'), candle(1, '1'), candle(2, '0.01')];
+    const result = simulator.simulate(
+      candles,
+      [
+        signal(candles[0], 'buy'),
+        signal(candles[1], 'sell'),
+        signal(candles[2]),
+      ],
+      {
+        quantity: '1',
+        feeRate: '0',
+        spreadRate: '0',
+        slippageRate: '0.5',
+        initialCapitalUsdt: '1000',
+        executionRules: { ...EXECUTION_RULES, tickSize: '0.01' },
+      },
+    );
+
+    expect(result.fills.map((fill) => fill.side)).toEqual(['buy']);
+    expect(result.openPosition).not.toBeNull();
+    expect(result.pricePrecisionUnfilledSignalCount).toBe(1);
+    expect(result.minimumNotionalUnfilledSignalCount).toBe(0);
   });
 });
 

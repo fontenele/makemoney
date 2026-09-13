@@ -9,6 +9,7 @@ interface BacktestFillBase {
   side: 'buy' | 'sell';
   quantity: string;
   referencePrice: string;
+  adjustedPrice: string;
   price: string;
   notional: string;
   feeRate: string;
@@ -79,6 +80,7 @@ export interface BacktestSimulationResult {
   ignoredSellSignalCount: number;
   insufficientCapitalBuySignalCount: number;
   minimumNotionalUnfilledSignalCount: number;
+  pricePrecisionUnfilledSignalCount: number;
   unfilledTerminalSignalCount: number;
 }
 

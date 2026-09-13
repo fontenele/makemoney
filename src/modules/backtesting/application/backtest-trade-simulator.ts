@@ -16,6 +16,7 @@ import { BacktestEndingValuationCalculator } from './backtest-ending-valuation-c
 import { BacktestEquityCalculator } from './backtest-equity-calculator';
 import { BacktestTimeMetricsCalculator } from './backtest-time-metrics-calculator';
 import { BacktestExecutionRulesValidator } from './backtest-execution-rules-validator';
+import { BacktestFillPriceCalculator } from './backtest-fill-price-calculator';
 
 const SimulationDecimal = Decimal.clone({
   precision: 40,
@@ -33,6 +34,7 @@ export class BacktestTradeSimulator {
     private readonly equityCalculator: BacktestEquityCalculator,
     private readonly timeMetricsCalculator: BacktestTimeMetricsCalculator,
     private readonly executionRulesValidator: BacktestExecutionRulesValidator,
+    private readonly fillPriceCalculator: BacktestFillPriceCalculator,
   ) {}
 
   simulate(
@@ -65,6 +67,7 @@ export class BacktestTradeSimulator {
     let ignoredSellSignalCount = 0;
     let insufficientCapitalBuySignalCount = 0;
     let minimumNotionalUnfilledSignalCount = 0;
+    let pricePrecisionUnfilledSignalCount = 0;
     let cash = initialCapital;
 
     for (let index = 1; index < candles.length; index += 1) {
@@ -83,7 +86,12 @@ export class BacktestTradeSimulator {
           quantity,
           feeRate,
           adversePriceImpactRate,
+          executionRules.tickSize,
         );
+        if (!candidateEntry) {
+          pricePrecisionUnfilledSignalCount += 1;
+          continue;
+        }
         if (
           !this.executionRulesValidator.meetsMinimumNotional(
             candidateEntry.notional,
@@ -113,7 +121,12 @@ export class BacktestTradeSimulator {
         quantity,
         feeRate,
         adversePriceImpactRate,
+        executionRules.tickSize,
       );
+      if (!exit) {
+        pricePrecisionUnfilledSignalCount += 1;
+        continue;
+      }
       if (
         !this.executionRulesValidator.meetsMinimumNotional(
           exit.notional,
@@ -190,6 +203,7 @@ export class BacktestTradeSimulator {
       ignoredSellSignalCount,
       insufficientCapitalBuySignalCount,
       minimumNotionalUnfilledSignalCount,
+      pricePrecisionUnfilledSignalCount,
       unfilledTerminalSignalCount:
         terminalSignal && terminalSignal.action !== 'hold' ? 1 : 0,
     };
@@ -201,17 +215,23 @@ export class BacktestTradeSimulator {
     quantity: Decimal,
     feeRate: Decimal,
     adversePriceImpactRate: Decimal,
-  ): BacktestBuyFill {
-    const referencePrice = new SimulationDecimal(candle.openPrice);
-    const price = referencePrice.times(
-      new SimulationDecimal(1).plus(adversePriceImpactRate),
+    tickSize: string,
+  ): BacktestBuyFill | null {
+    const fillPrice = this.fillPriceCalculator.calculate(
+      'buy',
+      candle.openPrice,
+      adversePriceImpactRate.toFixed(),
+      tickSize,
     );
+    if (!fillPrice.executablePrice) return null;
+    const price = new SimulationDecimal(fillPrice.executablePrice);
     const notional = price.times(quantity);
     const fee = notional.times(feeRate);
     return {
       side: 'buy',
       quantity: quantity.toFixed(),
-      referencePrice: referencePrice.toFixed(),
+      referencePrice: fillPrice.referencePrice,
+      adjustedPrice: fillPrice.adjustedPrice,
       price: price.toFixed(),
       notional: notional.toFixed(),
       feeRate: feeRate.toFixed(),
@@ -228,17 +248,23 @@ export class BacktestTradeSimulator {
     quantity: Decimal,
     feeRate: Decimal,
     adversePriceImpactRate: Decimal,
-  ): BacktestSellFill {
-    const referencePrice = new SimulationDecimal(candle.openPrice);
-    const price = referencePrice.times(
-      new SimulationDecimal(1).minus(adversePriceImpactRate),
+    tickSize: string,
+  ): BacktestSellFill | null {
+    const fillPrice = this.fillPriceCalculator.calculate(
+      'sell',
+      candle.openPrice,
+      adversePriceImpactRate.toFixed(),
+      tickSize,
     );
+    if (!fillPrice.executablePrice) return null;
+    const price = new SimulationDecimal(fillPrice.executablePrice);
     const notional = price.times(quantity);
     const fee = notional.times(feeRate);
     return {
       side: 'sell',
       quantity: quantity.toFixed(),
-      referencePrice: referencePrice.toFixed(),
+      referencePrice: fillPrice.referencePrice,
+      adjustedPrice: fillPrice.adjustedPrice,
       price: price.toFixed(),
       notional: notional.toFixed(),
       feeRate: feeRate.toFixed(),

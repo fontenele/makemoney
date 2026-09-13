@@ -347,3 +347,9 @@ Durations are exact safe integer milliseconds. Ratios and averages use precision
 Backtests carry their own provider-neutral minimum/maximum quantity, step size, and minimum-notional snapshot. They do not query current Binance metadata, because doing so would make an old replay depend on mutable present-day rules. The complete normalized snapshot is returned with the result for reproducibility.
 
 Fixed quantity must satisfy range and exact step-size constraints before simulation. Minimum notional is assessed per potential fill using its effective post-spread/slippage price. Failed buys preserve cash; failed sells preserve the open position; neither enters downstream ledgers. Quantity is rejected rather than silently rounded.
+
+## M6.14 conservative side-aware price quantization
+
+The historical rule snapshot now includes tick size. After adverse spread and slippage, buy prices round upward and sell prices round downward. This prevents precision normalization from accidentally improving a simulated execution. Reference, adjusted, and executable prices remain separately inspectable in each fill.
+
+The executable price is the sole source for notional and every downstream financial result. Minimum notional is deliberately checked afterward. A sell floored to zero is not executable and preserves the open position instead of manufacturing an invalid fill.

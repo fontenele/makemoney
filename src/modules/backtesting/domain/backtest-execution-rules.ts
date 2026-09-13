@@ -3,4 +3,5 @@ export interface BacktestExecutionRules {
   maxQuantity: string;
   stepSize: string;
   minNotional: string;
+  tickSize: string;
 }
