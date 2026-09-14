@@ -431,3 +431,9 @@ The caller-supplied idempotency key is unique and paired with a SHA-256 request 
 The first read operation is deliberately a primary-key lookup rather than a list. UUID validation occurs at the HTTP boundary, while absence remains distinct from database unavailability. The public response excludes idempotency keys and request fingerprints because those fields support persistence coordination rather than interpretation of the research result.
 
 Retrieval returns the stored JSON snapshot exactly and cannot invoke simulation or market-data loading. This creates the smallest useful read contract for later local tooling without introducing pagination, retention, deletion, or mutable run lifecycle semantics.
+
+## M6.28 bounded recent run listing
+
+The first collection read uses a strict bounded limit with a conservative default rather than unbounded history. PostgreSQL orders by creation time and then UUID descending, matching the existing composite index and making ties deterministic. Public list items reuse the direct-lookup projection so persistence coordination fields remain private.
+
+This increment deliberately stops before cursor pagination and filtering. The local dataset can now support a simple recent-runs view while pagination identity, query semantics, retention, and deletion remain separate decisions.

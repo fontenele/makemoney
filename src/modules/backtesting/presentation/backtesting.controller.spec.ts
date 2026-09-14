@@ -12,6 +12,51 @@ import { BacktestExecutionRulesValidator } from '../application/backtest-executi
 import { BacktestRunService } from '../application/backtest-run.service';
 
 describe('BacktestingController', () => {
+  it('returns recent backtest runs with a default bounded limit', async () => {
+    const runs = [
+      {
+        id: '00000000-0000-4000-8000-000000000001',
+        createdAt: new Date('2026-09-13T20:30:00.000Z'),
+        request: {},
+        result: {},
+      },
+    ];
+    const findRecent = jest.fn(() => Promise.resolve(runs));
+    const controller = controllerWith({}, { findRecent });
+
+    await expect(controller.getRuns()).resolves.toBe(runs);
+    expect(findRecent).toHaveBeenCalledWith(50);
+  });
+
+  it('accepts an explicit recent-run limit', async () => {
+    const findRecent = jest.fn(() => Promise.resolve([]));
+    const controller = controllerWith({}, { findRecent });
+    await expect(controller.getRuns('10')).resolves.toEqual([]);
+    expect(findRecent).toHaveBeenCalledWith(10);
+  });
+
+  it.each(['0', '101', '1.5', '-1', 'abc', '01'])(
+    'rejects invalid recent-run limit %s',
+    async (limit) => {
+      const findRecent = jest.fn();
+      const controller = controllerWith({}, { findRecent });
+      await expect(controller.getRuns(limit)).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
+      expect(findRecent).not.toHaveBeenCalled();
+    },
+  );
+
+  it('sanitizes an operational recent-run lookup failure', async () => {
+    const controller = controllerWith(
+      {},
+      { findRecent: jest.fn(() => Promise.reject(new Error('database'))) },
+    );
+    await expect(controller.getRuns()).rejects.toBeInstanceOf(
+      ServiceUnavailableException,
+    );
+  });
+
   it('returns a stored backtest run by UUID', async () => {
     const id = '00000000-0000-4000-8000-000000000001';
     const stored = {
@@ -172,7 +217,12 @@ function controllerWith(
     new BacktestSimulationRequestValidator(
       new BacktestExecutionRulesValidator(),
     ),
-    { create: jest.fn(), findById: jest.fn(), ...runs } as BacktestRunService,
+    {
+      create: jest.fn(),
+      findById: jest.fn(),
+      findRecent: jest.fn(),
+      ...runs,
+    } as BacktestRunService,
   );
 }
 

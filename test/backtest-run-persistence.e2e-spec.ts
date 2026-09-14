@@ -19,10 +19,14 @@ describe('Backtest run persistence (e2e)', () => {
   });
 
   beforeEach(() =>
-    prisma.backtestRun.deleteMany({ where: { idempotencyKey: key } }),
+    prisma.backtestRun.deleteMany({
+      where: { idempotencyKey: { startsWith: key } },
+    }),
   );
   afterAll(async () => {
-    await prisma.backtestRun.deleteMany({ where: { idempotencyKey: key } });
+    await prisma.backtestRun.deleteMany({
+      where: { idempotencyKey: { startsWith: key } },
+    });
     await prisma.onModuleDestroy();
   });
 
@@ -48,6 +52,30 @@ describe('Backtest run persistence (e2e)', () => {
     await expect(
       repository.findById('00000000-0000-4000-8000-000000000099'),
     ).resolves.toBeUndefined();
+  });
+
+  it('returns recent runs newest first with a strict limit', async () => {
+    const first = await repository.create({
+      idempotencyKey: key,
+      requestFingerprint: 'a'.repeat(64),
+      request: { sequence: 'first' },
+      result: {},
+    });
+    const second = await repository.create({
+      idempotencyKey: `${key}-second`,
+      requestFingerprint: 'b'.repeat(64),
+      request: { sequence: 'second' },
+      result: {},
+    });
+    await prisma.backtestRun.update({
+      where: { id: first.run.id },
+      data: { createdAt: new Date('2000-01-01T00:00:00.000Z') },
+    });
+
+    const recent = await repository.findRecent(1);
+    expect(recent).toHaveLength(1);
+    expect(recent[0]?.id).toBe(second.run.id);
+    expect(recent[0]?.id).not.toBe(first.run.id);
   });
 
   it('rejects conflicting idempotency-key reuse', async () => {

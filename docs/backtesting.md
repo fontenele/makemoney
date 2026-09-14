@@ -333,8 +333,19 @@ M6.27 adds read-only `GET /backtesting/runs/:id` for one previously persisted si
 - Missing runs return HTTP 404, invalid UUIDs return HTTP 400, and operational database failures return a sanitized HTTP 503.
 - Listing, pagination, filtering, update, and deletion are not introduced.
 
+## M6.28 bounded recent run listing
+
+M6.28 adds read-only `GET /backtesting/runs` for recent persisted simulation snapshots.
+
+- The optional `limit` query parameter is a canonical positive integer from 1 through 100 and defaults to 50.
+- Results are ordered by creation time descending and UUID descending, providing deterministic newest-first ordering.
+- Each item uses the same public stored-run shape as direct lookup and excludes idempotency keys and request fingerprints.
+- The route reads PostgreSQL only and never recalculates, loads candles, contacts Binance, or mutates a run.
+- Invalid limits return HTTP 400 and operational failures return a sanitized HTTP 503.
+- Cursor pagination, filtering, deletion, retention, and updates are not introduced.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, result persistence, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, and parameter optimization remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, cursor pagination, run deletion, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, and parameter optimization remain deferred and require separate approval.

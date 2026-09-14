@@ -32,6 +32,39 @@ describe('BacktestRunService', () => {
     await expect(service.findById(storedRun().id)).resolves.toBeUndefined();
   });
 
+  it('returns recent runs without persistence metadata', async () => {
+    const first = storedRun();
+    const second = {
+      ...storedRun(),
+      id: '00000000-0000-4000-8000-000000000002',
+    };
+    const repository = repositoryWith({
+      findRecent: jest.fn(() => Promise.resolve([second, first])),
+    });
+    const service = new BacktestRunService(
+      {} as HistoricalStrategyReplayService,
+      repository,
+    );
+
+    await expect(service.findRecent(2)).resolves.toEqual([
+      {
+        id: second.id,
+        createdAt: second.createdAt,
+        request: second.request,
+        result: second.result,
+      },
+      {
+        id: first.id,
+        createdAt: first.createdAt,
+        request: first.request,
+        result: first.result,
+      },
+    ]);
+    // Repository methods are Jest mocks in this test fixture.
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(repository.findRecent).toHaveBeenCalledWith(2);
+  });
+
   it('returns an identical existing run without recalculating', async () => {
     const existing = storedRun();
     const repository = repositoryWith({
@@ -101,6 +134,7 @@ function repositoryWith(
 ): BacktestRunRepository {
   return {
     findById: jest.fn(() => Promise.resolve(undefined)),
+    findRecent: jest.fn(() => Promise.resolve([])),
     findByIdempotencyKey: jest.fn(() => Promise.resolve(undefined)),
     create: jest.fn<BacktestRunRepository['create']>((run) =>
       Promise.resolve({

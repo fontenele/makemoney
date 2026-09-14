@@ -17,6 +17,15 @@ export class PrismaBacktestRunRepository implements BacktestRunRepository {
     return run ? mapRun(run) : undefined;
   }
 
+  async findRecent(limit: number): Promise<BacktestRun[]> {
+    return (
+      await this.prisma.backtestRun.findMany({
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        take: limit,
+      })
+    ).map(mapRun);
+  }
+
   async findByIdempotencyKey(key: string): Promise<BacktestRun | undefined> {
     const run = await this.prisma.backtestRun.findUnique({
       where: { idempotencyKey: key },

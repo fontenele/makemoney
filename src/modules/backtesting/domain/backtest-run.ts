@@ -14,6 +14,7 @@ export interface BacktestRun {
 
 export interface BacktestRunRepository {
   findById(id: string): Promise<BacktestRun | undefined>;
+  findRecent(limit: number): Promise<BacktestRun[]>;
   findByIdempotencyKey(key: string): Promise<BacktestRun | undefined>;
   create(
     run: Omit<BacktestRun, 'id' | 'createdAt'>,

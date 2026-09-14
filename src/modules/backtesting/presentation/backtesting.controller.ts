@@ -10,6 +10,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { HistoricalStrategyReplayService } from '../application/historical-strategy-replay.service';
@@ -109,6 +110,21 @@ export class BacktestingController {
     }
   }
 
+  @Get('runs')
+  async getRuns(
+    @Query('limit') limit?: string,
+  ): Promise<StoredBacktestRunResponse[]> {
+    const validLimit = validRunLimit(limit);
+    try {
+      return await this.runs.findRecent(validLimit);
+    } catch {
+      throw new ServiceUnavailableException({
+        message: 'Backtest runs are currently unavailable',
+        reason: 'backtest_runs_unavailable',
+      });
+    }
+  }
+
   private validSimulationRequest(value: unknown): {
     request: HistoricalCandleRequest;
     configuration: BacktestSimulationConfiguration;
@@ -151,6 +167,20 @@ function validUuid(value: string): string {
     throw new BadRequestException('Invalid backtest run id');
   }
   return value;
+}
+
+function validRunLimit(value: string | undefined): number {
+  if (value === undefined) {
+    return 50;
+  }
+  if (!/^[1-9]\d*$/.test(value)) {
+    throw new BadRequestException('limit must be an integer from 1 to 100');
+  }
+  const limit = Number(value);
+  if (limit > 100) {
+    throw new BadRequestException('limit must be an integer from 1 to 100');
+  }
+  return limit;
 }
 
 function validIdempotencyKey(value: string | undefined): string {

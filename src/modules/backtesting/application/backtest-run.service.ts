@@ -37,6 +37,10 @@ export class BacktestRunService {
     return storedResponse(run);
   }
 
+  async findRecent(limit: number): Promise<StoredBacktestRunResponse[]> {
+    return (await this.repository.findRecent(limit)).map(storedResponse);
+  }
+
   async create(
     idempotencyKey: string,
     request: HistoricalCandleRequest,

@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-13 — M6.28 bounded recent simulation-run listing completed
+
+### Added
+
+- Read-only `GET /backtesting/runs` returning immutable simulation snapshots newest first.
+- Strict optional `limit` validation from 1 through 100 with a default of 50 and sanitized operational failure handling.
+- Unit, HTTP E2E, and PostgreSQL-backed coverage for projection, bounds, deterministic ordering, and strict limiting.
+
+### Changed
+
+- Extended the backtest-run repository and application service with bounded recent reads using the existing creation-time and UUID index.
+- Added the route to the root README and synchronized backtesting documentation, project context, roadmap, plan, map, decisions, changelog, and current state.
+
+### Verification
+
+- 391 unit tests passed across 55 suites; 36 E2E tests passed across 3 suites.
+- Lint, formatting check, TypeScript build, Compose validation, and diff whitespace validation passed.
+- No cursor pagination, filtering, deletion, update, recalculation, Binance access, financial mutation, exchange authentication, order submission, or real trading was introduced.
+
 ## 2026-09-13 — M6.27 immutable simulation-run retrieval completed
 
 ### Added
