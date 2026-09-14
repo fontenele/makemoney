@@ -10,6 +10,7 @@ import {
   SPOT_SYMBOL_REPOSITORY,
   SpotSymbolCatalog,
   SpotSymbolCatalogProvider,
+  SpotSymbol,
   SpotSymbolRepository,
 } from '../domain/spot-symbol-catalog';
 
@@ -18,6 +19,7 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(SpotSymbolCatalogService.name);
   private readonly abortController = new AbortController();
   private catalog?: SpotSymbolCatalog;
+  private newlyObservedSymbols: SpotSymbol[] = [];
 
   constructor(
     @Inject(SPOT_SYMBOL_CATALOG_PROVIDER)
@@ -38,14 +40,20 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
     return this.catalog;
   }
 
+  latestNewlyObserved(): SpotSymbol[] {
+    return [...this.newlyObservedSymbols];
+  }
+
   private async load(): Promise<void> {
     try {
       const catalog = await this.provider.load(this.abortController.signal);
-      await this.repository.observe(catalog);
+      const newlyObservedSymbols = await this.repository.observe(catalog);
       this.catalog = catalog;
+      this.newlyObservedSymbols = newlyObservedSymbols;
       this.logger.log({
         event: 'new_listings.catalog_loaded',
         symbolCount: this.catalog.symbols.length,
+        newlyObservedCount: newlyObservedSymbols.length,
         receivedAt: this.catalog.receivedAt.toISOString(),
       });
     } catch (error: unknown) {

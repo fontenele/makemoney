@@ -463,3 +463,7 @@ A listing cannot be inferred from one exchange snapshot. M7 therefore begins wit
 ## M7.2 immutable first observation with mutable current state
 
 Provider and symbol form the durable identity. An upsert preserves `firstObservedAt` while updating `lastObservedAt` and current catalog fields in one transaction, enabling later comparisons without rewriting observation history or implying knowledge of the exchange's actual listing time.
+
+## M7.3 first population is not a listing event
+
+The repository compares a non-empty catalog against all existing rows for that provider before writing the current observation, within one serializable transaction. With no existing provider rows, it establishes a baseline and returns no additions. With an established baseline, only previously absent current symbols are newly observed. This conservative rule avoids presenting every symbol from a fresh installation as a new listing and keeps detection atomic with persistence.

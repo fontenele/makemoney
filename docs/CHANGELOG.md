@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.3 conservative newly observed detection completed
+
+- Compared each non-empty Spot catalog with its durable provider baseline in the same serializable transaction used for observation upserts.
+- Made the first provider population baseline-only and returned only later previously unseen symbols as newly observed.
+- Retained the latest newly observed set in the startup catalog service and logged its count without adding polling, routes, alerts, signals, or trading.
+- 413 unit tests and all 42 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — M7.2 durable symbol observations completed
 
 - Added transactional PostgreSQL persistence for first/latest application observations and current Spot symbol state.

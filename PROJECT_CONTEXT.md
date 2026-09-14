@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1 loads and retains a provider-neutral public Binance Spot/USDT symbol catalog as the baseline for later listing detection.
+- M6 is closed. M7.1–M7.3 load, persist, and conservatively compare provider-neutral public Binance Spot/USDT symbol observations.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -141,6 +141,8 @@ M6.32 isolates E2E persistence in a disposable `crypto_trader_e2e` PostgreSQL sc
 M7.1 loads one public Binance exchange-information snapshot at startup, strictly normalizes USDT symbols and Spot availability, and retains the ordered catalog in memory. It does not yet compare snapshots, persist observations, expose a route, score assets, or trade.
 
 M7.2 transactionally persists catalog observations by provider and symbol. It preserves the first application observation and updates the latest observation and current provider state without claiming an official listing timestamp.
+
+M7.3 compares each successful observation with the durable provider baseline in the same serializable transaction. The first population is baseline-only; later symbols absent from that baseline are retained in memory as newly observed. It adds no polling, route, alert, score, signal, or trading behavior.
 
 Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

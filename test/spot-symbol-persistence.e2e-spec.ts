@@ -14,17 +14,25 @@ describe('Spot symbol observation persistence (e2e)', () => {
 
   afterAll(async () => prisma.onModuleDestroy());
 
+  beforeEach(async () => {
+    await prisma.observedSpotSymbol.deleteMany();
+  });
+
   it('preserves first observation and updates current state', async () => {
     const first = new Date('2026-09-14T01:00:00.000Z');
     const second = new Date('2026-09-14T02:00:00.000Z');
-    await repository.observe({
-      receivedAt: first,
-      symbols: [symbol('TRADING', true)],
-    });
-    await repository.observe({
-      receivedAt: second,
-      symbols: [symbol('BREAK', false)],
-    });
+    await expect(
+      repository.observe({
+        receivedAt: first,
+        symbols: [symbol('TRADING', true)],
+      }),
+    ).resolves.toEqual([]);
+    await expect(
+      repository.observe({
+        receivedAt: second,
+        symbols: [symbol('BREAK', false)],
+      }),
+    ).resolves.toEqual([]);
 
     await expect(
       prisma.observedSpotSymbol.findUnique({
@@ -36,6 +44,29 @@ describe('Spot symbol observation persistence (e2e)', () => {
       status: 'BREAK',
       spotTradingAllowed: false,
     });
+  });
+
+  it('detects only symbols absent from an established baseline', async () => {
+    const first = new Date('2026-09-14T01:00:00.000Z');
+    const second = new Date('2026-09-14T02:00:00.000Z');
+    await expect(
+      repository.observe({
+        receivedAt: first,
+        symbols: [symbol('TRADING', true)],
+      }),
+    ).resolves.toEqual([]);
+
+    const added = {
+      ...symbol('TRADING', true),
+      symbol: 'NEWUSDT',
+      baseAsset: 'NEW',
+    };
+    await expect(
+      repository.observe({
+        receivedAt: second,
+        symbols: [symbol('TRADING', true), added],
+      }),
+    ).resolves.toEqual([added]);
   });
 });
 

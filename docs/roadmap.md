@@ -105,12 +105,13 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.32 — complete:** disposable-schema E2E isolation keeps local application data untouched and restores repeatable full-suite validation; M6 is closed.
 - Later M6 increments require separate approval for bulk deletion, automatic retention, additional run filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, or optimization.
 
-## M7 — New Listing Scanner — next
+## M7 — New Listing Scanner — in progress
 
 Collect and statistically analyze newly listed assets without assuming the hypothesis is profitable.
 
 - **M7.1 — complete:** one public Binance Spot/USDT catalog snapshot is normalized behind a provider-neutral contract and retained as an in-memory baseline.
 - **M7.2 — complete:** idempotent PostgreSQL observations preserve first-seen time and update latest-seen provider state transactionally.
+- **M7.3 — complete:** serializable observation comparison treats the first population as baseline-only and identifies only later previously unseen symbols.
 
 ## M8 — Dashboard — planned
 
