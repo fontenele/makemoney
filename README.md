@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M5 and M6.1–M6.30 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M5 and M6.1–M6.31 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -67,6 +67,7 @@ Local base URL: `http://localhost:3000`. Docker Compose publishes it on host loo
 | `POST` | `/backtesting/runs` | Run and persist an immutable fictional simulation snapshot | Same body as `/backtesting/simulate`; requires `Idempotency-Key`; identical replay returns the stored run, conflicting reuse returns `409`, and operational failure returns `503` |
 | `GET` | `/backtesting/runs` | Filtered, cursor-paginated immutable simulation snapshots | Local, read-only; optional `limit=1..100`, UUID `cursor`, and inclusive UTC `createdFrom`/`createdTo`; returns `400` for invalid parameters and `503` when unavailable |
 | `GET` | `/backtesting/runs/:id` | Retrieve one immutable fictional simulation snapshot | Local, read-only; UUID path parameter; returns `400` for an invalid UUID, `404` when absent, and `503` when unavailable |
+| `DELETE` | `/backtesting/runs/:id` | Delete one stored fictional simulation snapshot | Local, destructive; UUID path parameter; returns `204` when deleted, `400` for an invalid UUID, `404` when absent, and `503` when unavailable; historical candles are preserved |
 
 There are no public balance-mutation, order-submission, strategy-mutation, dashboard, exchange-account, or real-trading routes.
 

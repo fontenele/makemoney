@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-13 — M6.31 explicit simulation-run deletion completed
+
+- Added `DELETE /backtesting/runs/:id` with validated UUID identity and explicit HTTP 204, 400, 404, and sanitized 503 outcomes.
+- A single conditional PostgreSQL deletion removes only the selected simulation snapshot; historical candles and all financial state remain untouched.
+- 404 unit tests passed across 55 suites. The focused HTTP deletion test and all 5 backtest-run persistence E2E tests passed; the full E2E run reached 35/40 but remains blocked by pre-existing `e2e-*` paper-trading residue in the shared local database.
+
 ## 2026-09-13 — M6.30 persisted-run temporal filtering completed
 
 - Added inclusive canonical UTC `createdFrom` and `createdTo` filters to `GET /backtesting/runs`, composed with limit and cursor.

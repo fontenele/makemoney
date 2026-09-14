@@ -77,6 +77,7 @@ describe('Application (e2e)', () => {
       },
     ]),
   );
+  const deleteBacktestRun = jest.fn(() => Promise.resolve(true));
 
   beforeAll(async () => {
     const pairMetadataProvider: PairMetadataProvider = {
@@ -103,6 +104,7 @@ describe('Application (e2e)', () => {
         create: createBacktestRun,
         findById: findBacktestRun,
         findRecent: findRecentBacktestRuns,
+        deleteById: deleteBacktestRun,
       })
       .compile();
 
@@ -200,6 +202,14 @@ describe('Application (e2e)', () => {
         result: { totalNetReturnUsdt: '1.25' },
       });
     expect(findBacktestRun).toHaveBeenCalledWith(id);
+  });
+
+  it('/backtesting/runs/:id (DELETE) deletes one stored run', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const id = '00000000-0000-4000-8000-000000000001';
+
+    await request(server).delete(`/backtesting/runs/${id}`).expect(204);
+    expect(deleteBacktestRun).toHaveBeenCalledWith(id);
   });
 
   it('/backtesting/runs (GET) returns cursor-paginated immutable runs', async () => {

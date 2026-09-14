@@ -38,6 +38,10 @@ export class BacktestRunService {
     return storedResponse(run);
   }
 
+  async deleteById(id: string): Promise<boolean> {
+    return this.repository.deleteById(id);
+  }
+
   async findRecent(
     limit: number,
     cursorId?: string,

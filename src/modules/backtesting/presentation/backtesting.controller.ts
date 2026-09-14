@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   ConflictException,
+  Delete,
   Get,
   Headers,
   HttpCode,
@@ -108,6 +109,25 @@ export class BacktestingController {
       }
       throw new ServiceUnavailableException({
         message: 'Backtest run is currently unavailable',
+        reason: 'backtest_run_unavailable',
+      });
+    }
+  }
+
+  @Delete('runs/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteRun(@Param('id') id: string): Promise<void> {
+    const validId = validUuid(id);
+    try {
+      if (!(await this.runs.deleteById(validId))) {
+        throw new NotFoundException('Backtest run was not found');
+      }
+    } catch (error: unknown) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new ServiceUnavailableException({
+        message: 'Backtest run could not be deleted',
         reason: 'backtest_run_unavailable',
       });
     }

@@ -33,6 +33,17 @@ describe('BacktestRunService', () => {
     await expect(service.findById(storedRun().id)).resolves.toBeUndefined();
   });
 
+  it('deletes a stored run by id', async () => {
+    const deleteById = jest.fn(() => Promise.resolve(true));
+    const service = new BacktestRunService(
+      {} as HistoricalStrategyReplayService,
+      repositoryWith({ deleteById }),
+    );
+
+    await expect(service.deleteById(storedRun().id)).resolves.toBe(true);
+    expect(deleteById).toHaveBeenCalledWith(storedRun().id);
+  });
+
   it('returns recent runs without persistence metadata', async () => {
     const first = storedRun();
     const second = {
@@ -182,6 +193,7 @@ function repositoryWith(
 ): BacktestRunRepository {
   return {
     findById: jest.fn(() => Promise.resolve(undefined)),
+    deleteById: jest.fn(() => Promise.resolve(false)),
     findRecent: jest.fn(() => Promise.resolve([])),
     findByIdempotencyKey: jest.fn(() => Promise.resolve(undefined)),
     create: jest.fn<BacktestRunRepository['create']>((run) =>

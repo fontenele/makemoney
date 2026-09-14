@@ -176,6 +176,44 @@ describe('BacktestingController', () => {
     ).rejects.toBeInstanceOf(ServiceUnavailableException);
   });
 
+  it('deletes an existing run', async () => {
+    const id = '00000000-0000-4000-8000-000000000001';
+    const deleteById = jest.fn(() => Promise.resolve(true));
+    const controller = controllerWith({}, { deleteById });
+
+    await expect(controller.deleteRun(id)).resolves.toBeUndefined();
+    expect(deleteById).toHaveBeenCalledWith(id);
+  });
+
+  it('returns not found when deleting an absent run', async () => {
+    const controller = controllerWith(
+      {},
+      { deleteById: jest.fn(() => Promise.resolve(false)) },
+    );
+    await expect(
+      controller.deleteRun('00000000-0000-4000-8000-000000000001'),
+    ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('rejects an invalid deletion UUID before repository access', async () => {
+    const deleteById = jest.fn();
+    const controller = controllerWith({}, { deleteById });
+    await expect(controller.deleteRun('not-a-uuid')).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+    expect(deleteById).not.toHaveBeenCalled();
+  });
+
+  it('sanitizes an operational run deletion failure', async () => {
+    const controller = controllerWith(
+      {},
+      { deleteById: jest.fn(() => Promise.reject(new Error('database'))) },
+    );
+    await expect(
+      controller.deleteRun('00000000-0000-4000-8000-000000000001'),
+    ).rejects.toBeInstanceOf(ServiceUnavailableException);
+  });
+
   it('runs fixed BTC/USDT one-minute replay for a valid bounded request', async () => {
     const result = { candleCount: 1 } as BacktestResult;
     const run = jest.fn(() => Promise.resolve(result));
@@ -291,6 +329,7 @@ function controllerWith(
     {
       create: jest.fn(),
       findById: jest.fn(),
+      deleteById: jest.fn(),
       findRecent: jest.fn(),
       ...runs,
     } as BacktestRunService,

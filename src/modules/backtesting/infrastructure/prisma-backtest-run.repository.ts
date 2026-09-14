@@ -17,6 +17,11 @@ export class PrismaBacktestRunRepository implements BacktestRunRepository {
     return run ? mapRun(run) : undefined;
   }
 
+  async deleteById(id: string): Promise<boolean> {
+    const result = await this.prisma.backtestRun.deleteMany({ where: { id } });
+    return result.count === 1;
+  }
+
   async findRecent(
     limit: number,
     cursor?: Pick<BacktestRun, 'id' | 'createdAt'>,

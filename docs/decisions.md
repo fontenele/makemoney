@@ -442,8 +442,12 @@ This increment deliberately stops before cursor pagination and filtering. The lo
 
 The public cursor is an existing run UUID rather than an encoded client-controlled timestamp. The application resolves it to the immutable `(createdAt, id)` pair, then applies an exclusive lexicographic boundary matching the indexed descending order. This avoids offset drift and prevents callers from supplying an arbitrary sort timestamp.
 
-The collection response remains an array for compatibility with M6.28. A caller continues while a full page is returned by passing the final item's UUID; an additional empty request can occur when the total is an exact multiple of the limit. Unknown cursors are invalid input because run deletion is not available and a valid exposed cursor should remain resolvable.
+The collection response remains an array for compatibility with M6.28. A caller continues while a full page is returned by passing the final item's UUID; an additional empty request can occur when the total is an exact multiple of the limit. Unknown cursors are invalid input. After M6.31, deleting a cursor run intentionally makes subsequent use of that cursor invalid rather than reconstructing its removed sort boundary.
 
 ## M6.30 inclusive temporal run filtering
 
 Creation filters use canonical UTC instants and inclusive comparisons. A cursor must belong to the requested interval, preventing ambiguous continuation when filters change; the existing index serves the query without migration.
+
+## M6.31 explicit single-run deletion
+
+Deletion is an explicit UUID-addressed command rather than retention policy or bulk cleanup. The repository uses one conditional database delete and reports whether a row existed, allowing HTTP to distinguish `204` from `404` without a read-before-delete race. Historical candles have no dependency on stored runs and remain untouched.

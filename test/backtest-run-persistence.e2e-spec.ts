@@ -54,6 +54,28 @@ describe('Backtest run persistence (e2e)', () => {
     ).resolves.toBeUndefined();
   });
 
+  it('deletes only the selected stored run', async () => {
+    const first = await repository.create({
+      idempotencyKey: key,
+      requestFingerprint: 'a'.repeat(64),
+      request: {},
+      result: {},
+    });
+    const second = await repository.create({
+      idempotencyKey: `${key}-preserved`,
+      requestFingerprint: 'b'.repeat(64),
+      request: {},
+      result: {},
+    });
+
+    await expect(repository.deleteById(first.run.id)).resolves.toBe(true);
+    await expect(repository.deleteById(first.run.id)).resolves.toBe(false);
+    await expect(repository.findById(first.run.id)).resolves.toBeUndefined();
+    await expect(repository.findById(second.run.id)).resolves.toEqual(
+      second.run,
+    );
+  });
+
   it('returns recent runs newest first with a strict limit', async () => {
     const first = await repository.create({
       idempotencyKey: key,

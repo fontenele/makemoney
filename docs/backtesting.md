@@ -359,8 +359,12 @@ M6.29 extends `GET /backtesting/runs` with an optional `cursor` while preserving
 
 `GET /backtesting/runs` accepts optional canonical UTC `createdFrom` and `createdTo`. Bounds are inclusive, ordered, compose with limit and cursor, and reject cursors outside the selected interval. The response remains an array and the operation remains PostgreSQL-only.
 
+## M6.31 explicit stored-run deletion
+
+`DELETE /backtesting/runs/:id` removes exactly one stored simulation snapshot by validated UUID. A successful deletion returns HTTP 204, an absent run returns 404, invalid identity returns 400, and operational failure is sanitized as 503. The command does not delete historical candles, perform recalculation, contact Binance, or mutate any paper or real financial state.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, additional run filtering and deletion, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, and parameter optimization remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, bulk run deletion, automatic retention, additional run filtering, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, and parameter optimization remain deferred and require separate approval.

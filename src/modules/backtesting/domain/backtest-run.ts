@@ -14,6 +14,7 @@ export interface BacktestRun {
 
 export interface BacktestRunRepository {
   findById(id: string): Promise<BacktestRun | undefined>;
+  deleteById(id: string): Promise<boolean>;
   findRecent(
     limit: number,
     cursor?: Pick<BacktestRun, 'id' | 'createdAt'>,
