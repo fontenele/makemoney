@@ -107,3 +107,9 @@ The values are documented in `.env.example` and available to the new-listings mo
 An internal cycle service now creates a unique claim token, claims one configured batch at an explicit clock instant, and passes each claimed checkpoint to a provider-neutral processor sequentially. Successful processing attempts ownership-safe completion; processor failures are isolated per item and remain eligible after lease expiry. The result reports claimed, completed, failed, and lost-lease counts.
 
 The cycle service is registered for later scheduling but has no production processor and is never invoked automatically. This increment therefore performs no live claim, timer, provider request, market sample, alert, score, signal, or trade.
+
+## M7.20 exact checkpoint market-observation contract
+
+The checkpoint processor now has a provider-neutral data boundary to target before any Binance adapter is introduced. Each observation carries the provider and canonical exchange symbol, exact-string last price, base and quote volumes, a non-negative safe-integer trade count, the provider's market-window open and close times, and the independent local receive time.
+
+Validation requires a positive price, non-negative volumes, a canonical uppercase alphanumeric symbol, valid times, and a non-inverted provider window. It deliberately does not compare the provider clock with the local receive clock, because clock skew must not turn a valid public response into corrupt data. This increment adds no HTTP request, persistence, checkpoint processor, timer, score, signal, or trade.

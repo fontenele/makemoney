@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.20 exact checkpoint market observation completed
+
+- Added a provider-neutral checkpoint market-observation and loader contract for canonical symbols, exact-string prices and volumes, trade counts, provider-window times, and local receive time.
+- Added strict pure validation without floating-point conversion or cross-clock assumptions.
+- Kept provider loading, observation persistence, production checkpoint processing, and background scheduling inactive and out of scope.
+- 515 unit tests across 64 suites and all 46 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-14 — M7.19 deterministic single checkpoint cycle completed
 
 - Added a provider-neutral single-cycle processor contract and orchestration service.

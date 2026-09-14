@@ -543,3 +543,9 @@ The module receives one immutable-shaped options object, keeping operational wir
 Claiming, per-item processing, and completion are composed in a manually invoked cycle before any timer is introduced. Checkpoints are processed sequentially to keep provider pressure and completion ordering predictable. A processor exception affects only its item; the lease is left intact so the existing expiry mechanism owns recovery rather than an implicit immediate retry.
 
 Completion returning false is counted separately as lost ownership, because treating it as processor failure would hide lease timing or competing-worker behavior. The cycle is wired for dependency injection but deliberately has no production processor or lifecycle hook, preventing real rows from being claimed before observation persistence exists.
+
+## M7.20 preserve provider market values before deriving performance
+
+Checkpoint market input is modeled as one provider-neutral snapshot rather than provider JSON. Price and volume fields remain canonical decimal strings so the boundary never introduces native floating-point arithmetic. Trade count is a non-negative safe integer, and the provider's window timestamps remain distinct from the local receive timestamp.
+
+Only the provider window is ordered. The local receive clock is intentionally not required to follow the provider close clock because ordinary clock skew could otherwise reject valid observations. Derived detection-relative returns and volume changes require durable snapshots and therefore remain outside this contract-only increment.
