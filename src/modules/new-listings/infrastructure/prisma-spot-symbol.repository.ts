@@ -131,25 +131,51 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
     status,
     spotTradingAllowed,
   }: DetectedSpotSymbolFilters): Promise<DetectedSpotSymbolSummary> {
-    const result = await this.prisma.observedSpotSymbol.aggregate({
-      where: {
-        ...(provider ? { provider } : {}),
-        ...(status ? { status } : {}),
-        ...(spotTradingAllowed !== undefined ? { spotTradingAllowed } : {}),
-        detectedAt: {
-          not: null,
-          ...(detectedFrom ? { gte: detectedFrom } : {}),
-          ...(detectedTo ? { lte: detectedTo } : {}),
-        },
+    const where = {
+      ...(provider ? { provider } : {}),
+      ...(status ? { status } : {}),
+      ...(spotTradingAllowed !== undefined ? { spotTradingAllowed } : {}),
+      detectedAt: {
+        not: null,
+        ...(detectedFrom ? { gte: detectedFrom } : {}),
+        ...(detectedTo ? { lte: detectedTo } : {}),
       },
-      _count: { _all: true },
-      _min: { detectedAt: true },
-      _max: { detectedAt: true },
-    });
+    } satisfies Prisma.ObservedSpotSymbolWhereInput;
+    const [result, byStatus, bySpotTradingAllowed] =
+      await this.prisma.$transaction([
+        this.prisma.observedSpotSymbol.aggregate({
+          where,
+          _count: { _all: true },
+          _min: { detectedAt: true },
+          _max: { detectedAt: true },
+        }),
+        this.prisma.observedSpotSymbol.groupBy({
+          by: ['status'],
+          where,
+          _count: { _all: true },
+          orderBy: { status: 'asc' },
+        }),
+        this.prisma.observedSpotSymbol.groupBy({
+          by: ['spotTradingAllowed'],
+          where,
+          _count: { _all: true },
+          orderBy: { spotTradingAllowed: 'asc' },
+        }),
+      ]);
     return {
       count: result._count._all,
       firstDetectedAt: result._min.detectedAt,
       lastDetectedAt: result._max.detectedAt,
+      byStatus: byStatus.map(({ status, _count }) => ({
+        status,
+        count: _count._all,
+      })),
+      bySpotTradingAllowed: bySpotTradingAllowed.map(
+        ({ spotTradingAllowed, _count }) => ({
+          spotTradingAllowed,
+          count: _count._all,
+        }),
+      ),
     };
   }
 }

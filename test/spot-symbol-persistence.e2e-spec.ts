@@ -158,6 +158,14 @@ describe('Spot symbol observation persistence (e2e)', () => {
       count: 3,
       firstDetectedAt: tied,
       lastDetectedAt: newest,
+      byStatus: [
+        { status: 'BREAK', count: 1 },
+        { status: 'TRADING', count: 2 },
+      ],
+      bySpotTradingAllowed: [
+        { spotTradingAllowed: false, count: 1 },
+        { spotTradingAllowed: true, count: 2 },
+      ],
     });
     await expect(
       repository.summarizeDetected({
@@ -171,6 +179,8 @@ describe('Spot symbol observation persistence (e2e)', () => {
       count: 1,
       firstDetectedAt: tied,
       lastDetectedAt: tied,
+      byStatus: [{ status: 'TRADING', count: 1 }],
+      bySpotTradingAllowed: [{ spotTradingAllowed: true, count: 1 }],
     });
   });
 
@@ -179,6 +189,8 @@ describe('Spot symbol observation persistence (e2e)', () => {
       count: 0,
       firstDetectedAt: null,
       lastDetectedAt: null,
+      byStatus: [],
+      bySpotTradingAllowed: [],
     });
   });
 });

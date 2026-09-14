@@ -36,6 +36,11 @@ export interface DetectedSpotSymbolSummary {
   count: number;
   firstDetectedAt: Date | null;
   lastDetectedAt: Date | null;
+  byStatus: Array<{ status: string; count: number }>;
+  bySpotTradingAllowed: Array<{
+    spotTradingAllowed: boolean;
+    count: number;
+  }>;
 }
 
 export class DetectedSpotSymbolCursorNotFoundError extends Error {

@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M6 and M7.1–M7.10 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M6 and M7.1–M7.11 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -63,7 +63,7 @@ Local base URL: `http://localhost:3000`. Docker Compose publishes it on host loo
 | `GET` | `/strategies/signals` | Recent persisted moving-average crossover signals, newest first | Local, read-only; optional `limit=1..100`, default `50` |
 | `GET` | `/strategies/signals/latest` | Latest persisted moving-average crossover signal | Local, read-only; returns `503` before the first persisted evaluation |
 | `GET` | `/new-listings` | Recently detected post-baseline Spot/USDT symbols, newest first | Local, read-only; optional `limit=1..100` (default `50`), `provider:symbol` cursor, canonical UTC `detectedFrom`/`detectedTo`, `provider=binance`, uppercase `status`, and `spotTradingAllowed=true\|false`; returns an empty array when none exist |
-| `GET` | `/new-listings/summary` | Aggregate detected-symbol coverage | Local, read-only; accepts the same time, provider, status, and Spot-availability filters as `/new-listings`; returns count plus first/last detection times |
+| `GET` | `/new-listings/summary` | Aggregate detected-symbol coverage and current-state composition | Local, read-only; accepts the same time, provider, status, and Spot-availability filters as `/new-listings`; returns count, first/last detection times, status counts, and Spot-availability counts |
 | `POST` | `/backtesting/replay` | Run deterministic BTC/USDT one-minute historical signal replay | Local, research-only; JSON body `{ "startTime": UTC ISO string, "endTime": UTC ISO string, "limit": 1..10000 }`; may cache public candles; returns `400` for invalid input and `503` when unavailable |
 | `POST` | `/backtesting/simulate` | Run complete fictional BTC/USDT historical simulation | Local, research-only; replay fields plus mandatory `configuration` containing decimal-string `quantity`, `feeRate`, `spreadRate`, `slippageRate`, `maximumVolumeParticipationRate`, `initialCapitalUsdt`, and complete `executionRules`; returns `400` for invalid input and `503` when unavailable |
 | `POST` | `/backtesting/runs` | Run and persist an immutable fictional simulation snapshot | Same body as `/backtesting/simulate`; requires `Idempotency-Key`; identical replay returns the stored run, conflicting reuse returns `409`, and operational failure returns `503` |

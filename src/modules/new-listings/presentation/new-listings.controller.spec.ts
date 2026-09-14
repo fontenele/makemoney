@@ -11,6 +11,8 @@ describe('NewListingsController', () => {
         count: 2,
         firstDetectedAt: new Date('2026-09-14T02:00:00.000Z'),
         lastDetectedAt: new Date('2026-09-14T03:00:00.000Z'),
+        byStatus: [{ status: 'TRADING', count: 2 }],
+        bySpotTradingAllowed: [{ spotTradingAllowed: true, count: 2 }],
       }),
     );
     const controller = new NewListingsController({ summarize });
@@ -33,7 +35,7 @@ describe('NewListingsController', () => {
     });
   });
 
-  it('applies list filter validation to the summary', async () => {
+  it('applies list filter validation to the summary', () => {
     const controller = new NewListingsController({
       summarize: jest.fn(() => Promise.resolve({})),
     });

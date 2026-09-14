@@ -57,3 +57,9 @@ A cursor must itself match every active filter so changing filters between pages
 `GET /new-listings/summary` aggregates the durable detection set after applying the same optional detection-time, provider, current-status, and current Spot-availability filters as the list route. It returns `count`, `firstDetectedAt`, and `lastDetectedAt`; both timestamps are null when no detection matches.
 
 The summary answers only how many application detections are represented and the bounds of that sample. It does not infer official listing times or introduce price tracking, pump/correction classification, alerts, scoring, signals, or trading.
+
+## M7.11 current-state sample composition
+
+The same summary now includes `byStatus` and `bySpotTradingAllowed` arrays, each containing deterministic ascending groups and exact counts. Total, temporal bounds, and both breakdowns are read in one PostgreSQL transaction so they describe one consistent matching sample.
+
+These groups describe the latest observed mutable provider state and remain subject to all active filters. They do not reconstruct historical state at detection time or add market-performance tracking.

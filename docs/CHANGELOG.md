@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.11 current-state sample composition completed
+
+- Extended the filtered detection summary with deterministic counts grouped by current provider status and Spot-trading availability.
+- Read the aggregate and both breakdowns in one PostgreSQL transaction for a consistent snapshot during concurrent catalog refreshes.
+- Kept the analysis limited to already persisted current state, without historical-state inference or market tracking.
+- 454 unit tests and all 45 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — M7.10 filtered detection summary completed
 
 - Added read-only `GET /new-listings/summary` over the complete matching durable detection sample.

@@ -499,3 +499,7 @@ Filters apply inside the existing PostgreSQL query and form part of cursor compa
 ## M7.10 aggregate the existing sample before market enrichment
 
 The first statistical new-listing read aggregates only facts already stored for durable detections: sample count and minimum/maximum application detection time. It reuses the list's filters but excludes pagination because the aggregation covers the full matching set. Null temporal bounds make an empty sample explicit without inventing observations or introducing market tracking prematurely.
+
+## M7.11 consistent current-state breakdowns
+
+Status and Spot-availability counts extend the existing summary rather than creating independent endpoints. The aggregate and both grouped queries run in one PostgreSQL transaction and return deterministically ordered arrays. This prevents internally mismatched summary sections during a concurrent catalog refresh while keeping the distinction between current provider state and immutable detection time explicit.

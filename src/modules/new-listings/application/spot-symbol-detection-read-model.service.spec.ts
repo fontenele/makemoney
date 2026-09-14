@@ -8,6 +8,8 @@ describe('SpotSymbolDetectionReadModelService', () => {
       count: 2,
       firstDetectedAt: new Date('2026-09-14T01:00:00.000Z'),
       lastDetectedAt: new Date('2026-09-14T02:00:00.000Z'),
+      byStatus: [{ status: 'TRADING', count: 2 }],
+      bySpotTradingAllowed: [{ spotTradingAllowed: true, count: 2 }],
     };
     const summarizeDetected = jest.fn(() => Promise.resolve(summary));
     const service = new SpotSymbolDetectionReadModelService({
