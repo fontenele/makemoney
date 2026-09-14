@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.7 detection-time filters completed
+
+- Added optional inclusive `detectedFrom` and `detectedTo` filters to `GET /new-listings`.
+- Required canonical millisecond-precision UTC timestamps and rejected malformed or inverted ranges before database access.
+- Applied the filters within the existing bounded deterministic detection query without a migration or mutation path.
+- 429 unit tests and all 42 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — M7.6 bounded detection API completed
 
 - Added local read-only `GET /new-listings` for durable post-baseline detections, newest first.

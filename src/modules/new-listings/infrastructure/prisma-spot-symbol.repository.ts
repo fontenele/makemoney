@@ -3,6 +3,7 @@ import { Prisma } from '../../../generated/prisma/client';
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
 import {
   DetectedSpotSymbol,
+  DetectedSpotSymbolQuery,
   SpotSymbolCatalog,
   SpotSymbol,
   SpotSymbolRepository,
@@ -62,9 +63,19 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
     );
   }
 
-  async listDetected(limit: number): Promise<DetectedSpotSymbol[]> {
+  async listDetected({
+    limit,
+    detectedFrom,
+    detectedTo,
+  }: DetectedSpotSymbolQuery): Promise<DetectedSpotSymbol[]> {
     const rows = await this.prisma.observedSpotSymbol.findMany({
-      where: { detectedAt: { not: null } },
+      where: {
+        detectedAt: {
+          not: null,
+          ...(detectedFrom ? { gte: detectedFrom } : {}),
+          ...(detectedTo ? { lte: detectedTo } : {}),
+        },
+      },
       orderBy: [{ detectedAt: 'desc' }, { provider: 'asc' }, { symbol: 'asc' }],
       take: limit,
     });

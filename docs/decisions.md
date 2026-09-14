@@ -479,3 +479,7 @@ Detection classification belongs on the durable provider/symbol observation beca
 ## M7.6 bounded read before research enrichment
 
 The first detection API is a simple bounded recent list rather than pagination or filtering. It reads only non-null detection markers and applies deterministic ordering by detection time, provider, and symbol. Current provider state is included for interpretation, while first-observation internals and baseline rows remain outside the public contract. Further filtering, cursors, alerts, scoring, and market tracking remain separate increments.
+
+## M7.7 canonical inclusive detection windows
+
+Detection-time filters use exact canonical millisecond UTC strings and inclusive PostgreSQL comparisons. Strict canonical input avoids timezone ambiguity and equivalent alternate encodings, while rejecting inverted ranges at the HTTP boundary prevents unnecessary repository work. The existing detection index serves the filtered newest-first query without a schema change.

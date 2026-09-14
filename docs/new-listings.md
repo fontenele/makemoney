@@ -33,3 +33,9 @@ The marker records when this application detected the symbol, not when Binance o
 `GET /new-listings` reads only rows with a non-null `detectedAt`, ordered by detection time descending with provider and symbol tie-breakers. The optional `limit` accepts integers from 1 through 100 and defaults to 50. No detections returns an empty array.
 
 Each response item contains provider, symbol, base and quote assets, current provider status and Spot availability, immutable application detection time, and latest observation time. The route is local and read-only; it cannot trigger refreshes, alerts, scoring, signals, orders, or financial mutation.
+
+## M7.7 inclusive detection-time filters
+
+`GET /new-listings` accepts optional `detectedFrom` and `detectedTo` parameters as canonical millisecond-precision UTC timestamps such as `2026-09-14T02:00:00.000Z`. Both boundaries are inclusive and combine with the existing bounded newest-first query. A malformed timestamp or a range whose start is after its end returns `400` before database access.
+
+Filtering does not alter ordering or expose baseline rows. Cursor pagination, provider/status filters, alerts, scoring, market tracking, signals, and trading remain outside this increment.

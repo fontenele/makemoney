@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
   DetectedSpotSymbol,
+  DetectedSpotSymbolQuery,
   SPOT_SYMBOL_REPOSITORY,
   SpotSymbolRepository,
 } from '../domain/spot-symbol-catalog';
@@ -15,7 +16,7 @@ export class SpotSymbolDetectionReadModelService {
     private readonly repository: SpotSymbolRepository,
   ) {}
 
-  listRecent(limit: number): Promise<DetectedSpotSymbol[]> {
-    return this.repository.listDetected(limit);
+  listRecent(query: DetectedSpotSymbolQuery): Promise<DetectedSpotSymbol[]> {
+    return this.repository.listDetected(query);
   }
 }

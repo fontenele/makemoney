@@ -90,13 +90,25 @@ describe('Spot symbol observation persistence (e2e)', () => {
       detectedAt: second,
     });
 
-    await expect(repository.listDetected(10)).resolves.toEqual([
+    await expect(
+      repository.listDetected({
+        limit: 10,
+        detectedFrom: second,
+        detectedTo: second,
+      }),
+    ).resolves.toEqual([
       {
         ...added,
         detectedAt: second,
         lastObservedAt: third,
       },
     ]);
+    await expect(
+      repository.listDetected({
+        limit: 10,
+        detectedFrom: new Date(second.getTime() + 1),
+      }),
+    ).resolves.toEqual([]);
   });
 });
 

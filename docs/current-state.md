@@ -16,6 +16,8 @@ M7.5 persists an immutable nullable application detection time for post-baseline
 
 M7.6 exposes recent durable detections through a bounded local read-only endpoint.
 
+M7.7 supports optional inclusive canonical UTC detection-time filters on that endpoint.
+
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
@@ -26,6 +28,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.4 polls without overlapping requests using `NEW_LISTINGS_POLL_INTERVAL_MS`, which defaults to 60 seconds and cannot be configured below five seconds.
 - M7.5 records `detectedAt` only when a symbol is first observed after an established provider baseline; later refreshes cannot rewrite it.
 - M7.6 exposes detected symbols newest first at `GET /new-listings`, with optional `limit=1..100` and a default of 50.
+- M7.7 adds validated optional `detectedFrom` and `detectedTo` filters and rejects inverted ranges before querying PostgreSQL.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -165,12 +168,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-14 after M7.6:
+The following passed on 2026-09-14 after M7.7:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 425 tests passed across 59 suites
+- `npm test -- --runInBand` — 429 tests passed across 59 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -189,7 +192,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.6 are committed milestone increments.
+M0 through M7.7 are committed milestone increments.
 
 ## Known issues and cautions
 
