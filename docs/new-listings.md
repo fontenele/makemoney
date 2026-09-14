@@ -69,3 +69,9 @@ These groups describe the latest observed mutable provider state and remain subj
 The domain defines an immutable ordered checkpoint specification at `T+0`, `T+5s`, `T+10s`, `T+30s`, `T+1m`, `T+5m`, `T+15m`, `T+1h`, and `T+24h`. A pure function projects these offsets from a valid application `detectedAt` into independent UTC instants.
 
 This increment establishes timing semantics only. It creates no persistence, scheduler, timer, provider request, market sample, alert, score, signal, or trade.
+
+## M7.13 durable observation checkpoints
+
+Each post-baseline detection now creates all nine schedule rows in the same serializable transaction as the detected symbol. Composite provider/symbol/label identity prevents duplicates, while target-time indexing prepares later due-work reads. The migration backfills checkpoints only for rows with a legitimate non-null detection time.
+
+No worker claims checkpoints and no market data is requested or stored in this increment.

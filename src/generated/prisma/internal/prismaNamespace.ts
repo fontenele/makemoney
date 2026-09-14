@@ -403,7 +403,8 @@ export const ModelName = {
   StrategySignal: 'StrategySignal',
   HistoricalCandleRecord: 'HistoricalCandleRecord',
   BacktestRun: 'BacktestRun',
-  ObservedSpotSymbol: 'ObservedSpotSymbol'
+  ObservedSpotSymbol: 'ObservedSpotSymbol',
+  ListingObservationCheckpoint: 'ListingObservationCheckpoint'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "observedSpotSymbol"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "observedSpotSymbol" | "listingObservationCheckpoint"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -941,6 +942,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ListingObservationCheckpoint: {
+      payload: Prisma.$ListingObservationCheckpointPayload<ExtArgs>
+      fields: Prisma.ListingObservationCheckpointFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ListingObservationCheckpointFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingObservationCheckpointPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ListingObservationCheckpointFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingObservationCheckpointPayload>
+        }
+        findFirst: {
+          args: Prisma.ListingObservationCheckpointFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingObservationCheckpointPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ListingObservationCheckpointFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingObservationCheckpointPayload>
+        }
+        findMany: {
+          args: Prisma.ListingObservationCheckpointFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingObservationCheckpointPayload>[]
+        }
+        create: {
+          args: Prisma.ListingObservationCheckpointCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingObservationCheckpointPayload>
+        }
+        createMany: {
+          args: Prisma.ListingObservationCheckpointCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ListingObservationCheckpointCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingObservationCheckpointPayload>[]
+        }
+        delete: {
+          args: Prisma.ListingObservationCheckpointDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingObservationCheckpointPayload>
+        }
+        update: {
+          args: Prisma.ListingObservationCheckpointUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingObservationCheckpointPayload>
+        }
+        deleteMany: {
+          args: Prisma.ListingObservationCheckpointDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ListingObservationCheckpointUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ListingObservationCheckpointUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingObservationCheckpointPayload>[]
+        }
+        upsert: {
+          args: Prisma.ListingObservationCheckpointUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingObservationCheckpointPayload>
+        }
+        aggregate: {
+          args: Prisma.ListingObservationCheckpointAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateListingObservationCheckpoint>
+        }
+        groupBy: {
+          args: Prisma.ListingObservationCheckpointGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ListingObservationCheckpointGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ListingObservationCheckpointCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ListingObservationCheckpointCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1084,6 +1159,18 @@ export const ObservedSpotSymbolScalarFieldEnum = {
 } as const
 
 export type ObservedSpotSymbolScalarFieldEnum = (typeof ObservedSpotSymbolScalarFieldEnum)[keyof typeof ObservedSpotSymbolScalarFieldEnum]
+
+
+export const ListingObservationCheckpointScalarFieldEnum = {
+  provider: 'provider',
+  symbol: 'symbol',
+  label: 'label',
+  offsetMs: 'offsetMs',
+  targetAt: 'targetAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ListingObservationCheckpointScalarFieldEnum = (typeof ListingObservationCheckpointScalarFieldEnum)[keyof typeof ListingObservationCheckpointScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1394,6 +1481,7 @@ export type GlobalOmitConfig = {
   historicalCandleRecord?: Prisma.HistoricalCandleRecordOmit
   backtestRun?: Prisma.BacktestRunOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
+  listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit
 }
 
 /* Types for Logging */

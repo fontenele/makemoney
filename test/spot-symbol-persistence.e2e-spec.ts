@@ -15,6 +15,7 @@ describe('Spot symbol observation persistence (e2e)', () => {
   afterAll(async () => prisma.onModuleDestroy());
 
   beforeEach(async () => {
+    await prisma.listingObservationCheckpoint.deleteMany();
     await prisma.observedSpotSymbol.deleteMany();
   });
 
@@ -76,6 +77,21 @@ describe('Spot symbol observation persistence (e2e)', () => {
     ).resolves.toMatchObject({
       firstObservedAt: second,
       detectedAt: second,
+    });
+    const checkpoints = await prisma.listingObservationCheckpoint.findMany({
+      where: { provider: 'binance', symbol: 'NEWUSDT' },
+      orderBy: { targetAt: 'asc' },
+    });
+    expect(checkpoints).toHaveLength(9);
+    expect(checkpoints[0]).toMatchObject({
+      label: 'T+0',
+      offsetMs: 0,
+      targetAt: second,
+    });
+    expect(checkpoints[8]).toMatchObject({
+      label: 'T+24h',
+      offsetMs: 86_400_000,
+      targetAt: new Date('2026-09-15T02:00:00.000Z'),
     });
 
     const third = new Date('2026-09-14T03:00:00.000Z');

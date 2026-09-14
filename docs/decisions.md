@@ -507,3 +507,7 @@ Status and Spot-availability counts extend the existing summary rather than crea
 ## M7.12 fix checkpoint semantics before scheduling
 
 The research checkpoints are defined as explicit millisecond offsets from the immutable application detection time, not wall-clock rounding or elapsed timers. A pure schedule builder produces independent UTC instants for all nine planned horizons and rejects invalid or out-of-range dates. Persistence, due-work recovery, provider data, and sampling remain separate decisions.
+
+## M7.13 checkpoints are durable detection children
+
+Checkpoint identity is provider, symbol, and schedule label. Rows retain offset and target time and are inserted in the detection transaction, preventing a committed detection without its research plan. The foreign key cascades only if the parent observation is explicitly removed. No processing state is added before a worker contract exists.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.13 durable observation checkpoints completed
+
+- Added an indexed PostgreSQL checkpoint table related to durable detected symbols.
+- Created all nine observation targets atomically and idempotently with each new detection.
+- Backfilled only existing rows with legitimate detection timestamps; no worker or market sampling was introduced.
+- 457 unit tests and all 45 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — M7.12 deterministic observation schedule completed
 
 - Defined the nine planned detection-relative research checkpoints as a provider-neutral domain contract.

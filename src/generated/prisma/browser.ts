@@ -52,3 +52,8 @@ export type BacktestRun = Prisma.BacktestRunModel
  * 
  */
 export type ObservedSpotSymbol = Prisma.ObservedSpotSymbolModel
+/**
+ * Model ListingObservationCheckpoint
+ * 
+ */
+export type ListingObservationCheckpoint = Prisma.ListingObservationCheckpointModel

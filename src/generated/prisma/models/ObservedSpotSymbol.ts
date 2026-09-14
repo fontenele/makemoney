@@ -214,6 +214,7 @@ export type ObservedSpotSymbolWhereInput = {
   firstObservedAt?: Prisma.DateTimeFilter<"ObservedSpotSymbol"> | Date | string
   lastObservedAt?: Prisma.DateTimeFilter<"ObservedSpotSymbol"> | Date | string
   detectedAt?: Prisma.DateTimeNullableFilter<"ObservedSpotSymbol"> | Date | string | null
+  observationCheckpoints?: Prisma.ListingObservationCheckpointListRelationFilter
 }
 
 export type ObservedSpotSymbolOrderByWithRelationInput = {
@@ -226,6 +227,7 @@ export type ObservedSpotSymbolOrderByWithRelationInput = {
   firstObservedAt?: Prisma.SortOrder
   lastObservedAt?: Prisma.SortOrder
   detectedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  observationCheckpoints?: Prisma.ListingObservationCheckpointOrderByRelationAggregateInput
 }
 
 export type ObservedSpotSymbolWhereUniqueInput = Prisma.AtLeast<{
@@ -242,6 +244,7 @@ export type ObservedSpotSymbolWhereUniqueInput = Prisma.AtLeast<{
   firstObservedAt?: Prisma.DateTimeFilter<"ObservedSpotSymbol"> | Date | string
   lastObservedAt?: Prisma.DateTimeFilter<"ObservedSpotSymbol"> | Date | string
   detectedAt?: Prisma.DateTimeNullableFilter<"ObservedSpotSymbol"> | Date | string | null
+  observationCheckpoints?: Prisma.ListingObservationCheckpointListRelationFilter
 }, "provider_symbol">
 
 export type ObservedSpotSymbolOrderByWithAggregationInput = {
@@ -284,6 +287,7 @@ export type ObservedSpotSymbolCreateInput = {
   firstObservedAt: Date | string
   lastObservedAt: Date | string
   detectedAt?: Date | string | null
+  observationCheckpoints?: Prisma.ListingObservationCheckpointCreateNestedManyWithoutDetectionInput
 }
 
 export type ObservedSpotSymbolUncheckedCreateInput = {
@@ -296,6 +300,7 @@ export type ObservedSpotSymbolUncheckedCreateInput = {
   firstObservedAt: Date | string
   lastObservedAt: Date | string
   detectedAt?: Date | string | null
+  observationCheckpoints?: Prisma.ListingObservationCheckpointUncheckedCreateNestedManyWithoutDetectionInput
 }
 
 export type ObservedSpotSymbolUpdateInput = {
@@ -308,6 +313,7 @@ export type ObservedSpotSymbolUpdateInput = {
   firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  observationCheckpoints?: Prisma.ListingObservationCheckpointUpdateManyWithoutDetectionNestedInput
 }
 
 export type ObservedSpotSymbolUncheckedUpdateInput = {
@@ -320,6 +326,7 @@ export type ObservedSpotSymbolUncheckedUpdateInput = {
   firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  observationCheckpoints?: Prisma.ListingObservationCheckpointUncheckedUpdateManyWithoutDetectionNestedInput
 }
 
 export type ObservedSpotSymbolCreateManyInput = {
@@ -399,6 +406,118 @@ export type ObservedSpotSymbolMinOrderByAggregateInput = {
   detectedAt?: Prisma.SortOrder
 }
 
+export type ObservedSpotSymbolScalarRelationFilter = {
+  is?: Prisma.ObservedSpotSymbolWhereInput
+  isNot?: Prisma.ObservedSpotSymbolWhereInput
+}
+
+export type ObservedSpotSymbolCreateNestedOneWithoutObservationCheckpointsInput = {
+  create?: Prisma.XOR<Prisma.ObservedSpotSymbolCreateWithoutObservationCheckpointsInput, Prisma.ObservedSpotSymbolUncheckedCreateWithoutObservationCheckpointsInput>
+  connectOrCreate?: Prisma.ObservedSpotSymbolCreateOrConnectWithoutObservationCheckpointsInput
+  connect?: Prisma.ObservedSpotSymbolWhereUniqueInput
+}
+
+export type ObservedSpotSymbolUpdateOneRequiredWithoutObservationCheckpointsNestedInput = {
+  create?: Prisma.XOR<Prisma.ObservedSpotSymbolCreateWithoutObservationCheckpointsInput, Prisma.ObservedSpotSymbolUncheckedCreateWithoutObservationCheckpointsInput>
+  connectOrCreate?: Prisma.ObservedSpotSymbolCreateOrConnectWithoutObservationCheckpointsInput
+  upsert?: Prisma.ObservedSpotSymbolUpsertWithoutObservationCheckpointsInput
+  connect?: Prisma.ObservedSpotSymbolWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ObservedSpotSymbolUpdateToOneWithWhereWithoutObservationCheckpointsInput, Prisma.ObservedSpotSymbolUpdateWithoutObservationCheckpointsInput>, Prisma.ObservedSpotSymbolUncheckedUpdateWithoutObservationCheckpointsInput>
+}
+
+export type ObservedSpotSymbolCreateWithoutObservationCheckpointsInput = {
+  provider: string
+  symbol: string
+  baseAsset: string
+  quoteAsset: string
+  status: string
+  spotTradingAllowed: boolean
+  firstObservedAt: Date | string
+  lastObservedAt: Date | string
+  detectedAt?: Date | string | null
+}
+
+export type ObservedSpotSymbolUncheckedCreateWithoutObservationCheckpointsInput = {
+  provider: string
+  symbol: string
+  baseAsset: string
+  quoteAsset: string
+  status: string
+  spotTradingAllowed: boolean
+  firstObservedAt: Date | string
+  lastObservedAt: Date | string
+  detectedAt?: Date | string | null
+}
+
+export type ObservedSpotSymbolCreateOrConnectWithoutObservationCheckpointsInput = {
+  where: Prisma.ObservedSpotSymbolWhereUniqueInput
+  create: Prisma.XOR<Prisma.ObservedSpotSymbolCreateWithoutObservationCheckpointsInput, Prisma.ObservedSpotSymbolUncheckedCreateWithoutObservationCheckpointsInput>
+}
+
+export type ObservedSpotSymbolUpsertWithoutObservationCheckpointsInput = {
+  update: Prisma.XOR<Prisma.ObservedSpotSymbolUpdateWithoutObservationCheckpointsInput, Prisma.ObservedSpotSymbolUncheckedUpdateWithoutObservationCheckpointsInput>
+  create: Prisma.XOR<Prisma.ObservedSpotSymbolCreateWithoutObservationCheckpointsInput, Prisma.ObservedSpotSymbolUncheckedCreateWithoutObservationCheckpointsInput>
+  where?: Prisma.ObservedSpotSymbolWhereInput
+}
+
+export type ObservedSpotSymbolUpdateToOneWithWhereWithoutObservationCheckpointsInput = {
+  where?: Prisma.ObservedSpotSymbolWhereInput
+  data: Prisma.XOR<Prisma.ObservedSpotSymbolUpdateWithoutObservationCheckpointsInput, Prisma.ObservedSpotSymbolUncheckedUpdateWithoutObservationCheckpointsInput>
+}
+
+export type ObservedSpotSymbolUpdateWithoutObservationCheckpointsInput = {
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  baseAsset?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteAsset?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  spotTradingAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type ObservedSpotSymbolUncheckedUpdateWithoutObservationCheckpointsInput = {
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  baseAsset?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteAsset?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  spotTradingAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+
+/**
+ * Count Type ObservedSpotSymbolCountOutputType
+ */
+
+export type ObservedSpotSymbolCountOutputType = {
+  observationCheckpoints: number
+}
+
+export type ObservedSpotSymbolCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  observationCheckpoints?: boolean | ObservedSpotSymbolCountOutputTypeCountObservationCheckpointsArgs
+}
+
+/**
+ * ObservedSpotSymbolCountOutputType without action
+ */
+export type ObservedSpotSymbolCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ObservedSpotSymbolCountOutputType
+   */
+  select?: Prisma.ObservedSpotSymbolCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ObservedSpotSymbolCountOutputType without action
+ */
+export type ObservedSpotSymbolCountOutputTypeCountObservationCheckpointsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ListingObservationCheckpointWhereInput
+}
 
 
 export type ObservedSpotSymbolSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -411,6 +530,8 @@ export type ObservedSpotSymbolSelect<ExtArgs extends runtime.Types.Extensions.In
   firstObservedAt?: boolean
   lastObservedAt?: boolean
   detectedAt?: boolean
+  observationCheckpoints?: boolean | Prisma.ObservedSpotSymbol$observationCheckpointsArgs<ExtArgs>
+  _count?: boolean | Prisma.ObservedSpotSymbolCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["observedSpotSymbol"]>
 
 export type ObservedSpotSymbolSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -450,10 +571,18 @@ export type ObservedSpotSymbolSelectScalar = {
 }
 
 export type ObservedSpotSymbolOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"provider" | "symbol" | "baseAsset" | "quoteAsset" | "status" | "spotTradingAllowed" | "firstObservedAt" | "lastObservedAt" | "detectedAt", ExtArgs["result"]["observedSpotSymbol"]>
+export type ObservedSpotSymbolInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  observationCheckpoints?: boolean | Prisma.ObservedSpotSymbol$observationCheckpointsArgs<ExtArgs>
+  _count?: boolean | Prisma.ObservedSpotSymbolCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type ObservedSpotSymbolIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ObservedSpotSymbolIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $ObservedSpotSymbolPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ObservedSpotSymbol"
-  objects: {}
+  objects: {
+    observationCheckpoints: Prisma.$ListingObservationCheckpointPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     provider: string
     symbol: string
@@ -858,6 +987,7 @@ readonly fields: ObservedSpotSymbolFieldRefs;
  */
 export interface Prisma__ObservedSpotSymbolClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  observationCheckpoints<T extends Prisma.ObservedSpotSymbol$observationCheckpointsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ObservedSpotSymbol$observationCheckpointsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ListingObservationCheckpointPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -913,6 +1043,10 @@ export type ObservedSpotSymbolFindUniqueArgs<ExtArgs extends runtime.Types.Exten
    */
   omit?: Prisma.ObservedSpotSymbolOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ObservedSpotSymbolInclude<ExtArgs> | null
+  /**
    * Filter, which ObservedSpotSymbol to fetch.
    */
   where: Prisma.ObservedSpotSymbolWhereUniqueInput
@@ -931,6 +1065,10 @@ export type ObservedSpotSymbolFindUniqueOrThrowArgs<ExtArgs extends runtime.Type
    */
   omit?: Prisma.ObservedSpotSymbolOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ObservedSpotSymbolInclude<ExtArgs> | null
+  /**
    * Filter, which ObservedSpotSymbol to fetch.
    */
   where: Prisma.ObservedSpotSymbolWhereUniqueInput
@@ -948,6 +1086,10 @@ export type ObservedSpotSymbolFindFirstArgs<ExtArgs extends runtime.Types.Extens
    * Omit specific fields from the ObservedSpotSymbol
    */
   omit?: Prisma.ObservedSpotSymbolOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ObservedSpotSymbolInclude<ExtArgs> | null
   /**
    * Filter, which ObservedSpotSymbol to fetch.
    */
@@ -997,6 +1139,10 @@ export type ObservedSpotSymbolFindFirstOrThrowArgs<ExtArgs extends runtime.Types
    */
   omit?: Prisma.ObservedSpotSymbolOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ObservedSpotSymbolInclude<ExtArgs> | null
+  /**
    * Filter, which ObservedSpotSymbol to fetch.
    */
   where?: Prisma.ObservedSpotSymbolWhereInput
@@ -1044,6 +1190,10 @@ export type ObservedSpotSymbolFindManyArgs<ExtArgs extends runtime.Types.Extensi
    * Omit specific fields from the ObservedSpotSymbol
    */
   omit?: Prisma.ObservedSpotSymbolOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ObservedSpotSymbolInclude<ExtArgs> | null
   /**
    * Filter, which ObservedSpotSymbols to fetch.
    */
@@ -1093,6 +1243,10 @@ export type ObservedSpotSymbolCreateArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.ObservedSpotSymbolOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ObservedSpotSymbolInclude<ExtArgs> | null
+  /**
    * The data needed to create a ObservedSpotSymbol.
    */
   data: Prisma.XOR<Prisma.ObservedSpotSymbolCreateInput, Prisma.ObservedSpotSymbolUncheckedCreateInput>
@@ -1140,6 +1294,10 @@ export type ObservedSpotSymbolUpdateArgs<ExtArgs extends runtime.Types.Extension
    * Omit specific fields from the ObservedSpotSymbol
    */
   omit?: Prisma.ObservedSpotSymbolOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ObservedSpotSymbolInclude<ExtArgs> | null
   /**
    * The data needed to update a ObservedSpotSymbol.
    */
@@ -1207,6 +1365,10 @@ export type ObservedSpotSymbolUpsertArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.ObservedSpotSymbolOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ObservedSpotSymbolInclude<ExtArgs> | null
+  /**
    * The filter to search for the ObservedSpotSymbol to update in case it exists.
    */
   where: Prisma.ObservedSpotSymbolWhereUniqueInput
@@ -1233,6 +1395,10 @@ export type ObservedSpotSymbolDeleteArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.ObservedSpotSymbolOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ObservedSpotSymbolInclude<ExtArgs> | null
+  /**
    * Filter which ObservedSpotSymbol to delete.
    */
   where: Prisma.ObservedSpotSymbolWhereUniqueInput
@@ -1253,6 +1419,30 @@ export type ObservedSpotSymbolDeleteManyArgs<ExtArgs extends runtime.Types.Exten
 }
 
 /**
+ * ObservedSpotSymbol.observationCheckpoints
+ */
+export type ObservedSpotSymbol$observationCheckpointsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ListingObservationCheckpoint
+   */
+  select?: Prisma.ListingObservationCheckpointSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ListingObservationCheckpoint
+   */
+  omit?: Prisma.ListingObservationCheckpointOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ListingObservationCheckpointInclude<ExtArgs> | null
+  where?: Prisma.ListingObservationCheckpointWhereInput
+  orderBy?: Prisma.ListingObservationCheckpointOrderByWithRelationInput | Prisma.ListingObservationCheckpointOrderByWithRelationInput[]
+  cursor?: Prisma.ListingObservationCheckpointWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ListingObservationCheckpointScalarFieldEnum | Prisma.ListingObservationCheckpointScalarFieldEnum[]
+}
+
+/**
  * ObservedSpotSymbol without action
  */
 export type ObservedSpotSymbolDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1264,4 +1454,8 @@ export type ObservedSpotSymbolDefaultArgs<ExtArgs extends runtime.Types.Extensio
    * Omit specific fields from the ObservedSpotSymbol
    */
   omit?: Prisma.ObservedSpotSymbolOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ObservedSpotSymbolInclude<ExtArgs> | null
 }

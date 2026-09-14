@@ -1715,7 +1715,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.12 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.13 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -2298,6 +2298,7 @@ M7.9 Current Provider-State Filters: DONE
 M7.10 Filtered Detection Summary: DONE
 M7.11 Current-State Sample Composition: DONE
 M7.12 Deterministic Observation Schedule: DONE
+M7.13 Durable Observation Checkpoints: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2316,5 +2317,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7.12 is complete. Select the next bounded M7 increment; scheduling, persistence, provider sampling, alerts, scoring, signals, and trading remain separate decisions.
+M7.13 is complete. Select the next bounded M7 increment; checkpoint claiming, provider sampling, alerts, scoring, signals, and trading remain separate decisions.
 ```

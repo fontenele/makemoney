@@ -10,6 +10,7 @@ import {
   SpotSymbol,
   SpotSymbolRepository,
 } from '../domain/spot-symbol-catalog';
+import { buildListingObservationSchedule } from '../domain/listing-observation-schedule';
 
 @Injectable()
 export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
@@ -58,6 +59,23 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
             }),
           ),
         );
+
+        if (newlyObserved.length > 0) {
+          await tx.listingObservationCheckpoint.createMany({
+            data: newlyObserved.flatMap(({ provider, symbol }) =>
+              buildListingObservationSchedule(catalog.receivedAt).map(
+                ({ label, offsetMs, targetAt }) => ({
+                  provider,
+                  symbol,
+                  label,
+                  offsetMs,
+                  targetAt,
+                }),
+              ),
+            ),
+            skipDuplicates: true,
+          });
+        }
 
         return newlyObserved;
       },

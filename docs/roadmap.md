@@ -121,6 +121,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.10 — complete:** a filtered read-only summary reports the durable detection sample count and its earliest/latest application detection times.
 - **M7.11 — complete:** the filtered summary reports deterministic current-status and Spot-availability group counts from one consistent database snapshot.
 - **M7.12 — complete:** a pure provider-neutral domain contract defines the nine detection-relative observation checkpoints without scheduling or collecting market data.
+- **M7.13 — complete:** all nine checkpoints are persisted atomically for each durable detection, with idempotent identity, target-time indexing, and safe detected-row backfill.
 
 ## M8 — Dashboard — planned
 

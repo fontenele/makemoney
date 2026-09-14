@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.12 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, and define the provider-neutral detection-relative observation schedule.
+- M6 is closed. M7.1–M7.13 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, and durably schedule detection-relative observation checkpoints.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -161,6 +161,8 @@ M7.10 exposes a read-only filtered summary containing the matching durable appli
 M7.11 extends that summary with deterministic counts grouped by current provider status and current Spot-trading availability, read consistently in one database transaction.
 
 M7.12 defines pure detection-relative targets at T+0, 5s, 10s, 30s, 1m, 5m, 15m, 1h, and 24h. It does not schedule work or collect market samples.
+
+M7.13 persists all nine targets atomically with each new detection and safely backfills already detected rows. It does not process checkpoints.
 
 Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

@@ -57,7 +57,8 @@ export const ModelName = {
   StrategySignal: 'StrategySignal',
   HistoricalCandleRecord: 'HistoricalCandleRecord',
   BacktestRun: 'BacktestRun',
-  ObservedSpotSymbol: 'ObservedSpotSymbol'
+  ObservedSpotSymbol: 'ObservedSpotSymbol',
+  ListingObservationCheckpoint: 'ListingObservationCheckpoint'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -180,6 +181,18 @@ export const ObservedSpotSymbolScalarFieldEnum = {
 } as const
 
 export type ObservedSpotSymbolScalarFieldEnum = (typeof ObservedSpotSymbolScalarFieldEnum)[keyof typeof ObservedSpotSymbolScalarFieldEnum]
+
+
+export const ListingObservationCheckpointScalarFieldEnum = {
+  provider: 'provider',
+  symbol: 'symbol',
+  label: 'label',
+  offsetMs: 'offsetMs',
+  targetAt: 'targetAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ListingObservationCheckpointScalarFieldEnum = (typeof ListingObservationCheckpointScalarFieldEnum)[keyof typeof ListingObservationCheckpointScalarFieldEnum]
 
 
 export const SortOrder = {
