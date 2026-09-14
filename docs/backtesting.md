@@ -344,8 +344,19 @@ M6.28 adds read-only `GET /backtesting/runs` for recent persisted simulation sna
 - Invalid limits return HTTP 400 and operational failures return a sanitized HTTP 503.
 - Cursor pagination, filtering, deletion, retention, and updates are not introduced.
 
+## M6.29 stable UUID cursor pagination
+
+M6.29 extends `GET /backtesting/runs` with an optional `cursor` while preserving its array response.
+
+- The cursor is the UUID of the last run received on the preceding page.
+- The service resolves that immutable run and uses its `createdAt` and `id` as the exclusive descending sort boundary.
+- PostgreSQL returns rows with an older creation time or, for equal timestamps, a lexically smaller UUID, matching `createdAt DESC, id DESC`.
+- Malformed and unknown cursors return HTTP 400; repository failures remain sanitized HTTP 503 responses.
+- A request without a cursor retains the M6.28 behavior, including the validated limit and default.
+- Offset pagination, response envelopes, generated next-cursor fields, filtering, deletion, and mutation are not introduced.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, cursor pagination, run deletion, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, and parameter optimization remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, run filtering and deletion, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, and parameter optimization remain deferred and require separate approval.

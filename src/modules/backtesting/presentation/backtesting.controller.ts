@@ -21,7 +21,10 @@ import {
   HistoricalBacktestSimulationResult,
 } from '../domain/backtest-simulation';
 import { HistoricalCandleRequest } from '../domain/historical-candle-provider';
-import { BacktestRunIdempotencyConflictError } from '../domain/backtest-run';
+import {
+  BacktestRunCursorNotFoundError,
+  BacktestRunIdempotencyConflictError,
+} from '../domain/backtest-run';
 import {
   BacktestRunResponse,
   BacktestRunService,
@@ -113,11 +116,16 @@ export class BacktestingController {
   @Get('runs')
   async getRuns(
     @Query('limit') limit?: string,
+    @Query('cursor') cursor?: string,
   ): Promise<StoredBacktestRunResponse[]> {
     const validLimit = validRunLimit(limit);
+    const validCursor = cursor === undefined ? undefined : validUuid(cursor);
     try {
-      return await this.runs.findRecent(validLimit);
-    } catch {
+      return await this.runs.findRecent(validLimit, validCursor);
+    } catch (error: unknown) {
+      if (error instanceof BacktestRunCursorNotFoundError) {
+        throw new BadRequestException(error.message);
+      }
       throw new ServiceUnavailableException({
         message: 'Backtest runs are currently unavailable',
         reason: 'backtest_runs_unavailable',

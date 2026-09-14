@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   BACKTEST_RUN_REPOSITORY,
   BacktestRun,
+  BacktestRunCursorNotFoundError,
   BacktestRunIdempotencyConflictError,
   BacktestRunRepository,
   JsonValue,
@@ -37,8 +38,19 @@ export class BacktestRunService {
     return storedResponse(run);
   }
 
-  async findRecent(limit: number): Promise<StoredBacktestRunResponse[]> {
-    return (await this.repository.findRecent(limit)).map(storedResponse);
+  async findRecent(
+    limit: number,
+    cursorId?: string,
+  ): Promise<StoredBacktestRunResponse[]> {
+    const cursor = cursorId
+      ? await this.repository.findById(cursorId)
+      : undefined;
+    if (cursorId && !cursor) {
+      throw new BacktestRunCursorNotFoundError();
+    }
+    return (await this.repository.findRecent(limit, cursor)).map(
+      storedResponse,
+    );
   }
 
   async create(

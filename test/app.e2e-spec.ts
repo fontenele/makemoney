@@ -202,11 +202,12 @@ describe('Application (e2e)', () => {
     expect(findBacktestRun).toHaveBeenCalledWith(id);
   });
 
-  it('/backtesting/runs (GET) returns bounded recent immutable runs', async () => {
+  it('/backtesting/runs (GET) returns cursor-paginated immutable runs', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const cursor = '00000000-0000-4000-8000-000000000001';
 
     await request(server)
-      .get('/backtesting/runs?limit=1')
+      .get(`/backtesting/runs?limit=1&cursor=${cursor}`)
       .expect(200)
       .expect([
         {
@@ -216,7 +217,12 @@ describe('Application (e2e)', () => {
           result: { totalNetReturnUsdt: '2.50' },
         },
       ]);
-    expect(findRecentBacktestRuns).toHaveBeenCalledWith(1);
+    expect(findRecentBacktestRuns).toHaveBeenCalledWith(1, cursor);
+  });
+
+  it('/backtesting/runs (GET) rejects a malformed cursor', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(server).get('/backtesting/runs?cursor=invalid').expect(400);
   });
 
   it('persists strategy signals idempotently and serves them after memory-independent reads', async () => {

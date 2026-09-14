@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-13 — M6.29 stable simulation-run cursor pagination completed
+
+### Added
+
+- Optional UUID `cursor` on `GET /backtesting/runs`, taken from the last item of the preceding page.
+- Exclusive keyset boundary over immutable creation time and UUID with explicit malformed and unknown-cursor handling.
+- Unit, HTTP E2E, and PostgreSQL-backed coverage for cursor resolution, boundary semantics, validation, and unchanged no-cursor behavior.
+
+### Changed
+
+- Extended recent-run reads with stable keyset pagination while preserving the existing array response and 1–100 limit contract.
+- Updated the root README route table and synchronized backtesting documentation, project context, roadmap, plan, map, decisions, changelog, and current state.
+
+### Verification
+
+- 396 unit tests passed across 55 suites; 37 E2E tests passed across 3 suites.
+- Lint, formatting check, TypeScript build, Compose validation, and diff whitespace validation passed.
+- No response envelope, offset pagination, filtering, deletion, update, recalculation, Binance access, financial mutation, exchange authentication, order submission, or real trading was introduced.
+
 ## 2026-09-13 — M6.28 bounded recent simulation-run listing completed
 
 ### Added

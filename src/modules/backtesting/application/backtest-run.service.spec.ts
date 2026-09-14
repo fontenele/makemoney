@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
 import {
+  BacktestRunCursorNotFoundError,
   BacktestRunIdempotencyConflictError,
   BacktestRunRepository,
 } from '../domain/backtest-run';
@@ -62,7 +63,33 @@ describe('BacktestRunService', () => {
     ]);
     // Repository methods are Jest mocks in this test fixture.
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(repository.findRecent).toHaveBeenCalledWith(2);
+    expect(repository.findRecent).toHaveBeenCalledWith(2, undefined);
+  });
+
+  it('resolves a recent-run cursor to its stable sort pair', async () => {
+    const cursor = storedRun();
+    const repository = repositoryWith({
+      findById: jest.fn(() => Promise.resolve(cursor)),
+    });
+    const service = new BacktestRunService(
+      {} as HistoricalStrategyReplayService,
+      repository,
+    );
+
+    await expect(service.findRecent(10, cursor.id)).resolves.toEqual([]);
+    // Repository methods are Jest mocks in this test fixture.
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(repository.findRecent).toHaveBeenCalledWith(10, cursor);
+  });
+
+  it('rejects a recent-run cursor that does not exist', async () => {
+    const service = new BacktestRunService(
+      {} as HistoricalStrategyReplayService,
+      repositoryWith(),
+    );
+    await expect(service.findRecent(10, storedRun().id)).rejects.toBeInstanceOf(
+      BacktestRunCursorNotFoundError,
+    );
   });
 
   it('returns an identical existing run without recalculating', async () => {

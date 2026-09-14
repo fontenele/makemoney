@@ -17,9 +17,20 @@ export class PrismaBacktestRunRepository implements BacktestRunRepository {
     return run ? mapRun(run) : undefined;
   }
 
-  async findRecent(limit: number): Promise<BacktestRun[]> {
+  async findRecent(
+    limit: number,
+    cursor?: Pick<BacktestRun, 'id' | 'createdAt'>,
+  ): Promise<BacktestRun[]> {
     return (
       await this.prisma.backtestRun.findMany({
+        where: cursor
+          ? {
+              OR: [
+                { createdAt: { lt: cursor.createdAt } },
+                { createdAt: cursor.createdAt, id: { lt: cursor.id } },
+              ],
+            }
+          : undefined,
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         take: limit,
       })

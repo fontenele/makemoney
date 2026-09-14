@@ -10,6 +10,7 @@ import { BacktestingController } from './backtesting.controller';
 import { BacktestSimulationRequestValidator } from '../application/backtest-simulation-request-validator';
 import { BacktestExecutionRulesValidator } from '../application/backtest-execution-rules-validator';
 import { BacktestRunService } from '../application/backtest-run.service';
+import { BacktestRunCursorNotFoundError } from '../domain/backtest-run';
 
 describe('BacktestingController', () => {
   it('returns recent backtest runs with a default bounded limit', async () => {
@@ -25,14 +26,45 @@ describe('BacktestingController', () => {
     const controller = controllerWith({}, { findRecent });
 
     await expect(controller.getRuns()).resolves.toBe(runs);
-    expect(findRecent).toHaveBeenCalledWith(50);
+    expect(findRecent).toHaveBeenCalledWith(50, undefined);
   });
 
   it('accepts an explicit recent-run limit', async () => {
     const findRecent = jest.fn(() => Promise.resolve([]));
     const controller = controllerWith({}, { findRecent });
     await expect(controller.getRuns('10')).resolves.toEqual([]);
-    expect(findRecent).toHaveBeenCalledWith(10);
+    expect(findRecent).toHaveBeenCalledWith(10, undefined);
+  });
+
+  it('passes a valid UUID cursor to recent-run lookup', async () => {
+    const cursor = '00000000-0000-4000-8000-000000000001';
+    const findRecent = jest.fn(() => Promise.resolve([]));
+    const controller = controllerWith({}, { findRecent });
+    await expect(controller.getRuns('10', cursor)).resolves.toEqual([]);
+    expect(findRecent).toHaveBeenCalledWith(10, cursor);
+  });
+
+  it('rejects a malformed recent-run cursor before lookup', async () => {
+    const findRecent = jest.fn();
+    const controller = controllerWith({}, { findRecent });
+    await expect(
+      controller.getRuns(undefined, 'invalid'),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(findRecent).not.toHaveBeenCalled();
+  });
+
+  it('maps an unknown recent-run cursor to bad request', async () => {
+    const controller = controllerWith(
+      {},
+      {
+        findRecent: jest.fn(() =>
+          Promise.reject(new BacktestRunCursorNotFoundError()),
+        ),
+      },
+    );
+    await expect(
+      controller.getRuns(undefined, '00000000-0000-4000-8000-000000000001'),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 
   it.each(['0', '101', '1.5', '-1', 'abc', '01'])(

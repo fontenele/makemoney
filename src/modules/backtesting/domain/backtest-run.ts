@@ -14,11 +14,21 @@ export interface BacktestRun {
 
 export interface BacktestRunRepository {
   findById(id: string): Promise<BacktestRun | undefined>;
-  findRecent(limit: number): Promise<BacktestRun[]>;
+  findRecent(
+    limit: number,
+    cursor?: Pick<BacktestRun, 'id' | 'createdAt'>,
+  ): Promise<BacktestRun[]>;
   findByIdempotencyKey(key: string): Promise<BacktestRun | undefined>;
   create(
     run: Omit<BacktestRun, 'id' | 'createdAt'>,
   ): Promise<{ run: BacktestRun; replayed: boolean }>;
+}
+
+export class BacktestRunCursorNotFoundError extends Error {
+  constructor() {
+    super('Backtest run cursor was not found');
+    this.name = BacktestRunCursorNotFoundError.name;
+  }
 }
 
 export class BacktestRunIdempotencyConflictError extends Error {

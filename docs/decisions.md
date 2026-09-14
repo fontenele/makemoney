@@ -437,3 +437,9 @@ Retrieval returns the stored JSON snapshot exactly and cannot invoke simulation 
 The first collection read uses a strict bounded limit with a conservative default rather than unbounded history. PostgreSQL orders by creation time and then UUID descending, matching the existing composite index and making ties deterministic. Public list items reuse the direct-lookup projection so persistence coordination fields remain private.
 
 This increment deliberately stops before cursor pagination and filtering. The local dataset can now support a simple recent-runs view while pagination identity, query semantics, retention, and deletion remain separate decisions.
+
+## M6.29 UUID cursor over the immutable sort pair
+
+The public cursor is an existing run UUID rather than an encoded client-controlled timestamp. The application resolves it to the immutable `(createdAt, id)` pair, then applies an exclusive lexicographic boundary matching the indexed descending order. This avoids offset drift and prevents callers from supplying an arbitrary sort timestamp.
+
+The collection response remains an array for compatibility with M6.28. A caller continues while a full page is returned by passing the final item's UUID; an additional empty request can occur when the total is an exact multiple of the limit. Unknown cursors are invalid input because run deletion is not available and a valid exposed cursor should remain resolvable.
