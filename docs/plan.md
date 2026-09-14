@@ -1715,7 +1715,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.7 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.8 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -2311,5 +2311,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7.7 is complete. Select the next bounded M7 increment without introducing alerts, scoring, signals, market tracking, or trading early.
+M7.8 is complete. Select the next bounded M7 increment without introducing alerts, scoring, signals, market tracking, or trading early.
 ```

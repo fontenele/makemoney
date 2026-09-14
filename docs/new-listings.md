@@ -39,3 +39,9 @@ Each response item contains provider, symbol, base and quote assets, current pro
 `GET /new-listings` accepts optional `detectedFrom` and `detectedTo` parameters as canonical millisecond-precision UTC timestamps such as `2026-09-14T02:00:00.000Z`. Both boundaries are inclusive and combine with the existing bounded newest-first query. A malformed timestamp or a range whose start is after its end returns `400` before database access.
 
 Filtering does not alter ordering or expose baseline rows. Cursor pagination, provider/status filters, alerts, scoring, market tracking, signals, and trading remain outside this increment.
+
+## M7.8 stable detection cursor
+
+`GET /new-listings` accepts an optional cursor in canonical `provider:symbol` form, for example `binance:NEWUSDT`. A client obtains the next page by using the provider and symbol of the final item from the preceding page. The repository resolves that durable identity to its immutable detection time and continues exclusively after the complete `(detectedAt DESC, provider ASC, symbol ASC)` sort position.
+
+The cursor must identify a detected row and must belong to the requested detection-time interval. Malformed, missing, baseline-only, and filter-incompatible cursors return `400`. The response remains a bounded array; provider/status filters, alerts, scoring, market tracking, signals, and trading remain outside this increment.

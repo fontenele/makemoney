@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
+  DetectedSpotSymbolCursorNotFoundError,
   DetectedSpotSymbol,
   DetectedSpotSymbolQuery,
   SPOT_SYMBOL_REPOSITORY,
@@ -16,7 +17,26 @@ export class SpotSymbolDetectionReadModelService {
     private readonly repository: SpotSymbolRepository,
   ) {}
 
-  listRecent(query: DetectedSpotSymbolQuery): Promise<DetectedSpotSymbol[]> {
-    return this.repository.listDetected(query);
+  async listRecent(
+    query: Omit<DetectedSpotSymbolQuery, 'cursor'>,
+    cursor?: { provider: 'binance'; symbol: string },
+  ): Promise<DetectedSpotSymbol[]> {
+    const resolvedCursor = cursor
+      ? await this.repository.findDetected(cursor.provider, cursor.symbol)
+      : undefined;
+    if (cursor && !resolvedCursor) {
+      throw new DetectedSpotSymbolCursorNotFoundError();
+    }
+    if (
+      resolvedCursor &&
+      ((query.detectedFrom && resolvedCursor.detectedAt < query.detectedFrom) ||
+        (query.detectedTo && resolvedCursor.detectedAt > query.detectedTo))
+    ) {
+      throw new DetectedSpotSymbolCursorNotFoundError();
+    }
+    return this.repository.listDetected({
+      ...query,
+      cursor: resolvedCursor ?? undefined,
+    });
   }
 }

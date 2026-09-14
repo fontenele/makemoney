@@ -4,7 +4,10 @@ import {
   MAX_DETECTED_SPOT_SYMBOL_LIMIT,
   SpotSymbolDetectionReadModelService,
 } from '../application/spot-symbol-detection-read-model.service';
-import { DetectedSpotSymbol } from '../domain/spot-symbol-catalog';
+import {
+  DetectedSpotSymbol,
+  DetectedSpotSymbolCursorNotFoundError,
+} from '../domain/spot-symbol-catalog';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -13,10 +16,11 @@ export class NewListingsController {
   ) {}
 
   @Get()
-  list(
+  async list(
     @Query('limit') limit?: string,
     @Query('detectedFrom') detectedFrom?: string,
     @Query('detectedTo') detectedTo?: string,
+    @Query('cursor') cursor?: string,
   ): Promise<DetectedSpotSymbol[]> {
     const parsedLimit = validLimit(limit);
     const parsedFrom = optionalUtcTimestamp(detectedFrom, 'detectedFrom');
@@ -26,12 +30,33 @@ export class NewListingsController {
         'detectedFrom must be at or before detectedTo',
       );
     }
-    return this.detections.listRecent({
-      limit: parsedLimit,
-      detectedFrom: parsedFrom,
-      detectedTo: parsedTo,
-    });
+    const parsedCursor = optionalCursor(cursor);
+    try {
+      return await this.detections.listRecent(
+        {
+          limit: parsedLimit,
+          detectedFrom: parsedFrom,
+          detectedTo: parsedTo,
+        },
+        parsedCursor,
+      );
+    } catch (error) {
+      if (error instanceof DetectedSpotSymbolCursorNotFoundError) {
+        throw new BadRequestException('cursor must identify a detected symbol');
+      }
+      throw error;
+    }
   }
+}
+
+function optionalCursor(value?: string) {
+  if (value === undefined) return undefined;
+  const match = /^(binance):([A-Z0-9]{1,40})$/.exec(value);
+  const symbol = match?.[2];
+  if (!symbol) {
+    throw new BadRequestException('cursor must use provider:symbol format');
+  }
+  return { provider: 'binance' as const, symbol };
 }
 
 function validLimit(value?: string): number {

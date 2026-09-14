@@ -483,3 +483,9 @@ The first detection API is a simple bounded recent list rather than pagination o
 ## M7.7 canonical inclusive detection windows
 
 Detection-time filters use exact canonical millisecond UTC strings and inclusive PostgreSQL comparisons. Strict canonical input avoids timezone ambiguity and equivalent alternate encodings, while rejecting inverted ranges at the HTTP boundary prevents unnecessary repository work. The existing detection index serves the filtered newest-first query without a schema change.
+
+## M7.8 composite detection cursor
+
+Detection rows have a durable composite provider/symbol identity rather than a synthetic UUID. The public cursor therefore uses canonical `provider:symbol` text and is resolved server-side to the immutable detection timestamp before applying an exclusive keyset boundary over the complete indexed sort order. This avoids offset drift and client-controlled timestamps without requiring a schema migration.
+
+A cursor outside the selected time interval is invalid, ensuring pagination cannot silently continue with changed filters. The existing array response is preserved; clients continue while a full page is returned by passing the final item's provider and symbol.

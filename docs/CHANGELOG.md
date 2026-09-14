@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.8 stable detection cursor completed
+
+- Added optional canonical `provider:symbol` cursor pagination to `GET /new-listings`.
+- Resolved cursors server-side and continued after the complete immutable detection sort position without offset drift.
+- Rejected malformed, missing, baseline-only, and time-filter-incompatible cursors explicitly.
+- 445 unit tests and all 43 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — Risk decimal startup validation fixed
 
 - Fixed startup validation so strictly positive fractional risk limits such as the default `RISK_MAX_BTC_POSITION_QUANTITY=0.01` are accepted.

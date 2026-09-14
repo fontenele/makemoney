@@ -63,31 +63,78 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
     );
   }
 
+  async findDetected(
+    provider: SpotSymbol['provider'],
+    symbol: string,
+  ): Promise<DetectedSpotSymbol | null> {
+    const row = await this.prisma.observedSpotSymbol.findUnique({
+      where: { provider_symbol: { provider, symbol } },
+    });
+    if (!row?.detectedAt) return null;
+    return toDetectedSpotSymbol(row);
+  }
+
   async listDetected({
     limit,
     detectedFrom,
     detectedTo,
+    cursor,
   }: DetectedSpotSymbolQuery): Promise<DetectedSpotSymbol[]> {
     const rows = await this.prisma.observedSpotSymbol.findMany({
       where: {
-        detectedAt: {
-          not: null,
-          ...(detectedFrom ? { gte: detectedFrom } : {}),
-          ...(detectedTo ? { lte: detectedTo } : {}),
-        },
+        AND: [
+          {
+            detectedAt: {
+              not: null,
+              ...(detectedFrom ? { gte: detectedFrom } : {}),
+              ...(detectedTo ? { lte: detectedTo } : {}),
+            },
+          },
+          ...(cursor
+            ? [
+                {
+                  OR: [
+                    { detectedAt: { lt: cursor.detectedAt } },
+                    {
+                      detectedAt: cursor.detectedAt,
+                      provider: { gt: cursor.provider },
+                    },
+                    {
+                      detectedAt: cursor.detectedAt,
+                      provider: cursor.provider,
+                      symbol: { gt: cursor.symbol },
+                    },
+                  ],
+                },
+              ]
+            : []),
+        ],
       },
       orderBy: [{ detectedAt: 'desc' }, { provider: 'asc' }, { symbol: 'asc' }],
       take: limit,
     });
-    return rows.map((row) => ({
-      provider: 'binance',
-      symbol: row.symbol,
-      baseAsset: row.baseAsset,
-      quoteAsset: 'USDT',
-      status: row.status,
-      spotTradingAllowed: row.spotTradingAllowed,
-      detectedAt: row.detectedAt!,
-      lastObservedAt: row.lastObservedAt,
-    }));
+    return rows.map(toDetectedSpotSymbol);
   }
+}
+
+function toDetectedSpotSymbol(row: {
+  provider: string;
+  symbol: string;
+  baseAsset: string;
+  quoteAsset: string;
+  status: string;
+  spotTradingAllowed: boolean;
+  detectedAt: Date | null;
+  lastObservedAt: Date;
+}): DetectedSpotSymbol {
+  return {
+    provider: 'binance',
+    symbol: row.symbol,
+    baseAsset: row.baseAsset,
+    quoteAsset: 'USDT',
+    status: row.status,
+    spotTradingAllowed: row.spotTradingAllowed,
+    detectedAt: row.detectedAt!,
+    lastObservedAt: row.lastObservedAt,
+  };
 }

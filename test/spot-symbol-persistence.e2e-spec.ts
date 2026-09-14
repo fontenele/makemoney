@@ -110,6 +110,29 @@ describe('Spot symbol observation persistence (e2e)', () => {
       }),
     ).resolves.toEqual([]);
   });
+
+  it('paginates detections after the stable provider and symbol cursor', async () => {
+    const newest = new Date('2026-09-14T03:00:00.000Z');
+    const tied = new Date('2026-09-14T02:00:00.000Z');
+    await prisma.observedSpotSymbol.createMany({
+      data: [
+        detectedRow('NEWESTUSDT', newest),
+        detectedRow('ALPHAUSDT', tied),
+        detectedRow('BETAUSDT', tied),
+      ],
+    });
+
+    const firstPage = await repository.listDetected({ limit: 2 });
+    expect(firstPage.map(({ symbol }) => symbol)).toEqual([
+      'NEWESTUSDT',
+      'ALPHAUSDT',
+    ]);
+    const cursor = await repository.findDetected('binance', 'ALPHAUSDT');
+    if (!cursor) throw new Error('Expected detected cursor');
+    await expect(
+      repository.listDetected({ limit: 2, cursor }),
+    ).resolves.toMatchObject([{ symbol: 'BETAUSDT' }]);
+  });
 });
 
 function symbol(status: string, spotTradingAllowed: boolean) {
@@ -120,5 +143,19 @@ function symbol(status: string, spotTradingAllowed: boolean) {
     quoteAsset: 'USDT' as const,
     status,
     spotTradingAllowed,
+  };
+}
+
+function detectedRow(symbol: string, detectedAt: Date) {
+  return {
+    provider: 'binance',
+    symbol,
+    baseAsset: symbol.replace(/USDT$/, ''),
+    quoteAsset: 'USDT',
+    status: 'TRADING',
+    spotTradingAllowed: true,
+    firstObservedAt: detectedAt,
+    lastObservedAt: detectedAt,
+    detectedAt,
   };
 }
