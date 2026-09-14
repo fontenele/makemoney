@@ -525,3 +525,9 @@ The application service owns due-read input validation: time must be valid and l
 Checkpoint ownership uses a durable caller-generated token with explicit claim and expiry instants. Candidate selection and lease mutation are one PostgreSQL statement using `FOR UPDATE SKIP LOCKED`, so concurrent consumers cannot receive the same actively leased row. Expiry deliberately restores abandoned work without requiring a recovery job.
 
 The database requires the three lease fields to be either all absent or internally consistent. Completion, retry attempts, worker cadence, and the market observation payload remain separate decisions because this increment establishes ownership only.
+
+## M7.17 terminal completion belongs to the active owner
+
+Completion is a conditional atomic update rather than an unconditional timestamp write. Provider, symbol, label, and token must identify the row, the completion instant must fall at or after claim time and strictly before expiry, and `completedAt` must still be null. Returning a boolean keeps stale ownership and duplicate completion explicit without introducing an exception-driven worker policy.
+
+A database check preserves the same temporal invariant independently of the application. Completed rows remain immutable terminal work and are excluded at both read and claim boundaries. Observation payload persistence and failure/retry lifecycle remain separate because completion currently certifies lifecycle ownership only.

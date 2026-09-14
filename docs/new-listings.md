@@ -89,3 +89,9 @@ An internal application service now accepts only a valid due instant and an inte
 The internal application boundary can now claim a bounded due batch with a validated safe token, claim instant, and later expiry. PostgreSQL selects and updates candidates atomically with `FOR UPDATE SKIP LOCKED`; active leases are excluded and expired leases are reclaimable. Returned rows retain deterministic target/provider/symbol/label order.
 
 The database enforces all-or-none lease fields and a strictly later expiry. This increment adds no scheduler, worker loop, checkpoint completion, retry policy, provider request, market sample, alert, score, signal, or trade.
+
+## M7.17 ownership-safe checkpoint completion
+
+An internal completion command now validates checkpoint identity, lease token, and completion time before persistence access. PostgreSQL records `completedAt` only when the token matches, the completion falls within the active lease interval, and the checkpoint is not already complete. A failed ownership condition returns `false` without mutation.
+
+Completed checkpoints are terminal and excluded from both due reads and later claims. Database constraints bind completion time to the recorded lease interval. This increment adds no worker, retry policy, provider request, market sample, alert, score, signal, or trade.

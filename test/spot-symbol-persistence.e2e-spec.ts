@@ -289,6 +289,57 @@ describe('Spot symbol observation persistence (e2e)', () => {
     expect(reclaimed.every(({ claimToken }) => claimToken === 'worker-c')).toBe(
       true,
     );
+
+    const completedAt = new Date(reclaimedAt.getTime() + 1_000);
+    await expect(
+      repository.completeClaimedCheckpoint({
+        provider: 'binance',
+        symbol: 'LEASEUSDT',
+        label: 'T+0',
+        claimToken: 'wrong-worker',
+        completedAt,
+      }),
+    ).resolves.toBe(false);
+    await expect(
+      repository.completeClaimedCheckpoint({
+        provider: 'binance',
+        symbol: 'LEASEUSDT',
+        label: 'T+0',
+        claimToken: 'worker-c',
+        completedAt,
+      }),
+    ).resolves.toBe(true);
+    await expect(
+      repository.completeClaimedCheckpoint({
+        provider: 'binance',
+        symbol: 'LEASEUSDT',
+        label: 'T+0',
+        claimToken: 'worker-c',
+        completedAt,
+      }),
+    ).resolves.toBe(false);
+
+    const afterAllLeasesExpire = new Date(reclaimedAt.getTime() + 31_000);
+    await expect(
+      repository.completeClaimedCheckpoint({
+        provider: 'binance',
+        symbol: 'LEASEUSDT',
+        label: 'T+10s',
+        claimToken: 'worker-b',
+        completedAt: afterAllLeasesExpire,
+      }),
+    ).resolves.toBe(false);
+    const available = await repository.claimDueCheckpoints({
+      dueAt: afterAllLeasesExpire,
+      limit: 10,
+      claimToken: 'worker-d',
+      claimedAt: afterAllLeasesExpire,
+      claimExpiresAt: new Date(afterAllLeasesExpire.getTime() + 30_000),
+    });
+    expect(available.map(({ label }) => label)).toEqual(['T+5s', 'T+10s']);
+    await expect(
+      repository.listDueCheckpoints(afterAllLeasesExpire, 10),
+    ).resolves.toHaveLength(2);
   });
 });
 

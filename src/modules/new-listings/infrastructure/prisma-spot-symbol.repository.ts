@@ -206,7 +206,7 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
     limit: number,
   ): Promise<DueListingObservationCheckpoint[]> {
     const rows = await this.prisma.listingObservationCheckpoint.findMany({
-      where: { targetAt: { lte: dueAt } },
+      where: { targetAt: { lte: dueAt }, completedAt: null },
       orderBy: [
         { targetAt: 'asc' },
         { provider: 'asc' },
@@ -242,6 +242,7 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
         SELECT provider, symbol, label
         FROM listing_observation_checkpoints
         WHERE target_at <= ${dueAt}
+          AND completed_at IS NULL
           AND (claim_expires_at IS NULL OR claim_expires_at <= ${claimedAt})
         ORDER BY target_at ASC, provider ASC, symbol ASC, label ASC
         FOR UPDATE SKIP LOCKED
@@ -271,6 +272,34 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
         label: row.label as ClaimedListingObservationCheckpoint['label'],
       }))
       .sort(compareClaimedCheckpoints);
+  }
+
+  async completeClaimedCheckpoint({
+    provider,
+    symbol,
+    label,
+    claimToken,
+    completedAt,
+  }: {
+    provider: SpotSymbol['provider'];
+    symbol: string;
+    label: ClaimedListingObservationCheckpoint['label'];
+    claimToken: string;
+    completedAt: Date;
+  }): Promise<boolean> {
+    const result = await this.prisma.listingObservationCheckpoint.updateMany({
+      where: {
+        provider,
+        symbol,
+        label,
+        claimToken,
+        claimedAt: { lte: completedAt },
+        claimExpiresAt: { gt: completedAt },
+        completedAt: null,
+      },
+      data: { completedAt },
+    });
+    return result.count === 1;
   }
 }
 

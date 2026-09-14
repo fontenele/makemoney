@@ -6,6 +6,8 @@ import {
 import {
   ClaimedListingObservationCheckpoint,
   DueListingObservationCheckpoint,
+  LISTING_OBSERVATION_CHECKPOINTS,
+  ListingObservationCheckpointLabel,
 } from '../domain/listing-observation-schedule';
 
 export const MAX_DUE_LISTING_OBSERVATION_CHECKPOINT_LIMIT = 100;
@@ -56,6 +58,31 @@ export class DueListingObservationCheckpointService {
     return this.repository.claimDueCheckpoints(input);
   }
 
+  completeClaimed(input: {
+    provider: 'binance';
+    symbol: string;
+    label: ListingObservationCheckpointLabel;
+    claimToken: string;
+    completedAt: Date;
+  }): Promise<boolean> {
+    if (input.provider !== 'binance') {
+      throw new Error('Checkpoint provider must be binance');
+    }
+    if (!/^[A-Z0-9]{1,30}$/.test(input.symbol)) {
+      throw new Error('Checkpoint symbol must be canonical');
+    }
+    if (!LISTING_OBSERVATION_CHECKPOINT_LABELS.has(input.label)) {
+      throw new Error('Checkpoint label must be supported');
+    }
+    if (!/^[A-Za-z0-9._:-]{1,100}$/.test(input.claimToken)) {
+      throw new Error(
+        'Checkpoint claim token must contain 1 to 100 safe characters',
+      );
+    }
+    this.validateDate(input.completedAt, 'Checkpoint completion time');
+    return this.repository.completeClaimedCheckpoint(input);
+  }
+
   private validateDate(value: Date, label: string): void {
     if (!Number.isFinite(value.getTime()))
       throw new Error(`${label} must be valid`);
@@ -71,3 +98,7 @@ export class DueListingObservationCheckpointService {
     }
   }
 }
+
+const LISTING_OBSERVATION_CHECKPOINT_LABELS = new Set<string>(
+  LISTING_OBSERVATION_CHECKPOINTS.map(({ label }) => label),
+);

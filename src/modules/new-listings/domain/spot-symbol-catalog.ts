@@ -88,4 +88,11 @@ export interface SpotSymbolRepository {
   }): Promise<
     import('./listing-observation-schedule').ClaimedListingObservationCheckpoint[]
   >;
+  completeClaimedCheckpoint(input: {
+    provider: SpotSymbol['provider'];
+    symbol: string;
+    label: import('./listing-observation-schedule').ListingObservationCheckpointLabel;
+    claimToken: string;
+    completedAt: Date;
+  }): Promise<boolean>;
 }

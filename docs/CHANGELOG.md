@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.17 ownership-safe checkpoint completion completed
+
+- Added durable terminal checkpoint completion constrained to the recorded active lease interval.
+- Completion now requires matching provider, symbol, label, and claim token and is idempotently rejected after the first successful transition.
+- Completed checkpoints are excluded from bounded due reads, new claims, and expired-lease recovery.
+- Applied the migration locally; 476 unit tests and all 46 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-14 — M7.16 atomic checkpoint leases completed
 
 - Added durable checkpoint claim token, claim time, and expiry fields with database consistency enforcement.

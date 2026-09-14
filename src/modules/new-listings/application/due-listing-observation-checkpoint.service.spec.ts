@@ -7,6 +7,7 @@ describe('DueListingObservationCheckpointService', () => {
     const service = new DueListingObservationCheckpointService({
       listDueCheckpoints,
       claimDueCheckpoints: jest.fn(),
+      completeClaimedCheckpoint: jest.fn(),
     });
     const dueAt = new Date('2026-09-14T12:00:00.000Z');
 
@@ -21,6 +22,7 @@ describe('DueListingObservationCheckpointService', () => {
       const service = new DueListingObservationCheckpointService({
         listDueCheckpoints,
         claimDueCheckpoints: jest.fn(),
+        completeClaimedCheckpoint: jest.fn(),
       });
       expect(() => service.listDue(new Date(), limit)).toThrow(
         'Due checkpoint limit must be an integer from 1 to 100',
@@ -34,6 +36,7 @@ describe('DueListingObservationCheckpointService', () => {
     const service = new DueListingObservationCheckpointService({
       listDueCheckpoints,
       claimDueCheckpoints: jest.fn(),
+      completeClaimedCheckpoint: jest.fn(),
     });
     expect(() => service.listDue(new Date('invalid'), 1)).toThrow(
       'Due checkpoint time must be valid',
@@ -46,6 +49,7 @@ describe('DueListingObservationCheckpointService', () => {
     const service = new DueListingObservationCheckpointService({
       listDueCheckpoints: jest.fn(),
       claimDueCheckpoints,
+      completeClaimedCheckpoint: jest.fn(),
     });
     const input = {
       dueAt: new Date('2026-09-14T12:00:00.000Z'),
@@ -78,6 +82,7 @@ describe('DueListingObservationCheckpointService', () => {
       const service = new DueListingObservationCheckpointService({
         listDueCheckpoints: jest.fn(),
         claimDueCheckpoints,
+        completeClaimedCheckpoint: jest.fn(),
       });
       expect(() =>
         service.claimDue({
@@ -90,6 +95,57 @@ describe('DueListingObservationCheckpointService', () => {
         }),
       ).toThrow(message);
       expect(claimDueCheckpoints).not.toHaveBeenCalled();
+    },
+  );
+
+  it('delegates valid claimed-checkpoint completion', async () => {
+    const completeClaimedCheckpoint = jest.fn(() => Promise.resolve(true));
+    const service = new DueListingObservationCheckpointService({
+      listDueCheckpoints: jest.fn(),
+      claimDueCheckpoints: jest.fn(),
+      completeClaimedCheckpoint,
+    });
+    const input = {
+      provider: 'binance' as const,
+      symbol: 'NEWUSDT',
+      label: 'T+5s' as const,
+      claimToken: 'worker-1:batch-1',
+      completedAt: new Date('2026-09-14T12:00:10.000Z'),
+    };
+
+    await expect(service.completeClaimed(input)).resolves.toBe(true);
+    expect(completeClaimedCheckpoint).toHaveBeenCalledWith(input);
+  });
+
+  it.each([
+    [{ provider: 'other' }, 'Checkpoint provider must be binance'],
+    [{ symbol: 'new/usdt' }, 'Checkpoint symbol must be canonical'],
+    [{ label: 'T+2s' }, 'Checkpoint label must be supported'],
+    [{ claimToken: '' }, 'Checkpoint claim token must contain'],
+    [
+      { completedAt: new Date('invalid') },
+      'Checkpoint completion time must be valid',
+    ],
+  ])(
+    'rejects invalid completion input before repository access',
+    (change, message) => {
+      const completeClaimedCheckpoint = jest.fn(() => Promise.resolve(true));
+      const service = new DueListingObservationCheckpointService({
+        listDueCheckpoints: jest.fn(),
+        claimDueCheckpoints: jest.fn(),
+        completeClaimedCheckpoint,
+      });
+      expect(() =>
+        service.completeClaimed({
+          provider: 'binance',
+          symbol: 'NEWUSDT',
+          label: 'T+5s',
+          claimToken: 'worker-1',
+          completedAt: new Date('2026-09-14T12:00:10.000Z'),
+          ...change,
+        } as Parameters<typeof service.completeClaimed>[0]),
+      ).toThrow(message);
+      expect(completeClaimedCheckpoint).not.toHaveBeenCalled();
     },
   );
 });
