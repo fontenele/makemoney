@@ -7,6 +7,7 @@ interface Environment {
   REDIS_URL: string;
   BINANCE_WS_BASE_URL: string;
   BINANCE_REST_BASE_URL: string;
+  NEW_LISTINGS_POLL_INTERVAL_MS: number;
   PAPER_INITIAL_USDT_BALANCE: string;
   PAPER_VALUATION_MAX_PRICE_AGE_MS: number;
   PAPER_QUOTE_MAX_MARKET_DATA_AGE_MS: number;
@@ -37,6 +38,10 @@ const environmentSchema = Joi.object<Environment>({
   BINANCE_REST_BASE_URL: Joi.string()
     .uri({ scheme: ['https'] })
     .default('https://data-api.binance.vision'),
+  NEW_LISTINGS_POLL_INTERVAL_MS: Joi.number()
+    .integer()
+    .min(5000)
+    .default(60000),
   PAPER_INITIAL_USDT_BALANCE: Joi.string()
     .pattern(/^(0|[1-9]\d{0,19})(\.\d{1,18})?$/)
     .default('1000'),

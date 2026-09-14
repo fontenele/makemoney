@@ -112,6 +112,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.1 — complete:** one public Binance Spot/USDT catalog snapshot is normalized behind a provider-neutral contract and retained as an in-memory baseline.
 - **M7.2 — complete:** idempotent PostgreSQL observations preserve first-seen time and update latest-seen provider state transactionally.
 - **M7.3 — complete:** serializable observation comparison treats the first population as baseline-only and identifies only later previously unseen symbols.
+- **M7.4 — complete:** configurable sequential polling refreshes observations without overlap, preserves the last successful state after failure, and stops cleanly at shutdown.
 
 ## M8 — Dashboard — planned
 

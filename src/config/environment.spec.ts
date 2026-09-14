@@ -38,3 +38,29 @@ describe('validateEnvironment strategy periods', () => {
     );
   });
 });
+
+describe('validateEnvironment new-listing polling', () => {
+  it('uses a one-minute default', () => {
+    expect(validateEnvironment(required)).toMatchObject({
+      NEW_LISTINGS_POLL_INTERVAL_MS: 60000,
+    });
+  });
+
+  it('accepts bounded custom intervals', () => {
+    expect(
+      validateEnvironment({
+        ...required,
+        NEW_LISTINGS_POLL_INTERVAL_MS: '5000',
+      }),
+    ).toMatchObject({ NEW_LISTINGS_POLL_INTERVAL_MS: 5000 });
+  });
+
+  it.each([0, 4999, 5000.5])('rejects invalid interval %s', (interval) => {
+    expect(() =>
+      validateEnvironment({
+        ...required,
+        NEW_LISTINGS_POLL_INTERVAL_MS: interval,
+      }),
+    ).toThrow('Invalid environment configuration');
+  });
+});

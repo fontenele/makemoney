@@ -467,3 +467,7 @@ Provider and symbol form the durable identity. An upsert preserves `firstObserve
 ## M7.3 first population is not a listing event
 
 The repository compares a non-empty catalog against all existing rows for that provider before writing the current observation, within one serializable transaction. With no existing provider rows, it establishes a baseline and returns no additions. With an established baseline, only previously absent current symbols are newly observed. This conservative rule avoids presenting every symbol from a fresh installation as a new listing and keeps detection atomic with persistence.
+
+## M7.4 completion-relative polling without overlap
+
+Catalog polling uses recursive one-shot timers scheduled only after each complete load attempt rather than a fixed interval that could overlap slow requests. The configured interval therefore measures the quiet delay between attempts. A failed attempt retains the last successful in-memory state and does not permanently stop observation. Shutdown aborts the provider request and removes a pending timer.

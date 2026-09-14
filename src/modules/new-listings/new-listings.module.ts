@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SpotSymbolCatalogService } from './application/spot-symbol-catalog.service';
 import {
+  NEW_LISTINGS_POLL_INTERVAL_MS,
   SPOT_SYMBOL_CATALOG_PROVIDER,
   SPOT_SYMBOL_REPOSITORY,
 } from './domain/spot-symbol-catalog';
@@ -19,6 +20,12 @@ import { PrismaSpotSymbolRepository } from './infrastructure/prisma-spot-symbol.
         ),
     },
     { provide: SPOT_SYMBOL_REPOSITORY, useClass: PrismaSpotSymbolRepository },
+    {
+      provide: NEW_LISTINGS_POLL_INTERVAL_MS,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        config.getOrThrow<number>('NEW_LISTINGS_POLL_INTERVAL_MS'),
+    },
     SpotSymbolCatalogService,
   ],
   exports: [SpotSymbolCatalogService],

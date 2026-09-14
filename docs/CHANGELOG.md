@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.4 sequential catalog polling completed
+
+- Added immediate startup loading followed by non-overlapping public catalog refreshes, defaulting to a 60-second completion-relative interval.
+- Added validated `NEW_LISTINGS_POLL_INTERVAL_MS` configuration with a five-second minimum and a safe example value.
+- Preserved the last successful state across refresh failures and canceled active work and pending timers during shutdown.
+- 419 unit tests and all 42 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — M7.3 conservative newly observed detection completed
 
 - Compared each non-empty Spot catalog with its durable provider baseline in the same serializable transaction used for observation upserts.

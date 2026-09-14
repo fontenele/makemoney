@@ -21,6 +21,9 @@ export interface SpotSymbolCatalogProvider {
 }
 
 export const SPOT_SYMBOL_REPOSITORY = Symbol('SPOT_SYMBOL_REPOSITORY');
+export const NEW_LISTINGS_POLL_INTERVAL_MS = Symbol(
+  'NEW_LISTINGS_POLL_INTERVAL_MS',
+);
 
 export interface SpotSymbolRepository {
   observe(catalog: SpotSymbolCatalog): Promise<SpotSymbol[]>;
