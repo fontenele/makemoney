@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.12 deterministic observation schedule completed
+
+- Defined the nine planned detection-relative research checkpoints as a provider-neutral domain contract.
+- Added a pure validated schedule builder with independent UTC target instants and no mutable-date aliasing.
+- Added no persistence, scheduler, provider request, market tracking, alert, signal, or financial behavior.
+- 457 unit tests and all 45 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — M7.11 current-state sample composition completed
 
 - Extended the filtered detection summary with deterministic counts grouped by current provider status and Spot-trading availability.

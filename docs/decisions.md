@@ -503,3 +503,7 @@ The first statistical new-listing read aggregates only facts already stored for 
 ## M7.11 consistent current-state breakdowns
 
 Status and Spot-availability counts extend the existing summary rather than creating independent endpoints. The aggregate and both grouped queries run in one PostgreSQL transaction and return deterministically ordered arrays. This prevents internally mismatched summary sections during a concurrent catalog refresh while keeping the distinction between current provider state and immutable detection time explicit.
+
+## M7.12 fix checkpoint semantics before scheduling
+
+The research checkpoints are defined as explicit millisecond offsets from the immutable application detection time, not wall-clock rounding or elapsed timers. A pure schedule builder produces independent UTC instants for all nine planned horizons and rejects invalid or out-of-range dates. Persistence, due-work recovery, provider data, and sampling remain separate decisions.

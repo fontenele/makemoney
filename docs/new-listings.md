@@ -63,3 +63,9 @@ The summary answers only how many application detections are represented and the
 The same summary now includes `byStatus` and `bySpotTradingAllowed` arrays, each containing deterministic ascending groups and exact counts. Total, temporal bounds, and both breakdowns are read in one PostgreSQL transaction so they describe one consistent matching sample.
 
 These groups describe the latest observed mutable provider state and remain subject to all active filters. They do not reconstruct historical state at detection time or add market-performance tracking.
+
+## M7.12 deterministic observation schedule
+
+The domain defines an immutable ordered checkpoint specification at `T+0`, `T+5s`, `T+10s`, `T+30s`, `T+1m`, `T+5m`, `T+15m`, `T+1h`, and `T+24h`. A pure function projects these offsets from a valid application `detectedAt` into independent UTC instants.
+
+This increment establishes timing semantics only. It creates no persistence, scheduler, timer, provider request, market sample, alert, score, signal, or trade.
