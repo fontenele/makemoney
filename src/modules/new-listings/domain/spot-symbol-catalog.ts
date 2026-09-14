@@ -12,6 +12,11 @@ export interface SpotSymbolCatalog {
   receivedAt: Date;
 }
 
+export interface DetectedSpotSymbol extends SpotSymbol {
+  detectedAt: Date;
+  lastObservedAt: Date;
+}
+
 export const SPOT_SYMBOL_CATALOG_PROVIDER = Symbol(
   'SPOT_SYMBOL_CATALOG_PROVIDER',
 );
@@ -27,4 +32,5 @@ export const NEW_LISTINGS_POLL_INTERVAL_MS = Symbol(
 
 export interface SpotSymbolRepository {
   observe(catalog: SpotSymbolCatalog): Promise<SpotSymbol[]>;
+  listDetected(limit: number): Promise<DetectedSpotSymbol[]>;
 }

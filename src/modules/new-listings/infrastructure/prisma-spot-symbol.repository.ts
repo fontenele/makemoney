@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '../../../generated/prisma/client';
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
 import {
+  DetectedSpotSymbol,
   SpotSymbolCatalog,
   SpotSymbol,
   SpotSymbolRepository,
@@ -59,5 +60,23 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
+  }
+
+  async listDetected(limit: number): Promise<DetectedSpotSymbol[]> {
+    const rows = await this.prisma.observedSpotSymbol.findMany({
+      where: { detectedAt: { not: null } },
+      orderBy: [{ detectedAt: 'desc' }, { provider: 'asc' }, { symbol: 'asc' }],
+      take: limit,
+    });
+    return rows.map((row) => ({
+      provider: 'binance',
+      symbol: row.symbol,
+      baseAsset: row.baseAsset,
+      quoteAsset: 'USDT',
+      status: row.status,
+      spotTradingAllowed: row.spotTradingAllowed,
+      detectedAt: row.detectedAt!,
+      lastObservedAt: row.lastObservedAt,
+    }));
   }
 }

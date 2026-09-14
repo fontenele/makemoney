@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SpotSymbolCatalogService } from './application/spot-symbol-catalog.service';
+import { SpotSymbolDetectionReadModelService } from './application/spot-symbol-detection-read-model.service';
 import {
   NEW_LISTINGS_POLL_INTERVAL_MS,
   SPOT_SYMBOL_CATALOG_PROVIDER,
@@ -8,8 +9,10 @@ import {
 } from './domain/spot-symbol-catalog';
 import { BinanceSpotSymbolCatalogClient } from './infrastructure/binance-spot-symbol-catalog.client';
 import { PrismaSpotSymbolRepository } from './infrastructure/prisma-spot-symbol.repository';
+import { NewListingsController } from './presentation/new-listings.controller';
 
 @Module({
+  controllers: [NewListingsController],
   providers: [
     {
       provide: SPOT_SYMBOL_CATALOG_PROVIDER,
@@ -27,6 +30,7 @@ import { PrismaSpotSymbolRepository } from './infrastructure/prisma-spot-symbol.
         config.getOrThrow<number>('NEW_LISTINGS_POLL_INTERVAL_MS'),
     },
     SpotSymbolCatalogService,
+    SpotSymbolDetectionReadModelService,
   ],
   exports: [SpotSymbolCatalogService],
 })

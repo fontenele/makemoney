@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.6 bounded detection API completed
+
+- Added local read-only `GET /new-listings` for durable post-baseline detections, newest first.
+- Added strict optional `limit=1..100` validation with a default of 50 and deterministic provider/symbol tie-breaking.
+- Excluded baseline rows and returned current provider state alongside immutable detection and latest-observation times.
+- 425 unit tests and all 42 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — M7.5 durable detection marker completed
 
 - Added nullable immutable `detectedAt` persistence and an index for post-baseline symbol discoveries.

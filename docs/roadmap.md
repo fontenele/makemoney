@@ -114,6 +114,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.3 — complete:** serializable observation comparison treats the first population as baseline-only and identifies only later previously unseen symbols.
 - **M7.4 — complete:** configurable sequential polling refreshes observations without overlap, preserves the last successful state after failure, and stops cleanly at shutdown.
 - **M7.5 — complete:** an immutable nullable detection timestamp durably distinguishes post-baseline additions from baseline and migrated rows.
+- **M7.6 — complete:** a bounded local read-only endpoint exposes recent durable detections newest first without exposing baseline rows.
 
 ## M8 — Dashboard — planned
 

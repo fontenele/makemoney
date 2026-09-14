@@ -1715,7 +1715,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.5 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.6 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -2291,6 +2291,7 @@ M7.2 Durable Symbol Observations: DONE
 M7.3 Conservative Newly Observed Detection: DONE
 M7.4 Sequential Catalog Polling: DONE
 M7.5 Durable Detection Marker: DONE
+M7.6 Bounded Detection API: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2309,5 +2310,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7.5 is complete. Select the next bounded M7 increment without introducing alerts, scoring, signals, market tracking, or trading early.
+M7.6 is complete. Select the next bounded M7 increment without introducing alerts, scoring, signals, market tracking, or trading early.
 ```

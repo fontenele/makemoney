@@ -475,3 +475,7 @@ Catalog polling uses recursive one-shot timers scheduled only after each complet
 ## M7.5 nullable immutable application detection time
 
 Detection classification belongs on the durable provider/symbol observation because there can be at most one transition from unseen to first seen. A nullable `detectedAt` avoids inventing events for baseline and migrated rows. It is assigned only on a post-baseline insert and omitted from all update paths, preserving the original application detection time without claiming an official listing timestamp.
+
+## M7.6 bounded read before research enrichment
+
+The first detection API is a simple bounded recent list rather than pagination or filtering. It reads only non-null detection markers and applies deterministic ordering by detection time, provider, and symbol. Current provider state is included for interpretation, while first-observation internals and baseline rows remain outside the public contract. Further filtering, cursors, alerts, scoring, and market tracking remain separate increments.

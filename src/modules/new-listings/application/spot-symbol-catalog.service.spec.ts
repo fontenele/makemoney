@@ -21,6 +21,7 @@ describe('SpotSymbolCatalogService', () => {
     };
     const repository = {
       observe: jest.fn(() => Promise.resolve([newlyObserved])),
+      listDetected: jest.fn(() => Promise.resolve([])),
     };
     const service = new SpotSymbolCatalogService(provider, repository, 60_000);
     service.onModuleInit();
@@ -37,7 +38,10 @@ describe('SpotSymbolCatalogService', () => {
     };
     const service = new SpotSymbolCatalogService(
       provider,
-      { observe: jest.fn(() => Promise.resolve([])) },
+      {
+        observe: jest.fn(() => Promise.resolve([])),
+        listDetected: jest.fn(() => Promise.resolve([])),
+      },
       60_000,
     );
     service.onModuleInit();
@@ -63,7 +67,10 @@ describe('SpotSymbolCatalogService', () => {
         .mockResolvedValueOnce(first)
         .mockResolvedValueOnce(second);
       const provider: SpotSymbolCatalogProvider = { load };
-      const repository = { observe: jest.fn(() => Promise.resolve([])) };
+      const repository = {
+        observe: jest.fn(() => Promise.resolve([])),
+        listDetected: jest.fn(() => Promise.resolve([])),
+      };
       const service = new SpotSymbolCatalogService(provider, repository, 5000);
 
       service.onModuleInit();
