@@ -205,9 +205,13 @@ describe('Application (e2e)', () => {
   it('/backtesting/runs (GET) returns cursor-paginated immutable runs', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     const cursor = '00000000-0000-4000-8000-000000000001';
+    const createdFrom = '2026-09-01T00:00:00.000Z';
+    const createdTo = '2026-09-30T23:59:59.999Z';
 
     await request(server)
-      .get(`/backtesting/runs?limit=1&cursor=${cursor}`)
+      .get(
+        `/backtesting/runs?limit=1&cursor=${cursor}&createdFrom=${createdFrom}&createdTo=${createdTo}`,
+      )
       .expect(200)
       .expect([
         {
@@ -220,14 +224,23 @@ describe('Application (e2e)', () => {
     expect(findRecentBacktestRuns).toHaveBeenCalledWith(
       1,
       cursor,
-      undefined,
-      undefined,
+      new Date(createdFrom),
+      new Date(createdTo),
     );
   });
 
   it('/backtesting/runs (GET) rejects a malformed cursor', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     await request(server).get('/backtesting/runs?cursor=invalid').expect(400);
+  });
+
+  it('/backtesting/runs (GET) rejects an inverted creation range', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(server)
+      .get(
+        '/backtesting/runs?createdFrom=2026-09-02T00:00:00.000Z&createdTo=2026-09-01T00:00:00.000Z',
+      )
+      .expect(400);
   });
 
   it('persists strategy signals idempotently and serves them after memory-independent reads', async () => {

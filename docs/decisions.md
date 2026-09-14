@@ -443,3 +443,7 @@ This increment deliberately stops before cursor pagination and filtering. The lo
 The public cursor is an existing run UUID rather than an encoded client-controlled timestamp. The application resolves it to the immutable `(createdAt, id)` pair, then applies an exclusive lexicographic boundary matching the indexed descending order. This avoids offset drift and prevents callers from supplying an arbitrary sort timestamp.
 
 The collection response remains an array for compatibility with M6.28. A caller continues while a full page is returned by passing the final item's UUID; an additional empty request can occur when the total is an exact multiple of the limit. Unknown cursors are invalid input because run deletion is not available and a valid exposed cursor should remain resolvable.
+
+## M6.30 inclusive temporal run filtering
+
+Creation filters use canonical UTC instants and inclusive comparisons. A cursor must belong to the requested interval, preventing ambiguous continuation when filters change; the existing index serves the query without migration.

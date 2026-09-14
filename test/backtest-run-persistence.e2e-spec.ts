@@ -80,6 +80,15 @@ describe('Backtest run persistence (e2e)', () => {
     const afterSecond = await repository.findRecent(100, second.run);
     expect(afterSecond.map((run) => run.id)).toContain(first.run.id);
     expect(afterSecond.map((run) => run.id)).not.toContain(second.run.id);
+
+    const filtered = await repository.findRecent(
+      100,
+      undefined,
+      new Date('1999-01-01T00:00:00.000Z'),
+      new Date('2001-01-01T00:00:00.000Z'),
+    );
+    expect(filtered.map((run) => run.id)).toContain(first.run.id);
+    expect(filtered.map((run) => run.id)).not.toContain(second.run.id);
   });
 
   it('rejects conflicting idempotency-key reuse', async () => {

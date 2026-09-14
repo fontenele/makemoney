@@ -102,6 +102,17 @@ describe('BacktestRunService', () => {
     );
   });
 
+  it('rejects a cursor outside the requested creation range', async () => {
+    const cursor = storedRun();
+    const service = new BacktestRunService(
+      {} as HistoricalStrategyReplayService,
+      repositoryWith({ findById: jest.fn(() => Promise.resolve(cursor)) }),
+    );
+    await expect(
+      service.findRecent(10, cursor.id, new Date('2026-09-14T00:00:00.000Z')),
+    ).rejects.toBeInstanceOf(BacktestRunCursorNotFoundError);
+  });
+
   it('returns an identical existing run without recalculating', async () => {
     const existing = storedRun();
     const repository = repositoryWith({

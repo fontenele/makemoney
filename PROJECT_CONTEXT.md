@@ -8,7 +8,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.29 — deterministic replay, resilient durable historical loading, stored replay, gap-aware cache reuse, replay and simulation APIs, immutable simulation-run persistence, retrieval, and cursor pagination, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.30 — deterministic replay, resilient durable historical loading, stored replay, gap-aware cache reuse, replay and simulation APIs, immutable simulation-run persistence, retrieval, pagination, and temporal filtering, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
 - No next increment is approved. Stop and present a minimal plan before further backtesting work.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -132,7 +132,9 @@ M6.28 exposes recent stored simulation snapshots through read-only `GET /backtes
 
 M6.29 extends the same array response with an optional UUID cursor taken from the last received run. The cursor resolves to its immutable creation time and ID, and the next query returns only older sort pairs; malformed or missing cursor identities fail explicitly without offset pagination.
 
-Run deletion and filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
+M6.30 adds inclusive canonical UTC `createdFrom` and `createdTo` filters to the persisted-run list. Filters compose with limit and cursor, and cursors outside the selected interval are rejected.
+
+Run deletion and additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety
 

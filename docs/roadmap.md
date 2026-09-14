@@ -100,7 +100,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.27 — complete:** read-only `GET /backtesting/runs/:id` retrieves one immutable snapshot by validated UUID with explicit absent and unavailable states and no recalculation.
 - **M6.28 — complete:** bounded read-only `GET /backtesting/runs` lists immutable snapshots newest first with deterministic ordering and strict limit validation.
 - **M6.29 — complete:** optional UUID cursor pagination extends the recent-run array without offset drift or a response-format change and rejects malformed or unknown cursors explicitly.
-- Later M6 increments require separate approval for run filtering/deletion, cache refresh or expiry, overwriting stored candles, parallel gap loading, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, or optimization.
+- **M6.30 — complete:** inclusive UTC creation-time filters compose with limit and cursor and reject invalid ranges.
+- Later M6 increments require separate approval for additional run filtering or deletion, cache refresh or expiry, overwriting stored candles, parallel gap loading, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, or optimization.
 
 ## M7 — New Listing Scanner — planned
 

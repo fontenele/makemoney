@@ -355,8 +355,12 @@ M6.29 extends `GET /backtesting/runs` with an optional `cursor` while preserving
 - A request without a cursor retains the M6.28 behavior, including the validated limit and default.
 - Offset pagination, response envelopes, generated next-cursor fields, filtering, deletion, and mutation are not introduced.
 
+## M6.30 inclusive run creation-time filters
+
+`GET /backtesting/runs` accepts optional canonical UTC `createdFrom` and `createdTo`. Bounds are inclusive, ordered, compose with limit and cursor, and reject cursors outside the selected interval. The response remains an array and the operation remains PostgreSQL-only.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, run filtering and deletion, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, and parameter optimization remain deferred and require separate approval.
+Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, additional run filtering and deletion, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, and parameter optimization remain deferred and require separate approval.

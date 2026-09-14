@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-13 — M6.30 persisted-run temporal filtering completed
+
+- Added inclusive canonical UTC `createdFrom` and `createdTo` filters to `GET /backtesting/runs`, composed with limit and cursor.
+- Invalid, inverted, and cursor-incompatible ranges return HTTP 400; no response shape, schema, or financial behavior changed.
+- 399 unit tests passed across 55 suites; 38 E2E tests passed across 3 suites.
+
 ## 2026-09-13 — M6.29 stable simulation-run cursor pagination completed
 
 ### Added
