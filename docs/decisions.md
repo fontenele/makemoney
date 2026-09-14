@@ -455,3 +455,7 @@ Deletion is an explicit UUID-addressed command rather than retention policy or b
 ## M6.32 disposable PostgreSQL schema for E2E isolation
 
 The E2E suite recreates and migrates only the dedicated `crypto_trader_e2e` schema before each complete run. The application schema remains untouched. `PrismaService` passes the validated URL schema both to Prisma's generated-query namespace and PostgreSQL's connection `search_path`, ensuring raw transactional SQL and generated queries cannot diverge across schemas.
+
+## M7.1 provider-neutral catalog before listing detection
+
+A listing cannot be inferred from one exchange snapshot. M7 therefore begins with a strict provider-neutral Spot/USDT catalog baseline. Detection, observation timestamps, persistence, and polling remain separate decisions so the first observation is never mislabeled as the actual exchange listing time.

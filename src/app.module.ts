@@ -9,6 +9,7 @@ import { PaperWalletModule } from './modules/paper-wallet/paper-wallet.module';
 import { PaperTradingModule } from './modules/paper-trading/paper-trading.module';
 import { StrategiesModule } from './modules/strategies/strategies.module';
 import { BacktestingModule } from './modules/backtesting/backtesting.module';
+import { NewListingsModule } from './modules/new-listings/new-listings.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { BacktestingModule } from './modules/backtesting/backtesting.module';
     PaperTradingModule,
     StrategiesModule,
     BacktestingModule,
+    NewListingsModule,
   ],
 })
 export class AppModule {}

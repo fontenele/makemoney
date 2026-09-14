@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.1 public Spot symbol catalog completed
+
+- Added a provider-neutral Binance Spot/USDT catalog loaded from public exchange information without credentials.
+- Added strict normalization, deterministic ordering, startup retention, timeout, shutdown cancellation, and non-blocking failure handling.
+- No polling, persistence, listing claim, API route, signal, order, or financial mutation was introduced.
+- 413 unit tests passed across 58 suites; all 40 isolated E2E tests and static checks passed.
+
 ## 2026-09-13 — M6.32 isolated E2E validation and M6 closure completed
 
 - Added a disposable `crypto_trader_e2e` schema lifecycle for full E2E runs, with automatic migration and no access to local application records.

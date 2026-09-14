@@ -109,6 +109,8 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 
 Collect and statistically analyze newly listed assets without assuming the hypothesis is profitable.
 
+- **M7.1 — complete:** one public Binance Spot/USDT catalog snapshot is normalized behind a provider-neutral contract and retained as an in-memory baseline.
+
 ## M8 — Dashboard — planned
 
 Vue 3/Vite interface and market/portfolio visualizations. No dashboard exists yet.
