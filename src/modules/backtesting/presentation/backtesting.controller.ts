@@ -117,11 +117,25 @@ export class BacktestingController {
   async getRuns(
     @Query('limit') limit?: string,
     @Query('cursor') cursor?: string,
+    @Query('createdFrom') createdFrom?: string,
+    @Query('createdTo') createdTo?: string,
   ): Promise<StoredBacktestRunResponse[]> {
     const validLimit = validRunLimit(limit);
     const validCursor = cursor === undefined ? undefined : validUuid(cursor);
+    const validFrom = optionalUtcTimestamp(createdFrom, 'createdFrom');
+    const validTo = optionalUtcTimestamp(createdTo, 'createdTo');
+    if (validFrom && validTo && validFrom > validTo) {
+      throw new BadRequestException(
+        'createdFrom must be at or before createdTo',
+      );
+    }
     try {
-      return await this.runs.findRecent(validLimit, validCursor);
+      return await this.runs.findRecent(
+        validLimit,
+        validCursor,
+        validFrom,
+        validTo,
+      );
     } catch (error: unknown) {
       if (error instanceof BacktestRunCursorNotFoundError) {
         throw new BadRequestException(error.message);
@@ -164,6 +178,13 @@ export class BacktestingController {
       );
     }
   }
+}
+
+function optionalUtcTimestamp(
+  value: string | undefined,
+  field: string,
+): Date | undefined {
+  return value === undefined ? undefined : validUtcTimestamp(value, field);
 }
 
 function validUuid(value: string): string {

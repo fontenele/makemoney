@@ -63,7 +63,12 @@ describe('BacktestRunService', () => {
     ]);
     // Repository methods are Jest mocks in this test fixture.
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(repository.findRecent).toHaveBeenCalledWith(2, undefined);
+    expect(repository.findRecent).toHaveBeenCalledWith(
+      2,
+      undefined,
+      undefined,
+      undefined,
+    );
   });
 
   it('resolves a recent-run cursor to its stable sort pair', async () => {
@@ -79,7 +84,12 @@ describe('BacktestRunService', () => {
     await expect(service.findRecent(10, cursor.id)).resolves.toEqual([]);
     // Repository methods are Jest mocks in this test fixture.
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(repository.findRecent).toHaveBeenCalledWith(10, cursor);
+    expect(repository.findRecent).toHaveBeenCalledWith(
+      10,
+      cursor,
+      undefined,
+      undefined,
+    );
   });
 
   it('rejects a recent-run cursor that does not exist', async () => {

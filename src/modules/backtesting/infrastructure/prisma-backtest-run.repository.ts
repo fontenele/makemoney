@@ -20,17 +20,25 @@ export class PrismaBacktestRunRepository implements BacktestRunRepository {
   async findRecent(
     limit: number,
     cursor?: Pick<BacktestRun, 'id' | 'createdAt'>,
+    createdFrom?: Date,
+    createdTo?: Date,
   ): Promise<BacktestRun[]> {
     return (
       await this.prisma.backtestRun.findMany({
-        where: cursor
-          ? {
-              OR: [
-                { createdAt: { lt: cursor.createdAt } },
-                { createdAt: cursor.createdAt, id: { lt: cursor.id } },
-              ],
-            }
-          : undefined,
+        where: {
+          AND: [
+            createdFrom ? { createdAt: { gte: createdFrom } } : {},
+            createdTo ? { createdAt: { lte: createdTo } } : {},
+            cursor
+              ? {
+                  OR: [
+                    { createdAt: { lt: cursor.createdAt } },
+                    { createdAt: cursor.createdAt, id: { lt: cursor.id } },
+                  ],
+                }
+              : {},
+          ],
+        },
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         take: limit,
       })

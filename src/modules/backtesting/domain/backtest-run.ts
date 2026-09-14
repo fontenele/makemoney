@@ -17,6 +17,8 @@ export interface BacktestRunRepository {
   findRecent(
     limit: number,
     cursor?: Pick<BacktestRun, 'id' | 'createdAt'>,
+    createdFrom?: Date,
+    createdTo?: Date,
   ): Promise<BacktestRun[]>;
   findByIdempotencyKey(key: string): Promise<BacktestRun | undefined>;
   create(

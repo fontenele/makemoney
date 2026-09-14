@@ -217,7 +217,12 @@ describe('Application (e2e)', () => {
           result: { totalNetReturnUsdt: '2.50' },
         },
       ]);
-    expect(findRecentBacktestRuns).toHaveBeenCalledWith(1, cursor);
+    expect(findRecentBacktestRuns).toHaveBeenCalledWith(
+      1,
+      cursor,
+      undefined,
+      undefined,
+    );
   });
 
   it('/backtesting/runs (GET) rejects a malformed cursor', async () => {

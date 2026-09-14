@@ -26,14 +26,24 @@ describe('BacktestingController', () => {
     const controller = controllerWith({}, { findRecent });
 
     await expect(controller.getRuns()).resolves.toBe(runs);
-    expect(findRecent).toHaveBeenCalledWith(50, undefined);
+    expect(findRecent).toHaveBeenCalledWith(
+      50,
+      undefined,
+      undefined,
+      undefined,
+    );
   });
 
   it('accepts an explicit recent-run limit', async () => {
     const findRecent = jest.fn(() => Promise.resolve([]));
     const controller = controllerWith({}, { findRecent });
     await expect(controller.getRuns('10')).resolves.toEqual([]);
-    expect(findRecent).toHaveBeenCalledWith(10, undefined);
+    expect(findRecent).toHaveBeenCalledWith(
+      10,
+      undefined,
+      undefined,
+      undefined,
+    );
   });
 
   it('passes a valid UUID cursor to recent-run lookup', async () => {
@@ -41,7 +51,7 @@ describe('BacktestingController', () => {
     const findRecent = jest.fn(() => Promise.resolve([]));
     const controller = controllerWith({}, { findRecent });
     await expect(controller.getRuns('10', cursor)).resolves.toEqual([]);
-    expect(findRecent).toHaveBeenCalledWith(10, cursor);
+    expect(findRecent).toHaveBeenCalledWith(10, cursor, undefined, undefined);
   });
 
   it('rejects a malformed recent-run cursor before lookup', async () => {
@@ -87,6 +97,35 @@ describe('BacktestingController', () => {
     await expect(controller.getRuns()).rejects.toBeInstanceOf(
       ServiceUnavailableException,
     );
+  });
+
+  it('passes an inclusive creation-time range to recent-run lookup', async () => {
+    const findRecent = jest.fn(() => Promise.resolve([]));
+    const controller = controllerWith({}, { findRecent });
+    await controller.getRuns(
+      '10',
+      undefined,
+      '2026-09-01T00:00:00.000Z',
+      '2026-09-02T00:00:00.000Z',
+    );
+    expect(findRecent).toHaveBeenCalledWith(
+      10,
+      undefined,
+      new Date('2026-09-01T00:00:00.000Z'),
+      new Date('2026-09-02T00:00:00.000Z'),
+    );
+  });
+
+  it('rejects an inverted creation-time range', async () => {
+    const controller = controllerWith({}, { findRecent: jest.fn() });
+    await expect(
+      controller.getRuns(
+        undefined,
+        undefined,
+        '2026-09-02T00:00:00.000Z',
+        '2026-09-01T00:00:00.000Z',
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 
   it('returns a stored backtest run by UUID', async () => {

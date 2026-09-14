@@ -41,6 +41,8 @@ export class BacktestRunService {
   async findRecent(
     limit: number,
     cursorId?: string,
+    createdFrom?: Date,
+    createdTo?: Date,
   ): Promise<StoredBacktestRunResponse[]> {
     const cursor = cursorId
       ? await this.repository.findById(cursorId)
@@ -48,9 +50,16 @@ export class BacktestRunService {
     if (cursorId && !cursor) {
       throw new BacktestRunCursorNotFoundError();
     }
-    return (await this.repository.findRecent(limit, cursor)).map(
-      storedResponse,
-    );
+    if (
+      cursor &&
+      ((createdFrom && cursor.createdAt < createdFrom) ||
+        (createdTo && cursor.createdAt > createdTo))
+    ) {
+      throw new BacktestRunCursorNotFoundError();
+    }
+    return (
+      await this.repository.findRecent(limit, cursor, createdFrom, createdTo)
+    ).map(storedResponse);
   }
 
   async create(
