@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.2 durable symbol observations completed
+
+- Added transactional PostgreSQL persistence for first/latest application observations and current Spot symbol state.
+- Added the `observed_spot_symbols` migration and isolated database-backed idempotency coverage.
+- Observation time is explicitly not represented as an official Binance listing time; no polling, route, signal, or trading was added.
+- 413 unit tests and all 41 isolated E2E tests passed with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-14 — M7.1 public Spot symbol catalog completed
 
 - Added a provider-neutral Binance Spot/USDT catalog loaded from public exchange information without credentials.

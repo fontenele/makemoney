@@ -459,3 +459,7 @@ The E2E suite recreates and migrates only the dedicated `crypto_trader_e2e` sche
 ## M7.1 provider-neutral catalog before listing detection
 
 A listing cannot be inferred from one exchange snapshot. M7 therefore begins with a strict provider-neutral Spot/USDT catalog baseline. Detection, observation timestamps, persistence, and polling remain separate decisions so the first observation is never mislabeled as the actual exchange listing time.
+
+## M7.2 immutable first observation with mutable current state
+
+Provider and symbol form the durable identity. An upsert preserves `firstObservedAt` while updating `lastObservedAt` and current catalog fields in one transaction, enabling later comparisons without rewriting observation history or implying knowledge of the exchange's actual listing time.

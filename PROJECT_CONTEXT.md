@@ -140,6 +140,8 @@ M6.32 isolates E2E persistence in a disposable `crypto_trader_e2e` PostgreSQL sc
 
 M7.1 loads one public Binance exchange-information snapshot at startup, strictly normalizes USDT symbols and Spot availability, and retains the ordered catalog in memory. It does not yet compare snapshots, persist observations, expose a route, score assets, or trade.
 
+M7.2 transactionally persists catalog observations by provider and symbol. It preserves the first application observation and updates the latest observation and current provider state without claiming an official listing timestamp.
+
 Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 
 ## Non-negotiable safety

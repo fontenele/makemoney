@@ -1715,7 +1715,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.2 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -2287,6 +2287,7 @@ M6.30 Simulation Run Temporal Filter: DONE
 M6.31 Simulation Run Deletion: DONE
 M6.32 Isolated E2E Validation and M6 Closure: DONE
 M7.1 Public Spot Symbol Catalog: DONE
+M7.2 Durable Symbol Observations: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS

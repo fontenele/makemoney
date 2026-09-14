@@ -6,6 +6,8 @@ Last validated: 2026-09-13
 
 M7.1 is complete: the application loads one public provider-neutral Binance Spot/USDT symbol catalog at startup and retains it in memory as a future detection baseline. It does not yet claim that any observed symbol is newly listed.
 
+M7.2 persists each successful catalog observation transactionally, preserving first observation time while updating latest observation time and current provider state.
+
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
@@ -155,15 +157,15 @@ The following passed on 2026-09-13 at M6 closure:
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 407 tests passed across 56 suites
+- `npm test -- --runInBand` — 413 tests passed across 58 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
 The complete database-backed integration validation passed after E2E isolation:
 
-- `$env:RISK_MAX_BTC_POSITION_QUANTITY='1'; npm run test:e2e -- --runInBand` — all 40 tests passed across 3 suites in the disposable `crypto_trader_e2e` schema.
+- `$env:RISK_MAX_BTC_POSITION_QUANTITY='1'; npm run test:e2e -- --runInBand` — all 41 tests passed across 4 suites in the disposable `crypto_trader_e2e` schema.
 - The E2E global setup recreates and migrates only its dedicated schema; local application balances, executions, controls, signals, candles, and runs are not read or changed.
-- `npx prisma migrate deploy` — all eight migrations applied, including immutable backtest-run storage
+- `npx prisma migrate deploy` — all nine migrations applied, including durable Spot symbol observations
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live Binance historical-candle smoke test — the public market-data-only kline endpoint returned ordered BTCUSDT one-minute rows with the documented 12 fields and no credentials
@@ -174,7 +176,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M6.32 are committed. M7.1 changes are currently in the working tree.
+M0 through M7.1 are committed. M7.2 changes are currently in the working tree.
 
 ## Known issues and cautions
 
