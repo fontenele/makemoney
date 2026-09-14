@@ -5,6 +5,37 @@ const required = {
   REDIS_URL: 'redis://localhost:6379',
 };
 
+describe('validateEnvironment positive risk decimals', () => {
+  it('accepts positive fractional limits, including the BTC position default', () => {
+    expect(
+      validateEnvironment({
+        ...required,
+        RISK_MAX_ORDER_NOTIONAL_USDT: '0.5',
+        RISK_MAX_BTC_POSITION_QUANTITY: '0.01',
+        RISK_MAX_DAILY_REALIZED_LOSS_USDT: '0.25',
+        RISK_MAX_UNREALIZED_LOSS_USDT: '0.10',
+      }),
+    ).toMatchObject({
+      RISK_MAX_ORDER_NOTIONAL_USDT: '0.5',
+      RISK_MAX_BTC_POSITION_QUANTITY: '0.01',
+      RISK_MAX_DAILY_REALIZED_LOSS_USDT: '0.25',
+      RISK_MAX_UNREALIZED_LOSS_USDT: '0.10',
+    });
+  });
+
+  it.each(['0', '0.0', '0.000', '-0.01', '.01', '1.', '01'])(
+    'rejects non-positive or non-canonical risk decimal %s',
+    (value) => {
+      expect(() =>
+        validateEnvironment({
+          ...required,
+          RISK_MAX_BTC_POSITION_QUANTITY: value,
+        }),
+      ).toThrow('Invalid environment configuration');
+    },
+  );
+});
+
 describe('validateEnvironment strategy periods', () => {
   it('uses conservative 3/5 defaults', () => {
     expect(validateEnvironment(required)).toMatchObject({

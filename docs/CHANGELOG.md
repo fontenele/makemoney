@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-14 — Risk decimal startup validation fixed
+
+- Fixed startup validation so strictly positive fractional risk limits such as the default `RISK_MAX_BTC_POSITION_QUANTITY=0.01` are accepted.
+- Kept zero, negative, non-canonical, over-precision, and over-scale values rejected.
+- Added regression coverage for all affected positive decimal risk-limit settings.
+
 ## 2026-09-14 — M7.7 detection-time filters completed
 
 - Added optional inclusive `detectedFrom` and `detectedTo` filters to `GET /new-listings`.

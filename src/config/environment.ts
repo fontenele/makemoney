@@ -25,6 +25,9 @@ interface Environment {
   STRATEGY_MA_LONG_PERIOD: number;
 }
 
+const positiveDecimalPattern =
+  /^(?:[1-9]\d{0,19}(?:\.\d{1,18})?|0\.(?=\d{0,17}[1-9])\d{1,18})$/;
+
 const environmentSchema = Joi.object<Environment>({
   NODE_ENV: Joi.string()
     .valid('development', 'test', 'production')
@@ -57,17 +60,17 @@ const environmentSchema = Joi.object<Environment>({
     .pattern(/^(0|0\.\d+)$/)
     .default('0.001'),
   RISK_MAX_ORDER_NOTIONAL_USDT: Joi.string()
-    .pattern(/^[1-9]\d{0,19}(\.\d{1,18})?$/)
+    .pattern(positiveDecimalPattern)
     .default('100'),
   RISK_EMERGENCY_STOP: Joi.boolean().default(false),
   RISK_MAX_BTC_POSITION_QUANTITY: Joi.string()
-    .pattern(/^[1-9]\d{0,19}(\.\d{1,18})?$/)
+    .pattern(positiveDecimalPattern)
     .default('0.01'),
   RISK_MAX_DAILY_REALIZED_LOSS_USDT: Joi.string()
-    .pattern(/^[1-9]\d{0,19}(\.\d{1,18})?$/)
+    .pattern(positiveDecimalPattern)
     .default('25'),
   RISK_MAX_UNREALIZED_LOSS_USDT: Joi.string()
-    .pattern(/^[1-9]\d{0,19}(\.\d{1,18})?$/)
+    .pattern(positiveDecimalPattern)
     .default('25'),
   RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE: Joi.string()
     .pattern(/^(0\.\d*[1-9]\d*|1(?:\.0+)?)$/)
