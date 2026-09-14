@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.10 filtered detection summary completed
+
+- Added read-only `GET /new-listings/summary` over the complete matching durable detection sample.
+- Reused strict time, provider, status, and Spot-availability filters without pagination semantics.
+- Returned an exact count and explicit nullable earliest/latest application detection times without adding market tracking or financial behavior.
+- 454 unit tests and all 45 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — M7.9 current provider-state filters completed
 
 - Added strict optional provider, current status, and Spot-availability filters to `GET /new-listings`.

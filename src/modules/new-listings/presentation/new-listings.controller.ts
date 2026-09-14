@@ -7,6 +7,8 @@ import {
 import {
   DetectedSpotSymbol,
   DetectedSpotSymbolCursorNotFoundError,
+  DetectedSpotSymbolFilters,
+  DetectedSpotSymbolSummary,
 } from '../domain/spot-symbol-catalog';
 
 @Controller('new-listings')
@@ -14,6 +16,25 @@ export class NewListingsController {
   constructor(
     private readonly detections: SpotSymbolDetectionReadModelService,
   ) {}
+
+  @Get('summary')
+  summary(
+    @Query('detectedFrom') detectedFrom?: string,
+    @Query('detectedTo') detectedTo?: string,
+    @Query('provider') provider?: string,
+    @Query('status') status?: string,
+    @Query('spotTradingAllowed') spotTradingAllowed?: string,
+  ): Promise<DetectedSpotSymbolSummary> {
+    return this.detections.summarize(
+      validFilters(
+        detectedFrom,
+        detectedTo,
+        provider,
+        status,
+        spotTradingAllowed,
+      ),
+    );
+  }
 
   @Get()
   async list(
@@ -26,31 +47,19 @@ export class NewListingsController {
     @Query('spotTradingAllowed') spotTradingAllowed?: string,
   ): Promise<DetectedSpotSymbol[]> {
     const parsedLimit = validLimit(limit);
-    const parsedFrom = optionalUtcTimestamp(detectedFrom, 'detectedFrom');
-    const parsedTo = optionalUtcTimestamp(detectedTo, 'detectedTo');
-    if (parsedFrom && parsedTo && parsedFrom > parsedTo) {
-      throw new BadRequestException(
-        'detectedFrom must be at or before detectedTo',
-      );
-    }
     const parsedCursor = optionalCursor(cursor);
-    const parsedProvider = optionalProvider(provider);
-    const parsedStatus = optionalStatus(status);
-    const parsedSpotTradingAllowed = optionalBoolean(
+    const filters = validFilters(
+      detectedFrom,
+      detectedTo,
+      provider,
+      status,
       spotTradingAllowed,
-      'spotTradingAllowed',
     );
     try {
       return await this.detections.listRecent(
         {
           limit: parsedLimit,
-          detectedFrom: parsedFrom,
-          detectedTo: parsedTo,
-          ...(parsedProvider ? { provider: parsedProvider } : {}),
-          ...(parsedStatus ? { status: parsedStatus } : {}),
-          ...(parsedSpotTradingAllowed !== undefined
-            ? { spotTradingAllowed: parsedSpotTradingAllowed }
-            : {}),
+          ...filters,
         },
         parsedCursor,
       );
@@ -61,6 +70,37 @@ export class NewListingsController {
       throw error;
     }
   }
+}
+
+function validFilters(
+  detectedFrom?: string,
+  detectedTo?: string,
+  provider?: string,
+  status?: string,
+  spotTradingAllowed?: string,
+): DetectedSpotSymbolFilters {
+  const parsedFrom = optionalUtcTimestamp(detectedFrom, 'detectedFrom');
+  const parsedTo = optionalUtcTimestamp(detectedTo, 'detectedTo');
+  if (parsedFrom && parsedTo && parsedFrom > parsedTo) {
+    throw new BadRequestException(
+      'detectedFrom must be at or before detectedTo',
+    );
+  }
+  const parsedProvider = optionalProvider(provider);
+  const parsedStatus = optionalStatus(status);
+  const parsedSpotTradingAllowed = optionalBoolean(
+    spotTradingAllowed,
+    'spotTradingAllowed',
+  );
+  return {
+    detectedFrom: parsedFrom,
+    detectedTo: parsedTo,
+    ...(parsedProvider ? { provider: parsedProvider } : {}),
+    ...(parsedStatus ? { status: parsedStatus } : {}),
+    ...(parsedSpotTradingAllowed !== undefined
+      ? { spotTradingAllowed: parsedSpotTradingAllowed }
+      : {}),
+  };
 }
 
 function optionalProvider(value?: string) {

@@ -51,3 +51,9 @@ The cursor must identify a detected row and must belong to the requested detecti
 `GET /new-listings` accepts optional `provider=binance`, an uppercase provider `status` of up to 30 characters, and strict `spotTradingAllowed=true|false`. These filters compose with limit, detection-time bounds, and cursor pagination and are applied by PostgreSQL before the bounded result is returned.
 
 A cursor must itself match every active filter so changing filters between pages fails explicitly with `400` instead of creating an ambiguous continuation. The fields describe the latest observed provider state, not state at detection time. Historical state transitions, alerts, scoring, market tracking, signals, and trading remain outside this increment.
+
+## M7.10 filtered detection summary
+
+`GET /new-listings/summary` aggregates the durable detection set after applying the same optional detection-time, provider, current-status, and current Spot-availability filters as the list route. It returns `count`, `firstDetectedAt`, and `lastDetectedAt`; both timestamps are null when no detection matches.
+
+The summary answers only how many application detections are represented and the bounds of that sample. It does not infer official listing times or introduce price tracking, pump/correction classification, alerts, scoring, signals, or trading.

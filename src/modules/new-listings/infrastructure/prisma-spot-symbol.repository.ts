@@ -3,7 +3,9 @@ import { Prisma } from '../../../generated/prisma/client';
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
 import {
   DetectedSpotSymbol,
+  DetectedSpotSymbolFilters,
   DetectedSpotSymbolQuery,
+  DetectedSpotSymbolSummary,
   SpotSymbolCatalog,
   SpotSymbol,
   SpotSymbolRepository,
@@ -120,6 +122,35 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
       take: limit,
     });
     return rows.map(toDetectedSpotSymbol);
+  }
+
+  async summarizeDetected({
+    detectedFrom,
+    detectedTo,
+    provider,
+    status,
+    spotTradingAllowed,
+  }: DetectedSpotSymbolFilters): Promise<DetectedSpotSymbolSummary> {
+    const result = await this.prisma.observedSpotSymbol.aggregate({
+      where: {
+        ...(provider ? { provider } : {}),
+        ...(status ? { status } : {}),
+        ...(spotTradingAllowed !== undefined ? { spotTradingAllowed } : {}),
+        detectedAt: {
+          not: null,
+          ...(detectedFrom ? { gte: detectedFrom } : {}),
+          ...(detectedTo ? { lte: detectedTo } : {}),
+        },
+      },
+      _count: { _all: true },
+      _min: { detectedAt: true },
+      _max: { detectedAt: true },
+    });
+    return {
+      count: result._count._all,
+      firstDetectedAt: result._min.detectedAt,
+      lastDetectedAt: result._max.detectedAt,
+    };
   }
 }
 

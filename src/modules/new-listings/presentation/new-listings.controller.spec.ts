@@ -5,6 +5,43 @@ import { DetectedSpotSymbolCursorNotFoundError } from '../domain/spot-symbol-cat
 import { NewListingsController } from './new-listings.controller';
 
 describe('NewListingsController', () => {
+  it('returns a filtered detection summary without pagination input', async () => {
+    const summarize = jest.fn(() =>
+      Promise.resolve({
+        count: 2,
+        firstDetectedAt: new Date('2026-09-14T02:00:00.000Z'),
+        lastDetectedAt: new Date('2026-09-14T03:00:00.000Z'),
+      }),
+    );
+    const controller = new NewListingsController({ summarize });
+
+    await expect(
+      controller.summary(
+        '2026-09-14T01:00:00.000Z',
+        '2026-09-14T04:00:00.000Z',
+        'binance',
+        'TRADING',
+        'true',
+      ),
+    ).resolves.toMatchObject({ count: 2 });
+    expect(summarize).toHaveBeenCalledWith({
+      detectedFrom: new Date('2026-09-14T01:00:00.000Z'),
+      detectedTo: new Date('2026-09-14T04:00:00.000Z'),
+      provider: 'binance',
+      status: 'TRADING',
+      spotTradingAllowed: true,
+    });
+  });
+
+  it('applies list filter validation to the summary', async () => {
+    const controller = new NewListingsController({
+      summarize: jest.fn(() => Promise.resolve({})),
+    });
+    expect(() =>
+      controller.summary(undefined, undefined, undefined, 'trading'),
+    ).toThrow('status must be an uppercase provider status');
+  });
+
   it('uses the default or requested bounded limit', async () => {
     const listRecent = jest.fn((query: { limit: number }) =>
       Promise.resolve(query.limit > 0 ? [detection()] : []),

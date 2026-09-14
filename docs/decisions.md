@@ -495,3 +495,7 @@ A cursor outside the selected time interval is invalid, ensuring pagination cann
 Detection research can now narrow results by the provider, its current status string, and current Spot-trading availability. Inputs remain deliberately strict: only the implemented `binance` provider is accepted, status uses the normalized uppercase provider form, and booleans have only literal `true` and `false` encodings.
 
 Filters apply inside the existing PostgreSQL query and form part of cursor compatibility. They describe the most recently observed mutable state; no historical state is inferred or stored by this read feature.
+
+## M7.10 aggregate the existing sample before market enrichment
+
+The first statistical new-listing read aggregates only facts already stored for durable detections: sample count and minimum/maximum application detection time. It reuses the list's filters but excludes pagination because the aggregation covers the full matching set. Null temporal bounds make an empty sample explicit without inventing observations or introducing market tracking prematurely.

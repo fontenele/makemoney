@@ -24,6 +24,8 @@ M7.8 supports stable provider/symbol cursor pagination composed with those filte
 
 M7.9 supports strict filtering by provider, current status, and current Spot-trading availability.
 
+M7.10 exposes a filtered aggregate count and earliest/latest application detection times.
+
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
@@ -37,6 +39,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.7 adds validated optional `detectedFrom` and `detectedTo` filters and rejects inverted ranges before querying PostgreSQL.
 - M7.8 adds an optional canonical `provider:symbol` cursor resolved to the immutable detection sort position; invalid and filter-incompatible cursors return HTTP 400.
 - M7.9 adds optional `provider`, `status`, and `spotTradingAllowed` filters applied within the bounded PostgreSQL query and cursor compatibility checks.
+- M7.10 exposes `GET /new-listings/summary` with the same non-pagination filters, returning the matching detection count and nullable temporal bounds.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -176,18 +179,18 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-14 after M7.7:
+The following passed on 2026-09-14 after M7.10:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 429 tests passed across 59 suites
+- `npm test -- --runInBand` — 454 tests passed across 60 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
 The complete database-backed integration validation passed after E2E isolation:
 
-- `$env:RISK_MAX_BTC_POSITION_QUANTITY='1'; npm run test:e2e -- --runInBand` — all 42 tests passed across 4 suites in the disposable `crypto_trader_e2e` schema.
+- `npm run test:e2e -- --runInBand` — all 45 tests passed across 4 suites in the disposable `crypto_trader_e2e` schema.
 - The E2E global setup recreates and migrates only its dedicated schema; local application balances, executions, controls, signals, candles, and runs are not read or changed.
 - `npx prisma migrate deploy` — all ten migrations applied, including durable Spot symbol observations and detection timestamps
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
@@ -200,11 +203,10 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.7 are committed milestone increments.
+M0 through M7.10 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 
-- The local `.env` currently sets `RISK_MAX_BTC_POSITION_QUANTITY=0.01`, which the existing canonical positive-decimal validator rejects. Complete E2E validation used a process-only value of `1`; the local file was not modified and application startup will require correcting that local setting.
 - Jest requires Node's `--experimental-vm-modules` flag because NestJS 12 packages are ESM.
 - The Docker build reported eight high-severity findings in the dependency audit. They have not been automatically changed because `npm audit fix --force` may introduce breaking upgrades; review them separately.
 - A transitive Angular DevKit package recommends Node `24.15.0` or newer while the machine has Node `24.14.1`. Current build, lint, and tests pass, but a Node 24 LTS patch update is advisable.

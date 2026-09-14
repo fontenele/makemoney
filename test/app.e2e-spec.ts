@@ -165,6 +165,13 @@ describe('Application (e2e)', () => {
     return request(server).get('/health').expect(200);
   });
 
+  it('/new-listings/summary (GET) exposes aggregate detection coverage', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(server)
+      .get('/new-listings/summary?provider=binance&spotTradingAllowed=true')
+      .expect(200);
+  });
+
   it('/backtesting/replay (POST) exposes bounded deterministic replay', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     const body = {

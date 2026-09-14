@@ -2,7 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   DetectedSpotSymbolCursorNotFoundError,
   DetectedSpotSymbol,
+  DetectedSpotSymbolFilters,
   DetectedSpotSymbolQuery,
+  DetectedSpotSymbolSummary,
   SPOT_SYMBOL_REPOSITORY,
   SpotSymbolRepository,
 } from '../domain/spot-symbol-catalog';
@@ -42,5 +44,11 @@ export class SpotSymbolDetectionReadModelService {
       ...query,
       cursor: resolvedCursor ?? undefined,
     });
+  }
+
+  summarize(
+    filters: DetectedSpotSymbolFilters,
+  ): Promise<DetectedSpotSymbolSummary> {
+    return this.repository.summarizeDetected(filters);
   }
 }

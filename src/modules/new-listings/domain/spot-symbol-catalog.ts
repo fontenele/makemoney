@@ -27,6 +27,17 @@ export interface DetectedSpotSymbolQuery {
   cursor?: Pick<DetectedSpotSymbol, 'provider' | 'symbol' | 'detectedAt'>;
 }
 
+export type DetectedSpotSymbolFilters = Omit<
+  DetectedSpotSymbolQuery,
+  'limit' | 'cursor'
+>;
+
+export interface DetectedSpotSymbolSummary {
+  count: number;
+  firstDetectedAt: Date | null;
+  lastDetectedAt: Date | null;
+}
+
 export class DetectedSpotSymbolCursorNotFoundError extends Error {
   constructor() {
     super('Detected Spot symbol cursor was not found');
@@ -54,4 +65,7 @@ export interface SpotSymbolRepository {
     symbol: string,
   ): Promise<DetectedSpotSymbol | null>;
   listDetected(query: DetectedSpotSymbolQuery): Promise<DetectedSpotSymbol[]>;
+  summarizeDetected(
+    filters: DetectedSpotSymbolFilters,
+  ): Promise<DetectedSpotSymbolSummary>;
 }

@@ -154,6 +154,32 @@ describe('Spot symbol observation persistence (e2e)', () => {
         spotTradingAllowed: false,
       }),
     ).resolves.toMatchObject([{ symbol: 'BETAUSDT' }]);
+    await expect(repository.summarizeDetected({})).resolves.toEqual({
+      count: 3,
+      firstDetectedAt: tied,
+      lastDetectedAt: newest,
+    });
+    await expect(
+      repository.summarizeDetected({
+        detectedFrom: tied,
+        detectedTo: tied,
+        provider: 'binance',
+        status: 'TRADING',
+        spotTradingAllowed: true,
+      }),
+    ).resolves.toEqual({
+      count: 1,
+      firstDetectedAt: tied,
+      lastDetectedAt: tied,
+    });
+  });
+
+  it('returns an explicit empty detection summary', async () => {
+    await expect(repository.summarizeDetected({})).resolves.toEqual({
+      count: 0,
+      firstDetectedAt: null,
+      lastDetectedAt: null,
+    });
   });
 });
 

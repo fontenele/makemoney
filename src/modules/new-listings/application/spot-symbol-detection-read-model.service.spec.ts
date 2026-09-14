@@ -3,6 +3,22 @@ import { SpotSymbolDetectionReadModelService } from './spot-symbol-detection-rea
 import { DetectedSpotSymbolCursorNotFoundError } from '../domain/spot-symbol-catalog';
 
 describe('SpotSymbolDetectionReadModelService', () => {
+  it('delegates filtered aggregate summaries to the repository', async () => {
+    const summary = {
+      count: 2,
+      firstDetectedAt: new Date('2026-09-14T01:00:00.000Z'),
+      lastDetectedAt: new Date('2026-09-14T02:00:00.000Z'),
+    };
+    const summarizeDetected = jest.fn(() => Promise.resolve(summary));
+    const service = new SpotSymbolDetectionReadModelService({
+      summarizeDetected,
+    });
+    const filters = { status: 'TRADING' };
+
+    await expect(service.summarize(filters)).resolves.toBe(summary);
+    expect(summarizeDetected).toHaveBeenCalledWith(filters);
+  });
+
   it('resolves a cursor and passes its immutable sort identity', async () => {
     const cursor = detection();
     const repository = repositoryWith({
