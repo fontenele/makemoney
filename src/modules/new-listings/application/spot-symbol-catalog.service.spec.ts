@@ -11,10 +11,12 @@ describe('SpotSymbolCatalogService', () => {
     const provider: SpotSymbolCatalogProvider = {
       load: jest.fn(() => Promise.resolve(catalog)),
     };
-    const service = new SpotSymbolCatalogService(provider);
+    const repository = { observe: jest.fn(() => Promise.resolve()) };
+    const service = new SpotSymbolCatalogService(provider, repository);
     service.onModuleInit();
     await new Promise<void>((resolve) => setImmediate(resolve));
     expect(service.latest()).toBe(catalog);
+    expect(repository.observe).toHaveBeenCalledWith(catalog);
     service.onModuleDestroy();
   });
 
@@ -22,7 +24,9 @@ describe('SpotSymbolCatalogService', () => {
     const provider: SpotSymbolCatalogProvider = {
       load: jest.fn(() => Promise.reject(new Error('network'))),
     };
-    const service = new SpotSymbolCatalogService(provider);
+    const service = new SpotSymbolCatalogService(provider, {
+      observe: jest.fn(() => Promise.resolve()),
+    });
     service.onModuleInit();
     await new Promise<void>((resolve) => setImmediate(resolve));
     expect(service.latest()).toBeUndefined();

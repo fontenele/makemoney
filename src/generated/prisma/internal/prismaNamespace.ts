@@ -402,7 +402,8 @@ export const ModelName = {
   RiskControlEvent: 'RiskControlEvent',
   StrategySignal: 'StrategySignal',
   HistoricalCandleRecord: 'HistoricalCandleRecord',
-  BacktestRun: 'BacktestRun'
+  BacktestRun: 'BacktestRun',
+  ObservedSpotSymbol: 'ObservedSpotSymbol'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -418,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "observedSpotSymbol"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -866,6 +867,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ObservedSpotSymbol: {
+      payload: Prisma.$ObservedSpotSymbolPayload<ExtArgs>
+      fields: Prisma.ObservedSpotSymbolFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ObservedSpotSymbolFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ObservedSpotSymbolPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ObservedSpotSymbolFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ObservedSpotSymbolPayload>
+        }
+        findFirst: {
+          args: Prisma.ObservedSpotSymbolFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ObservedSpotSymbolPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ObservedSpotSymbolFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ObservedSpotSymbolPayload>
+        }
+        findMany: {
+          args: Prisma.ObservedSpotSymbolFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ObservedSpotSymbolPayload>[]
+        }
+        create: {
+          args: Prisma.ObservedSpotSymbolCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ObservedSpotSymbolPayload>
+        }
+        createMany: {
+          args: Prisma.ObservedSpotSymbolCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ObservedSpotSymbolCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ObservedSpotSymbolPayload>[]
+        }
+        delete: {
+          args: Prisma.ObservedSpotSymbolDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ObservedSpotSymbolPayload>
+        }
+        update: {
+          args: Prisma.ObservedSpotSymbolUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ObservedSpotSymbolPayload>
+        }
+        deleteMany: {
+          args: Prisma.ObservedSpotSymbolDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ObservedSpotSymbolUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ObservedSpotSymbolUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ObservedSpotSymbolPayload>[]
+        }
+        upsert: {
+          args: Prisma.ObservedSpotSymbolUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ObservedSpotSymbolPayload>
+        }
+        aggregate: {
+          args: Prisma.ObservedSpotSymbolAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateObservedSpotSymbol>
+        }
+        groupBy: {
+          args: Prisma.ObservedSpotSymbolGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ObservedSpotSymbolGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ObservedSpotSymbolCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ObservedSpotSymbolCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -994,6 +1069,20 @@ export const BacktestRunScalarFieldEnum = {
 } as const
 
 export type BacktestRunScalarFieldEnum = (typeof BacktestRunScalarFieldEnum)[keyof typeof BacktestRunScalarFieldEnum]
+
+
+export const ObservedSpotSymbolScalarFieldEnum = {
+  provider: 'provider',
+  symbol: 'symbol',
+  baseAsset: 'baseAsset',
+  quoteAsset: 'quoteAsset',
+  status: 'status',
+  spotTradingAllowed: 'spotTradingAllowed',
+  firstObservedAt: 'firstObservedAt',
+  lastObservedAt: 'lastObservedAt'
+} as const
+
+export type ObservedSpotSymbolScalarFieldEnum = (typeof ObservedSpotSymbolScalarFieldEnum)[keyof typeof ObservedSpotSymbolScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1303,6 +1392,7 @@ export type GlobalOmitConfig = {
   strategySignal?: Prisma.StrategySignalOmit
   historicalCandleRecord?: Prisma.HistoricalCandleRecordOmit
   backtestRun?: Prisma.BacktestRunOmit
+  observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
 }
 
 /* Types for Logging */

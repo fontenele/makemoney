@@ -47,3 +47,8 @@ export type HistoricalCandleRecord = Prisma.HistoricalCandleRecordModel
  * 
  */
 export type BacktestRun = Prisma.BacktestRunModel
+/**
+ * Model ObservedSpotSymbol
+ * 
+ */
+export type ObservedSpotSymbol = Prisma.ObservedSpotSymbolModel

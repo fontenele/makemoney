@@ -56,7 +56,8 @@ export const ModelName = {
   RiskControlEvent: 'RiskControlEvent',
   StrategySignal: 'StrategySignal',
   HistoricalCandleRecord: 'HistoricalCandleRecord',
-  BacktestRun: 'BacktestRun'
+  BacktestRun: 'BacktestRun',
+  ObservedSpotSymbol: 'ObservedSpotSymbol'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -164,6 +165,20 @@ export const BacktestRunScalarFieldEnum = {
 } as const
 
 export type BacktestRunScalarFieldEnum = (typeof BacktestRunScalarFieldEnum)[keyof typeof BacktestRunScalarFieldEnum]
+
+
+export const ObservedSpotSymbolScalarFieldEnum = {
+  provider: 'provider',
+  symbol: 'symbol',
+  baseAsset: 'baseAsset',
+  quoteAsset: 'quoteAsset',
+  status: 'status',
+  spotTradingAllowed: 'spotTradingAllowed',
+  firstObservedAt: 'firstObservedAt',
+  lastObservedAt: 'lastObservedAt'
+} as const
+
+export type ObservedSpotSymbolScalarFieldEnum = (typeof ObservedSpotSymbolScalarFieldEnum)[keyof typeof ObservedSpotSymbolScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -7,8 +7,10 @@ import {
 } from '@nestjs/common';
 import {
   SPOT_SYMBOL_CATALOG_PROVIDER,
+  SPOT_SYMBOL_REPOSITORY,
   SpotSymbolCatalog,
   SpotSymbolCatalogProvider,
+  SpotSymbolRepository,
 } from '../domain/spot-symbol-catalog';
 
 @Injectable()
@@ -20,6 +22,8 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
   constructor(
     @Inject(SPOT_SYMBOL_CATALOG_PROVIDER)
     private readonly provider: SpotSymbolCatalogProvider,
+    @Inject(SPOT_SYMBOL_REPOSITORY)
+    private readonly repository: SpotSymbolRepository,
   ) {}
 
   onModuleInit(): void {
@@ -36,7 +40,9 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
 
   private async load(): Promise<void> {
     try {
-      this.catalog = await this.provider.load(this.abortController.signal);
+      const catalog = await this.provider.load(this.abortController.signal);
+      await this.repository.observe(catalog);
+      this.catalog = catalog;
       this.logger.log({
         event: 'new_listings.catalog_loaded',
         symbolCount: this.catalog.symbols.length,

@@ -19,3 +19,9 @@ export const SPOT_SYMBOL_CATALOG_PROVIDER = Symbol(
 export interface SpotSymbolCatalogProvider {
   load(signal?: AbortSignal): Promise<SpotSymbolCatalog>;
 }
+
+export const SPOT_SYMBOL_REPOSITORY = Symbol('SPOT_SYMBOL_REPOSITORY');
+
+export interface SpotSymbolRepository {
+  observe(catalog: SpotSymbolCatalog): Promise<void>;
+}
