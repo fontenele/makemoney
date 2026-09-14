@@ -73,4 +73,10 @@ export interface SpotSymbolRepository {
   summarizeDetected(
     filters: DetectedSpotSymbolFilters,
   ): Promise<DetectedSpotSymbolSummary>;
+  listDueCheckpoints(
+    dueAt: Date,
+    limit: number,
+  ): Promise<
+    import('./listing-observation-schedule').DueListingObservationCheckpoint[]
+  >;
 }

@@ -75,3 +75,7 @@ This increment establishes timing semantics only. It creates no persistence, sch
 Each post-baseline detection now creates all nine schedule rows in the same serializable transaction as the detected symbol. Composite provider/symbol/label identity prevents duplicates, while target-time indexing prepares later due-work reads. The migration backfills checkpoints only for rows with a legitimate non-null detection time.
 
 No worker claims checkpoints and no market data is requested or stored in this increment.
+
+## M7.14 bounded due-checkpoint read
+
+The repository can now list checkpoints with `targetAt` at or before an explicit instant, bounded by a caller-supplied limit and ordered by target time, provider, symbol, and label. This internal read is deterministic and provider-neutral. It does not claim, complete, retry, or process checkpoints and performs no provider request.

@@ -511,3 +511,7 @@ The research checkpoints are defined as explicit millisecond offsets from the im
 ## M7.13 checkpoints are durable detection children
 
 Checkpoint identity is provider, symbol, and schedule label. Rows retain offset and target time and are inserted in the detection transaction, preventing a committed detection without its research plan. The foreign key cascades only if the parent observation is explicitly removed. No processing state is added before a worker contract exists.
+
+## M7.14 explicit-time bounded due reads
+
+Due-checkpoint selection receives its clock instant and limit from the caller and uses the target-time composite index with a complete deterministic order. The repository only reads candidates; claim ownership, retries, completion state, provider sampling, and scheduling lifecycle remain separate increments.

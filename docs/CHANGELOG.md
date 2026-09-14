@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.14 bounded due-checkpoint read completed
+
+- Added a provider-neutral internal read for checkpoints due by an explicit instant.
+- Bounded and deterministically ordered results using the target-time index.
+- Added no claiming, worker, retry, provider request, market sample, or financial behavior.
+- 457 unit tests and all 45 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — M7.13 durable observation checkpoints completed
 
 - Added an indexed PostgreSQL checkpoint table related to durable detected symbols.

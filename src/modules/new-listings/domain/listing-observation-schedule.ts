@@ -19,6 +19,11 @@ export interface ListingObservationCheckpoint {
   targetAt: Date;
 }
 
+export interface DueListingObservationCheckpoint extends ListingObservationCheckpoint {
+  provider: 'binance';
+  symbol: string;
+}
+
 export function buildListingObservationSchedule(
   detectedAt: Date,
 ): ListingObservationCheckpoint[] {

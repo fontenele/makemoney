@@ -32,6 +32,8 @@ M7.12 defines the provider-neutral nine-checkpoint observation schedule as a pur
 
 M7.13 persists those checkpoints atomically for each durable detection without processing them.
 
+M7.14 reads bounded due checkpoints deterministically without claiming or processing them.
+
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
@@ -49,6 +51,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.11 extends that summary with `byStatus` and `bySpotTradingAllowed` counts read from one consistent PostgreSQL transaction.
 - M7.12 projects `T+0` through `T+24h` checkpoint targets deterministically from a valid detection time, with no scheduler or collection side effect.
 - M7.13 stores the nine targets under an idempotent composite identity and target-time index in the detection transaction.
+- M7.14 exposes an internal target-time-bounded repository read with deterministic identity tie-breakers.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -188,7 +191,7 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-14 after M7.13:
+The following passed on 2026-09-14 after M7.14:
 
 - `npm run build`
 - `npm run lint`
@@ -212,7 +215,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.13 are implemented and fully verified milestone increments.
+M0 through M7.14 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

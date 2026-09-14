@@ -93,6 +93,12 @@ describe('Spot symbol observation persistence (e2e)', () => {
       offsetMs: 86_400_000,
       targetAt: new Date('2026-09-15T02:00:00.000Z'),
     });
+    await expect(
+      repository.listDueCheckpoints(new Date('2026-09-14T02:00:10.000Z'), 2),
+    ).resolves.toMatchObject([
+      { symbol: 'NEWUSDT', label: 'T+0' },
+      { symbol: 'NEWUSDT', label: 'T+5s' },
+    ]);
 
     const third = new Date('2026-09-14T03:00:00.000Z');
     await repository.observe({ receivedAt: third, symbols: [added] });

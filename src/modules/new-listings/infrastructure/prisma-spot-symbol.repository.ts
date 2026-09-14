@@ -11,6 +11,7 @@ import {
   SpotSymbolRepository,
 } from '../domain/spot-symbol-catalog';
 import { buildListingObservationSchedule } from '../domain/listing-observation-schedule';
+import { DueListingObservationCheckpoint } from '../domain/listing-observation-schedule';
 
 @Injectable()
 export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
@@ -195,6 +196,29 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
         }),
       ),
     };
+  }
+
+  async listDueCheckpoints(
+    dueAt: Date,
+    limit: number,
+  ): Promise<DueListingObservationCheckpoint[]> {
+    const rows = await this.prisma.listingObservationCheckpoint.findMany({
+      where: { targetAt: { lte: dueAt } },
+      orderBy: [
+        { targetAt: 'asc' },
+        { provider: 'asc' },
+        { symbol: 'asc' },
+        { label: 'asc' },
+      ],
+      take: limit,
+    });
+    return rows.map(({ symbol, label, offsetMs, targetAt }) => ({
+      provider: 'binance',
+      symbol,
+      label: label as DueListingObservationCheckpoint['label'],
+      offsetMs,
+      targetAt,
+    }));
   }
 }
 
