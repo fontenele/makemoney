@@ -6,7 +6,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | --- | --- | --- |
 | context, scope, safety, rules | `../PROJECT_CONTEXT.md`, `../AGENTS.md` | — |
 | current status, verification, known issues | `current-state.md`, `CHANGELOG.md` | — |
-| milestones, next work, M1, M2, M3, M4, M5, M6, M6.1, M6.2, M6.3, M6.4, M6.5, M6.6, M6.7, M6.8, M6.9, M6.10, M6.11, M6.12, M6.13, M6.14, M6.15, M6.16, M6.17, M6.18, M6.19, M6.20, M6.21, M6.22, M6.23, M6.24, M6.25, M6.26, M6.27, M6.28, M6.29, M6.30, M6.31, original plan | `roadmap.md`, `plan.md`, `../PROJECT_CONTEXT.md` | — |
+| milestones, next work, M1, M2, M3, M4, M5, M6, M6.1, M6.2, M6.3, M6.4, M6.5, M6.6, M6.7, M6.8, M6.9, M6.10, M6.11, M6.12, M6.13, M6.14, M6.15, M6.16, M6.17, M6.18, M6.19, M6.20, M6.21, M6.22, M6.23, M6.24, M6.25, M6.26, M6.27, M6.28, M6.29, M6.30, M6.31, M6.32, original plan | `roadmap.md`, `plan.md`, `../PROJECT_CONTEXT.md` | — |
 | decisions, ports, ESM, Prisma | `decisions.md` | `../package.json`, `../tsconfig.json`, `../compose.yaml` |
 | bootstrap, NestJS, modules | `current-state.md` | `../src/main.ts`, `../src/app.module.ts` |
 | API, HTTP, routes, endpoints, controllers | `../README.md`, `current-state.md` | `../src/modules/*/presentation` |
@@ -16,6 +16,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | health, readiness | `current-state.md` | `../src/modules/health`, `../test/app.e2e-spec.ts` |
 | Docker, Compose, containers | `current-state.md`, `decisions.md` | `../Dockerfile`, `../compose.yaml` |
 | tests, Jest, E2E, lint, formatting | `current-state.md`, `decisions.md` | `../package.json`, `../eslint.config.mjs`, `../test` |
+| E2E isolation, test schema, crypto_trader_e2e, PostgreSQL search path | `current-state.md`, `decisions.md` | `../test/e2e-global-setup.cjs`, `../test/e2e-setup.cjs`, `../src/infrastructure/database/prisma.service.ts` |
 | Binance, REST, exchange info, pair metadata, filters, tick size, step size, minimum notional, WebSocket, reconnect, backoff, public trades, mini ticker, candle, kline, OHLC, volume, trade count, book ticker, top of book, bid, ask, spread, midpoint, basis points, bps, decimal.js, latest price, BTC/USDT | `binance-public-trades.md`, `binance-public-ticker.md`, `binance-public-candles.md`, `binance-public-top-of-book.md`, `binance-pair-metadata.md`, `decisions.md`, `roadmap.md` | `../src/modules/market-data` |
 | dashboard, Vue, frontend | `roadmap.md` | Not implemented; M8 |
 | paper wallet, paper balance repository, persistence, atomic balance, portfolio API, balances endpoint, valuation endpoint, portfolio valuation, stale price, freshness, max price age, clock, latest market price, virtual balance, BTC balance, USDT balance, credit, debit, insufficient funds, decimal.js | `paper-wallet.md`, `decisions.md`, `roadmap.md` | `../src/modules/paper-wallet`, `../prisma/schema.prisma`, `../src/modules/market-data/application/latest-market-price.service.ts`, `../src/config/environment.ts` |

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-13 — M6.32 isolated E2E validation and M6 closure completed
+
+- Added a disposable `crypto_trader_e2e` schema lifecycle for full E2E runs, with automatic migration and no access to local application records.
+- Fixed PostgreSQL adapter schema propagation so generated Prisma operations and raw SQL transactions share the configured schema and validated search path.
+- Closed M6 after 407 unit tests across 56 suites and all 40 E2E tests across 3 suites passed together; build, lint, formatting, Compose, and diff checks also passed.
+
 ## 2026-09-13 — M6.31 explicit simulation-run deletion completed
 
 - Added `DELETE /backtesting/runs/:id` with validated UUID identity and explicit HTTP 204, 400, 404, and sanitized 503 outcomes.

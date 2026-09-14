@@ -8,8 +8,8 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6.1–M6.31 — deterministic replay, resilient durable historical loading, stored replay, gap-aware cache reuse, replay and simulation APIs, simulation-run persistence, retrieval, pagination, temporal filtering, and explicit deletion, capital-constrained simulation, execution costs and constraints, equity, and performance measurement**.
-- No next increment is approved. Stop and present a minimal plan before further backtesting work.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
+- M6 is closed after full unit, isolated database-backed E2E, build, lint, formatting, and Compose validation. The next work is to define the first minimal M7 New Listing Scanner increment before implementation.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -135,6 +135,8 @@ M6.29 extends the same array response with an optional UUID cursor taken from th
 M6.30 adds inclusive canonical UTC `createdFrom` and `createdTo` filters to the persisted-run list. Filters compose with limit and cursor, and cursors outside the selected interval are rejected.
 
 M6.31 adds explicit deletion of one stored simulation snapshot by UUID through `DELETE /backtesting/runs/:id`. Absence remains distinct from operational failure, and historical candles are preserved.
+
+M6.32 isolates E2E persistence in a disposable `crypto_trader_e2e` PostgreSQL schema, propagates configured schemas consistently to generated Prisma queries and raw transactional SQL, and closes M6 with the complete 40-test E2E suite green without touching local application data.
 
 Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

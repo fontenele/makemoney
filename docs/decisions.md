@@ -451,3 +451,7 @@ Creation filters use canonical UTC instants and inclusive comparisons. A cursor 
 ## M6.31 explicit single-run deletion
 
 Deletion is an explicit UUID-addressed command rather than retention policy or bulk cleanup. The repository uses one conditional database delete and reports whether a row existed, allowing HTTP to distinguish `204` from `404` without a read-before-delete race. Historical candles have no dependency on stored runs and remain untouched.
+
+## M6.32 disposable PostgreSQL schema for E2E isolation
+
+The E2E suite recreates and migrates only the dedicated `crypto_trader_e2e` schema before each complete run. The application schema remains untouched. `PrismaService` passes the validated URL schema both to Prisma's generated-query namespace and PostgreSQL's connection `search_path`, ensuring raw transactional SQL and generated queries cannot diverge across schemas.

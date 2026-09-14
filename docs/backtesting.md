@@ -363,6 +363,10 @@ M6.29 extends `GET /backtesting/runs` with an optional `cursor` while preserving
 
 `DELETE /backtesting/runs/:id` removes exactly one stored simulation snapshot by validated UUID. A successful deletion returns HTTP 204, an absent run returns 404, invalid identity returns 400, and operational failure is sanitized as 503. The command does not delete historical candles, perform recalculation, contact Binance, or mutate any paper or real financial state.
 
+## M6.32 verification isolation and M6 closure
+
+Database-backed E2E tests run against a disposable, migrated `crypto_trader_e2e` schema. Generated Prisma operations and raw transactional SQL share the same validated schema selection. The full M6 surface is therefore repeatable without reading, deleting, or resetting local application balances, executions, signals, candles, controls, or stored runs.
+
 ## Safety and deferred scope
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.

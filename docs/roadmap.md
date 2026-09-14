@@ -69,7 +69,7 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M5.6 — complete:** idempotent PostgreSQL persistence for live signals, with restart-safe recent and latest read APIs.
 - Cursor-paginated history, filters, position sizing, execution integration, and additional strategies require separate approval.
 
-## M6 — Backtesting — in progress
+## M6 — Backtesting — complete
 
 - **M6.1 — complete:** deterministic, provider-neutral replay of supplied ordered closed candles through the configured strategy, with strict input validation, bounded no-lookahead evaluation, and an ordered signal timeline plus action counts.
 - **M6.2 — complete:** bounded public Binance Spot historical BTC/USDT one-minute candle loading behind a provider-neutral contract, strict payload validation, open-candle exclusion, cancellation, and direct internal replay integration.
@@ -102,9 +102,10 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.29 — complete:** optional UUID cursor pagination extends the recent-run array without offset drift or a response-format change and rejects malformed or unknown cursors explicitly.
 - **M6.30 — complete:** inclusive UTC creation-time filters compose with limit and cursor and reject invalid ranges.
 - **M6.31 — complete:** explicit UUID deletion removes one stored simulation snapshot while preserving historical candles and distinguishing absence from operational failure.
+- **M6.32 — complete:** disposable-schema E2E isolation keeps local application data untouched and restores repeatable full-suite validation; M6 is closed.
 - Later M6 increments require separate approval for bulk deletion, automatic retention, additional run filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, or optimization.
 
-## M7 — New Listing Scanner — planned
+## M7 — New Listing Scanner — next
 
 Collect and statistically analyze newly listed assets without assuming the hypothesis is profitable.
 
