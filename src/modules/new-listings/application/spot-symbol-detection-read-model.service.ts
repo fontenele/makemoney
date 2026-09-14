@@ -30,7 +30,11 @@ export class SpotSymbolDetectionReadModelService {
     if (
       resolvedCursor &&
       ((query.detectedFrom && resolvedCursor.detectedAt < query.detectedFrom) ||
-        (query.detectedTo && resolvedCursor.detectedAt > query.detectedTo))
+        (query.detectedTo && resolvedCursor.detectedAt > query.detectedTo) ||
+        (query.provider && resolvedCursor.provider !== query.provider) ||
+        (query.status && resolvedCursor.status !== query.status) ||
+        (query.spotTradingAllowed !== undefined &&
+          resolvedCursor.spotTradingAllowed !== query.spotTradingAllowed))
     ) {
       throw new DetectedSpotSymbolCursorNotFoundError();
     }

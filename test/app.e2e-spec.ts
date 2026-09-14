@@ -18,6 +18,22 @@ import {
   TICKER_STREAM,
   TickerStream,
 } from '../src/modules/market-data/domain/ticker-stream';
+import {
+  TRADE_STREAM,
+  TradeStream,
+} from '../src/modules/market-data/domain/trade-stream';
+import {
+  CANDLE_STREAM,
+  CandleStream,
+} from '../src/modules/market-data/domain/candle-stream';
+import {
+  TOP_OF_BOOK_STREAM,
+  TopOfBookStream,
+} from '../src/modules/market-data/domain/top-of-book-stream';
+import {
+  SPOT_SYMBOL_CATALOG_PROVIDER,
+  SpotSymbolCatalogProvider,
+} from '../src/modules/new-listings/domain/spot-symbol-catalog';
 import { PaperWalletService } from '../src/modules/paper-wallet/application/paper-wallet.service';
 import { PaperTradingExecutor } from '../src/modules/paper-trading/application/paper-trading.executor';
 import {
@@ -87,6 +103,25 @@ describe('Application (e2e)', () => {
       start: () => undefined,
       stop: () => undefined,
     };
+    const tradeStream: TradeStream = {
+      start: () => undefined,
+      stop: () => undefined,
+    };
+    const candleStream: CandleStream = {
+      start: () => undefined,
+      stop: () => undefined,
+    };
+    const topOfBookStream: TopOfBookStream = {
+      start: () => undefined,
+      stop: () => undefined,
+    };
+    const spotSymbolCatalogProvider: SpotSymbolCatalogProvider = {
+      load: () =>
+        Promise.resolve({
+          symbols: [],
+          receivedAt: new Date(),
+        }),
+    };
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     })
@@ -94,6 +129,14 @@ describe('Application (e2e)', () => {
       .useValue(pairMetadataProvider)
       .overrideProvider(TICKER_STREAM)
       .useValue(tickerStream)
+      .overrideProvider(TRADE_STREAM)
+      .useValue(tradeStream)
+      .overrideProvider(CANDLE_STREAM)
+      .useValue(candleStream)
+      .overrideProvider(TOP_OF_BOOK_STREAM)
+      .useValue(topOfBookStream)
+      .overrideProvider(SPOT_SYMBOL_CATALOG_PROVIDER)
+      .useValue(spotSymbolCatalogProvider)
       .overrideProvider(HistoricalStrategyReplayService)
       .useValue({
         run: runHistoricalReplay,

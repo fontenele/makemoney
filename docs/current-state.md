@@ -22,6 +22,8 @@ M7.7 supports optional inclusive canonical UTC detection-time filters on that en
 
 M7.8 supports stable provider/symbol cursor pagination composed with those filters.
 
+M7.9 supports strict filtering by provider, current status, and current Spot-trading availability.
+
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
@@ -34,6 +36,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.6 exposes detected symbols newest first at `GET /new-listings`, with optional `limit=1..100` and a default of 50.
 - M7.7 adds validated optional `detectedFrom` and `detectedTo` filters and rejects inverted ranges before querying PostgreSQL.
 - M7.8 adds an optional canonical `provider:symbol` cursor resolved to the immutable detection sort position; invalid and filter-incompatible cursors return HTTP 400.
+- M7.9 adds optional `provider`, `status`, and `spotTradingAllowed` filters applied within the bounded PostgreSQL query and cursor compatibility checks.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.

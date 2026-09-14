@@ -118,7 +118,11 @@ describe('Spot symbol observation persistence (e2e)', () => {
       data: [
         detectedRow('NEWESTUSDT', newest),
         detectedRow('ALPHAUSDT', tied),
-        detectedRow('BETAUSDT', tied),
+        {
+          ...detectedRow('BETAUSDT', tied),
+          status: 'BREAK',
+          spotTradingAllowed: false,
+        },
       ],
     });
 
@@ -131,6 +135,24 @@ describe('Spot symbol observation persistence (e2e)', () => {
     if (!cursor) throw new Error('Expected detected cursor');
     await expect(
       repository.listDetected({ limit: 2, cursor }),
+    ).resolves.toMatchObject([{ symbol: 'BETAUSDT' }]);
+    await expect(
+      repository.listDetected({
+        limit: 10,
+        provider: 'binance',
+        status: 'TRADING',
+        spotTradingAllowed: true,
+      }),
+    ).resolves.toMatchObject([
+      { symbol: 'NEWESTUSDT' },
+      { symbol: 'ALPHAUSDT' },
+    ]);
+    await expect(
+      repository.listDetected({
+        limit: 10,
+        status: 'BREAK',
+        spotTradingAllowed: false,
+      }),
     ).resolves.toMatchObject([{ symbol: 'BETAUSDT' }]);
   });
 });

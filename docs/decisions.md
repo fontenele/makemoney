@@ -489,3 +489,9 @@ Detection-time filters use exact canonical millisecond UTC strings and inclusive
 Detection rows have a durable composite provider/symbol identity rather than a synthetic UUID. The public cursor therefore uses canonical `provider:symbol` text and is resolved server-side to the immutable detection timestamp before applying an exclusive keyset boundary over the complete indexed sort order. This avoids offset drift and client-controlled timestamps without requiring a schema migration.
 
 A cursor outside the selected time interval is invalid, ensuring pagination cannot silently continue with changed filters. The existing array response is preserved; clients continue while a full page is returned by passing the final item's provider and symbol.
+
+## M7.9 strict filters over current provider state
+
+Detection research can now narrow results by the provider, its current status string, and current Spot-trading availability. Inputs remain deliberately strict: only the implemented `binance` provider is accepted, status uses the normalized uppercase provider form, and booleans have only literal `true` and `false` encodings.
+
+Filters apply inside the existing PostgreSQL query and form part of cursor compatibility. They describe the most recently observed mutable state; no historical state is inferred or stored by this read feature.

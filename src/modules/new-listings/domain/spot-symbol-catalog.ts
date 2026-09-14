@@ -21,6 +21,9 @@ export interface DetectedSpotSymbolQuery {
   limit: number;
   detectedFrom?: Date;
   detectedTo?: Date;
+  provider?: SpotSymbol['provider'];
+  status?: string;
+  spotTradingAllowed?: boolean;
   cursor?: Pick<DetectedSpotSymbol, 'provider' | 'symbol' | 'detectedAt'>;
 }
 

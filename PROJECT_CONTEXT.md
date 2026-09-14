@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.8 load, persist, conservatively compare, periodically refresh, durably classify, and expose bounded cursor-paginated and time-filtered reads of provider-neutral public Binance Spot/USDT symbol observations.
+- M6 is closed. M7.1–M7.9 load, persist, conservatively compare, periodically refresh, durably classify, and expose bounded cursor-paginated, time-filtered, and current-state-filtered reads of provider-neutral public Binance Spot/USDT symbol observations.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -153,6 +153,8 @@ M7.6 exposes recent durable detections newest first at `GET /new-listings`, with
 M7.7 adds optional inclusive canonical UTC `detectedFrom` and `detectedTo` filters to the same bounded route. Inverted or malformed ranges fail validation before database access.
 
 M7.8 adds stable keyset pagination using a canonical provider/symbol cursor resolved to the immutable detection sort position. Invalid, missing, baseline-only, or filter-incompatible cursors fail explicitly.
+
+M7.9 adds strict optional filters for provider, current provider status, and current Spot-trading availability. Filters compose with the existing time window and cursor contract.
 
 Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution remain unimplemented and require separately approved milestones.
 

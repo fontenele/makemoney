@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { BadRequestException } from '@nestjs/common';
 import { DetectedSpotSymbol } from '../domain/spot-symbol-catalog';
 import { DetectedSpotSymbolCursorNotFoundError } from '../domain/spot-symbol-catalog';
 import { NewListingsController } from './new-listings.controller';
@@ -113,6 +114,53 @@ describe('NewListingsController', () => {
     await expect(
       controller.list(undefined, undefined, undefined, 'binance:NEWUSDT'),
     ).rejects.toThrow('cursor must identify a detected symbol');
+  });
+
+  it('accepts composable provider state filters', async () => {
+    const listRecent = jest.fn(() => Promise.resolve([]));
+    const controller = new NewListingsController({ listRecent });
+    await controller.list(
+      '10',
+      undefined,
+      undefined,
+      undefined,
+      'binance',
+      'TRADING',
+      'true',
+    );
+    expect(listRecent).toHaveBeenCalledWith(
+      {
+        limit: 10,
+        detectedFrom: undefined,
+        detectedTo: undefined,
+        provider: 'binance',
+        status: 'TRADING',
+        spotTradingAllowed: true,
+      },
+      undefined,
+    );
+  });
+
+  it.each([
+    ['provider', 'other'],
+    ['status', 'trading'],
+    ['status', ''],
+    ['spotTradingAllowed', '1'],
+  ])('rejects invalid %s filter', async (field, value) => {
+    const controller = new NewListingsController({
+      listRecent: jest.fn(() => Promise.resolve([])),
+    });
+    await expect(
+      controller.list(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        field === 'provider' ? value : undefined,
+        field === 'status' ? value : undefined,
+        field === 'spotTradingAllowed' ? value : undefined,
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 });
 

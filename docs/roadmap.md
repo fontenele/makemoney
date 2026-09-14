@@ -117,6 +117,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.6 — complete:** a bounded local read-only endpoint exposes recent durable detections newest first without exposing baseline rows.
 - **M7.7 — complete:** optional inclusive canonical UTC detection-time filters support bounded research windows with strict input validation.
 - **M7.8 — complete:** a canonical provider/symbol cursor provides stable keyset pagination over the immutable detection sort position and composes with time filters.
+- **M7.9 — complete:** strict provider, current status, and Spot-availability filters compose with bounded time-filtered cursor pagination.
 
 ## M8 — Dashboard — planned
 

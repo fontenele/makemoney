@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-14 — M7.9 current provider-state filters completed
+
+- Added strict optional provider, current status, and Spot-availability filters to `GET /new-listings`.
+- Composed state filters with the existing limit, detection-time window, and stable cursor query.
+- Rejected cursors that do not match the active filters rather than silently changing pagination semantics.
+- Isolated all public market-data and symbol-catalog providers in the application E2E harness so controlled paper-market assertions cannot be overwritten by live Binance events.
+- 451 unit tests and all 43 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — M7.8 stable detection cursor completed
 
 - Added optional canonical `provider:symbol` cursor pagination to `GET /new-listings`.

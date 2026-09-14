@@ -40,6 +40,26 @@ describe('SpotSymbolDetectionReadModelService', () => {
       ),
     ).rejects.toBeInstanceOf(DetectedSpotSymbolCursorNotFoundError);
   });
+
+  it('rejects a cursor outside the requested provider-state filters', async () => {
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+    );
+    await expect(
+      service.listRecent(
+        { limit: 10, status: 'BREAK' },
+        { provider: 'binance', symbol: 'NEWUSDT' },
+      ),
+    ).rejects.toBeInstanceOf(DetectedSpotSymbolCursorNotFoundError);
+    await expect(
+      service.listRecent(
+        { limit: 10, spotTradingAllowed: false },
+        { provider: 'binance', symbol: 'NEWUSDT' },
+      ),
+    ).rejects.toBeInstanceOf(DetectedSpotSymbolCursorNotFoundError);
+  });
 });
 
 function repositoryWith(overrides: Record<string, unknown> = {}) {

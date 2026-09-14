@@ -78,12 +78,18 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
     limit,
     detectedFrom,
     detectedTo,
+    provider,
+    status,
+    spotTradingAllowed,
     cursor,
   }: DetectedSpotSymbolQuery): Promise<DetectedSpotSymbol[]> {
     const rows = await this.prisma.observedSpotSymbol.findMany({
       where: {
         AND: [
           {
+            ...(provider ? { provider } : {}),
+            ...(status ? { status } : {}),
+            ...(spotTradingAllowed !== undefined ? { spotTradingAllowed } : {}),
             detectedAt: {
               not: null,
               ...(detectedFrom ? { gte: detectedFrom } : {}),
