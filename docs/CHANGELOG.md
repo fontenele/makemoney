@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.5 durable detection marker completed
+
+- Added nullable immutable `detectedAt` persistence and an index for post-baseline symbol discoveries.
+- Kept baseline and pre-migration observations unclassified instead of fabricating historical detection events.
+- Verified that later observations update current provider state without rewriting the original application detection time.
+- 419 unit tests and all 42 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — M7.4 sequential catalog polling completed
 
 - Added immediate startup loading followed by non-overlapping public catalog refreshes, defaulting to a 60-second completion-relative interval.

@@ -42,6 +42,7 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
                 ...symbol,
                 firstObservedAt: catalog.receivedAt,
                 lastObservedAt: catalog.receivedAt,
+                detectedAt: hadBaseline ? catalog.receivedAt : null,
               },
               update: {
                 baseAsset: symbol.baseAsset,

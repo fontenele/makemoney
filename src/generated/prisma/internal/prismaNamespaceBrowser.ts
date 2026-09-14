@@ -175,7 +175,8 @@ export const ObservedSpotSymbolScalarFieldEnum = {
   status: 'status',
   spotTradingAllowed: 'spotTradingAllowed',
   firstObservedAt: 'firstObservedAt',
-  lastObservedAt: 'lastObservedAt'
+  lastObservedAt: 'lastObservedAt',
+  detectedAt: 'detectedAt'
 } as const
 
 export type ObservedSpotSymbolScalarFieldEnum = (typeof ObservedSpotSymbolScalarFieldEnum)[keyof typeof ObservedSpotSymbolScalarFieldEnum]

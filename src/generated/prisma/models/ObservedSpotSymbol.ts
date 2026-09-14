@@ -33,6 +33,7 @@ export type ObservedSpotSymbolMinAggregateOutputType = {
   spotTradingAllowed: boolean | null
   firstObservedAt: Date | null
   lastObservedAt: Date | null
+  detectedAt: Date | null
 }
 
 export type ObservedSpotSymbolMaxAggregateOutputType = {
@@ -44,6 +45,7 @@ export type ObservedSpotSymbolMaxAggregateOutputType = {
   spotTradingAllowed: boolean | null
   firstObservedAt: Date | null
   lastObservedAt: Date | null
+  detectedAt: Date | null
 }
 
 export type ObservedSpotSymbolCountAggregateOutputType = {
@@ -55,6 +57,7 @@ export type ObservedSpotSymbolCountAggregateOutputType = {
   spotTradingAllowed: number
   firstObservedAt: number
   lastObservedAt: number
+  detectedAt: number
   _all: number
 }
 
@@ -68,6 +71,7 @@ export type ObservedSpotSymbolMinAggregateInputType = {
   spotTradingAllowed?: true
   firstObservedAt?: true
   lastObservedAt?: true
+  detectedAt?: true
 }
 
 export type ObservedSpotSymbolMaxAggregateInputType = {
@@ -79,6 +83,7 @@ export type ObservedSpotSymbolMaxAggregateInputType = {
   spotTradingAllowed?: true
   firstObservedAt?: true
   lastObservedAt?: true
+  detectedAt?: true
 }
 
 export type ObservedSpotSymbolCountAggregateInputType = {
@@ -90,6 +95,7 @@ export type ObservedSpotSymbolCountAggregateInputType = {
   spotTradingAllowed?: true
   firstObservedAt?: true
   lastObservedAt?: true
+  detectedAt?: true
   _all?: true
 }
 
@@ -174,6 +180,7 @@ export type ObservedSpotSymbolGroupByOutputType = {
   spotTradingAllowed: boolean
   firstObservedAt: Date
   lastObservedAt: Date
+  detectedAt: Date | null
   _count: ObservedSpotSymbolCountAggregateOutputType | null
   _min: ObservedSpotSymbolMinAggregateOutputType | null
   _max: ObservedSpotSymbolMaxAggregateOutputType | null
@@ -206,6 +213,7 @@ export type ObservedSpotSymbolWhereInput = {
   spotTradingAllowed?: Prisma.BoolFilter<"ObservedSpotSymbol"> | boolean
   firstObservedAt?: Prisma.DateTimeFilter<"ObservedSpotSymbol"> | Date | string
   lastObservedAt?: Prisma.DateTimeFilter<"ObservedSpotSymbol"> | Date | string
+  detectedAt?: Prisma.DateTimeNullableFilter<"ObservedSpotSymbol"> | Date | string | null
 }
 
 export type ObservedSpotSymbolOrderByWithRelationInput = {
@@ -217,6 +225,7 @@ export type ObservedSpotSymbolOrderByWithRelationInput = {
   spotTradingAllowed?: Prisma.SortOrder
   firstObservedAt?: Prisma.SortOrder
   lastObservedAt?: Prisma.SortOrder
+  detectedAt?: Prisma.SortOrderInput | Prisma.SortOrder
 }
 
 export type ObservedSpotSymbolWhereUniqueInput = Prisma.AtLeast<{
@@ -232,6 +241,7 @@ export type ObservedSpotSymbolWhereUniqueInput = Prisma.AtLeast<{
   spotTradingAllowed?: Prisma.BoolFilter<"ObservedSpotSymbol"> | boolean
   firstObservedAt?: Prisma.DateTimeFilter<"ObservedSpotSymbol"> | Date | string
   lastObservedAt?: Prisma.DateTimeFilter<"ObservedSpotSymbol"> | Date | string
+  detectedAt?: Prisma.DateTimeNullableFilter<"ObservedSpotSymbol"> | Date | string | null
 }, "provider_symbol">
 
 export type ObservedSpotSymbolOrderByWithAggregationInput = {
@@ -243,6 +253,7 @@ export type ObservedSpotSymbolOrderByWithAggregationInput = {
   spotTradingAllowed?: Prisma.SortOrder
   firstObservedAt?: Prisma.SortOrder
   lastObservedAt?: Prisma.SortOrder
+  detectedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ObservedSpotSymbolCountOrderByAggregateInput
   _max?: Prisma.ObservedSpotSymbolMaxOrderByAggregateInput
   _min?: Prisma.ObservedSpotSymbolMinOrderByAggregateInput
@@ -260,6 +271,7 @@ export type ObservedSpotSymbolScalarWhereWithAggregatesInput = {
   spotTradingAllowed?: Prisma.BoolWithAggregatesFilter<"ObservedSpotSymbol"> | boolean
   firstObservedAt?: Prisma.DateTimeWithAggregatesFilter<"ObservedSpotSymbol"> | Date | string
   lastObservedAt?: Prisma.DateTimeWithAggregatesFilter<"ObservedSpotSymbol"> | Date | string
+  detectedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ObservedSpotSymbol"> | Date | string | null
 }
 
 export type ObservedSpotSymbolCreateInput = {
@@ -271,6 +283,7 @@ export type ObservedSpotSymbolCreateInput = {
   spotTradingAllowed: boolean
   firstObservedAt: Date | string
   lastObservedAt: Date | string
+  detectedAt?: Date | string | null
 }
 
 export type ObservedSpotSymbolUncheckedCreateInput = {
@@ -282,6 +295,7 @@ export type ObservedSpotSymbolUncheckedCreateInput = {
   spotTradingAllowed: boolean
   firstObservedAt: Date | string
   lastObservedAt: Date | string
+  detectedAt?: Date | string | null
 }
 
 export type ObservedSpotSymbolUpdateInput = {
@@ -293,6 +307,7 @@ export type ObservedSpotSymbolUpdateInput = {
   spotTradingAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ObservedSpotSymbolUncheckedUpdateInput = {
@@ -304,6 +319,7 @@ export type ObservedSpotSymbolUncheckedUpdateInput = {
   spotTradingAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ObservedSpotSymbolCreateManyInput = {
@@ -315,6 +331,7 @@ export type ObservedSpotSymbolCreateManyInput = {
   spotTradingAllowed: boolean
   firstObservedAt: Date | string
   lastObservedAt: Date | string
+  detectedAt?: Date | string | null
 }
 
 export type ObservedSpotSymbolUpdateManyMutationInput = {
@@ -326,6 +343,7 @@ export type ObservedSpotSymbolUpdateManyMutationInput = {
   spotTradingAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ObservedSpotSymbolUncheckedUpdateManyInput = {
@@ -337,6 +355,7 @@ export type ObservedSpotSymbolUncheckedUpdateManyInput = {
   spotTradingAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ObservedSpotSymbolProviderSymbolCompoundUniqueInput = {
@@ -353,6 +372,7 @@ export type ObservedSpotSymbolCountOrderByAggregateInput = {
   spotTradingAllowed?: Prisma.SortOrder
   firstObservedAt?: Prisma.SortOrder
   lastObservedAt?: Prisma.SortOrder
+  detectedAt?: Prisma.SortOrder
 }
 
 export type ObservedSpotSymbolMaxOrderByAggregateInput = {
@@ -364,6 +384,7 @@ export type ObservedSpotSymbolMaxOrderByAggregateInput = {
   spotTradingAllowed?: Prisma.SortOrder
   firstObservedAt?: Prisma.SortOrder
   lastObservedAt?: Prisma.SortOrder
+  detectedAt?: Prisma.SortOrder
 }
 
 export type ObservedSpotSymbolMinOrderByAggregateInput = {
@@ -375,6 +396,7 @@ export type ObservedSpotSymbolMinOrderByAggregateInput = {
   spotTradingAllowed?: Prisma.SortOrder
   firstObservedAt?: Prisma.SortOrder
   lastObservedAt?: Prisma.SortOrder
+  detectedAt?: Prisma.SortOrder
 }
 
 
@@ -388,6 +410,7 @@ export type ObservedSpotSymbolSelect<ExtArgs extends runtime.Types.Extensions.In
   spotTradingAllowed?: boolean
   firstObservedAt?: boolean
   lastObservedAt?: boolean
+  detectedAt?: boolean
 }, ExtArgs["result"]["observedSpotSymbol"]>
 
 export type ObservedSpotSymbolSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -399,6 +422,7 @@ export type ObservedSpotSymbolSelectCreateManyAndReturn<ExtArgs extends runtime.
   spotTradingAllowed?: boolean
   firstObservedAt?: boolean
   lastObservedAt?: boolean
+  detectedAt?: boolean
 }, ExtArgs["result"]["observedSpotSymbol"]>
 
 export type ObservedSpotSymbolSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -410,6 +434,7 @@ export type ObservedSpotSymbolSelectUpdateManyAndReturn<ExtArgs extends runtime.
   spotTradingAllowed?: boolean
   firstObservedAt?: boolean
   lastObservedAt?: boolean
+  detectedAt?: boolean
 }, ExtArgs["result"]["observedSpotSymbol"]>
 
 export type ObservedSpotSymbolSelectScalar = {
@@ -421,9 +446,10 @@ export type ObservedSpotSymbolSelectScalar = {
   spotTradingAllowed?: boolean
   firstObservedAt?: boolean
   lastObservedAt?: boolean
+  detectedAt?: boolean
 }
 
-export type ObservedSpotSymbolOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"provider" | "symbol" | "baseAsset" | "quoteAsset" | "status" | "spotTradingAllowed" | "firstObservedAt" | "lastObservedAt", ExtArgs["result"]["observedSpotSymbol"]>
+export type ObservedSpotSymbolOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"provider" | "symbol" | "baseAsset" | "quoteAsset" | "status" | "spotTradingAllowed" | "firstObservedAt" | "lastObservedAt" | "detectedAt", ExtArgs["result"]["observedSpotSymbol"]>
 
 export type $ObservedSpotSymbolPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ObservedSpotSymbol"
@@ -437,6 +463,7 @@ export type $ObservedSpotSymbolPayload<ExtArgs extends runtime.Types.Extensions.
     spotTradingAllowed: boolean
     firstObservedAt: Date
     lastObservedAt: Date
+    detectedAt: Date | null
   }, ExtArgs["result"]["observedSpotSymbol"]>
   composites: {}
 }
@@ -868,6 +895,7 @@ export interface ObservedSpotSymbolFieldRefs {
   readonly spotTradingAllowed: Prisma.FieldRef<"ObservedSpotSymbol", 'Boolean'>
   readonly firstObservedAt: Prisma.FieldRef<"ObservedSpotSymbol", 'DateTime'>
   readonly lastObservedAt: Prisma.FieldRef<"ObservedSpotSymbol", 'DateTime'>
+  readonly detectedAt: Prisma.FieldRef<"ObservedSpotSymbol", 'DateTime'>
 }
     
 

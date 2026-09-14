@@ -21,3 +21,9 @@ This is application-observation detection, not proof of an exchange listing time
 The catalog service loads immediately at startup and schedules the next refresh only after the current load and persistence attempt finishes. This prevents overlapping observations even when Binance or PostgreSQL is slow. Failures preserve the last successful catalog and detection result and still schedule a later retry.
 
 `NEW_LISTINGS_POLL_INTERVAL_MS` controls the delay between completed attempts, defaults to 60,000 milliseconds, and has a validated minimum of 5,000 milliseconds. Application shutdown aborts the active public request and clears any pending timer. No route, alert, score, strategy signal, order, or financial mutation is introduced.
+
+## M7.5 durable detection marker
+
+`ObservedSpotSymbol.detectedAt` durably distinguishes additions found after an established provider baseline. Baseline rows receive null, including rows that predate this migration. A newly observed symbol receives the catalog's `receivedAt` value during its initial insert, and subsequent observations cannot change that value.
+
+The marker records when this application detected the symbol, not when Binance officially listed it. The indexed nullable field prepares bounded research reads without adding an HTTP route, notification, scoring, market tracking, signal, order, or financial mutation.

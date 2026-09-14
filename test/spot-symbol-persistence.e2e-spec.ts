@@ -43,6 +43,7 @@ describe('Spot symbol observation persistence (e2e)', () => {
       lastObservedAt: second,
       status: 'BREAK',
       spotTradingAllowed: false,
+      detectedAt: null,
     });
   });
 
@@ -67,6 +68,27 @@ describe('Spot symbol observation persistence (e2e)', () => {
         symbols: [symbol('TRADING', true), added],
       }),
     ).resolves.toEqual([added]);
+
+    await expect(
+      prisma.observedSpotSymbol.findUnique({
+        where: { provider_symbol: { provider: 'binance', symbol: 'NEWUSDT' } },
+      }),
+    ).resolves.toMatchObject({
+      firstObservedAt: second,
+      detectedAt: second,
+    });
+
+    const third = new Date('2026-09-14T03:00:00.000Z');
+    await repository.observe({ receivedAt: third, symbols: [added] });
+    await expect(
+      prisma.observedSpotSymbol.findUnique({
+        where: { provider_symbol: { provider: 'binance', symbol: 'NEWUSDT' } },
+      }),
+    ).resolves.toMatchObject({
+      firstObservedAt: second,
+      lastObservedAt: third,
+      detectedAt: second,
+    });
   });
 });
 

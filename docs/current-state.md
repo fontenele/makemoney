@@ -12,6 +12,8 @@ M7.3 compares a current observation with the durable provider baseline in one se
 
 M7.4 refreshes observations sequentially at a validated configurable interval, preserving the last successful state after failures and canceling cleanly at shutdown.
 
+M7.5 persists an immutable nullable application detection time for post-baseline symbols while leaving baseline and migrated rows unclassified.
+
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
@@ -20,6 +22,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.2 persists immutable first-observation time and mutable latest provider state for each provider/symbol identity.
 - M7.3 detects only symbols absent from an established durable baseline and retains the latest detection result in memory.
 - M7.4 polls without overlapping requests using `NEW_LISTINGS_POLL_INTERVAL_MS`, which defaults to 60 seconds and cannot be configured below five seconds.
+- M7.5 records `detectedAt` only when a symbol is first observed after an established provider baseline; later refreshes cannot rewrite it.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -172,7 +175,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 - `$env:RISK_MAX_BTC_POSITION_QUANTITY='1'; npm run test:e2e -- --runInBand` — all 42 tests passed across 4 suites in the disposable `crypto_trader_e2e` schema.
 - The E2E global setup recreates and migrates only its dedicated schema; local application balances, executions, controls, signals, candles, and runs are not read or changed.
-- `npx prisma migrate deploy` — all nine migrations applied, including durable Spot symbol observations
+- `npx prisma migrate deploy` — all ten migrations applied, including durable Spot symbol observations and detection timestamps
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live Binance historical-candle smoke test — the public market-data-only kline endpoint returned ordered BTCUSDT one-minute rows with the documented 12 fields and no credentials
@@ -183,7 +186,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.4 are committed milestone increments.
+M0 through M7.5 are committed milestone increments.
 
 ## Known issues and cautions
 

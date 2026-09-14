@@ -106,8 +106,10 @@ model ObservedSpotSymbol {
   spotTradingAllowed Boolean  @map("spot_trading_allowed")
   firstObservedAt    DateTime @map("first_observed_at")
   lastObservedAt     DateTime @map("last_observed_at")
+  detectedAt         DateTime? @map("detected_at")
 
   @@id([provider, symbol])
   @@index([firstObservedAt, provider, symbol])
+  @@index([detectedAt, provider, symbol])
   @@map("observed_spot_symbols")
 }
