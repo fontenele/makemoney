@@ -11,6 +11,10 @@ import { BinanceSpotSymbolCatalogClient } from './infrastructure/binance-spot-sy
 import { PrismaSpotSymbolRepository } from './infrastructure/prisma-spot-symbol.repository';
 import { NewListingsController } from './presentation/new-listings.controller';
 import { DueListingObservationCheckpointService } from './application/due-listing-observation-checkpoint.service';
+import {
+  LISTING_OBSERVATION_CHECKPOINT_WORKER_OPTIONS,
+  ListingObservationCheckpointWorkerOptions,
+} from './application/listing-observation-checkpoint-worker-options';
 
 @Module({
   controllers: [NewListingsController],
@@ -33,6 +37,23 @@ import { DueListingObservationCheckpointService } from './application/due-listin
     SpotSymbolCatalogService,
     SpotSymbolDetectionReadModelService,
     DueListingObservationCheckpointService,
+    {
+      provide: LISTING_OBSERVATION_CHECKPOINT_WORKER_OPTIONS,
+      inject: [ConfigService],
+      useFactory: (
+        config: ConfigService,
+      ): ListingObservationCheckpointWorkerOptions => ({
+        intervalMs: config.getOrThrow<number>(
+          'NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS',
+        ),
+        batchSize: config.getOrThrow<number>(
+          'NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE',
+        ),
+        leaseDurationMs: config.getOrThrow<number>(
+          'NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS',
+        ),
+      }),
+    },
   ],
   exports: [SpotSymbolCatalogService],
 })

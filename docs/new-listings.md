@@ -95,3 +95,9 @@ The database enforces all-or-none lease fields and a strictly later expiry. This
 An internal completion command now validates checkpoint identity, lease token, and completion time before persistence access. PostgreSQL records `completedAt` only when the token matches, the completion falls within the active lease interval, and the checkpoint is not already complete. A failed ownership condition returns `false` without mutation.
 
 Completed checkpoints are terminal and excluded from both due reads and later claims. Database constraints bind completion time to the recorded lease interval. This increment adds no worker, retry policy, provider request, market sample, alert, score, signal, or trade.
+
+## M7.18 bounded worker configuration
+
+The future checkpoint worker now has one injected options contract populated by startup-validated environment configuration. Defaults are a 5-second completion-relative interval, a batch size of 25, and a 30-second lease. Interval is restricted to 1–60 seconds, batch size to 1–100, and lease duration to 5–300 seconds.
+
+The values are documented in `.env.example` and available to the new-listings module, but no scheduler or timer consumes them yet. No checkpoint is automatically claimed or completed and no provider request, market sample, alert, score, signal, or trade is introduced.

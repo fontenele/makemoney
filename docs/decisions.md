@@ -531,3 +531,9 @@ The database requires the three lease fields to be either all absent or internal
 Completion is a conditional atomic update rather than an unconditional timestamp write. Provider, symbol, label, and token must identify the row, the completion instant must fall at or after claim time and strictly before expiry, and `completedAt` must still be null. Returning a boolean keeps stale ownership and duplicate completion explicit without introducing an exception-driven worker policy.
 
 A database check preserves the same temporal invariant independently of the application. Completed rows remain immutable terminal work and are excluded at both read and claim boundaries. Observation payload persistence and failure/retry lifecycle remain separate because completion currently certifies lifecycle ownership only.
+
+## M7.18 validate worker limits before activating lifecycle
+
+Worker cadence, batch size, and lease duration are startup configuration rather than hidden constants. Defaults favor small local batches and short recovery, while explicit maximums prevent accidentally unbounded queries, excessively tight loops, or abandoned claims that remain unavailable for too long.
+
+The module receives one immutable-shaped options object, keeping operational wiring separate from environment access. Activation is intentionally deferred: scheduling before a processing contract exists would only claim rows until their leases expire and create noisy, purposeless database work.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.18 bounded checkpoint-worker configuration completed
+
+- Added startup-validated interval, batch-size, and lease-duration configuration for the future checkpoint worker.
+- Added one injected worker-options contract with conservative defaults and strict upper/lower bounds.
+- Updated `.env.example`; no timer, automatic claim, provider request, or market sample was activated.
+- 484 unit tests and all 46 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-14 — M7.17 ownership-safe checkpoint completion completed
 
 - Added durable terminal checkpoint completion constrained to the recorded active lease interval.

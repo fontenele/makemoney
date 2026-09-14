@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.17 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, and durably schedule, lease, and complete bounded observation checkpoints.
+- M6 is closed. M7.1–M7.18 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, durably schedule/lease/complete observation checkpoints, and validate bounded worker options.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -171,6 +171,8 @@ M7.15 validates due-read time and a strict 1–100 batch limit before repository
 M7.16 atomically leases bounded due-checkpoint batches in PostgreSQL, excludes active claims, and permits abandoned work to be reclaimed after lease expiry. It does not run a worker or request market data.
 
 M7.17 records terminal completion only for a matching active lease and excludes completed checkpoints from all future due work. It does not run a worker or request market data.
+
+M7.18 validates bounded checkpoint-worker interval, batch, and lease settings at startup and injects one options contract. It does not activate a worker or request market data.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

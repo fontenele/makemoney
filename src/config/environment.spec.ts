@@ -95,3 +95,41 @@ describe('validateEnvironment new-listing polling', () => {
     ).toThrow('Invalid environment configuration');
   });
 });
+
+describe('validateEnvironment new-listing checkpoint worker', () => {
+  it('uses bounded operational defaults', () => {
+    expect(validateEnvironment(required)).toMatchObject({
+      NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: 5000,
+      NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: 25,
+      NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS: 30000,
+    });
+  });
+
+  it('accepts bounded custom values', () => {
+    expect(
+      validateEnvironment({
+        ...required,
+        NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: '1000',
+        NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: '100',
+        NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS: '300000',
+      }),
+    ).toMatchObject({
+      NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: 1000,
+      NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: 100,
+      NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS: 300000,
+    });
+  });
+
+  it.each([
+    { NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: 999 },
+    { NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: 60001 },
+    { NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: 0 },
+    { NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: 101 },
+    { NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS: 4999 },
+    { NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS: 300001 },
+  ])('rejects out-of-bounds worker configuration %#', (configuration) => {
+    expect(() =>
+      validateEnvironment({ ...required, ...configuration }),
+    ).toThrow('Invalid environment configuration');
+  });
+});

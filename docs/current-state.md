@@ -40,6 +40,8 @@ M7.16 atomically leases bounded due-checkpoint batches, excludes active leases, 
 
 M7.17 records terminal completion only for the matching active lease; completed checkpoints never return to due reads or claims.
 
+M7.18 validates and injects bounded future-worker interval, batch-size, and lease-duration options without starting background work.
+
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
@@ -61,6 +63,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.15 prevents invalid or unbounded due reads before PostgreSQL access.
 - M7.16 uses a durable token and expiry with PostgreSQL `FOR UPDATE SKIP LOCKED` to claim due work without overlapping active consumers.
 - M7.17 validates completion identity and atomically requires matching ownership, an active lease interval, and incomplete state before recording `completedAt`.
+- M7.18 defaults the inactive future worker to a 5-second interval, 25-row batch, and 30-second lease, with strict startup bounds.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -200,12 +203,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-14 after M7.17:
+The following passed on 2026-09-14 after M7.18:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 476 tests passed across 62 suites
+- `npm test -- --runInBand` — 484 tests passed across 62 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -224,7 +227,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.17 are implemented and fully verified milestone increments.
+M0 through M7.18 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

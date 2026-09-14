@@ -8,6 +8,9 @@ interface Environment {
   BINANCE_WS_BASE_URL: string;
   BINANCE_REST_BASE_URL: string;
   NEW_LISTINGS_POLL_INTERVAL_MS: number;
+  NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: number;
+  NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: number;
+  NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS: number;
   PAPER_INITIAL_USDT_BALANCE: string;
   PAPER_VALUATION_MAX_PRICE_AGE_MS: number;
   PAPER_QUOTE_MAX_MARKET_DATA_AGE_MS: number;
@@ -45,6 +48,21 @@ const environmentSchema = Joi.object<Environment>({
     .integer()
     .min(5000)
     .default(60000),
+  NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: Joi.number()
+    .integer()
+    .min(1000)
+    .max(60000)
+    .default(5000),
+  NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: Joi.number()
+    .integer()
+    .min(1)
+    .max(100)
+    .default(25),
+  NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS: Joi.number()
+    .integer()
+    .min(5000)
+    .max(300000)
+    .default(30000),
   PAPER_INITIAL_USDT_BALANCE: Joi.string()
     .pattern(/^(0|[1-9]\d{0,19})(\.\d{1,18})?$/)
     .default('1000'),
