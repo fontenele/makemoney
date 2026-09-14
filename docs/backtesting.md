@@ -371,4 +371,4 @@ Database-backed E2E tests run against a disposable, migrated `crypto_trader_e2e`
 
 Replay produces signals only. It cannot access a wallet, the Risk Engine, an executor, exchange credentials, or real funds.
 
-Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, bulk run deletion, automatic retention, additional run filtering, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, and parameter optimization remain deferred and require separate approval.
+M6 satisfies its complete acceptance scope. Intracandle equity paths, order-book/depth liquidity, partial fills, variable sizing or reinvestment, Risk Engine modeling, bulk run deletion, automatic retention, additional run filtering, cache refresh, parallel gap loading, shared or persisted circuit state, risk-adjusted or annualized metrics, and parameter optimization are optional post-M6 enhancements. They require separately planned milestones and approval and are not unfinished M6 work.

@@ -103,7 +103,7 @@ Deterministic, reproducible, measurable strategies that produce signals and neve
 - **M6.30 — complete:** inclusive UTC creation-time filters compose with limit and cursor and reject invalid ranges.
 - **M6.31 — complete:** explicit UUID deletion removes one stored simulation snapshot while preserving historical candles and distinguishing absence from operational failure.
 - **M6.32 — complete:** disposable-schema E2E isolation keeps local application data untouched and restores repeatable full-suite validation; M6 is closed.
-- Later M6 increments require separate approval for bulk deletion, automatic retention, additional run filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, or optimization.
+- M6 satisfies its complete acceptance scope. Bulk deletion, automatic retention, additional run filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, shared/persisted circuit state, intracandle equity paths, variable sizing, order-book/depth modeling, partial fills, and optimization are optional post-M6 enhancements that require separately planned milestones and approval; they are not unfinished M6 work.
 
 ## M7 — New Listing Scanner — in progress
 

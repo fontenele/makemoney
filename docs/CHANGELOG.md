@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-14 — M6 closure wording clarified
+
+- Clarified that M6.1–M6.32 fully satisfy the accepted M6 scope.
+- Reclassified the previously listed advanced capabilities as optional post-M6 enhancements requiring separately planned milestones, not unfinished M6 work.
+
 ## 2026-09-14 — M7.14 bounded due-checkpoint read completed
 
 - Added a provider-neutral internal read for checkpoints due by an explicit instant.
