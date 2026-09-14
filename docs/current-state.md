@@ -36,6 +36,8 @@ M7.14 reads bounded due checkpoints deterministically without claiming or proces
 
 M7.15 validates the due time and strict 1–100 batch limit at the internal application boundary.
 
+M7.16 atomically leases bounded due-checkpoint batches, excludes active leases, and makes expired leases reclaimable.
+
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
@@ -55,6 +57,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.13 stores the nine targets under an idempotent composite identity and target-time index in the detection transaction.
 - M7.14 exposes an internal target-time-bounded repository read with deterministic identity tie-breakers.
 - M7.15 prevents invalid or unbounded due reads before PostgreSQL access.
+- M7.16 uses a durable token and expiry with PostgreSQL `FOR UPDATE SKIP LOCKED` to claim due work without overlapping active consumers.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -194,20 +197,20 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-14 after M7.15:
+The following passed on 2026-09-14 after M7.16:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 464 tests passed across 62 suites
+- `npm test -- --runInBand` — 470 tests passed across 62 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
 The complete database-backed integration validation passed after E2E isolation:
 
-- `npm run test:e2e -- --runInBand` — all 45 tests passed across 4 suites in the disposable `crypto_trader_e2e` schema.
+- `npm run test:e2e -- --runInBand` — all 46 tests passed across 4 suites in the disposable `crypto_trader_e2e` schema.
 - The E2E global setup recreates and migrates only its dedicated schema; local application balances, executions, controls, signals, candles, and runs are not read or changed.
-- `npx prisma migrate deploy` — all ten migrations applied, including durable Spot symbol observations and detection timestamps
+- `npx prisma migrate deploy` — all twelve migrations applied, including durable observation checkpoints and checkpoint leases
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live Binance historical-candle smoke test — the public market-data-only kline endpoint returned ordered BTCUSDT one-minute rows with the documented 12 fields and no credentials
@@ -218,7 +221,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.15 are implemented and fully verified milestone increments.
+M0 through M7.16 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

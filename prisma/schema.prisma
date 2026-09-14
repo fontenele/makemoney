@@ -116,15 +116,19 @@ model ObservedSpotSymbol {
 }
 
 model ListingObservationCheckpoint {
-  provider  String   @db.VarChar(30)
-  symbol    String   @db.VarChar(30)
-  label     String   @db.VarChar(10)
-  offsetMs  Int      @map("offset_ms")
-  targetAt  DateTime @map("target_at")
-  createdAt DateTime @default(now()) @map("created_at")
+  provider       String    @db.VarChar(30)
+  symbol         String    @db.VarChar(30)
+  label          String    @db.VarChar(10)
+  offsetMs       Int       @map("offset_ms")
+  targetAt       DateTime  @map("target_at")
+  claimToken     String?   @map("claim_token") @db.VarChar(100)
+  claimedAt      DateTime? @map("claimed_at")
+  claimExpiresAt DateTime? @map("claim_expires_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
   detection ObservedSpotSymbol @relation(fields: [provider, symbol], references: [provider, symbol], onDelete: Cascade)
 
   @@id([provider, symbol, label])
   @@index([targetAt, provider, symbol, label])
+  @@index([claimExpiresAt, targetAt, provider, symbol, label])
   @@map("listing_observation_checkpoints")
 }

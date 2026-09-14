@@ -40,6 +40,9 @@ export type ListingObservationCheckpointMinAggregateOutputType = {
   label: string | null
   offsetMs: number | null
   targetAt: Date | null
+  claimToken: string | null
+  claimedAt: Date | null
+  claimExpiresAt: Date | null
   createdAt: Date | null
 }
 
@@ -49,6 +52,9 @@ export type ListingObservationCheckpointMaxAggregateOutputType = {
   label: string | null
   offsetMs: number | null
   targetAt: Date | null
+  claimToken: string | null
+  claimedAt: Date | null
+  claimExpiresAt: Date | null
   createdAt: Date | null
 }
 
@@ -58,6 +64,9 @@ export type ListingObservationCheckpointCountAggregateOutputType = {
   label: number
   offsetMs: number
   targetAt: number
+  claimToken: number
+  claimedAt: number
+  claimExpiresAt: number
   createdAt: number
   _all: number
 }
@@ -77,6 +86,9 @@ export type ListingObservationCheckpointMinAggregateInputType = {
   label?: true
   offsetMs?: true
   targetAt?: true
+  claimToken?: true
+  claimedAt?: true
+  claimExpiresAt?: true
   createdAt?: true
 }
 
@@ -86,6 +98,9 @@ export type ListingObservationCheckpointMaxAggregateInputType = {
   label?: true
   offsetMs?: true
   targetAt?: true
+  claimToken?: true
+  claimedAt?: true
+  claimExpiresAt?: true
   createdAt?: true
 }
 
@@ -95,6 +110,9 @@ export type ListingObservationCheckpointCountAggregateInputType = {
   label?: true
   offsetMs?: true
   targetAt?: true
+  claimToken?: true
+  claimedAt?: true
+  claimExpiresAt?: true
   createdAt?: true
   _all?: true
 }
@@ -191,6 +209,9 @@ export type ListingObservationCheckpointGroupByOutputType = {
   label: string
   offsetMs: number
   targetAt: Date
+  claimToken: string | null
+  claimedAt: Date | null
+  claimExpiresAt: Date | null
   createdAt: Date
   _count: ListingObservationCheckpointCountAggregateOutputType | null
   _avg: ListingObservationCheckpointAvgAggregateOutputType | null
@@ -223,6 +244,9 @@ export type ListingObservationCheckpointWhereInput = {
   label?: Prisma.StringFilter<"ListingObservationCheckpoint"> | string
   offsetMs?: Prisma.IntFilter<"ListingObservationCheckpoint"> | number
   targetAt?: Prisma.DateTimeFilter<"ListingObservationCheckpoint"> | Date | string
+  claimToken?: Prisma.StringNullableFilter<"ListingObservationCheckpoint"> | string | null
+  claimedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
+  claimExpiresAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ListingObservationCheckpoint"> | Date | string
   detection?: Prisma.XOR<Prisma.ObservedSpotSymbolScalarRelationFilter, Prisma.ObservedSpotSymbolWhereInput>
 }
@@ -233,6 +257,9 @@ export type ListingObservationCheckpointOrderByWithRelationInput = {
   label?: Prisma.SortOrder
   offsetMs?: Prisma.SortOrder
   targetAt?: Prisma.SortOrder
+  claimToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  claimedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  claimExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   detection?: Prisma.ObservedSpotSymbolOrderByWithRelationInput
 }
@@ -247,6 +274,9 @@ export type ListingObservationCheckpointWhereUniqueInput = Prisma.AtLeast<{
   label?: Prisma.StringFilter<"ListingObservationCheckpoint"> | string
   offsetMs?: Prisma.IntFilter<"ListingObservationCheckpoint"> | number
   targetAt?: Prisma.DateTimeFilter<"ListingObservationCheckpoint"> | Date | string
+  claimToken?: Prisma.StringNullableFilter<"ListingObservationCheckpoint"> | string | null
+  claimedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
+  claimExpiresAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ListingObservationCheckpoint"> | Date | string
   detection?: Prisma.XOR<Prisma.ObservedSpotSymbolScalarRelationFilter, Prisma.ObservedSpotSymbolWhereInput>
 }, "provider_symbol_label">
@@ -257,6 +287,9 @@ export type ListingObservationCheckpointOrderByWithAggregationInput = {
   label?: Prisma.SortOrder
   offsetMs?: Prisma.SortOrder
   targetAt?: Prisma.SortOrder
+  claimToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  claimedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  claimExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ListingObservationCheckpointCountOrderByAggregateInput
   _avg?: Prisma.ListingObservationCheckpointAvgOrderByAggregateInput
@@ -274,6 +307,9 @@ export type ListingObservationCheckpointScalarWhereWithAggregatesInput = {
   label?: Prisma.StringWithAggregatesFilter<"ListingObservationCheckpoint"> | string
   offsetMs?: Prisma.IntWithAggregatesFilter<"ListingObservationCheckpoint"> | number
   targetAt?: Prisma.DateTimeWithAggregatesFilter<"ListingObservationCheckpoint"> | Date | string
+  claimToken?: Prisma.StringNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | string | null
+  claimedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | Date | string | null
+  claimExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ListingObservationCheckpoint"> | Date | string
 }
 
@@ -281,6 +317,9 @@ export type ListingObservationCheckpointCreateInput = {
   label: string
   offsetMs: number
   targetAt: Date | string
+  claimToken?: string | null
+  claimedAt?: Date | string | null
+  claimExpiresAt?: Date | string | null
   createdAt?: Date | string
   detection: Prisma.ObservedSpotSymbolCreateNestedOneWithoutObservationCheckpointsInput
 }
@@ -291,6 +330,9 @@ export type ListingObservationCheckpointUncheckedCreateInput = {
   label: string
   offsetMs: number
   targetAt: Date | string
+  claimToken?: string | null
+  claimedAt?: Date | string | null
+  claimExpiresAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -298,6 +340,9 @@ export type ListingObservationCheckpointUpdateInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   offsetMs?: Prisma.IntFieldUpdateOperationsInput | number
   targetAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  claimToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   detection?: Prisma.ObservedSpotSymbolUpdateOneRequiredWithoutObservationCheckpointsNestedInput
 }
@@ -308,6 +353,9 @@ export type ListingObservationCheckpointUncheckedUpdateInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   offsetMs?: Prisma.IntFieldUpdateOperationsInput | number
   targetAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  claimToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -317,6 +365,9 @@ export type ListingObservationCheckpointCreateManyInput = {
   label: string
   offsetMs: number
   targetAt: Date | string
+  claimToken?: string | null
+  claimedAt?: Date | string | null
+  claimExpiresAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -324,6 +375,9 @@ export type ListingObservationCheckpointUpdateManyMutationInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   offsetMs?: Prisma.IntFieldUpdateOperationsInput | number
   targetAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  claimToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -333,6 +387,9 @@ export type ListingObservationCheckpointUncheckedUpdateManyInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   offsetMs?: Prisma.IntFieldUpdateOperationsInput | number
   targetAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  claimToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -358,6 +415,9 @@ export type ListingObservationCheckpointCountOrderByAggregateInput = {
   label?: Prisma.SortOrder
   offsetMs?: Prisma.SortOrder
   targetAt?: Prisma.SortOrder
+  claimToken?: Prisma.SortOrder
+  claimedAt?: Prisma.SortOrder
+  claimExpiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -371,6 +431,9 @@ export type ListingObservationCheckpointMaxOrderByAggregateInput = {
   label?: Prisma.SortOrder
   offsetMs?: Prisma.SortOrder
   targetAt?: Prisma.SortOrder
+  claimToken?: Prisma.SortOrder
+  claimedAt?: Prisma.SortOrder
+  claimExpiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -380,6 +443,9 @@ export type ListingObservationCheckpointMinOrderByAggregateInput = {
   label?: Prisma.SortOrder
   offsetMs?: Prisma.SortOrder
   targetAt?: Prisma.SortOrder
+  claimToken?: Prisma.SortOrder
+  claimedAt?: Prisma.SortOrder
+  claimExpiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -429,10 +495,17 @@ export type ListingObservationCheckpointUncheckedUpdateManyWithoutDetectionNeste
   deleteMany?: Prisma.ListingObservationCheckpointScalarWhereInput | Prisma.ListingObservationCheckpointScalarWhereInput[]
 }
 
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
 export type ListingObservationCheckpointCreateWithoutDetectionInput = {
   label: string
   offsetMs: number
   targetAt: Date | string
+  claimToken?: string | null
+  claimedAt?: Date | string | null
+  claimExpiresAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -440,6 +513,9 @@ export type ListingObservationCheckpointUncheckedCreateWithoutDetectionInput = {
   label: string
   offsetMs: number
   targetAt: Date | string
+  claimToken?: string | null
+  claimedAt?: Date | string | null
+  claimExpiresAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -478,6 +554,9 @@ export type ListingObservationCheckpointScalarWhereInput = {
   label?: Prisma.StringFilter<"ListingObservationCheckpoint"> | string
   offsetMs?: Prisma.IntFilter<"ListingObservationCheckpoint"> | number
   targetAt?: Prisma.DateTimeFilter<"ListingObservationCheckpoint"> | Date | string
+  claimToken?: Prisma.StringNullableFilter<"ListingObservationCheckpoint"> | string | null
+  claimedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
+  claimExpiresAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ListingObservationCheckpoint"> | Date | string
 }
 
@@ -485,6 +564,9 @@ export type ListingObservationCheckpointCreateManyDetectionInput = {
   label: string
   offsetMs: number
   targetAt: Date | string
+  claimToken?: string | null
+  claimedAt?: Date | string | null
+  claimExpiresAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -492,6 +574,9 @@ export type ListingObservationCheckpointUpdateWithoutDetectionInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   offsetMs?: Prisma.IntFieldUpdateOperationsInput | number
   targetAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  claimToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -499,6 +584,9 @@ export type ListingObservationCheckpointUncheckedUpdateWithoutDetectionInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   offsetMs?: Prisma.IntFieldUpdateOperationsInput | number
   targetAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  claimToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -506,6 +594,9 @@ export type ListingObservationCheckpointUncheckedUpdateManyWithoutDetectionInput
   label?: Prisma.StringFieldUpdateOperationsInput | string
   offsetMs?: Prisma.IntFieldUpdateOperationsInput | number
   targetAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  claimToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -517,6 +608,9 @@ export type ListingObservationCheckpointSelect<ExtArgs extends runtime.Types.Ext
   label?: boolean
   offsetMs?: boolean
   targetAt?: boolean
+  claimToken?: boolean
+  claimedAt?: boolean
+  claimExpiresAt?: boolean
   createdAt?: boolean
   detection?: boolean | Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listingObservationCheckpoint"]>
@@ -527,6 +621,9 @@ export type ListingObservationCheckpointSelectCreateManyAndReturn<ExtArgs extend
   label?: boolean
   offsetMs?: boolean
   targetAt?: boolean
+  claimToken?: boolean
+  claimedAt?: boolean
+  claimExpiresAt?: boolean
   createdAt?: boolean
   detection?: boolean | Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listingObservationCheckpoint"]>
@@ -537,6 +634,9 @@ export type ListingObservationCheckpointSelectUpdateManyAndReturn<ExtArgs extend
   label?: boolean
   offsetMs?: boolean
   targetAt?: boolean
+  claimToken?: boolean
+  claimedAt?: boolean
+  claimExpiresAt?: boolean
   createdAt?: boolean
   detection?: boolean | Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listingObservationCheckpoint"]>
@@ -547,10 +647,13 @@ export type ListingObservationCheckpointSelectScalar = {
   label?: boolean
   offsetMs?: boolean
   targetAt?: boolean
+  claimToken?: boolean
+  claimedAt?: boolean
+  claimExpiresAt?: boolean
   createdAt?: boolean
 }
 
-export type ListingObservationCheckpointOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"provider" | "symbol" | "label" | "offsetMs" | "targetAt" | "createdAt", ExtArgs["result"]["listingObservationCheckpoint"]>
+export type ListingObservationCheckpointOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"provider" | "symbol" | "label" | "offsetMs" | "targetAt" | "claimToken" | "claimedAt" | "claimExpiresAt" | "createdAt", ExtArgs["result"]["listingObservationCheckpoint"]>
 export type ListingObservationCheckpointInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   detection?: boolean | Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs>
 }
@@ -572,6 +675,9 @@ export type $ListingObservationCheckpointPayload<ExtArgs extends runtime.Types.E
     label: string
     offsetMs: number
     targetAt: Date
+    claimToken: string | null
+    claimedAt: Date | null
+    claimExpiresAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["listingObservationCheckpoint"]>
   composites: {}
@@ -1002,6 +1108,9 @@ export interface ListingObservationCheckpointFieldRefs {
   readonly label: Prisma.FieldRef<"ListingObservationCheckpoint", 'String'>
   readonly offsetMs: Prisma.FieldRef<"ListingObservationCheckpoint", 'Int'>
   readonly targetAt: Prisma.FieldRef<"ListingObservationCheckpoint", 'DateTime'>
+  readonly claimToken: Prisma.FieldRef<"ListingObservationCheckpoint", 'String'>
+  readonly claimedAt: Prisma.FieldRef<"ListingObservationCheckpoint", 'DateTime'>
+  readonly claimExpiresAt: Prisma.FieldRef<"ListingObservationCheckpoint", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"ListingObservationCheckpoint", 'DateTime'>
 }
     

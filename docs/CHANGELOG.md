@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.16 atomic checkpoint leases completed
+
+- Added durable checkpoint claim token, claim time, and expiry fields with database consistency enforcement.
+- Added bounded atomic claims using PostgreSQL `FOR UPDATE SKIP LOCKED`; active leases are excluded and expired work is reclaimable.
+- Added application validation and deterministic claimed-batch ordering without introducing a worker or provider request.
+- Applied the migration locally; 470 unit tests and all 46 isolated E2E tests passed together with build, lint, and formatting checks.
+
 ## 2026-09-14 — M7.15 validated due-checkpoint boundary completed
 
 - Added an internal application service for due-checkpoint reads.

@@ -10,8 +10,11 @@ import {
   SpotSymbol,
   SpotSymbolRepository,
 } from '../domain/spot-symbol-catalog';
-import { buildListingObservationSchedule } from '../domain/listing-observation-schedule';
-import { DueListingObservationCheckpoint } from '../domain/listing-observation-schedule';
+import {
+  buildListingObservationSchedule,
+  ClaimedListingObservationCheckpoint,
+  DueListingObservationCheckpoint,
+} from '../domain/listing-observation-schedule';
 
 @Injectable()
 export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
@@ -220,6 +223,78 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
       targetAt,
     }));
   }
+
+  async claimDueCheckpoints({
+    dueAt,
+    limit,
+    claimToken,
+    claimedAt,
+    claimExpiresAt,
+  }: {
+    dueAt: Date;
+    limit: number;
+    claimToken: string;
+    claimedAt: Date;
+    claimExpiresAt: Date;
+  }): Promise<ClaimedListingObservationCheckpoint[]> {
+    const rows = await this.prisma.$queryRaw<ClaimedCheckpointRow[]>`
+      WITH candidates AS (
+        SELECT provider, symbol, label
+        FROM listing_observation_checkpoints
+        WHERE target_at <= ${dueAt}
+          AND (claim_expires_at IS NULL OR claim_expires_at <= ${claimedAt})
+        ORDER BY target_at ASC, provider ASC, symbol ASC, label ASC
+        FOR UPDATE SKIP LOCKED
+        LIMIT ${limit}
+      )
+      UPDATE listing_observation_checkpoints AS checkpoint
+      SET claim_token = ${claimToken},
+          claimed_at = ${claimedAt},
+          claim_expires_at = ${claimExpiresAt}
+      FROM candidates
+      WHERE checkpoint.provider = candidates.provider
+        AND checkpoint.symbol = candidates.symbol
+        AND checkpoint.label = candidates.label
+      RETURNING checkpoint.provider,
+                checkpoint.symbol,
+                checkpoint.label,
+                checkpoint.offset_ms AS "offsetMs",
+                checkpoint.target_at AS "targetAt",
+                checkpoint.claim_token AS "claimToken",
+                checkpoint.claimed_at AS "claimedAt",
+                checkpoint.claim_expires_at AS "claimExpiresAt"
+    `;
+    return rows
+      .map((row) => ({
+        ...row,
+        provider: 'binance' as const,
+        label: row.label as ClaimedListingObservationCheckpoint['label'],
+      }))
+      .sort(compareClaimedCheckpoints);
+  }
+}
+
+interface ClaimedCheckpointRow {
+  provider: string;
+  symbol: string;
+  label: string;
+  offsetMs: number;
+  targetAt: Date;
+  claimToken: string;
+  claimedAt: Date;
+  claimExpiresAt: Date;
+}
+
+function compareClaimedCheckpoints(
+  left: ClaimedListingObservationCheckpoint,
+  right: ClaimedListingObservationCheckpoint,
+): number {
+  return (
+    left.targetAt.getTime() - right.targetAt.getTime() ||
+    left.provider.localeCompare(right.provider) ||
+    left.symbol.localeCompare(right.symbol) ||
+    left.label.localeCompare(right.label)
+  );
 }
 
 function toDetectedSpotSymbol(row: {

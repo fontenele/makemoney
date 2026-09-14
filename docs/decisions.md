@@ -519,3 +519,9 @@ Due-checkpoint selection receives its clock instant and limit from the caller an
 ## M7.15 validate bounded work before persistence access
 
 The application service owns due-read input validation: time must be valid and limit must be a safe integer from 1 through 100. Keeping this policy above the repository prevents accidental unbounded worker batches while leaving clock acquisition and processing lifecycle for later increments.
+
+## M7.16 lease due work atomically before processing
+
+Checkpoint ownership uses a durable caller-generated token with explicit claim and expiry instants. Candidate selection and lease mutation are one PostgreSQL statement using `FOR UPDATE SKIP LOCKED`, so concurrent consumers cannot receive the same actively leased row. Expiry deliberately restores abandoned work without requiring a recovery job.
+
+The database requires the three lease fields to be either all absent or internally consistent. Completion, retry attempts, worker cadence, and the market observation payload remain separate decisions because this increment establishes ownership only.

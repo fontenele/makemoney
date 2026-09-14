@@ -24,6 +24,12 @@ export interface DueListingObservationCheckpoint extends ListingObservationCheck
   symbol: string;
 }
 
+export interface ClaimedListingObservationCheckpoint extends DueListingObservationCheckpoint {
+  claimToken: string;
+  claimedAt: Date;
+  claimExpiresAt: Date;
+}
+
 export function buildListingObservationSchedule(
   detectedAt: Date,
 ): ListingObservationCheckpoint[] {

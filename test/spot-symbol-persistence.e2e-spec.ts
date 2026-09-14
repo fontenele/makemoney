@@ -215,6 +215,81 @@ describe('Spot symbol observation persistence (e2e)', () => {
       bySpotTradingAllowed: [],
     });
   });
+
+  it('claims due checkpoints atomically and reclaims expired leases', async () => {
+    const detectedAt = new Date('2026-09-14T02:00:00.000Z');
+    await prisma.observedSpotSymbol.create({
+      data: detectedRow('LEASEUSDT', detectedAt),
+    });
+    await prisma.listingObservationCheckpoint.createMany({
+      data: [
+        {
+          provider: 'binance',
+          symbol: 'LEASEUSDT',
+          label: 'T+0',
+          offsetMs: 0,
+          targetAt: detectedAt,
+        },
+        {
+          provider: 'binance',
+          symbol: 'LEASEUSDT',
+          label: 'T+5s',
+          offsetMs: 5_000,
+          targetAt: new Date(detectedAt.getTime() + 5_000),
+        },
+        {
+          provider: 'binance',
+          symbol: 'LEASEUSDT',
+          label: 'T+10s',
+          offsetMs: 10_000,
+          targetAt: new Date(detectedAt.getTime() + 10_000),
+        },
+      ],
+    });
+    const claimedAt = new Date('2026-09-14T02:01:00.000Z');
+    const expiry = new Date('2026-09-14T02:01:30.000Z');
+
+    const first = await repository.claimDueCheckpoints({
+      dueAt: claimedAt,
+      limit: 2,
+      claimToken: 'worker-a',
+      claimedAt,
+      claimExpiresAt: expiry,
+    });
+    expect(first.map(({ label }) => label)).toEqual(['T+0', 'T+5s']);
+    expect(first).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          claimToken: 'worker-a',
+          claimedAt,
+          claimExpiresAt: expiry,
+        }),
+      ]),
+    );
+
+    await expect(
+      repository.claimDueCheckpoints({
+        dueAt: claimedAt,
+        limit: 2,
+        claimToken: 'worker-b',
+        claimedAt,
+        claimExpiresAt: expiry,
+      }),
+    ).resolves.toMatchObject([{ label: 'T+10s', claimToken: 'worker-b' }]);
+
+    const reclaimedAt = new Date(expiry.getTime() + 1);
+    const reclaimed = await repository.claimDueCheckpoints({
+      dueAt: reclaimedAt,
+      limit: 2,
+      claimToken: 'worker-c',
+      claimedAt: reclaimedAt,
+      claimExpiresAt: new Date(reclaimedAt.getTime() + 30_000),
+    });
+    expect(reclaimed.map(({ label }) => label)).toEqual(['T+0', 'T+5s']);
+    expect(reclaimed.every(({ claimToken }) => claimToken === 'worker-c')).toBe(
+      true,
+    );
+  });
 });
 
 function symbol(status: string, spotTradingAllowed: boolean) {

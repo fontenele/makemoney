@@ -83,3 +83,9 @@ The repository can now list checkpoints with `targetAt` at or before an explicit
 ## M7.15 validated due-checkpoint application boundary
 
 An internal application service now accepts only a valid due instant and an integer limit from 1 through 100 before delegating to the M7.14 repository read. Invalid input fails before PostgreSQL access. No controller, worker, claim, retry, or market request is introduced.
+
+## M7.16 atomic checkpoint leases
+
+The internal application boundary can now claim a bounded due batch with a validated safe token, claim instant, and later expiry. PostgreSQL selects and updates candidates atomically with `FOR UPDATE SKIP LOCKED`; active leases are excluded and expired leases are reclaimable. Returned rows retain deterministic target/provider/symbol/label order.
+
+The database enforces all-or-none lease fields and a strictly later expiry. This increment adds no scheduler, worker loop, checkpoint completion, retry policy, provider request, market sample, alert, score, signal, or trade.

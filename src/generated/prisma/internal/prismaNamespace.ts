@@ -1167,6 +1167,9 @@ export const ListingObservationCheckpointScalarFieldEnum = {
   label: 'label',
   offsetMs: 'offsetMs',
   targetAt: 'targetAt',
+  claimToken: 'claimToken',
+  claimedAt: 'claimedAt',
+  claimExpiresAt: 'claimExpiresAt',
   createdAt: 'createdAt'
 } as const
 

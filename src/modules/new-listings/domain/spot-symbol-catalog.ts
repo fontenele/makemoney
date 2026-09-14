@@ -79,4 +79,13 @@ export interface SpotSymbolRepository {
   ): Promise<
     import('./listing-observation-schedule').DueListingObservationCheckpoint[]
   >;
+  claimDueCheckpoints(input: {
+    dueAt: Date;
+    limit: number;
+    claimToken: string;
+    claimedAt: Date;
+    claimExpiresAt: Date;
+  }): Promise<
+    import('./listing-observation-schedule').ClaimedListingObservationCheckpoint[]
+  >;
 }
