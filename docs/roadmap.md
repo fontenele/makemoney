@@ -123,6 +123,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.12 — complete:** a pure provider-neutral domain contract defines the nine detection-relative observation checkpoints without scheduling or collecting market data.
 - **M7.13 — complete:** all nine checkpoints are persisted atomically for each durable detection, with idempotent identity, target-time indexing, and safe detected-row backfill.
 - **M7.14 — complete:** a bounded deterministic repository read exposes checkpoints due by an explicit instant without claiming or processing them.
+- **M7.15 — complete:** an internal application boundary validates due time and a strict 1–100 limit before checkpoint repository access.
 
 ## M8 — Dashboard — planned
 

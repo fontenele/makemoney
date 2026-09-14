@@ -10,6 +10,7 @@ import {
 import { BinanceSpotSymbolCatalogClient } from './infrastructure/binance-spot-symbol-catalog.client';
 import { PrismaSpotSymbolRepository } from './infrastructure/prisma-spot-symbol.repository';
 import { NewListingsController } from './presentation/new-listings.controller';
+import { DueListingObservationCheckpointService } from './application/due-listing-observation-checkpoint.service';
 
 @Module({
   controllers: [NewListingsController],
@@ -31,6 +32,7 @@ import { NewListingsController } from './presentation/new-listings.controller';
     },
     SpotSymbolCatalogService,
     SpotSymbolDetectionReadModelService,
+    DueListingObservationCheckpointService,
   ],
   exports: [SpotSymbolCatalogService],
 })

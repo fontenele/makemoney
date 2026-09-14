@@ -79,3 +79,7 @@ No worker claims checkpoints and no market data is requested or stored in this i
 ## M7.14 bounded due-checkpoint read
 
 The repository can now list checkpoints with `targetAt` at or before an explicit instant, bounded by a caller-supplied limit and ordered by target time, provider, symbol, and label. This internal read is deterministic and provider-neutral. It does not claim, complete, retry, or process checkpoints and performs no provider request.
+
+## M7.15 validated due-checkpoint application boundary
+
+An internal application service now accepts only a valid due instant and an integer limit from 1 through 100 before delegating to the M7.14 repository read. Invalid input fails before PostgreSQL access. No controller, worker, claim, retry, or market request is introduced.

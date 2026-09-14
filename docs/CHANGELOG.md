@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.15 validated due-checkpoint boundary completed
+
+- Added an internal application service for due-checkpoint reads.
+- Enforced a valid reference time and strict integer batch limit from 1 through 100 before database access.
+- Added no route, worker, claim, retry, provider request, or market sample.
+- 464 unit tests and all 45 isolated E2E tests passed; build, lint, formatting, Compose, and diff validation also passed.
+
 ## 2026-09-14 — M6 closure wording clarified
 
 - Clarified that M6.1–M6.32 fully satisfy the accepted M6 scope.

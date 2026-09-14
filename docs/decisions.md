@@ -515,3 +515,7 @@ Checkpoint identity is provider, symbol, and schedule label. Rows retain offset 
 ## M7.14 explicit-time bounded due reads
 
 Due-checkpoint selection receives its clock instant and limit from the caller and uses the target-time composite index with a complete deterministic order. The repository only reads candidates; claim ownership, retries, completion state, provider sampling, and scheduling lifecycle remain separate increments.
+
+## M7.15 validate bounded work before persistence access
+
+The application service owns due-read input validation: time must be valid and limit must be a safe integer from 1 through 100. Keeping this policy above the repository prevents accidental unbounded worker batches while leaving clock acquisition and processing lifecycle for later increments.
