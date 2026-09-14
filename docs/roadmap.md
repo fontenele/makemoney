@@ -127,6 +127,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.16 — complete:** atomic PostgreSQL leases claim bounded due-checkpoint batches with `FOR UPDATE SKIP LOCKED`, exclude active claims, and make abandoned work eligible again after expiry.
 - **M7.17 — complete:** ownership-safe terminal completion records a checkpoint only for its matching active lease and permanently excludes completed work from due reads and future claims.
 - **M7.18 — complete:** startup-validated checkpoint-worker options define bounded interval, batch size, and lease duration without activating background processing.
+- **M7.19 — complete:** a deterministic single-cycle orchestrator claims one bounded batch, processes checkpoints sequentially, completes successes, and leaves failures recoverable by lease expiry without activating a timer or production processor.
 
 ## M8 — Dashboard — planned
 

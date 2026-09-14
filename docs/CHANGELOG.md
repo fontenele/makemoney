@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-14 — M7.19 deterministic single checkpoint cycle completed
+
+- Added a provider-neutral single-cycle processor contract and orchestration service.
+- Each cycle claims one bounded batch, processes it sequentially, completes successes with persisted ownership, and isolates per-item failures for lease-expiry recovery.
+- Added explicit claimed/completed/failed/lost-lease results; no timer, production processor, provider request, or live claim was activated.
+- 487 unit tests across 63 suites and all 46 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-14 — M7.18 bounded checkpoint-worker configuration completed
 
 - Added startup-validated interval, batch-size, and lease-duration configuration for the future checkpoint worker.

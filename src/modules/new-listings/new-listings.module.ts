@@ -15,6 +15,7 @@ import {
   LISTING_OBSERVATION_CHECKPOINT_WORKER_OPTIONS,
   ListingObservationCheckpointWorkerOptions,
 } from './application/listing-observation-checkpoint-worker-options';
+import { ListingObservationCheckpointCycleService } from './application/listing-observation-checkpoint-cycle.service';
 
 @Module({
   controllers: [NewListingsController],
@@ -53,6 +54,17 @@ import {
           'NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS',
         ),
       }),
+    },
+    {
+      provide: ListingObservationCheckpointCycleService,
+      inject: [
+        DueListingObservationCheckpointService,
+        LISTING_OBSERVATION_CHECKPOINT_WORKER_OPTIONS,
+      ],
+      useFactory: (
+        checkpoints: DueListingObservationCheckpointService,
+        options: ListingObservationCheckpointWorkerOptions,
+      ) => new ListingObservationCheckpointCycleService(checkpoints, options),
     },
   ],
   exports: [SpotSymbolCatalogService],

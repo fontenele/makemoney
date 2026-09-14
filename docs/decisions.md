@@ -537,3 +537,9 @@ A database check preserves the same temporal invariant independently of the appl
 Worker cadence, batch size, and lease duration are startup configuration rather than hidden constants. Defaults favor small local batches and short recovery, while explicit maximums prevent accidentally unbounded queries, excessively tight loops, or abandoned claims that remain unavailable for too long.
 
 The module receives one immutable-shaped options object, keeping operational wiring separate from environment access. Activation is intentionally deferred: scheduling before a processing contract exists would only claim rows until their leases expire and create noisy, purposeless database work.
+
+## M7.19 one deterministic cycle before background scheduling
+
+Claiming, per-item processing, and completion are composed in a manually invoked cycle before any timer is introduced. Checkpoints are processed sequentially to keep provider pressure and completion ordering predictable. A processor exception affects only its item; the lease is left intact so the existing expiry mechanism owns recovery rather than an implicit immediate retry.
+
+Completion returning false is counted separately as lost ownership, because treating it as processor failure would hide lease timing or competing-worker behavior. The cycle is wired for dependency injection but deliberately has no production processor or lifecycle hook, preventing real rows from being claimed before observation persistence exists.

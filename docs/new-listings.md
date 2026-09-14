@@ -101,3 +101,9 @@ Completed checkpoints are terminal and excluded from both due reads and later cl
 The future checkpoint worker now has one injected options contract populated by startup-validated environment configuration. Defaults are a 5-second completion-relative interval, a batch size of 25, and a 30-second lease. Interval is restricted to 1–60 seconds, batch size to 1–100, and lease duration to 5–300 seconds.
 
 The values are documented in `.env.example` and available to the new-listings module, but no scheduler or timer consumes them yet. No checkpoint is automatically claimed or completed and no provider request, market sample, alert, score, signal, or trade is introduced.
+
+## M7.19 deterministic single-cycle orchestration
+
+An internal cycle service now creates a unique claim token, claims one configured batch at an explicit clock instant, and passes each claimed checkpoint to a provider-neutral processor sequentially. Successful processing attempts ownership-safe completion; processor failures are isolated per item and remain eligible after lease expiry. The result reports claimed, completed, failed, and lost-lease counts.
+
+The cycle service is registered for later scheduling but has no production processor and is never invoked automatically. This increment therefore performs no live claim, timer, provider request, market sample, alert, score, signal, or trade.
