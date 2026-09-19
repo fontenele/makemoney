@@ -28,10 +28,18 @@ export type AggregateListingObservationCheckpoint = {
 
 export type ListingObservationCheckpointAvgAggregateOutputType = {
   offsetMs: number | null
+  lastPrice: runtime.Decimal | null
+  baseVolume: runtime.Decimal | null
+  quoteVolume: runtime.Decimal | null
+  tradeCount: number | null
 }
 
 export type ListingObservationCheckpointSumAggregateOutputType = {
   offsetMs: number | null
+  lastPrice: runtime.Decimal | null
+  baseVolume: runtime.Decimal | null
+  quoteVolume: runtime.Decimal | null
+  tradeCount: bigint | null
 }
 
 export type ListingObservationCheckpointMinAggregateOutputType = {
@@ -44,6 +52,13 @@ export type ListingObservationCheckpointMinAggregateOutputType = {
   claimedAt: Date | null
   claimExpiresAt: Date | null
   completedAt: Date | null
+  lastPrice: runtime.Decimal | null
+  baseVolume: runtime.Decimal | null
+  quoteVolume: runtime.Decimal | null
+  tradeCount: bigint | null
+  windowOpenTime: Date | null
+  windowCloseTime: Date | null
+  receivedAt: Date | null
   createdAt: Date | null
 }
 
@@ -57,6 +72,13 @@ export type ListingObservationCheckpointMaxAggregateOutputType = {
   claimedAt: Date | null
   claimExpiresAt: Date | null
   completedAt: Date | null
+  lastPrice: runtime.Decimal | null
+  baseVolume: runtime.Decimal | null
+  quoteVolume: runtime.Decimal | null
+  tradeCount: bigint | null
+  windowOpenTime: Date | null
+  windowCloseTime: Date | null
+  receivedAt: Date | null
   createdAt: Date | null
 }
 
@@ -70,6 +92,13 @@ export type ListingObservationCheckpointCountAggregateOutputType = {
   claimedAt: number
   claimExpiresAt: number
   completedAt: number
+  lastPrice: number
+  baseVolume: number
+  quoteVolume: number
+  tradeCount: number
+  windowOpenTime: number
+  windowCloseTime: number
+  receivedAt: number
   createdAt: number
   _all: number
 }
@@ -77,10 +106,18 @@ export type ListingObservationCheckpointCountAggregateOutputType = {
 
 export type ListingObservationCheckpointAvgAggregateInputType = {
   offsetMs?: true
+  lastPrice?: true
+  baseVolume?: true
+  quoteVolume?: true
+  tradeCount?: true
 }
 
 export type ListingObservationCheckpointSumAggregateInputType = {
   offsetMs?: true
+  lastPrice?: true
+  baseVolume?: true
+  quoteVolume?: true
+  tradeCount?: true
 }
 
 export type ListingObservationCheckpointMinAggregateInputType = {
@@ -93,6 +130,13 @@ export type ListingObservationCheckpointMinAggregateInputType = {
   claimedAt?: true
   claimExpiresAt?: true
   completedAt?: true
+  lastPrice?: true
+  baseVolume?: true
+  quoteVolume?: true
+  tradeCount?: true
+  windowOpenTime?: true
+  windowCloseTime?: true
+  receivedAt?: true
   createdAt?: true
 }
 
@@ -106,6 +150,13 @@ export type ListingObservationCheckpointMaxAggregateInputType = {
   claimedAt?: true
   claimExpiresAt?: true
   completedAt?: true
+  lastPrice?: true
+  baseVolume?: true
+  quoteVolume?: true
+  tradeCount?: true
+  windowOpenTime?: true
+  windowCloseTime?: true
+  receivedAt?: true
   createdAt?: true
 }
 
@@ -119,6 +170,13 @@ export type ListingObservationCheckpointCountAggregateInputType = {
   claimedAt?: true
   claimExpiresAt?: true
   completedAt?: true
+  lastPrice?: true
+  baseVolume?: true
+  quoteVolume?: true
+  tradeCount?: true
+  windowOpenTime?: true
+  windowCloseTime?: true
+  receivedAt?: true
   createdAt?: true
   _all?: true
 }
@@ -219,6 +277,13 @@ export type ListingObservationCheckpointGroupByOutputType = {
   claimedAt: Date | null
   claimExpiresAt: Date | null
   completedAt: Date | null
+  lastPrice: runtime.Decimal | null
+  baseVolume: runtime.Decimal | null
+  quoteVolume: runtime.Decimal | null
+  tradeCount: bigint | null
+  windowOpenTime: Date | null
+  windowCloseTime: Date | null
+  receivedAt: Date | null
   createdAt: Date
   _count: ListingObservationCheckpointCountAggregateOutputType | null
   _avg: ListingObservationCheckpointAvgAggregateOutputType | null
@@ -255,6 +320,13 @@ export type ListingObservationCheckpointWhereInput = {
   claimedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   claimExpiresAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
+  lastPrice?: Prisma.DecimalNullableFilter<"ListingObservationCheckpoint"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.DecimalNullableFilter<"ListingObservationCheckpoint"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.DecimalNullableFilter<"ListingObservationCheckpoint"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.BigIntNullableFilter<"ListingObservationCheckpoint"> | bigint | number | null
+  windowOpenTime?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
+  windowCloseTime?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
+  receivedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ListingObservationCheckpoint"> | Date | string
   detection?: Prisma.XOR<Prisma.ObservedSpotSymbolScalarRelationFilter, Prisma.ObservedSpotSymbolWhereInput>
 }
@@ -269,6 +341,13 @@ export type ListingObservationCheckpointOrderByWithRelationInput = {
   claimedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   claimExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastPrice?: Prisma.SortOrderInput | Prisma.SortOrder
+  baseVolume?: Prisma.SortOrderInput | Prisma.SortOrder
+  quoteVolume?: Prisma.SortOrderInput | Prisma.SortOrder
+  tradeCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  windowOpenTime?: Prisma.SortOrderInput | Prisma.SortOrder
+  windowCloseTime?: Prisma.SortOrderInput | Prisma.SortOrder
+  receivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   detection?: Prisma.ObservedSpotSymbolOrderByWithRelationInput
 }
@@ -287,6 +366,13 @@ export type ListingObservationCheckpointWhereUniqueInput = Prisma.AtLeast<{
   claimedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   claimExpiresAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
+  lastPrice?: Prisma.DecimalNullableFilter<"ListingObservationCheckpoint"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.DecimalNullableFilter<"ListingObservationCheckpoint"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.DecimalNullableFilter<"ListingObservationCheckpoint"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.BigIntNullableFilter<"ListingObservationCheckpoint"> | bigint | number | null
+  windowOpenTime?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
+  windowCloseTime?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
+  receivedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ListingObservationCheckpoint"> | Date | string
   detection?: Prisma.XOR<Prisma.ObservedSpotSymbolScalarRelationFilter, Prisma.ObservedSpotSymbolWhereInput>
 }, "provider_symbol_label">
@@ -301,6 +387,13 @@ export type ListingObservationCheckpointOrderByWithAggregationInput = {
   claimedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   claimExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastPrice?: Prisma.SortOrderInput | Prisma.SortOrder
+  baseVolume?: Prisma.SortOrderInput | Prisma.SortOrder
+  quoteVolume?: Prisma.SortOrderInput | Prisma.SortOrder
+  tradeCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  windowOpenTime?: Prisma.SortOrderInput | Prisma.SortOrder
+  windowCloseTime?: Prisma.SortOrderInput | Prisma.SortOrder
+  receivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ListingObservationCheckpointCountOrderByAggregateInput
   _avg?: Prisma.ListingObservationCheckpointAvgOrderByAggregateInput
@@ -322,6 +415,13 @@ export type ListingObservationCheckpointScalarWhereWithAggregatesInput = {
   claimedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | Date | string | null
   claimExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | Date | string | null
+  lastPrice?: Prisma.DecimalNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.DecimalNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.DecimalNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.BigIntNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | bigint | number | null
+  windowOpenTime?: Prisma.DateTimeNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | Date | string | null
+  windowCloseTime?: Prisma.DateTimeNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | Date | string | null
+  receivedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ListingObservationCheckpoint"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ListingObservationCheckpoint"> | Date | string
 }
 
@@ -333,6 +433,13 @@ export type ListingObservationCheckpointCreateInput = {
   claimedAt?: Date | string | null
   claimExpiresAt?: Date | string | null
   completedAt?: Date | string | null
+  lastPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: bigint | number | null
+  windowOpenTime?: Date | string | null
+  windowCloseTime?: Date | string | null
+  receivedAt?: Date | string | null
   createdAt?: Date | string
   detection: Prisma.ObservedSpotSymbolCreateNestedOneWithoutObservationCheckpointsInput
 }
@@ -347,6 +454,13 @@ export type ListingObservationCheckpointUncheckedCreateInput = {
   claimedAt?: Date | string | null
   claimExpiresAt?: Date | string | null
   completedAt?: Date | string | null
+  lastPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: bigint | number | null
+  windowOpenTime?: Date | string | null
+  windowCloseTime?: Date | string | null
+  receivedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -358,6 +472,13 @@ export type ListingObservationCheckpointUpdateInput = {
   claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  windowOpenTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  windowCloseTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   detection?: Prisma.ObservedSpotSymbolUpdateOneRequiredWithoutObservationCheckpointsNestedInput
 }
@@ -372,6 +493,13 @@ export type ListingObservationCheckpointUncheckedUpdateInput = {
   claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  windowOpenTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  windowCloseTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -385,6 +513,13 @@ export type ListingObservationCheckpointCreateManyInput = {
   claimedAt?: Date | string | null
   claimExpiresAt?: Date | string | null
   completedAt?: Date | string | null
+  lastPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: bigint | number | null
+  windowOpenTime?: Date | string | null
+  windowCloseTime?: Date | string | null
+  receivedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -396,6 +531,13 @@ export type ListingObservationCheckpointUpdateManyMutationInput = {
   claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  windowOpenTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  windowCloseTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -409,6 +551,13 @@ export type ListingObservationCheckpointUncheckedUpdateManyInput = {
   claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  windowOpenTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  windowCloseTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -438,11 +587,22 @@ export type ListingObservationCheckpointCountOrderByAggregateInput = {
   claimedAt?: Prisma.SortOrder
   claimExpiresAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
+  lastPrice?: Prisma.SortOrder
+  baseVolume?: Prisma.SortOrder
+  quoteVolume?: Prisma.SortOrder
+  tradeCount?: Prisma.SortOrder
+  windowOpenTime?: Prisma.SortOrder
+  windowCloseTime?: Prisma.SortOrder
+  receivedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type ListingObservationCheckpointAvgOrderByAggregateInput = {
   offsetMs?: Prisma.SortOrder
+  lastPrice?: Prisma.SortOrder
+  baseVolume?: Prisma.SortOrder
+  quoteVolume?: Prisma.SortOrder
+  tradeCount?: Prisma.SortOrder
 }
 
 export type ListingObservationCheckpointMaxOrderByAggregateInput = {
@@ -455,6 +615,13 @@ export type ListingObservationCheckpointMaxOrderByAggregateInput = {
   claimedAt?: Prisma.SortOrder
   claimExpiresAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
+  lastPrice?: Prisma.SortOrder
+  baseVolume?: Prisma.SortOrder
+  quoteVolume?: Prisma.SortOrder
+  tradeCount?: Prisma.SortOrder
+  windowOpenTime?: Prisma.SortOrder
+  windowCloseTime?: Prisma.SortOrder
+  receivedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -468,11 +635,22 @@ export type ListingObservationCheckpointMinOrderByAggregateInput = {
   claimedAt?: Prisma.SortOrder
   claimExpiresAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
+  lastPrice?: Prisma.SortOrder
+  baseVolume?: Prisma.SortOrder
+  quoteVolume?: Prisma.SortOrder
+  tradeCount?: Prisma.SortOrder
+  windowOpenTime?: Prisma.SortOrder
+  windowCloseTime?: Prisma.SortOrder
+  receivedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type ListingObservationCheckpointSumOrderByAggregateInput = {
   offsetMs?: Prisma.SortOrder
+  lastPrice?: Prisma.SortOrder
+  baseVolume?: Prisma.SortOrder
+  quoteVolume?: Prisma.SortOrder
+  tradeCount?: Prisma.SortOrder
 }
 
 export type ListingObservationCheckpointCreateNestedManyWithoutDetectionInput = {
@@ -521,6 +699,14 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
+export type NullableBigIntFieldUpdateOperationsInput = {
+  set?: bigint | number | null
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
+}
+
 export type ListingObservationCheckpointCreateWithoutDetectionInput = {
   label: string
   offsetMs: number
@@ -529,6 +715,13 @@ export type ListingObservationCheckpointCreateWithoutDetectionInput = {
   claimedAt?: Date | string | null
   claimExpiresAt?: Date | string | null
   completedAt?: Date | string | null
+  lastPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: bigint | number | null
+  windowOpenTime?: Date | string | null
+  windowCloseTime?: Date | string | null
+  receivedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -540,6 +733,13 @@ export type ListingObservationCheckpointUncheckedCreateWithoutDetectionInput = {
   claimedAt?: Date | string | null
   claimExpiresAt?: Date | string | null
   completedAt?: Date | string | null
+  lastPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: bigint | number | null
+  windowOpenTime?: Date | string | null
+  windowCloseTime?: Date | string | null
+  receivedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -582,6 +782,13 @@ export type ListingObservationCheckpointScalarWhereInput = {
   claimedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   claimExpiresAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
+  lastPrice?: Prisma.DecimalNullableFilter<"ListingObservationCheckpoint"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.DecimalNullableFilter<"ListingObservationCheckpoint"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.DecimalNullableFilter<"ListingObservationCheckpoint"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.BigIntNullableFilter<"ListingObservationCheckpoint"> | bigint | number | null
+  windowOpenTime?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
+  windowCloseTime?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
+  receivedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ListingObservationCheckpoint"> | Date | string
 }
 
@@ -593,6 +800,13 @@ export type ListingObservationCheckpointCreateManyDetectionInput = {
   claimedAt?: Date | string | null
   claimExpiresAt?: Date | string | null
   completedAt?: Date | string | null
+  lastPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: bigint | number | null
+  windowOpenTime?: Date | string | null
+  windowCloseTime?: Date | string | null
+  receivedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -604,6 +818,13 @@ export type ListingObservationCheckpointUpdateWithoutDetectionInput = {
   claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  windowOpenTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  windowCloseTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -615,6 +836,13 @@ export type ListingObservationCheckpointUncheckedUpdateWithoutDetectionInput = {
   claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  windowOpenTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  windowCloseTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -626,6 +854,13 @@ export type ListingObservationCheckpointUncheckedUpdateManyWithoutDetectionInput
   claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  windowOpenTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  windowCloseTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -641,6 +876,13 @@ export type ListingObservationCheckpointSelect<ExtArgs extends runtime.Types.Ext
   claimedAt?: boolean
   claimExpiresAt?: boolean
   completedAt?: boolean
+  lastPrice?: boolean
+  baseVolume?: boolean
+  quoteVolume?: boolean
+  tradeCount?: boolean
+  windowOpenTime?: boolean
+  windowCloseTime?: boolean
+  receivedAt?: boolean
   createdAt?: boolean
   detection?: boolean | Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listingObservationCheckpoint"]>
@@ -655,6 +897,13 @@ export type ListingObservationCheckpointSelectCreateManyAndReturn<ExtArgs extend
   claimedAt?: boolean
   claimExpiresAt?: boolean
   completedAt?: boolean
+  lastPrice?: boolean
+  baseVolume?: boolean
+  quoteVolume?: boolean
+  tradeCount?: boolean
+  windowOpenTime?: boolean
+  windowCloseTime?: boolean
+  receivedAt?: boolean
   createdAt?: boolean
   detection?: boolean | Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listingObservationCheckpoint"]>
@@ -669,6 +918,13 @@ export type ListingObservationCheckpointSelectUpdateManyAndReturn<ExtArgs extend
   claimedAt?: boolean
   claimExpiresAt?: boolean
   completedAt?: boolean
+  lastPrice?: boolean
+  baseVolume?: boolean
+  quoteVolume?: boolean
+  tradeCount?: boolean
+  windowOpenTime?: boolean
+  windowCloseTime?: boolean
+  receivedAt?: boolean
   createdAt?: boolean
   detection?: boolean | Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listingObservationCheckpoint"]>
@@ -683,10 +939,17 @@ export type ListingObservationCheckpointSelectScalar = {
   claimedAt?: boolean
   claimExpiresAt?: boolean
   completedAt?: boolean
+  lastPrice?: boolean
+  baseVolume?: boolean
+  quoteVolume?: boolean
+  tradeCount?: boolean
+  windowOpenTime?: boolean
+  windowCloseTime?: boolean
+  receivedAt?: boolean
   createdAt?: boolean
 }
 
-export type ListingObservationCheckpointOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"provider" | "symbol" | "label" | "offsetMs" | "targetAt" | "claimToken" | "claimedAt" | "claimExpiresAt" | "completedAt" | "createdAt", ExtArgs["result"]["listingObservationCheckpoint"]>
+export type ListingObservationCheckpointOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"provider" | "symbol" | "label" | "offsetMs" | "targetAt" | "claimToken" | "claimedAt" | "claimExpiresAt" | "completedAt" | "lastPrice" | "baseVolume" | "quoteVolume" | "tradeCount" | "windowOpenTime" | "windowCloseTime" | "receivedAt" | "createdAt", ExtArgs["result"]["listingObservationCheckpoint"]>
 export type ListingObservationCheckpointInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   detection?: boolean | Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs>
 }
@@ -712,6 +975,13 @@ export type $ListingObservationCheckpointPayload<ExtArgs extends runtime.Types.E
     claimedAt: Date | null
     claimExpiresAt: Date | null
     completedAt: Date | null
+    lastPrice: runtime.Decimal | null
+    baseVolume: runtime.Decimal | null
+    quoteVolume: runtime.Decimal | null
+    tradeCount: bigint | null
+    windowOpenTime: Date | null
+    windowCloseTime: Date | null
+    receivedAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["listingObservationCheckpoint"]>
   composites: {}
@@ -1146,6 +1416,13 @@ export interface ListingObservationCheckpointFieldRefs {
   readonly claimedAt: Prisma.FieldRef<"ListingObservationCheckpoint", 'DateTime'>
   readonly claimExpiresAt: Prisma.FieldRef<"ListingObservationCheckpoint", 'DateTime'>
   readonly completedAt: Prisma.FieldRef<"ListingObservationCheckpoint", 'DateTime'>
+  readonly lastPrice: Prisma.FieldRef<"ListingObservationCheckpoint", 'Decimal'>
+  readonly baseVolume: Prisma.FieldRef<"ListingObservationCheckpoint", 'Decimal'>
+  readonly quoteVolume: Prisma.FieldRef<"ListingObservationCheckpoint", 'Decimal'>
+  readonly tradeCount: Prisma.FieldRef<"ListingObservationCheckpoint", 'BigInt'>
+  readonly windowOpenTime: Prisma.FieldRef<"ListingObservationCheckpoint", 'DateTime'>
+  readonly windowCloseTime: Prisma.FieldRef<"ListingObservationCheckpoint", 'DateTime'>
+  readonly receivedAt: Prisma.FieldRef<"ListingObservationCheckpoint", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"ListingObservationCheckpoint", 'DateTime'>
 }
     

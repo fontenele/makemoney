@@ -15,6 +15,7 @@ import {
   ClaimedListingObservationCheckpoint,
   DueListingObservationCheckpoint,
 } from '../domain/listing-observation-schedule';
+import { ListingMarketObservation } from '../domain/listing-market-observation';
 
 @Injectable()
 export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
@@ -280,12 +281,14 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
     label,
     claimToken,
     completedAt,
+    observation,
   }: {
     provider: SpotSymbol['provider'];
     symbol: string;
     label: ClaimedListingObservationCheckpoint['label'];
     claimToken: string;
     completedAt: Date;
+    observation: ListingMarketObservation;
   }): Promise<boolean> {
     const result = await this.prisma.listingObservationCheckpoint.updateMany({
       where: {
@@ -297,7 +300,16 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
         claimExpiresAt: { gt: completedAt },
         completedAt: null,
       },
-      data: { completedAt },
+      data: {
+        completedAt,
+        lastPrice: new Prisma.Decimal(observation.lastPrice),
+        baseVolume: new Prisma.Decimal(observation.baseVolume),
+        quoteVolume: new Prisma.Decimal(observation.quoteVolume),
+        tradeCount: BigInt(observation.tradeCount),
+        windowOpenTime: observation.windowOpenTime,
+        windowCloseTime: observation.windowCloseTime,
+        receivedAt: observation.receivedAt,
+      },
     });
     return result.count === 1;
   }

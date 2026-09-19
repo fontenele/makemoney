@@ -1171,6 +1171,13 @@ export const ListingObservationCheckpointScalarFieldEnum = {
   claimedAt: 'claimedAt',
   claimExpiresAt: 'claimExpiresAt',
   completedAt: 'completedAt',
+  lastPrice: 'lastPrice',
+  baseVolume: 'baseVolume',
+  quoteVolume: 'quoteVolume',
+  tradeCount: 'tradeCount',
+  windowOpenTime: 'windowOpenTime',
+  windowCloseTime: 'windowCloseTime',
+  receivedAt: 'receivedAt',
   createdAt: 'createdAt'
 } as const
 

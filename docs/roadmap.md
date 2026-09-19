@@ -129,6 +129,8 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.18 — complete:** startup-validated checkpoint-worker options define bounded interval, batch size, and lease duration without activating background processing.
 - **M7.19 — complete:** a deterministic single-cycle orchestrator claims one bounded batch, processes checkpoints sequentially, completes successes, and leaves failures recoverable by lease expiry without activating a timer or production processor.
 - **M7.20 — complete:** a provider-neutral checkpoint market-observation contract preserves exact decimal price and volumes and validates symbol, trade count, provider-window, and receive-time invariants without loading or persisting data.
+- **M7.21 — complete:** an inactive public Binance Spot adapter loads one explicitly named symbol's rolling 24-hour ticker with timeout, cancellation, strict payload validation, and exact decimal normalization.
+- **M7.22 — complete:** atomic checkpoint completion persists validated market observations (`lastPrice`, `baseVolume`, `quoteVolume`, `tradeCount`, `windowOpenTime`, `windowCloseTime`, `receivedAt`) in PostgreSQL with database consistency constraints.
 
 ## M8 — Dashboard — planned
 

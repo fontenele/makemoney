@@ -1,10 +1,13 @@
 import { randomUUID } from 'node:crypto';
 import { ClaimedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
+import { ListingMarketObservation } from '../domain/listing-market-observation';
 import { DueListingObservationCheckpointService } from './due-listing-observation-checkpoint.service';
 import { ListingObservationCheckpointWorkerOptions } from './listing-observation-checkpoint-worker-options';
 
 export interface ListingObservationCheckpointProcessor {
-  process(checkpoint: ClaimedListingObservationCheckpoint): Promise<void>;
+  process(
+    checkpoint: ClaimedListingObservationCheckpoint,
+  ): Promise<ListingMarketObservation>;
 }
 
 export interface ListingObservationCheckpointCycleResult {
@@ -47,8 +50,9 @@ export class ListingObservationCheckpointCycleService {
     };
 
     for (const checkpoint of claimed) {
+      let observation: ListingMarketObservation;
       try {
-        await processor.process(checkpoint);
+        observation = await processor.process(checkpoint);
       } catch {
         result.failed += 1;
         continue;
@@ -59,6 +63,7 @@ export class ListingObservationCheckpointCycleService {
         label: checkpoint.label,
         claimToken: checkpoint.claimToken,
         completedAt: this.clock(),
+        observation,
       });
       if (completed) result.completed += 1;
       else result.lostLease += 1;

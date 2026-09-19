@@ -9,6 +9,10 @@ import {
   LISTING_OBSERVATION_CHECKPOINTS,
   ListingObservationCheckpointLabel,
 } from '../domain/listing-observation-schedule';
+import {
+  ListingMarketObservation,
+  validateListingMarketObservation,
+} from '../domain/listing-market-observation';
 
 export const MAX_DUE_LISTING_OBSERVATION_CHECKPOINT_LIMIT = 100;
 
@@ -64,6 +68,7 @@ export class DueListingObservationCheckpointService {
     label: ListingObservationCheckpointLabel;
     claimToken: string;
     completedAt: Date;
+    observation: ListingMarketObservation;
   }): Promise<boolean> {
     if (input.provider !== 'binance') {
       throw new Error('Checkpoint provider must be binance');
@@ -80,6 +85,14 @@ export class DueListingObservationCheckpointService {
       );
     }
     this.validateDate(input.completedAt, 'Checkpoint completion time');
+    if (
+      !input.observation ||
+      input.observation.provider !== input.provider ||
+      input.observation.symbol !== input.symbol
+    ) {
+      throw new Error('Checkpoint observation identity must match checkpoint');
+    }
+    validateListingMarketObservation(input.observation);
     return this.repository.completeClaimedCheckpoint(input);
   }
 

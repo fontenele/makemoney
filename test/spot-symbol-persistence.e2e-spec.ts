@@ -291,6 +291,7 @@ describe('Spot symbol observation persistence (e2e)', () => {
     );
 
     const completedAt = new Date(reclaimedAt.getTime() + 1_000);
+    const obs = sampleObservation('LEASEUSDT');
     await expect(
       repository.completeClaimedCheckpoint({
         provider: 'binance',
@@ -298,6 +299,7 @@ describe('Spot symbol observation persistence (e2e)', () => {
         label: 'T+0',
         claimToken: 'wrong-worker',
         completedAt,
+        observation: obs,
       }),
     ).resolves.toBe(false);
     await expect(
@@ -307,8 +309,54 @@ describe('Spot symbol observation persistence (e2e)', () => {
         label: 'T+0',
         claimToken: 'worker-c',
         completedAt,
+        observation: obs,
       }),
     ).resolves.toBe(true);
+
+    const completedRow =
+      await prisma.listingObservationCheckpoint.findUniqueOrThrow({
+        where: {
+          provider_symbol_label: {
+            provider: 'binance',
+            symbol: 'LEASEUSDT',
+            label: 'T+0',
+          },
+        },
+      });
+    expect(completedRow.completedAt).toEqual(completedAt);
+    expect(completedRow.lastPrice?.toString()).toBe('0.00001');
+    expect(completedRow.baseVolume?.toString()).toBe('1200000.5');
+    expect(completedRow.quoteVolume?.toString()).toBe('12.3456789');
+    expect(completedRow.tradeCount).toBe(42n);
+    expect(completedRow.windowOpenTime).toEqual(
+      new Date('2026-09-13T12:00:00.000Z'),
+    );
+    expect(completedRow.windowCloseTime).toEqual(
+      new Date('2026-09-14T12:00:00.000Z'),
+    );
+    expect(completedRow.receivedAt).toEqual(
+      new Date('2026-09-14T12:00:10.000Z'),
+    );
+
+    const uncompletedRow =
+      await prisma.listingObservationCheckpoint.findUniqueOrThrow({
+        where: {
+          provider_symbol_label: {
+            provider: 'binance',
+            symbol: 'LEASEUSDT',
+            label: 'T+5s',
+          },
+        },
+      });
+    expect(uncompletedRow.completedAt).toBeNull();
+    expect(uncompletedRow.lastPrice).toBeNull();
+    expect(uncompletedRow.baseVolume).toBeNull();
+    expect(uncompletedRow.quoteVolume).toBeNull();
+    expect(uncompletedRow.tradeCount).toBeNull();
+    expect(uncompletedRow.windowOpenTime).toBeNull();
+    expect(uncompletedRow.windowCloseTime).toBeNull();
+    expect(uncompletedRow.receivedAt).toBeNull();
+
     await expect(
       repository.completeClaimedCheckpoint({
         provider: 'binance',
@@ -316,6 +364,7 @@ describe('Spot symbol observation persistence (e2e)', () => {
         label: 'T+0',
         claimToken: 'worker-c',
         completedAt,
+        observation: obs,
       }),
     ).resolves.toBe(false);
 
@@ -327,6 +376,7 @@ describe('Spot symbol observation persistence (e2e)', () => {
         label: 'T+10s',
         claimToken: 'worker-b',
         completedAt: afterAllLeasesExpire,
+        observation: sampleObservation('LEASEUSDT'),
       }),
     ).resolves.toBe(false);
     const available = await repository.claimDueCheckpoints({
@@ -365,5 +415,25 @@ function detectedRow(symbol: string, detectedAt: Date) {
     firstObservedAt: detectedAt,
     lastObservedAt: detectedAt,
     detectedAt,
+  };
+}
+
+function sampleObservation(
+  symbol: string,
+  overrides: Partial<
+    import('../src/modules/new-listings/domain/listing-market-observation').ListingMarketObservation
+  > = {},
+): import('../src/modules/new-listings/domain/listing-market-observation').ListingMarketObservation {
+  return {
+    provider: 'binance',
+    symbol,
+    lastPrice: '0.00001000',
+    baseVolume: '1200000.50000000',
+    quoteVolume: '12.34567890',
+    tradeCount: 42,
+    windowOpenTime: new Date('2026-09-13T12:00:00.000Z'),
+    windowCloseTime: new Date('2026-09-14T12:00:00.000Z'),
+    receivedAt: new Date('2026-09-14T12:00:10.000Z'),
+    ...overrides,
   };
 }

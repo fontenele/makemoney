@@ -1,6 +1,6 @@
 # Current State
 
-Last validated: 2026-09-14
+Last validated: 2026-09-19
 
 The startup validator accepts strictly positive canonical fractional values such as `0.01` for risk limits, matching the documented defaults and `.env.example`.
 
@@ -46,6 +46,10 @@ M7.19 provides a deterministic manually invoked single-cycle orchestrator with s
 
 M7.20 defines a validated provider-neutral checkpoint market observation with exact-string price and volumes, safe trade counts, explicit provider-window times, and an independent local receive time.
 
+M7.21 provides an inactive unauthenticated Binance Spot adapter that loads and strictly normalizes one symbol's public rolling 24-hour ticker.
+
+M7.22 persists checkpoint market observations atomically on completion, enforces consistency through PostgreSQL check constraints, and passes observations through the cycle orchestrator.
+
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
@@ -70,6 +74,8 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.18 defaults the inactive future worker to a 5-second interval, 25-row batch, and 30-second lease, with strict startup bounds.
 - M7.19 isolates processor failures, completes only successful active claims, and has no timer or production processor, so it performs no live background work.
 - M7.20 exposes only an internal observation/provider contract; no Binance market-snapshot client, persistence, production processor, or worker timer exists yet.
+- M7.21 registers the public Binance observation adapter with a ten-second timeout and cancellation support, but nothing invokes it automatically and no observation persistence exists yet.
+- M7.22 persists validated market observations (`lastPrice`, `baseVolume`, `quoteVolume`, `tradeCount`, `windowOpenTime`, `windowCloseTime`, `receivedAt`) atomically alongside `completedAt` under active lease ownership, with database check constraints enforcing observation completeness.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -209,12 +215,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-14 after M7.20:
+The following passed on 2026-09-19 after M7.22:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 515 tests passed across 64 suites
+- `npm test -- --runInBand` — 538 tests passed across 65 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -222,7 +228,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 - `npm run test:e2e -- --runInBand` — all 46 tests passed across 4 suites in the disposable `crypto_trader_e2e` schema.
 - The E2E global setup recreates and migrates only its dedicated schema; local application balances, executions, controls, signals, candles, and runs are not read or changed.
-- `npx prisma migrate deploy` — all thirteen migrations applied, including terminal checkpoint completion
+- `npx prisma migrate deploy` — all fourteen migrations applied, including atomic checkpoint observation persistence
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live Binance historical-candle smoke test — the public market-data-only kline endpoint returned ordered BTCUSDT one-minute rows with the documented 12 fields and no credentials
@@ -233,7 +239,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.20 are implemented and fully verified milestone increments.
+M0 through M7.22 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

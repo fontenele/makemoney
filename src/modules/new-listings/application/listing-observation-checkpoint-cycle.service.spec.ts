@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
 import { ClaimedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
+import { ListingMarketObservation } from '../domain/listing-market-observation';
 import { ListingObservationCheckpointCycleService } from './listing-observation-checkpoint-cycle.service';
 
 const claimedAt = new Date('2026-09-14T12:00:00.000Z');
@@ -13,7 +14,11 @@ describe('ListingObservationCheckpointCycleService', () => {
       Promise.resolve([checkpoint('AUSDT'), checkpoint('BUSDT')]),
     );
     const completeClaimed = jest.fn(() => Promise.resolve(true));
-    const process = jest.fn(() => Promise.resolve());
+    const process = jest.fn<
+      (
+        checkpoint: ClaimedListingObservationCheckpoint,
+      ) => Promise<ListingMarketObservation>
+    >((cp) => Promise.resolve(sampleObservation(cp.symbol)));
     const clock = jest.fn(() => claimedAt);
     const service = new ListingObservationCheckpointCycleService(
       { claimDue, completeClaimed } as never,
@@ -40,6 +45,22 @@ describe('ListingObservationCheckpointCycleService', () => {
       'BUSDT',
     ]);
     expect(completeClaimed).toHaveBeenCalledTimes(2);
+    expect(completeClaimed).toHaveBeenNthCalledWith(1, {
+      provider: 'binance',
+      symbol: 'AUSDT',
+      label: 'T+0',
+      claimToken: 'cycle-1',
+      completedAt: claimedAt,
+      observation: sampleObservation('AUSDT'),
+    });
+    expect(completeClaimed).toHaveBeenNthCalledWith(2, {
+      provider: 'binance',
+      symbol: 'BUSDT',
+      label: 'T+0',
+      claimToken: 'cycle-1',
+      completedAt: claimedAt,
+      observation: sampleObservation('BUSDT'),
+    });
   });
 
   it('isolates processor failures and reports ownership lost before completion', async () => {
@@ -55,7 +76,7 @@ describe('ListingObservationCheckpointCycleService', () => {
     const process = jest.fn((value: ClaimedListingObservationCheckpoint) =>
       value.symbol === 'BUSDT'
         ? Promise.reject(new Error('processing failed'))
-        : Promise.resolve(),
+        : Promise.resolve(sampleObservation(value.symbol)),
     );
     const service = new ListingObservationCheckpointCycleService(
       {
@@ -74,10 +95,26 @@ describe('ListingObservationCheckpointCycleService', () => {
       lostLease: 1,
     });
     expect(completeClaimed).toHaveBeenCalledTimes(2);
+    expect(completeClaimed).toHaveBeenNthCalledWith(1, {
+      provider: 'binance',
+      symbol: 'AUSDT',
+      label: 'T+0',
+      claimToken: 'cycle-1',
+      completedAt: claimedAt,
+      observation: sampleObservation('AUSDT'),
+    });
+    expect(completeClaimed).toHaveBeenNthCalledWith(2, {
+      provider: 'binance',
+      symbol: 'CUSDT',
+      label: 'T+0',
+      claimToken: 'cycle-1',
+      completedAt: claimedAt,
+      observation: sampleObservation('CUSDT'),
+    });
   });
 
   it('returns an explicit empty result without invoking the processor', async () => {
-    const process = jest.fn(() => Promise.resolve());
+    const process = jest.fn(() => Promise.resolve(sampleObservation('AUSDT')));
     const service = new ListingObservationCheckpointCycleService(
       {
         claimDue: jest.fn(() => Promise.resolve([])),
@@ -108,5 +145,19 @@ function checkpoint(symbol: string): ClaimedListingObservationCheckpoint {
     claimToken: 'cycle-1',
     claimedAt,
     claimExpiresAt,
+  };
+}
+
+function sampleObservation(symbol: string): ListingMarketObservation {
+  return {
+    provider: 'binance',
+    symbol,
+    lastPrice: '1.23000000',
+    baseVolume: '1000.50000000',
+    quoteVolume: '1230.61500000',
+    tradeCount: 42,
+    windowOpenTime: new Date('2026-09-13T12:00:00.000Z'),
+    windowCloseTime: new Date('2026-09-14T12:00:00.000Z'),
+    receivedAt: claimedAt,
   };
 }

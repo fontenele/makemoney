@@ -45,19 +45,19 @@ model RiskControlEvent {
 }
 
 model StrategySignal {
-  id                      String    @id @default(uuid()) @db.Uuid
-  strategy                String    @db.VarChar(100)
-  symbol                  String    @db.VarChar(20)
-  action                  String    @db.VarChar(10)
-  reason                  String    @db.VarChar(100)
-  shortPeriod             Int       @map("short_period")
-  longPeriod              Int       @map("long_period")
-  previousShortAverage    Decimal?  @map("previous_short_average") @db.Decimal(65, 40)
-  previousLongAverage     Decimal?  @map("previous_long_average") @db.Decimal(65, 40)
-  currentShortAverage     Decimal?  @map("current_short_average") @db.Decimal(65, 40)
-  currentLongAverage      Decimal?  @map("current_long_average") @db.Decimal(65, 40)
-  latestCandleCloseTime   DateTime? @map("latest_candle_close_time")
-  evaluatedAt             DateTime  @map("evaluated_at")
+  id                    String    @id @default(uuid()) @db.Uuid
+  strategy              String    @db.VarChar(100)
+  symbol                String    @db.VarChar(20)
+  action                String    @db.VarChar(10)
+  reason                String    @db.VarChar(100)
+  shortPeriod           Int       @map("short_period")
+  longPeriod            Int       @map("long_period")
+  previousShortAverage  Decimal?  @map("previous_short_average") @db.Decimal(65, 40)
+  previousLongAverage   Decimal?  @map("previous_long_average") @db.Decimal(65, 40)
+  currentShortAverage   Decimal?  @map("current_short_average") @db.Decimal(65, 40)
+  currentLongAverage    Decimal?  @map("current_long_average") @db.Decimal(65, 40)
+  latestCandleCloseTime DateTime? @map("latest_candle_close_time")
+  evaluatedAt           DateTime  @map("evaluated_at")
 
   @@unique([strategy, symbol, latestCandleCloseTime])
   @@index([evaluatedAt, id])
@@ -98,15 +98,15 @@ model BacktestRun {
 }
 
 model ObservedSpotSymbol {
-  provider           String   @db.VarChar(30)
-  symbol             String   @db.VarChar(30)
-  baseAsset          String   @map("base_asset") @db.VarChar(20)
-  quoteAsset         String   @map("quote_asset") @db.VarChar(20)
-  status             String   @db.VarChar(30)
-  spotTradingAllowed Boolean  @map("spot_trading_allowed")
-  firstObservedAt    DateTime @map("first_observed_at")
-  lastObservedAt     DateTime @map("last_observed_at")
-  detectedAt         DateTime? @map("detected_at")
+  provider               String                         @db.VarChar(30)
+  symbol                 String                         @db.VarChar(30)
+  baseAsset              String                         @map("base_asset") @db.VarChar(20)
+  quoteAsset             String                         @map("quote_asset") @db.VarChar(20)
+  status                 String                         @db.VarChar(30)
+  spotTradingAllowed     Boolean                        @map("spot_trading_allowed")
+  firstObservedAt        DateTime                       @map("first_observed_at")
+  lastObservedAt         DateTime                       @map("last_observed_at")
+  detectedAt             DateTime?                      @map("detected_at")
   observationCheckpoints ListingObservationCheckpoint[]
 
   @@id([provider, symbol])
@@ -116,17 +116,24 @@ model ObservedSpotSymbol {
 }
 
 model ListingObservationCheckpoint {
-  provider       String    @db.VarChar(30)
-  symbol         String    @db.VarChar(30)
-  label          String    @db.VarChar(10)
-  offsetMs       Int       @map("offset_ms")
-  targetAt       DateTime  @map("target_at")
-  claimToken     String?   @map("claim_token") @db.VarChar(100)
-  claimedAt      DateTime? @map("claimed_at")
-  claimExpiresAt DateTime? @map("claim_expires_at")
-  completedAt    DateTime? @map("completed_at")
-  createdAt      DateTime  @default(now()) @map("created_at")
-  detection ObservedSpotSymbol @relation(fields: [provider, symbol], references: [provider, symbol], onDelete: Cascade)
+  provider        String             @db.VarChar(30)
+  symbol          String             @db.VarChar(30)
+  label           String             @db.VarChar(10)
+  offsetMs        Int                @map("offset_ms")
+  targetAt        DateTime           @map("target_at")
+  claimToken      String?            @map("claim_token") @db.VarChar(100)
+  claimedAt       DateTime?          @map("claimed_at")
+  claimExpiresAt  DateTime?          @map("claim_expires_at")
+  completedAt     DateTime?          @map("completed_at")
+  lastPrice       Decimal?           @map("last_price") @db.Decimal(38, 18)
+  baseVolume      Decimal?           @map("base_volume") @db.Decimal(38, 18)
+  quoteVolume     Decimal?           @map("quote_volume") @db.Decimal(38, 18)
+  tradeCount      BigInt?            @map("trade_count")
+  windowOpenTime  DateTime?          @map("window_open_time")
+  windowCloseTime DateTime?          @map("window_close_time")
+  receivedAt      DateTime?          @map("received_at")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  detection       ObservedSpotSymbol @relation(fields: [provider, symbol], references: [provider, symbol], onDelete: Cascade)
 
   @@id([provider, symbol, label])
   @@index([targetAt, provider, symbol, label])

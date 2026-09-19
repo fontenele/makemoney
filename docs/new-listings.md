@@ -113,3 +113,15 @@ The cycle service is registered for later scheduling but has no production proce
 The checkpoint processor now has a provider-neutral data boundary to target before any Binance adapter is introduced. Each observation carries the provider and canonical exchange symbol, exact-string last price, base and quote volumes, a non-negative safe-integer trade count, the provider's market-window open and close times, and the independent local receive time.
 
 Validation requires a positive price, non-negative volumes, a canonical uppercase alphanumeric symbol, valid times, and a non-inverted provider window. It deliberately does not compare the provider clock with the local receive clock, because clock skew must not turn a valid public response into corrupt data. This increment adds no HTTP request, persistence, checkpoint processor, timer, score, signal, or trade.
+
+## M7.21 public Binance rolling-ticker adapter
+
+The provider contract is now implemented through Binance Spot `GET /api/v3/ticker/24hr` with one mandatory canonical symbol, using the public market-data base URL and no authentication. The adapter maps `lastPrice`, `volume`, `quoteVolume`, `count`, `openTime`, and `closeTime` into the M7.20 observation and records a separate local receive time.
+
+Requests have a ten-second timeout and compose caller cancellation. Non-success responses, symbol mismatches, malformed payloads, unsafe timestamps or counts, and domain-invalid decimals are rejected. The adapter is available through dependency injection but no production checkpoint processor calls it, so this increment neither persists observations nor starts the worker cycle.
+
+## M7.22 durable checkpoint market-observation persistence
+
+`listing_observation_checkpoints` now stores `lastPrice`, `baseVolume`, `quoteVolume`, `tradeCount`, `windowOpenTime`, `windowCloseTime`, and `receivedAt` alongside `completedAt`. The application completion command validates the matching observation before persistence, and PostgreSQL enforces that all observation fields are either completely absent on uncompleted checkpoints or fully populated and consistent when completed. Lifecycle-only completions from before this schema are reopened without fabricated data so a future processor can collect them honestly.
+
+The cycle service passes the observation returned by the checkpoint processor directly to ownership-safe completion. A production processor, background timer, retries, alerts, scoring, signals, and trading remain separate increments.

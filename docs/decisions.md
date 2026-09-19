@@ -549,3 +549,15 @@ Completion returning false is counted separately as lost ownership, because trea
 Checkpoint market input is modeled as one provider-neutral snapshot rather than provider JSON. Price and volume fields remain canonical decimal strings so the boundary never introduces native floating-point arithmetic. Trade count is a non-negative safe integer, and the provider's window timestamps remain distinct from the local receive timestamp.
 
 Only the provider window is ordered. The local receive clock is intentionally not required to follow the provider close clock because ordinary clock skew could otherwise reject valid observations. Derived detection-relative returns and volume changes require durable snapshots and therefore remain outside this contract-only increment.
+
+## M7.21 use the single-symbol public rolling ticker first
+
+The first observation adapter requests Binance Spot `GET /api/v3/ticker/24hr` with an explicit symbol. A single-symbol request bounds both response size and provider weight and supplies the exact price, aggregate volumes, trade count, and provider-window timestamps already fixed by M7.20. The public market-data host requires no credentials.
+
+The adapter applies the same ten-second request ceiling as the catalog client and composes caller cancellation. It validates response identity before domain normalization and never includes provider response bodies in HTTP-status errors. Retries, circuit state, persistence, and production processing remain separate lifecycle decisions.
+
+## M7.22 observation and completion are one owned transition
+
+A checkpoint is meaningful for research only when its market sample exists. Completion therefore writes the validated observation and `completedAt` in one conditional PostgreSQL update under the existing active-lease token. A stale owner cannot store data, and a completed checkpoint cannot contain a partial sample.
+
+PostgreSQL independently requires all observation fields to be absent while incomplete or fully present and internally coherent when complete. Lifecycle-only completions created before this schema existed cannot be honestly backfilled, so the migration reopens them and clears their expired ownership fields for future collection rather than fabricating market data.

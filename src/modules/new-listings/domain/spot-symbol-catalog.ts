@@ -94,5 +94,6 @@ export interface SpotSymbolRepository {
     label: import('./listing-observation-schedule').ListingObservationCheckpointLabel;
     claimToken: string;
     completedAt: Date;
+    observation: import('./listing-market-observation').ListingMarketObservation;
   }): Promise<boolean>;
 }

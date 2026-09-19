@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-19 — M7.22 durable checkpoint market observation completed
+
+- Persisted each validated market observation atomically with ownership-safe checkpoint completion.
+- Added database constraints requiring a complete coherent observation on completed checkpoints and reopened legacy lifecycle-only completions without fabricating market data.
+- Passed observations through the deterministic cycle while keeping the production processor and timer inactive.
+- 538 unit tests across 65 suites and all 46 isolated E2E tests passed together with build, lint, formatting, Prisma generation/migration, Compose, and diff validation.
+
+## 2026-09-19 — M7.21 public Binance market observation adapter completed
+
+- Added an unauthenticated single-symbol Binance Spot rolling 24-hour ticker client behind the M7.20 provider-neutral contract.
+- Added strict request, response-identity, payload, timestamp, trade-count, and decimal validation with a ten-second timeout and caller cancellation.
+- Registered the adapter for dependency injection without activating checkpoint processing, persistence, or background scheduling.
+
 ## 2026-09-14 — M7.20 exact checkpoint market observation completed
 
 - Added a provider-neutral checkpoint market-observation and loader contract for canonical symbols, exact-string prices and volumes, trade counts, provider-window times, and local receive time.

@@ -16,6 +16,8 @@ import {
   ListingObservationCheckpointWorkerOptions,
 } from './application/listing-observation-checkpoint-worker-options';
 import { ListingObservationCheckpointCycleService } from './application/listing-observation-checkpoint-cycle.service';
+import { LISTING_MARKET_OBSERVATION_PROVIDER } from './domain/listing-market-observation';
+import { BinanceListingMarketObservationClient } from './infrastructure/binance-listing-market-observation.client';
 
 @Module({
   controllers: [NewListingsController],
@@ -25,6 +27,14 @@ import { ListingObservationCheckpointCycleService } from './application/listing-
       inject: [ConfigService],
       useFactory: (config: ConfigService) =>
         new BinanceSpotSymbolCatalogClient(
+          config.getOrThrow<string>('BINANCE_REST_BASE_URL'),
+        ),
+    },
+    {
+      provide: LISTING_MARKET_OBSERVATION_PROVIDER,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new BinanceListingMarketObservationClient(
           config.getOrThrow<string>('BINANCE_REST_BASE_URL'),
         ),
     },

@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.20 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, durably schedule/lease/complete observation checkpoints, orchestrate an inactive bounded processing cycle, and define the exact provider-neutral market-observation boundary.
+- M6 is closed. M7.1–M7.22 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, durably schedule/lease/complete observation checkpoints, orchestrate an inactive bounded processing cycle, load validated public Binance rolling-ticker snapshots on demand, and persist validated observations atomically with checkpoint completion.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -177,6 +177,10 @@ M7.18 validates bounded checkpoint-worker interval, batch, and lease settings at
 M7.19 deterministically orchestrates one claimed batch through a caller-supplied processor and ownership-safe completion. No timer or production processor invokes it, and it requests no market data.
 
 M7.20 defines and validates the provider-neutral market snapshot required by a checkpoint: canonical provider symbol, positive last price, non-negative base and quote volumes, safe trade count, provider window times, and local receive time. Decimal values remain strings and no provider adapter, persistence, processor, or timer is active.
+
+M7.21 implements that boundary with the unauthenticated public Binance Spot 24-hour ticker endpoint for one explicitly validated symbol. Responses are normalized and domain-validated with a ten-second timeout and caller cancellation; no checkpoint invokes the client automatically and no observation is persisted.
+
+M7.22 stores a validated market observation in the same ownership-checked update that completes its checkpoint. Database constraints require an all-or-none observation payload on completion, while legacy lifecycle-only completions are reopened for future real collection. No production processor or timer invokes this flow automatically.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

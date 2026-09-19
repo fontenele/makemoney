@@ -105,12 +105,14 @@ describe('DueListingObservationCheckpointService', () => {
       claimDueCheckpoints: jest.fn(),
       completeClaimedCheckpoint,
     });
+    const obs = sampleObservation();
     const input = {
       provider: 'binance' as const,
       symbol: 'NEWUSDT',
       label: 'T+5s' as const,
       claimToken: 'worker-1:batch-1',
       completedAt: new Date('2026-09-14T12:00:10.000Z'),
+      observation: obs,
     };
 
     await expect(service.completeClaimed(input)).resolves.toBe(true);
@@ -126,8 +128,24 @@ describe('DueListingObservationCheckpointService', () => {
       { completedAt: new Date('invalid') },
       'Checkpoint completion time must be valid',
     ],
+    [
+      { observation: undefined },
+      'Checkpoint observation identity must match checkpoint',
+    ],
+    [
+      { observation: sampleObservation({ provider: 'other' as never }) },
+      'Checkpoint observation identity must match checkpoint',
+    ],
+    [
+      { observation: sampleObservation({ symbol: 'OTHERUSDT' }) },
+      'Checkpoint observation identity must match checkpoint',
+    ],
+    [
+      { observation: sampleObservation({ lastPrice: '0' }) },
+      'Listing market observation last price must be positive',
+    ],
   ])(
-    'rejects invalid completion input before repository access',
+    'rejects invalid completion input before repository access %#',
     (change, message) => {
       const completeClaimedCheckpoint = jest.fn(() => Promise.resolve(true));
       const service = new DueListingObservationCheckpointService({
@@ -142,6 +160,7 @@ describe('DueListingObservationCheckpointService', () => {
           label: 'T+5s',
           claimToken: 'worker-1',
           completedAt: new Date('2026-09-14T12:00:10.000Z'),
+          observation: sampleObservation(),
           ...change,
         } as Parameters<typeof service.completeClaimed>[0]),
       ).toThrow(message);
@@ -149,3 +168,22 @@ describe('DueListingObservationCheckpointService', () => {
     },
   );
 });
+
+function sampleObservation(
+  overrides: Partial<
+    import('../domain/listing-market-observation').ListingMarketObservation
+  > = {},
+): import('../domain/listing-market-observation').ListingMarketObservation {
+  return {
+    provider: 'binance',
+    symbol: 'NEWUSDT',
+    lastPrice: '0.00001000',
+    baseVolume: '1200000.50000000',
+    quoteVolume: '12.34567890',
+    tradeCount: 42,
+    windowOpenTime: new Date('2026-09-13T12:00:00.000Z'),
+    windowCloseTime: new Date('2026-09-14T12:00:00.000Z'),
+    receivedAt: new Date('2026-09-14T12:00:10.000Z'),
+    ...overrides,
+  };
+}
