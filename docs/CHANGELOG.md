@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-19 — M7.34 pattern cohort statistics completed
+
+- Added pure aggregation of same-threshold listing classifications into explicit no-pump, pump, and correction counts.
+- Added exact pump and correction rates over the full cohort plus correction rate among observed pumps, with null undefined denominators.
+- Rejected duplicate symbols, mixed thresholds, and incoherent classification states while keeping loading, HTTP, persistence, scoring, alerts, signals, and trading out of scope.
+- 584 unit tests across 71 suites and all 50 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.33 pattern classification API completed
 
 - Added local read-only `GET /new-listings/:provider/:symbol/classification` with mandatory explicit pump and correction thresholds.

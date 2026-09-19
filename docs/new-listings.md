@@ -191,3 +191,9 @@ Classification remains calculated on demand and is not persisted. This increment
 `GET /new-listings/:provider/:symbol/classification` exposes the M7.32 durable on-demand classification. Both `pumpReturnRate` and `correctionFromPeakRate` are required positive decimal query parameters, and the correction threshold cannot exceed one. Invalid identity or thresholds return `400` before durable observation loading.
 
 An unknown detection returns `404`, while a known detection without completed `T+0` returns `503`. The endpoint introduces no default thresholds, derived persistence, cohort classification statistics, score, alert, signal, or trading behavior.
+
+## M7.34 pattern cohort statistics
+
+A pure calculator now aggregates classifications produced with numerically equal explicit thresholds. It reports the total classified sample, no-pump count, pump count (including corrected pumps), correction count, pump rate over the full sample, correction rate over the full sample, and correction rate among observed pumps.
+
+All rates use isolated 40-digit decimal arithmetic. Empty cohorts expose zero counts and null rates, while duplicate symbols, mixed thresholds, or incoherent classification states fail explicitly. This increment adds no durable loading, route, persistence, score, alert, signal, or trading behavior.

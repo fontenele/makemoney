@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.33 load, persist, conservatively compare, periodically refresh, durably classify detections, expose filtered research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, expose completed timelines and exact performance, aggregate bounded cohorts, and calculate and expose explicitly thresholded pump/correction classifications.
+- M6 is closed. M7.1–M7.34 load, persist, conservatively compare, periodically refresh, durably classify detections, expose filtered research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, expose completed timelines and exact performance, aggregate bounded cohorts, calculate and expose explicitly thresholded pump/correction classifications, and aggregate their descriptive cohort rates.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -203,6 +203,8 @@ M7.31 defines a pure exact-decimal classification of observed pump and post-pump
 M7.32 composes one durable detected-symbol timeline through exact performance and explicit pattern classification internally. Missing T+0 remains unavailable and no derived classification is persisted or exposed over HTTP.
 
 M7.33 exposes that classification at local read-only `GET /new-listings/:provider/:symbol/classification`. Both thresholds are required per request; invalid input returns 400, unknown detections return 404, and missing T+0 returns 503.
+
+M7.34 aggregates same-threshold pattern classifications into explicit counts and exact pump/correction rates. Empty samples and correction-within-pump denominators remain explicit rather than being fabricated.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

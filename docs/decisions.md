@@ -627,3 +627,9 @@ A known detection without T+0 has no valid classification baseline and remains e
 The classification route has no implicit market hypothesis: clients must supply both positive decimal thresholds on every request. Shared validation rejects malformed criteria before database access, and a correction threshold above one is invalid because a positive price cannot fall by more than its entire peak value.
 
 The route mirrors existing detection semantics: malformed input is 400, unknown identity is 404, and missing T+0 is 503. Results remain calculated on demand and read-only.
+
+## M7.34 keep classification cohort denominators explicit
+
+Pump rate and correction rate use the full classified sample, while correction-among-pumps rate uses only classifications where a pump was observed. Publishing both denominators avoids making correction prevalence appear larger or smaller through an implicit population choice.
+
+Only unique symbols classified under numerically equal thresholds may share a cohort. Empty samples and samples without pumps return null for undefined rates instead of zero, and all defined ratios use isolated 40-digit decimal arithmetic.
