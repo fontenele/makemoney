@@ -143,3 +143,9 @@ A NestJS lifecycle worker can now invoke the production cycle at the validated c
 `GET /new-listings/:provider/:symbol/observations` exposes only completed checkpoint samples for one durable detected symbol, ordered by checkpoint target time from `T+0` through `T+24h`. Price and volume values remain exact decimal strings and each item includes its schedule identity, target and completion times, provider window, receive time, and trade count.
 
 The path accepts only `binance` and a canonical uppercase alphanumeric symbol. Invalid identities return `400`, an identity that is not a durable detection returns `404`, and a known detection with no completed sample returns an empty array. Pending/leased checkpoints, claim metadata, alerts, scoring, derived returns, signals, and trading are not exposed.
+
+## M7.26 exact T+0-relative price performance
+
+A pure provider-neutral calculator validates one completed observation timeline and derives each checkpoint's absolute price change and price return rate relative to the explicit `T+0` last price. Inputs are normalized into deterministic schedule order, and all arithmetic uses a 40-digit `decimal.js` context with decimal-string outputs.
+
+An empty timeline or one without `T+0` returns unavailable instead of substituting a later sample as the baseline. Mixed provider/symbol identities, duplicate labels, invalid schedule metadata, and incoherent checkpoint times fail explicitly. This calculation has no HTTP route, derived persistence, aggregate statistics, score, alert, signal, or trading behavior.

@@ -56,6 +56,8 @@ M7.24 adds a disabled-by-default non-overlapping lifecycle worker with completio
 
 M7.25 exposes completed checkpoint observation timelines for individual durable detections through a local read-only endpoint.
 
+M7.26 calculates exact T+0-relative price changes and return rates as a pure internal research rule.
+
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
@@ -85,6 +87,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.23 maps claimed provider/symbol identity to the public observation provider and deliberately propagates failures to cycle-level lease recovery; no scheduler invokes it yet.
 - M7.24 schedules bounded cycles only when `NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED=true`; the safe default remains inactive, cycle failures do not stop later attempts, and shutdown clears or awaits outstanding work.
 - M7.25 exposes completed observations oldest target first at `GET /new-listings/:provider/:symbol/observations`, rejects invalid or unknown identities explicitly, and preserves exact persisted decimal strings.
+- M7.26 validates and chronologically normalizes one completed timeline, then uses only `T+0` to derive exact decimal-string absolute price changes and return rates; missing `T+0` is explicitly unavailable.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -224,12 +227,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-19 after M7.25:
+The following passed on 2026-09-19 after M7.26:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 551 tests passed across 67 suites
+- `npm test -- --runInBand` — 554 tests passed across 68 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -248,7 +251,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.25 are implemented and fully verified milestone increments.
+M0 through M7.26 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

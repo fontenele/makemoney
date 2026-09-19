@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-19 — M7.26 exact T+0 price performance completed
+
+- Added a pure deterministic calculator for checkpoint price changes and fractional returns relative to the explicit `T+0` baseline.
+- Used isolated 40-digit decimal arithmetic and preserved every derived value as an exact decimal string.
+- Added strict timeline identity, label, schedule, and time validation while keeping HTTP exposure, persistence, classification, alerts, signals, and trading out of scope.
+- 554 unit tests across 68 suites and all 47 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.25 completed observation timeline API
 
 - Added a local read-only route for one detected symbol's completed checkpoint observations in chronological target order.

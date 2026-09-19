@@ -579,3 +579,9 @@ Activation is an explicit startup setting that defaults to disabled. Although co
 The first observation read is a naturally bounded per-detection timeline rather than a global feed: each detection has exactly nine scheduled checkpoints. PostgreSQL returns only completed rows in chronological target order, and persisted decimals are mapped back to exact strings and revalidated at the repository boundary.
 
 The route distinguishes malformed identity from an unknown durable detection, while a known detection with no completed checkpoint is a valid empty research result. Claim tokens and incomplete work remain internal, and no derived performance claim is introduced.
+
+## M7.26 anchor price performance only to T+0
+
+Detection-relative price performance must have one stable, interpretable denominator. The calculator therefore accepts only the scheduled `T+0` price as its baseline and reports unavailable when that observation is missing; it never silently promotes the first later sample.
+
+Absolute price changes and fractional return rates use an isolated 40-digit decimal context and remain decimal strings. The calculator validates observation identity, uniqueness, schedule offsets, and checkpoint timing before calculation, but does not classify, score, persist, or expose the result yet.
