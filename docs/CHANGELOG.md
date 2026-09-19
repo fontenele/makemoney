@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-19 — M7.31 explicit pump/correction classification completed
+
+- Added a pure exact-decimal classifier with explicit pump-return and correction-from-peak thresholds.
+- Added observed-only statuses, first-pump capture, running post-pump peak tracking, and first qualifying correction capture.
+- Kept threshold defaults, durable loading, HTTP exposure, persistence, scoring, alerts, signals, and trading out of scope.
+- 573 unit tests across 70 suites and all 49 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.30 cohort performance API completed
 
 - Added local read-only `GET /new-listings/performance` over the bounded durable cohort calculation.

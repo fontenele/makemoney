@@ -609,3 +609,9 @@ Incomplete later checkpoints remain valid and contribute only where present. Loa
 The first cohort endpoint calculates directly from bounded durable timelines so newly completed checkpoints are reflected immediately and no cache invalidation or derived-table lifecycle is needed. It defaults to the 50 most recent eligible detections and allows at most 100.
 
 The response keeps each checkpoint's independent sample size visible and returns a valid empty aggregate when no completed T+0 baseline exists. This remains descriptive public-market research, not a profitability or trading signal.
+
+## M7.31 require explicit pattern thresholds
+
+“Pump” and “correction” have no trustworthy universal percentage in the project hypothesis. The classifier therefore accepts both thresholds explicitly instead of embedding defaults. A pump is first observed when a T+0-relative return reaches its threshold; correction is measured only afterward against the highest observed post-pump price.
+
+Statuses use “observed” deliberately: an incomplete timeline with no qualifying event is not proof that the event will never happen. Classification remains pure, exact-decimal research output and cannot create a score, signal, alert, or order.

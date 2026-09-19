@@ -139,6 +139,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.28 — complete:** a pure cross-detection cohort calculator groups available returns by checkpoint and reports sample size, outcome counts, and exact-decimal average return.
 - **M7.29 — complete:** a bounded durable cohort query selects recent detections with a completed T+0 baseline and calculates aggregate checkpoint performance without exposing a route.
 - **M7.30 — complete:** local read-only `GET /new-listings/performance` exposes the bounded durable cohort calculation with strict provider and limit validation.
+- **M7.31 — complete:** a pure exact-decimal classifier detects an explicitly thresholded observed pump and subsequent correction from the running post-pump peak.
 
 ## M8 — Dashboard — planned
 

@@ -173,3 +173,9 @@ Each timeline is converted through the existing exact T+0-relative calculator an
 `GET /new-listings/performance` exposes the M7.29 durable cohort calculation through a local read-only route. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider is restricted to `binance` and defaults to it.
 
 An empty eligible cohort returns the explicit empty aggregate rather than an error. The endpoint reads durable public-market observations and calculates on demand; it does not persist derived values, classify assets, emit alerts or signals, or reach any trading path.
+
+## M7.31 explicit pump/correction classification
+
+A pure classifier now consumes one validated T+0-relative price-performance timeline plus caller-supplied positive pump and correction thresholds. The first checkpoint at or above the pump return threshold marks the observed pump; subsequent prices update the running post-pump peak until a checkpoint reaches the required fractional drawdown from that peak.
+
+The result explicitly distinguishes `no-pump-observed`, `pump-observed`, and `pump-and-correction-observed`, records the evaluated-through checkpoint, and preserves exact decimal strings. The correction threshold cannot exceed one. No default hypothesis, database query, route, persistence, score, alert, signal, or trade is introduced.
