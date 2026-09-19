@@ -68,6 +68,8 @@ M7.30 exposes the bounded durable cohort through a local read-only aggregate-per
 
 M7.31 classifies observed pump and post-pump correction patterns with explicit thresholds as a pure internal research rule.
 
+M7.32 loads and classifies one durable detection internally without persisting derived state or exposing a route.
+
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
@@ -103,6 +105,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.29 selects at most 100 recent detected symbols with completed T+0 observations in PostgreSQL, loads their completed timelines, and composes the existing exact calculators without an HTTP route.
 - M7.30 exposes `GET /new-listings/performance` with optional `limit=1..100` and `provider=binance`, defaulting to 50 recent eligible detections and returning an explicit empty aggregate when none exist.
 - M7.31 requires explicit positive pump-return and correction-from-peak thresholds, tracks the running post-pump peak, and reports only what the available timeline has observed without implying finality or profitability.
+- M7.32 reuses the durable observation, T+0 performance, and pattern-classification boundaries in sequence; known detections without T+0 return unavailable and unknown detections remain explicit errors.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -242,12 +245,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-19 after M7.31:
+The following passed on 2026-09-19 after M7.32:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 573 tests passed across 70 suites
+- `npm test -- --runInBand` — 575 tests passed across 70 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -266,7 +269,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.31 are implemented and fully verified milestone increments.
+M0 through M7.32 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

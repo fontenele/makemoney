@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-19 — M7.32 durable pattern classification completed
+
+- Composed durable completed observation loading, exact T+0 performance, and explicit-threshold pattern classification in the internal read model.
+- Preserved explicit unknown-detection errors and unavailable classification until a completed T+0 exists.
+- Kept derived persistence, HTTP exposure, threshold defaults, cohort classification statistics, scoring, alerts, signals, and trading out of scope.
+- 575 unit tests across 70 suites and all 49 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.31 explicit pump/correction classification completed
 
 - Added a pure exact-decimal classifier with explicit pump-return and correction-from-peak thresholds.

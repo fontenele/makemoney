@@ -14,6 +14,11 @@ import { ListingObservationPricePerformance } from '../domain/listing-observatio
 import { ListingObservationPricePerformanceCalculator } from './listing-observation-price-performance-calculator';
 import { ListingObservationCohortPerformance } from '../domain/listing-observation-cohort-performance';
 import { ListingObservationCohortPerformanceCalculator } from './listing-observation-cohort-performance-calculator';
+import {
+  ListingObservationPatternClassification,
+  ListingObservationPatternThresholds,
+} from '../domain/listing-observation-pattern-classification';
+import { ListingObservationPatternClassifier } from './listing-observation-pattern-classifier';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -25,6 +30,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingObservationPricePerformanceCalculator();
   private readonly cohortPerformance =
     new ListingObservationCohortPerformanceCalculator();
+  private readonly patternClassifier =
+    new ListingObservationPatternClassifier();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -109,5 +116,16 @@ export class SpotSymbolDetectionReadModelService {
         return performance;
       }),
     );
+  }
+
+  async getPatternClassification(
+    provider: 'binance',
+    symbol: string,
+    thresholds: ListingObservationPatternThresholds,
+  ): Promise<ListingObservationPatternClassification | null> {
+    const performance = await this.getPricePerformance(provider, symbol);
+    return performance
+      ? this.patternClassifier.classify(performance, thresholds)
+      : null;
   }
 }

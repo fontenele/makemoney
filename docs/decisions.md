@@ -615,3 +615,9 @@ The response keeps each checkpoint's independent sample size visible and returns
 “Pump” and “correction” have no trustworthy universal percentage in the project hypothesis. The classifier therefore accepts both thresholds explicitly instead of embedding defaults. A pump is first observed when a T+0-relative return reaches its threshold; correction is measured only afterward against the highest observed post-pump price.
 
 Statuses use “observed” deliberately: an incomplete timeline with no qualifying event is not proof that the event will never happen. Classification remains pure, exact-decimal research output and cannot create a score, signal, alert, or order.
+
+## M7.32 derive classification from durable observations on demand
+
+Pattern classification reuses the existing durable timeline and price-performance calculation instead of storing another mutable projection. This keeps one source of truth and lets newly completed checkpoints affect the next calculation immediately.
+
+A known detection without T+0 has no valid classification baseline and remains explicitly unavailable. Thresholds stay caller-supplied; this internal composition does not choose a market hypothesis or expose it publicly.

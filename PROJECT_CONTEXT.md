@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.31 load, persist, conservatively compare, periodically refresh, durably classify detections, expose filtered research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, expose completed timelines and exact performance, aggregate bounded cohorts, and classify explicitly thresholded pump/correction patterns deterministically.
+- M6 is closed. M7.1–M7.32 load, persist, conservatively compare, periodically refresh, durably classify detections, expose filtered research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, expose completed timelines and exact performance, aggregate bounded cohorts, and classify explicitly thresholded pump/correction patterns from supplied or durable timelines.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -199,6 +199,8 @@ M7.29 loads at most 100 recent durable detections with completed T+0 baselines a
 M7.30 exposes that durable aggregate through local read-only `GET /new-listings/performance`, with an optional 1–100 limit and Binance-only provider validation.
 
 M7.31 defines a pure exact-decimal classification of observed pump and post-pump correction patterns. Both thresholds are explicit inputs, so the project does not silently encode an unverified universal market hypothesis.
+
+M7.32 composes one durable detected-symbol timeline through exact performance and explicit pattern classification internally. Missing T+0 remains unavailable and no derived classification is persisted or exposed over HTTP.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

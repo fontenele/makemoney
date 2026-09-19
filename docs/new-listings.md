@@ -179,3 +179,9 @@ An empty eligible cohort returns the explicit empty aggregate rather than an err
 A pure classifier now consumes one validated T+0-relative price-performance timeline plus caller-supplied positive pump and correction thresholds. The first checkpoint at or above the pump return threshold marks the observed pump; subsequent prices update the running post-pump peak until a checkpoint reaches the required fractional drawdown from that peak.
 
 The result explicitly distinguishes `no-pump-observed`, `pump-observed`, and `pump-and-correction-observed`, records the evaluated-through checkpoint, and preserves exact decimal strings. The correction threshold cannot exceed one. No default hypothesis, database query, route, persistence, score, alert, signal, or trade is introduced.
+
+## M7.32 durable pattern classification
+
+The internal detection read model now composes one durable completed observation timeline through the existing exact T+0 performance calculator and the M7.31 explicit-threshold pattern classifier. Unknown detections preserve the existing not-found behavior, while a known detection without completed `T+0` returns classification unavailable.
+
+Classification remains calculated on demand and is not persisted. This increment adds no HTTP route, default thresholds, cohort classification statistics, score, alert, signal, or trading behavior.

@@ -35,6 +35,52 @@ describe('SpotSymbolDetectionReadModelService', () => {
     ).resolves.toBeNull();
   });
 
+  it('loads durable performance and classifies an observed pattern', async () => {
+    const repository = repositoryWith({
+      findDetected: jest.fn(() => Promise.resolve(detection())),
+      listCompletedObservations: jest.fn(() =>
+        Promise.resolve([
+          completedObservation(),
+          completedObservation({
+            label: 'T+5s',
+            offsetMs: 5_000,
+            targetAt: new Date('2026-09-14T02:00:05.000Z'),
+            completedAt: new Date('2026-09-14T02:00:06.000Z'),
+            lastPrice: '125',
+          }),
+        ]),
+      ),
+    });
+    const service = new SpotSymbolDetectionReadModelService(repository);
+
+    await expect(
+      service.getPatternClassification('binance', 'NEWUSDT', {
+        pumpReturnRate: '0.2',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).resolves.toMatchObject({
+      provider: 'binance',
+      symbol: 'NEWUSDT',
+      status: 'pump-observed',
+      pump: { label: 'T+5s', priceReturnRate: '0.25' },
+    });
+  });
+
+  it('reports classification unavailable until durable T+0 exists', async () => {
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+    );
+
+    await expect(
+      service.getPatternClassification('binance', 'NEWUSDT', {
+        pumpReturnRate: '0.2',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).resolves.toBeNull();
+  });
+
   it('loads a bounded durable cohort and calculates checkpoint performance', async () => {
     const listCompletedObservationCohort = jest.fn(() =>
       Promise.resolve([
