@@ -225,6 +225,86 @@ describe('SpotSymbolDetectionReadModelService', () => {
     expect(listCompletedObservationCohort).not.toHaveBeenCalled();
   });
 
+  it('loads a durable cohort and calculates pattern magnitude medians', async () => {
+    const listCompletedObservationCohort = jest.fn(() =>
+      Promise.resolve([
+        [
+          completedObservation(),
+          completedObservation({
+            label: 'T+5s',
+            offsetMs: 5_000,
+            lastPrice: '130',
+          }),
+        ],
+        [
+          completedObservation({ symbol: 'OTHERUSDT', lastPrice: '200' }),
+          completedObservation({
+            symbol: 'OTHERUSDT',
+            label: 'T+5s',
+            offsetMs: 5_000,
+            lastPrice: '250',
+          }),
+        ],
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(
+      service.getPatternMagnitudeCohort('binance', 25, {
+        pumpReturnRate: '0.2',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).resolves.toMatchObject({
+      provider: 'binance',
+      pumpSampleSize: 2,
+      correctionSampleSize: 0,
+      medianPeakReturnRate: '0.275',
+      medianCorrectionFromPeakRate: null,
+    });
+    expect(listCompletedObservationCohort).toHaveBeenCalledWith('binance', 25);
+  });
+
+  it('returns an explicit empty durable pattern magnitude cohort', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith());
+
+    await expect(
+      service.getPatternMagnitudeCohort('binance', 50, {
+        pumpReturnRate: '0.2',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).resolves.toEqual({
+      provider: null,
+      thresholds: null,
+      pumpSampleSize: 0,
+      correctionSampleSize: 0,
+      medianPeakReturnRate: null,
+      medianCorrectionFromPeakRate: null,
+    });
+  });
+
+  it('rejects invalid magnitude cohort input before repository access', async () => {
+    const listCompletedObservationCohort = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(
+      service.getPatternMagnitudeCohort('binance', 101, {
+        pumpReturnRate: '0.2',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).rejects.toThrow('cohort limit must be an integer from 1 to 100');
+    await expect(
+      service.getPatternMagnitudeCohort('binance', 25, {
+        pumpReturnRate: '0',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).rejects.toThrow('pump return rate must be a positive decimal');
+    expect(listCompletedObservationCohort).not.toHaveBeenCalled();
+  });
+
   it('lists completed observations only for a durable detection', async () => {
     const observations = [{ label: 'T+0' }];
     const repository = repositoryWith({

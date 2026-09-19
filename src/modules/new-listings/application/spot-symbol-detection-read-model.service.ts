@@ -24,6 +24,8 @@ import {
 } from './listing-observation-pattern-classifier';
 import { ListingObservationPatternCohort } from '../domain/listing-observation-pattern-cohort';
 import { ListingObservationPatternCohortCalculator } from './listing-observation-pattern-cohort-calculator';
+import { ListingObservationPatternMagnitudeCohort } from '../domain/listing-observation-pattern-magnitude-cohort';
+import { ListingObservationPatternMagnitudeCohortCalculator } from './listing-observation-pattern-magnitude-cohort-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -39,6 +41,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingObservationPatternClassifier();
   private readonly patternCohort =
     new ListingObservationPatternCohortCalculator();
+  private readonly patternMagnitudeCohort =
+    new ListingObservationPatternMagnitudeCohortCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -133,21 +137,39 @@ export class SpotSymbolDetectionReadModelService {
     limit: number,
     thresholds: ListingObservationPatternThresholds,
   ): Promise<ListingObservationPatternCohort> {
+    return this.patternCohort.calculate(
+      await this.loadPatternClassifications(provider, limit, thresholds),
+    );
+  }
+
+  async getPatternMagnitudeCohort(
+    provider: 'binance',
+    limit: number,
+    thresholds: ListingObservationPatternThresholds,
+  ): Promise<ListingObservationPatternMagnitudeCohort> {
+    return this.patternMagnitudeCohort.calculate(
+      await this.loadPatternClassifications(provider, limit, thresholds),
+    );
+  }
+
+  private async loadPatternClassifications(
+    provider: 'binance',
+    limit: number,
+    thresholds: ListingObservationPatternThresholds,
+  ): Promise<ListingObservationPatternClassification[]> {
     this.validateCohortLimit(limit);
     validateListingObservationPatternThresholds(thresholds);
     const timelines = await this.repository.listCompletedObservationCohort(
       provider,
       limit,
     );
-    return this.patternCohort.calculate(
-      timelines.map((timeline) => {
-        const performance = this.pricePerformance.calculate(timeline);
-        if (!performance) {
-          throw new Error('Cohort timeline must include completed T+0');
-        }
-        return this.patternClassifier.classify(performance, thresholds);
-      }),
-    );
+    return timelines.map((timeline) => {
+      const performance = this.pricePerformance.calculate(timeline);
+      if (!performance) {
+        throw new Error('Cohort timeline must include completed T+0');
+      }
+      return this.patternClassifier.classify(performance, thresholds);
+    });
   }
 
   private validateCohortLimit(limit: number): void {

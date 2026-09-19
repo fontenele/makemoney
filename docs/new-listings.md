@@ -215,3 +215,9 @@ Invalid query input returns `400` before durable loading, while an empty eligibl
 A pure calculator now reports the median observed peak return among pump classifications and the median observed drawdown from peak among corrected classifications. Each statistic exposes its own sample size, so uncorrected pumps contribute to peak magnitude without being treated as zero corrections.
 
 Odd samples select the middle exact-decimal value and even samples average their two middle values under the isolated 40-digit decimal policy. Empty denominators remain null, and magnitudes below the thresholds that produced their classifications fail explicitly. This increment adds no durable loading, route, persistence, score, alert, signal, or trading behavior.
+
+## M7.38 durable pattern magnitude loading
+
+The internal detection read model now applies the M7.37 magnitude calculator to the same bounded cohort of 1 through 100 recent durable Binance detections with completed `T+0` observations. One shared internal composition validates limit and thresholds, loads timelines, derives exact performance, and classifies each detection before either frequency or magnitude aggregation.
+
+An empty eligible cohort preserves explicit null medians and zero event samples. Incoherent repository results still fail rather than weakening T+0 eligibility. This increment adds no route, default thresholds, derived persistence, score, alert, signal, or trading behavior.

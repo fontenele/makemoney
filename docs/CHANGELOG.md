@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-19 — M7.38 durable pattern magnitude loading completed
+
+- Added internal bounded durable pattern-magnitude calculation over recent detections with completed `T+0` observations.
+- Shared the validated durable classification composition between frequency and magnitude aggregates.
+- Added populated, empty, and fail-fast invalid-input read-model coverage.
+- Kept HTTP exposure, default thresholds, derived persistence, scoring, alerts, signals, and trading outside this increment.
+- 601 unit tests across 72 suites and all 51 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.37 pattern magnitude medians completed
 
 - Added pure exact-decimal median peak-return and correction-from-peak statistics over classified listing cohorts.

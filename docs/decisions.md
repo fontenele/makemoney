@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-19 — Durable frequency and magnitude cohorts share classification composition
+
+M7.38 centralizes the internal sequence of cohort limit validation, explicit-threshold validation, durable T+0-eligible timeline loading, exact performance calculation, and classification. Both frequency and magnitude aggregation consume that same classification result shape, preventing their eligible populations or threshold semantics from drifting. Each API call still performs one bounded repository read, and no derived state is persisted.
+
 ## 2026-09-19 — Pattern magnitude medians use event-specific samples
 
 M7.37 measures peak-return magnitude only among classifications with an observed pump and correction magnitude only among classifications with an observed correction. Missing events are excluded rather than converted to zero, and each median therefore publishes its own sample size. Even samples average the two middle exact-decimal values; no floating-point arithmetic, interpolation, persistence, or default hypothesis is introduced.
