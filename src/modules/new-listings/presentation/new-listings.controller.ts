@@ -5,6 +5,7 @@ import {
   NotFoundException,
   Param,
   Query,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import {
   DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT,
@@ -19,6 +20,7 @@ import {
   DetectedSpotSymbolSummary,
 } from '../domain/spot-symbol-catalog';
 import { CompletedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
+import { ListingObservationPricePerformance } from '../domain/listing-observation-price-performance';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -26,19 +28,42 @@ export class NewListingsController {
     private readonly detections: SpotSymbolDetectionReadModelService,
   ) {}
 
+  @Get(':provider/:symbol/performance')
+  async performance(
+    @Param('provider') provider: string,
+    @Param('symbol') symbol: string,
+  ): Promise<ListingObservationPricePerformance> {
+    const identity = validObservationIdentity(provider, symbol);
+    try {
+      const result = await this.detections.getPricePerformance(
+        identity.provider,
+        identity.symbol,
+      );
+      if (!result) {
+        throw new ServiceUnavailableException(
+          'T+0 listing observation is not available',
+        );
+      }
+      return result;
+    } catch (error) {
+      if (error instanceof DetectedSpotSymbolNotFoundError) {
+        throw new NotFoundException('detected symbol was not found');
+      }
+      throw error;
+    }
+  }
+
   @Get(':provider/:symbol/observations')
   async observations(
     @Param('provider') provider: string,
     @Param('symbol') symbol: string,
   ): Promise<CompletedListingObservationCheckpoint[]> {
-    const parsedProvider = optionalProvider(provider);
-    if (!parsedProvider || !/^[A-Z0-9]{1,40}$/.test(symbol)) {
-      throw new BadRequestException(
-        'symbol must be an uppercase provider symbol from 1 to 40 characters',
-      );
-    }
+    const identity = validObservationIdentity(provider, symbol);
     try {
-      return await this.detections.listObservations(parsedProvider, symbol);
+      return await this.detections.listObservations(
+        identity.provider,
+        identity.symbol,
+      );
     } catch (error) {
       if (error instanceof DetectedSpotSymbolNotFoundError) {
         throw new NotFoundException('detected symbol was not found');
@@ -102,6 +127,16 @@ export class NewListingsController {
   }
 }
 
+function validObservationIdentity(provider: string, symbol: string) {
+  const parsedProvider = optionalProvider(provider);
+  if (!parsedProvider || !/^[A-Z0-9]{1,40}$/.test(symbol)) {
+    throw new BadRequestException(
+      'symbol must be an uppercase provider symbol from 1 to 40 characters',
+    );
+  }
+  return { provider: parsedProvider, symbol };
+}
+
 function validFilters(
   detectedFrom?: string,
   detectedTo?: string,
@@ -133,7 +168,7 @@ function validFilters(
   };
 }
 
-function optionalProvider(value?: string) {
+function optionalProvider(value?: string): 'binance' | undefined {
   if (value === undefined) return undefined;
   if (value !== 'binance') {
     throw new BadRequestException('provider must be binance');

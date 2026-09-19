@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-19 — M7.27 price-performance API completed
+
+- Added a local read-only endpoint that calculates one durable detection's exact T+0-relative price performance on demand.
+- Preserved explicit `400` invalid identity, `404` unknown detection, and `503` missing-baseline semantics.
+- Updated the root API route table and kept derived persistence, aggregate analysis, classification, alerts, signals, and trading out of scope.
+- 559 unit tests across 68 suites and all 48 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.26 exact T+0 price performance completed
 
 - Added a pure deterministic calculator for checkpoint price changes and fractional returns relative to the explicit `T+0` baseline.

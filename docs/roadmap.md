@@ -135,6 +135,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.24 — complete:** a disabled-by-default lifecycle worker schedules completion-relative non-overlapping cycles, continues after cycle-level failures, and clears pending work cleanly during shutdown.
 - **M7.25 — complete:** a local read-only route exposes the completed checkpoint observation timeline for one durable detection with strict identity validation and exact decimal values.
 - **M7.26 — complete:** a pure exact-decimal calculator derives chronological absolute price changes and return rates from the explicit `T+0` observation baseline.
+- **M7.27 — complete:** a local read-only endpoint loads the durable timeline and exposes its T+0-relative price performance with explicit unavailable semantics.
 
 ## M8 — Dashboard — planned
 

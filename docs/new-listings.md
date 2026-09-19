@@ -149,3 +149,9 @@ The path accepts only `binance` and a canonical uppercase alphanumeric symbol. I
 A pure provider-neutral calculator validates one completed observation timeline and derives each checkpoint's absolute price change and price return rate relative to the explicit `T+0` last price. Inputs are normalized into deterministic schedule order, and all arithmetic uses a 40-digit `decimal.js` context with decimal-string outputs.
 
 An empty timeline or one without `T+0` returns unavailable instead of substituting a later sample as the baseline. Mixed provider/symbol identities, duplicate labels, invalid schedule metadata, and incoherent checkpoint times fail explicitly. This calculation has no HTTP route, derived persistence, aggregate statistics, score, alert, signal, or trading behavior.
+
+## M7.27 price-performance API
+
+`GET /new-listings/:provider/:symbol/performance` loads the completed durable observation timeline and applies the M7.26 calculation on demand. The response identifies the provider, symbol, `T+0` baseline price, and chronological points containing last price, absolute change, and fractional return rate as decimal strings.
+
+The route shares the timeline identity validation: malformed input returns `400` and an unknown durable detection returns `404`. A known detection without a completed `T+0` returns `503`, clearly separating temporary analytical unavailability from absence. No derived result is persisted, and aggregate statistics, classification, score, alert, signal, and trading remain outside this increment.

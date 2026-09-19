@@ -6,6 +6,35 @@ import {
 } from '../domain/spot-symbol-catalog';
 
 describe('SpotSymbolDetectionReadModelService', () => {
+  it('loads the durable timeline and calculates price performance', async () => {
+    const repository = repositoryWith({
+      findDetected: jest.fn(() => Promise.resolve(detection())),
+      listCompletedObservations: jest.fn(() =>
+        Promise.resolve([completedObservation()]),
+      ),
+    });
+    const service = new SpotSymbolDetectionReadModelService(repository);
+
+    await expect(
+      service.getPricePerformance('binance', 'NEWUSDT'),
+    ).resolves.toMatchObject({
+      symbol: 'NEWUSDT',
+      baselinePrice: '100',
+      points: [{ priceReturnRate: '0' }],
+    });
+  });
+
+  it('reports price performance unavailable until T+0 is complete', async () => {
+    const repository = repositoryWith({
+      findDetected: jest.fn(() => Promise.resolve(detection())),
+    });
+    const service = new SpotSymbolDetectionReadModelService(repository);
+
+    await expect(
+      service.getPricePerformance('binance', 'NEWUSDT'),
+    ).resolves.toBeNull();
+  });
+
   it('lists completed observations only for a durable detection', async () => {
     const observations = [{ label: 'T+0' }];
     const repository = repositoryWith({
@@ -130,5 +159,23 @@ function detection() {
     spotTradingAllowed: true,
     detectedAt: new Date('2026-09-14T02:00:00.000Z'),
     lastObservedAt: new Date('2026-09-14T03:00:00.000Z'),
+  };
+}
+
+function completedObservation() {
+  return {
+    provider: 'binance' as const,
+    symbol: 'NEWUSDT',
+    label: 'T+0' as const,
+    offsetMs: 0,
+    targetAt: new Date('2026-09-14T02:00:00.000Z'),
+    completedAt: new Date('2026-09-14T02:00:01.000Z'),
+    lastPrice: '100',
+    baseVolume: '1000',
+    quoteVolume: '100000',
+    tradeCount: 100,
+    windowOpenTime: new Date('2026-09-13T02:00:00.000Z'),
+    windowCloseTime: new Date('2026-09-14T02:00:00.000Z'),
+    receivedAt: new Date('2026-09-14T02:00:01.000Z'),
   };
 }

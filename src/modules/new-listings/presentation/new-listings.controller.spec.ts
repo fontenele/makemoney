@@ -8,6 +8,42 @@ import {
 import { NewListingsController } from './new-listings.controller';
 
 describe('NewListingsController', () => {
+  it('returns available listing price performance', async () => {
+    const performance = {
+      provider: 'binance' as const,
+      symbol: 'NEWUSDT',
+      baselineLabel: 'T+0' as const,
+      baselinePrice: '100',
+      points: [],
+    };
+    const getPricePerformance = jest.fn(() => Promise.resolve(performance));
+    const controller = new NewListingsController({ getPricePerformance });
+
+    await expect(controller.performance('binance', 'NEWUSDT')).resolves.toBe(
+      performance,
+    );
+  });
+
+  it('maps missing T+0 performance to service unavailable', async () => {
+    const controller = new NewListingsController({
+      getPricePerformance: jest.fn(() => Promise.resolve(null)),
+    });
+    await expect(controller.performance('binance', 'NEWUSDT')).rejects.toThrow(
+      'T+0 listing observation is not available',
+    );
+  });
+
+  it('maps an unknown performance identity to not found', async () => {
+    const controller = new NewListingsController({
+      getPricePerformance: jest.fn(() =>
+        Promise.reject(new DetectedSpotSymbolNotFoundError()),
+      ),
+    });
+    await expect(
+      controller.performance('binance', 'UNKNOWNUSDT'),
+    ).rejects.toThrow('detected symbol was not found');
+  });
+
   it('returns the completed observation timeline for a detected symbol', async () => {
     const listObservations = jest.fn(() => Promise.resolve([]));
     const controller = new NewListingsController({ listObservations });

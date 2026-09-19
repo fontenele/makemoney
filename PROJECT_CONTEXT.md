@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.26 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, expose completed observation timelines, and calculate exact T+0-relative price performance.
+- M6 is closed. M7.1–M7.27 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, expose completed observation timelines, and calculate and expose exact T+0-relative price performance.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -189,6 +189,8 @@ M7.24 adds a completion-relative, non-overlapping lifecycle worker with clean ti
 M7.25 exposes completed checkpoint observations oldest target first at `GET /new-listings/:provider/:symbol/observations`. It validates the durable detection identity, preserves exact decimal strings, distinguishes invalid and unknown identities, and returns an empty array when the detected symbol has no completed checkpoint.
 
 M7.26 defines a pure deterministic price-performance calculator over one completed observation timeline. It uses only the explicit `T+0` checkpoint as baseline, returns unavailable until that checkpoint exists, and derives exact absolute price change and return rate for each collected point without persistence or HTTP exposure.
+
+M7.27 exposes that calculation at `GET /new-listings/:provider/:symbol/performance`. The local read-only route returns `503` until `T+0` is complete, preserves `404` for an unknown durable detection, and performs no derived persistence or classification.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 
