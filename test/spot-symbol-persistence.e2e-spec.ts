@@ -338,6 +338,26 @@ describe('Spot symbol observation persistence (e2e)', () => {
       new Date('2026-09-14T12:00:10.000Z'),
     );
 
+    await expect(
+      repository.listCompletedObservations('binance', 'LEASEUSDT'),
+    ).resolves.toEqual([
+      {
+        provider: 'binance',
+        symbol: 'LEASEUSDT',
+        label: 'T+0',
+        offsetMs: 0,
+        targetAt: new Date('2026-09-14T02:00:00.000Z'),
+        completedAt,
+        lastPrice: '0.00001',
+        baseVolume: '1200000.5',
+        quoteVolume: '12.3456789',
+        tradeCount: 42,
+        windowOpenTime: new Date('2026-09-13T12:00:00.000Z'),
+        windowCloseTime: new Date('2026-09-14T12:00:00.000Z'),
+        receivedAt: new Date('2026-09-14T12:00:10.000Z'),
+      },
+    ]);
+
     const uncompletedRow =
       await prisma.listingObservationCheckpoint.findUniqueOrThrow({
         where: {

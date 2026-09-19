@@ -50,6 +50,13 @@ export class DetectedSpotSymbolCursorNotFoundError extends Error {
   }
 }
 
+export class DetectedSpotSymbolNotFoundError extends Error {
+  constructor() {
+    super('Detected Spot symbol was not found');
+    this.name = DetectedSpotSymbolNotFoundError.name;
+  }
+}
+
 export const SPOT_SYMBOL_CATALOG_PROVIDER = Symbol(
   'SPOT_SYMBOL_CATALOG_PROVIDER',
 );
@@ -73,6 +80,12 @@ export interface SpotSymbolRepository {
   summarizeDetected(
     filters: DetectedSpotSymbolFilters,
   ): Promise<DetectedSpotSymbolSummary>;
+  listCompletedObservations(
+    provider: SpotSymbol['provider'],
+    symbol: string,
+  ): Promise<
+    import('./listing-observation-schedule').CompletedListingObservationCheckpoint[]
+  >;
   listDueCheckpoints(
     dueAt: Date,
     limit: number,

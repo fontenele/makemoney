@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-19 — M7.25 completed observation timeline API
+
+- Added a local read-only route for one detected symbol's completed checkpoint observations in chronological target order.
+- Preserved exact decimal values, excluded incomplete lease state, and distinguished invalid identity, unknown detection, and a valid empty timeline.
+- Added application, controller, repository integration, and HTTP route coverage without introducing analysis, alerts, signals, or trading.
+- 551 unit tests across 67 suites and all 47 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.24 opt-in checkpoint worker lifecycle completed
 
 - Added a completion-relative lifecycle worker that prevents overlapping cycles, survives cycle-level failures, and shuts down cleanly.

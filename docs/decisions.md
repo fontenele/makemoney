@@ -573,3 +573,9 @@ Provider errors are not swallowed or retried by the processor. They flow to the 
 The lifecycle worker uses completion-relative recursive timers rather than a fixed interval, so slow cycles cannot overlap within one process. Shutdown prevents another timer and waits for the current bounded cycle, while cycle-level failure is logged and does not permanently stop scheduling.
 
 Activation is an explicit startup setting that defaults to disabled. Although collection is public and read-only at Binance, it claims and completes durable local work; an upgrade must not begin that behavior silently. Enabling the worker does not grant any trading capability.
+
+## M7.25 expose completed samples by durable detection identity
+
+The first observation read is a naturally bounded per-detection timeline rather than a global feed: each detection has exactly nine scheduled checkpoints. PostgreSQL returns only completed rows in chronological target order, and persisted decimals are mapped back to exact strings and revalidated at the repository boundary.
+
+The route distinguishes malformed identity from an unknown durable detection, while a known detection with no completed checkpoint is a valid empty research result. Claim tokens and incomplete work remain internal, and no derived performance claim is introduced.

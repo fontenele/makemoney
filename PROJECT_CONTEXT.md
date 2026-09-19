@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.24 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, and provide a disabled-by-default lifecycle worker.
+- M6 is closed. M7.1–M7.25 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, and expose completed observation timelines.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -185,6 +185,8 @@ M7.22 stores a validated market observation in the same ownership-checked update
 M7.23 provides the production processor that maps a claimed checkpoint to the provider-neutral observation request and returns the validated public snapshot to the cycle. It propagates provider failure to the cycle's existing lease-expiry recovery policy, but no timer invokes the processor automatically.
 
 M7.24 adds a completion-relative, non-overlapping lifecycle worker with clean timer shutdown and cycle-failure recovery. `NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED` defaults to `false`, so upgrades do not begin external collection until the operator opts in explicitly.
+
+M7.25 exposes completed checkpoint observations oldest target first at `GET /new-listings/:provider/:symbol/observations`. It validates the durable detection identity, preserves exact decimal strings, distinguishes invalid and unknown identities, and returns an empty array when the detected symbol has no completed checkpoint.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

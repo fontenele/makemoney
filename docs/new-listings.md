@@ -137,3 +137,9 @@ Provider failures are intentionally propagated to the cycle, which isolates the 
 A NestJS lifecycle worker can now invoke the production cycle at the validated configured interval. It uses recursive one-shot timers after each cycle settles, preventing overlap even when provider or database work lasts longer than the configured quiet period. Cycle-level failures are logged and followed by the next scheduled attempt.
 
 `NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED` defaults to `false`. Existing installations therefore retain inactive behavior until an operator explicitly opts into public market collection. Shutdown clears a pending timer and waits for an in-flight bounded cycle before completing; retries, alerting, scoring, signals, and trading remain outside this increment.
+
+## M7.25 completed observation timeline API
+
+`GET /new-listings/:provider/:symbol/observations` exposes only completed checkpoint samples for one durable detected symbol, ordered by checkpoint target time from `T+0` through `T+24h`. Price and volume values remain exact decimal strings and each item includes its schedule identity, target and completion times, provider window, receive time, and trade count.
+
+The path accepts only `binance` and a canonical uppercase alphanumeric symbol. Invalid identities return `400`, an identity that is not a durable detection returns `404`, and a known detection with no completed sample returns an empty array. Pending/leased checkpoints, claim metadata, alerts, scoring, derived returns, signals, and trading are not exposed.

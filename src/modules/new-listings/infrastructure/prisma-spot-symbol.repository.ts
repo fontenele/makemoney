@@ -13,9 +13,13 @@ import {
 import {
   buildListingObservationSchedule,
   ClaimedListingObservationCheckpoint,
+  CompletedListingObservationCheckpoint,
   DueListingObservationCheckpoint,
 } from '../domain/listing-observation-schedule';
-import { ListingMarketObservation } from '../domain/listing-market-observation';
+import {
+  ListingMarketObservation,
+  validateListingMarketObservation,
+} from '../domain/listing-market-observation';
 
 @Injectable()
 export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
@@ -202,6 +206,17 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
     };
   }
 
+  async listCompletedObservations(
+    provider: SpotSymbol['provider'],
+    symbol: string,
+  ): Promise<CompletedListingObservationCheckpoint[]> {
+    const rows = await this.prisma.listingObservationCheckpoint.findMany({
+      where: { provider, symbol, completedAt: { not: null } },
+      orderBy: [{ targetAt: 'asc' }, { label: 'asc' }],
+    });
+    return rows.map(toCompletedObservation);
+  }
+
   async listDueCheckpoints(
     dueAt: Date,
     limit: number,
@@ -357,5 +372,53 @@ function toDetectedSpotSymbol(row: {
     spotTradingAllowed: row.spotTradingAllowed,
     detectedAt: row.detectedAt!,
     lastObservedAt: row.lastObservedAt,
+  };
+}
+
+function toCompletedObservation(row: {
+  provider: string;
+  symbol: string;
+  label: string;
+  offsetMs: number;
+  targetAt: Date;
+  completedAt: Date | null;
+  lastPrice: Prisma.Decimal | null;
+  baseVolume: Prisma.Decimal | null;
+  quoteVolume: Prisma.Decimal | null;
+  tradeCount: bigint | null;
+  windowOpenTime: Date | null;
+  windowCloseTime: Date | null;
+  receivedAt: Date | null;
+}): CompletedListingObservationCheckpoint {
+  if (
+    !row.completedAt ||
+    !row.lastPrice ||
+    !row.baseVolume ||
+    !row.quoteVolume ||
+    row.tradeCount === null ||
+    !row.windowOpenTime ||
+    !row.windowCloseTime ||
+    !row.receivedAt
+  ) {
+    throw new Error('Completed listing observation is incomplete');
+  }
+  const observation: ListingMarketObservation = {
+    provider: 'binance',
+    symbol: row.symbol,
+    lastPrice: row.lastPrice.toString(),
+    baseVolume: row.baseVolume.toString(),
+    quoteVolume: row.quoteVolume.toString(),
+    tradeCount: Number(row.tradeCount),
+    windowOpenTime: row.windowOpenTime,
+    windowCloseTime: row.windowCloseTime,
+    receivedAt: row.receivedAt,
+  };
+  validateListingMarketObservation(observation);
+  return {
+    label: row.label as CompletedListingObservationCheckpoint['label'],
+    offsetMs: row.offsetMs,
+    targetAt: row.targetAt,
+    completedAt: row.completedAt,
+    ...observation,
   };
 }

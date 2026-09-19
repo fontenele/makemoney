@@ -1,10 +1,47 @@
 import { jest } from '@jest/globals';
 import { BadRequestException } from '@nestjs/common';
 import { DetectedSpotSymbol } from '../domain/spot-symbol-catalog';
-import { DetectedSpotSymbolCursorNotFoundError } from '../domain/spot-symbol-catalog';
+import {
+  DetectedSpotSymbolCursorNotFoundError,
+  DetectedSpotSymbolNotFoundError,
+} from '../domain/spot-symbol-catalog';
 import { NewListingsController } from './new-listings.controller';
 
 describe('NewListingsController', () => {
+  it('returns the completed observation timeline for a detected symbol', async () => {
+    const listObservations = jest.fn(() => Promise.resolve([]));
+    const controller = new NewListingsController({ listObservations });
+
+    await expect(
+      controller.observations('binance', 'NEWUSDT'),
+    ).resolves.toEqual([]);
+    expect(listObservations).toHaveBeenCalledWith('binance', 'NEWUSDT');
+  });
+
+  it.each([
+    ['other', 'NEWUSDT'],
+    ['binance', 'newusdt'],
+    ['binance', ''],
+  ])('rejects invalid observation identity %s/%s', async (provider, symbol) => {
+    const controller = new NewListingsController({
+      listObservations: jest.fn(() => Promise.resolve([])),
+    });
+    await expect(
+      controller.observations(provider, symbol),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('maps an unknown observation identity to not found', async () => {
+    const controller = new NewListingsController({
+      listObservations: jest.fn(() =>
+        Promise.reject(new DetectedSpotSymbolNotFoundError()),
+      ),
+    });
+    await expect(
+      controller.observations('binance', 'UNKNOWNUSDT'),
+    ).rejects.toThrow('detected symbol was not found');
+  });
+
   it('returns a filtered detection summary without pagination input', async () => {
     const summarize = jest.fn(() =>
       Promise.resolve({

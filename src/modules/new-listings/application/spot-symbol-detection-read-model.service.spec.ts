@@ -1,8 +1,38 @@
 import { jest } from '@jest/globals';
 import { SpotSymbolDetectionReadModelService } from './spot-symbol-detection-read-model.service';
-import { DetectedSpotSymbolCursorNotFoundError } from '../domain/spot-symbol-catalog';
+import {
+  DetectedSpotSymbolCursorNotFoundError,
+  DetectedSpotSymbolNotFoundError,
+} from '../domain/spot-symbol-catalog';
 
 describe('SpotSymbolDetectionReadModelService', () => {
+  it('lists completed observations only for a durable detection', async () => {
+    const observations = [{ label: 'T+0' }];
+    const repository = repositoryWith({
+      findDetected: jest.fn(() => Promise.resolve(detection())),
+      listCompletedObservations: jest.fn(() => Promise.resolve(observations)),
+    });
+    const service = new SpotSymbolDetectionReadModelService(repository);
+
+    await expect(service.listObservations('binance', 'NEWUSDT')).resolves.toBe(
+      observations,
+    );
+    expect(repository.listCompletedObservations).toHaveBeenCalledWith(
+      'binance',
+      'NEWUSDT',
+    );
+  });
+
+  it('rejects observations for an unknown detection', async () => {
+    const repository = repositoryWith();
+    const service = new SpotSymbolDetectionReadModelService(repository);
+
+    await expect(
+      service.listObservations('binance', 'UNKNOWNUSDT'),
+    ).rejects.toBeInstanceOf(DetectedSpotSymbolNotFoundError);
+    expect(repository.listCompletedObservations).not.toHaveBeenCalled();
+  });
+
   it('delegates filtered aggregate summaries to the repository', async () => {
     const summary = {
       count: 2,
@@ -85,6 +115,7 @@ function repositoryWith(overrides: Record<string, unknown> = {}) {
     observe: jest.fn(() => Promise.resolve([])),
     findDetected: jest.fn(() => Promise.resolve(null)),
     listDetected: jest.fn(() => Promise.resolve([])),
+    listCompletedObservations: jest.fn(() => Promise.resolve([])),
     ...overrides,
   };
 }

@@ -133,6 +133,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.22 — complete:** atomic checkpoint completion persists validated market observations (`lastPrice`, `baseVolume`, `quoteVolume`, `tradeCount`, `windowOpenTime`, `windowCloseTime`, `receivedAt`) in PostgreSQL with database consistency constraints.
 - **M7.23 — complete:** an injected production checkpoint processor maps claimed provider/symbol identity to the public observation provider while preserving the cycle's failure isolation and without activating background work.
 - **M7.24 — complete:** a disabled-by-default lifecycle worker schedules completion-relative non-overlapping cycles, continues after cycle-level failures, and clears pending work cleanly during shutdown.
+- **M7.25 — complete:** a local read-only route exposes the completed checkpoint observation timeline for one durable detection with strict identity validation and exact decimal values.
 
 ## M8 — Dashboard — planned
 

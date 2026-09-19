@@ -172,6 +172,13 @@ describe('Application (e2e)', () => {
       .expect(200);
   });
 
+  it('/new-listings/:provider/:symbol/observations validates identity', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(server)
+      .get('/new-listings/other/NEWUSDT/observations')
+      .expect(400);
+  });
+
   it('/backtesting/replay (POST) exposes bounded deterministic replay', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     const body = {

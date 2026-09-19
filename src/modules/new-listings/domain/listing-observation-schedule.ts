@@ -1,3 +1,5 @@
+import { ListingMarketObservation } from './listing-market-observation';
+
 export const LISTING_OBSERVATION_CHECKPOINTS = [
   { label: 'T+0', offsetMs: 0 },
   { label: 'T+5s', offsetMs: 5_000 },
@@ -28,6 +30,11 @@ export interface ClaimedListingObservationCheckpoint extends DueListingObservati
   claimToken: string;
   claimedAt: Date;
   claimExpiresAt: Date;
+}
+
+export interface CompletedListingObservationCheckpoint
+  extends ListingObservationCheckpoint, ListingMarketObservation {
+  completedAt: Date;
 }
 
 export function buildListingObservationSchedule(

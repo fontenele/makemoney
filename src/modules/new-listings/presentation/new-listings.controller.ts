@@ -1,4 +1,11 @@
-import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Query,
+} from '@nestjs/common';
 import {
   DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT,
   MAX_DETECTED_SPOT_SYMBOL_LIMIT,
@@ -8,14 +15,37 @@ import {
   DetectedSpotSymbol,
   DetectedSpotSymbolCursorNotFoundError,
   DetectedSpotSymbolFilters,
+  DetectedSpotSymbolNotFoundError,
   DetectedSpotSymbolSummary,
 } from '../domain/spot-symbol-catalog';
+import { CompletedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
 
 @Controller('new-listings')
 export class NewListingsController {
   constructor(
     private readonly detections: SpotSymbolDetectionReadModelService,
   ) {}
+
+  @Get(':provider/:symbol/observations')
+  async observations(
+    @Param('provider') provider: string,
+    @Param('symbol') symbol: string,
+  ): Promise<CompletedListingObservationCheckpoint[]> {
+    const parsedProvider = optionalProvider(provider);
+    if (!parsedProvider || !/^[A-Z0-9]{1,40}$/.test(symbol)) {
+      throw new BadRequestException(
+        'symbol must be an uppercase provider symbol from 1 to 40 characters',
+      );
+    }
+    try {
+      return await this.detections.listObservations(parsedProvider, symbol);
+    } catch (error) {
+      if (error instanceof DetectedSpotSymbolNotFoundError) {
+        throw new NotFoundException('detected symbol was not found');
+      }
+      throw error;
+    }
+  }
 
   @Get('summary')
   summary(

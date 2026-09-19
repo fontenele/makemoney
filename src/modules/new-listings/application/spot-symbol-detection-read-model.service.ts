@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
   DetectedSpotSymbolCursorNotFoundError,
+  DetectedSpotSymbolNotFoundError,
   DetectedSpotSymbol,
   DetectedSpotSymbolFilters,
   DetectedSpotSymbolQuery,
@@ -8,6 +9,7 @@ import {
   SPOT_SYMBOL_REPOSITORY,
   SpotSymbolRepository,
 } from '../domain/spot-symbol-catalog';
+import { CompletedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -50,5 +52,15 @@ export class SpotSymbolDetectionReadModelService {
     filters: DetectedSpotSymbolFilters,
   ): Promise<DetectedSpotSymbolSummary> {
     return this.repository.summarizeDetected(filters);
+  }
+
+  async listObservations(
+    provider: 'binance',
+    symbol: string,
+  ): Promise<CompletedListingObservationCheckpoint[]> {
+    if (!(await this.repository.findDetected(provider, symbol))) {
+      throw new DetectedSpotSymbolNotFoundError();
+    }
+    return this.repository.listCompletedObservations(provider, symbol);
   }
 }
