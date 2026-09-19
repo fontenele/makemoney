@@ -139,6 +139,92 @@ describe('SpotSymbolDetectionReadModelService', () => {
     expect(listCompletedObservationCohort).not.toHaveBeenCalled();
   });
 
+  it('loads a durable cohort and calculates pattern statistics', async () => {
+    const listCompletedObservationCohort = jest.fn(() =>
+      Promise.resolve([
+        [
+          completedObservation(),
+          completedObservation({
+            label: 'T+5s',
+            offsetMs: 5_000,
+            lastPrice: '125',
+          }),
+        ],
+        [
+          completedObservation({ symbol: 'OTHERUSDT', lastPrice: '200' }),
+          completedObservation({
+            symbol: 'OTHERUSDT',
+            label: 'T+5s',
+            offsetMs: 5_000,
+            lastPrice: '210',
+          }),
+        ],
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(
+      service.getPatternCohort('binance', 25, {
+        pumpReturnRate: '0.2',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).resolves.toMatchObject({
+      provider: 'binance',
+      classificationCount: 2,
+      noPumpObservedCount: 1,
+      pumpObservedCount: 1,
+      correctionObservedCount: 0,
+      pumpObservedRate: '0.5',
+      correctionObservedRate: '0',
+      correctionAmongPumpsRate: '0',
+    });
+    expect(listCompletedObservationCohort).toHaveBeenCalledWith('binance', 25);
+  });
+
+  it('returns an explicit empty durable pattern cohort', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith());
+
+    await expect(
+      service.getPatternCohort('binance', 50, {
+        pumpReturnRate: '0.2',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).resolves.toEqual({
+      provider: null,
+      thresholds: null,
+      classificationCount: 0,
+      noPumpObservedCount: 0,
+      pumpObservedCount: 0,
+      correctionObservedCount: 0,
+      pumpObservedRate: null,
+      correctionObservedRate: null,
+      correctionAmongPumpsRate: null,
+    });
+  });
+
+  it('rejects invalid durable pattern cohort input before repository access', async () => {
+    const listCompletedObservationCohort = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(
+      service.getPatternCohort('binance', 0, {
+        pumpReturnRate: '0.2',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).rejects.toThrow('cohort limit must be an integer from 1 to 100');
+    await expect(
+      service.getPatternCohort('binance', 25, {
+        pumpReturnRate: '0',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).rejects.toThrow('pump return rate must be a positive decimal');
+    expect(listCompletedObservationCohort).not.toHaveBeenCalled();
+  });
+
   it('lists completed observations only for a durable detection', async () => {
     const observations = [{ label: 'T+0' }];
     const repository = repositoryWith({

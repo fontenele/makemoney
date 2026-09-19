@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-19 — Durable pattern cohorts reuse the existing T+0-eligible sample
+
+M7.35 reuses the M7.29 repository selection instead of creating a second cohort query: recent detections qualify only when their `T+0` observation is complete, and the 1–100 limit is applied before timelines are loaded. The read model validates the explicit shared thresholds before database access, classifies every eligible timeline on demand, and delegates rate denominators to the pure M7.34 calculator. No derived classifications or aggregates are persisted.
+
 ## Modular monolith
 
 The project remains a single NestJS application. Feature modules and provider boundaries are introduced only when required by an approved milestone.

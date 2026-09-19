@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-19 — M7.35 durable pattern cohort loading completed
+
+- Added internal bounded durable pattern-cohort calculation over recent detections with completed `T+0` observations.
+- Reused the existing durable cohort query and exact performance/classification pipeline without adding schema or provider work.
+- Added fail-fast limit and threshold validation plus focused empty and populated cohort coverage.
+- Kept HTTP exposure, default thresholds, persistence, scoring, alerts, signals, and trading outside this increment.
+- 587 unit tests across 71 suites and all 50 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.34 pattern cohort statistics completed
 
 - Added pure aggregation of same-threshold listing classifications into explicit no-pump, pump, and correction counts.

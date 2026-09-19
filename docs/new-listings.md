@@ -197,3 +197,9 @@ An unknown detection returns `404`, while a known detection without completed `T
 A pure calculator now aggregates classifications produced with numerically equal explicit thresholds. It reports the total classified sample, no-pump count, pump count (including corrected pumps), correction count, pump rate over the full sample, correction rate over the full sample, and correction rate among observed pumps.
 
 All rates use isolated 40-digit decimal arithmetic. Empty cohorts expose zero counts and null rates, while duplicate symbols, mixed thresholds, or incoherent classification states fail explicitly. This increment adds no durable loading, route, persistence, score, alert, signal, or trading behavior.
+
+## M7.35 durable pattern cohort loading
+
+The internal detection read model now loads the same bounded cohort of 1 through 100 recent durable Binance detections with completed `T+0` observations introduced by M7.29. It converts each completed timeline to exact price performance, applies one caller-supplied valid threshold pair, and aggregates the classifications through the M7.34 calculator.
+
+Limit and threshold validation run before repository access. An empty eligible sample preserves the explicit empty aggregate, and an incoherent repository result without `T+0` fails rather than silently changing eligibility. This increment adds no route, default thresholds, derived persistence, score, alert, signal, or trading behavior.

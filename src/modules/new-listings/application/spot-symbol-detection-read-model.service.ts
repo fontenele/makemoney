@@ -18,7 +18,12 @@ import {
   ListingObservationPatternClassification,
   ListingObservationPatternThresholds,
 } from '../domain/listing-observation-pattern-classification';
-import { ListingObservationPatternClassifier } from './listing-observation-pattern-classifier';
+import {
+  ListingObservationPatternClassifier,
+  validateListingObservationPatternThresholds,
+} from './listing-observation-pattern-classifier';
+import { ListingObservationPatternCohort } from '../domain/listing-observation-pattern-cohort';
+import { ListingObservationPatternCohortCalculator } from './listing-observation-pattern-cohort-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -32,6 +37,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingObservationCohortPerformanceCalculator();
   private readonly patternClassifier =
     new ListingObservationPatternClassifier();
+  private readonly patternCohort =
+    new ListingObservationPatternCohortCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -94,15 +101,7 @@ export class SpotSymbolDetectionReadModelService {
     provider: 'binance',
     limit: number,
   ): Promise<ListingObservationCohortPerformance> {
-    if (
-      !Number.isInteger(limit) ||
-      limit < 1 ||
-      limit > MAX_LISTING_OBSERVATION_COHORT_LIMIT
-    ) {
-      throw new Error(
-        `Listing observation cohort limit must be an integer from 1 to ${MAX_LISTING_OBSERVATION_COHORT_LIMIT}`,
-      );
-    }
+    this.validateCohortLimit(limit);
     const timelines = await this.repository.listCompletedObservationCohort(
       provider,
       limit,
@@ -127,5 +126,39 @@ export class SpotSymbolDetectionReadModelService {
     return performance
       ? this.patternClassifier.classify(performance, thresholds)
       : null;
+  }
+
+  async getPatternCohort(
+    provider: 'binance',
+    limit: number,
+    thresholds: ListingObservationPatternThresholds,
+  ): Promise<ListingObservationPatternCohort> {
+    this.validateCohortLimit(limit);
+    validateListingObservationPatternThresholds(thresholds);
+    const timelines = await this.repository.listCompletedObservationCohort(
+      provider,
+      limit,
+    );
+    return this.patternCohort.calculate(
+      timelines.map((timeline) => {
+        const performance = this.pricePerformance.calculate(timeline);
+        if (!performance) {
+          throw new Error('Cohort timeline must include completed T+0');
+        }
+        return this.patternClassifier.classify(performance, thresholds);
+      }),
+    );
+  }
+
+  private validateCohortLimit(limit: number): void {
+    if (
+      !Number.isInteger(limit) ||
+      limit < 1 ||
+      limit > MAX_LISTING_OBSERVATION_COHORT_LIMIT
+    ) {
+      throw new Error(
+        `Listing observation cohort limit must be an integer from 1 to ${MAX_LISTING_OBSERVATION_COHORT_LIMIT}`,
+      );
+    }
   }
 }
