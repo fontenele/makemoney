@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import {
   DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT,
+  MAX_LISTING_OBSERVATION_COHORT_LIMIT,
   MAX_DETECTED_SPOT_SYMBOL_LIMIT,
   SpotSymbolDetectionReadModelService,
 } from '../application/spot-symbol-detection-read-model.service';
@@ -21,12 +22,24 @@ import {
 } from '../domain/spot-symbol-catalog';
 import { CompletedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
 import { ListingObservationPricePerformance } from '../domain/listing-observation-price-performance';
+import { ListingObservationCohortPerformance } from '../domain/listing-observation-cohort-performance';
 
 @Controller('new-listings')
 export class NewListingsController {
   constructor(
     private readonly detections: SpotSymbolDetectionReadModelService,
   ) {}
+
+  @Get('performance')
+  cohortPerformance(
+    @Query('limit') limit?: string,
+    @Query('provider') provider?: string,
+  ): Promise<ListingObservationCohortPerformance> {
+    return this.detections.getCohortPerformance(
+      optionalProvider(provider) ?? 'binance',
+      validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
+    );
+  }
 
   @Get(':provider/:symbol/performance')
   async performance(
@@ -203,13 +216,16 @@ function optionalCursor(value?: string) {
   return { provider: 'binance' as const, symbol };
 }
 
-function validLimit(value?: string): number {
+function validLimit(
+  value?: string,
+  maximum = MAX_DETECTED_SPOT_SYMBOL_LIMIT,
+): number {
   if (value === undefined) return DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT;
   if (!/^[1-9]\d*$/.test(value)) {
     throw new BadRequestException('limit must be an integer from 1 to 100');
   }
   const parsed = Number(value);
-  if (parsed > MAX_DETECTED_SPOT_SYMBOL_LIMIT) {
+  if (parsed > maximum) {
     throw new BadRequestException('limit must be an integer from 1 to 100');
   }
   return parsed;

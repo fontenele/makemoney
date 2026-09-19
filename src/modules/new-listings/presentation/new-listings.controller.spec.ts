@@ -8,6 +8,35 @@ import {
 import { NewListingsController } from './new-listings.controller';
 
 describe('NewListingsController', () => {
+  it('returns recent durable cohort performance with bounded input', async () => {
+    const cohort = {
+      provider: 'binance' as const,
+      detectionCount: 0,
+      checkpoints: [],
+    };
+    const getCohortPerformance = jest.fn(() => Promise.resolve(cohort));
+    const controller = new NewListingsController({ getCohortPerformance });
+
+    await expect(controller.cohortPerformance()).resolves.toBe(cohort);
+    expect(getCohortPerformance).toHaveBeenLastCalledWith('binance', 50);
+    await controller.cohortPerformance('25', 'binance');
+    expect(getCohortPerformance).toHaveBeenLastCalledWith('binance', 25);
+  });
+
+  it.each([
+    ['0', undefined],
+    ['101', undefined],
+    ['1.5', undefined],
+    [undefined, 'other'],
+  ])('rejects invalid cohort query %s/%s', (limit, provider) => {
+    const controller = new NewListingsController({
+      getCohortPerformance: jest.fn(() => Promise.resolve({})),
+    });
+    expect(() => controller.cohortPerformance(limit, provider)).toThrow(
+      BadRequestException,
+    );
+  });
+
   it('returns available listing price performance', async () => {
     const performance = {
       provider: 'binance' as const,

@@ -64,6 +64,8 @@ M7.28 calculates descriptive cross-detection checkpoint cohorts as a pure intern
 
 M7.29 loads bounded recent durable cohorts with completed T+0 baselines and calculates aggregate checkpoint performance internally.
 
+M7.30 exposes the bounded durable cohort through a local read-only aggregate-performance endpoint.
+
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
@@ -97,6 +99,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.27 exposes `GET /new-listings/:provider/:symbol/performance`, returning 503 until `T+0` exists and calculating directly from durable observations without derived persistence.
 - M7.28 groups available per-detection returns by checkpoint with independent sample size, positive/negative/flat counts, and exact-decimal average; incomplete timelines are never forward-filled.
 - M7.29 selects at most 100 recent detected symbols with completed T+0 observations in PostgreSQL, loads their completed timelines, and composes the existing exact calculators without an HTTP route.
+- M7.30 exposes `GET /new-listings/performance` with optional `limit=1..100` and `provider=binance`, defaulting to 50 recent eligible detections and returning an explicit empty aggregate when none exist.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -236,18 +239,18 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-19 after M7.29:
+The following passed on 2026-09-19 after M7.30:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 564 tests passed across 69 suites
+- `npm test -- --runInBand` — 569 tests passed across 69 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
 The complete database-backed integration validation passed after E2E isolation:
 
-- `npm run test:e2e -- --runInBand` — all 48 tests passed across 4 suites in the disposable `crypto_trader_e2e` schema.
+- `npm run test:e2e -- --runInBand` — all 49 tests passed across 4 suites in the disposable `crypto_trader_e2e` schema.
 - The E2E global setup recreates and migrates only its dedicated schema; local application balances, executions, controls, signals, candles, and runs are not read or changed.
 - `npx prisma migrate deploy` — all fourteen migrations applied, including atomic checkpoint observation persistence
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
@@ -260,7 +263,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.29 are implemented and fully verified milestone increments.
+M0 through M7.30 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

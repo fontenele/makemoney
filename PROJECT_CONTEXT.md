@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.29 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, expose completed observation timelines, calculate and expose exact T+0-relative price performance, and load and aggregate bounded checkpoint cohorts deterministically.
+- M6 is closed. M7.1–M7.30 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, expose completed observation timelines, calculate and expose exact T+0-relative price performance, and load, aggregate, and expose bounded checkpoint cohorts deterministically.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -195,6 +195,8 @@ M7.27 exposes that calculation at `GET /new-listings/:provider/:symbol/performan
 M7.28 defines a pure cross-detection cohort calculator. It groups available T+0-relative returns by checkpoint and reports each sample size, positive/negative/flat counts, and exact-decimal average while keeping unequal checkpoint coverage explicit.
 
 M7.29 loads at most 100 recent durable detections with completed T+0 baselines and composes their validated timelines through the per-detection and cohort calculators. It remains internal and exposes no new route.
+
+M7.30 exposes that durable aggregate through local read-only `GET /new-listings/performance`, with an optional 1–100 limit and Binance-only provider validation.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

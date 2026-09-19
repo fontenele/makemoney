@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-19 — M7.30 cohort performance API completed
+
+- Added local read-only `GET /new-listings/performance` over the bounded durable cohort calculation.
+- Added strict optional `limit=1..100` and `provider=binance` validation with safe defaults and explicit empty-cohort output.
+- Updated the root API route table and kept derived persistence, classification, alerts, signals, and trading out of scope.
+- 569 unit tests across 69 suites and all 49 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.29 durable cohort loading completed
 
 - Added a bounded PostgreSQL query for recent durable detections with completed T+0 baselines and their completed observation timelines.

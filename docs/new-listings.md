@@ -167,3 +167,9 @@ Incomplete timelines contribute only the checkpoints they actually contain, so l
 The internal detection read model can now load a bounded cohort of 1 through 100 recent durable Binance detections that have a completed `T+0` checkpoint. PostgreSQL applies eligibility, newest-detection ordering, symbol tie-breaking, and the limit before loading each detection's completed observation timeline.
 
 Each timeline is converted through the existing exact T+0-relative calculator and then aggregated by the M7.28 cohort calculator. Later incomplete checkpoints remain absent from their independent samples. This increment adds no HTTP route, derived persistence, classification, score, alert, signal, or trading behavior.
+
+## M7.30 cohort performance API
+
+`GET /new-listings/performance` exposes the M7.29 durable cohort calculation through a local read-only route. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider is restricted to `binance` and defaults to it.
+
+An empty eligible cohort returns the explicit empty aggregate rather than an error. The endpoint reads durable public-market observations and calculates on demand; it does not persist derived values, classify assets, emit alerts or signals, or reach any trading path.

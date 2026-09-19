@@ -1715,7 +1715,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.29 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.30 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -2315,6 +2315,7 @@ M7.26 Exact T+0 Price Performance: DONE
 M7.27 Price Performance API: DONE
 M7.28 Checkpoint Cohort Performance: DONE
 M7.29 Durable Cohort Loading: DONE
+M7.30 Cohort Performance API: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2333,5 +2334,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7.29 is complete. Select the next bounded M7 increment; HTTP aggregate exposure, classification, alerts, scoring, signals, and trading remain separate decisions.
+M7.30 is complete. Select the next bounded M7 increment; classification, alerts, scoring, signals, and trading remain separate decisions.
 ```

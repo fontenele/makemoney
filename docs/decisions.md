@@ -603,3 +603,9 @@ Each detection contributes at most once, each checkpoint label at most once per 
 The durable cohort query selects only detected symbols with a completed `T+0`, because that explicit baseline is required by the existing performance contract. PostgreSQL applies newest-detection ordering and the 1–100 limit before loading completed timelines, keeping memory and query work bounded.
 
 Incomplete later checkpoints remain valid and contribute only where present. Loading, per-detection calculation, and cohort aggregation stay separate from HTTP exposure and derived persistence.
+
+## M7.30 expose one bounded aggregate without derived storage
+
+The first cohort endpoint calculates directly from bounded durable timelines so newly completed checkpoints are reflected immediately and no cache invalidation or derived-table lifecycle is needed. It defaults to the 50 most recent eligible detections and allows at most 100.
+
+The response keeps each checkpoint's independent sample size visible and returns a valid empty aggregate when no completed T+0 baseline exists. This remains descriptive public-market research, not a profitability or trading signal.
