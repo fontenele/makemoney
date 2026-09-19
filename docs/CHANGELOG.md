@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-19 — M7.28 checkpoint cohort performance completed
+
+- Added a pure deterministic cross-detection calculator grouping available T+0-relative returns by checkpoint.
+- Added per-checkpoint sample size, positive/negative/flat counts, and exact-decimal average return without forward-filling incomplete timelines.
+- Kept cohort loading, HTTP exposure, persistence, classification, alerts, signals, and trading out of scope.
+- 562 unit tests across 69 suites and all 48 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.27 price-performance API completed
 
 - Added a local read-only endpoint that calculates one durable detection's exact T+0-relative price performance on demand.

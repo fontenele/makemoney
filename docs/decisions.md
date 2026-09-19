@@ -591,3 +591,9 @@ Absolute price changes and fractional return rates use an isolated 40-digit deci
 The first performance API reuses the durable observation timeline and calculates M7.26 results per request. This avoids duplicating derivable state and ensures newly completed checkpoints are visible immediately without a refresh job or cache invalidation policy.
 
 Missing `T+0` is represented as HTTP 503 because the detection exists but its required analytical baseline is not yet available. Unknown detection remains 404, malformed identity remains 400, and the response makes no claim that price return implies profitability or tradeability.
+
+## M7.28 keep cohort sample coverage explicit per checkpoint
+
+Observation completion can differ between detections, so the cohort calculator groups only actually available performance points. Every checkpoint carries its own sample size and outcome counts; a missing later observation is never forward-filled or treated as a flat return.
+
+Each detection contributes at most once, each checkpoint label at most once per detection, and averages use the same 40-digit half-even decimal context. This is descriptive price research only and does not classify an asset or infer executable profit.

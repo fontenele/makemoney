@@ -155,3 +155,9 @@ An empty timeline or one without `T+0` returns unavailable instead of substituti
 `GET /new-listings/:provider/:symbol/performance` loads the completed durable observation timeline and applies the M7.26 calculation on demand. The response identifies the provider, symbol, `T+0` baseline price, and chronological points containing last price, absolute change, and fractional return rate as decimal strings.
 
 The route shares the timeline identity validation: malformed input returns `400` and an unknown durable detection returns `404`. A known detection without a completed `T+0` returns `503`, clearly separating temporary analytical unavailability from absence. No derived result is persisted, and aggregate statistics, classification, score, alert, signal, and trading remain outside this increment.
+
+## M7.28 checkpoint cohort performance
+
+A pure calculator aggregates already validated per-detection performance by scheduled checkpoint. For each available label it reports the independent sample size, positive, negative, and flat return counts, plus the average fractional price return using the same isolated 40-digit decimal policy.
+
+Incomplete timelines contribute only the checkpoints they actually contain, so later labels may have smaller samples and never inherit values from earlier observations. Duplicate detection symbols and malformed points fail explicitly. This increment adds no database query, route, derived persistence, classification, score, alert, signal, or trading behavior.
