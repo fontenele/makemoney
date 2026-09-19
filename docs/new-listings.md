@@ -161,3 +161,9 @@ The route shares the timeline identity validation: malformed input returns `400`
 A pure calculator aggregates already validated per-detection performance by scheduled checkpoint. For each available label it reports the independent sample size, positive, negative, and flat return counts, plus the average fractional price return using the same isolated 40-digit decimal policy.
 
 Incomplete timelines contribute only the checkpoints they actually contain, so later labels may have smaller samples and never inherit values from earlier observations. Duplicate detection symbols and malformed points fail explicitly. This increment adds no database query, route, derived persistence, classification, score, alert, signal, or trading behavior.
+
+## M7.29 durable cohort loading
+
+The internal detection read model can now load a bounded cohort of 1 through 100 recent durable Binance detections that have a completed `T+0` checkpoint. PostgreSQL applies eligibility, newest-detection ordering, symbol tie-breaking, and the limit before loading each detection's completed observation timeline.
+
+Each timeline is converted through the existing exact T+0-relative calculator and then aggregated by the M7.28 cohort calculator. Later incomplete checkpoints remain absent from their independent samples. This increment adds no HTTP route, derived persistence, classification, score, alert, signal, or trading behavior.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-19 — M7.29 durable cohort loading completed
+
+- Added a bounded PostgreSQL query for recent durable detections with completed T+0 baselines and their completed observation timelines.
+- Composed durable timelines through the existing exact per-detection and cohort calculators with strict 1–100 input bounds.
+- Kept HTTP exposure, derived persistence, classification, alerts, signals, and trading out of scope.
+- 564 unit tests across 69 suites and all 48 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.28 checkpoint cohort performance completed
 
 - Added a pure deterministic cross-detection calculator grouping available T+0-relative returns by checkpoint.

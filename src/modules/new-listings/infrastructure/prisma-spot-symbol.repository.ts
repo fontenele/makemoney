@@ -217,6 +217,32 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
     return rows.map(toCompletedObservation);
   }
 
+  async listCompletedObservationCohort(
+    provider: SpotSymbol['provider'],
+    limit: number,
+  ): Promise<CompletedListingObservationCheckpoint[][]> {
+    const detections = await this.prisma.observedSpotSymbol.findMany({
+      where: {
+        provider,
+        detectedAt: { not: null },
+        observationCheckpoints: {
+          some: { label: 'T+0', completedAt: { not: null } },
+        },
+      },
+      orderBy: [{ detectedAt: 'desc' }, { symbol: 'asc' }],
+      take: limit,
+      select: {
+        observationCheckpoints: {
+          where: { completedAt: { not: null } },
+          orderBy: [{ targetAt: 'asc' }, { label: 'asc' }],
+        },
+      },
+    });
+    return detections.map(({ observationCheckpoints }) =>
+      observationCheckpoints.map(toCompletedObservation),
+    );
+  }
+
   async listDueCheckpoints(
     dueAt: Date,
     limit: number,

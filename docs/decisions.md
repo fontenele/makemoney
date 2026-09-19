@@ -597,3 +597,9 @@ Missing `T+0` is represented as HTTP 503 because the detection exists but its re
 Observation completion can differ between detections, so the cohort calculator groups only actually available performance points. Every checkpoint carries its own sample size and outcome counts; a missing later observation is never forward-filled or treated as a flat return.
 
 Each detection contributes at most once, each checkpoint label at most once per detection, and averages use the same 40-digit half-even decimal context. This is descriptive price research only and does not classify an asset or infer executable profit.
+
+## M7.29 bound durable cohorts by eligible T+0 detections
+
+The durable cohort query selects only detected symbols with a completed `T+0`, because that explicit baseline is required by the existing performance contract. PostgreSQL applies newest-detection ordering and the 1–100 limit before loading completed timelines, keeping memory and query work bounded.
+
+Incomplete later checkpoints remain valid and contribute only where present. Loading, per-detection calculation, and cohort aggregation stay separate from HTTP exposure and derived persistence.

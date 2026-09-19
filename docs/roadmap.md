@@ -137,6 +137,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.26 — complete:** a pure exact-decimal calculator derives chronological absolute price changes and return rates from the explicit `T+0` observation baseline.
 - **M7.27 — complete:** a local read-only endpoint loads the durable timeline and exposes its T+0-relative price performance with explicit unavailable semantics.
 - **M7.28 — complete:** a pure cross-detection cohort calculator groups available returns by checkpoint and reports sample size, outcome counts, and exact-decimal average return.
+- **M7.29 — complete:** a bounded durable cohort query selects recent detections with a completed T+0 baseline and calculates aggregate checkpoint performance without exposing a route.
 
 ## M8 — Dashboard — planned
 

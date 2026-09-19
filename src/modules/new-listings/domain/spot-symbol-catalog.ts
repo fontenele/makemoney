@@ -86,6 +86,12 @@ export interface SpotSymbolRepository {
   ): Promise<
     import('./listing-observation-schedule').CompletedListingObservationCheckpoint[]
   >;
+  listCompletedObservationCohort(
+    provider: SpotSymbol['provider'],
+    limit: number,
+  ): Promise<
+    import('./listing-observation-schedule').CompletedListingObservationCheckpoint[][]
+  >;
   listDueCheckpoints(
     dueAt: Date,
     limit: number,

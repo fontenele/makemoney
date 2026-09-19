@@ -35,6 +35,64 @@ describe('SpotSymbolDetectionReadModelService', () => {
     ).resolves.toBeNull();
   });
 
+  it('loads a bounded durable cohort and calculates checkpoint performance', async () => {
+    const listCompletedObservationCohort = jest.fn(() =>
+      Promise.resolve([
+        [completedObservation()],
+        [
+          { ...completedObservation(), symbol: 'OTHERUSDT', lastPrice: '200' },
+          completedObservation({
+            symbol: 'OTHERUSDT',
+            label: 'T+5s',
+            offsetMs: 5_000,
+            lastPrice: '220',
+          }),
+        ],
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(service.getCohortPerformance('binance', 25)).resolves.toEqual({
+      provider: 'binance',
+      detectionCount: 2,
+      checkpoints: [
+        {
+          label: 'T+0',
+          offsetMs: 0,
+          sampleSize: 2,
+          positiveReturnCount: 0,
+          negativeReturnCount: 0,
+          flatReturnCount: 2,
+          averagePriceReturnRate: '0',
+        },
+        {
+          label: 'T+5s',
+          offsetMs: 5_000,
+          sampleSize: 1,
+          positiveReturnCount: 1,
+          negativeReturnCount: 0,
+          flatReturnCount: 0,
+          averagePriceReturnRate: '0.1',
+        },
+      ],
+    });
+    expect(listCompletedObservationCohort).toHaveBeenCalledWith('binance', 25);
+  });
+
+  it('rejects an invalid cohort limit before repository access', async () => {
+    const listCompletedObservationCohort = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(service.getCohortPerformance('binance', 0)).rejects.toThrow(
+      'cohort limit must be an integer from 1 to 100',
+    );
+    expect(listCompletedObservationCohort).not.toHaveBeenCalled();
+  });
+
   it('lists completed observations only for a durable detection', async () => {
     const observations = [{ label: 'T+0' }];
     const repository = repositoryWith({
@@ -145,6 +203,7 @@ function repositoryWith(overrides: Record<string, unknown> = {}) {
     findDetected: jest.fn(() => Promise.resolve(null)),
     listDetected: jest.fn(() => Promise.resolve([])),
     listCompletedObservations: jest.fn(() => Promise.resolve([])),
+    listCompletedObservationCohort: jest.fn(() => Promise.resolve([])),
     ...overrides,
   };
 }
@@ -162,7 +221,13 @@ function detection() {
   };
 }
 
-function completedObservation() {
+function completedObservation(
+  overrides: Partial<ReturnType<typeof baseCompletedObservation>> = {},
+) {
+  return { ...baseCompletedObservation(), ...overrides };
+}
+
+function baseCompletedObservation() {
   return {
     provider: 'binance' as const,
     symbol: 'NEWUSDT',
