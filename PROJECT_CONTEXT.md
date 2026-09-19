@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.35 load, persist, conservatively compare, periodically refresh, durably classify detections, expose filtered research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, expose completed timelines and exact performance, aggregate bounded cohorts, calculate and expose explicitly thresholded pump/correction classifications, aggregate their descriptive rates, and compose those statistics over a bounded durable cohort.
+- M6 is closed. M7.1–M7.36 load, persist, conservatively compare, periodically refresh, durably classify detections, expose filtered research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, expose completed timelines and exact performance, aggregate bounded cohorts, calculate and expose explicitly thresholded pump/correction classifications, aggregate their descriptive rates, compose those statistics over a bounded durable cohort, and expose that aggregate through a local read-only API.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -207,6 +207,8 @@ M7.33 exposes that classification at local read-only `GET /new-listings/:provide
 M7.34 aggregates same-threshold pattern classifications into explicit counts and exact pump/correction rates. Empty samples and correction-within-pump denominators remain explicit rather than being fabricated.
 
 M7.35 loads the bounded durable T+0-eligible cohort, applies one explicit valid threshold pair to each timeline, and aggregates the resulting classifications on demand without a route or derived persistence.
+
+M7.36 exposes that bounded aggregate at `GET /new-listings/classification`. Thresholds remain mandatory and explicit; the endpoint adds no default hypothesis or derived persistence.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

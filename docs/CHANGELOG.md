@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-19 — M7.36 pattern cohort API completed
+
+- Added local read-only `GET /new-listings/classification` over the bounded durable pattern cohort.
+- Required explicit positive pump and correction thresholds while retaining optional bounded limit and Binance provider input.
+- Added controller and route-level validation coverage and synchronized the root API route table.
+- Kept default hypotheses, derived persistence, scoring, alerts, signals, and trading outside this increment.
+- 594 unit tests across 71 suites and all 51 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.35 durable pattern cohort loading completed
 
 - Added internal bounded durable pattern-cohort calculation over recent detections with completed `T+0` observations.

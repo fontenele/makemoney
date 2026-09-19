@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-19 — Aggregate pattern classification has no implicit thresholds
+
+M7.36 mirrors the durable cohort-performance route at `GET /new-listings/classification`, but requires both research thresholds on every request. The API validates provider, limit, and thresholds before durable loading and returns the explicit empty aggregate when no detection has a completed T+0 observation. It does not persist results or establish a recommended market hypothesis.
+
 ## 2026-09-19 — Durable pattern cohorts reuse the existing T+0-eligible sample
 
 M7.35 reuses the M7.29 repository selection instead of creating a second cohort query: recent detections qualify only when their `T+0` observation is complete, and the 1–100 limit is applied before timelines are loaded. The read model validates the explicit shared thresholds before database access, classifies every eligible timeline on demand, and delegates rate denominators to the pure M7.34 calculator. No derived classifications or aggregates are persisted.

@@ -203,3 +203,9 @@ All rates use isolated 40-digit decimal arithmetic. Empty cohorts expose zero co
 The internal detection read model now loads the same bounded cohort of 1 through 100 recent durable Binance detections with completed `T+0` observations introduced by M7.29. It converts each completed timeline to exact price performance, applies one caller-supplied valid threshold pair, and aggregates the classifications through the M7.34 calculator.
 
 Limit and threshold validation run before repository access. An empty eligible sample preserves the explicit empty aggregate, and an incoherent repository result without `T+0` fails rather than silently changing eligibility. This increment adds no route, default thresholds, derived persistence, score, alert, signal, or trading behavior.
+
+## M7.36 pattern cohort API
+
+`GET /new-listings/classification` exposes the M7.35 durable pattern cohort through a local read-only route. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider is restricted to `binance`. Both positive decimal `pumpReturnRate` and `correctionFromPeakRate` are required, and the correction threshold cannot exceed one.
+
+Invalid query input returns `400` before durable loading, while an empty eligible cohort returns the explicit empty aggregate. The endpoint calculates on demand and adds no default thresholds, derived persistence, score, alert, signal, or trading behavior.

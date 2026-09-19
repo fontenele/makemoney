@@ -144,6 +144,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.33 — complete:** local read-only classification HTTP access requires explicit valid pump/correction thresholds and preserves unknown/unavailable semantics.
 - **M7.34 — complete:** a pure cohort calculator aggregates same-threshold classifications into observed pump/correction counts and exact rates with explicit denominators.
 - **M7.35 — complete:** the internal read model loads a bounded durable T+0-eligible cohort, applies explicit pump/correction thresholds to every timeline, and returns aggregate pattern statistics without HTTP exposure.
+- **M7.36 — complete:** local read-only `GET /new-listings/classification` exposes bounded durable pattern-cohort statistics with mandatory explicit pump and correction thresholds.
 
 ## M8 — Dashboard — planned
 

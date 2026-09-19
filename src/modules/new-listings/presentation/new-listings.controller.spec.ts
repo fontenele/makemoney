@@ -8,6 +8,54 @@ import {
 import { NewListingsController } from './new-listings.controller';
 
 describe('NewListingsController', () => {
+  it('returns durable pattern cohort statistics for explicit thresholds', async () => {
+    const cohort = {
+      provider: 'binance' as const,
+      classificationCount: 0,
+    };
+    const getPatternCohort = jest.fn(() => Promise.resolve(cohort));
+    const controller = new NewListingsController({ getPatternCohort });
+
+    await expect(
+      controller.patternCohort(undefined, undefined, '0.2', '0.25'),
+    ).resolves.toBe(cohort);
+    expect(getPatternCohort).toHaveBeenLastCalledWith('binance', 50, {
+      pumpReturnRate: '0.2',
+      correctionFromPeakRate: '0.25',
+    });
+
+    await controller.patternCohort('25', 'binance', '0.3', '0.1');
+    expect(getPatternCohort).toHaveBeenLastCalledWith('binance', 25, {
+      pumpReturnRate: '0.3',
+      correctionFromPeakRate: '0.1',
+    });
+  });
+
+  it.each([
+    [undefined, undefined, undefined, '0.25'],
+    [undefined, undefined, '0.2', undefined],
+    ['0', undefined, '0.2', '0.25'],
+    [undefined, 'other', '0.2', '0.25'],
+    [undefined, undefined, '0', '0.25'],
+    [undefined, undefined, '0.2', '1.1'],
+  ])(
+    'rejects invalid pattern cohort query %s/%s/%s/%s',
+    (limit, provider, pumpReturnRate, correctionFromPeakRate) => {
+      const getPatternCohort = jest.fn(() => Promise.resolve({}));
+      const controller = new NewListingsController({ getPatternCohort });
+
+      expect(() =>
+        controller.patternCohort(
+          limit,
+          provider,
+          pumpReturnRate,
+          correctionFromPeakRate,
+        ),
+      ).toThrow(BadRequestException);
+      expect(getPatternCohort).not.toHaveBeenCalled();
+    },
+  );
+
   it('returns durable pattern classification for explicit thresholds', async () => {
     const classification = {
       provider: 'binance' as const,
