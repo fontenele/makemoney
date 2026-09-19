@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-19 — Pattern magnitudes have a separate research endpoint
+
+M7.39 exposes medians at `GET /new-listings/classification/magnitudes` instead of silently expanding the M7.36 frequency response. The separate route keeps event-specific sample denominators visible and lets clients request magnitude research explicitly under the same mandatory thresholds, provider, and bounded cohort limit. Results remain calculated on demand and unpersisted.
+
 ## 2026-09-19 — Durable frequency and magnitude cohorts share classification composition
 
 M7.38 centralizes the internal sequence of cohort limit validation, explicit-threshold validation, durable T+0-eligible timeline loading, exact performance calculation, and classification. Both frequency and magnitude aggregation consume that same classification result shape, preventing their eligible populations or threshold semantics from drifting. Each API call still performs one bounded repository read, and no derived state is persisted.

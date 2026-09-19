@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-19 — M7.39 pattern magnitude API completed
+
+- Added local read-only `GET /new-listings/classification/magnitudes` over the bounded durable magnitude cohort.
+- Required explicit positive pump and correction thresholds while retaining optional bounded limit and Binance provider input.
+- Preserved independent event samples and synchronized the root API route table.
+- Kept default hypotheses, derived persistence, timing statistics, scoring, alerts, signals, and trading outside this increment.
+- 608 unit tests across 72 suites and all 52 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.38 durable pattern magnitude loading completed
 
 - Added internal bounded durable pattern-magnitude calculation over recent detections with completed `T+0` observations.

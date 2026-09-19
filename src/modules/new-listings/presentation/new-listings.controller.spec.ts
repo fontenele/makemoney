@@ -8,6 +8,61 @@ import {
 import { NewListingsController } from './new-listings.controller';
 
 describe('NewListingsController', () => {
+  it('returns durable pattern magnitude medians for explicit thresholds', async () => {
+    const magnitudes = {
+      provider: 'binance' as const,
+      pumpSampleSize: 0,
+      correctionSampleSize: 0,
+    };
+    const getPatternMagnitudeCohort = jest.fn(() =>
+      Promise.resolve(magnitudes),
+    );
+    const controller = new NewListingsController({
+      getPatternMagnitudeCohort,
+    });
+
+    await expect(
+      controller.patternMagnitudeCohort(undefined, undefined, '0.2', '0.25'),
+    ).resolves.toBe(magnitudes);
+    expect(getPatternMagnitudeCohort).toHaveBeenLastCalledWith('binance', 50, {
+      pumpReturnRate: '0.2',
+      correctionFromPeakRate: '0.25',
+    });
+
+    await controller.patternMagnitudeCohort('25', 'binance', '0.3', '0.1');
+    expect(getPatternMagnitudeCohort).toHaveBeenLastCalledWith('binance', 25, {
+      pumpReturnRate: '0.3',
+      correctionFromPeakRate: '0.1',
+    });
+  });
+
+  it.each([
+    [undefined, undefined, undefined, '0.25'],
+    [undefined, undefined, '0.2', undefined],
+    ['0', undefined, '0.2', '0.25'],
+    [undefined, 'other', '0.2', '0.25'],
+    [undefined, undefined, '0', '0.25'],
+    [undefined, undefined, '0.2', '1.1'],
+  ])(
+    'rejects invalid pattern magnitude query %s/%s/%s/%s',
+    (limit, provider, pumpReturnRate, correctionFromPeakRate) => {
+      const getPatternMagnitudeCohort = jest.fn(() => Promise.resolve({}));
+      const controller = new NewListingsController({
+        getPatternMagnitudeCohort,
+      });
+
+      expect(() =>
+        controller.patternMagnitudeCohort(
+          limit,
+          provider,
+          pumpReturnRate,
+          correctionFromPeakRate,
+        ),
+      ).toThrow(BadRequestException);
+      expect(getPatternMagnitudeCohort).not.toHaveBeenCalled();
+    },
+  );
+
   it('returns durable pattern cohort statistics for explicit thresholds', async () => {
     const cohort = {
       provider: 'binance' as const,

@@ -72,7 +72,7 @@ M7.32 loads and classifies one durable detection internally without persisting d
 
 M7.33 exposes explicit-threshold durable classification through a local read-only endpoint.
 
-M7.34 calculates descriptive pump/correction cohort counts and exact rates as a pure internal research rule. M7.35 composes that rule over the bounded durable T+0-eligible cohort, M7.36 exposes it through a local read-only route, M7.37 calculates exact median observed pattern magnitudes, and M7.38 composes those magnitudes over the durable cohort internally.
+M7.34 calculates descriptive pump/correction cohort counts and exact rates as a pure internal research rule. M7.35 composes that rule over the bounded durable T+0-eligible cohort, M7.36 exposes it through a local read-only route, M7.37 calculates exact median observed pattern magnitudes, M7.38 composes those magnitudes over the durable cohort, and M7.39 exposes them separately through a local read-only route.
 
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
@@ -116,6 +116,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.36 exposes the bounded aggregate at `GET /new-listings/classification` with optional provider/limit, mandatory explicit thresholds, fail-fast `400` validation, and no derived persistence.
 - M7.37 calculates median observed peak return and correction-from-peak rates with independent event sample sizes, exact even-sample averaging, explicit null empty samples, and threshold-coherence validation.
 - M7.38 reuses one validated 1–100 durable T+0 cohort classification pipeline for both frequency and magnitude aggregation, returning exact median magnitudes internally without another route or persistence.
+- M7.39 exposes `GET /new-listings/classification/magnitudes` with optional provider/limit, mandatory explicit thresholds, independent pump/correction samples, fail-fast `400` validation, and no derived persistence.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -255,18 +256,18 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-19 after M7.38:
+The following passed on 2026-09-19 after M7.39:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 601 tests passed across 72 suites
+- `npm test -- --runInBand` — 608 tests passed across 72 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
 The complete database-backed integration validation passed after E2E isolation:
 
-- `npm run test:e2e -- --runInBand` — all 51 tests passed across 4 suites in the disposable `crypto_trader_e2e` schema.
+- `npm run test:e2e -- --runInBand` — all 52 tests passed across 4 suites in the disposable `crypto_trader_e2e` schema.
 - The E2E global setup recreates and migrates only its dedicated schema; local application balances, executions, controls, signals, candles, and runs are not read or changed.
 - `npx prisma migrate deploy` — all fourteen migrations applied, including atomic checkpoint observation persistence
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
@@ -279,7 +280,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.38 are implemented and fully verified milestone increments.
+M0 through M7.39 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

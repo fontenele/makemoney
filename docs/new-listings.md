@@ -221,3 +221,9 @@ Odd samples select the middle exact-decimal value and even samples average their
 The internal detection read model now applies the M7.37 magnitude calculator to the same bounded cohort of 1 through 100 recent durable Binance detections with completed `T+0` observations. One shared internal composition validates limit and thresholds, loads timelines, derives exact performance, and classifies each detection before either frequency or magnitude aggregation.
 
 An empty eligible cohort preserves explicit null medians and zero event samples. Incoherent repository results still fail rather than weakening T+0 eligibility. This increment adds no route, default thresholds, derived persistence, score, alert, signal, or trading behavior.
+
+## M7.39 pattern magnitude API
+
+`GET /new-listings/classification/magnitudes` exposes the M7.38 durable magnitude calculation through a separate local read-only route. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider is restricted to `binance`. Both positive decimal pattern thresholds are mandatory, and the correction threshold cannot exceed one.
+
+The response preserves independent pump and correction sample sizes with null medians for absent event samples. Invalid query input returns `400` before durable loading. No default thresholds, derived persistence, timing statistics, scoring, alert, signal, or trading behavior is introduced.

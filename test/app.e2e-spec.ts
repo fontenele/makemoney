@@ -184,6 +184,13 @@ describe('Application (e2e)', () => {
     await request(server).get('/new-listings/classification').expect(400);
   });
 
+  it('/new-listings/classification/magnitudes (GET) requires thresholds', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(server)
+      .get('/new-listings/classification/magnitudes')
+      .expect(400);
+  });
+
   it('/new-listings/:provider/:symbol/observations validates identity', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     await request(server)
