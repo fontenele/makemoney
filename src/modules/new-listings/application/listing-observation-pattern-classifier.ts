@@ -16,17 +16,7 @@ export class ListingObservationPatternClassifier {
     performance: ListingObservationPricePerformance,
     thresholds: ListingObservationPatternThresholds,
   ): ListingObservationPatternClassification {
-    const pumpThreshold = positiveRate(
-      thresholds.pumpReturnRate,
-      'pump return rate',
-    );
-    const correctionThreshold = positiveRate(
-      thresholds.correctionFromPeakRate,
-      'correction from peak rate',
-    );
-    if (correctionThreshold.greaterThan(1)) {
-      throw new Error('Correction from peak rate must not exceed one');
-    }
+    const { pumpThreshold, correctionThreshold } = parseThresholds(thresholds);
     validatePerformance(performance);
 
     let pumpIndex = -1;
@@ -91,6 +81,27 @@ export class ListingObservationPatternClassifier {
       correction,
     };
   }
+}
+
+export function validateListingObservationPatternThresholds(
+  thresholds: ListingObservationPatternThresholds,
+): void {
+  parseThresholds(thresholds);
+}
+
+function parseThresholds(thresholds: ListingObservationPatternThresholds) {
+  const pumpThreshold = positiveRate(
+    thresholds.pumpReturnRate,
+    'pump return rate',
+  );
+  const correctionThreshold = positiveRate(
+    thresholds.correctionFromPeakRate,
+    'correction from peak rate',
+  );
+  if (correctionThreshold.greaterThan(1)) {
+    throw new Error('Correction from peak rate must not exceed one');
+  }
+  return { pumpThreshold, correctionThreshold };
 }
 
 function event(point: ListingObservationPricePerformance['points'][number]) {

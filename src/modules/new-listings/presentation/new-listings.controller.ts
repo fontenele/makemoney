@@ -23,6 +23,11 @@ import {
 import { CompletedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
 import { ListingObservationPricePerformance } from '../domain/listing-observation-price-performance';
 import { ListingObservationCohortPerformance } from '../domain/listing-observation-cohort-performance';
+import {
+  ListingObservationPatternClassification,
+  ListingObservationPatternThresholds,
+} from '../domain/listing-observation-pattern-classification';
+import { validateListingObservationPatternThresholds } from '../application/listing-observation-pattern-classifier';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -51,6 +56,38 @@ export class NewListingsController {
       const result = await this.detections.getPricePerformance(
         identity.provider,
         identity.symbol,
+      );
+      if (!result) {
+        throw new ServiceUnavailableException(
+          'T+0 listing observation is not available',
+        );
+      }
+      return result;
+    } catch (error) {
+      if (error instanceof DetectedSpotSymbolNotFoundError) {
+        throw new NotFoundException('detected symbol was not found');
+      }
+      throw error;
+    }
+  }
+
+  @Get(':provider/:symbol/classification')
+  async classification(
+    @Param('provider') provider: string,
+    @Param('symbol') symbol: string,
+    @Query('pumpReturnRate') pumpReturnRate?: string,
+    @Query('correctionFromPeakRate') correctionFromPeakRate?: string,
+  ): Promise<ListingObservationPatternClassification> {
+    const identity = validObservationIdentity(provider, symbol);
+    const thresholds = validPatternThresholds(
+      pumpReturnRate,
+      correctionFromPeakRate,
+    );
+    try {
+      const result = await this.detections.getPatternClassification(
+        identity.provider,
+        identity.symbol,
+        thresholds,
       );
       if (!result) {
         throw new ServiceUnavailableException(
@@ -148,6 +185,26 @@ function validObservationIdentity(provider: string, symbol: string) {
     );
   }
   return { provider: parsedProvider, symbol };
+}
+
+function validPatternThresholds(
+  pumpReturnRate?: string,
+  correctionFromPeakRate?: string,
+): ListingObservationPatternThresholds {
+  if (pumpReturnRate === undefined || correctionFromPeakRate === undefined) {
+    throw new BadRequestException(
+      'pumpReturnRate and correctionFromPeakRate are required',
+    );
+  }
+  const thresholds = { pumpReturnRate, correctionFromPeakRate };
+  try {
+    validateListingObservationPatternThresholds(thresholds);
+  } catch (error) {
+    throw new BadRequestException(
+      error instanceof Error ? error.message : 'invalid pattern thresholds',
+    );
+  }
+  return thresholds;
 }
 
 function validFilters(

@@ -141,6 +141,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.30 — complete:** local read-only `GET /new-listings/performance` exposes the bounded durable cohort calculation with strict provider and limit validation.
 - **M7.31 — complete:** a pure exact-decimal classifier detects an explicitly thresholded observed pump and subsequent correction from the running post-pump peak.
 - **M7.32 — complete:** the internal read model loads one durable detection timeline and composes exact performance with explicit pump/correction classification.
+- **M7.33 — complete:** local read-only classification HTTP access requires explicit valid pump/correction thresholds and preserves unknown/unavailable semantics.
 
 ## M8 — Dashboard — planned
 

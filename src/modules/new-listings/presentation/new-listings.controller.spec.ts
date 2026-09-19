@@ -8,6 +8,69 @@ import {
 import { NewListingsController } from './new-listings.controller';
 
 describe('NewListingsController', () => {
+  it('returns durable pattern classification for explicit thresholds', async () => {
+    const classification = {
+      provider: 'binance' as const,
+      symbol: 'NEWUSDT',
+      status: 'no-pump-observed' as const,
+    };
+    const getPatternClassification = jest.fn(() =>
+      Promise.resolve(classification),
+    );
+    const controller = new NewListingsController({ getPatternClassification });
+
+    await expect(
+      controller.classification('binance', 'NEWUSDT', '0.2', '0.25'),
+    ).resolves.toBe(classification);
+    expect(getPatternClassification).toHaveBeenCalledWith(
+      'binance',
+      'NEWUSDT',
+      { pumpReturnRate: '0.2', correctionFromPeakRate: '0.25' },
+    );
+  });
+
+  it.each([
+    [undefined, '0.25'],
+    ['0.2', undefined],
+    ['0', '0.25'],
+    ['0.2', '1.1'],
+  ])(
+    'rejects invalid classification thresholds %s/%s before loading',
+    async (pumpReturnRate, correctionFromPeakRate) => {
+      const getPatternClassification = jest.fn(() => Promise.resolve(null));
+      const controller = new NewListingsController({
+        getPatternClassification,
+      });
+      await expect(
+        controller.classification(
+          'binance',
+          'NEWUSDT',
+          pumpReturnRate,
+          correctionFromPeakRate,
+        ),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(getPatternClassification).not.toHaveBeenCalled();
+    },
+  );
+
+  it('maps unavailable and unknown classification identities explicitly', async () => {
+    const unavailable = new NewListingsController({
+      getPatternClassification: jest.fn(() => Promise.resolve(null)),
+    });
+    await expect(
+      unavailable.classification('binance', 'NEWUSDT', '0.2', '0.25'),
+    ).rejects.toThrow('T+0 listing observation is not available');
+
+    const missing = new NewListingsController({
+      getPatternClassification: jest.fn(() =>
+        Promise.reject(new DetectedSpotSymbolNotFoundError()),
+      ),
+    });
+    await expect(
+      missing.classification('binance', 'UNKNOWNUSDT', '0.2', '0.25'),
+    ).rejects.toThrow('detected symbol was not found');
+  });
+
   it('returns recent durable cohort performance with bounded input', async () => {
     const cohort = {
       provider: 'binance' as const,

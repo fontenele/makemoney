@@ -185,3 +185,9 @@ The result explicitly distinguishes `no-pump-observed`, `pump-observed`, and `pu
 The internal detection read model now composes one durable completed observation timeline through the existing exact T+0 performance calculator and the M7.31 explicit-threshold pattern classifier. Unknown detections preserve the existing not-found behavior, while a known detection without completed `T+0` returns classification unavailable.
 
 Classification remains calculated on demand and is not persisted. This increment adds no HTTP route, default thresholds, cohort classification statistics, score, alert, signal, or trading behavior.
+
+## M7.33 pattern classification API
+
+`GET /new-listings/:provider/:symbol/classification` exposes the M7.32 durable on-demand classification. Both `pumpReturnRate` and `correctionFromPeakRate` are required positive decimal query parameters, and the correction threshold cannot exceed one. Invalid identity or thresholds return `400` before durable observation loading.
+
+An unknown detection returns `404`, while a known detection without completed `T+0` returns `503`. The endpoint introduces no default thresholds, derived persistence, cohort classification statistics, score, alert, signal, or trading behavior.

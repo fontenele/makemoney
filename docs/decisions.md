@@ -621,3 +621,9 @@ Statuses use “observed” deliberately: an incomplete timeline with no qualify
 Pattern classification reuses the existing durable timeline and price-performance calculation instead of storing another mutable projection. This keeps one source of truth and lets newly completed checkpoints affect the next calculation immediately.
 
 A known detection without T+0 has no valid classification baseline and remains explicitly unavailable. Thresholds stay caller-supplied; this internal composition does not choose a market hypothesis or expose it publicly.
+
+## M7.33 require thresholds on every classification request
+
+The classification route has no implicit market hypothesis: clients must supply both positive decimal thresholds on every request. Shared validation rejects malformed criteria before database access, and a correction threshold above one is invalid because a positive price cannot fall by more than its entire peak value.
+
+The route mirrors existing detection semantics: malformed input is 400, unknown identity is 404, and missing T+0 is 503. Results remain calculated on demand and read-only.

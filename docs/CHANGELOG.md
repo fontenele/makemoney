@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-19 — M7.33 pattern classification API completed
+
+- Added local read-only `GET /new-listings/:provider/:symbol/classification` with mandatory explicit pump and correction thresholds.
+- Shared exact threshold validation before durable loading and preserved `400`, `404`, and `503` semantics.
+- Updated the root API route table and kept defaults, derived persistence, cohort classification statistics, scoring, alerts, signals, and trading out of scope.
+- 581 unit tests across 70 suites and all 50 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.32 durable pattern classification completed
 
 - Composed durable completed observation loading, exact T+0 performance, and explicit-threshold pattern classification in the internal read model.
