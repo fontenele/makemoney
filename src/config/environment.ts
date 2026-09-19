@@ -8,6 +8,7 @@ interface Environment {
   BINANCE_WS_BASE_URL: string;
   BINANCE_REST_BASE_URL: string;
   NEW_LISTINGS_POLL_INTERVAL_MS: number;
+  NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED: boolean;
   NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: number;
   NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: number;
   NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS: number;
@@ -48,6 +49,7 @@ const environmentSchema = Joi.object<Environment>({
     .integer()
     .min(5000)
     .default(60000),
+  NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED: Joi.boolean().default(false),
   NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: Joi.number()
     .integer()
     .min(1000)

@@ -1,4 +1,5 @@
 export interface ListingObservationCheckpointWorkerOptions {
+  enabled: boolean;
   intervalMs: number;
   batchSize: number;
   leaseDurationMs: number;

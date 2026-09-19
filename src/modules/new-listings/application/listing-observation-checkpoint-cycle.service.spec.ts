@@ -7,7 +7,12 @@ const claimedAt = new Date('2026-09-14T12:00:00.000Z');
 const claimExpiresAt = new Date('2026-09-14T12:00:30.000Z');
 
 describe('ListingObservationCheckpointCycleService', () => {
-  const options = { intervalMs: 5000, batchSize: 25, leaseDurationMs: 30000 };
+  const options = {
+    enabled: false,
+    intervalMs: 5000,
+    batchSize: 25,
+    leaseDurationMs: 30000,
+  };
 
   it('claims one bounded batch and completes successful processing sequentially', async () => {
     const claimDue = jest.fn(() =>

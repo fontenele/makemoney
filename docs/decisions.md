@@ -567,3 +567,9 @@ PostgreSQL independently requires all observation fields to be absent while inco
 The production checkpoint processor performs only one translation: claimed provider/symbol identity becomes a provider-neutral market-observation request. It returns the observation without completing the checkpoint itself, preserving the cycle as the sole coordinator of processing and ownership-safe completion.
 
 Provider errors are not swallowed or retried by the processor. They flow to the cycle's per-item isolation, and the durable lease remains the recovery clock. Automatic cadence and shutdown cancellation remain separate from this wiring increment.
+
+## M7.24 opt in before starting durable external collection
+
+The lifecycle worker uses completion-relative recursive timers rather than a fixed interval, so slow cycles cannot overlap within one process. Shutdown prevents another timer and waits for the current bounded cycle, while cycle-level failure is logged and does not permanently stop scheduling.
+
+Activation is an explicit startup setting that defaults to disabled. Although collection is public and read-only at Binance, it claims and completes durable local work; an upgrade must not begin that behavior silently. Enabling the worker does not grant any trading capability.

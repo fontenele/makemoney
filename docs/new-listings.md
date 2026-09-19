@@ -131,3 +131,9 @@ The cycle service passes the observation returned by the checkpoint processor di
 The production processor now maps each claimed checkpoint's provider and symbol into the M7.20 observation-provider request and returns that snapshot to the existing cycle. The Binance implementation remains behind the provider-neutral interface, so orchestration contains no exchange-specific payload logic.
 
 Provider failures are intentionally propagated to the cycle, which isolates the failed item and leaves its lease to expire under the existing recovery rule. The processor is registered for dependency injection but no lifecycle hook or timer calls the cycle yet.
+
+## M7.24 opt-in checkpoint worker lifecycle
+
+A NestJS lifecycle worker can now invoke the production cycle at the validated configured interval. It uses recursive one-shot timers after each cycle settles, preventing overlap even when provider or database work lasts longer than the configured quiet period. Cycle-level failures are logged and followed by the next scheduled attempt.
+
+`NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED` defaults to `false`. Existing installations therefore retain inactive behavior until an operator explicitly opts into public market collection. Shutdown clears a pending timer and waits for an in-flight bounded cycle before completing; retries, alerting, scoring, signals, and trading remain outside this increment.

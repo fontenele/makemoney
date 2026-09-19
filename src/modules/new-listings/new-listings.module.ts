@@ -22,6 +22,7 @@ import {
 } from './domain/listing-market-observation';
 import { BinanceListingMarketObservationClient } from './infrastructure/binance-listing-market-observation.client';
 import { ProviderListingObservationCheckpointProcessor } from './application/provider-listing-observation-checkpoint.processor';
+import { ListingObservationCheckpointWorker } from './application/listing-observation-checkpoint.worker';
 
 @Module({
   controllers: [NewListingsController],
@@ -64,6 +65,9 @@ import { ProviderListingObservationCheckpointProcessor } from './application/pro
       useFactory: (
         config: ConfigService,
       ): ListingObservationCheckpointWorkerOptions => ({
+        enabled: config.getOrThrow<boolean>(
+          'NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED',
+        ),
         intervalMs: config.getOrThrow<number>(
           'NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS',
         ),
@@ -85,6 +89,19 @@ import { ProviderListingObservationCheckpointProcessor } from './application/pro
         checkpoints: DueListingObservationCheckpointService,
         options: ListingObservationCheckpointWorkerOptions,
       ) => new ListingObservationCheckpointCycleService(checkpoints, options),
+    },
+    {
+      provide: ListingObservationCheckpointWorker,
+      inject: [
+        ListingObservationCheckpointCycleService,
+        ProviderListingObservationCheckpointProcessor,
+        LISTING_OBSERVATION_CHECKPOINT_WORKER_OPTIONS,
+      ],
+      useFactory: (
+        cycle: ListingObservationCheckpointCycleService,
+        processor: ProviderListingObservationCheckpointProcessor,
+        options: ListingObservationCheckpointWorkerOptions,
+      ) => new ListingObservationCheckpointWorker(cycle, processor, options),
     },
   ],
   exports: [SpotSymbolCatalogService],

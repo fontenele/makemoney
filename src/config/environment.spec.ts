@@ -99,6 +99,7 @@ describe('validateEnvironment new-listing polling', () => {
 describe('validateEnvironment new-listing checkpoint worker', () => {
   it('uses bounded operational defaults', () => {
     expect(validateEnvironment(required)).toMatchObject({
+      NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED: false,
       NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: 5000,
       NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: 25,
       NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS: 30000,
@@ -109,11 +110,13 @@ describe('validateEnvironment new-listing checkpoint worker', () => {
     expect(
       validateEnvironment({
         ...required,
+        NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED: 'true',
         NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: '1000',
         NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: '100',
         NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS: '300000',
       }),
     ).toMatchObject({
+      NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED: true,
       NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: 1000,
       NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: 100,
       NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS: 300000,
