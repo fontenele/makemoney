@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-19 — M7.23 provider-backed checkpoint processor completed
+
+- Added an injected production processor that maps each claimed checkpoint to the provider-neutral public market-observation request.
+- Preserved cycle-owned completion and propagated provider failures to existing per-item isolation and lease-expiry recovery.
+- Kept background scheduling inactive; no checkpoint is claimed automatically.
+- 540 unit tests across 66 suites and all 46 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.22 durable checkpoint market observation completed
 
 - Persisted each validated market observation atomically with ownership-safe checkpoint completion.

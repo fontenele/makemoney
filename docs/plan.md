@@ -1715,7 +1715,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.22 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.23 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -2308,6 +2308,7 @@ M7.19 Deterministic Single Checkpoint Cycle: DONE
 M7.20 Exact Checkpoint Market Observation: DONE
 M7.21 Public Binance Market Observation Adapter: DONE
 M7.22 Durable Checkpoint Market Observation: DONE
+M7.23 Provider-Backed Checkpoint Processor: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2326,5 +2327,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7.22 is complete. Select the next bounded M7 increment; production checkpoint processing, worker scheduling, retries, alerts, scoring, signals, and trading remain separate decisions.
+M7.23 is complete. Select the next bounded M7 increment; worker scheduling, retries, alerts, scoring, signals, and trading remain separate decisions.
 ```

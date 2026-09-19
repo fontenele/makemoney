@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.22 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, durably schedule/lease/complete observation checkpoints, orchestrate an inactive bounded processing cycle, load validated public Binance rolling-ticker snapshots on demand, and persist validated observations atomically with checkpoint completion.
+- M6 is closed. M7.1–M7.23 load, persist, conservatively compare, periodically refresh, durably classify, expose filtered detection research reads, durably schedule/lease/complete observation checkpoints, orchestrate an inactive bounded processing cycle, load validated public Binance rolling-ticker snapshots on demand, persist observations atomically, and provide an inactive production checkpoint processor.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -181,6 +181,8 @@ M7.20 defines and validates the provider-neutral market snapshot required by a c
 M7.21 implements that boundary with the unauthenticated public Binance Spot 24-hour ticker endpoint for one explicitly validated symbol. Responses are normalized and domain-validated with a ten-second timeout and caller cancellation; no checkpoint invokes the client automatically and no observation is persisted.
 
 M7.22 stores a validated market observation in the same ownership-checked update that completes its checkpoint. Database constraints require an all-or-none observation payload on completion, while legacy lifecycle-only completions are reopened for future real collection. No production processor or timer invokes this flow automatically.
+
+M7.23 provides the production processor that maps a claimed checkpoint to the provider-neutral observation request and returns the validated public snapshot to the cycle. It propagates provider failure to the cycle's existing lease-expiry recovery policy, but no timer invokes the processor automatically.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

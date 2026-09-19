@@ -561,3 +561,9 @@ The adapter applies the same ten-second request ceiling as the catalog client an
 A checkpoint is meaningful for research only when its market sample exists. Completion therefore writes the validated observation and `completedAt` in one conditional PostgreSQL update under the existing active-lease token. A stale owner cannot store data, and a completed checkpoint cannot contain a partial sample.
 
 PostgreSQL independently requires all observation fields to be absent while incomplete or fully present and internally coherent when complete. Lifecycle-only completions created before this schema existed cannot be honestly backfilled, so the migration reopens them and clears their expired ownership fields for future collection rather than fabricating market data.
+
+## M7.23 keep provider loading behind the cycle processor boundary
+
+The production checkpoint processor performs only one translation: claimed provider/symbol identity becomes a provider-neutral market-observation request. It returns the observation without completing the checkpoint itself, preserving the cycle as the sole coordinator of processing and ownership-safe completion.
+
+Provider errors are not swallowed or retried by the processor. They flow to the cycle's per-item isolation, and the durable lease remains the recovery clock. Automatic cadence and shutdown cancellation remain separate from this wiring increment.

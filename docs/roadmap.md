@@ -131,6 +131,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.20 — complete:** a provider-neutral checkpoint market-observation contract preserves exact decimal price and volumes and validates symbol, trade count, provider-window, and receive-time invariants without loading or persisting data.
 - **M7.21 — complete:** an inactive public Binance Spot adapter loads one explicitly named symbol's rolling 24-hour ticker with timeout, cancellation, strict payload validation, and exact decimal normalization.
 - **M7.22 — complete:** atomic checkpoint completion persists validated market observations (`lastPrice`, `baseVolume`, `quoteVolume`, `tradeCount`, `windowOpenTime`, `windowCloseTime`, `receivedAt`) in PostgreSQL with database consistency constraints.
+- **M7.23 — complete:** an injected production checkpoint processor maps claimed provider/symbol identity to the public observation provider while preserving the cycle's failure isolation and without activating background work.
 
 ## M8 — Dashboard — planned
 

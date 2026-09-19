@@ -125,3 +125,9 @@ Requests have a ten-second timeout and compose caller cancellation. Non-success 
 `listing_observation_checkpoints` now stores `lastPrice`, `baseVolume`, `quoteVolume`, `tradeCount`, `windowOpenTime`, `windowCloseTime`, and `receivedAt` alongside `completedAt`. The application completion command validates the matching observation before persistence, and PostgreSQL enforces that all observation fields are either completely absent on uncompleted checkpoints or fully populated and consistent when completed. Lifecycle-only completions from before this schema are reopened without fabricated data so a future processor can collect them honestly.
 
 The cycle service passes the observation returned by the checkpoint processor directly to ownership-safe completion. A production processor, background timer, retries, alerts, scoring, signals, and trading remain separate increments.
+
+## M7.23 provider-backed checkpoint processor
+
+The production processor now maps each claimed checkpoint's provider and symbol into the M7.20 observation-provider request and returns that snapshot to the existing cycle. The Binance implementation remains behind the provider-neutral interface, so orchestration contains no exchange-specific payload logic.
+
+Provider failures are intentionally propagated to the cycle, which isolates the failed item and leaves its lease to expire under the existing recovery rule. The processor is registered for dependency injection but no lifecycle hook or timer calls the cycle yet.
