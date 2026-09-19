@@ -209,3 +209,9 @@ Limit and threshold validation run before repository access. An empty eligible s
 `GET /new-listings/classification` exposes the M7.35 durable pattern cohort through a local read-only route. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider is restricted to `binance`. Both positive decimal `pumpReturnRate` and `correctionFromPeakRate` are required, and the correction threshold cannot exceed one.
 
 Invalid query input returns `400` before durable loading, while an empty eligible cohort returns the explicit empty aggregate. The endpoint calculates on demand and adds no default thresholds, derived persistence, score, alert, signal, or trading behavior.
+
+## M7.37 pattern magnitude medians
+
+A pure calculator now reports the median observed peak return among pump classifications and the median observed drawdown from peak among corrected classifications. Each statistic exposes its own sample size, so uncorrected pumps contribute to peak magnitude without being treated as zero corrections.
+
+Odd samples select the middle exact-decimal value and even samples average their two middle values under the isolated 40-digit decimal policy. Empty denominators remain null, and magnitudes below the thresholds that produced their classifications fail explicitly. This increment adds no durable loading, route, persistence, score, alert, signal, or trading behavior.

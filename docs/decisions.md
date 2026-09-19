@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-19 — Pattern magnitude medians use event-specific samples
+
+M7.37 measures peak-return magnitude only among classifications with an observed pump and correction magnitude only among classifications with an observed correction. Missing events are excluded rather than converted to zero, and each median therefore publishes its own sample size. Even samples average the two middle exact-decimal values; no floating-point arithmetic, interpolation, persistence, or default hypothesis is introduced.
+
 ## 2026-09-19 — Aggregate pattern classification has no implicit thresholds
 
 M7.36 mirrors the durable cohort-performance route at `GET /new-listings/classification`, but requires both research thresholds on every request. The API validates provider, limit, and thresholds before durable loading and returns the explicit empty aggregate when no detection has a completed T+0 observation. It does not persist results or establish a recommended market hypothesis.

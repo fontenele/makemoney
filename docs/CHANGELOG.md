@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-19 — M7.37 pattern magnitude medians completed
+
+- Added pure exact-decimal median peak-return and correction-from-peak statistics over classified listing cohorts.
+- Kept independent pump and correction sample sizes and explicit null results when an event sample is absent.
+- Added odd/even median coverage and rejected observed magnitudes that contradict their classification thresholds.
+- Kept durable loading, HTTP exposure, persistence, scoring, alerts, signals, and trading outside this increment.
+- 598 unit tests across 72 suites and all 51 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.36 pattern cohort API completed
 
 - Added local read-only `GET /new-listings/classification` over the bounded durable pattern cohort.
