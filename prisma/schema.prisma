@@ -116,27 +116,45 @@ model ObservedSpotSymbol {
 }
 
 model ListingObservationCheckpoint {
-  provider        String             @db.VarChar(30)
-  symbol          String             @db.VarChar(30)
-  label           String             @db.VarChar(10)
-  offsetMs        Int                @map("offset_ms")
-  targetAt        DateTime           @map("target_at")
-  claimToken      String?            @map("claim_token") @db.VarChar(100)
-  claimedAt       DateTime?          @map("claimed_at")
-  claimExpiresAt  DateTime?          @map("claim_expires_at")
-  completedAt     DateTime?          @map("completed_at")
-  lastPrice       Decimal?           @map("last_price") @db.Decimal(38, 18)
-  baseVolume      Decimal?           @map("base_volume") @db.Decimal(38, 18)
-  quoteVolume     Decimal?           @map("quote_volume") @db.Decimal(38, 18)
-  tradeCount      BigInt?            @map("trade_count")
-  windowOpenTime  DateTime?          @map("window_open_time")
-  windowCloseTime DateTime?          @map("window_close_time")
-  receivedAt      DateTime?          @map("received_at")
-  createdAt       DateTime           @default(now()) @map("created_at")
-  detection       ObservedSpotSymbol @relation(fields: [provider, symbol], references: [provider, symbol], onDelete: Cascade)
+  provider        String                      @db.VarChar(30)
+  symbol          String                      @db.VarChar(30)
+  label           String                      @db.VarChar(10)
+  offsetMs        Int                         @map("offset_ms")
+  targetAt        DateTime                    @map("target_at")
+  claimToken      String?                     @map("claim_token") @db.VarChar(100)
+  claimedAt       DateTime?                   @map("claimed_at")
+  claimExpiresAt  DateTime?                   @map("claim_expires_at")
+  completedAt     DateTime?                   @map("completed_at")
+  lastPrice       Decimal?                    @map("last_price") @db.Decimal(38, 18)
+  baseVolume      Decimal?                    @map("base_volume") @db.Decimal(38, 18)
+  quoteVolume     Decimal?                    @map("quote_volume") @db.Decimal(38, 18)
+  tradeCount      BigInt?                     @map("trade_count")
+  windowOpenTime  DateTime?                   @map("window_open_time")
+  windowCloseTime DateTime?                   @map("window_close_time")
+  receivedAt      DateTime?                   @map("received_at")
+  createdAt       DateTime                    @default(now()) @map("created_at")
+  detection       ObservedSpotSymbol          @relation(fields: [provider, symbol], references: [provider, symbol], onDelete: Cascade)
+  topOfBook       ListingCheckpointTopOfBook?
 
   @@id([provider, symbol, label])
   @@index([targetAt, provider, symbol, label])
   @@index([claimExpiresAt, targetAt, provider, symbol, label])
   @@map("listing_observation_checkpoints")
+}
+
+model ListingCheckpointTopOfBook {
+  provider    String                       @db.VarChar(30)
+  symbol      String                       @db.VarChar(30)
+  label       String                       @db.VarChar(10)
+  updateId    String                       @map("update_id") @db.Text
+  bidPrice    String                       @map("bid_price") @db.Text
+  bidQuantity String                       @map("bid_quantity") @db.Text
+  askPrice    String                       @map("ask_price") @db.Text
+  askQuantity String                       @map("ask_quantity") @db.Text
+  receivedAt  DateTime                     @map("received_at")
+  createdAt   DateTime                     @default(now()) @map("created_at")
+  checkpoint  ListingObservationCheckpoint @relation(fields: [provider, symbol, label], references: [provider, symbol, label], onDelete: Cascade)
+
+  @@id([provider, symbol, label])
+  @@map("listing_checkpoint_top_of_books")
 }

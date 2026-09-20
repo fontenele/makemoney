@@ -30,6 +30,8 @@ import {
 import { BinanceListingTopOfBookClient } from './infrastructure/binance-listing-top-of-book.client';
 import { ListingTopOfBookSnapshotService } from './application/listing-top-of-book-snapshot.service';
 import { ListingTopOfBookSpreadCalculator } from './application/listing-top-of-book-spread-calculator';
+import { LISTING_TOP_OF_BOOK_OBSERVATION_REPOSITORY } from './domain/listing-top-of-book-observation-repository';
+import { PrismaListingTopOfBookObservationRepository } from './infrastructure/prisma-listing-top-of-book-observation.repository';
 
 @Module({
   controllers: [NewListingsController],
@@ -61,6 +63,10 @@ import { ListingTopOfBookSpreadCalculator } from './application/listing-top-of-b
         ),
     },
     ListingTopOfBookSpreadCalculator,
+    {
+      provide: LISTING_TOP_OF_BOOK_OBSERVATION_REPOSITORY,
+      useClass: PrismaListingTopOfBookObservationRepository,
+    },
     {
       provide: ListingTopOfBookSnapshotService,
       inject: [

@@ -128,6 +128,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.48 loads an explicit symbol through the public Binance depth snapshot with limit 5, retains only the best level and `lastUpdateId`, and remains unwired from all active lifecycle paths.
 - M7.49 registers that snapshot adapter behind the provider-neutral dependency token, using the existing Binance REST base URL while retaining no active consumer.
 - M7.50 provides an explicitly invoked internal composition that loads one top-of-book snapshot and derives exact spread metrics, with no automatic collection or storage.
+- M7.51 stores at most one immutable exact-text top-of-book observation per existing checkpoint through a provider-neutral repository, without changing checkpoint completion or worker behavior.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -267,12 +268,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-20 after M7.50:
+The following passed on 2026-09-20 after M7.51:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 668 tests passed across 79 suites
+- `npm test -- --runInBand` — 670 tests passed across 80 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -280,7 +281,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 - `npm run test:e2e -- --runInBand` — all 52 tests passed across 4 suites in the disposable `crypto_trader_e2e` schema.
 - The E2E global setup recreates and migrates only its dedicated schema; local application balances, executions, controls, signals, candles, and runs are not read or changed.
-- `npx prisma migrate deploy` — all fourteen migrations applied, including atomic checkpoint observation persistence
+- `npx prisma migrate deploy` — all fifteen migrations applied, including exact checkpoint top-of-book storage
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live Binance historical-candle smoke test — the public market-data-only kline endpoint returned ordered BTCUSDT one-minute rows with the documented 12 fields and no credentials
@@ -291,7 +292,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.50 are implemented and fully verified milestone increments.
+M0 through M7.51 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

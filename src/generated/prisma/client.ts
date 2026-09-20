@@ -79,3 +79,8 @@ export type ObservedSpotSymbol = Prisma.ObservedSpotSymbolModel
  * 
  */
 export type ListingObservationCheckpoint = Prisma.ListingObservationCheckpointModel
+/**
+ * Model ListingCheckpointTopOfBook
+ * 
+ */
+export type ListingCheckpointTopOfBook = Prisma.ListingCheckpointTopOfBookModel

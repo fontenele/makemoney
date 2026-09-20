@@ -293,3 +293,9 @@ The registration is inert by itself: no service injects the token, no request st
 An internal application service now composes the provider-neutral top-of-book loader with the exact spread calculator. A caller must explicitly supply the provider and canonical symbol; the service forwards optional cancellation, loads exactly one snapshot, and returns spread, midpoint, and basis points tied to that same update ID and receive time.
 
 Provider failure is propagated and prevents calculation. The service is available through dependency injection but nothing invokes it automatically, and it adds no persistence, checkpoint integration, route, scoring, alert, signal, or trading behavior.
+
+## M7.51 durable checkpoint top-of-book storage
+
+Each existing observation checkpoint can now own at most one optional top-of-book record. The child row uses the checkpoint's provider, symbol, and schedule label as its immutable primary and foreign key, and deletion of the parent detection/checkpoint cascades naturally.
+
+Update ID, bid/ask prices, and displayed quantities remain their exact validated strings rather than being rounded to a database decimal scale. Database constraints independently enforce canonical numeric shapes, positive prices, non-negative quantities, and a non-crossed book. The create-only provider-neutral repository rejects observation/checkpoint identity mismatches before database access. It is registered for later use but the worker does not invoke it, so no automatic collection, HTTP route, scoring, alert, signal, or trading behavior is added.

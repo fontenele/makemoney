@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Checkpoint top-of-book storage is separate and immutable
+
+M7.51 stores top-of-book observations in an optional child table keyed by the existing checkpoint identity instead of expanding the checkpoint's completion invariant. This lets historical completed ticker observations remain valid and prevents top-of-book collection from silently redefining completion.
+
+Update IDs, prices, and quantities are stored as validated text so persistence does not truncate the provider-neutral decimal contract. PostgreSQL enforces the decimal shapes, positive prices, non-negative quantities, and non-crossed books. Create-only repository behavior makes a checkpoint snapshot immutable; worker integration remains separate.
+
 ## 2026-09-20 — Top-of-book loading and spread calculation compose internally
 
 M7.50 introduces one small application service that delegates snapshot loading to the provider-neutral boundary and exact arithmetic to the existing spread calculator. The service passes caller cancellation unchanged, propagates provider failure, and cannot calculate when no observation was loaded.

@@ -58,7 +58,8 @@ export const ModelName = {
   HistoricalCandleRecord: 'HistoricalCandleRecord',
   BacktestRun: 'BacktestRun',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
-  ListingObservationCheckpoint: 'ListingObservationCheckpoint'
+  ListingObservationCheckpoint: 'ListingObservationCheckpoint',
+  ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -204,6 +205,22 @@ export const ListingObservationCheckpointScalarFieldEnum = {
 } as const
 
 export type ListingObservationCheckpointScalarFieldEnum = (typeof ListingObservationCheckpointScalarFieldEnum)[keyof typeof ListingObservationCheckpointScalarFieldEnum]
+
+
+export const ListingCheckpointTopOfBookScalarFieldEnum = {
+  provider: 'provider',
+  symbol: 'symbol',
+  label: 'label',
+  updateId: 'updateId',
+  bidPrice: 'bidPrice',
+  bidQuantity: 'bidQuantity',
+  askPrice: 'askPrice',
+  askQuantity: 'askQuantity',
+  receivedAt: 'receivedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ListingCheckpointTopOfBookScalarFieldEnum = (typeof ListingCheckpointTopOfBookScalarFieldEnum)[keyof typeof ListingCheckpointTopOfBookScalarFieldEnum]
 
 
 export const SortOrder = {

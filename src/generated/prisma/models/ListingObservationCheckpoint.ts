@@ -329,6 +329,7 @@ export type ListingObservationCheckpointWhereInput = {
   receivedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ListingObservationCheckpoint"> | Date | string
   detection?: Prisma.XOR<Prisma.ObservedSpotSymbolScalarRelationFilter, Prisma.ObservedSpotSymbolWhereInput>
+  topOfBook?: Prisma.XOR<Prisma.ListingCheckpointTopOfBookNullableScalarRelationFilter, Prisma.ListingCheckpointTopOfBookWhereInput> | null
 }
 
 export type ListingObservationCheckpointOrderByWithRelationInput = {
@@ -350,6 +351,7 @@ export type ListingObservationCheckpointOrderByWithRelationInput = {
   receivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   detection?: Prisma.ObservedSpotSymbolOrderByWithRelationInput
+  topOfBook?: Prisma.ListingCheckpointTopOfBookOrderByWithRelationInput
 }
 
 export type ListingObservationCheckpointWhereUniqueInput = Prisma.AtLeast<{
@@ -375,6 +377,7 @@ export type ListingObservationCheckpointWhereUniqueInput = Prisma.AtLeast<{
   receivedAt?: Prisma.DateTimeNullableFilter<"ListingObservationCheckpoint"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ListingObservationCheckpoint"> | Date | string
   detection?: Prisma.XOR<Prisma.ObservedSpotSymbolScalarRelationFilter, Prisma.ObservedSpotSymbolWhereInput>
+  topOfBook?: Prisma.XOR<Prisma.ListingCheckpointTopOfBookNullableScalarRelationFilter, Prisma.ListingCheckpointTopOfBookWhereInput> | null
 }, "provider_symbol_label">
 
 export type ListingObservationCheckpointOrderByWithAggregationInput = {
@@ -442,6 +445,7 @@ export type ListingObservationCheckpointCreateInput = {
   receivedAt?: Date | string | null
   createdAt?: Date | string
   detection: Prisma.ObservedSpotSymbolCreateNestedOneWithoutObservationCheckpointsInput
+  topOfBook?: Prisma.ListingCheckpointTopOfBookCreateNestedOneWithoutCheckpointInput
 }
 
 export type ListingObservationCheckpointUncheckedCreateInput = {
@@ -462,6 +466,7 @@ export type ListingObservationCheckpointUncheckedCreateInput = {
   windowCloseTime?: Date | string | null
   receivedAt?: Date | string | null
   createdAt?: Date | string
+  topOfBook?: Prisma.ListingCheckpointTopOfBookUncheckedCreateNestedOneWithoutCheckpointInput
 }
 
 export type ListingObservationCheckpointUpdateInput = {
@@ -481,6 +486,7 @@ export type ListingObservationCheckpointUpdateInput = {
   receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   detection?: Prisma.ObservedSpotSymbolUpdateOneRequiredWithoutObservationCheckpointsNestedInput
+  topOfBook?: Prisma.ListingCheckpointTopOfBookUpdateOneWithoutCheckpointNestedInput
 }
 
 export type ListingObservationCheckpointUncheckedUpdateInput = {
@@ -501,6 +507,7 @@ export type ListingObservationCheckpointUncheckedUpdateInput = {
   windowCloseTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  topOfBook?: Prisma.ListingCheckpointTopOfBookUncheckedUpdateOneWithoutCheckpointNestedInput
 }
 
 export type ListingObservationCheckpointCreateManyInput = {
@@ -653,6 +660,11 @@ export type ListingObservationCheckpointSumOrderByAggregateInput = {
   tradeCount?: Prisma.SortOrder
 }
 
+export type ListingObservationCheckpointScalarRelationFilter = {
+  is?: Prisma.ListingObservationCheckpointWhereInput
+  isNot?: Prisma.ListingObservationCheckpointWhereInput
+}
+
 export type ListingObservationCheckpointCreateNestedManyWithoutDetectionInput = {
   create?: Prisma.XOR<Prisma.ListingObservationCheckpointCreateWithoutDetectionInput, Prisma.ListingObservationCheckpointUncheckedCreateWithoutDetectionInput> | Prisma.ListingObservationCheckpointCreateWithoutDetectionInput[] | Prisma.ListingObservationCheckpointUncheckedCreateWithoutDetectionInput[]
   connectOrCreate?: Prisma.ListingObservationCheckpointCreateOrConnectWithoutDetectionInput | Prisma.ListingObservationCheckpointCreateOrConnectWithoutDetectionInput[]
@@ -707,6 +719,20 @@ export type NullableBigIntFieldUpdateOperationsInput = {
   divide?: bigint | number
 }
 
+export type ListingObservationCheckpointCreateNestedOneWithoutTopOfBookInput = {
+  create?: Prisma.XOR<Prisma.ListingObservationCheckpointCreateWithoutTopOfBookInput, Prisma.ListingObservationCheckpointUncheckedCreateWithoutTopOfBookInput>
+  connectOrCreate?: Prisma.ListingObservationCheckpointCreateOrConnectWithoutTopOfBookInput
+  connect?: Prisma.ListingObservationCheckpointWhereUniqueInput
+}
+
+export type ListingObservationCheckpointUpdateOneRequiredWithoutTopOfBookNestedInput = {
+  create?: Prisma.XOR<Prisma.ListingObservationCheckpointCreateWithoutTopOfBookInput, Prisma.ListingObservationCheckpointUncheckedCreateWithoutTopOfBookInput>
+  connectOrCreate?: Prisma.ListingObservationCheckpointCreateOrConnectWithoutTopOfBookInput
+  upsert?: Prisma.ListingObservationCheckpointUpsertWithoutTopOfBookInput
+  connect?: Prisma.ListingObservationCheckpointWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ListingObservationCheckpointUpdateToOneWithWhereWithoutTopOfBookInput, Prisma.ListingObservationCheckpointUpdateWithoutTopOfBookInput>, Prisma.ListingObservationCheckpointUncheckedUpdateWithoutTopOfBookInput>
+}
+
 export type ListingObservationCheckpointCreateWithoutDetectionInput = {
   label: string
   offsetMs: number
@@ -723,6 +749,7 @@ export type ListingObservationCheckpointCreateWithoutDetectionInput = {
   windowCloseTime?: Date | string | null
   receivedAt?: Date | string | null
   createdAt?: Date | string
+  topOfBook?: Prisma.ListingCheckpointTopOfBookCreateNestedOneWithoutCheckpointInput
 }
 
 export type ListingObservationCheckpointUncheckedCreateWithoutDetectionInput = {
@@ -741,6 +768,7 @@ export type ListingObservationCheckpointUncheckedCreateWithoutDetectionInput = {
   windowCloseTime?: Date | string | null
   receivedAt?: Date | string | null
   createdAt?: Date | string
+  topOfBook?: Prisma.ListingCheckpointTopOfBookUncheckedCreateNestedOneWithoutCheckpointInput
 }
 
 export type ListingObservationCheckpointCreateOrConnectWithoutDetectionInput = {
@@ -792,6 +820,100 @@ export type ListingObservationCheckpointScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"ListingObservationCheckpoint"> | Date | string
 }
 
+export type ListingObservationCheckpointCreateWithoutTopOfBookInput = {
+  label: string
+  offsetMs: number
+  targetAt: Date | string
+  claimToken?: string | null
+  claimedAt?: Date | string | null
+  claimExpiresAt?: Date | string | null
+  completedAt?: Date | string | null
+  lastPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: bigint | number | null
+  windowOpenTime?: Date | string | null
+  windowCloseTime?: Date | string | null
+  receivedAt?: Date | string | null
+  createdAt?: Date | string
+  detection: Prisma.ObservedSpotSymbolCreateNestedOneWithoutObservationCheckpointsInput
+}
+
+export type ListingObservationCheckpointUncheckedCreateWithoutTopOfBookInput = {
+  provider: string
+  symbol: string
+  label: string
+  offsetMs: number
+  targetAt: Date | string
+  claimToken?: string | null
+  claimedAt?: Date | string | null
+  claimExpiresAt?: Date | string | null
+  completedAt?: Date | string | null
+  lastPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: bigint | number | null
+  windowOpenTime?: Date | string | null
+  windowCloseTime?: Date | string | null
+  receivedAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type ListingObservationCheckpointCreateOrConnectWithoutTopOfBookInput = {
+  where: Prisma.ListingObservationCheckpointWhereUniqueInput
+  create: Prisma.XOR<Prisma.ListingObservationCheckpointCreateWithoutTopOfBookInput, Prisma.ListingObservationCheckpointUncheckedCreateWithoutTopOfBookInput>
+}
+
+export type ListingObservationCheckpointUpsertWithoutTopOfBookInput = {
+  update: Prisma.XOR<Prisma.ListingObservationCheckpointUpdateWithoutTopOfBookInput, Prisma.ListingObservationCheckpointUncheckedUpdateWithoutTopOfBookInput>
+  create: Prisma.XOR<Prisma.ListingObservationCheckpointCreateWithoutTopOfBookInput, Prisma.ListingObservationCheckpointUncheckedCreateWithoutTopOfBookInput>
+  where?: Prisma.ListingObservationCheckpointWhereInput
+}
+
+export type ListingObservationCheckpointUpdateToOneWithWhereWithoutTopOfBookInput = {
+  where?: Prisma.ListingObservationCheckpointWhereInput
+  data: Prisma.XOR<Prisma.ListingObservationCheckpointUpdateWithoutTopOfBookInput, Prisma.ListingObservationCheckpointUncheckedUpdateWithoutTopOfBookInput>
+}
+
+export type ListingObservationCheckpointUpdateWithoutTopOfBookInput = {
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  offsetMs?: Prisma.IntFieldUpdateOperationsInput | number
+  targetAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  claimToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  windowOpenTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  windowCloseTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  detection?: Prisma.ObservedSpotSymbolUpdateOneRequiredWithoutObservationCheckpointsNestedInput
+}
+
+export type ListingObservationCheckpointUncheckedUpdateWithoutTopOfBookInput = {
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  offsetMs?: Prisma.IntFieldUpdateOperationsInput | number
+  targetAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  claimToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  claimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  baseVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  quoteVolume?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tradeCount?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  windowOpenTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  windowCloseTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type ListingObservationCheckpointCreateManyDetectionInput = {
   label: string
   offsetMs: number
@@ -826,6 +948,7 @@ export type ListingObservationCheckpointUpdateWithoutDetectionInput = {
   windowCloseTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  topOfBook?: Prisma.ListingCheckpointTopOfBookUpdateOneWithoutCheckpointNestedInput
 }
 
 export type ListingObservationCheckpointUncheckedUpdateWithoutDetectionInput = {
@@ -844,6 +967,7 @@ export type ListingObservationCheckpointUncheckedUpdateWithoutDetectionInput = {
   windowCloseTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  topOfBook?: Prisma.ListingCheckpointTopOfBookUncheckedUpdateOneWithoutCheckpointNestedInput
 }
 
 export type ListingObservationCheckpointUncheckedUpdateManyWithoutDetectionInput = {
@@ -885,6 +1009,7 @@ export type ListingObservationCheckpointSelect<ExtArgs extends runtime.Types.Ext
   receivedAt?: boolean
   createdAt?: boolean
   detection?: boolean | Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs>
+  topOfBook?: boolean | Prisma.ListingObservationCheckpoint$topOfBookArgs<ExtArgs>
 }, ExtArgs["result"]["listingObservationCheckpoint"]>
 
 export type ListingObservationCheckpointSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -952,6 +1077,7 @@ export type ListingObservationCheckpointSelectScalar = {
 export type ListingObservationCheckpointOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"provider" | "symbol" | "label" | "offsetMs" | "targetAt" | "claimToken" | "claimedAt" | "claimExpiresAt" | "completedAt" | "lastPrice" | "baseVolume" | "quoteVolume" | "tradeCount" | "windowOpenTime" | "windowCloseTime" | "receivedAt" | "createdAt", ExtArgs["result"]["listingObservationCheckpoint"]>
 export type ListingObservationCheckpointInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   detection?: boolean | Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs>
+  topOfBook?: boolean | Prisma.ListingObservationCheckpoint$topOfBookArgs<ExtArgs>
 }
 export type ListingObservationCheckpointIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   detection?: boolean | Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs>
@@ -964,6 +1090,7 @@ export type $ListingObservationCheckpointPayload<ExtArgs extends runtime.Types.E
   name: "ListingObservationCheckpoint"
   objects: {
     detection: Prisma.$ObservedSpotSymbolPayload<ExtArgs>
+    topOfBook: Prisma.$ListingCheckpointTopOfBookPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     provider: string
@@ -1378,6 +1505,7 @@ readonly fields: ListingObservationCheckpointFieldRefs;
 export interface Prisma__ListingObservationCheckpointClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   detection<T extends Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ObservedSpotSymbolDefaultArgs<ExtArgs>>): Prisma.Prisma__ObservedSpotSymbolClient<runtime.Types.Result.GetResult<Prisma.$ObservedSpotSymbolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  topOfBook<T extends Prisma.ListingObservationCheckpoint$topOfBookArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ListingObservationCheckpoint$topOfBookArgs<ExtArgs>>): Prisma.Prisma__ListingCheckpointTopOfBookClient<runtime.Types.Result.GetResult<Prisma.$ListingCheckpointTopOfBookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1822,6 +1950,25 @@ export type ListingObservationCheckpointDeleteManyArgs<ExtArgs extends runtime.T
    * Limit how many ListingObservationCheckpoints to delete.
    */
   limit?: number
+}
+
+/**
+ * ListingObservationCheckpoint.topOfBook
+ */
+export type ListingObservationCheckpoint$topOfBookArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ListingCheckpointTopOfBook
+   */
+  select?: Prisma.ListingCheckpointTopOfBookSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ListingCheckpointTopOfBook
+   */
+  omit?: Prisma.ListingCheckpointTopOfBookOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ListingCheckpointTopOfBookInclude<ExtArgs> | null
+  where?: Prisma.ListingCheckpointTopOfBookWhereInput
 }
 
 /**

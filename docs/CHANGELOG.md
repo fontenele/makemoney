@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-20 — M7.51 durable checkpoint top-of-book storage completed
+
+- Added an optional one-to-one top-of-book record keyed to an existing listing observation checkpoint with cascade ownership.
+- Preserved update IDs and decimal strings exactly as text while enforcing positive prices, non-negative quantities, non-crossed books, and immutable checkpoint identity in PostgreSQL.
+- Added a provider-neutral repository and Prisma implementation with fail-fast identity validation and create-only storage.
+- Kept the repository disconnected from the checkpoint worker, lifecycle collection, routes, scoring, alerts, signals, and trading.
+- 670 unit tests across 80 suites and all 52 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.50 listing top-of-book snapshot composition completed
 
 - Added an internal service that loads one explicit provider-neutral top-of-book snapshot and immediately derives its exact spread metrics.

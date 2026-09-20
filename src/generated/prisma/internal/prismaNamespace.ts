@@ -404,7 +404,8 @@ export const ModelName = {
   HistoricalCandleRecord: 'HistoricalCandleRecord',
   BacktestRun: 'BacktestRun',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
-  ListingObservationCheckpoint: 'ListingObservationCheckpoint'
+  ListingObservationCheckpoint: 'ListingObservationCheckpoint',
+  ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -420,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "observedSpotSymbol" | "listingObservationCheckpoint"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1016,6 +1017,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ListingCheckpointTopOfBook: {
+      payload: Prisma.$ListingCheckpointTopOfBookPayload<ExtArgs>
+      fields: Prisma.ListingCheckpointTopOfBookFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ListingCheckpointTopOfBookFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingCheckpointTopOfBookPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ListingCheckpointTopOfBookFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingCheckpointTopOfBookPayload>
+        }
+        findFirst: {
+          args: Prisma.ListingCheckpointTopOfBookFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingCheckpointTopOfBookPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ListingCheckpointTopOfBookFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingCheckpointTopOfBookPayload>
+        }
+        findMany: {
+          args: Prisma.ListingCheckpointTopOfBookFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingCheckpointTopOfBookPayload>[]
+        }
+        create: {
+          args: Prisma.ListingCheckpointTopOfBookCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingCheckpointTopOfBookPayload>
+        }
+        createMany: {
+          args: Prisma.ListingCheckpointTopOfBookCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ListingCheckpointTopOfBookCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingCheckpointTopOfBookPayload>[]
+        }
+        delete: {
+          args: Prisma.ListingCheckpointTopOfBookDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingCheckpointTopOfBookPayload>
+        }
+        update: {
+          args: Prisma.ListingCheckpointTopOfBookUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingCheckpointTopOfBookPayload>
+        }
+        deleteMany: {
+          args: Prisma.ListingCheckpointTopOfBookDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ListingCheckpointTopOfBookUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ListingCheckpointTopOfBookUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingCheckpointTopOfBookPayload>[]
+        }
+        upsert: {
+          args: Prisma.ListingCheckpointTopOfBookUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingCheckpointTopOfBookPayload>
+        }
+        aggregate: {
+          args: Prisma.ListingCheckpointTopOfBookAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateListingCheckpointTopOfBook>
+        }
+        groupBy: {
+          args: Prisma.ListingCheckpointTopOfBookGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ListingCheckpointTopOfBookGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ListingCheckpointTopOfBookCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ListingCheckpointTopOfBookCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1182,6 +1257,22 @@ export const ListingObservationCheckpointScalarFieldEnum = {
 } as const
 
 export type ListingObservationCheckpointScalarFieldEnum = (typeof ListingObservationCheckpointScalarFieldEnum)[keyof typeof ListingObservationCheckpointScalarFieldEnum]
+
+
+export const ListingCheckpointTopOfBookScalarFieldEnum = {
+  provider: 'provider',
+  symbol: 'symbol',
+  label: 'label',
+  updateId: 'updateId',
+  bidPrice: 'bidPrice',
+  bidQuantity: 'bidQuantity',
+  askPrice: 'askPrice',
+  askQuantity: 'askQuantity',
+  receivedAt: 'receivedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ListingCheckpointTopOfBookScalarFieldEnum = (typeof ListingCheckpointTopOfBookScalarFieldEnum)[keyof typeof ListingCheckpointTopOfBookScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1493,6 +1584,7 @@ export type GlobalOmitConfig = {
   backtestRun?: Prisma.BacktestRunOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
   listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit
+  listingCheckpointTopOfBook?: Prisma.ListingCheckpointTopOfBookOmit
 }
 
 /* Types for Logging */
