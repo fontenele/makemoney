@@ -115,6 +115,8 @@ Use this keyword map to locate context before changing code. Read the listed doc
 
 | durable spread evolution cohort, bounded spread evolution cohort loading, usable T+0 book baseline, M7.75 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-top-of-book-spread-evolution-calculator.ts`, `../src/modules/new-listings/application/listing-top-of-book-spread-evolution-cohort-calculator.ts` |
 
+| spread evolution cohort API, GET /new-listings/top-of-book/spread/evolution, aggregate spread change API, M7.76 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
+
 ## Before every task
 
 1. Read `../AGENTS.md` and `../PROJECT_CONTEXT.md` completely.

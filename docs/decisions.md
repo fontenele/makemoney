@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Expose bounded spread evolution without derived storage
+
+M7.76 follows the established aggregate API contract: provider defaults to Binance, limit defaults to 50 and is bounded at 100, and invalid input fails before repository access. The result is calculated from stored books on every request so checkpoint coverage remains current without a projection table or cache lifecycle.
+
 ## 2026-09-20 — Reuse the bounded durable book cohort for spread evolution
 
 M7.75 composes existing repository selection, per-detection spread evolution, and pure cohort aggregation instead of adding a query or projection table. The limit is validated before persistence access, the repository bounds recent T+0-eligible detections, and any timeline that still cannot produce a T+0 evolution is omitted defensively.

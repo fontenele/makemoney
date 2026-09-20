@@ -443,3 +443,9 @@ Inputs must use unique canonical Binance symbols, coherent non-negative spreads,
 The internal detection read model now validates a cohort limit from 1 through 100, loads the repository's bounded recent top-of-book cohort, derives each timeline's exact spread evolution, excludes timelines without a stored T+0 baseline, and applies the M7.74 aggregate.
 
 The repository continues to select the recent T+0-eligible durable detections before loading their canonical stored books, so memory and database work remain bounded. Results are calculated on demand and are not persisted. This increment adds no route, provider request, score, alert, signal, or trading behavior.
+
+## M7.76 durable top-of-book spread evolution cohort API
+
+`GET /new-listings/top-of-book/spread/evolution` exposes the M7.75 bounded durable aggregate through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it. Invalid query values return `400` before persistence access.
+
+The response preserves each checkpoint's independent sample size and exact average T+0-relative spread-basis-point change. Positive averages mean widening and negative averages mean tightening. The route cannot collect data, persist a derived result, score, alert, signal, or trade.

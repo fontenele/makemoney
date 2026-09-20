@@ -184,6 +184,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.73 — complete:** local read-only per-detection HTTP access exposes exact durable spread evolution with explicit T+0 unavailability.
 - **M7.74 — complete:** a pure exact-decimal cohort calculator aggregates spread-basis-point evolution with independent checkpoint coverage.
 - **M7.75 — complete:** the internal read model composes spread evolution over a bounded recent durable cohort with usable T+0 books.
+- **M7.76 — complete:** local read-only HTTP access exposes the bounded durable spread-evolution cohort with explicit checkpoint coverage.
 
 ## M8 — Dashboard — planned
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.76 durable top-of-book spread evolution cohort API completed
+
+- Added local read-only `GET /new-listings/top-of-book/spread/evolution` with optional validated provider and limit.
+- Preserved exact checkpoint averages and independent sample coverage without derived persistence.
+- Updated the root API route table; the endpoint cannot collect data, score, alert, signal, or trade.
+- 775 unit tests across 88 suites and all 59 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.75 durable top-of-book spread evolution cohort completed
 
 - Composed exact per-detection spread evolution over the bounded recent durable top-of-book cohort.

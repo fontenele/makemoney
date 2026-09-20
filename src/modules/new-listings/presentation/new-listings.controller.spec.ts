@@ -124,6 +124,55 @@ describe('NewListingsController', () => {
     },
   );
 
+  it('returns the durable spread evolution cohort with bounded input', async () => {
+    const cohort = {
+      provider: 'binance' as const,
+      detectionCount: 0,
+      checkpoints: [],
+    };
+    const getTopOfBookSpreadEvolutionCohort = jest.fn(() =>
+      Promise.resolve(cohort),
+    );
+    const controller = new NewListingsController({
+      getTopOfBookSpreadEvolutionCohort,
+    });
+
+    await expect(controller.topOfBookSpreadEvolutionCohort()).resolves.toBe(
+      cohort,
+    );
+    expect(getTopOfBookSpreadEvolutionCohort).toHaveBeenLastCalledWith(
+      'binance',
+      50,
+    );
+    await controller.topOfBookSpreadEvolutionCohort('25', 'binance');
+    expect(getTopOfBookSpreadEvolutionCohort).toHaveBeenLastCalledWith(
+      'binance',
+      25,
+    );
+  });
+
+  it.each([
+    ['0', undefined],
+    ['101', undefined],
+    ['1.5', undefined],
+    [undefined, 'other'],
+  ])(
+    'rejects invalid spread evolution cohort query %s/%s',
+    (limit, provider) => {
+      const getTopOfBookSpreadEvolutionCohort = jest.fn(() =>
+        Promise.resolve({}),
+      );
+      const controller = new NewListingsController({
+        getTopOfBookSpreadEvolutionCohort,
+      });
+
+      expect(() =>
+        controller.topOfBookSpreadEvolutionCohort(limit, provider),
+      ).toThrow(BadRequestException);
+      expect(getTopOfBookSpreadEvolutionCohort).not.toHaveBeenCalled();
+    },
+  );
+
   it('returns durable checkpoint market activity with bounded input', async () => {
     const activity = {
       provider: 'binance' as const,

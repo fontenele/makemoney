@@ -200,6 +200,13 @@ describe('Application (e2e)', () => {
       .expect(400);
   });
 
+  it('/new-listings/top-of-book/spread/evolution (GET) validates bounded cohort input', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(server)
+      .get('/new-listings/top-of-book/spread/evolution?limit=101')
+      .expect(400);
+  });
+
   it('/new-listings/classification (GET) requires thresholds', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     await request(server).get('/new-listings/classification').expect(400);

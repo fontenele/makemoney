@@ -39,6 +39,7 @@ import { ListingTopOfBookImbalanceCohort } from '../domain/listing-top-of-book-i
 import { ListingTopOfBookImbalanceEvolution } from '../domain/listing-top-of-book-imbalance-evolution';
 import { ListingTopOfBookImbalanceEvolutionCohort } from '../domain/listing-top-of-book-imbalance-evolution-cohort';
 import { ListingTopOfBookSpreadEvolution } from '../domain/listing-top-of-book-spread-evolution';
+import { ListingTopOfBookSpreadEvolutionCohort } from '../domain/listing-top-of-book-spread-evolution-cohort';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -96,6 +97,17 @@ export class NewListingsController {
     @Query('provider') provider?: string,
   ): Promise<ListingTopOfBookImbalanceEvolutionCohort> {
     return this.detections.getTopOfBookImbalanceEvolutionCohort(
+      optionalProvider(provider) ?? 'binance',
+      validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
+    );
+  }
+
+  @Get('top-of-book/spread/evolution')
+  topOfBookSpreadEvolutionCohort(
+    @Query('limit') limit?: string,
+    @Query('provider') provider?: string,
+  ): Promise<ListingTopOfBookSpreadEvolutionCohort> {
+    return this.detections.getTopOfBookSpreadEvolutionCohort(
       optionalProvider(provider) ?? 'binance',
       validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
     );
