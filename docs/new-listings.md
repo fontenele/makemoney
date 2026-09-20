@@ -239,3 +239,9 @@ Odd samples select the middle duration and even samples average their two middle
 The internal detection read model now applies the M7.40 timing calculator to the bounded cohort of 1 through 100 recent durable Binance detections with completed `T+0`. It reuses the shared validation, timeline loading, exact performance, and explicit-threshold classification pipeline already consumed by frequency and magnitude statistics.
 
 An empty eligible cohort returns zero event samples and null timing medians. Invalid limit or thresholds fail before repository access, and incoherent timelines remain explicit failures. This increment adds no route, persistence, scoring, alert, signal, or trading behavior.
+
+## M7.42 pattern timing API
+
+`GET /new-listings/classification/timing` exposes the M7.41 durable timing calculation through a separate local read-only route. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider is restricted to `binance`. Both positive decimal pattern thresholds are mandatory, and the correction threshold cannot exceed one.
+
+The response preserves independent pump and correction sample sizes with null medians for absent event samples. Invalid query input returns `400` before durable loading. No default thresholds, derived persistence, scoring, alert, signal, or trading behavior is introduced.

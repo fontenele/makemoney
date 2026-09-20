@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-19 — Pattern timing has a separate research endpoint
+
+M7.42 exposes timing medians at `GET /new-listings/classification/timing` instead of expanding the frequency or magnitude responses. The separate route keeps duration units and event-specific sample denominators explicit while reusing the same mandatory thresholds, provider, and bounded cohort limit. Results remain calculated on demand and unpersisted.
+
 ## 2026-09-19 — Durable timing reuses the shared classified cohort
 
 M7.41 applies timing aggregation only after the same limit validation, threshold validation, durable T+0 eligibility, exact performance calculation, and classification used by frequency and magnitude research. This keeps all three views on the same population and threshold semantics while preserving one bounded repository read per call. Timing remains calculated on demand and unpersisted.

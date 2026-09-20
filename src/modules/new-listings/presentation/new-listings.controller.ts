@@ -30,6 +30,7 @@ import {
 import { validateListingObservationPatternThresholds } from '../application/listing-observation-pattern-classifier';
 import { ListingObservationPatternCohort } from '../domain/listing-observation-pattern-cohort';
 import { ListingObservationPatternMagnitudeCohort } from '../domain/listing-observation-pattern-magnitude-cohort';
+import { ListingObservationPatternTimingCohort } from '../domain/listing-observation-pattern-timing-cohort';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -70,6 +71,20 @@ export class NewListingsController {
     @Query('correctionFromPeakRate') correctionFromPeakRate?: string,
   ): Promise<ListingObservationPatternMagnitudeCohort> {
     return this.detections.getPatternMagnitudeCohort(
+      optionalProvider(provider) ?? 'binance',
+      validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
+      validPatternThresholds(pumpReturnRate, correctionFromPeakRate),
+    );
+  }
+
+  @Get('classification/timing')
+  patternTimingCohort(
+    @Query('limit') limit?: string,
+    @Query('provider') provider?: string,
+    @Query('pumpReturnRate') pumpReturnRate?: string,
+    @Query('correctionFromPeakRate') correctionFromPeakRate?: string,
+  ): Promise<ListingObservationPatternTimingCohort> {
+    return this.detections.getPatternTimingCohort(
       optionalProvider(provider) ?? 'binance',
       validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
       validPatternThresholds(pumpReturnRate, correctionFromPeakRate),

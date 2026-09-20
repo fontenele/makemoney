@@ -8,6 +8,55 @@ import {
 import { NewListingsController } from './new-listings.controller';
 
 describe('NewListingsController', () => {
+  it('returns durable pattern timing medians for explicit thresholds', async () => {
+    const timing = {
+      provider: 'binance' as const,
+      pumpSampleSize: 0,
+      correctionSampleSize: 0,
+    };
+    const getPatternTimingCohort = jest.fn(() => Promise.resolve(timing));
+    const controller = new NewListingsController({ getPatternTimingCohort });
+
+    await expect(
+      controller.patternTimingCohort(undefined, undefined, '0.2', '0.25'),
+    ).resolves.toBe(timing);
+    expect(getPatternTimingCohort).toHaveBeenLastCalledWith('binance', 50, {
+      pumpReturnRate: '0.2',
+      correctionFromPeakRate: '0.25',
+    });
+
+    await controller.patternTimingCohort('25', 'binance', '0.3', '0.1');
+    expect(getPatternTimingCohort).toHaveBeenLastCalledWith('binance', 25, {
+      pumpReturnRate: '0.3',
+      correctionFromPeakRate: '0.1',
+    });
+  });
+
+  it.each([
+    [undefined, undefined, undefined, '0.25'],
+    [undefined, undefined, '0.2', undefined],
+    ['0', undefined, '0.2', '0.25'],
+    [undefined, 'other', '0.2', '0.25'],
+    [undefined, undefined, '0', '0.25'],
+    [undefined, undefined, '0.2', '1.1'],
+  ])(
+    'rejects invalid pattern timing query %s/%s/%s/%s',
+    (limit, provider, pumpReturnRate, correctionFromPeakRate) => {
+      const getPatternTimingCohort = jest.fn(() => Promise.resolve({}));
+      const controller = new NewListingsController({ getPatternTimingCohort });
+
+      expect(() =>
+        controller.patternTimingCohort(
+          limit,
+          provider,
+          pumpReturnRate,
+          correctionFromPeakRate,
+        ),
+      ).toThrow(BadRequestException);
+      expect(getPatternTimingCohort).not.toHaveBeenCalled();
+    },
+  );
+
   it('returns durable pattern magnitude medians for explicit thresholds', async () => {
     const magnitudes = {
       provider: 'binance' as const,

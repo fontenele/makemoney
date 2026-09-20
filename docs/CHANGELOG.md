@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-19 — M7.42 pattern timing API completed
+
+- Added local read-only `GET /new-listings/classification/timing` over the bounded durable timing cohort.
+- Required explicit positive pump and correction thresholds while retaining optional bounded limit and Binance provider input.
+- Preserved independent event samples and synchronized the root API route table.
+- Kept default hypotheses, derived persistence, scoring, alerts, signals, and trading outside this increment.
+- 622 unit tests across 73 suites and all 52 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.41 durable pattern timing loading completed
 
 - Added internal bounded durable pattern-timing calculation over recent detections with completed `T+0` observations.
