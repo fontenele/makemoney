@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Derive durable imbalance evolution on demand
+
+M7.66 reuses the canonical stored-book timeline and the M7.65 pure calculator rather than persisting another projection. Unknown detection remains distinct from a known detection whose T+0 imbalance is unavailable, and newly stored checkpoints affect the next calculation immediately.
+
 ## 2026-09-20 — Anchor imbalance evolution only to available T+0
 
 M7.65 uses the scheduled T+0 imbalance as the sole baseline and subtracts it from each available checkpoint rate with isolated exact-decimal arithmetic. Missing or zero-notional T+0 makes the evolution unavailable; unavailable later books remain explicit `null` points and are never forward-filled.

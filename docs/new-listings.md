@@ -383,3 +383,9 @@ The response retains independent stored-book, calculable imbalance, and unavaila
 A pure exact-decimal calculator validates and orders one stored top-of-book timeline, requires an available scheduled T+0 imbalance, and subtracts that baseline rate from each checkpoint's available imbalance. T+0 therefore has an exact zero change while later changes may span the full `-2` through `2` difference range.
 
 An empty timeline, missing T+0, or zero displayed notional at T+0 returns unavailable. A later zero displayed book retains both its imbalance and change as `null`; no value is filled or inferred. This increment adds no durable composition, route, persistence, score, alert, signal, or trading behavior.
+
+## M7.66 durable top-of-book imbalance evolution
+
+The internal detection read model now loads one detected symbol's canonical stored-book timeline and applies the M7.65 exact evolution calculation on demand. An unknown durable detection keeps the established not-found behavior, while a known detection without an available T+0 imbalance returns analytical unavailability (`null`).
+
+No derived value is stored, so newly completed checkpoint books are visible on the next calculation. This increment adds no route, provider request, score, alert, signal, or trading behavior.

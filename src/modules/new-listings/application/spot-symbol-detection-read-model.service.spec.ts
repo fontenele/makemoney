@@ -560,6 +560,73 @@ describe('SpotSymbolDetectionReadModelService', () => {
     expect(listForDetection).toHaveBeenCalledWith('binance', 'NEWUSDT');
   });
 
+  it('derives exact T+0-relative imbalance evolution from durable books', async () => {
+    const timeline = [
+      topOfBookCheckpoint('NEWUSDT', '99', '1', '101', '0'),
+      {
+        ...topOfBookCheckpoint('NEWUSDT', '99', '0', '101', '1'),
+        label: 'T+5s' as const,
+        offsetMs: 5_000,
+        targetAt: new Date('2026-09-14T02:00:05.000Z'),
+      },
+    ];
+    const listForDetection = jest.fn(() => Promise.resolve(timeline));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+      {
+        store: jest.fn(),
+        listForDetection,
+        listCohort: jest.fn(),
+      },
+    );
+
+    await expect(
+      service.getTopOfBookImbalanceEvolution('binance', 'NEWUSDT'),
+    ).resolves.toMatchObject({
+      provider: 'binance',
+      symbol: 'NEWUSDT',
+      baselineImbalanceRate: '1',
+      points: [
+        { label: 'T+0', imbalanceRate: '1', imbalanceChange: '0' },
+        { label: 'T+5s', imbalanceRate: '-1', imbalanceChange: '-2' },
+      ],
+    });
+    expect(listForDetection).toHaveBeenCalledWith('binance', 'NEWUSDT');
+  });
+
+  it('reports durable imbalance evolution unavailable without a usable T+0', async () => {
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+      {
+        store: jest.fn(),
+        listForDetection: jest.fn(() => Promise.resolve([])),
+        listCohort: jest.fn(),
+      },
+    );
+
+    await expect(
+      service.getTopOfBookImbalanceEvolution('binance', 'NEWUSDT'),
+    ).resolves.toBeNull();
+  });
+
+  it('rejects imbalance evolution for an unknown detection', async () => {
+    const listForDetection = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection,
+      listCohort: jest.fn(),
+    });
+
+    await expect(
+      service.getTopOfBookImbalanceEvolution('binance', 'UNKNOWNUSDT'),
+    ).rejects.toBeInstanceOf(DetectedSpotSymbolNotFoundError);
+    expect(listForDetection).not.toHaveBeenCalled();
+  });
+
   it('loads and calculates a bounded durable top-of-book cohort', async () => {
     const listCohort = jest.fn(() =>
       Promise.resolve([

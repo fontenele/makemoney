@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.66 durable top-of-book imbalance evolution completed
+
+- Added an internal read-model operation that derives exact T+0-relative imbalance evolution from one detected symbol's stored books.
+- Reused durable detection existence checks, canonical repository reads, and explicit analytical unavailability when no usable baseline exists.
+- Kept evolution on demand without derived persistence, a route, score, alert, signal, provider request, or trade.
+- 730 unit tests across 85 suites and all 55 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.65 exact top-of-book imbalance evolution completed
 
 - Added a pure exact-decimal calculator for checkpoint imbalance changes relative to an explicit available T+0 baseline.
