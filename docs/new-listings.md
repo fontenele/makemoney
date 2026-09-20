@@ -407,3 +407,9 @@ The calculator verifies provider and symbol identity, unique detections, canonic
 The internal detection read model validates a 1–100 limit, loads the existing bounded newest-first durable cohort whose members have a stored T+0 book, derives each available T+0-relative imbalance evolution, and applies the M7.68 exact cohort calculator on demand.
 
 A selected member whose T+0 book has zero displayed notional cannot establish an imbalance baseline and is excluded from the analytical detection count. Later unavailable checkpoints remain explicit and do not enter their checkpoint average. This increment adds no route, repository query, derived persistence, provider request, score, alert, signal, or trading behavior.
+
+## M7.70 durable top-of-book imbalance evolution cohort API
+
+`GET /new-listings/top-of-book/imbalance/evolution` exposes the M7.69 bounded durable aggregate through the local read-only API. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider accepts only `binance` and defaults to it.
+
+The response reports only detections with a usable T+0 imbalance baseline and retains independent total, available, and unavailable change coverage at every observed checkpoint. It reads stored books only, cannot trigger collection or persistence, and does not present imbalance evolution as pressure, prediction, score, alert, signal, or trading instruction.

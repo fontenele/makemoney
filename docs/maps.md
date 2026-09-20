@@ -103,6 +103,8 @@ Use this keyword map to locate context before changing code. Read the listed doc
 
 | durable imbalance evolution cohort, bounded evolution cohort loading, usable T+0 imbalance baseline, M7.69 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-top-of-book-imbalance-evolution-calculator.ts`, `../src/modules/new-listings/application/listing-top-of-book-imbalance-evolution-cohort-calculator.ts` |
 
+| imbalance evolution cohort API, GET /new-listings/top-of-book/imbalance/evolution, aggregate imbalance change API, M7.70 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
+
 ## Before every task
 
 1. Read `../AGENTS.md` and `../PROJECT_CONTEXT.md` completely.

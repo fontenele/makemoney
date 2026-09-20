@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.70 durable imbalance evolution cohort API completed
+
+- Added local read-only `GET /new-listings/top-of-book/imbalance/evolution` for bounded durable imbalance-change averages.
+- Reused strict optional provider and 1–100 limit validation and retained explicit analytical eligibility and checkpoint coverage.
+- Updated the root API route table; the endpoint cannot collect data, persist derived results, score, signal, or trade.
+- 749 unit tests across 86 suites and all 57 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.69 durable imbalance evolution cohort loading completed
 
 - Composed exact imbalance-evolution aggregation over the existing bounded durable T+0-book cohort.

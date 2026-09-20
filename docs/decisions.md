@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Expose evolution cohorts with analytical eligibility
+
+M7.70 exposes the M7.69 on-demand result through the same optional `provider=binance` and `limit=1..100` contract as other listing cohorts. The response detection count represents only members with a usable T+0 imbalance baseline, while checkpoint fields retain available and unavailable change coverage; the route cannot trigger collection or persist derived values.
+
 ## 2026-09-20 — Reuse the bounded T+0-book cohort for evolution research
 
 M7.69 reuses the existing newest-first durable selection, so PostgreSQL applies the requested 1–100 limit before derived calculation. A stored T+0 book with zero displayed notional has no imbalance baseline and is excluded from the analytical detection count rather than converted to zero; later unavailable checkpoints remain explicit within otherwise eligible evolutions.
