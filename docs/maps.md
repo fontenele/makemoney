@@ -109,6 +109,8 @@ Use this keyword map to locate context before changing code. Read the listed doc
 
 | durable top-of-book spread evolution, stored spread change timeline, M7.72 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-top-of-book-spread-evolution-calculator.ts` |
 
+| top-of-book spread evolution API, GET /new-listings/:provider/:symbol/top-of-book/spread/evolution, M7.73 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
+
 ## Before every task
 
 1. Read `../AGENTS.md` and `../PROJECT_CONTEXT.md` completely.

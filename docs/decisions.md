@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Expose spread evolution with baseline availability semantics
+
+M7.73 mirrors the per-detection imbalance-evolution API: malformed identity is 400, unknown detection is 404, and an existing detection without a stored T+0 book is 503. The route derives from stored books on demand and cannot trigger collection or persist results.
+
 ## 2026-09-20 — Derive durable spread evolution on demand
 
 M7.72 reuses the canonical stored-book timeline and the M7.71 pure calculator rather than persisting another projection. Unknown detection remains distinct from a known detection without a T+0 book, and newly stored checkpoints affect the next calculation immediately.

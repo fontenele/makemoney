@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.73 durable top-of-book spread evolution API completed
+
+- Added local read-only `GET /new-listings/:provider/:symbol/top-of-book/spread/evolution`.
+- Preserved strict identity validation, unknown-detection `404`, and missing-T+0 `503` semantics.
+- Updated the root API route table; the endpoint cannot collect data, persist derived results, score, signal, or trade.
+- 762 unit tests across 87 suites and all 58 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.72 durable top-of-book spread evolution completed
 
 - Added an internal read-model operation that derives exact T+0-relative spread changes from one durable stored-book timeline.

@@ -38,6 +38,7 @@ import { StoredListingTopOfBookImbalance } from '../domain/listing-top-of-book-i
 import { ListingTopOfBookImbalanceCohort } from '../domain/listing-top-of-book-imbalance-cohort';
 import { ListingTopOfBookImbalanceEvolution } from '../domain/listing-top-of-book-imbalance-evolution';
 import { ListingTopOfBookImbalanceEvolutionCohort } from '../domain/listing-top-of-book-imbalance-evolution-cohort';
+import { ListingTopOfBookSpreadEvolution } from '../domain/listing-top-of-book-spread-evolution';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -270,6 +271,31 @@ export class NewListingsController {
       if (!result) {
         throw new ServiceUnavailableException(
           'T+0 top-of-book imbalance is not available',
+        );
+      }
+      return result;
+    } catch (error) {
+      if (error instanceof DetectedSpotSymbolNotFoundError) {
+        throw new NotFoundException('detected symbol was not found');
+      }
+      throw error;
+    }
+  }
+
+  @Get(':provider/:symbol/top-of-book/spread/evolution')
+  async topOfBookSpreadEvolution(
+    @Param('provider') provider: string,
+    @Param('symbol') symbol: string,
+  ): Promise<ListingTopOfBookSpreadEvolution> {
+    const identity = validObservationIdentity(provider, symbol);
+    try {
+      const result = await this.detections.getTopOfBookSpreadEvolution(
+        identity.provider,
+        identity.symbol,
+      );
+      if (!result) {
+        throw new ServiceUnavailableException(
+          'T+0 top-of-book spread is not available',
         );
       }
       return result;

@@ -425,3 +425,9 @@ Using an absolute basis-point difference avoids division by the baseline and rem
 The internal detection read model now loads one detected symbol's canonical stored top-of-book timeline and applies the M7.71 exact spread-evolution calculation on demand. An unknown durable detection keeps the established not-found behavior, while a known detection without a stored T+0 book returns analytical unavailability (`null`).
 
 No derived value is stored, so newly completed checkpoint books are visible on the next calculation. This increment adds no route, provider request, cohort statistic, score, alert, signal, or trading behavior.
+
+## M7.73 durable top-of-book spread evolution API
+
+`GET /new-listings/:provider/:symbol/top-of-book/spread/evolution` exposes the M7.72 on-demand evolution through the local read-only API. Provider must be `binance`, symbol must be canonical uppercase alphanumeric with 1–30 characters, an unknown durable detection returns `404`, and an existing detection without a stored T+0 book returns `503`.
+
+Positive basis-point changes mean spread widening and negative changes mean tightening. The route reads PostgreSQL only, cannot trigger Binance collection or persist a derived result, and does not convert spread evolution into a score, alert, signal, or trading instruction.

@@ -608,6 +608,71 @@ describe('NewListingsController', () => {
     ).rejects.toThrow('detected symbol was not found');
   });
 
+  it('returns durable top-of-book spread evolution', async () => {
+    const evolution = {
+      provider: 'binance' as const,
+      symbol: 'NEWUSDT',
+      baselineLabel: 'T+0' as const,
+      baselineSpreadBasisPoints: '200',
+      points: [],
+    };
+    const getTopOfBookSpreadEvolution = jest.fn(() =>
+      Promise.resolve(evolution),
+    );
+    const controller = new NewListingsController({
+      getTopOfBookSpreadEvolution,
+    });
+
+    await expect(
+      controller.topOfBookSpreadEvolution('binance', 'NEWUSDT'),
+    ).resolves.toBe(evolution);
+    expect(getTopOfBookSpreadEvolution).toHaveBeenCalledWith(
+      'binance',
+      'NEWUSDT',
+    );
+  });
+
+  it.each([
+    ['other', 'NEWUSDT'],
+    ['binance', 'newusdt'],
+    ['binance', ''],
+  ])(
+    'rejects invalid top-of-book spread evolution identity %s/%s',
+    async (provider, symbol) => {
+      const getTopOfBookSpreadEvolution = jest.fn(() => Promise.resolve({}));
+      const controller = new NewListingsController({
+        getTopOfBookSpreadEvolution,
+      });
+
+      await expect(
+        controller.topOfBookSpreadEvolution(provider, symbol),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(getTopOfBookSpreadEvolution).not.toHaveBeenCalled();
+    },
+  );
+
+  it('reports top-of-book spread evolution unavailable without T+0', async () => {
+    const controller = new NewListingsController({
+      getTopOfBookSpreadEvolution: jest.fn(() => Promise.resolve(null)),
+    });
+
+    await expect(
+      controller.topOfBookSpreadEvolution('binance', 'NEWUSDT'),
+    ).rejects.toThrow('T+0 top-of-book spread is not available');
+  });
+
+  it('maps unknown spread evolution identity to not found', async () => {
+    const controller = new NewListingsController({
+      getTopOfBookSpreadEvolution: jest.fn(() =>
+        Promise.reject(new DetectedSpotSymbolNotFoundError()),
+      ),
+    });
+
+    await expect(
+      controller.topOfBookSpreadEvolution('binance', 'UNKNOWNUSDT'),
+    ).rejects.toThrow('detected symbol was not found');
+  });
+
   it('returns a filtered detection summary without pagination input', async () => {
     const summarize = jest.fn(() =>
       Promise.resolve({
