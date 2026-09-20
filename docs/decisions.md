@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-19 — Pattern timing uses scheduled offsets and causal event anchors
+
+M7.40 measures time to pump from T+0 to the first threshold-reaching checkpoint, while correction time starts at the post-pump peak rather than the initial pump checkpoint. This separates discovery latency from reversal latency. Only canonical scheduled offsets are accepted, corrections must occur after their peak, and absent events are excluded with independent sample sizes instead of being converted to zero durations.
+
 ## 2026-09-19 — Pattern magnitudes have a separate research endpoint
 
 M7.39 exposes medians at `GET /new-listings/classification/magnitudes` instead of silently expanding the M7.36 frequency response. The separate route keeps event-specific sample denominators visible and lets clients request magnitude research explicitly under the same mandatory thresholds, provider, and bounded cohort limit. Results remain calculated on demand and unpersisted.

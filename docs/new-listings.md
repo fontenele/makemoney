@@ -227,3 +227,9 @@ An empty eligible cohort preserves explicit null medians and zero event samples.
 `GET /new-listings/classification/magnitudes` exposes the M7.38 durable magnitude calculation through a separate local read-only route. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider is restricted to `binance`. Both positive decimal pattern thresholds are mandatory, and the correction threshold cannot exceed one.
 
 The response preserves independent pump and correction sample sizes with null medians for absent event samples. Invalid query input returns `400` before durable loading. No default thresholds, derived persistence, timing statistics, scoring, alert, signal, or trading behavior is introduced.
+
+## M7.40 pattern timing medians
+
+A pure calculator now reports the median scheduled duration from `T+0` to the first observed pump threshold and the median duration from the post-pump peak to the first observed correction. Pump and correction durations retain independent sample sizes; missing events are excluded rather than represented as zero.
+
+Odd samples select the middle duration and even samples average their two middle durations. Every event label must match its canonical checkpoint offset, peaks cannot precede pumps, and corrections must follow their peak. Empty samples remain explicit nulls. This increment adds no durable loading, route, persistence, scoring, alert, signal, or trading behavior.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-19 — M7.40 pattern timing medians completed
+
+- Added pure median T+0-to-pump and peak-to-correction duration statistics over classified listing cohorts.
+- Kept independent pump and correction timing samples with explicit null empty results.
+- Added odd/even median coverage plus canonical checkpoint and causal event-order validation.
+- Kept durable loading, HTTP exposure, persistence, scoring, alerts, signals, and trading outside this increment.
+- 612 unit tests across 73 suites and all 52 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.39 pattern magnitude API completed
 
 - Added local read-only `GET /new-listings/classification/magnitudes` over the bounded durable magnitude cohort.
