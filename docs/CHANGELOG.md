@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.61 durable top-of-book imbalance API completed
+
+- Added local read-only `GET /new-listings/:provider/:symbol/top-of-book/imbalance` for one detected symbol's derived durable timeline.
+- Reused strict detection identity validation, unknown-detection `404`, and explicit empty-timeline semantics.
+- Kept imbalance descriptive and on demand; the route cannot trigger provider collection or persist derived values.
+- 709 unit tests across 83 suites and all 54 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.60 durable top-of-book imbalance composition completed
 
 - Added an internal read-model operation that derives exact imbalance across one detected symbol's stored top-of-book timeline.

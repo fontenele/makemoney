@@ -353,3 +353,9 @@ When both displayed quantities are zero, the rate is explicitly unavailable (`nu
 The internal detection read model now loads one detected symbol's canonical durable top-of-book timeline and applies the M7.59 exact imbalance calculation independently to every stored checkpoint. Each derived item preserves its schedule label, offset, and target time together with the original book snapshot.
 
 An unknown detection retains the established not-found behavior, a known detection without stored books returns an empty timeline, and no derived value is persisted. This increment adds no route, cohort statistic, score, alert, signal, or trading behavior.
+
+## M7.61 durable top-of-book imbalance API
+
+`GET /new-listings/:provider/:symbol/top-of-book/imbalance` exposes the M7.60 on-demand timeline through the local read-only API. Provider must be `binance`, symbol must be canonical uppercase alphanumeric with 1–30 characters, an unknown durable detection returns `404`, and a known detection without stored books returns an empty array.
+
+Each response item retains its checkpoint metadata and exact displayed bid/ask quote notionals. The normalized imbalance remains `null` when both displayed quantities are zero. The route reads stored snapshots only and cannot invoke Binance, collect or persist data, score a listing, emit a signal, or trade.

@@ -205,6 +205,13 @@ describe('Application (e2e)', () => {
       .expect(400);
   });
 
+  it('/new-listings/:provider/:symbol/top-of-book/imbalance validates identity', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(server)
+      .get('/new-listings/other/NEWUSDT/top-of-book/imbalance')
+      .expect(400);
+  });
+
   it('/new-listings/:provider/:symbol/performance validates identity', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     await request(server)

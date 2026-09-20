@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Expose stored-book imbalance without activating collection
+
+M7.61 exposes the existing on-demand imbalance composition through a local read-only route. It mirrors the raw stored-book timeline's identity, not-found, and empty-result semantics, while retaining `null` for a zero displayed book and never invoking Binance or storing derived metrics.
+
 ## 2026-09-20 — Derive imbalance from canonical durable books on demand
 
 M7.60 reuses the stored top-of-book timeline rather than persisting duplicate derived values. Each result keeps its schedule metadata and applies the M7.59 calculator independently, so absent checkpoints remain absent and a zero displayed book remains explicitly unavailable.

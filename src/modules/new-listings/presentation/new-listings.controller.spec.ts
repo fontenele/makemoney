@@ -418,6 +418,45 @@ describe('NewListingsController', () => {
     ).rejects.toThrow('detected symbol was not found');
   });
 
+  it('returns the durable top-of-book imbalance timeline for a detected symbol', async () => {
+    const listTopOfBookImbalance = jest.fn(() => Promise.resolve([]));
+    const controller = new NewListingsController({ listTopOfBookImbalance });
+
+    await expect(
+      controller.topOfBookImbalance('binance', 'NEWUSDT'),
+    ).resolves.toEqual([]);
+    expect(listTopOfBookImbalance).toHaveBeenCalledWith('binance', 'NEWUSDT');
+  });
+
+  it.each([
+    ['other', 'NEWUSDT'],
+    ['binance', 'newusdt'],
+    ['binance', ''],
+  ])(
+    'rejects invalid top-of-book imbalance identity %s/%s',
+    async (provider, symbol) => {
+      const listTopOfBookImbalance = jest.fn(() => Promise.resolve([]));
+      const controller = new NewListingsController({ listTopOfBookImbalance });
+
+      await expect(
+        controller.topOfBookImbalance(provider, symbol),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(listTopOfBookImbalance).not.toHaveBeenCalled();
+    },
+  );
+
+  it('maps an unknown top-of-book imbalance identity to not found', async () => {
+    const controller = new NewListingsController({
+      listTopOfBookImbalance: jest.fn(() =>
+        Promise.reject(new DetectedSpotSymbolNotFoundError()),
+      ),
+    });
+
+    await expect(
+      controller.topOfBookImbalance('binance', 'UNKNOWNUSDT'),
+    ).rejects.toThrow('detected symbol was not found');
+  });
+
   it('returns a filtered detection summary without pagination input', async () => {
     const summarize = jest.fn(() =>
       Promise.resolve({

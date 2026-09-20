@@ -34,6 +34,7 @@ import { ListingObservationPatternTimingCohort } from '../domain/listing-observa
 import { ListingObservationMarketActivityCohort } from '../domain/listing-observation-market-activity-cohort';
 import { StoredListingTopOfBookCheckpoint } from '../domain/listing-top-of-book-observation-repository';
 import { ListingTopOfBookCohort } from '../domain/listing-top-of-book-cohort';
+import { StoredListingTopOfBookImbalance } from '../domain/listing-top-of-book-imbalance';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -200,6 +201,25 @@ export class NewListingsController {
     const identity = validObservationIdentity(provider, symbol);
     try {
       return await this.detections.listTopOfBook(
+        identity.provider,
+        identity.symbol,
+      );
+    } catch (error) {
+      if (error instanceof DetectedSpotSymbolNotFoundError) {
+        throw new NotFoundException('detected symbol was not found');
+      }
+      throw error;
+    }
+  }
+
+  @Get(':provider/:symbol/top-of-book/imbalance')
+  async topOfBookImbalance(
+    @Param('provider') provider: string,
+    @Param('symbol') symbol: string,
+  ): Promise<StoredListingTopOfBookImbalance[]> {
+    const identity = validObservationIdentity(provider, symbol);
+    try {
+      return await this.detections.listTopOfBookImbalance(
         identity.provider,
         identity.symbol,
       );
