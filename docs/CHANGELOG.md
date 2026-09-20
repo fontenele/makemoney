@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.63 durable top-of-book imbalance cohort loading completed
+
+- Added an internal read-model operation that composes exact imbalance statistics over the bounded durable T+0-book-eligible cohort.
+- Reused the existing newest-first PostgreSQL selection, 1–100 limit validation, and explicit empty-cohort result.
+- Kept calculation on demand without adding a route, derived persistence, provider request, score, alert, signal, or trade.
+- 717 unit tests across 84 suites and all 54 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.62 top-of-book imbalance cohort calculation completed
 
 - Added a pure exact-decimal cohort calculator for average displayed level-one imbalance by observation checkpoint.

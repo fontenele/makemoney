@@ -365,3 +365,9 @@ Each response item retains its checkpoint metadata and exact displayed bid/ask q
 A pure exact-decimal calculator groups validated stored-book timelines by canonical checkpoint and averages their available normalized level-one imbalance rates. Each checkpoint reports the total stored-book sample, the independently calculable imbalance sample, and the count unavailable because both displayed quantities are zero.
 
 Unavailable imbalance never enters the average denominator and produces a `null` average when no defined rate remains. Incomplete timelines contribute only the checkpoints they contain. This descriptive calculation adds no durable query, route, persistence, score, alert, signal, or trading behavior.
+
+## M7.63 durable top-of-book imbalance cohort loading
+
+The internal detection read model now validates a 1–100 cohort limit, loads the existing bounded newest-first durable selection whose members have a stored T+0 book, and applies the M7.62 exact imbalance cohort calculator on demand.
+
+Later checkpoint books remain independently optional, zero displayed books remain explicitly unavailable, and an empty eligible selection returns the explicit empty aggregate. This increment adds no route, new repository query, derived persistence, provider request, score, alert, signal, or trading behavior.

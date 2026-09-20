@@ -626,6 +626,72 @@ describe('SpotSymbolDetectionReadModelService', () => {
     );
   });
 
+  it('loads and calculates a bounded durable top-of-book imbalance cohort', async () => {
+    const listCohort = jest.fn(() =>
+      Promise.resolve([
+        [topOfBookCheckpoint('AUSDT', '99', '1', '101', '0')],
+        [topOfBookCheckpoint('BUSDT', '99', '0', '101', '1')],
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort,
+    });
+
+    await expect(
+      service.getTopOfBookImbalanceCohort('binance', 25),
+    ).resolves.toEqual({
+      provider: 'binance',
+      detectionCount: 2,
+      checkpoints: [
+        {
+          label: 'T+0',
+          offsetMs: 0,
+          sampleSize: 2,
+          imbalanceSampleSize: 2,
+          unavailableImbalanceCount: 0,
+          averageImbalanceRate: '0',
+        },
+      ],
+    });
+    expect(listCohort).toHaveBeenCalledWith('binance', 25);
+  });
+
+  it('rejects an invalid top-of-book imbalance cohort limit before loading', async () => {
+    const listCohort = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort,
+    });
+
+    await expect(
+      service.getTopOfBookImbalanceCohort('binance', 101),
+    ).rejects.toThrow('cohort limit must be an integer from 1 to 100');
+    expect(listCohort).not.toHaveBeenCalled();
+  });
+
+  it('returns an explicit empty durable top-of-book imbalance cohort', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort: jest.fn(() => Promise.resolve([])),
+    });
+
+    await expect(
+      service.getTopOfBookImbalanceCohort('binance', 50),
+    ).resolves.toEqual({ provider: null, detectionCount: 0, checkpoints: [] });
+  });
+
+  it('fails explicitly when durable imbalance cohort access is unavailable', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith());
+
+    await expect(
+      service.getTopOfBookImbalanceCohort('binance', 50),
+    ).rejects.toThrow('top-of-book repository is unavailable');
+  });
+
   it('delegates filtered aggregate summaries to the repository', async () => {
     const summary = {
       count: 2,

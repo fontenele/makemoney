@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Reuse T+0-book eligibility for imbalance cohorts
+
+M7.63 uses the same bounded newest-first durable cohort selected for top-of-book statistics. Requiring a stored T+0 book gives every selected detection an explicit baseline checkpoint while later books remain independently optional; no second repository query or derived storage lifecycle is introduced.
+
 ## 2026-09-20 — Keep imbalance cohort availability explicit
 
 M7.62 averages only defined level-one imbalance rates. Every checkpoint separately reports stored-book coverage, calculable imbalance coverage, and unavailable zero-denominator books, so missing information cannot be silently converted into a neutral value or hidden in the average denominator.
