@@ -263,3 +263,9 @@ An empty eligible cohort returns no checkpoints and a zero detection count. Inva
 `GET /new-listings/activity` exposes the M7.44 durable activity calculation through a local read-only route. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider is restricted to `binance`. Invalid query input returns `400` before durable loading.
 
 The response reports exact average rolling-window base volume, quote volume, and trade count with independent checkpoint sample sizes. Its naming and route deliberately avoid claiming order-book depth or executable liquidity. This increment adds no derived persistence, scoring, alert, signal, or trading behavior.
+
+## M7.46 listing top-of-book observation contract
+
+A provider-neutral contract now represents one public top-of-book observation for an arbitrary canonical listing symbol. It preserves the provider update ID, exact bid and ask prices, exact displayed quantities, and independent local receive time. A loader interface accepts an explicit provider/symbol request and optional cancellation signal without selecting a transport.
+
+Validation requires Binance identity, canonical symbols, a non-negative integer update ID, positive prices, non-negative quantities, a non-crossed book, and a valid receive time. Locked books and zero displayed quantities remain valid observations. This increment adds no Binance request, stream, spread calculation, persistence, worker integration, route, score, alert, signal, or trading behavior.

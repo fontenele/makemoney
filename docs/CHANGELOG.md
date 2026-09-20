@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-20 — M7.46 listing top-of-book observation contract completed
+
+- Added a provider-neutral arbitrary-symbol top-of-book observation and cancellable loader boundary.
+- Preserved exact bid/ask prices and displayed quantities with strict provider, symbol, update-ID, book-coherence, and receive-time validation.
+- Kept the existing BTC/USDT streaming contract unchanged and accepted locked books or zero displayed quantities without execution claims.
+- Kept provider loading, spread calculation, persistence, worker integration, routes, scoring, alerts, signals, and trading outside this increment.
+- 644 unit tests across 75 suites and all 52 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.45 checkpoint market activity API completed
 
 - Added local read-only `GET /new-listings/activity` over the bounded durable activity cohort.

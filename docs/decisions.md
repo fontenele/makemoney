@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Listing liquidity starts with a separate top-of-book boundary
+
+M7.46 does not generalize the existing BTC/USDT streaming model because that contract is intentionally fixed to M1's live pair. New-listing research instead receives a provider-neutral request/observation boundary for arbitrary canonical symbols. It preserves exact public bid/ask values and displayed quantities, rejects crossed books, and allows locked books or zero quantities without pretending they guarantee execution.
+
+Provider transport, snapshot loading, spread derivation, depth, persistence, and checkpoint integration remain separate increments. This keeps an eventual Binance adapter replaceable and prevents rolling ticker volume from being conflated with actual displayed top-of-book state.
+
 ## 2026-09-20 — Market activity has a descriptive endpoint
 
 M7.45 exposes the durable aggregate at `GET /new-listings/activity`, separate from price performance and pattern-classification endpoints. The route accepts only the shared bounded cohort inputs because the persisted rolling-ticker values require no research threshold. Its public description explicitly distinguishes rolling turnover from spread, depth, price impact, or executable liquidity.
