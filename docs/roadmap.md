@@ -173,6 +173,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.62 — complete:** a pure exact-decimal cohort calculator reports average checkpoint imbalance with explicit stored-book, calculable, and unavailable sample coverage.
 - **M7.63 — complete:** the internal read model applies exact imbalance aggregation to the bounded durable T+0-book-eligible cohort without HTTP exposure.
 - **M7.64 — complete:** local read-only `GET /new-listings/top-of-book/imbalance` exposes bounded durable imbalance averages with explicit availability denominators.
+- **M7.65 — complete:** a pure exact-decimal calculator derives canonical checkpoint imbalance changes from an explicitly available T+0 baseline.
 
 ## M8 — Dashboard — planned
 

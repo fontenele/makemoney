@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Anchor imbalance evolution only to available T+0
+
+M7.65 uses the scheduled T+0 imbalance as the sole baseline and subtracts it from each available checkpoint rate with isolated exact-decimal arithmetic. Missing or zero-notional T+0 makes the evolution unavailable; unavailable later books remain explicit `null` points and are never forward-filled.
+
 ## 2026-09-20 — Expose imbalance cohorts with their denominators
 
 M7.64 publishes the bounded on-demand aggregate without hiding availability. The route retains total stored-book, calculable imbalance, and zero-denominator counts per checkpoint, reads PostgreSQL only, and cannot activate provider collection or convert the descriptive metric into a score or signal.

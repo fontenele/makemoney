@@ -377,3 +377,9 @@ Later checkpoint books remain independently optional, zero displayed books remai
 `GET /new-listings/top-of-book/imbalance` exposes the M7.63 durable aggregate through the local read-only API. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider accepts only `binance` and defaults to it.
 
 The response retains independent stored-book, calculable imbalance, and unavailable zero-denominator coverage for every checkpoint. It reads stored snapshots only, cannot trigger collection or persistence, and does not present displayed level-one imbalance as market pressure, predictive score, alert, signal, or trading instruction.
+
+## M7.65 exact top-of-book imbalance evolution
+
+A pure exact-decimal calculator validates and orders one stored top-of-book timeline, requires an available scheduled T+0 imbalance, and subtracts that baseline rate from each checkpoint's available imbalance. T+0 therefore has an exact zero change while later changes may span the full `-2` through `2` difference range.
+
+An empty timeline, missing T+0, or zero displayed notional at T+0 returns unavailable. A later zero displayed book retains both its imbalance and change as `null`; no value is filled or inferred. This increment adds no durable composition, route, persistence, score, alert, signal, or trading behavior.

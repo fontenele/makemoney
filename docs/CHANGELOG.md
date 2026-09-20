@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.65 exact top-of-book imbalance evolution completed
+
+- Added a pure exact-decimal calculator for checkpoint imbalance changes relative to an explicit available T+0 baseline.
+- Normalized valid timelines into canonical schedule order and preserved unavailable later imbalance as `null` rather than filling it.
+- Returned unavailable when T+0 is absent or has zero displayed notional, without adding durable loading, a route, score, alert, signal, or trade.
+- 727 unit tests across 85 suites and all 55 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.64 top-of-book imbalance cohort API completed
 
 - Added local read-only `GET /new-listings/top-of-book/imbalance` for bounded durable checkpoint imbalance statistics.
