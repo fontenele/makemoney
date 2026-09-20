@@ -352,6 +352,42 @@ describe('NewListingsController', () => {
     ).rejects.toThrow('detected symbol was not found');
   });
 
+  it('returns the durable top-of-book timeline for a detected symbol', async () => {
+    const listTopOfBook = jest.fn(() => Promise.resolve([]));
+    const controller = new NewListingsController({ listTopOfBook });
+
+    await expect(controller.topOfBook('binance', 'NEWUSDT')).resolves.toEqual(
+      [],
+    );
+    expect(listTopOfBook).toHaveBeenCalledWith('binance', 'NEWUSDT');
+  });
+
+  it.each([
+    ['other', 'NEWUSDT'],
+    ['binance', 'newusdt'],
+    ['binance', ''],
+  ])('rejects invalid top-of-book identity %s/%s', async (provider, symbol) => {
+    const listTopOfBook = jest.fn(() => Promise.resolve([]));
+    const controller = new NewListingsController({ listTopOfBook });
+
+    await expect(controller.topOfBook(provider, symbol)).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+    expect(listTopOfBook).not.toHaveBeenCalled();
+  });
+
+  it('maps an unknown top-of-book identity to not found', async () => {
+    const controller = new NewListingsController({
+      listTopOfBook: jest.fn(() =>
+        Promise.reject(new DetectedSpotSymbolNotFoundError()),
+      ),
+    });
+
+    await expect(
+      controller.topOfBook('binance', 'UNKNOWNUSDT'),
+    ).rejects.toThrow('detected symbol was not found');
+  });
+
   it('returns a filtered detection summary without pagination input', async () => {
     const summarize = jest.fn(() =>
       Promise.resolve({

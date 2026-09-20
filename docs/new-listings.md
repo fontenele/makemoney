@@ -305,3 +305,9 @@ Update ID, bid/ask prices, and displayed quantities remain their exact validated
 The repository can now load every stored top-of-book record for one explicit provider and canonical symbol. It returns the empty timeline explicitly when no row exists; otherwise each result includes its checkpoint label, offset, target time, update ID, exact bid/ask values, displayed quantities, and receive time.
 
 Database return order is normalized to the canonical schedule. Persisted observation invariants and joined label/offset/target metadata are validated before results leave the infrastructure boundary. The read remains internal and naturally bounded by the nine checkpoints; no worker integration, route, scoring, alert, signal, or trading behavior is added.
+
+## M7.53 durable top-of-book timeline API
+
+`GET /new-listings/:provider/:symbol/top-of-book` exposes the M7.52 durable timeline through the local read-only API. Provider must be `binance` and symbol must be canonical uppercase alphanumeric with 1–30 characters. Invalid identity returns `400`, an identity that is not a durable detection returns `404`, and a known detection without stored books returns an empty array.
+
+Each item preserves checkpoint label, offset, target time, update ID, exact bid/ask prices and quantities, and local receive time in canonical schedule order. The route reads PostgreSQL only and cannot trigger Binance loading, checkpoint processing, persistence, scoring, alerts, signals, or trading.

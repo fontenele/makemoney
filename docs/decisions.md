@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Top-of-book HTTP access is durable and read-only
+
+M7.53 exposes only records already stored for a durable detection. The route shares the established provider/symbol validation and unknown-detection semantics, returns canonical checkpoint order, and represents absent collection as an empty array rather than provider unavailability.
+
+Reading the route cannot call Binance or start collection. Symbols are capped at the database and domain limit of 30 canonical uppercase alphanumeric characters across detection timeline routes.
+
 ## 2026-09-20 — Durable top-of-book reads follow checkpoint schedule order
 
 M7.52 reads all stored book rows for one validated provider/symbol identity and orders them by their canonical checkpoint offset, independent of database return order. Each child observation and its joined checkpoint metadata are revalidated at the persistence boundary; malformed durable state fails instead of being partially returned.

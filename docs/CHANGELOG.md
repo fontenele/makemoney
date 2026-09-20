@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-20 — M7.53 durable top-of-book timeline API completed
+
+- Added local read-only `GET /new-listings/:provider/:symbol/top-of-book` for the canonical durable checkpoint book timeline.
+- Reused durable detection identity semantics: malformed input returns `400`, unknown detections return `404`, and detections without books return `[]`.
+- Standardized detection timeline symbols to the persisted 1–30-character canonical provider-symbol limit.
+- Kept the route observational: it never triggers provider loading, worker execution, persistence, scoring, alerts, signals, or trading.
+- 680 unit tests across 80 suites and all 52 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.52 durable top-of-book timeline loading completed
 
 - Added provider-neutral loading of all stored top-of-book checkpoints for one explicit detection identity.

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import {
   DetectedSpotSymbolCursorNotFoundError,
   DetectedSpotSymbolNotFoundError,
@@ -30,6 +30,11 @@ import { ListingObservationPatternTimingCohort } from '../domain/listing-observa
 import { ListingObservationPatternTimingCohortCalculator } from './listing-observation-pattern-timing-cohort-calculator';
 import { ListingObservationMarketActivityCohort } from '../domain/listing-observation-market-activity-cohort';
 import { ListingObservationMarketActivityCohortCalculator } from './listing-observation-market-activity-cohort-calculator';
+import {
+  LISTING_TOP_OF_BOOK_OBSERVATION_REPOSITORY,
+  ListingTopOfBookObservationRepository,
+  StoredListingTopOfBookCheckpoint,
+} from '../domain/listing-top-of-book-observation-repository';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -55,6 +60,9 @@ export class SpotSymbolDetectionReadModelService {
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
     private readonly repository: SpotSymbolRepository,
+    @Optional()
+    @Inject(LISTING_TOP_OF_BOOK_OBSERVATION_REPOSITORY)
+    private readonly topOfBookRepository?: ListingTopOfBookObservationRepository,
   ) {}
 
   async listRecent(
@@ -98,6 +106,19 @@ export class SpotSymbolDetectionReadModelService {
       throw new DetectedSpotSymbolNotFoundError();
     }
     return this.repository.listCompletedObservations(provider, symbol);
+  }
+
+  async listTopOfBook(
+    provider: 'binance',
+    symbol: string,
+  ): Promise<StoredListingTopOfBookCheckpoint[]> {
+    if (!(await this.repository.findDetected(provider, symbol))) {
+      throw new DetectedSpotSymbolNotFoundError();
+    }
+    if (!this.topOfBookRepository) {
+      throw new Error('Listing top-of-book repository is unavailable');
+    }
+    return this.topOfBookRepository.listForDetection(provider, symbol);
   }
 
   async getPricePerformance(

@@ -485,6 +485,38 @@ describe('SpotSymbolDetectionReadModelService', () => {
     expect(repository.listCompletedObservations).not.toHaveBeenCalled();
   });
 
+  it('loads top-of-book checkpoints only for a durable detection', async () => {
+    const timeline = [{ label: 'T+0' }];
+    const listForDetection = jest.fn(() => Promise.resolve(timeline));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+      {
+        store: jest.fn(),
+        listForDetection,
+      },
+    );
+
+    await expect(service.listTopOfBook('binance', 'NEWUSDT')).resolves.toBe(
+      timeline,
+    );
+    expect(listForDetection).toHaveBeenCalledWith('binance', 'NEWUSDT');
+  });
+
+  it('rejects top-of-book loading for an unknown detection', async () => {
+    const listForDetection = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection,
+    });
+
+    await expect(
+      service.listTopOfBook('binance', 'UNKNOWNUSDT'),
+    ).rejects.toBeInstanceOf(DetectedSpotSymbolNotFoundError);
+    expect(listForDetection).not.toHaveBeenCalled();
+  });
+
   it('delegates filtered aggregate summaries to the repository', async () => {
     const summary = {
       count: 2,

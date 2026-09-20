@@ -32,6 +32,7 @@ import { ListingObservationPatternCohort } from '../domain/listing-observation-p
 import { ListingObservationPatternMagnitudeCohort } from '../domain/listing-observation-pattern-magnitude-cohort';
 import { ListingObservationPatternTimingCohort } from '../domain/listing-observation-pattern-timing-cohort';
 import { ListingObservationMarketActivityCohort } from '../domain/listing-observation-market-activity-cohort';
+import { StoredListingTopOfBookCheckpoint } from '../domain/listing-top-of-book-observation-repository';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -179,6 +180,25 @@ export class NewListingsController {
     }
   }
 
+  @Get(':provider/:symbol/top-of-book')
+  async topOfBook(
+    @Param('provider') provider: string,
+    @Param('symbol') symbol: string,
+  ): Promise<StoredListingTopOfBookCheckpoint[]> {
+    const identity = validObservationIdentity(provider, symbol);
+    try {
+      return await this.detections.listTopOfBook(
+        identity.provider,
+        identity.symbol,
+      );
+    } catch (error) {
+      if (error instanceof DetectedSpotSymbolNotFoundError) {
+        throw new NotFoundException('detected symbol was not found');
+      }
+      throw error;
+    }
+  }
+
   @Get('summary')
   summary(
     @Query('detectedFrom') detectedFrom?: string,
@@ -236,9 +256,9 @@ export class NewListingsController {
 
 function validObservationIdentity(provider: string, symbol: string) {
   const parsedProvider = optionalProvider(provider);
-  if (!parsedProvider || !/^[A-Z0-9]{1,40}$/.test(symbol)) {
+  if (!parsedProvider || !/^[A-Z0-9]{1,30}$/.test(symbol)) {
     throw new BadRequestException(
-      'symbol must be an uppercase provider symbol from 1 to 40 characters',
+      'symbol must be an uppercase provider symbol from 1 to 30 characters',
     );
   }
   return { provider: parsedProvider, symbol };
