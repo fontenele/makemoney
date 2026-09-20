@@ -1715,7 +1715,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.42 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.43 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -2328,6 +2328,7 @@ M7.39 Pattern Magnitude API: DONE
 M7.40 Pattern Timing Medians: DONE
 M7.41 Durable Pattern Timing Loading: DONE
 M7.42 Pattern Timing API: DONE
+M7.43 Checkpoint Market Activity Cohort: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2346,5 +2347,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7.42 is complete. Select the next bounded M7 increment; liquidity research, scoring, alerts, signals, and trading remain separate decisions.
+M7.43 is complete. Select the next bounded M7 increment; durable activity loading, HTTP exposure, order-book liquidity, scoring, alerts, signals, and trading remain separate decisions.
 ```

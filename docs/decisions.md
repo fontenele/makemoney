@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-19 — Rolling ticker volume is market activity, not liquidity
+
+M7.43 aggregates the exact rolling-24-hour base volume, quote volume, and trade count already captured at each checkpoint. These values describe turnover and activity but cannot establish executable size, spread, depth, or price impact, so the domain deliberately calls the result market activity rather than liquidity. Checkpoints retain independent sample sizes, arithmetic remains decimal-exact, and no missing observation is forward-filled.
+
 ## 2026-09-19 — Pattern timing has a separate research endpoint
 
 M7.42 exposes timing medians at `GET /new-listings/classification/timing` instead of expanding the frequency or magnitude responses. The separate route keeps duration units and event-specific sample denominators explicit while reusing the same mandatory thresholds, provider, and bounded cohort limit. Results remain calculated on demand and unpersisted.

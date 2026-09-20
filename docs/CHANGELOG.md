@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-19 — M7.43 checkpoint market activity cohort completed
+
+- Added a pure cohort calculator for exact average rolling-24-hour base volume, quote volume, and trade count by canonical checkpoint.
+- Preserved unequal checkpoint samples and explicit empty cohorts while rejecting duplicate detections and incoherent timelines.
+- Classified the output as descriptive market activity rather than order-book or executable liquidity.
+- Kept durable loading, HTTP exposure, persistence, scoring, alerts, signals, and trading outside this increment.
+- 625 unit tests across 74 suites and all 52 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.42 pattern timing API completed
 
 - Added local read-only `GET /new-listings/classification/timing` over the bounded durable timing cohort.

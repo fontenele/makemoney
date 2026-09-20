@@ -245,3 +245,9 @@ An empty eligible cohort returns zero event samples and null timing medians. Inv
 `GET /new-listings/classification/timing` exposes the M7.41 durable timing calculation through a separate local read-only route. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider is restricted to `binance`. Both positive decimal pattern thresholds are mandatory, and the correction threshold cannot exceed one.
 
 The response preserves independent pump and correction sample sizes with null medians for absent event samples. Invalid query input returns `400` before durable loading. No default thresholds, derived persistence, scoring, alert, signal, or trading behavior is introduced.
+
+## M7.43 checkpoint market activity cohort
+
+A pure cohort calculator groups completed listing observations by canonical checkpoint and reports the exact average rolling-24-hour base volume, quote volume, and trade count with an explicit sample size. Unequal timeline coverage is preserved rather than filled, and empty cohorts remain explicit.
+
+Every timeline must be non-empty, provider-valid, internally single-symbol, unique within the cohort, and free of duplicate or non-canonical checkpoints. Decimal averages use exact arithmetic and trade-count averages remain decimal strings when non-integral. These provider rolling-window measures describe market activity only: they do not represent order-book depth, spread, price impact, or executable liquidity. This increment adds no durable loading, route, persistence, score, alert, signal, or trading behavior.

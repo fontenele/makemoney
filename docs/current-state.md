@@ -72,7 +72,7 @@ M7.32 loads and classifies one durable detection internally without persisting d
 
 M7.33 exposes explicit-threshold durable classification through a local read-only endpoint.
 
-M7.34 calculates descriptive pump/correction cohort counts and exact rates as a pure internal research rule. M7.35 composes that rule over the bounded durable T+0-eligible cohort, M7.36 exposes it through a local read-only route, M7.37–M7.39 calculate, durably compose, and expose median observed magnitudes, and M7.40–M7.42 calculate, durably compose, and expose median observed pattern timing.
+M7.34 calculates descriptive pump/correction cohort counts and exact rates as a pure internal research rule. M7.35 composes that rule over the bounded durable T+0-eligible cohort, M7.36 exposes it through a local read-only route, M7.37–M7.39 calculate, durably compose, and expose median observed magnitudes, M7.40–M7.42 calculate, durably compose, and expose median observed pattern timing, and M7.43 calculates descriptive checkpoint market activity.
 
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
@@ -120,6 +120,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.40 calculates median T+0-to-pump and peak-to-correction durations with independent samples, canonical checkpoint validation, causal event ordering, and explicit null empty samples.
 - M7.41 reuses the shared validated 1–100 durable T+0 cohort classification pipeline to return timing medians internally, with explicit empty results and no additional persistence or route.
 - M7.42 exposes `GET /new-listings/classification/timing` with optional provider/limit, mandatory explicit thresholds, independent pump/correction samples, fail-fast `400` validation, and no derived persistence.
+- M7.43 calculates exact average rolling-24-hour base volume, quote volume, and trade count per canonical checkpoint with explicit sample sizes, while refusing to label those turnover measures as executable liquidity.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -259,12 +260,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-19 after M7.42:
+The following passed on 2026-09-19 after M7.43:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 622 tests passed across 73 suites
+- `npm test -- --runInBand` — 625 tests passed across 74 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -283,7 +284,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.42 are implemented and fully verified milestone increments.
+M0 through M7.43 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 
