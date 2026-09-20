@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Preserve availability in imbalance-evolution cohorts
+
+M7.68 averages only validated available T+0-relative imbalance changes at each checkpoint. Every checkpoint independently reports total evolution coverage, available-change coverage, and unavailable changes; missing values never become neutral zero. Inputs must prove that each available change exactly equals its rate minus the declared T+0 baseline before aggregation.
+
 ## 2026-09-20 — Expose imbalance evolution with baseline availability semantics
 
 M7.67 mirrors the existing per-detection performance API: malformed identity is 400, unknown detection is 404, and an existing detection without an available T+0 analytical baseline is 503. The route derives from stored books on demand and cannot trigger collection or persist results.

@@ -395,3 +395,9 @@ No derived value is stored, so newly completed checkpoint books are visible on t
 `GET /new-listings/:provider/:symbol/top-of-book/imbalance/evolution` exposes the M7.66 on-demand evolution through the local read-only API. Provider must be `binance`, symbol must be canonical uppercase alphanumeric with 1–30 characters, an unknown durable detection returns `404`, and an existing detection without an available T+0 imbalance returns `503`.
 
 Later zero-notional books retain `null` imbalance and change values. The route reads PostgreSQL only, cannot trigger Binance collection or persist a derived result, and does not convert imbalance evolution into pressure, prediction, score, alert, signal, or trading instruction.
+
+## M7.68 top-of-book imbalance evolution cohort calculation
+
+A pure exact-decimal calculator groups validated per-detection imbalance evolutions by canonical checkpoint and averages their available changes from T+0. Each checkpoint independently reports total evolution samples, available change samples, unavailable changes, and a nullable exact average.
+
+The calculator verifies provider and symbol identity, unique detections, canonical schedule metadata, the declared T+0 baseline, and that every available change exactly equals its imbalance rate minus that baseline. Unavailable later values never enter the denominator or become zero. This increment adds no durable query, route, persistence, provider request, score, alert, signal, or trading behavior.

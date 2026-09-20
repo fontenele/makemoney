@@ -463,18 +463,13 @@ Exemplo conceitual:
 
 ```ts
 interface MarketProvider {
-    getTicker(symbol: string): Promise<Ticker>;
+  getTicker(symbol: string): Promise<Ticker>;
 
-    getOrderBook(symbol: string): Promise<OrderBook>;
+  getOrderBook(symbol: string): Promise<OrderBook>;
 
-    getCandles(
-        symbol: string,
-        interval: CandleInterval
-    ): Promise<Candle[]>;
+  getCandles(symbol: string, interval: CandleInterval): Promise<Candle[]>;
 
-    subscribeTrades(
-        symbol: string
-    ): AsyncIterable<MarketTrade>;
+  subscribeTrades(symbol: string): AsyncIterable<MarketTrade>;
 }
 ```
 
@@ -499,9 +494,9 @@ Conceitualmente:
 
 ```ts
 interface TradingExecutor {
-    buy(order: BuyOrder): Promise<Execution>;
+  buy(order: BuyOrder): Promise<Execution>;
 
-    sell(order: SellOrder): Promise<Execution>;
+  sell(order: SellOrder): Promise<Execution>;
 }
 ```
 
@@ -720,7 +715,7 @@ REGRA IMPORTANTE.
 Dinheiro não deve depender ingenuamente de:
 
 ```ts
-number
+number;
 ```
 
 para cálculos financeiros sensíveis.
@@ -728,7 +723,7 @@ para cálculos financeiros sensíveis.
 Problema clássico:
 
 ```ts
-0.1 + 0.2 !== 0.3
+0.1 + 0.2 !== 0.3;
 ```
 
 Escolher abordagem segura para:
@@ -817,7 +812,7 @@ Conceitualmente:
 
 ```ts
 if (estimatedCosts.div(orderValue).gt(MAX_COST_RATIO)) {
-    return RiskDecision.REJECT;
+  return RiskDecision.REJECT;
 }
 ```
 
@@ -929,9 +924,7 @@ Interface conceitual:
 
 ```ts
 interface Strategy {
-    analyze(
-        market: MarketSnapshot
-    ): Promise<StrategySignal>;
+  analyze(market: MarketSnapshot): Promise<StrategySignal>;
 }
 ```
 
@@ -1715,7 +1708,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.67 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.68 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -1868,17 +1861,13 @@ Provider payload não deve vazar para o domínio.
 Evitar:
 
 ```ts
-function strategy(
-    event: BinanceWebSocketTradeEvent
-)
+function strategy(event: BinanceWebSocketTradeEvent);
 ```
 
 Preferir:
 
 ```ts
-function strategy(
-    trade: MarketTrade
-)
+function strategy(trade: MarketTrade);
 ```
 
 O adapter Binance faz:
@@ -2353,6 +2342,7 @@ M7.64 Top-of-Book Imbalance Cohort API: DONE
 M7.65 Exact Top-of-Book Imbalance Evolution: DONE
 M7.66 Durable Top-of-Book Imbalance Evolution: DONE
 M7.67 Durable Top-of-Book Imbalance Evolution API: DONE
+M7.68 Top-of-Book Imbalance Evolution Cohort Calculation: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2371,5 +2361,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7.67 is complete. Select the next bounded M7 increment; cohort evolution statistics, scoring, alerts, signals, and trading remain separate.
+M7.68 is complete. Select the next bounded M7 increment; durable cohort loading, API exposure, scoring, alerts, signals, and trading remain separate.
 ```

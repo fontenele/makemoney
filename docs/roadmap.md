@@ -176,6 +176,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.65 — complete:** a pure exact-decimal calculator derives canonical checkpoint imbalance changes from an explicitly available T+0 baseline.
 - **M7.66 — complete:** the internal read model derives exact imbalance evolution from one detected symbol's canonical durable stored-book timeline.
 - **M7.67 — complete:** local read-only per-detection HTTP access exposes exact durable imbalance evolution with explicit T+0 unavailability.
+- **M7.68 — complete:** a pure exact-decimal cohort calculator averages T+0-relative imbalance changes by checkpoint with explicit availability coverage.
 
 ## M8 — Dashboard — planned
 

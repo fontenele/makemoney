@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.68 top-of-book imbalance evolution cohort completed
+
+- Added a pure exact-decimal cohort calculator for average T+0-relative imbalance change by checkpoint.
+- Preserved independent total, available, and unavailable change coverage and rejected incoherent derived inputs.
+- Kept durable loading and HTTP exposure separate; no provider request, persistence, score, signal, or trading path was added.
+- 740 unit tests across 86 suites and all 56 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.67 durable top-of-book imbalance evolution API completed
 
 - Added local read-only `GET /new-listings/:provider/:symbol/top-of-book/imbalance/evolution`.
