@@ -105,6 +105,8 @@ Use this keyword map to locate context before changing code. Read the listed doc
 
 | imbalance evolution cohort API, GET /new-listings/top-of-book/imbalance/evolution, aggregate imbalance change API, M7.70 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
 
+| top-of-book spread evolution, T+0 spread baseline, spread basis points change, M7.71 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-top-of-book-spread-evolution-calculator.ts`, `../src/modules/new-listings/domain/listing-top-of-book-spread-evolution.ts` |
+
 ## Before every task
 
 1. Read `../AGENTS.md` and `../PROJECT_CONTEXT.md` completely.

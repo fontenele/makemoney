@@ -179,6 +179,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.68 — complete:** a pure exact-decimal cohort calculator averages T+0-relative imbalance changes by checkpoint with explicit availability coverage.
 - **M7.69 — complete:** the internal read model composes exact imbalance-evolution statistics over the bounded durable T+0-book cohort.
 - **M7.70 — complete:** local read-only HTTP access exposes the bounded durable imbalance-evolution cohort with explicit coverage.
+- **M7.71 — complete:** a pure exact-decimal calculator derives checkpoint spread-basis-point changes from the explicit T+0 book.
 
 ## M8 — Dashboard — planned
 

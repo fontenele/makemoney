@@ -413,3 +413,9 @@ A selected member whose T+0 book has zero displayed notional cannot establish an
 `GET /new-listings/top-of-book/imbalance/evolution` exposes the M7.69 bounded durable aggregate through the local read-only API. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider accepts only `binance` and defaults to it.
 
 The response reports only detections with a usable T+0 imbalance baseline and retains independent total, available, and unavailable change coverage at every observed checkpoint. It reads stored books only, cannot trigger collection or persistence, and does not present imbalance evolution as pressure, prediction, score, alert, signal, or trading instruction.
+
+## M7.71 exact top-of-book spread evolution
+
+A pure exact-decimal calculator validates and orders one stored top-of-book timeline, requires an explicit scheduled T+0 book, and subtracts its spread in basis points from every available checkpoint spread. T+0 therefore has exact zero change, positive values mean widening, and negative values mean tightening.
+
+Using an absolute basis-point difference avoids division by the baseline and remains defined for a locked zero-spread T+0 book. An empty timeline or missing T+0 returns unavailable. This increment adds no durable composition, route, persistence, score, alert, signal, or trading behavior.

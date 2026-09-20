@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.71 exact top-of-book spread evolution completed
+
+- Added a pure exact-decimal calculator for checkpoint spread-basis-point changes relative to T+0.
+- Defined positive changes as spread widening and negative changes as tightening, including a valid zero-spread baseline.
+- Kept durable composition and HTTP exposure separate; no persistence, provider request, score, signal, or trading path was added.
+- 753 unit tests across 87 suites and all 57 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.70 durable imbalance evolution cohort API completed
 
 - Added local read-only `GET /new-listings/top-of-book/imbalance/evolution` for bounded durable imbalance-change averages.

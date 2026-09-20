@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Express spread evolution as a basis-point difference
+
+M7.71 subtracts the T+0 spread in basis points from each later checkpoint rather than calculating a proportional return on spread. This preserves the already normalized cross-asset unit, makes tightening negative and widening positive, and remains defined when the T+0 book is locked at zero spread. Missing T+0 makes the evolution unavailable.
+
 ## 2026-09-20 — Expose evolution cohorts with analytical eligibility
 
 M7.70 exposes the M7.69 on-demand result through the same optional `provider=binance` and `limit=1..100` contract as other listing cohorts. The response detection count represents only members with a usable T+0 imbalance baseline, while checkpoint fields retain available and unavailable change coverage; the route cannot trigger collection or persist derived values.
