@@ -114,6 +114,50 @@ describe('PrismaListingTopOfBookObservationRepository', () => {
     ).rejects.toThrow('Invalid listing top-of-book detection identity');
     expect(findMany).not.toHaveBeenCalled();
   });
+
+  it('loads a bounded newest-detection cohort eligible from T+0', async () => {
+    const findMany = jest.fn().mockResolvedValue([
+      {
+        observationCheckpoints: [
+          {
+            offsetMs: 0,
+            targetAt: new Date(1_790_000_000_000),
+            topOfBook: persistedTopOfBook('T+0', 0, '42'),
+          },
+        ],
+      },
+    ]);
+    const prisma = {
+      observedSpotSymbol: { findMany },
+    } as unknown as PrismaService;
+    const repository = new PrismaListingTopOfBookObservationRepository(prisma);
+
+    await expect(repository.listCohort('binance', 25)).resolves.toMatchObject([
+      [{ symbol: 'NEWUSDT', label: 'T+0', updateId: '42' }],
+    ]);
+    expect(findMany).toHaveBeenCalledWith({
+      where: {
+        provider: 'binance',
+        detectedAt: { not: null },
+        observationCheckpoints: {
+          some: { label: 'T+0', topOfBook: { isNot: null } },
+        },
+      },
+      orderBy: [{ detectedAt: 'desc' }, { symbol: 'asc' }],
+      take: 25,
+      select: {
+        observationCheckpoints: {
+          where: { topOfBook: { isNot: null } },
+          orderBy: [{ targetAt: 'asc' }, { label: 'asc' }],
+          select: {
+            offsetMs: true,
+            targetAt: true,
+            topOfBook: true,
+          },
+        },
+      },
+    });
+  });
 });
 
 function topOfBook(): ListingTopOfBookObservation {

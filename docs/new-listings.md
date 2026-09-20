@@ -329,3 +329,9 @@ The cycle completes every successful combined result through the M7.54 lease-saf
 A pure exact-decimal calculator groups validated top-of-book timelines by canonical observation checkpoint. Each available checkpoint reports its independent sample size, average spread in basis points, and average displayed bid and ask quote notionals calculated as exact `price × quantity` values.
 
 Raw base quantities are not averaged across different assets because their units are not comparable. The quote notionals describe only the displayed best level at each snapshot; they are not an order-book depth model, fill simulation, or guarantee of executable liquidity. This increment adds no durable cohort query, route, persistence, scoring, alert, signal, or trading behavior.
+
+## M7.57 durable top-of-book cohort loading
+
+The top-of-book repository now selects a bounded cohort of the newest durable detections that have a stored T+0 book, ordered by detection time descending with a symbol tie-breaker. PostgreSQL applies eligibility and the 1–100 limit before loading each detection's available book timeline.
+
+The internal read model validates the limit and applies the M7.56 exact calculator to those timelines. Later checkpoints contribute independently when present, and an empty eligible cohort returns an explicit empty aggregate. This increment adds no route, derived persistence, depth model, scoring, alert, signal, or trading behavior.

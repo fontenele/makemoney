@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.57 durable top-of-book cohort loading completed
+
+- Added a bounded newest-detection query requiring stored T+0 top-of-book eligibility before loading canonical book timelines.
+- Composed those durable timelines through the M7.56 exact cohort calculator in the internal detection read model.
+- Added explicit empty-cohort, invalid-limit, and unavailable-repository behavior without adding an HTTP route.
+- 693 unit tests across 82 suites and all 52 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.56 top-of-book cohort calculation completed
 
 - Added a pure exact-decimal cohort calculator for average spread basis points and displayed bid/ask quote notionals at each observation checkpoint.

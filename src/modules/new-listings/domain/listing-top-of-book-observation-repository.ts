@@ -26,4 +26,8 @@ export interface ListingTopOfBookObservationRepository {
     provider: ListingTopOfBookObservation['provider'],
     symbol: string,
   ): Promise<StoredListingTopOfBookCheckpoint[]>;
+  listCohort(
+    provider: ListingTopOfBookObservation['provider'],
+    limit: number,
+  ): Promise<StoredListingTopOfBookCheckpoint[][]>;
 }

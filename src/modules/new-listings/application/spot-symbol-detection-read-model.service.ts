@@ -35,6 +35,8 @@ import {
   ListingTopOfBookObservationRepository,
   StoredListingTopOfBookCheckpoint,
 } from '../domain/listing-top-of-book-observation-repository';
+import { ListingTopOfBookCohort } from '../domain/listing-top-of-book-cohort';
+import { ListingTopOfBookCohortCalculator } from './listing-top-of-book-cohort-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -56,6 +58,7 @@ export class SpotSymbolDetectionReadModelService {
     new ListingObservationPatternTimingCohortCalculator();
   private readonly marketActivityCohort =
     new ListingObservationMarketActivityCohortCalculator();
+  private readonly topOfBookCohort = new ListingTopOfBookCohortCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -198,6 +201,19 @@ export class SpotSymbolDetectionReadModelService {
     this.validateCohortLimit(limit);
     return this.marketActivityCohort.calculate(
       await this.repository.listCompletedObservationCohort(provider, limit),
+    );
+  }
+
+  async getTopOfBookCohort(
+    provider: 'binance',
+    limit: number,
+  ): Promise<ListingTopOfBookCohort> {
+    this.validateCohortLimit(limit);
+    if (!this.topOfBookRepository) {
+      throw new Error('Listing top-of-book repository is unavailable');
+    }
+    return this.topOfBookCohort.calculate(
+      await this.topOfBookRepository.listCohort(provider, limit),
     );
   }
 

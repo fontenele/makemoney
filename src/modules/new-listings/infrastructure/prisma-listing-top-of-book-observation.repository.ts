@@ -60,6 +60,45 @@ export class PrismaListingTopOfBookObservationRepository implements ListingTopOf
       return left.offsetMs - right.offsetMs;
     });
   }
+
+  async listCohort(
+    provider: ListingTopOfBookObservation['provider'],
+    limit: number,
+  ): Promise<StoredListingTopOfBookCheckpoint[][]> {
+    const detections = await this.prisma.observedSpotSymbol.findMany({
+      where: {
+        provider,
+        detectedAt: { not: null },
+        observationCheckpoints: {
+          some: { label: 'T+0', topOfBook: { isNot: null } },
+        },
+      },
+      orderBy: [{ detectedAt: 'desc' }, { symbol: 'asc' }],
+      take: limit,
+      select: {
+        observationCheckpoints: {
+          where: { topOfBook: { isNot: null } },
+          orderBy: [{ targetAt: 'asc' }, { label: 'asc' }],
+          select: {
+            offsetMs: true,
+            targetAt: true,
+            topOfBook: true,
+          },
+        },
+      },
+    });
+    return detections.map(({ observationCheckpoints }) =>
+      observationCheckpoints.map(({ offsetMs, targetAt, topOfBook }) => {
+        if (!topOfBook) {
+          throw new Error('Selected listing top-of-book checkpoint is missing');
+        }
+        return toStoredCheckpoint({
+          ...topOfBook,
+          checkpoint: { offsetMs, targetAt },
+        });
+      }),
+    );
+  }
 }
 
 function toStoredCheckpoint(row: {

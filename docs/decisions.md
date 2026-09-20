@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Require durable T+0 book eligibility before cohort selection
+
+M7.57 selects and limits recent detections in PostgreSQL only when a stored T+0 top-of-book record exists. Later checkpoint books remain independently optional, so their sample sizes may decrease honestly rather than inheriting or fabricating observations. Calculation remains on demand and is not persisted.
+
 ## 2026-09-20 — Compare displayed book value in quote-asset units
 
 M7.56 aggregates bid and ask `price × quantity` in quote-asset units rather than averaging raw base-asset quantities across different listed assets. Spread is normalized in basis points. Both remain descriptive level-one snapshots: they are not depth, fill capacity, or guaranteed executable liquidity.

@@ -495,6 +495,7 @@ describe('SpotSymbolDetectionReadModelService', () => {
       {
         store: jest.fn(),
         listForDetection,
+        listCohort: jest.fn(),
       },
     );
 
@@ -509,12 +510,79 @@ describe('SpotSymbolDetectionReadModelService', () => {
     const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
       store: jest.fn(),
       listForDetection,
+      listCohort: jest.fn(),
     });
 
     await expect(
       service.listTopOfBook('binance', 'UNKNOWNUSDT'),
     ).rejects.toBeInstanceOf(DetectedSpotSymbolNotFoundError);
     expect(listForDetection).not.toHaveBeenCalled();
+  });
+
+  it('loads and calculates a bounded durable top-of-book cohort', async () => {
+    const listCohort = jest.fn(() =>
+      Promise.resolve([
+        [topOfBookCheckpoint('AUSDT', '99', '2', '101', '3')],
+        [topOfBookCheckpoint('BUSDT', '198', '1', '202', '2')],
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort,
+    });
+
+    await expect(service.getTopOfBookCohort('binance', 25)).resolves.toEqual({
+      provider: 'binance',
+      detectionCount: 2,
+      checkpoints: [
+        {
+          label: 'T+0',
+          offsetMs: 0,
+          sampleSize: 2,
+          averageSpreadBasisPoints: '200',
+          averageBidQuoteNotional: '198',
+          averageAskQuoteNotional: '353.5',
+        },
+      ],
+    });
+    expect(listCohort).toHaveBeenCalledWith('binance', 25);
+  });
+
+  it('rejects an invalid top-of-book cohort limit before loading', async () => {
+    const listCohort = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort,
+    });
+
+    await expect(service.getTopOfBookCohort('binance', 0)).rejects.toThrow(
+      'cohort limit must be an integer from 1 to 100',
+    );
+    expect(listCohort).not.toHaveBeenCalled();
+  });
+
+  it('returns an explicit empty durable top-of-book cohort', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort: jest.fn(() => Promise.resolve([])),
+    });
+
+    await expect(service.getTopOfBookCohort('binance', 50)).resolves.toEqual({
+      provider: null,
+      detectionCount: 0,
+      checkpoints: [],
+    });
+  });
+
+  it('fails explicitly when durable top-of-book access is unavailable', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith());
+
+    await expect(service.getTopOfBookCohort('binance', 50)).rejects.toThrow(
+      'top-of-book repository is unavailable',
+    );
   });
 
   it('delegates filtered aggregate summaries to the repository', async () => {
@@ -638,6 +706,28 @@ function baseCompletedObservation() {
     tradeCount: 100,
     windowOpenTime: new Date('2026-09-13T02:00:00.000Z'),
     windowCloseTime: new Date('2026-09-14T02:00:00.000Z'),
+    receivedAt: new Date('2026-09-14T02:00:01.000Z'),
+  };
+}
+
+function topOfBookCheckpoint(
+  symbol: string,
+  bidPrice: string,
+  bidQuantity: string,
+  askPrice: string,
+  askQuantity: string,
+) {
+  return {
+    provider: 'binance' as const,
+    symbol,
+    label: 'T+0' as const,
+    offsetMs: 0,
+    targetAt: new Date('2026-09-14T02:00:00.000Z'),
+    updateId: '42',
+    bidPrice,
+    bidQuantity,
+    askPrice,
+    askQuantity,
     receivedAt: new Date('2026-09-14T02:00:01.000Z'),
   };
 }
