@@ -401,3 +401,9 @@ Later zero-notional books retain `null` imbalance and change values. The route r
 A pure exact-decimal calculator groups validated per-detection imbalance evolutions by canonical checkpoint and averages their available changes from T+0. Each checkpoint independently reports total evolution samples, available change samples, unavailable changes, and a nullable exact average.
 
 The calculator verifies provider and symbol identity, unique detections, canonical schedule metadata, the declared T+0 baseline, and that every available change exactly equals its imbalance rate minus that baseline. Unavailable later values never enter the denominator or become zero. This increment adds no durable query, route, persistence, provider request, score, alert, signal, or trading behavior.
+
+## M7.69 durable top-of-book imbalance evolution cohort loading
+
+The internal detection read model validates a 1–100 limit, loads the existing bounded newest-first durable cohort whose members have a stored T+0 book, derives each available T+0-relative imbalance evolution, and applies the M7.68 exact cohort calculator on demand.
+
+A selected member whose T+0 book has zero displayed notional cannot establish an imbalance baseline and is excluded from the analytical detection count. Later unavailable checkpoints remain explicit and do not enter their checkpoint average. This increment adds no route, repository query, derived persistence, provider request, score, alert, signal, or trading behavior.

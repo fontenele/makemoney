@@ -42,7 +42,9 @@ import { ListingTopOfBookImbalanceCalculator } from './listing-top-of-book-imbal
 import { ListingTopOfBookImbalanceCohort } from '../domain/listing-top-of-book-imbalance-cohort';
 import { ListingTopOfBookImbalanceCohortCalculator } from './listing-top-of-book-imbalance-cohort-calculator';
 import { ListingTopOfBookImbalanceEvolution } from '../domain/listing-top-of-book-imbalance-evolution';
+import { ListingTopOfBookImbalanceEvolutionCohort } from '../domain/listing-top-of-book-imbalance-evolution-cohort';
 import { ListingTopOfBookImbalanceEvolutionCalculator } from './listing-top-of-book-imbalance-evolution-calculator';
+import { ListingTopOfBookImbalanceEvolutionCohortCalculator } from './listing-top-of-book-imbalance-evolution-cohort-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -71,6 +73,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingTopOfBookImbalanceCohortCalculator();
   private readonly topOfBookImbalanceEvolution =
     new ListingTopOfBookImbalanceEvolutionCalculator();
+  private readonly topOfBookImbalanceEvolutionCohort =
+    new ListingTopOfBookImbalanceEvolutionCohortCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -260,6 +264,26 @@ export class SpotSymbolDetectionReadModelService {
     }
     return this.topOfBookImbalanceCohort.calculate(
       await this.topOfBookRepository.listCohort(provider, limit),
+    );
+  }
+
+  async getTopOfBookImbalanceEvolutionCohort(
+    provider: 'binance',
+    limit: number,
+  ): Promise<ListingTopOfBookImbalanceEvolutionCohort> {
+    this.validateCohortLimit(limit);
+    if (!this.topOfBookRepository) {
+      throw new Error('Listing top-of-book repository is unavailable');
+    }
+    const timelines = await this.topOfBookRepository.listCohort(
+      provider,
+      limit,
+    );
+    return this.topOfBookImbalanceEvolutionCohort.calculate(
+      timelines.flatMap((timeline) => {
+        const evolution = this.topOfBookImbalanceEvolution.calculate(timeline);
+        return evolution ? [evolution] : [];
+      }),
     );
   }
 

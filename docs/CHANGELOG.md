@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.69 durable imbalance evolution cohort loading completed
+
+- Composed exact imbalance-evolution aggregation over the existing bounded durable T+0-book cohort.
+- Excluded zero-notional T+0 books that cannot establish an analytical baseline while preserving later checkpoint unavailability.
+- Kept the operation internal and on demand with no new query, route, persistence, provider request, score, signal, or trading path.
+- 744 unit tests across 86 suites and all 56 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.68 top-of-book imbalance evolution cohort completed
 
 - Added a pure exact-decimal cohort calculator for average T+0-relative imbalance change by checkpoint.

@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Reuse the bounded T+0-book cohort for evolution research
+
+M7.69 reuses the existing newest-first durable selection, so PostgreSQL applies the requested 1–100 limit before derived calculation. A stored T+0 book with zero displayed notional has no imbalance baseline and is excluded from the analytical detection count rather than converted to zero; later unavailable checkpoints remain explicit within otherwise eligible evolutions.
+
 ## 2026-09-20 — Preserve availability in imbalance-evolution cohorts
 
 M7.68 averages only validated available T+0-relative imbalance changes at each checkpoint. Every checkpoint independently reports total evolution coverage, available-change coverage, and unavailable changes; missing values never become neutral zero. Inputs must prove that each available change exactly equals its rate minus the declared T+0 baseline before aggregation.

@@ -759,6 +759,90 @@ describe('SpotSymbolDetectionReadModelService', () => {
     ).rejects.toThrow('top-of-book repository is unavailable');
   });
 
+  it('loads and calculates a bounded durable imbalance evolution cohort', async () => {
+    const later = {
+      ...topOfBookCheckpoint('AUSDT', '99', '0', '101', '1'),
+      label: 'T+5s' as const,
+      offsetMs: 5_000,
+      targetAt: new Date('2026-09-14T02:00:05.000Z'),
+    };
+    const listCohort = jest.fn(() =>
+      Promise.resolve([
+        [topOfBookCheckpoint('AUSDT', '99', '1', '101', '0'), later],
+        [topOfBookCheckpoint('BUSDT', '99', '0', '101', '0')],
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort,
+    });
+
+    await expect(
+      service.getTopOfBookImbalanceEvolutionCohort('binance', 25),
+    ).resolves.toEqual({
+      provider: 'binance',
+      detectionCount: 1,
+      checkpoints: [
+        {
+          label: 'T+0',
+          offsetMs: 0,
+          sampleSize: 1,
+          changeSampleSize: 1,
+          unavailableChangeCount: 0,
+          averageImbalanceChange: '0',
+        },
+        {
+          label: 'T+5s',
+          offsetMs: 5_000,
+          sampleSize: 1,
+          changeSampleSize: 1,
+          unavailableChangeCount: 0,
+          averageImbalanceChange: '-2',
+        },
+      ],
+    });
+    expect(listCohort).toHaveBeenCalledWith('binance', 25);
+  });
+
+  it('rejects an invalid imbalance evolution cohort limit before loading', async () => {
+    const listCohort = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort,
+    });
+
+    await expect(
+      service.getTopOfBookImbalanceEvolutionCohort('binance', 0),
+    ).rejects.toThrow('cohort limit must be an integer from 1 to 100');
+    expect(listCohort).not.toHaveBeenCalled();
+  });
+
+  it('returns an empty durable evolution cohort without usable T+0 books', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort: jest.fn(() =>
+        Promise.resolve([
+          [topOfBookCheckpoint('AUSDT', '99', '0', '101', '0')],
+        ]),
+      ),
+    });
+
+    await expect(
+      service.getTopOfBookImbalanceEvolutionCohort('binance', 50),
+    ).resolves.toEqual({ provider: null, detectionCount: 0, checkpoints: [] });
+  });
+
+  it('fails explicitly when durable evolution cohort access is unavailable', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith());
+
+    await expect(
+      service.getTopOfBookImbalanceEvolutionCohort('binance', 50),
+    ).rejects.toThrow('top-of-book repository is unavailable');
+  });
+
   it('delegates filtered aggregate summaries to the repository', async () => {
     const summary = {
       count: 2,
