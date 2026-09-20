@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.62 top-of-book imbalance cohort calculation completed
+
+- Added a pure exact-decimal cohort calculator for average displayed level-one imbalance by observation checkpoint.
+- Reported total book coverage, calculable imbalance coverage, and zero-denominator unavailability independently.
+- Kept zero displayed books out of the average denominator instead of fabricating neutral imbalance.
+- 713 unit tests across 84 suites and all 54 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.61 durable top-of-book imbalance API completed
 
 - Added local read-only `GET /new-listings/:provider/:symbol/top-of-book/imbalance` for one detected symbol's derived durable timeline.

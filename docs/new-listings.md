@@ -359,3 +359,9 @@ An unknown detection retains the established not-found behavior, a known detecti
 `GET /new-listings/:provider/:symbol/top-of-book/imbalance` exposes the M7.60 on-demand timeline through the local read-only API. Provider must be `binance`, symbol must be canonical uppercase alphanumeric with 1–30 characters, an unknown durable detection returns `404`, and a known detection without stored books returns an empty array.
 
 Each response item retains its checkpoint metadata and exact displayed bid/ask quote notionals. The normalized imbalance remains `null` when both displayed quantities are zero. The route reads stored snapshots only and cannot invoke Binance, collect or persist data, score a listing, emit a signal, or trade.
+
+## M7.62 top-of-book imbalance cohort calculation
+
+A pure exact-decimal calculator groups validated stored-book timelines by canonical checkpoint and averages their available normalized level-one imbalance rates. Each checkpoint reports the total stored-book sample, the independently calculable imbalance sample, and the count unavailable because both displayed quantities are zero.
+
+Unavailable imbalance never enters the average denominator and produces a `null` average when no defined rate remains. Incomplete timelines contribute only the checkpoints they contain. This descriptive calculation adds no durable query, route, persistence, score, alert, signal, or trading behavior.

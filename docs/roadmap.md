@@ -170,6 +170,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.59 — complete:** a pure exact-decimal calculator derives displayed bid/ask quote notionals and normalized level-one imbalance with explicit zero-book unavailability.
 - **M7.60 — complete:** the internal read model applies exact imbalance to one detected symbol's canonical durable book timeline while preserving checkpoint metadata and empty/not-found semantics.
 - **M7.61 — complete:** local read-only `GET /new-listings/:provider/:symbol/top-of-book/imbalance` exposes the exact derived durable timeline without collection or derived persistence.
+- **M7.62 — complete:** a pure exact-decimal cohort calculator reports average checkpoint imbalance with explicit stored-book, calculable, and unavailable sample coverage.
 
 ## M8 — Dashboard — planned
 

@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Keep imbalance cohort availability explicit
+
+M7.62 averages only defined level-one imbalance rates. Every checkpoint separately reports stored-book coverage, calculable imbalance coverage, and unavailable zero-denominator books, so missing information cannot be silently converted into a neutral value or hidden in the average denominator.
+
 ## 2026-09-20 — Expose stored-book imbalance without activating collection
 
 M7.61 exposes the existing on-demand imbalance composition through a local read-only route. It mirrors the raw stored-book timeline's identity, not-found, and empty-result semantics, while retaining `null` for a zero displayed book and never invoking Binance or storing derived metrics.
