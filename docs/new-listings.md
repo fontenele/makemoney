@@ -299,3 +299,9 @@ Provider failure is propagated and prevents calculation. The service is availabl
 Each existing observation checkpoint can now own at most one optional top-of-book record. The child row uses the checkpoint's provider, symbol, and schedule label as its immutable primary and foreign key, and deletion of the parent detection/checkpoint cascades naturally.
 
 Update ID, bid/ask prices, and displayed quantities remain their exact validated strings rather than being rounded to a database decimal scale. Database constraints independently enforce canonical numeric shapes, positive prices, non-negative quantities, and a non-crossed book. The create-only provider-neutral repository rejects observation/checkpoint identity mismatches before database access. It is registered for later use but the worker does not invoke it, so no automatic collection, HTTP route, scoring, alert, signal, or trading behavior is added.
+
+## M7.52 durable top-of-book timeline loading
+
+The repository can now load every stored top-of-book record for one explicit provider and canonical symbol. It returns the empty timeline explicitly when no row exists; otherwise each result includes its checkpoint label, offset, target time, update ID, exact bid/ask values, displayed quantities, and receive time.
+
+Database return order is normalized to the canonical schedule. Persisted observation invariants and joined label/offset/target metadata are validated before results leave the infrastructure boundary. The read remains internal and naturally bounded by the nine checkpoints; no worker integration, route, scoring, alert, signal, or trading behavior is added.

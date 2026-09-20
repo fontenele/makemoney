@@ -12,8 +12,18 @@ export interface StoreListingTopOfBookObservationRequest {
   observation: ListingTopOfBookObservation;
 }
 
+export interface StoredListingTopOfBookCheckpoint extends ListingTopOfBookObservation {
+  label: ListingObservationCheckpointLabel;
+  offsetMs: number;
+  targetAt: Date;
+}
+
 export interface ListingTopOfBookObservationRepository {
   store(
     request: StoreListingTopOfBookObservationRequest,
   ): Promise<ListingTopOfBookObservation>;
+  listForDetection(
+    provider: ListingTopOfBookObservation['provider'],
+    symbol: string,
+  ): Promise<StoredListingTopOfBookCheckpoint[]>;
 }

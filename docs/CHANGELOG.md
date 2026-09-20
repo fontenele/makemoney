@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-20 — M7.52 durable top-of-book timeline loading completed
+
+- Added provider-neutral loading of all stored top-of-book checkpoints for one explicit detection identity.
+- Returned an explicit empty timeline or canonically ordered checkpoint records with schedule metadata and exact book fields.
+- Added fail-fast request validation and strict validation of persisted schedule and observation data.
+- Kept loading internal, with no worker integration, route, scoring, alerts, signals, or trading.
+- 673 unit tests across 80 suites and all 52 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.51 durable checkpoint top-of-book storage completed
 
 - Added an optional one-to-one top-of-book record keyed to an existing listing observation checkpoint with cascade ownership.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Durable top-of-book reads follow checkpoint schedule order
+
+M7.52 reads all stored book rows for one validated provider/symbol identity and orders them by their canonical checkpoint offset, independent of database return order. Each child observation and its joined checkpoint metadata are revalidated at the persistence boundary; malformed durable state fails instead of being partially returned.
+
+The timeline is bounded naturally by the nine checkpoint identities and returns an explicit empty array when nothing has been collected. HTTP exposure and worker collection remain separate increments.
+
 ## 2026-09-20 — Checkpoint top-of-book storage is separate and immutable
 
 M7.51 stores top-of-book observations in an optional child table keyed by the existing checkpoint identity instead of expanding the checkpoint's completion invariant. This lets historical completed ticker observations remain valid and prevents top-of-book collection from silently redefining completion.

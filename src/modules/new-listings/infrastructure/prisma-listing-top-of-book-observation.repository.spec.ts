@@ -63,6 +63,57 @@ describe('PrismaListingTopOfBookObservationRepository', () => {
     ).rejects.toThrow('Listing top-of-book checkpoint identity mismatch');
     expect(create).not.toHaveBeenCalled();
   });
+
+  it('loads stored observations in canonical checkpoint order', async () => {
+    const findMany = jest
+      .fn()
+      .mockResolvedValue([
+        persistedTopOfBook('T+5s', 5_000, '43'),
+        persistedTopOfBook('T+0', 0, '42'),
+      ]);
+    const prisma = {
+      listingCheckpointTopOfBook: { findMany },
+    } as unknown as PrismaService;
+    const repository = new PrismaListingTopOfBookObservationRepository(prisma);
+
+    await expect(
+      repository.listForDetection('binance', 'NEWUSDT'),
+    ).resolves.toMatchObject([
+      { label: 'T+0', offsetMs: 0, updateId: '42' },
+      { label: 'T+5s', offsetMs: 5_000, updateId: '43' },
+    ]);
+    expect(findMany).toHaveBeenCalledWith({
+      where: { provider: 'binance', symbol: 'NEWUSDT' },
+      include: {
+        checkpoint: { select: { offsetMs: true, targetAt: true } },
+      },
+    });
+  });
+
+  it('returns an explicit empty timeline', async () => {
+    const findMany = jest.fn().mockResolvedValue([]);
+    const prisma = {
+      listingCheckpointTopOfBook: { findMany },
+    } as unknown as PrismaService;
+    const repository = new PrismaListingTopOfBookObservationRepository(prisma);
+
+    await expect(
+      repository.listForDetection('binance', 'NEWUSDT'),
+    ).resolves.toEqual([]);
+  });
+
+  it('rejects malformed identity before durable loading', async () => {
+    const findMany = jest.fn();
+    const prisma = {
+      listingCheckpointTopOfBook: { findMany },
+    } as unknown as PrismaService;
+    const repository = new PrismaListingTopOfBookObservationRepository(prisma);
+
+    await expect(
+      repository.listForDetection('binance', 'newusdt'),
+    ).rejects.toThrow('Invalid listing top-of-book detection identity');
+    expect(findMany).not.toHaveBeenCalled();
+  });
 });
 
 function topOfBook(): ListingTopOfBookObservation {
@@ -75,5 +126,18 @@ function topOfBook(): ListingTopOfBookObservation {
     askPrice: '1.3',
     askQuantity: '9',
     receivedAt: new Date('2026-09-20T12:00:00.000Z'),
+  };
+}
+
+function persistedTopOfBook(label: string, offsetMs: number, updateId: string) {
+  return {
+    ...topOfBook(),
+    label,
+    updateId,
+    createdAt: new Date('2026-09-20T12:00:01.000Z'),
+    checkpoint: {
+      offsetMs,
+      targetAt: new Date(1_790_000_000_000 + offsetMs),
+    },
   };
 }
