@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.60 durable top-of-book imbalance composition completed
+
+- Added an internal read-model operation that derives exact imbalance across one detected symbol's stored top-of-book timeline.
+- Reused the durable detection existence check, canonical repository ordering, and explicit empty-timeline semantics.
+- Preserved checkpoint label, offset, and target time without persisting derived notionals or imbalance rates.
+- 704 unit tests across 83 suites and all 53 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.59 exact top-of-book imbalance completed
 
 - Added a pure exact-decimal calculator for displayed bid and ask quote notionals and their normalized level-one imbalance rate.

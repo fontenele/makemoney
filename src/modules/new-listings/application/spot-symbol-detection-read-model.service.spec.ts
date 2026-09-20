@@ -519,6 +519,47 @@ describe('SpotSymbolDetectionReadModelService', () => {
     expect(listForDetection).not.toHaveBeenCalled();
   });
 
+  it('derives exact imbalance across a durable top-of-book timeline', async () => {
+    const timeline = [
+      topOfBookCheckpoint('NEWUSDT', '99', '2', '101', '1'),
+      {
+        ...topOfBookCheckpoint('NEWUSDT', '99', '0', '101', '0'),
+        label: 'T+5s' as const,
+        offsetMs: 5_000,
+        targetAt: new Date('2026-09-14T02:00:05.000Z'),
+      },
+    ];
+    const listForDetection = jest.fn(() => Promise.resolve(timeline));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+      {
+        store: jest.fn(),
+        listForDetection,
+        listCohort: jest.fn(),
+      },
+    );
+
+    await expect(
+      service.listTopOfBookImbalance('binance', 'NEWUSDT'),
+    ).resolves.toMatchObject([
+      {
+        label: 'T+0',
+        bidQuoteNotional: '198',
+        askQuoteNotional: '101',
+        imbalanceRate: '0.3244147157190635451505016722408026755853',
+      },
+      {
+        label: 'T+5s',
+        bidQuoteNotional: '0',
+        askQuoteNotional: '0',
+        imbalanceRate: null,
+      },
+    ]);
+    expect(listForDetection).toHaveBeenCalledWith('binance', 'NEWUSDT');
+  });
+
   it('loads and calculates a bounded durable top-of-book cohort', async () => {
     const listCohort = jest.fn(() =>
       Promise.resolve([

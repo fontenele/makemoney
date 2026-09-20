@@ -37,6 +37,8 @@ import {
 } from '../domain/listing-top-of-book-observation-repository';
 import { ListingTopOfBookCohort } from '../domain/listing-top-of-book-cohort';
 import { ListingTopOfBookCohortCalculator } from './listing-top-of-book-cohort-calculator';
+import { StoredListingTopOfBookImbalance } from '../domain/listing-top-of-book-imbalance';
+import { ListingTopOfBookImbalanceCalculator } from './listing-top-of-book-imbalance-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -59,6 +61,8 @@ export class SpotSymbolDetectionReadModelService {
   private readonly marketActivityCohort =
     new ListingObservationMarketActivityCohortCalculator();
   private readonly topOfBookCohort = new ListingTopOfBookCohortCalculator();
+  private readonly topOfBookImbalance =
+    new ListingTopOfBookImbalanceCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -122,6 +126,18 @@ export class SpotSymbolDetectionReadModelService {
       throw new Error('Listing top-of-book repository is unavailable');
     }
     return this.topOfBookRepository.listForDetection(provider, symbol);
+  }
+
+  async listTopOfBookImbalance(
+    provider: 'binance',
+    symbol: string,
+  ): Promise<StoredListingTopOfBookImbalance[]> {
+    return (await this.listTopOfBook(provider, symbol)).map((checkpoint) => ({
+      label: checkpoint.label,
+      offsetMs: checkpoint.offsetMs,
+      targetAt: checkpoint.targetAt,
+      ...this.topOfBookImbalance.calculate(checkpoint),
+    }));
   }
 
   async getPricePerformance(

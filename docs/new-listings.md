@@ -347,3 +347,9 @@ The response preserves exact decimal-string averages and independent checkpoint 
 A pure exact-decimal calculator derives displayed bid and ask quote notionals from one validated top-of-book observation and normalizes their difference by total displayed quote notional. The resulting rate is bounded from `-1` for ask-only displayed value through `1` for bid-only displayed value.
 
 When both displayed quantities are zero, the rate is explicitly unavailable (`null`) because no denominator exists. This level-one snapshot metric does not establish market pressure, depth, fill capacity, predictive value, or a trading signal. This increment adds no durable composition, route, persistence, score, alert, signal, or trading behavior.
+
+## M7.60 durable top-of-book imbalance composition
+
+The internal detection read model now loads one detected symbol's canonical durable top-of-book timeline and applies the M7.59 exact imbalance calculation independently to every stored checkpoint. Each derived item preserves its schedule label, offset, and target time together with the original book snapshot.
+
+An unknown detection retains the established not-found behavior, a known detection without stored books returns an empty timeline, and no derived value is persisted. This increment adds no route, cohort statistic, score, alert, signal, or trading behavior.

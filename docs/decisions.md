@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Derive imbalance from canonical durable books on demand
+
+M7.60 reuses the stored top-of-book timeline rather than persisting duplicate derived values. Each result keeps its schedule metadata and applies the M7.59 calculator independently, so absent checkpoints remain absent and a zero displayed book remains explicitly unavailable.
+
 ## 2026-09-20 — Treat zero displayed book as unavailable imbalance
 
 M7.59 defines level-one imbalance as `(bid quote notional - ask quote notional) / total displayed quote notional`. A one-sided book produces the exact boundary `-1` or `1`; when both displayed quantities are zero, the denominator has no information and the result is `null` rather than a fabricated neutral zero.
