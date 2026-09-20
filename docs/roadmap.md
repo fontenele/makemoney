@@ -182,6 +182,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.71 — complete:** a pure exact-decimal calculator derives checkpoint spread-basis-point changes from the explicit T+0 book.
 - **M7.72 — complete:** the internal read model derives exact spread evolution from one detected symbol's canonical durable stored-book timeline.
 - **M7.73 — complete:** local read-only per-detection HTTP access exposes exact durable spread evolution with explicit T+0 unavailability.
+- **M7.74 — complete:** a pure exact-decimal cohort calculator aggregates spread-basis-point evolution with independent checkpoint coverage.
 
 ## M8 — Dashboard — planned
 

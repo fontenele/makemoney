@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.74 top-of-book spread evolution cohort calculation completed
+
+- Added a pure exact-decimal calculator for checkpoint spread-evolution cohort averages.
+- Preserved independent checkpoint sample coverage and rejected duplicate symbols or incoherent baseline-relative values.
+- Added no database query, route, persistence, score, alert, signal, or trading behavior.
+- 766 unit tests across 88 suites and all 58 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.73 durable top-of-book spread evolution API completed
 
 - Added local read-only `GET /new-listings/:provider/:symbol/top-of-book/spread/evolution`.

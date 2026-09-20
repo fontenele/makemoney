@@ -111,6 +111,8 @@ Use this keyword map to locate context before changing code. Read the listed doc
 
 | top-of-book spread evolution API, GET /new-listings/:provider/:symbol/top-of-book/spread/evolution, M7.73 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
 
+| top-of-book spread evolution cohort, average spread basis points change, evolution coverage, M7.74 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-top-of-book-spread-evolution-cohort-calculator.ts`, `../src/modules/new-listings/domain/listing-top-of-book-spread-evolution-cohort.ts` |
+
 ## Before every task
 
 1. Read `../AGENTS.md` and `../PROJECT_CONTEXT.md` completely.
