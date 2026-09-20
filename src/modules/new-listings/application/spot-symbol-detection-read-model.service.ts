@@ -47,6 +47,8 @@ import { ListingTopOfBookImbalanceEvolutionCalculator } from './listing-top-of-b
 import { ListingTopOfBookImbalanceEvolutionCohortCalculator } from './listing-top-of-book-imbalance-evolution-cohort-calculator';
 import { ListingTopOfBookSpreadEvolution } from '../domain/listing-top-of-book-spread-evolution';
 import { ListingTopOfBookSpreadEvolutionCalculator } from './listing-top-of-book-spread-evolution-calculator';
+import { ListingTopOfBookSpreadEvolutionCohort } from '../domain/listing-top-of-book-spread-evolution-cohort';
+import { ListingTopOfBookSpreadEvolutionCohortCalculator } from './listing-top-of-book-spread-evolution-cohort-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -79,6 +81,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingTopOfBookImbalanceEvolutionCohortCalculator();
   private readonly topOfBookSpreadEvolution =
     new ListingTopOfBookSpreadEvolutionCalculator();
+  private readonly topOfBookSpreadEvolutionCohort =
+    new ListingTopOfBookSpreadEvolutionCohortCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -295,6 +299,26 @@ export class SpotSymbolDetectionReadModelService {
     return this.topOfBookImbalanceEvolutionCohort.calculate(
       timelines.flatMap((timeline) => {
         const evolution = this.topOfBookImbalanceEvolution.calculate(timeline);
+        return evolution ? [evolution] : [];
+      }),
+    );
+  }
+
+  async getTopOfBookSpreadEvolutionCohort(
+    provider: 'binance',
+    limit: number,
+  ): Promise<ListingTopOfBookSpreadEvolutionCohort> {
+    this.validateCohortLimit(limit);
+    if (!this.topOfBookRepository) {
+      throw new Error('Listing top-of-book repository is unavailable');
+    }
+    const timelines = await this.topOfBookRepository.listCohort(
+      provider,
+      limit,
+    );
+    return this.topOfBookSpreadEvolutionCohort.calculate(
+      timelines.flatMap((timeline) => {
+        const evolution = this.topOfBookSpreadEvolution.calculate(timeline);
         return evolution ? [evolution] : [];
       }),
     );

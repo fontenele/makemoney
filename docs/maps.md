@@ -113,6 +113,8 @@ Use this keyword map to locate context before changing code. Read the listed doc
 
 | top-of-book spread evolution cohort, average spread basis points change, evolution coverage, M7.74 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-top-of-book-spread-evolution-cohort-calculator.ts`, `../src/modules/new-listings/domain/listing-top-of-book-spread-evolution-cohort.ts` |
 
+| durable spread evolution cohort, bounded spread evolution cohort loading, usable T+0 book baseline, M7.75 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-top-of-book-spread-evolution-calculator.ts`, `../src/modules/new-listings/application/listing-top-of-book-spread-evolution-cohort-calculator.ts` |
+
 ## Before every task
 
 1. Read `../AGENTS.md` and `../PROJECT_CONTEXT.md` completely.

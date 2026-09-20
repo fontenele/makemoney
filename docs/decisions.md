@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Reuse the bounded durable book cohort for spread evolution
+
+M7.75 composes existing repository selection, per-detection spread evolution, and pure cohort aggregation instead of adding a query or projection table. The limit is validated before persistence access, the repository bounds recent T+0-eligible detections, and any timeline that still cannot produce a T+0 evolution is omitted defensively.
+
 ## 2026-09-20 — Aggregate spread evolution with independent checkpoint coverage
 
 M7.74 averages exact basis-point changes only where each detection has a stored checkpoint. Every aggregate checkpoint exposes its own sample size, missing later checkpoints are not filled, and each input evolution must have a coherent explicit T+0 baseline and a unique symbol. The calculation remains pure and uses isolated 40-digit decimal arithmetic.

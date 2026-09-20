@@ -437,3 +437,9 @@ Positive basis-point changes mean spread widening and negative changes mean tigh
 A pure calculator aggregates validated per-detection spread evolutions by canonical checkpoint. Each checkpoint reports its independent sample size and the exact average spread-basis-point change relative to each detection's own T+0 book; missing later checkpoints contribute no fabricated value.
 
 Inputs must use unique canonical Binance symbols, coherent non-negative spreads, an explicit T+0 baseline, unique valid schedule labels, and exact changes consistent with that baseline. Arithmetic uses an isolated 40-digit half-even decimal context. This increment adds no database query, route, persistence, score, alert, signal, or trading behavior.
+
+## M7.75 durable top-of-book spread evolution cohort loading
+
+The internal detection read model now validates a cohort limit from 1 through 100, loads the repository's bounded recent top-of-book cohort, derives each timeline's exact spread evolution, excludes timelines without a stored T+0 baseline, and applies the M7.74 aggregate.
+
+The repository continues to select the recent T+0-eligible durable detections before loading their canonical stored books, so memory and database work remain bounded. Results are calculated on demand and are not persisted. This increment adds no route, provider request, score, alert, signal, or trading behavior.

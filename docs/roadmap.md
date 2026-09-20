@@ -183,6 +183,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.72 — complete:** the internal read model derives exact spread evolution from one detected symbol's canonical durable stored-book timeline.
 - **M7.73 — complete:** local read-only per-detection HTTP access exposes exact durable spread evolution with explicit T+0 unavailability.
 - **M7.74 — complete:** a pure exact-decimal cohort calculator aggregates spread-basis-point evolution with independent checkpoint coverage.
+- **M7.75 — complete:** the internal read model composes spread evolution over a bounded recent durable cohort with usable T+0 books.
 
 ## M8 — Dashboard — planned
 
