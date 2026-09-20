@@ -251,3 +251,9 @@ The response preserves independent pump and correction sample sizes with null me
 A pure cohort calculator groups completed listing observations by canonical checkpoint and reports the exact average rolling-24-hour base volume, quote volume, and trade count with an explicit sample size. Unequal timeline coverage is preserved rather than filled, and empty cohorts remain explicit.
 
 Every timeline must be non-empty, provider-valid, internally single-symbol, unique within the cohort, and free of duplicate or non-canonical checkpoints. Decimal averages use exact arithmetic and trade-count averages remain decimal strings when non-integral. These provider rolling-window measures describe market activity only: they do not represent order-book depth, spread, price impact, or executable liquidity. This increment adds no durable loading, route, persistence, score, alert, signal, or trading behavior.
+
+## M7.44 durable checkpoint market activity loading
+
+The internal detection read model now applies the M7.43 activity calculator to the existing bounded cohort of 1 through 100 recent durable Binance detections with completed `T+0`. It performs one repository read and retains each checkpoint's independent coverage instead of requiring complete timelines.
+
+An empty eligible cohort returns no checkpoints and a zero detection count. Invalid limits fail before repository access, and incoherent durable timelines remain explicit errors. The result continues to describe rolling-window market activity, not executable liquidity. This increment adds no route, derived persistence, score, alert, signal, or trading behavior.

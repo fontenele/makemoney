@@ -381,6 +381,83 @@ describe('SpotSymbolDetectionReadModelService', () => {
     expect(listCompletedObservationCohort).not.toHaveBeenCalled();
   });
 
+  it('loads a durable cohort and calculates checkpoint market activity', async () => {
+    const listCompletedObservationCohort = jest.fn(() =>
+      Promise.resolve([
+        [completedObservation()],
+        [
+          completedObservation({
+            symbol: 'OTHERUSDT',
+            baseVolume: '2000',
+            quoteVolume: '200000',
+            tradeCount: 200,
+          }),
+          completedObservation({
+            symbol: 'OTHERUSDT',
+            label: 'T+5s',
+            offsetMs: 5_000,
+            baseVolume: '3000',
+            quoteVolume: '300000',
+            tradeCount: 300,
+          }),
+        ],
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(
+      service.getMarketActivityCohort('binance', 25),
+    ).resolves.toEqual({
+      provider: 'binance',
+      detectionCount: 2,
+      checkpoints: [
+        {
+          label: 'T+0',
+          offsetMs: 0,
+          sampleSize: 2,
+          averageBaseVolume: '1500',
+          averageQuoteVolume: '150000',
+          averageTradeCount: '150',
+        },
+        {
+          label: 'T+5s',
+          offsetMs: 5_000,
+          sampleSize: 1,
+          averageBaseVolume: '3000',
+          averageQuoteVolume: '300000',
+          averageTradeCount: '300',
+        },
+      ],
+    });
+    expect(listCompletedObservationCohort).toHaveBeenCalledWith('binance', 25);
+  });
+
+  it('returns an explicit empty durable market activity cohort', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith());
+
+    await expect(
+      service.getMarketActivityCohort('binance', 50),
+    ).resolves.toEqual({
+      provider: null,
+      detectionCount: 0,
+      checkpoints: [],
+    });
+  });
+
+  it('rejects an invalid activity cohort limit before repository access', async () => {
+    const listCompletedObservationCohort = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(
+      service.getMarketActivityCohort('binance', 101),
+    ).rejects.toThrow('cohort limit must be an integer from 1 to 100');
+    expect(listCompletedObservationCohort).not.toHaveBeenCalled();
+  });
+
   it('lists completed observations only for a durable detection', async () => {
     const observations = [{ label: 'T+0' }];
     const repository = repositoryWith({

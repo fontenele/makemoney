@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-19 — M7.44 durable checkpoint market activity loading completed
+
+- Added internal bounded durable market-activity calculation over recent detections with completed `T+0` observations.
+- Reused the existing durable cohort selection while retaining independent later-checkpoint sample coverage.
+- Added populated, empty, and fail-fast invalid-limit read-model coverage.
+- Kept HTTP exposure, derived persistence, order-book liquidity claims, scoring, alerts, signals, and trading outside this increment.
+- 628 unit tests across 74 suites and all 52 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.43 checkpoint market activity cohort completed
 
 - Added a pure cohort calculator for exact average rolling-24-hour base volume, quote volume, and trade count by canonical checkpoint.

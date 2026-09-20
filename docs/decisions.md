@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-19 — Durable activity reuses the T+0-eligible cohort
+
+M7.44 uses the existing bounded repository selection for recent detections with completed `T+0`, then passes their raw completed timelines directly to the M7.43 activity calculator. This preserves one durable population across checkpoint research while allowing incomplete later checkpoints to retain independent sample sizes. The aggregate is calculated on demand, remains unpersisted, and is still not an order-book liquidity measure.
+
 ## 2026-09-19 — Rolling ticker volume is market activity, not liquidity
 
 M7.43 aggregates the exact rolling-24-hour base volume, quote volume, and trade count already captured at each checkpoint. These values describe turnover and activity but cannot establish executable size, spread, depth, or price impact, so the domain deliberately calls the result market activity rather than liquidity. Checkpoints retain independent sample sizes, arithmetic remains decimal-exact, and no missing observation is forward-filled.
