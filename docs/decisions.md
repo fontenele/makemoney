@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Listing spread is derived from one validated snapshot
+
+M7.47 calculates absolute spread, midpoint, and basis points only after the M7.46 contract validates identity, prices, quantities, update ID, and receive time. An isolated 40-digit half-even `decimal.js` context avoids native floating-point arithmetic, and the result retains the complete level-one provenance required to interpret the metric.
+
+Zero spread is valid for a locked positive book. The calculation makes no claim about deeper levels, price impact, slippage, or actual fillability; provider loading and durable sampling remain separate concerns.
+
 ## 2026-09-20 — Listing liquidity starts with a separate top-of-book boundary
 
 M7.46 does not generalize the existing BTC/USDT streaming model because that contract is intentionally fixed to M1's live pair. New-listing research instead receives a provider-neutral request/observation boundary for arbitrary canonical symbols. It preserves exact public bid/ask values and displayed quantities, rejects crossed books, and allows locked books or zero quantities without pretending they guarantee execution.

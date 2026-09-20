@@ -269,3 +269,9 @@ The response reports exact average rolling-window base volume, quote volume, and
 A provider-neutral contract now represents one public top-of-book observation for an arbitrary canonical listing symbol. It preserves the provider update ID, exact bid and ask prices, exact displayed quantities, and independent local receive time. A loader interface accepts an explicit provider/symbol request and optional cancellation signal without selecting a transport.
 
 Validation requires Binance identity, canonical symbols, a non-negative integer update ID, positive prices, non-negative quantities, a non-crossed book, and a valid receive time. Locked books and zero displayed quantities remain valid observations. This increment adds no Binance request, stream, spread calculation, persistence, worker integration, route, score, alert, signal, or trading behavior.
+
+## M7.47 listing top-of-book spread
+
+A pure calculator validates one M7.46 observation and derives its absolute spread, midpoint, and spread in basis points with an isolated 40-digit half-even decimal context. The normalized result preserves provider, symbol, update ID, best prices, displayed quantities, and receive time so every metric remains traceable to one snapshot.
+
+A locked positive book produces zero spread, while a crossed or otherwise invalid observation fails before calculation. The result describes only level-one displayed state and does not estimate depth, market impact, slippage, or executable fill size. This increment adds no Binance request, persistence, worker integration, route, score, alert, signal, or trading behavior.

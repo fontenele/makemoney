@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-20 — M7.47 listing top-of-book spread completed
+
+- Added a pure exact-decimal calculator for absolute spread, midpoint, and spread basis points from validated listing top-of-book observations.
+- Preserved provider, symbol, update ID, best prices, displayed quantities, and receive time in the derived result.
+- Covered ordinary, fractional, locked, and invalid crossed-book behavior without native floating-point arithmetic.
+- Kept provider loading, persistence, worker integration, routes, scoring, alerts, signals, and trading outside this increment.
+- 648 unit tests across 76 suites and all 52 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.46 listing top-of-book observation contract completed
 
 - Added a provider-neutral arbitrary-symbol top-of-book observation and cancellable loader boundary.

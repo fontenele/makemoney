@@ -155,6 +155,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.44 — complete:** the internal read model applies checkpoint market-activity averages to the bounded durable T+0-eligible cohort without HTTP exposure.
 - **M7.45 — complete:** local read-only `GET /new-listings/activity` exposes durable checkpoint market-activity averages without presenting rolling turnover as executable liquidity.
 - **M7.46 — complete:** a provider-neutral listing top-of-book contract preserves exact bid/ask prices and quantities with strict identity, update, book-coherence, and receive-time validation without loading data.
+- **M7.47 — complete:** a pure exact-decimal calculator derives listing top-of-book absolute spread, midpoint, and spread basis points while preserving displayed level-one quantities.
 
 ## M8 — Dashboard — planned
 
