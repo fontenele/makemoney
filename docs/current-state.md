@@ -72,7 +72,7 @@ M7.32 loads and classifies one durable detection internally without persisting d
 
 M7.33 exposes explicit-threshold durable classification through a local read-only endpoint.
 
-M7.34 calculates descriptive pump/correction cohort counts and exact rates as a pure internal research rule. M7.35 composes that rule over the bounded durable T+0-eligible cohort, M7.36 exposes it through a local read-only route, M7.37–M7.39 calculate, durably compose, and expose median observed magnitudes, M7.40–M7.42 calculate, durably compose, and expose median observed pattern timing, M7.43–M7.45 calculate, durably compose, and expose descriptive checkpoint market activity, and M7.46–M7.58 establish listing top-of-book observations, exact spread derivation, public snapshot loading, dependency composition, exact durable storage, canonical reads, local read-only exposure, atomic completion, opt-in worker collection, pure cohort aggregation, bounded durable cohort composition, and local aggregate exposure.
+M7.34 calculates descriptive pump/correction cohort counts and exact rates as a pure internal research rule. M7.35 composes that rule over the bounded durable T+0-eligible cohort, M7.36 exposes it through a local read-only route, M7.37–M7.39 calculate, durably compose, and expose median observed magnitudes, M7.40–M7.42 calculate, durably compose, and expose median observed pattern timing, M7.43–M7.45 calculate, durably compose, and expose descriptive checkpoint market activity, and M7.46–M7.59 establish listing top-of-book observations, exact spread derivation, public snapshot loading, dependency composition, exact durable storage, canonical reads, local read-only exposure, atomic completion, opt-in worker collection, cohort aggregation, and pure displayed imbalance derivation.
 
 M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
@@ -136,6 +136,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.56 purely aggregates exact checkpoint spread basis points and displayed best-level bid/ask quote notionals across validated top-of-book timelines, without claiming depth or executable liquidity.
 - M7.57 selects a bounded newest-first durable cohort with stored T+0 books and composes its available timelines through the exact top-of-book cohort calculator without HTTP exposure.
 - M7.58 exposes that durable book cohort at local read-only `GET /new-listings/top-of-book` with strict provider and bounded-limit validation.
+- M7.59 purely derives exact displayed bid/ask quote notionals and normalized level-one imbalance, returning `null` when both displayed quantities are zero.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -275,12 +276,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-20 after M7.58:
+The following passed on 2026-09-20 after M7.59:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 698 tests passed across 82 suites
+- `npm test -- --runInBand` — 703 tests passed across 83 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -299,7 +300,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.58 are implemented and fully verified milestone increments.
+M0 through M7.59 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

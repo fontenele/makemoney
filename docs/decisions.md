@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Treat zero displayed book as unavailable imbalance
+
+M7.59 defines level-one imbalance as `(bid quote notional - ask quote notional) / total displayed quote notional`. A one-sided book produces the exact boundary `-1` or `1`; when both displayed quantities are zero, the denominator has no information and the result is `null` rather than a fabricated neutral zero.
+
 ## 2026-09-20 — Expose durable book aggregates without triggering collection
 
 M7.58 exposes only the on-demand aggregate of already stored snapshots. `GET /new-listings/top-of-book` cannot invoke Binance or activate the worker, uses the same bounded cohort parameters as the other research endpoints, and preserves independent checkpoint sample sizes.

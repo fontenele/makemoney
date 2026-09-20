@@ -341,3 +341,9 @@ The internal read model validates the limit and applies the M7.56 exact calculat
 `GET /new-listings/top-of-book` exposes the M7.57 durable aggregate through the local read-only API. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider accepts only `binance` and defaults to it.
 
 The response preserves exact decimal-string averages and independent checkpoint sample sizes. It reads stored snapshots only, does not trigger collection, and continues to describe displayed level-one quote notional rather than depth or guaranteed execution. No derived result is persisted and no scoring, alert, signal, or trading behavior is added.
+
+## M7.59 exact top-of-book imbalance
+
+A pure exact-decimal calculator derives displayed bid and ask quote notionals from one validated top-of-book observation and normalizes their difference by total displayed quote notional. The resulting rate is bounded from `-1` for ask-only displayed value through `1` for bid-only displayed value.
+
+When both displayed quantities are zero, the rate is explicitly unavailable (`null`) because no denominator exists. This level-one snapshot metric does not establish market pressure, depth, fill capacity, predictive value, or a trading signal. This increment adds no durable composition, route, persistence, score, alert, signal, or trading behavior.

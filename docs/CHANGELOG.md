@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.59 exact top-of-book imbalance completed
+
+- Added a pure exact-decimal calculator for displayed bid and ask quote notionals and their normalized level-one imbalance rate.
+- Defined exact `-1` and `1` one-sided boundaries and explicit `null` imbalance when both displayed quantities are zero.
+- Kept the metric internal and descriptive; it is not market pressure, depth, fill capacity, a score, or a signal.
+- 703 unit tests across 83 suites and all 53 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.58 top-of-book cohort API completed
 
 - Added local read-only `GET /new-listings/top-of-book` for the bounded durable top-of-book cohort.

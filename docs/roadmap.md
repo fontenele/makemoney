@@ -167,6 +167,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.56 — complete:** a pure exact-decimal cohort calculator reports average checkpoint spread basis points and displayed level-one bid/ask quote notionals without treating them as depth or executable liquidity.
 - **M7.57 — complete:** the internal read model loads a bounded newest-first durable cohort with stored T+0 books and applies the exact top-of-book cohort calculator without HTTP exposure.
 - **M7.58 — complete:** local read-only `GET /new-listings/top-of-book` exposes bounded durable checkpoint spread and displayed level-one quote-notional averages without triggering collection.
+- **M7.59 — complete:** a pure exact-decimal calculator derives displayed bid/ask quote notionals and normalized level-one imbalance with explicit zero-book unavailability.
 
 ## M8 — Dashboard — planned
 
