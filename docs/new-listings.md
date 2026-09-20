@@ -371,3 +371,9 @@ Unavailable imbalance never enters the average denominator and produces a `null`
 The internal detection read model now validates a 1–100 cohort limit, loads the existing bounded newest-first durable selection whose members have a stored T+0 book, and applies the M7.62 exact imbalance cohort calculator on demand.
 
 Later checkpoint books remain independently optional, zero displayed books remain explicitly unavailable, and an empty eligible selection returns the explicit empty aggregate. This increment adds no route, new repository query, derived persistence, provider request, score, alert, signal, or trading behavior.
+
+## M7.64 top-of-book imbalance cohort API
+
+`GET /new-listings/top-of-book/imbalance` exposes the M7.63 durable aggregate through the local read-only API. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider accepts only `binance` and defaults to it.
+
+The response retains independent stored-book, calculable imbalance, and unavailable zero-denominator coverage for every checkpoint. It reads stored snapshots only, cannot trigger collection or persistence, and does not present displayed level-one imbalance as market pressure, predictive score, alert, signal, or trading instruction.

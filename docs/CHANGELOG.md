@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.64 top-of-book imbalance cohort API completed
+
+- Added local read-only `GET /new-listings/top-of-book/imbalance` for bounded durable checkpoint imbalance statistics.
+- Reused optional `provider=binance` and `limit=1..100` validation with defaults of Binance and 50 detections.
+- Preserved separate stored-book, calculable, and unavailable coverage and documented that imbalance is not pressure or a signal.
+- 722 unit tests across 84 suites and all 55 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.63 durable top-of-book imbalance cohort loading completed
 
 - Added an internal read-model operation that composes exact imbalance statistics over the bounded durable T+0-book-eligible cohort.

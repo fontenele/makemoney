@@ -38,6 +38,43 @@ describe('NewListingsController', () => {
     expect(getTopOfBookCohort).not.toHaveBeenCalled();
   });
 
+  it('returns the durable top-of-book imbalance cohort with bounded input', async () => {
+    const cohort = {
+      provider: 'binance' as const,
+      detectionCount: 0,
+      checkpoints: [],
+    };
+    const getTopOfBookImbalanceCohort = jest.fn(() => Promise.resolve(cohort));
+    const controller = new NewListingsController({
+      getTopOfBookImbalanceCohort,
+    });
+
+    await expect(controller.topOfBookImbalanceCohort()).resolves.toBe(cohort);
+    expect(getTopOfBookImbalanceCohort).toHaveBeenLastCalledWith('binance', 50);
+    await controller.topOfBookImbalanceCohort('25', 'binance');
+    expect(getTopOfBookImbalanceCohort).toHaveBeenLastCalledWith('binance', 25);
+  });
+
+  it.each([
+    ['0', undefined],
+    ['101', undefined],
+    ['1.5', undefined],
+    [undefined, 'other'],
+  ])(
+    'rejects invalid top-of-book imbalance cohort query %s/%s',
+    (limit, provider) => {
+      const getTopOfBookImbalanceCohort = jest.fn(() => Promise.resolve({}));
+      const controller = new NewListingsController({
+        getTopOfBookImbalanceCohort,
+      });
+
+      expect(() =>
+        controller.topOfBookImbalanceCohort(limit, provider),
+      ).toThrow(BadRequestException);
+      expect(getTopOfBookImbalanceCohort).not.toHaveBeenCalled();
+    },
+  );
+
   it('returns durable checkpoint market activity with bounded input', async () => {
     const activity = {
       provider: 'binance' as const,

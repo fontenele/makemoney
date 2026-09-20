@@ -172,6 +172,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.61 — complete:** local read-only `GET /new-listings/:provider/:symbol/top-of-book/imbalance` exposes the exact derived durable timeline without collection or derived persistence.
 - **M7.62 — complete:** a pure exact-decimal cohort calculator reports average checkpoint imbalance with explicit stored-book, calculable, and unavailable sample coverage.
 - **M7.63 — complete:** the internal read model applies exact imbalance aggregation to the bounded durable T+0-book-eligible cohort without HTTP exposure.
+- **M7.64 — complete:** local read-only `GET /new-listings/top-of-book/imbalance` exposes bounded durable imbalance averages with explicit availability denominators.
 
 ## M8 — Dashboard — planned
 

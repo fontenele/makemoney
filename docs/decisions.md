@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Expose imbalance cohorts with their denominators
+
+M7.64 publishes the bounded on-demand aggregate without hiding availability. The route retains total stored-book, calculable imbalance, and zero-denominator counts per checkpoint, reads PostgreSQL only, and cannot activate provider collection or convert the descriptive metric into a score or signal.
+
 ## 2026-09-20 — Reuse T+0-book eligibility for imbalance cohorts
 
 M7.63 uses the same bounded newest-first durable cohort selected for top-of-book statistics. Requiring a stored T+0 book gives every selected detection an explicit baseline checkpoint while later books remain independently optional; no second repository query or derived storage lifecycle is introduced.

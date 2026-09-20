@@ -35,6 +35,7 @@ import { ListingObservationMarketActivityCohort } from '../domain/listing-observ
 import { StoredListingTopOfBookCheckpoint } from '../domain/listing-top-of-book-observation-repository';
 import { ListingTopOfBookCohort } from '../domain/listing-top-of-book-cohort';
 import { StoredListingTopOfBookImbalance } from '../domain/listing-top-of-book-imbalance';
+import { ListingTopOfBookImbalanceCohort } from '../domain/listing-top-of-book-imbalance-cohort';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -70,6 +71,17 @@ export class NewListingsController {
     @Query('provider') provider?: string,
   ): Promise<ListingTopOfBookCohort> {
     return this.detections.getTopOfBookCohort(
+      optionalProvider(provider) ?? 'binance',
+      validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
+    );
+  }
+
+  @Get('top-of-book/imbalance')
+  topOfBookImbalanceCohort(
+    @Query('limit') limit?: string,
+    @Query('provider') provider?: string,
+  ): Promise<ListingTopOfBookImbalanceCohort> {
+    return this.detections.getTopOfBookImbalanceCohort(
       optionalProvider(provider) ?? 'binance',
       validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
     );
