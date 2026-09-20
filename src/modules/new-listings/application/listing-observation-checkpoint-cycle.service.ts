@@ -1,13 +1,15 @@
 import { randomUUID } from 'node:crypto';
 import { ClaimedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
 import { ListingMarketObservation } from '../domain/listing-market-observation';
+import { ListingTopOfBookObservation } from '../domain/listing-top-of-book-observation';
 import { DueListingObservationCheckpointService } from './due-listing-observation-checkpoint.service';
 import { ListingObservationCheckpointWorkerOptions } from './listing-observation-checkpoint-worker-options';
 
 export interface ListingObservationCheckpointProcessor {
-  process(
-    checkpoint: ClaimedListingObservationCheckpoint,
-  ): Promise<ListingMarketObservation>;
+  process(checkpoint: ClaimedListingObservationCheckpoint): Promise<{
+    observation: ListingMarketObservation;
+    topOfBook: ListingTopOfBookObservation;
+  }>;
 }
 
 export interface ListingObservationCheckpointCycleResult {
@@ -50,20 +52,22 @@ export class ListingObservationCheckpointCycleService {
     };
 
     for (const checkpoint of claimed) {
-      let observation: ListingMarketObservation;
+      let processed: Awaited<
+        ReturnType<ListingObservationCheckpointProcessor['process']>
+      >;
       try {
-        observation = await processor.process(checkpoint);
+        processed = await processor.process(checkpoint);
       } catch {
         result.failed += 1;
         continue;
       }
-      const completed = await this.checkpoints.completeClaimed({
+      const completed = await this.checkpoints.completeClaimedWithTopOfBook({
         provider: checkpoint.provider,
         symbol: checkpoint.symbol,
         label: checkpoint.label,
         claimToken: checkpoint.claimToken,
         completedAt: this.clock(),
-        observation,
+        ...processed,
       });
       if (completed) result.completed += 1;
       else result.lostLease += 1;

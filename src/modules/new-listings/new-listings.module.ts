@@ -90,9 +90,15 @@ import { PrismaListingTopOfBookObservationRepository } from './infrastructure/pr
     DueListingObservationCheckpointService,
     {
       provide: ProviderListingObservationCheckpointProcessor,
-      inject: [LISTING_MARKET_OBSERVATION_PROVIDER],
-      useFactory: (provider: ListingMarketObservationProvider) =>
-        new ProviderListingObservationCheckpointProcessor(provider),
+      inject: [
+        LISTING_MARKET_OBSERVATION_PROVIDER,
+        ListingTopOfBookSnapshotService,
+      ],
+      useFactory: (
+        provider: ListingMarketObservationProvider,
+        topOfBook: ListingTopOfBookSnapshotService,
+      ) =>
+        new ProviderListingObservationCheckpointProcessor(provider, topOfBook),
     },
     {
       provide: LISTING_OBSERVATION_CHECKPOINT_WORKER_OPTIONS,

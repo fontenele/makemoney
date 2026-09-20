@@ -1,19 +1,25 @@
-import {
-  ListingMarketObservation,
-  ListingMarketObservationProvider,
-} from '../domain/listing-market-observation';
+import { ListingMarketObservationProvider } from '../domain/listing-market-observation';
 import { ClaimedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
 import { ListingObservationCheckpointProcessor } from './listing-observation-checkpoint-cycle.service';
+import { ListingTopOfBookSnapshotService } from './listing-top-of-book-snapshot.service';
 
 export class ProviderListingObservationCheckpointProcessor implements ListingObservationCheckpointProcessor {
-  constructor(private readonly provider: ListingMarketObservationProvider) {}
+  constructor(
+    private readonly provider: ListingMarketObservationProvider,
+    private readonly topOfBook: ListingTopOfBookSnapshotService,
+  ) {}
 
-  process(
+  async process(
     checkpoint: ClaimedListingObservationCheckpoint,
-  ): Promise<ListingMarketObservation> {
-    return this.provider.load({
+  ): ReturnType<ListingObservationCheckpointProcessor['process']> {
+    const request = {
       provider: checkpoint.provider,
       symbol: checkpoint.symbol,
-    });
+    };
+    const [observation, topOfBook] = await Promise.all([
+      this.provider.load(request),
+      this.topOfBook.load(request),
+    ]);
+    return { observation, topOfBook };
   }
 }

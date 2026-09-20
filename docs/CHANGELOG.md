@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.55 opt-in checkpoint top-of-book collection completed
+
+- Composed the existing public rolling-ticker and top-of-book loaders in the production checkpoint processor.
+- Changed the checkpoint cycle to select the lease-safe atomic completion path for every successful combined sample.
+- Either public-provider failure remains isolated per checkpoint and leaves its lease recoverable; the lifecycle worker remains disabled by default.
+- 685 unit tests across 81 suites and all 52 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.54 atomic checkpoint top-of-book completion completed
 
 - Added a validated completion command carrying both the rolling market observation and matching top-of-book snapshot.

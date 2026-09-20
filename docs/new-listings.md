@@ -317,3 +317,9 @@ Each item preserves checkpoint label, offset, target time, update ID, exact bid/
 A new internal completion command validates one rolling market observation and one top-of-book snapshot against the same claimed checkpoint identity. PostgreSQL then verifies active lease ownership, writes the existing completion and rolling-ticker fields, and inserts the immutable top-of-book child within one transaction.
 
 If lease ownership was lost, the operation returns `false` before inserting a book. If book insertion or a database constraint fails, the transaction rolls back checkpoint completion and all observation fields. The existing worker does not call this primitive yet, so this increment adds no provider request, collection behavior, route, score, alert, signal, or trade.
+
+## M7.55 opt-in checkpoint top-of-book collection
+
+The production checkpoint processor now loads the public rolling 24-hour ticker and exact top-of-book snapshot for the same claimed provider/symbol identity. The independent requests run concurrently and either failure rejects the combined result, preserving the existing per-item failure isolation and lease-expiry recovery behavior.
+
+The cycle completes every successful combined result through the M7.54 lease-safe transaction, so a durable completed checkpoint always receives its immutable top-of-book child together with its rolling-ticker fields. The lifecycle worker remains disabled by default and this increment adds no route, retry policy, scoring, alert, signal, or trading behavior.
