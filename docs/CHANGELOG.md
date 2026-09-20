@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-19 — M7.41 durable pattern timing loading completed
+
+- Added internal bounded durable pattern-timing calculation over recent detections with completed `T+0` observations.
+- Reused the shared explicit-threshold durable classification pipeline used by frequency and magnitude statistics.
+- Added populated, empty, and fail-fast invalid-input read-model coverage.
+- Kept HTTP exposure, persistence, scoring, alerts, signals, and trading outside this increment.
+- 615 unit tests across 73 suites and all 52 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.40 pattern timing medians completed
 
 - Added pure median T+0-to-pump and peak-to-correction duration statistics over classified listing cohorts.

@@ -233,3 +233,9 @@ The response preserves independent pump and correction sample sizes with null me
 A pure calculator now reports the median scheduled duration from `T+0` to the first observed pump threshold and the median duration from the post-pump peak to the first observed correction. Pump and correction durations retain independent sample sizes; missing events are excluded rather than represented as zero.
 
 Odd samples select the middle duration and even samples average their two middle durations. Every event label must match its canonical checkpoint offset, peaks cannot precede pumps, and corrections must follow their peak. Empty samples remain explicit nulls. This increment adds no durable loading, route, persistence, scoring, alert, signal, or trading behavior.
+
+## M7.41 durable pattern timing loading
+
+The internal detection read model now applies the M7.40 timing calculator to the bounded cohort of 1 through 100 recent durable Binance detections with completed `T+0`. It reuses the shared validation, timeline loading, exact performance, and explicit-threshold classification pipeline already consumed by frequency and magnitude statistics.
+
+An empty eligible cohort returns zero event samples and null timing medians. Invalid limit or thresholds fail before repository access, and incoherent timelines remain explicit failures. This increment adds no route, persistence, scoring, alert, signal, or trading behavior.

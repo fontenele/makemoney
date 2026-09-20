@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.40 load, persist, conservatively compare, periodically refresh, durably classify detections, expose filtered research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, expose completed timelines and exact performance, aggregate bounded cohorts, calculate and expose explicitly thresholded pump/correction classifications, aggregate their descriptive rates, compose those statistics over a bounded durable cohort, expose that aggregate through a local read-only API, calculate exact median observed pattern magnitudes, compose and expose those magnitudes over the durable cohort, and calculate median observed pattern timing.
+- M6 is closed. M7.1–M7.41 load, persist, conservatively compare, periodically refresh, durably classify detections, expose filtered research reads, durably schedule/lease/complete observation checkpoints, load and persist public Binance rolling-ticker observations, provide a disabled-by-default lifecycle worker, expose completed timelines and exact performance, aggregate bounded cohorts, calculate and expose explicitly thresholded pump/correction classifications, aggregate their descriptive rates, compose those statistics over a bounded durable cohort, expose that aggregate through a local read-only API, calculate exact median observed pattern magnitudes, compose and expose those magnitudes over the durable cohort, calculate median observed pattern timing, and compose timing over the durable cohort.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -217,6 +217,8 @@ M7.38 applies the M7.37 magnitude calculation to the bounded durable T+0-eligibl
 M7.39 exposes those median magnitudes at `GET /new-listings/classification/magnitudes`, retaining mandatory explicit thresholds and independent event sample sizes.
 
 M7.40 calculates median time from T+0 to the first observed pump and from the post-pump peak to correction as a pure internal research rule.
+
+M7.41 applies the M7.40 timing calculation to the bounded durable T+0-eligible cohort through the shared internal classification pipeline without exposing another route.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

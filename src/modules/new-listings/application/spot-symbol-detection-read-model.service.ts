@@ -26,6 +26,8 @@ import { ListingObservationPatternCohort } from '../domain/listing-observation-p
 import { ListingObservationPatternCohortCalculator } from './listing-observation-pattern-cohort-calculator';
 import { ListingObservationPatternMagnitudeCohort } from '../domain/listing-observation-pattern-magnitude-cohort';
 import { ListingObservationPatternMagnitudeCohortCalculator } from './listing-observation-pattern-magnitude-cohort-calculator';
+import { ListingObservationPatternTimingCohort } from '../domain/listing-observation-pattern-timing-cohort';
+import { ListingObservationPatternTimingCohortCalculator } from './listing-observation-pattern-timing-cohort-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -43,6 +45,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingObservationPatternCohortCalculator();
   private readonly patternMagnitudeCohort =
     new ListingObservationPatternMagnitudeCohortCalculator();
+  private readonly patternTimingCohort =
+    new ListingObservationPatternTimingCohortCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -148,6 +152,16 @@ export class SpotSymbolDetectionReadModelService {
     thresholds: ListingObservationPatternThresholds,
   ): Promise<ListingObservationPatternMagnitudeCohort> {
     return this.patternMagnitudeCohort.calculate(
+      await this.loadPatternClassifications(provider, limit, thresholds),
+    );
+  }
+
+  async getPatternTimingCohort(
+    provider: 'binance',
+    limit: number,
+    thresholds: ListingObservationPatternThresholds,
+  ): Promise<ListingObservationPatternTimingCohort> {
+    return this.patternTimingCohort.calculate(
       await this.loadPatternClassifications(provider, limit, thresholds),
     );
   }

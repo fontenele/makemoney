@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-19 — Durable timing reuses the shared classified cohort
+
+M7.41 applies timing aggregation only after the same limit validation, threshold validation, durable T+0 eligibility, exact performance calculation, and classification used by frequency and magnitude research. This keeps all three views on the same population and threshold semantics while preserving one bounded repository read per call. Timing remains calculated on demand and unpersisted.
+
 ## 2026-09-19 — Pattern timing uses scheduled offsets and causal event anchors
 
 M7.40 measures time to pump from T+0 to the first threshold-reaching checkpoint, while correction time starts at the post-pump peak rather than the initial pump checkpoint. This separates discovery latency from reversal latency. Only canonical scheduled offsets are accepted, corrections must occur after their peak, and absent events are excluded with independent sample sizes instead of being converted to zero durations.

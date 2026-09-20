@@ -149,6 +149,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.38 — complete:** the internal read model loads the bounded durable T+0-eligible cohort, classifies it under explicit thresholds, and returns exact pattern-magnitude medians without HTTP exposure.
 - **M7.39 — complete:** local read-only `GET /new-listings/classification/magnitudes` exposes durable median pattern magnitudes with mandatory explicit thresholds and independent event samples.
 - **M7.40 — complete:** a pure cohort calculator reports median T+0-to-pump and peak-to-correction durations with independent event samples and schedule validation.
+- **M7.41 — complete:** the internal read model applies pattern timing medians to the bounded durable T+0-eligible cohort through the shared explicit-threshold classification pipeline.
 
 ## M8 — Dashboard — planned
 

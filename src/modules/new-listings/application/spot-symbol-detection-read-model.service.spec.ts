@@ -305,6 +305,82 @@ describe('SpotSymbolDetectionReadModelService', () => {
     expect(listCompletedObservationCohort).not.toHaveBeenCalled();
   });
 
+  it('loads a durable cohort and calculates pattern timing medians', async () => {
+    const listCompletedObservationCohort = jest.fn(() =>
+      Promise.resolve([
+        [
+          completedObservation(),
+          completedObservation({
+            label: 'T+5s',
+            offsetMs: 5_000,
+            lastPrice: '130',
+          }),
+          completedObservation({
+            label: 'T+10s',
+            offsetMs: 10_000,
+            lastPrice: '90',
+          }),
+        ],
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(
+      service.getPatternTimingCohort('binance', 25, {
+        pumpReturnRate: '0.2',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).resolves.toMatchObject({
+      provider: 'binance',
+      pumpSampleSize: 1,
+      correctionSampleSize: 1,
+      medianTimeToPumpMs: 5_000,
+      medianTimeFromPeakToCorrectionMs: 5_000,
+    });
+    expect(listCompletedObservationCohort).toHaveBeenCalledWith('binance', 25);
+  });
+
+  it('returns an explicit empty durable pattern timing cohort', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith());
+
+    await expect(
+      service.getPatternTimingCohort('binance', 50, {
+        pumpReturnRate: '0.2',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).resolves.toEqual({
+      provider: null,
+      thresholds: null,
+      pumpSampleSize: 0,
+      correctionSampleSize: 0,
+      medianTimeToPumpMs: null,
+      medianTimeFromPeakToCorrectionMs: null,
+    });
+  });
+
+  it('rejects invalid timing cohort input before repository access', async () => {
+    const listCompletedObservationCohort = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(
+      service.getPatternTimingCohort('binance', 101, {
+        pumpReturnRate: '0.2',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).rejects.toThrow('cohort limit must be an integer from 1 to 100');
+    await expect(
+      service.getPatternTimingCohort('binance', 25, {
+        pumpReturnRate: '0',
+        correctionFromPeakRate: '0.25',
+      }),
+    ).rejects.toThrow('pump return rate must be a positive decimal');
+    expect(listCompletedObservationCohort).not.toHaveBeenCalled();
+  });
+
   it('lists completed observations only for a durable detection', async () => {
     const observations = [{ label: 'T+0' }];
     const repository = repositoryWith({
