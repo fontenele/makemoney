@@ -354,6 +354,63 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
     });
     return result.count === 1;
   }
+
+  async completeClaimedCheckpointWithTopOfBook({
+    provider,
+    symbol,
+    label,
+    claimToken,
+    completedAt,
+    observation,
+    topOfBook,
+  }: {
+    provider: SpotSymbol['provider'];
+    symbol: string;
+    label: ClaimedListingObservationCheckpoint['label'];
+    claimToken: string;
+    completedAt: Date;
+    observation: ListingMarketObservation;
+    topOfBook: import('../domain/listing-top-of-book-observation').ListingTopOfBookObservation;
+  }): Promise<boolean> {
+    return this.prisma.$transaction(async (tx) => {
+      const result = await tx.listingObservationCheckpoint.updateMany({
+        where: {
+          provider,
+          symbol,
+          label,
+          claimToken,
+          claimedAt: { lte: completedAt },
+          claimExpiresAt: { gt: completedAt },
+          completedAt: null,
+        },
+        data: {
+          completedAt,
+          lastPrice: new Prisma.Decimal(observation.lastPrice),
+          baseVolume: new Prisma.Decimal(observation.baseVolume),
+          quoteVolume: new Prisma.Decimal(observation.quoteVolume),
+          tradeCount: BigInt(observation.tradeCount),
+          windowOpenTime: observation.windowOpenTime,
+          windowCloseTime: observation.windowCloseTime,
+          receivedAt: observation.receivedAt,
+        },
+      });
+      if (result.count !== 1) return false;
+      await tx.listingCheckpointTopOfBook.create({
+        data: {
+          provider,
+          symbol,
+          label,
+          updateId: topOfBook.updateId,
+          bidPrice: topOfBook.bidPrice,
+          bidQuantity: topOfBook.bidQuantity,
+          askPrice: topOfBook.askPrice,
+          askQuantity: topOfBook.askQuantity,
+          receivedAt: topOfBook.receivedAt,
+        },
+      });
+      return true;
+    });
+  }
 }
 
 interface ClaimedCheckpointRow {

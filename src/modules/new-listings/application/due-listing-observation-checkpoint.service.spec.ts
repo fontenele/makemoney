@@ -167,6 +167,55 @@ describe('DueListingObservationCheckpointService', () => {
       expect(completeClaimedCheckpoint).not.toHaveBeenCalled();
     },
   );
+
+  it('delegates atomic completion with a matching top-of-book snapshot', async () => {
+    const completeClaimedCheckpointWithTopOfBook = jest.fn(() =>
+      Promise.resolve(true),
+    );
+    const service = new DueListingObservationCheckpointService({
+      listDueCheckpoints: jest.fn(),
+      claimDueCheckpoints: jest.fn(),
+      completeClaimedCheckpoint: jest.fn(),
+      completeClaimedCheckpointWithTopOfBook,
+    });
+    const input = {
+      provider: 'binance' as const,
+      symbol: 'NEWUSDT',
+      label: 'T+5s' as const,
+      claimToken: 'worker-1:batch-1',
+      completedAt: new Date('2026-09-14T12:00:10.000Z'),
+      observation: sampleObservation(),
+      topOfBook: sampleTopOfBook(),
+    };
+
+    await expect(service.completeClaimedWithTopOfBook(input)).resolves.toBe(
+      true,
+    );
+    expect(completeClaimedCheckpointWithTopOfBook).toHaveBeenCalledWith(input);
+  });
+
+  it('rejects a mismatched top-of-book before atomic completion', () => {
+    const completeClaimedCheckpointWithTopOfBook = jest.fn();
+    const service = new DueListingObservationCheckpointService({
+      listDueCheckpoints: jest.fn(),
+      claimDueCheckpoints: jest.fn(),
+      completeClaimedCheckpoint: jest.fn(),
+      completeClaimedCheckpointWithTopOfBook,
+    });
+
+    expect(() =>
+      service.completeClaimedWithTopOfBook({
+        provider: 'binance',
+        symbol: 'NEWUSDT',
+        label: 'T+0',
+        claimToken: 'worker-1',
+        completedAt: new Date('2026-09-14T12:00:10.000Z'),
+        observation: sampleObservation(),
+        topOfBook: sampleTopOfBook({ symbol: 'OTHERUSDT' }),
+      }),
+    ).toThrow('Checkpoint top-of-book identity must match checkpoint');
+    expect(completeClaimedCheckpointWithTopOfBook).not.toHaveBeenCalled();
+  });
 });
 
 function sampleObservation(
@@ -183,6 +232,24 @@ function sampleObservation(
     tradeCount: 42,
     windowOpenTime: new Date('2026-09-13T12:00:00.000Z'),
     windowCloseTime: new Date('2026-09-14T12:00:00.000Z'),
+    receivedAt: new Date('2026-09-14T12:00:10.000Z'),
+    ...overrides,
+  };
+}
+
+function sampleTopOfBook(
+  overrides: Partial<
+    import('../domain/listing-top-of-book-observation').ListingTopOfBookObservation
+  > = {},
+): import('../domain/listing-top-of-book-observation').ListingTopOfBookObservation {
+  return {
+    provider: 'binance',
+    symbol: 'NEWUSDT',
+    updateId: '42',
+    bidPrice: '0.00000999',
+    bidQuantity: '1000',
+    askPrice: '0.00001001',
+    askQuantity: '900',
     receivedAt: new Date('2026-09-14T12:00:10.000Z'),
     ...overrides,
   };

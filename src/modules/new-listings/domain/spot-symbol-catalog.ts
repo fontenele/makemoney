@@ -115,4 +115,13 @@ export interface SpotSymbolRepository {
     completedAt: Date;
     observation: import('./listing-market-observation').ListingMarketObservation;
   }): Promise<boolean>;
+  completeClaimedCheckpointWithTopOfBook(input: {
+    provider: SpotSymbol['provider'];
+    symbol: string;
+    label: import('./listing-observation-schedule').ListingObservationCheckpointLabel;
+    claimToken: string;
+    completedAt: Date;
+    observation: import('./listing-market-observation').ListingMarketObservation;
+    topOfBook: import('./listing-top-of-book-observation').ListingTopOfBookObservation;
+  }): Promise<boolean>;
 }

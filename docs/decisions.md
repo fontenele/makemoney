@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Checkpoint completion and book insertion share one transaction
+
+M7.54 adds a separate atomic completion primitive rather than storing the top-of-book before or after the existing completion call. The transaction first applies the ownership-safe checkpoint update; only a successful active-lease update inserts the immutable child book. A lost lease returns without insertion, while any child constraint or insertion failure rolls back the parent completion.
+
+The existing completion path remains available and unchanged until the provider-backed processor can return both observations. This increment establishes the safe persistence boundary without activating another public request.
+
 ## 2026-09-20 — Top-of-book HTTP access is durable and read-only
 
 M7.53 exposes only records already stored for a durable detection. The route shares the established provider/symbol validation and unknown-detection semantics, returns canonical checkpoint order, and represents absent collection as an empty array rather than provider unavailability.

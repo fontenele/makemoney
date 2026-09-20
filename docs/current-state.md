@@ -131,6 +131,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.51 stores at most one immutable exact-text top-of-book observation per existing checkpoint through a provider-neutral repository, without changing checkpoint completion or worker behavior.
 - M7.52 reloads stored top-of-book records for one detection as an empty or canonically ordered validated checkpoint timeline, still without public exposure.
 - M7.53 exposes the durable book timeline at `GET /new-listings/:provider/:symbol/top-of-book` with validated identity, unknown-detection `404`, and explicit empty results.
+- M7.54 provides a validated lease-safe transaction that can persist checkpoint completion, rolling ticker data, and one immutable top-of-book together, but is not yet selected by the worker.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -270,12 +271,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-20 after M7.53:
+The following passed on 2026-09-20 after M7.54:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 680 tests passed across 80 suites
+- `npm test -- --runInBand` — 684 tests passed across 81 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -294,7 +295,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.53 are implemented and fully verified milestone increments.
+M0 through M7.54 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

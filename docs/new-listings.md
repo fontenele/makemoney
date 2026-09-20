@@ -311,3 +311,9 @@ Database return order is normalized to the canonical schedule. Persisted observa
 `GET /new-listings/:provider/:symbol/top-of-book` exposes the M7.52 durable timeline through the local read-only API. Provider must be `binance` and symbol must be canonical uppercase alphanumeric with 1–30 characters. Invalid identity returns `400`, an identity that is not a durable detection returns `404`, and a known detection without stored books returns an empty array.
 
 Each item preserves checkpoint label, offset, target time, update ID, exact bid/ask prices and quantities, and local receive time in canonical schedule order. The route reads PostgreSQL only and cannot trigger Binance loading, checkpoint processing, persistence, scoring, alerts, signals, or trading.
+
+## M7.54 atomic checkpoint top-of-book completion
+
+A new internal completion command validates one rolling market observation and one top-of-book snapshot against the same claimed checkpoint identity. PostgreSQL then verifies active lease ownership, writes the existing completion and rolling-ticker fields, and inserts the immutable top-of-book child within one transaction.
+
+If lease ownership was lost, the operation returns `false` before inserting a book. If book insertion or a database constraint fails, the transaction rolls back checkpoint completion and all observation fields. The existing worker does not call this primitive yet, so this increment adds no provider request, collection behavior, route, score, alert, signal, or trade.

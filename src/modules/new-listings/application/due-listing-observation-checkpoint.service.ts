@@ -13,6 +13,10 @@ import {
   ListingMarketObservation,
   validateListingMarketObservation,
 } from '../domain/listing-market-observation';
+import {
+  ListingTopOfBookObservation,
+  validateListingTopOfBookObservation,
+} from '../domain/listing-top-of-book-observation';
 
 export const MAX_DUE_LISTING_OBSERVATION_CHECKPOINT_LIMIT = 100;
 
@@ -70,6 +74,39 @@ export class DueListingObservationCheckpointService {
     completedAt: Date;
     observation: ListingMarketObservation;
   }): Promise<boolean> {
+    this.validateCompletion(input);
+    return this.repository.completeClaimedCheckpoint(input);
+  }
+
+  completeClaimedWithTopOfBook(input: {
+    provider: 'binance';
+    symbol: string;
+    label: ListingObservationCheckpointLabel;
+    claimToken: string;
+    completedAt: Date;
+    observation: ListingMarketObservation;
+    topOfBook: ListingTopOfBookObservation;
+  }): Promise<boolean> {
+    this.validateCompletion(input);
+    if (
+      !input.topOfBook ||
+      input.topOfBook.provider !== input.provider ||
+      input.topOfBook.symbol !== input.symbol
+    ) {
+      throw new Error('Checkpoint top-of-book identity must match checkpoint');
+    }
+    validateListingTopOfBookObservation(input.topOfBook);
+    return this.repository.completeClaimedCheckpointWithTopOfBook(input);
+  }
+
+  private validateCompletion(input: {
+    provider: 'binance';
+    symbol: string;
+    label: ListingObservationCheckpointLabel;
+    claimToken: string;
+    completedAt: Date;
+    observation: ListingMarketObservation;
+  }): void {
     if (input.provider !== 'binance') {
       throw new Error('Checkpoint provider must be binance');
     }
@@ -93,7 +130,6 @@ export class DueListingObservationCheckpointService {
       throw new Error('Checkpoint observation identity must match checkpoint');
     }
     validateListingMarketObservation(input.observation);
-    return this.repository.completeClaimedCheckpoint(input);
   }
 
   private validateDate(value: Date, label: string): void {

@@ -162,6 +162,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.51 — complete:** an immutable optional child record stores one exact-string top-of-book snapshot per existing checkpoint behind a provider-neutral repository, without worker integration.
 - **M7.52 — complete:** the repository reloads an explicit detection's stored top-of-book checkpoints as an empty or canonically ordered validated timeline without HTTP exposure.
 - **M7.53 — complete:** local read-only `GET /new-listings/:provider/:symbol/top-of-book` exposes the durable canonical book timeline without triggering collection.
+- **M7.54 — complete:** a lease-safe PostgreSQL transaction can complete a checkpoint together with rolling-ticker and immutable top-of-book data, with no partial state and no worker activation.
 
 ## M8 — Dashboard — planned
 

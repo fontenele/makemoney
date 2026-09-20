@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-20 — M7.54 atomic checkpoint top-of-book completion completed
+
+- Added a validated completion command carrying both the rolling market observation and matching top-of-book snapshot.
+- Added one PostgreSQL transaction that verifies active lease ownership, completes the checkpoint, and inserts its immutable book together.
+- Lost leases return `false` without inserting a book; any insertion failure rolls back checkpoint completion and market-observation fields.
+- Kept the existing worker and processor on their prior completion path pending separate provider-composition work.
+- 684 unit tests across 81 suites and all 52 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.53 durable top-of-book timeline API completed
 
 - Added local read-only `GET /new-listings/:provider/:symbol/top-of-book` for the canonical durable checkpoint book timeline.
