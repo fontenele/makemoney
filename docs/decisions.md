@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Expose durable book aggregates without triggering collection
+
+M7.58 exposes only the on-demand aggregate of already stored snapshots. `GET /new-listings/top-of-book` cannot invoke Binance or activate the worker, uses the same bounded cohort parameters as the other research endpoints, and preserves independent checkpoint sample sizes.
+
 ## 2026-09-20 — Require durable T+0 book eligibility before cohort selection
 
 M7.57 selects and limits recent detections in PostgreSQL only when a stored T+0 top-of-book record exists. Later checkpoint books remain independently optional, so their sample sizes may decrease honestly rather than inheriting or fabricating observations. Calculation remains on demand and is not persisted.

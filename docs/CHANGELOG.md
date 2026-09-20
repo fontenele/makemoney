@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.58 top-of-book cohort API completed
+
+- Added local read-only `GET /new-listings/top-of-book` for the bounded durable top-of-book cohort.
+- Reused the shared optional `provider=binance` and `limit=1..100` validation with defaults of Binance and 50 detections.
+- Documented that displayed best-level quote notionals are neither depth nor guaranteed executable liquidity.
+- 698 unit tests across 82 suites and all 53 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.57 durable top-of-book cohort loading completed
 
 - Added a bounded newest-detection query requiring stored T+0 top-of-book eligibility before loading canonical book timelines.

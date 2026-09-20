@@ -335,3 +335,9 @@ Raw base quantities are not averaged across different assets because their units
 The top-of-book repository now selects a bounded cohort of the newest durable detections that have a stored T+0 book, ordered by detection time descending with a symbol tie-breaker. PostgreSQL applies eligibility and the 1–100 limit before loading each detection's available book timeline.
 
 The internal read model validates the limit and applies the M7.56 exact calculator to those timelines. Later checkpoints contribute independently when present, and an empty eligible cohort returns an explicit empty aggregate. This increment adds no route, derived persistence, depth model, scoring, alert, signal, or trading behavior.
+
+## M7.58 top-of-book cohort API
+
+`GET /new-listings/top-of-book` exposes the M7.57 durable aggregate through the local read-only API. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider accepts only `binance` and defaults to it.
+
+The response preserves exact decimal-string averages and independent checkpoint sample sizes. It reads stored snapshots only, does not trigger collection, and continues to describe displayed level-one quote notional rather than depth or guaranteed execution. No derived result is persisted and no scoring, alert, signal, or trading behavior is added.

@@ -33,6 +33,7 @@ import { ListingObservationPatternMagnitudeCohort } from '../domain/listing-obse
 import { ListingObservationPatternTimingCohort } from '../domain/listing-observation-pattern-timing-cohort';
 import { ListingObservationMarketActivityCohort } from '../domain/listing-observation-market-activity-cohort';
 import { StoredListingTopOfBookCheckpoint } from '../domain/listing-top-of-book-observation-repository';
+import { ListingTopOfBookCohort } from '../domain/listing-top-of-book-cohort';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -57,6 +58,17 @@ export class NewListingsController {
     @Query('provider') provider?: string,
   ): Promise<ListingObservationMarketActivityCohort> {
     return this.detections.getMarketActivityCohort(
+      optionalProvider(provider) ?? 'binance',
+      validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
+    );
+  }
+
+  @Get('top-of-book')
+  topOfBookCohort(
+    @Query('limit') limit?: string,
+    @Query('provider') provider?: string,
+  ): Promise<ListingTopOfBookCohort> {
+    return this.detections.getTopOfBookCohort(
       optionalProvider(provider) ?? 'binance',
       validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
     );
