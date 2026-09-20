@@ -175,6 +175,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.64 — complete:** local read-only `GET /new-listings/top-of-book/imbalance` exposes bounded durable imbalance averages with explicit availability denominators.
 - **M7.65 — complete:** a pure exact-decimal calculator derives canonical checkpoint imbalance changes from an explicitly available T+0 baseline.
 - **M7.66 — complete:** the internal read model derives exact imbalance evolution from one detected symbol's canonical durable stored-book timeline.
+- **M7.67 — complete:** local read-only per-detection HTTP access exposes exact durable imbalance evolution with explicit T+0 unavailability.
 
 ## M8 — Dashboard — planned
 

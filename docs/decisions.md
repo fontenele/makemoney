@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Expose imbalance evolution with baseline availability semantics
+
+M7.67 mirrors the existing per-detection performance API: malformed identity is 400, unknown detection is 404, and an existing detection without an available T+0 analytical baseline is 503. The route derives from stored books on demand and cannot trigger collection or persist results.
+
 ## 2026-09-20 — Derive durable imbalance evolution on demand
 
 M7.66 reuses the canonical stored-book timeline and the M7.65 pure calculator rather than persisting another projection. Unknown detection remains distinct from a known detection whose T+0 imbalance is unavailable, and newly stored checkpoints affect the next calculation immediately.

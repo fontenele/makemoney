@@ -494,6 +494,71 @@ describe('NewListingsController', () => {
     ).rejects.toThrow('detected symbol was not found');
   });
 
+  it('returns durable top-of-book imbalance evolution', async () => {
+    const evolution = {
+      provider: 'binance' as const,
+      symbol: 'NEWUSDT',
+      baselineLabel: 'T+0' as const,
+      baselineImbalanceRate: '0.25',
+      points: [],
+    };
+    const getTopOfBookImbalanceEvolution = jest.fn(() =>
+      Promise.resolve(evolution),
+    );
+    const controller = new NewListingsController({
+      getTopOfBookImbalanceEvolution,
+    });
+
+    await expect(
+      controller.topOfBookImbalanceEvolution('binance', 'NEWUSDT'),
+    ).resolves.toBe(evolution);
+    expect(getTopOfBookImbalanceEvolution).toHaveBeenCalledWith(
+      'binance',
+      'NEWUSDT',
+    );
+  });
+
+  it.each([
+    ['other', 'NEWUSDT'],
+    ['binance', 'newusdt'],
+    ['binance', ''],
+  ])(
+    'rejects invalid top-of-book imbalance evolution identity %s/%s',
+    async (provider, symbol) => {
+      const getTopOfBookImbalanceEvolution = jest.fn(() => Promise.resolve({}));
+      const controller = new NewListingsController({
+        getTopOfBookImbalanceEvolution,
+      });
+
+      await expect(
+        controller.topOfBookImbalanceEvolution(provider, symbol),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(getTopOfBookImbalanceEvolution).not.toHaveBeenCalled();
+    },
+  );
+
+  it('reports top-of-book imbalance evolution unavailable without T+0', async () => {
+    const controller = new NewListingsController({
+      getTopOfBookImbalanceEvolution: jest.fn(() => Promise.resolve(null)),
+    });
+
+    await expect(
+      controller.topOfBookImbalanceEvolution('binance', 'NEWUSDT'),
+    ).rejects.toThrow('T+0 top-of-book imbalance is not available');
+  });
+
+  it('maps unknown imbalance evolution identity to not found', async () => {
+    const controller = new NewListingsController({
+      getTopOfBookImbalanceEvolution: jest.fn(() =>
+        Promise.reject(new DetectedSpotSymbolNotFoundError()),
+      ),
+    });
+
+    await expect(
+      controller.topOfBookImbalanceEvolution('binance', 'UNKNOWNUSDT'),
+    ).rejects.toThrow('detected symbol was not found');
+  });
+
   it('returns a filtered detection summary without pagination input', async () => {
     const summarize = jest.fn(() =>
       Promise.resolve({

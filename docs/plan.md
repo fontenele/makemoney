@@ -1715,7 +1715,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.66 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.67 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -2352,6 +2352,7 @@ M7.63 Durable Top-of-Book Imbalance Cohort Loading: DONE
 M7.64 Top-of-Book Imbalance Cohort API: DONE
 M7.65 Exact Top-of-Book Imbalance Evolution: DONE
 M7.66 Durable Top-of-Book Imbalance Evolution: DONE
+M7.67 Durable Top-of-Book Imbalance Evolution API: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2370,5 +2371,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7.66 is complete. Select the next bounded M7 increment; imbalance-evolution HTTP exposure remains separate from scoring, alerts, signals, and trading.
+M7.67 is complete. Select the next bounded M7 increment; cohort evolution statistics, scoring, alerts, signals, and trading remain separate.
 ```

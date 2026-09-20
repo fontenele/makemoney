@@ -389,3 +389,9 @@ An empty timeline, missing T+0, or zero displayed notional at T+0 returns unavai
 The internal detection read model now loads one detected symbol's canonical stored-book timeline and applies the M7.65 exact evolution calculation on demand. An unknown durable detection keeps the established not-found behavior, while a known detection without an available T+0 imbalance returns analytical unavailability (`null`).
 
 No derived value is stored, so newly completed checkpoint books are visible on the next calculation. This increment adds no route, provider request, score, alert, signal, or trading behavior.
+
+## M7.67 durable top-of-book imbalance evolution API
+
+`GET /new-listings/:provider/:symbol/top-of-book/imbalance/evolution` exposes the M7.66 on-demand evolution through the local read-only API. Provider must be `binance`, symbol must be canonical uppercase alphanumeric with 1–30 characters, an unknown durable detection returns `404`, and an existing detection without an available T+0 imbalance returns `503`.
+
+Later zero-notional books retain `null` imbalance and change values. The route reads PostgreSQL only, cannot trigger Binance collection or persist a derived result, and does not convert imbalance evolution into pressure, prediction, score, alert, signal, or trading instruction.

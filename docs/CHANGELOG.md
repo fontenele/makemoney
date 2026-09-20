@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.67 durable top-of-book imbalance evolution API completed
+
+- Added local read-only `GET /new-listings/:provider/:symbol/top-of-book/imbalance/evolution`.
+- Reused strict identity validation, unknown-detection `404`, and returned `503` until an available T+0 imbalance baseline exists.
+- Preserved later zero-notional points as explicit null values without collection, derived persistence, score, alert, signal, or trade.
+- 736 unit tests across 85 suites and all 56 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.66 durable top-of-book imbalance evolution completed
 
 - Added an internal read-model operation that derives exact T+0-relative imbalance evolution from one detected symbol's stored books.
