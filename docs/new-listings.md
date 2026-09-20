@@ -257,3 +257,9 @@ Every timeline must be non-empty, provider-valid, internally single-symbol, uniq
 The internal detection read model now applies the M7.43 activity calculator to the existing bounded cohort of 1 through 100 recent durable Binance detections with completed `T+0`. It performs one repository read and retains each checkpoint's independent coverage instead of requiring complete timelines.
 
 An empty eligible cohort returns no checkpoints and a zero detection count. Invalid limits fail before repository access, and incoherent durable timelines remain explicit errors. The result continues to describe rolling-window market activity, not executable liquidity. This increment adds no route, derived persistence, score, alert, signal, or trading behavior.
+
+## M7.45 checkpoint market activity API
+
+`GET /new-listings/activity` exposes the M7.44 durable activity calculation through a local read-only route. The optional `limit` accepts integers from 1 through 100 and defaults to 50; the optional provider is restricted to `binance`. Invalid query input returns `400` before durable loading.
+
+The response reports exact average rolling-window base volume, quote volume, and trade count with independent checkpoint sample sizes. Its naming and route deliberately avoid claiming order-book depth or executable liquidity. This increment adds no derived persistence, scoring, alert, signal, or trading behavior.

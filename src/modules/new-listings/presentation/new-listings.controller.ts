@@ -31,6 +31,7 @@ import { validateListingObservationPatternThresholds } from '../application/list
 import { ListingObservationPatternCohort } from '../domain/listing-observation-pattern-cohort';
 import { ListingObservationPatternMagnitudeCohort } from '../domain/listing-observation-pattern-magnitude-cohort';
 import { ListingObservationPatternTimingCohort } from '../domain/listing-observation-pattern-timing-cohort';
+import { ListingObservationMarketActivityCohort } from '../domain/listing-observation-market-activity-cohort';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -44,6 +45,17 @@ export class NewListingsController {
     @Query('provider') provider?: string,
   ): Promise<ListingObservationCohortPerformance> {
     return this.detections.getCohortPerformance(
+      optionalProvider(provider) ?? 'binance',
+      validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
+    );
+  }
+
+  @Get('activity')
+  marketActivityCohort(
+    @Query('limit') limit?: string,
+    @Query('provider') provider?: string,
+  ): Promise<ListingObservationMarketActivityCohort> {
+    return this.detections.getMarketActivityCohort(
       optionalProvider(provider) ?? 'binance',
       validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
     );

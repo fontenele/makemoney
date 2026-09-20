@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-20 — M7.45 checkpoint market activity API completed
+
+- Added local read-only `GET /new-listings/activity` over the bounded durable activity cohort.
+- Retained optional bounded limit and Binance provider input with fail-fast query validation.
+- Exposed exact rolling-window activity averages and synchronized the root API route table without claiming executable liquidity.
+- Kept derived persistence, order-book modeling, scoring, alerts, signals, and trading outside this increment.
+- 633 unit tests across 74 suites and all 52 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-19 — M7.44 durable checkpoint market activity loading completed
 
 - Added internal bounded durable market-activity calculation over recent detections with completed `T+0` observations.

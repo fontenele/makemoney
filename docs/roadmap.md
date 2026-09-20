@@ -153,6 +153,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.42 — complete:** local read-only `GET /new-listings/classification/timing` exposes durable median pattern timing with mandatory explicit thresholds and independent event samples.
 - **M7.43 — complete:** a pure cohort calculator reports exact average rolling-window base volume, quote volume, and trade count per checkpoint as market activity rather than executable liquidity.
 - **M7.44 — complete:** the internal read model applies checkpoint market-activity averages to the bounded durable T+0-eligible cohort without HTTP exposure.
+- **M7.45 — complete:** local read-only `GET /new-listings/activity` exposes durable checkpoint market-activity averages without presenting rolling turnover as executable liquidity.
 
 ## M8 — Dashboard — planned
 

@@ -8,6 +8,36 @@ import {
 import { NewListingsController } from './new-listings.controller';
 
 describe('NewListingsController', () => {
+  it('returns durable checkpoint market activity with bounded input', async () => {
+    const activity = {
+      provider: 'binance' as const,
+      detectionCount: 0,
+      checkpoints: [],
+    };
+    const getMarketActivityCohort = jest.fn(() => Promise.resolve(activity));
+    const controller = new NewListingsController({ getMarketActivityCohort });
+
+    await expect(controller.marketActivityCohort()).resolves.toBe(activity);
+    expect(getMarketActivityCohort).toHaveBeenLastCalledWith('binance', 50);
+    await controller.marketActivityCohort('25', 'binance');
+    expect(getMarketActivityCohort).toHaveBeenLastCalledWith('binance', 25);
+  });
+
+  it.each([
+    ['0', undefined],
+    ['101', undefined],
+    ['1.5', undefined],
+    [undefined, 'other'],
+  ])('rejects invalid activity query %s/%s', (limit, provider) => {
+    const getMarketActivityCohort = jest.fn(() => Promise.resolve({}));
+    const controller = new NewListingsController({ getMarketActivityCohort });
+
+    expect(() => controller.marketActivityCohort(limit, provider)).toThrow(
+      BadRequestException,
+    );
+    expect(getMarketActivityCohort).not.toHaveBeenCalled();
+  });
+
   it('returns durable pattern timing medians for explicit thresholds', async () => {
     const timing = {
       provider: 'binance' as const,

@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Market activity has a descriptive endpoint
+
+M7.45 exposes the durable aggregate at `GET /new-listings/activity`, separate from price performance and pattern-classification endpoints. The route accepts only the shared bounded cohort inputs because the persisted rolling-ticker values require no research threshold. Its public description explicitly distinguishes rolling turnover from spread, depth, price impact, or executable liquidity.
+
 ## 2026-09-19 — Durable activity reuses the T+0-eligible cohort
 
 M7.44 uses the existing bounded repository selection for recent detections with completed `T+0`, then passes their raw completed timelines directly to the M7.43 activity calculator. This preserves one durable population across checkpoint research while allowing incomplete later checkpoints to retain independent sample sizes. The aggregate is calculated on demand, remains unpersisted, and is still not an order-book liquidity measure.
