@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-20 — M7.48 Binance listing top-of-book snapshot completed
+
+- Added an inactive unauthenticated Binance Spot depth-snapshot adapter for one explicit listing symbol.
+- Preserved `lastUpdateId`, normalized only the best bid/ask and exact quantities, and deliberately discarded deeper returned levels.
+- Added timeout, composed cancellation, fail-fast request validation, safe status errors, and strict successful-payload validation.
+- Kept module wiring, checkpoint persistence, routes, scoring, alerts, signals, and trading outside this increment.
+- 665 unit tests across 77 suites and all 52 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.47 listing top-of-book spread completed
 
 - Added a pure exact-decimal calculator for absolute spread, midpoint, and spread basis points from validated listing top-of-book observations.

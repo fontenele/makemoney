@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Public listing top-of-book uses the depth snapshot
+
+M7.48 uses Binance Spot `GET /api/v3/depth?limit=5` instead of `bookTicker` because the depth response includes `lastUpdateId`, preserving the M7.46 snapshot identity. The adapter intentionally keeps only the first bid and ask; consuming the remaining levels would silently introduce a depth model outside this increment.
+
+One explicit symbol bounds response size and provider weight. The request is public, timeout-bound, caller-cancelable, and strict about both transport shape and domain invariants. It remains inactive until separately wired, and no provider body is included in status errors.
+
 ## 2026-09-20 — Listing spread is derived from one validated snapshot
 
 M7.47 calculates absolute spread, midpoint, and basis points only after the M7.46 contract validates identity, prices, quantities, update ID, and receive time. An isolated 40-digit half-even `decimal.js` context avoids native floating-point arithmetic, and the result retains the complete level-one provenance required to interpret the metric.

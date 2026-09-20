@@ -275,3 +275,9 @@ Validation requires Binance identity, canonical symbols, a non-negative integer 
 A pure calculator validates one M7.46 observation and derives its absolute spread, midpoint, and spread in basis points with an isolated 40-digit half-even decimal context. The normalized result preserves provider, symbol, update ID, best prices, displayed quantities, and receive time so every metric remains traceable to one snapshot.
 
 A locked positive book produces zero spread, while a crossed or otherwise invalid observation fails before calculation. The result describes only level-one displayed state and does not estimate depth, market impact, slippage, or executable fill size. This increment adds no Binance request, persistence, worker integration, route, score, alert, signal, or trading behavior.
+
+## M7.48 Binance listing top-of-book snapshot
+
+The M7.46 provider contract is now implemented with public Binance Spot `GET /api/v3/depth` for one mandatory canonical symbol and `limit=5`. The adapter uses the smallest supported depth snapshot that preserves `lastUpdateId`, normalizes only the first bid and ask, and discards the additional returned levels rather than introducing a depth model.
+
+Requests require no credentials, have a ten-second timeout, compose caller cancellation, and validate input before network access. Non-success errors expose only the status code; successful payloads require a safe non-negative update ID, non-empty exact-string price levels, and all M7.46 domain invariants. This increment does not wire the adapter into the module, checkpoint worker, persistence, routes, scoring, alerts, signals, or trading.
