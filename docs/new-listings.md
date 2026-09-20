@@ -323,3 +323,9 @@ If lease ownership was lost, the operation returns `false` before inserting a bo
 The production checkpoint processor now loads the public rolling 24-hour ticker and exact top-of-book snapshot for the same claimed provider/symbol identity. The independent requests run concurrently and either failure rejects the combined result, preserving the existing per-item failure isolation and lease-expiry recovery behavior.
 
 The cycle completes every successful combined result through the M7.54 lease-safe transaction, so a durable completed checkpoint always receives its immutable top-of-book child together with its rolling-ticker fields. The lifecycle worker remains disabled by default and this increment adds no route, retry policy, scoring, alert, signal, or trading behavior.
+
+## M7.56 top-of-book cohort calculation
+
+A pure exact-decimal calculator groups validated top-of-book timelines by canonical observation checkpoint. Each available checkpoint reports its independent sample size, average spread in basis points, and average displayed bid and ask quote notionals calculated as exact `price × quantity` values.
+
+Raw base quantities are not averaged across different assets because their units are not comparable. The quote notionals describe only the displayed best level at each snapshot; they are not an order-book depth model, fill simulation, or guarantee of executable liquidity. This increment adds no durable cohort query, route, persistence, scoring, alert, signal, or trading behavior.

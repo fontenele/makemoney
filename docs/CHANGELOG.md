@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.56 top-of-book cohort calculation completed
+
+- Added a pure exact-decimal cohort calculator for average spread basis points and displayed bid/ask quote notionals at each observation checkpoint.
+- Preserved independent checkpoint samples and canonical schedule order while rejecting empty member timelines, duplicate symbols, duplicate labels, and invalid books.
+- Kept level-one displayed notional explicitly separate from depth or guaranteed executable liquidity; no database query or route was added.
+- 688 unit tests across 82 suites and all 52 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.55 opt-in checkpoint top-of-book collection completed
 
 - Composed the existing public rolling-ticker and top-of-book loaders in the production checkpoint processor.

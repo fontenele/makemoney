@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Compare displayed book value in quote-asset units
+
+M7.56 aggregates bid and ask `price × quantity` in quote-asset units rather than averaging raw base-asset quantities across different listed assets. Spread is normalized in basis points. Both remain descriptive level-one snapshots: they are not depth, fill capacity, or guaranteed executable liquidity.
+
 ## 2026-09-20 — Collect ticker and top-of-book as one checkpoint result
 
 The production processor loads the two independent public snapshots concurrently and returns no partial result if either fails. The cycle always sends that combined result to the M7.54 transaction, so durable checkpoint completion cannot omit its corresponding top-of-book record. This changes only the already opt-in worker path; collection remains disabled by default.
