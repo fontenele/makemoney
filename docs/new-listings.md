@@ -281,3 +281,9 @@ A locked positive book produces zero spread, while a crossed or otherwise invali
 The M7.46 provider contract is now implemented with public Binance Spot `GET /api/v3/depth` for one mandatory canonical symbol and `limit=5`. The adapter uses the smallest supported depth snapshot that preserves `lastUpdateId`, normalizes only the first bid and ask, and discards the additional returned levels rather than introducing a depth model.
 
 Requests require no credentials, have a ten-second timeout, compose caller cancellation, and validate input before network access. Non-success errors expose only the status code; successful payloads require a safe non-negative update ID, non-empty exact-string price levels, and all M7.46 domain invariants. This increment does not wire the adapter into the module, checkpoint worker, persistence, routes, scoring, alerts, signals, or trading.
+
+## M7.49 listing top-of-book provider registration
+
+The Binance depth-snapshot adapter is registered in the new-listings dependency container behind `LISTING_TOP_OF_BOOK_OBSERVATION_PROVIDER`. Its factory reuses the startup-validated `BINANCE_REST_BASE_URL`, keeping future application consumers independent from the concrete provider client.
+
+The registration is inert by itself: no service injects the token, no request starts during application lifecycle, and no checkpoint, persistence, route, score, alert, signal, or trading behavior is introduced.

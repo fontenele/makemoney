@@ -23,6 +23,11 @@ import {
 import { BinanceListingMarketObservationClient } from './infrastructure/binance-listing-market-observation.client';
 import { ProviderListingObservationCheckpointProcessor } from './application/provider-listing-observation-checkpoint.processor';
 import { ListingObservationCheckpointWorker } from './application/listing-observation-checkpoint.worker';
+import {
+  LISTING_TOP_OF_BOOK_OBSERVATION_PROVIDER,
+  ListingTopOfBookObservationProvider,
+} from './domain/listing-top-of-book-observation';
+import { BinanceListingTopOfBookClient } from './infrastructure/binance-listing-top-of-book.client';
 
 @Module({
   controllers: [NewListingsController],
@@ -40,6 +45,16 @@ import { ListingObservationCheckpointWorker } from './application/listing-observ
       inject: [ConfigService],
       useFactory: (config: ConfigService) =>
         new BinanceListingMarketObservationClient(
+          config.getOrThrow<string>('BINANCE_REST_BASE_URL'),
+        ),
+    },
+    {
+      provide: LISTING_TOP_OF_BOOK_OBSERVATION_PROVIDER,
+      inject: [ConfigService],
+      useFactory: (
+        config: ConfigService,
+      ): ListingTopOfBookObservationProvider =>
+        new BinanceListingTopOfBookClient(
           config.getOrThrow<string>('BINANCE_REST_BASE_URL'),
         ),
     },

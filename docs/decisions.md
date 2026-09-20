@@ -1,10 +1,16 @@
 # Technical Decisions
 
+## 2026-09-20 — Listing top-of-book provider is registered but inert
+
+M7.49 registers the M7.48 Binance adapter behind `LISTING_TOP_OF_BOOK_OBSERVATION_PROVIDER` and constructs it from the already validated public REST base URL. The token preserves the provider-neutral application boundary without exposing the concrete client to future consumers.
+
+Registration alone starts no request and creates no lifecycle behavior. Selecting a consumer, persistence model, collection schedule, or public route remains a separate increment.
+
 ## 2026-09-20 — Public listing top-of-book uses the depth snapshot
 
 M7.48 uses Binance Spot `GET /api/v3/depth?limit=5` instead of `bookTicker` because the depth response includes `lastUpdateId`, preserving the M7.46 snapshot identity. The adapter intentionally keeps only the first bid and ask; consuming the remaining levels would silently introduce a depth model outside this increment.
 
-One explicit symbol bounds response size and provider weight. The request is public, timeout-bound, caller-cancelable, and strict about both transport shape and domain invariants. It remains inactive until separately wired, and no provider body is included in status errors.
+One explicit symbol bounds response size and provider weight. The request is public, timeout-bound, caller-cancelable, and strict about both transport shape and domain invariants. No provider body is included in status errors; M7.49 registers the adapter but leaves it without an active consumer.
 
 ## 2026-09-20 — Listing spread is derived from one validated snapshot
 

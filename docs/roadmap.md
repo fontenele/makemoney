@@ -157,6 +157,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.46 — complete:** a provider-neutral listing top-of-book contract preserves exact bid/ask prices and quantities with strict identity, update, book-coherence, and receive-time validation without loading data.
 - **M7.47 — complete:** a pure exact-decimal calculator derives listing top-of-book absolute spread, midpoint, and spread basis points while preserving displayed level-one quantities.
 - **M7.48 — complete:** an inactive public Binance Spot depth adapter loads one explicit symbol, preserves `lastUpdateId`, and normalizes only the best bid/ask with timeout, cancellation, and strict validation.
+- **M7.49 — complete:** the Binance listing top-of-book adapter is registered behind its provider-neutral dependency token while remaining without an active consumer or lifecycle behavior.
 
 ## M8 — Dashboard — planned
 

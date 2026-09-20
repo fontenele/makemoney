@@ -126,6 +126,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.46 defines a provider-neutral arbitrary-symbol top-of-book observation and loader interface with exact prices/quantities, non-crossed-book validation, and no active provider or lifecycle behavior.
 - M7.47 derives exact absolute spread, midpoint, and basis points from a validated top-of-book observation while preserving level-one snapshot provenance and making no depth or fill claim.
 - M7.48 loads an explicit symbol through the public Binance depth snapshot with limit 5, retains only the best level and `lastUpdateId`, and remains unwired from all active lifecycle paths.
+- M7.49 registers that snapshot adapter behind the provider-neutral dependency token, using the existing Binance REST base URL while retaining no active consumer.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -265,12 +266,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-20 after M7.48:
+The following passed on 2026-09-20 after M7.49:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 665 tests passed across 77 suites
+- `npm test -- --runInBand` — 666 tests passed across 78 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -289,7 +290,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.48 are implemented and fully verified milestone increments.
+M0 through M7.49 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

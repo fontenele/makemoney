@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.49 listing top-of-book provider registration completed
+
+- Registered the public Binance top-of-book adapter behind its provider-neutral token in the new-listings module.
+- Reused the validated `BINANCE_REST_BASE_URL` configuration and added focused registration/factory coverage.
+- Kept the provider inactive: no consumer, checkpoint persistence, worker invocation, route, scoring, alerts, signals, or trading was added.
+- 666 unit tests across 78 suites and all 52 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.48 Binance listing top-of-book snapshot completed
 
 - Added an inactive unauthenticated Binance Spot depth-snapshot adapter for one explicit listing symbol.
