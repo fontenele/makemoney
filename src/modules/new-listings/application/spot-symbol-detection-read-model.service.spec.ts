@@ -627,6 +627,81 @@ describe('SpotSymbolDetectionReadModelService', () => {
     expect(listForDetection).not.toHaveBeenCalled();
   });
 
+  it('derives exact T+0-relative spread evolution from durable books', async () => {
+    const timeline = [
+      topOfBookCheckpoint('NEWUSDT', '99', '1', '101', '1'),
+      {
+        ...topOfBookCheckpoint('NEWUSDT', '98', '1', '102', '1'),
+        label: 'T+5s' as const,
+        offsetMs: 5_000,
+        targetAt: new Date('2026-09-14T02:00:05.000Z'),
+      },
+    ];
+    const listForDetection = jest.fn(() => Promise.resolve(timeline));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+      {
+        store: jest.fn(),
+        listForDetection,
+        listCohort: jest.fn(),
+      },
+    );
+
+    await expect(
+      service.getTopOfBookSpreadEvolution('binance', 'NEWUSDT'),
+    ).resolves.toMatchObject({
+      provider: 'binance',
+      symbol: 'NEWUSDT',
+      baselineSpreadBasisPoints: '200',
+      points: [
+        {
+          label: 'T+0',
+          spreadBasisPoints: '200',
+          spreadBasisPointsChange: '0',
+        },
+        {
+          label: 'T+5s',
+          spreadBasisPoints: '400',
+          spreadBasisPointsChange: '200',
+        },
+      ],
+    });
+    expect(listForDetection).toHaveBeenCalledWith('binance', 'NEWUSDT');
+  });
+
+  it('reports durable spread evolution unavailable without T+0', async () => {
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+      {
+        store: jest.fn(),
+        listForDetection: jest.fn(() => Promise.resolve([])),
+        listCohort: jest.fn(),
+      },
+    );
+
+    await expect(
+      service.getTopOfBookSpreadEvolution('binance', 'NEWUSDT'),
+    ).resolves.toBeNull();
+  });
+
+  it('rejects spread evolution for an unknown detection', async () => {
+    const listForDetection = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection,
+      listCohort: jest.fn(),
+    });
+
+    await expect(
+      service.getTopOfBookSpreadEvolution('binance', 'UNKNOWNUSDT'),
+    ).rejects.toBeInstanceOf(DetectedSpotSymbolNotFoundError);
+    expect(listForDetection).not.toHaveBeenCalled();
+  });
+
   it('loads and calculates a bounded durable top-of-book cohort', async () => {
     const listCohort = jest.fn(() =>
       Promise.resolve([

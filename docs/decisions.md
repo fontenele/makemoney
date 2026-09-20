@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Derive durable spread evolution on demand
+
+M7.72 reuses the canonical stored-book timeline and the M7.71 pure calculator rather than persisting another projection. Unknown detection remains distinct from a known detection without a T+0 book, and newly stored checkpoints affect the next calculation immediately.
+
 ## 2026-09-20 — Express spread evolution as a basis-point difference
 
 M7.71 subtracts the T+0 spread in basis points from each later checkpoint rather than calculating a proportional return on spread. This preserves the already normalized cross-asset unit, makes tightening negative and widening positive, and remains defined when the T+0 book is locked at zero spread. Missing T+0 makes the evolution unavailable.

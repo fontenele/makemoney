@@ -45,6 +45,8 @@ import { ListingTopOfBookImbalanceEvolution } from '../domain/listing-top-of-boo
 import { ListingTopOfBookImbalanceEvolutionCohort } from '../domain/listing-top-of-book-imbalance-evolution-cohort';
 import { ListingTopOfBookImbalanceEvolutionCalculator } from './listing-top-of-book-imbalance-evolution-calculator';
 import { ListingTopOfBookImbalanceEvolutionCohortCalculator } from './listing-top-of-book-imbalance-evolution-cohort-calculator';
+import { ListingTopOfBookSpreadEvolution } from '../domain/listing-top-of-book-spread-evolution';
+import { ListingTopOfBookSpreadEvolutionCalculator } from './listing-top-of-book-spread-evolution-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -75,6 +77,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingTopOfBookImbalanceEvolutionCalculator();
   private readonly topOfBookImbalanceEvolutionCohort =
     new ListingTopOfBookImbalanceEvolutionCohortCalculator();
+  private readonly topOfBookSpreadEvolution =
+    new ListingTopOfBookSpreadEvolutionCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -157,6 +161,15 @@ export class SpotSymbolDetectionReadModelService {
     symbol: string,
   ): Promise<ListingTopOfBookImbalanceEvolution | null> {
     return this.topOfBookImbalanceEvolution.calculate(
+      await this.listTopOfBook(provider, symbol),
+    );
+  }
+
+  async getTopOfBookSpreadEvolution(
+    provider: 'binance',
+    symbol: string,
+  ): Promise<ListingTopOfBookSpreadEvolution | null> {
+    return this.topOfBookSpreadEvolution.calculate(
       await this.listTopOfBook(provider, symbol),
     );
   }

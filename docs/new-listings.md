@@ -419,3 +419,9 @@ The response reports only detections with a usable T+0 imbalance baseline and re
 A pure exact-decimal calculator validates and orders one stored top-of-book timeline, requires an explicit scheduled T+0 book, and subtracts its spread in basis points from every available checkpoint spread. T+0 therefore has exact zero change, positive values mean widening, and negative values mean tightening.
 
 Using an absolute basis-point difference avoids division by the baseline and remains defined for a locked zero-spread T+0 book. An empty timeline or missing T+0 returns unavailable. This increment adds no durable composition, route, persistence, score, alert, signal, or trading behavior.
+
+## M7.72 durable top-of-book spread evolution
+
+The internal detection read model now loads one detected symbol's canonical stored top-of-book timeline and applies the M7.71 exact spread-evolution calculation on demand. An unknown durable detection keeps the established not-found behavior, while a known detection without a stored T+0 book returns analytical unavailability (`null`).
+
+No derived value is stored, so newly completed checkpoint books are visible on the next calculation. This increment adds no route, provider request, cohort statistic, score, alert, signal, or trading behavior.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.72 durable top-of-book spread evolution completed
+
+- Added an internal read-model operation that derives exact T+0-relative spread changes from one durable stored-book timeline.
+- Preserved unknown-detection and missing-T+0 semantics without persisting the derived projection.
+- Kept HTTP exposure and cohort statistics separate; no provider request, score, signal, or trading path was added.
+- 756 unit tests across 87 suites and all 57 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.71 exact top-of-book spread evolution completed
 
 - Added a pure exact-decimal calculator for checkpoint spread-basis-point changes relative to T+0.
