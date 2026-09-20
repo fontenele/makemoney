@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Top-of-book loading and spread calculation compose internally
+
+M7.50 introduces one small application service that delegates snapshot loading to the provider-neutral boundary and exact arithmetic to the existing spread calculator. The service passes caller cancellation unchanged, propagates provider failure, and cannot calculate when no observation was loaded.
+
+The composition is registered but has no lifecycle hook or presentation adapter. Automatic sampling, durable storage, HTTP exposure, and any use in scoring or execution remain separate decisions.
+
 ## 2026-09-20 — Listing top-of-book provider is registered but inert
 
 M7.49 registers the M7.48 Binance adapter behind `LISTING_TOP_OF_BOOK_OBSERVATION_PROVIDER` and constructs it from the already validated public REST base URL. The token preserves the provider-neutral application boundary without exposing the concrete client to future consumers.

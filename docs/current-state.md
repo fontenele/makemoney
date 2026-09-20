@@ -127,6 +127,7 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.47 derives exact absolute spread, midpoint, and basis points from a validated top-of-book observation while preserving level-one snapshot provenance and making no depth or fill claim.
 - M7.48 loads an explicit symbol through the public Binance depth snapshot with limit 5, retains only the best level and `lastUpdateId`, and remains unwired from all active lifecycle paths.
 - M7.49 registers that snapshot adapter behind the provider-neutral dependency token, using the existing Binance REST base URL while retaining no active consumer.
+- M7.50 provides an explicitly invoked internal composition that loads one top-of-book snapshot and derives exact spread metrics, with no automatic collection or storage.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -266,12 +267,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-20 after M7.49:
+The following passed on 2026-09-20 after M7.50:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 666 tests passed across 78 suites
+- `npm test -- --runInBand` — 668 tests passed across 79 suites
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -290,7 +291,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.49 are implemented and fully verified milestone increments.
+M0 through M7.50 are implemented and fully verified milestone increments.
 
 ## Known issues and cautions
 

@@ -287,3 +287,9 @@ Requests require no credentials, have a ten-second timeout, compose caller cance
 The Binance depth-snapshot adapter is registered in the new-listings dependency container behind `LISTING_TOP_OF_BOOK_OBSERVATION_PROVIDER`. Its factory reuses the startup-validated `BINANCE_REST_BASE_URL`, keeping future application consumers independent from the concrete provider client.
 
 The registration is inert by itself: no service injects the token, no request starts during application lifecycle, and no checkpoint, persistence, route, score, alert, signal, or trading behavior is introduced.
+
+## M7.50 listing top-of-book snapshot composition
+
+An internal application service now composes the provider-neutral top-of-book loader with the exact spread calculator. A caller must explicitly supply the provider and canonical symbol; the service forwards optional cancellation, loads exactly one snapshot, and returns spread, midpoint, and basis points tied to that same update ID and receive time.
+
+Provider failure is propagated and prevents calculation. The service is available through dependency injection but nothing invokes it automatically, and it adds no persistence, checkpoint integration, route, scoring, alert, signal, or trading behavior.

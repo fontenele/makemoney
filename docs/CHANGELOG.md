@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.50 listing top-of-book snapshot composition completed
+
+- Added an internal service that loads one explicit provider-neutral top-of-book snapshot and immediately derives its exact spread metrics.
+- Preserved caller cancellation and provider errors without calculating from missing data, and registered the service through explicit dependency injection.
+- Kept invocation manual and internal: no lifecycle collection, persistence, route, scoring, alerts, signals, or trading was added.
+- 668 unit tests across 79 suites and all 52 isolated E2E tests passed together with build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.49 listing top-of-book provider registration completed
 
 - Registered the public Binance top-of-book adapter behind its provider-neutral token in the new-listings module.

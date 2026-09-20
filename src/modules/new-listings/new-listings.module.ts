@@ -28,6 +28,8 @@ import {
   ListingTopOfBookObservationProvider,
 } from './domain/listing-top-of-book-observation';
 import { BinanceListingTopOfBookClient } from './infrastructure/binance-listing-top-of-book.client';
+import { ListingTopOfBookSnapshotService } from './application/listing-top-of-book-snapshot.service';
+import { ListingTopOfBookSpreadCalculator } from './application/listing-top-of-book-spread-calculator';
 
 @Module({
   controllers: [NewListingsController],
@@ -57,6 +59,18 @@ import { BinanceListingTopOfBookClient } from './infrastructure/binance-listing-
         new BinanceListingTopOfBookClient(
           config.getOrThrow<string>('BINANCE_REST_BASE_URL'),
         ),
+    },
+    ListingTopOfBookSpreadCalculator,
+    {
+      provide: ListingTopOfBookSnapshotService,
+      inject: [
+        LISTING_TOP_OF_BOOK_OBSERVATION_PROVIDER,
+        ListingTopOfBookSpreadCalculator,
+      ],
+      useFactory: (
+        provider: ListingTopOfBookObservationProvider,
+        calculator: ListingTopOfBookSpreadCalculator,
+      ) => new ListingTopOfBookSnapshotService(provider, calculator),
     },
     { provide: SPOT_SYMBOL_REPOSITORY, useClass: PrismaSpotSymbolRepository },
     {
