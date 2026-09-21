@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Require an explicit threshold for spread widening
+
+M7.77 treats widening as an observed descriptive condition, not a score or prediction. The caller must provide a positive basis-point threshold; the classifier records the first qualifying checkpoint and the maximum observed T+0-relative change. A timeline that has not crossed the threshold remains explicitly `no-widening-observed` rather than implying future behavior.
+
 ## 2026-09-20 — Expose bounded spread evolution without derived storage
 
 M7.76 follows the established aggregate API contract: provider defaults to Binance, limit defaults to 50 and is bounded at 100, and invalid input fails before repository access. The result is calculated from stored books on every request so checkpoint coverage remains current without a projection table or cache lifecycle.

@@ -449,3 +449,9 @@ The repository continues to select the recent T+0-eligible durable detections be
 `GET /new-listings/top-of-book/spread/evolution` exposes the M7.75 bounded durable aggregate through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it. Invalid query values return `400` before persistence access.
 
 The response preserves each checkpoint's independent sample size and exact average T+0-relative spread-basis-point change. Positive averages mean widening and negative averages mean tightening. The route cannot collect data, persist a derived result, score, alert, signal, or trade.
+
+## M7.77 explicit top-of-book spread widening classification
+
+A pure exact-decimal classifier consumes one validated spread-evolution timeline and a caller-supplied positive `wideningBasisPoints` threshold. It reports whether widening was observed, the first checkpoint whose T+0-relative spread change met the threshold, the maximum observed widening, and the last checkpoint evaluated.
+
+The classifier validates the canonical identity, ordered schedule, explicit coherent T+0 baseline, non-negative spreads, and exact baseline-relative changes. No threshold is embedded because the project has no universal widening hypothesis. This increment adds no durable composition, route, persistence, score, alert, signal, or trading behavior.

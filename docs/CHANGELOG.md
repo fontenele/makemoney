@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.77 explicit top-of-book spread widening classification completed
+
+- Added a pure exact-decimal classifier with a mandatory positive spread-widening threshold.
+- Reports the first qualifying checkpoint, maximum observed widening, evaluation horizon, and explicit observed/not-observed status.
+- Added no durable composition, route, persistence, score, alert, signal, or trading behavior.
+- 779 unit tests across 89 suites and all 59 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.76 durable top-of-book spread evolution cohort API completed
 
 - Added local read-only `GET /new-listings/top-of-book/spread/evolution` with optional validated provider and limit.
