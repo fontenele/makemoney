@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.80 top-of-book spread widening classification cohort calculation completed
+
+- Added a pure exact-decimal cohort calculator for explicit-threshold spread-widening classifications.
+- Reports observed/not-observed counts, total denominator, and exact observed rate with explicit empty-sample semantics.
+- Rejects duplicate symbols, mixed thresholds, and incoherent classifications without adding database or HTTP behavior.
+- 792 unit tests across 90 suites and all 60 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.79 durable top-of-book spread widening classification API completed
 
 - Added local read-only `GET /new-listings/:provider/:symbol/top-of-book/spread/classification` with a mandatory positive `wideningBasisPoints` threshold.

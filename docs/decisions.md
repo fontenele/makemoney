@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Keep spread-classification cohort denominators explicit
+
+M7.80 calculates the widening-observed rate over the complete supplied classification sample and returns both observed and not-observed counts alongside that denominator. Empty samples use a null rate rather than implying that widening was absent.
+
+Only unique symbols classified under numerically equal caller-supplied thresholds may share a cohort. The aggregation remains pure descriptive research and adds no durable query, route, score, alert, signal, or trading behavior.
+
 ## 2026-09-20 — Require an explicit spread-widening threshold on every API request
 
 M7.79 does not embed a market hypothesis. Callers must provide a positive decimal `wideningBasisPoints`, which is validated before persistence access and passed unchanged to the existing durable classifier.

@@ -467,3 +467,9 @@ An unknown durable detection keeps the established not-found error, while a know
 `GET /new-listings/:provider/:symbol/top-of-book/spread/classification` exposes the M7.78 on-demand result through the local read-only API. Every request must provide a positive decimal `wideningBasisPoints`; malformed identity or threshold input returns `400` before persistence access.
 
 An unknown detection returns `404`, while a known detection without a stored T+0 book returns `503`. The route calculates from the current durable timeline and cannot collect data, persist a derived classification, score, alert, signal, or trade.
+
+## M7.80 top-of-book spread widening classification cohort calculation
+
+A pure exact-decimal calculator aggregates classifications produced under one numerically equal explicit `wideningBasisPoints` threshold. It reports total, widening-observed, and no-widening-observed counts plus the exact widening-observed rate; an empty input returns zero counts with null provider, threshold, and rate.
+
+Every non-empty input must contain unique canonical Binance symbols, coherent classification status/event presence, and matching valid thresholds. This increment adds no repository access, route, persistence, score, alert, signal, or trading behavior.

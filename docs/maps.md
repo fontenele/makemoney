@@ -121,6 +121,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 
 | durable spread widening classification, stored-book threshold classification, M7.78 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-top-of-book-spread-evolution-calculator.ts`, `../src/modules/new-listings/application/listing-top-of-book-spread-classifier.ts` |
 | spread widening classification API, GET /new-listings/:provider/:symbol/top-of-book/spread/classification, M7.79 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
+| spread widening classification cohort, widening observed rate, classification counts, M7.80 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-top-of-book-spread-classification-cohort-calculator.ts`, `../src/modules/new-listings/domain/listing-top-of-book-spread-classification-cohort.ts` |
 
 ## Before every task
 
