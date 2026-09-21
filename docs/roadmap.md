@@ -211,6 +211,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.100 — complete:** local read-only HTTP access exposes bounded durable non-annualized price-variability cohort statistics.
 - **M7.101 — complete:** a pure exact-decimal calculator evaluates an explicit stored-ask-to-later-stored-bid checkpoint round trip after observed spread, two-sided fees, and adverse slippage.
 - **M7.102 — complete:** the internal read model composes an explicitly selected round trip from one known detection's durable top-of-book timeline, with pre-access input validation and explicit missing-checkpoint semantics.
+- **M7.103 — complete:** local read-only HTTP access exposes one explicit durable checkpoint round trip with mandatory pair and cost inputs plus explicit `400`/`404`/`503` outcomes.
 
 ## M8 — Dashboard — planned
 

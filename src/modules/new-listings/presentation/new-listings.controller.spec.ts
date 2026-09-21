@@ -846,6 +846,102 @@ describe('NewListingsController', () => {
     expect(listObservations).toHaveBeenCalledWith('binance', 'NEWUSDT');
   });
 
+  it('returns an explicit durable checkpoint round trip', async () => {
+    const roundTrip = {
+      provider: 'binance' as const,
+      symbol: 'NEWUSDT',
+      configuration: { feeRate: '0.001', slippageRate: '0.002' },
+      entry: {
+        label: 'T+0' as const,
+        offsetMs: 0,
+        referencePrice: '101',
+        executionPrice: '101.202',
+      },
+      exit: {
+        label: 'T+5s' as const,
+        offsetMs: 5_000,
+        referencePrice: '109',
+        executionPrice: '108.782',
+      },
+      durationMs: 5_000,
+      grossReturnRate: '0.07920792079207920792079207920792079207921',
+      netReturnRate: '0.072900248172928024863329951883014439248',
+      profitableAfterCosts: true,
+    };
+    const getCheckpointRoundTrip = jest.fn(() => Promise.resolve(roundTrip));
+    const controller = new NewListingsController({ getCheckpointRoundTrip });
+
+    await expect(
+      controller.checkpointRoundTrip(
+        'binance',
+        'NEWUSDT',
+        'T+0',
+        'T+5s',
+        '0.001',
+        '0.002',
+      ),
+    ).resolves.toBe(roundTrip);
+    expect(getCheckpointRoundTrip).toHaveBeenCalledWith('binance', 'NEWUSDT', {
+      entryLabel: 'T+0',
+      exitLabel: 'T+5s',
+      feeRate: '0.001',
+      slippageRate: '0.002',
+    });
+  });
+
+  it('maps missing selected checkpoint books to service unavailable', async () => {
+    const controller = new NewListingsController({
+      getCheckpointRoundTrip: jest.fn(() => Promise.resolve(null)),
+    });
+
+    await expect(
+      controller.checkpointRoundTrip(
+        'binance',
+        'NEWUSDT',
+        'T+0',
+        'T+5s',
+        '0',
+        '0',
+      ),
+    ).rejects.toThrow('selected top-of-book checkpoints are not available');
+  });
+
+  it('maps an unknown round-trip identity to not found', async () => {
+    const controller = new NewListingsController({
+      getCheckpointRoundTrip: jest.fn(() =>
+        Promise.reject(new DetectedSpotSymbolNotFoundError()),
+      ),
+    });
+
+    await expect(
+      controller.checkpointRoundTrip(
+        'binance',
+        'UNKNOWNUSDT',
+        'T+0',
+        'T+5s',
+        '0',
+        '0',
+      ),
+    ).rejects.toThrow('detected symbol was not found');
+  });
+
+  it('rejects invalid round-trip input before read-model access', async () => {
+    const getCheckpointRoundTrip = jest.fn(() => Promise.resolve(null));
+    const controller = new NewListingsController({ getCheckpointRoundTrip });
+
+    await expect(
+      controller.checkpointRoundTrip(
+        'binance',
+        'NEWUSDT',
+        'T+5s',
+        'T+0',
+        '0',
+        '0',
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(getCheckpointRoundTrip).not.toHaveBeenCalled();
+  });
+
   it.each([
     ['other', 'NEWUSDT'],
     ['binance', 'newusdt'],

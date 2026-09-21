@@ -52,6 +52,11 @@ import { validateListingTopOfBookSpreadThresholds } from '../application/listing
 import { ListingTopOfBookSpreadClassificationCohort } from '../domain/listing-top-of-book-spread-classification-cohort';
 import { ListingTopOfBookSpreadClassificationMagnitudeCohort } from '../domain/listing-top-of-book-spread-classification-magnitude-cohort';
 import { ListingTopOfBookSpreadClassificationTimingCohort } from '../domain/listing-top-of-book-spread-classification-timing-cohort';
+import {
+  ListingCheckpointRoundTrip,
+  ListingCheckpointRoundTripSelection,
+} from '../domain/listing-checkpoint-round-trip';
+import { validateListingCheckpointRoundTripSelection } from '../application/listing-checkpoint-round-trip-calculator';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -373,6 +378,42 @@ export class NewListingsController {
     }
   }
 
+  @Get(':provider/:symbol/round-trip')
+  async checkpointRoundTrip(
+    @Param('provider') provider: string,
+    @Param('symbol') symbol: string,
+    @Query('entryLabel') entryLabel?: string,
+    @Query('exitLabel') exitLabel?: string,
+    @Query('feeRate') feeRate?: string,
+    @Query('slippageRate') slippageRate?: string,
+  ): Promise<ListingCheckpointRoundTrip> {
+    const identity = validObservationIdentity(provider, symbol);
+    const selection = validRoundTripSelection(
+      entryLabel,
+      exitLabel,
+      feeRate,
+      slippageRate,
+    );
+    try {
+      const result = await this.detections.getCheckpointRoundTrip(
+        identity.provider,
+        identity.symbol,
+        selection,
+      );
+      if (!result) {
+        throw new ServiceUnavailableException(
+          'selected top-of-book checkpoints are not available',
+        );
+      }
+      return result;
+    } catch (error) {
+      if (error instanceof DetectedSpotSymbolNotFoundError) {
+        throw new NotFoundException('detected symbol was not found');
+      }
+      throw error;
+    }
+  }
+
   @Get(':provider/:symbol/top-of-book/imbalance')
   async topOfBookImbalance(
     @Param('provider') provider: string,
@@ -570,6 +611,38 @@ function validSpreadThresholds(
     );
   }
   return thresholds;
+}
+
+function validRoundTripSelection(
+  entryLabel?: string,
+  exitLabel?: string,
+  feeRate?: string,
+  slippageRate?: string,
+): ListingCheckpointRoundTripSelection {
+  if (
+    entryLabel === undefined ||
+    exitLabel === undefined ||
+    feeRate === undefined ||
+    slippageRate === undefined
+  ) {
+    throw new BadRequestException(
+      'entryLabel, exitLabel, feeRate, and slippageRate are required',
+    );
+  }
+  const selection = {
+    entryLabel,
+    exitLabel,
+    feeRate,
+    slippageRate,
+  } as ListingCheckpointRoundTripSelection;
+  try {
+    validateListingCheckpointRoundTripSelection(selection);
+  } catch (error) {
+    throw new BadRequestException(
+      error instanceof Error ? error.message : 'invalid round trip selection',
+    );
+  }
+  return selection;
 }
 
 function validFilters(

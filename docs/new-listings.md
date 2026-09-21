@@ -605,3 +605,9 @@ Both books must share one canonical identity, retain canonical schedule labels a
 The internal detection read model now accepts one explicit forward entry/exit label pair plus fee and slippage rates, validates that request before persistence access, and loads the known detection's durable top-of-book timeline. When both selected books exist, it delegates to the M7.101 exact calculator rather than duplicating financial arithmetic.
 
 An unknown detection preserves the existing not-found error. A known detection missing either selected checkpoint returns an explicit unavailable result and never substitutes another book. The result remains transient: this increment adds no route, projection, automatic pair selection, optimization, depth or fill model, signal, order simulation, or trading behavior.
+
+## M7.103 durable listing checkpoint round-trip API
+
+`GET /new-listings/:provider/:symbol/round-trip` exposes M7.102 through the local read-only API. It requires explicit `entryLabel`, `exitLabel`, `feeRate`, and `slippageRate` query values; because `+` is special in query strings, checkpoint labels must encode it as `%2B`, such as `entryLabel=T%2B0&exitLabel=T%2B5s`.
+
+Identity and selection are validated before read-model access. Invalid or missing input returns `400`, an unknown detection returns `404`, and absence of either selected durable book returns `503`. The response preserves exact reference/execution prices, gross/net returns, duration, configured costs, and profitability after costs. The route cannot select or optimize a pair, infer costs, model depth or fills, persist a projection, emit a signal, simulate an order, or trade.

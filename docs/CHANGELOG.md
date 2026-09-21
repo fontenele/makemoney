@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.103 durable listing checkpoint round-trip API completed
+
+- Added local read-only `GET /new-listings/:provider/:symbol/round-trip` with mandatory entry/exit labels and explicit fee/slippage rates.
+- Added pre-read validation and explicit `400`, `404`, and `503` behavior; documented `%2B` encoding for checkpoint-label plus signs.
+- Updated the root API route table; the endpoint does not select, optimize, persist, signal, simulate an order, or trade.
+- 888 unit tests across 97 suites and all 68 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.102 durable listing checkpoint round-trip composition completed
 
 - Added internal read-model composition of an explicit forward checkpoint round trip from a known detection's durable top-of-book timeline.

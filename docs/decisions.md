@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Expose only explicitly configured checkpoint round trips
+
+M7.103 exposes the durable calculation through a local read-only GET whose entry label, exit label, fee rate, and slippage rate are all mandatory. This keeps assumptions visible to the caller and avoids implicit defaults or automatic checkpoint selection; plus signs in query labels must be URL-encoded.
+
+Invalid input is rejected before read-model access, unknown detections return not found, and missing selected books remain temporarily unavailable. The endpoint does not claim executable liquidity and creates no projection, signal, simulated order, or trading path.
+
 ## 2026-09-21 — Compose selected round trips only from durable books
 
 M7.102 resolves a caller-selected forward checkpoint pair from one known detection's persisted top-of-book timeline and delegates exact arithmetic to M7.101. Selection and cost validation precede repository access, unknown detections retain not-found semantics, and a missing selected book is unavailable rather than silently replaced.
