@@ -213,6 +213,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.102 — complete:** the internal read model composes an explicitly selected round trip from one known detection's durable top-of-book timeline, with pre-access input validation and explicit missing-checkpoint semantics.
 - **M7.103 — complete:** local read-only HTTP access exposes one explicit durable checkpoint round trip with mandatory pair and cost inputs plus explicit `400`/`404`/`503` outcomes.
 - **M7.104 — complete:** a pure exact-decimal cohort calculator aggregates one fixed explicit round-trip configuration with available/unavailable coverage, gross/net return summaries, and profitability-after-costs statistics.
+- **M7.105 — complete:** the internal read model composes one fixed explicit round-trip configuration over a bounded durable top-of-book cohort while retaining every incomplete timeline as unavailable coverage.
 
 ## M8 — Dashboard — planned
 

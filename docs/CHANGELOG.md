@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.105 durable listing checkpoint round-trip cohort composition completed
+
+- Added bounded internal read-model composition of one fixed round-trip configuration over durable top-of-book timelines.
+- Validates the cohort limit, selected pair, and costs before loading; incomplete timelines remain explicit unavailable samples without checkpoint substitution.
+- Reuses M7.101 per available timeline and M7.104 for aggregation, with no route, selection, optimization, signal, simulation, or trading behavior.
+- 898 unit tests across 98 suites and all 68 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.104 listing checkpoint round-trip cohort calculation completed
 
 - Added a pure exact-decimal cohort calculator for one fixed entry/exit and fee/slippage configuration.

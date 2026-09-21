@@ -1235,6 +1235,110 @@ describe('SpotSymbolDetectionReadModelService', () => {
     );
   });
 
+  it('composes a fixed round-trip configuration over a durable book cohort', async () => {
+    const availableExit = {
+      ...topOfBookCheckpoint('GAINUSDT', '120', '1', '121', '1'),
+      label: 'T+5s' as const,
+      offsetMs: 5_000,
+      targetAt: new Date('2026-09-14T02:00:05.000Z'),
+    };
+    const listCohort = jest.fn(() =>
+      Promise.resolve([
+        [topOfBookCheckpoint('GAINUSDT', '99', '1', '100', '1'), availableExit],
+        [topOfBookCheckpoint('MISSINGUSDT', '99', '1', '100', '1')],
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort,
+    });
+
+    await expect(
+      service.getCheckpointRoundTripCohort('binance', 25, {
+        entryLabel: 'T+0',
+        exitLabel: 'T+5s',
+        feeRate: '0',
+        slippageRate: '0',
+      }),
+    ).resolves.toMatchObject({
+      provider: 'binance',
+      sampleSize: 2,
+      availableSampleSize: 1,
+      unavailableSampleSize: 1,
+      profitableAfterCostsCount: 1,
+      profitableAfterCostsRate: '1',
+      averageGrossReturnRate: '0.2',
+      averageNetReturnRate: '0.2',
+      medianNetReturnRate: '0.2',
+    });
+    expect(listCohort).toHaveBeenCalledWith('binance', 25);
+  });
+
+  it('validates round-trip cohort input before durable loading', async () => {
+    const listCohort = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort,
+    });
+
+    await expect(
+      service.getCheckpointRoundTripCohort('binance', 0, {
+        entryLabel: 'T+0',
+        exitLabel: 'T+5s',
+        feeRate: '0',
+        slippageRate: '0',
+      }),
+    ).rejects.toThrow('cohort limit must be an integer from 1 to 100');
+    await expect(
+      service.getCheckpointRoundTripCohort('binance', 25, {
+        entryLabel: 'T+5s',
+        exitLabel: 'T+0',
+        feeRate: '0',
+        slippageRate: '0',
+      }),
+    ).rejects.toThrow('Listing round trip checkpoint selection is invalid');
+    expect(listCohort).not.toHaveBeenCalled();
+  });
+
+  it('returns an explicit empty durable round-trip cohort', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort: jest.fn(() => Promise.resolve([])),
+    });
+
+    await expect(
+      service.getCheckpointRoundTripCohort('binance', 50, {
+        entryLabel: 'T+0',
+        exitLabel: 'T+5s',
+        feeRate: '0.001',
+        slippageRate: '0.002',
+      }),
+    ).resolves.toMatchObject({
+      provider: null,
+      sampleSize: 0,
+      availableSampleSize: 0,
+      unavailableSampleSize: 0,
+      profitableAfterCostsRate: null,
+      averageNetReturnRate: null,
+    });
+  });
+
+  it('fails explicitly when durable round-trip cohort access is unavailable', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith());
+
+    await expect(
+      service.getCheckpointRoundTripCohort('binance', 50, {
+        entryLabel: 'T+0',
+        exitLabel: 'T+5s',
+        feeRate: '0',
+        slippageRate: '0',
+      }),
+    ).rejects.toThrow('top-of-book repository is unavailable');
+  });
+
   it('loads and calculates a bounded durable top-of-book imbalance cohort', async () => {
     const listCohort = jest.fn(() =>
       Promise.resolve([

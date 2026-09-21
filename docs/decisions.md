@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Retain incomplete durable timelines in round-trip coverage
+
+M7.105 applies one validated fixed configuration to the bounded recent durable top-of-book cohort. Each repository timeline contributes exactly one sample: both selected books produce an exact M7.101 result, while a missing entry or exit remains unavailable and is never replaced by another checkpoint.
+
+Limit and configuration validation precede repository access. Composition is transient and adds no route, pair search, ranking, optimization, persistence, signal, simulated order, or trading behavior.
+
 ## 2026-09-21 — Keep round-trip cohort assumptions fixed and coverage explicit
 
 M7.104 aggregates only results sharing one caller-supplied checkpoint pair and fee/slippage configuration. Missing results remain part of total coverage but cannot contribute fabricated zero returns; available and unavailable sample counts are therefore reported separately.

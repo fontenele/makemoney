@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.104 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip and cohort research.
+- M6 is closed. M7.1–M7.105 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip research through durable cohort composition.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -333,6 +333,8 @@ M7.102 composes that calculation on demand from one known detection's durable to
 M7.103 exposes that explicit composition at local read-only `GET /new-listings/:provider/:symbol/round-trip`. All four query inputs are mandatory, `+` in checkpoint labels must be URL-encoded, and invalid, unknown, and unavailable outcomes map to `400`, `404`, and `503` without adding automatic selection or execution behavior.
 
 M7.104 purely aggregates one fixed explicit round-trip configuration across caller-supplied detection samples. It preserves available/unavailable coverage, exact gross/net return summaries, and profitability-after-costs counts and rate while strictly reconciling every available result; it adds no repository access or route.
+
+M7.105 composes that aggregate on demand over the bounded recent durable top-of-book cohort. Limit, selected labels, and cost rates are validated before repository access; every returned timeline remains in coverage, while a missing selected entry or exit produces an unavailable sample rather than substitution.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

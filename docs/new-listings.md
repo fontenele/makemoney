@@ -617,3 +617,9 @@ Identity and selection are validated before read-model access. Invalid or missin
 A pure exact-decimal cohort calculator aggregates detection samples under one fixed explicit entry/exit and fee/slippage configuration. It reports total, available, and unavailable samples; profitable and non-profitable available counts; exact profitability-after-costs rate; average gross and net return; and median net return. Empty and all-unavailable inputs retain explicit nullable return/rate semantics instead of fabricated zero performance.
 
 Every sample identity must be canonical and unique. Each available result must match the sample and fixed configuration, retain the canonical checkpoint schedule and duration, reconcile adverse slippage into execution prices, reconcile gross and fee-adjusted net returns, and agree with its profitability flag. This increment adds no repository access, durable composition, route, pair search, ranking, optimization, depth or fill model, signal, order simulation, or trading behavior.
+
+## M7.105 durable listing checkpoint round-trip cohort composition
+
+The internal detection read model now validates the bounded cohort limit and fixed entry/exit plus fee/slippage configuration before durable access, loads the recent top-of-book cohort once, derives each available round trip with M7.101, and aggregates all samples with M7.104. A returned timeline missing either selected checkpoint remains in the denominator as explicitly unavailable; no other checkpoint is substituted.
+
+An empty durable cohort preserves the explicit empty aggregate, and absence of the top-of-book repository fails rather than silently falling back. The result is transient and adds no route, provider request, projection, automatic pair selection, ranking, optimization, depth or fill model, signal, order simulation, or trading behavior.
