@@ -509,3 +509,9 @@ Invalid query input returns `400` before read-model access. The response preserv
 A pure cohort calculator reports the median scheduled duration from T+0 to the first threshold-qualified widening event. The response carries the independent widening sample size; empty cohorts and cohorts without observed widening return a null median.
 
 The calculator reuses the classification-cohort consistency rules, validates event and evaluation labels against the canonical checkpoint schedule, and rejects widening at T+0 or after the declared evaluation horizon. This increment adds no repository access, durable composition, route, persistence, score, alert, signal, or trading behavior.
+
+## M7.87 durable top-of-book spread widening timing cohort loading
+
+The internal detection read model now applies M7.86 to the same bounded recent durable classification sample used by frequency and magnitude aggregation. The shared loader validates the cohort limit and explicit threshold before persistence access, loads T+0-eligible books, derives exact spread evolution, and classifies every usable timeline once per request.
+
+Empty or non-widening samples retain the explicit null-median contract. Results are calculated on demand and not persisted. This increment adds no route, provider request, score, alert, signal, or trading behavior.

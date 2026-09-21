@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.87 durable top-of-book spread widening timing cohort completed
+
+- Composed median T+0-to-first-widening timing over the shared bounded recent durable classification cohort.
+- Reused the existing limit, threshold, T+0 eligibility, spread-evolution, and classification pipeline before applying M7.86.
+- Added no route, derived persistence, score, alert, signal, or trading behavior.
+- 822 unit tests across 92 suites and all 62 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.86 top-of-book spread widening timing cohort calculation completed
 
 - Added a pure cohort calculator for median T+0-to-first-observed-widening duration under one explicit threshold.

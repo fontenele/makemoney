@@ -61,6 +61,8 @@ import { ListingTopOfBookSpreadClassificationCohort } from '../domain/listing-to
 import { ListingTopOfBookSpreadClassificationCohortCalculator } from './listing-top-of-book-spread-classification-cohort-calculator';
 import { ListingTopOfBookSpreadClassificationMagnitudeCohort } from '../domain/listing-top-of-book-spread-classification-magnitude-cohort';
 import { ListingTopOfBookSpreadClassificationMagnitudeCohortCalculator } from './listing-top-of-book-spread-classification-magnitude-cohort-calculator';
+import { ListingTopOfBookSpreadClassificationTimingCohort } from '../domain/listing-top-of-book-spread-classification-timing-cohort';
+import { ListingTopOfBookSpreadClassificationTimingCohortCalculator } from './listing-top-of-book-spread-classification-timing-cohort-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -101,6 +103,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingTopOfBookSpreadClassificationCohortCalculator();
   private readonly topOfBookSpreadClassificationMagnitudeCohort =
     new ListingTopOfBookSpreadClassificationMagnitudeCohortCalculator();
+  private readonly topOfBookSpreadClassificationTimingCohort =
+    new ListingTopOfBookSpreadClassificationTimingCohortCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -374,6 +378,20 @@ export class SpotSymbolDetectionReadModelService {
     thresholds: ListingTopOfBookSpreadThresholds,
   ): Promise<ListingTopOfBookSpreadClassificationMagnitudeCohort> {
     return this.topOfBookSpreadClassificationMagnitudeCohort.calculate(
+      await this.loadTopOfBookSpreadClassifications(
+        provider,
+        limit,
+        thresholds,
+      ),
+    );
+  }
+
+  async getTopOfBookSpreadClassificationTimingCohort(
+    provider: 'binance',
+    limit: number,
+    thresholds: ListingTopOfBookSpreadThresholds,
+  ): Promise<ListingTopOfBookSpreadClassificationTimingCohort> {
+    return this.topOfBookSpreadClassificationTimingCohort.calculate(
       await this.loadTopOfBookSpreadClassifications(
         provider,
         limit,

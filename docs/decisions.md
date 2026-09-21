@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Reuse the durable spread-classification sample for timing
+
+M7.87 applies first-widening timing to the same bounded durable classification sample used by frequency and magnitude statistics. Limit and threshold validation, T+0 eligibility, spread derivation, and classification therefore cannot drift between the three analyses.
+
+The timing remains calculated on demand with an independent observed-widening sample. This increment adds no projection, cache, route, score, alert, signal, or trading behavior.
+
 ## 2026-09-21 — Measure first-widening timing from the scheduled T+0 baseline
 
 M7.86 treats a threshold-qualified classification's first widening checkpoint offset as its observed time to widening. The cohort median includes only observed widenings and publishes that independent sample size, avoiding any imputation for classifications without an event.
