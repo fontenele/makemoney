@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Reuse the bounded durable observation cohort for variability
+
+M7.99 derives each M7.95 variability path from the same bounded recent T+0-eligible durable timelines used by existing observation cohort research and then applies M7.98. Limit validation occurs before repository access, and each loaded timeline must preserve the repository's T+0 invariant.
+
+The aggregate is calculated on demand and not persisted. HTTP exposure, annualization, scoring, alerts, signals, simulation, and trading remain outside this increment.
+
 ## 2026-09-21 — Aggregate variability with explicit transition coverage
 
 M7.98 reports exact medians of each path's average and maximum absolute consecutive return. These rates are comparable across differently priced assets, while absolute prices are not. The total path sample remains separate from the transition-bearing sample so a T+0-only path is visible but does not become an invented zero observation.

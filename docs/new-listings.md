@@ -581,3 +581,9 @@ The response preserves exact consecutive returns, average absolute return, actua
 A pure exact-decimal cohort calculator reports the median per-path average absolute consecutive return and median per-path maximum absolute consecutive return. It keeps the total path sample separate from the transition-bearing sample, so T+0-only paths remain visible while contributing no fabricated zero variability.
 
 Inputs require unique canonical identities, coherent transition counts and nullable values, canonical event schedules, exact duration and return reconciliation, and an average not exceeding the observed maximum. The aggregate remains non-annualized and descriptive. This increment adds no repository access, durable composition, route, persistence, score, alert, signal, strategy simulation, or trading behavior.
+
+## M7.99 durable listing checkpoint price variability cohort composition
+
+The internal detection read model now validates the requested cohort limit, loads the bounded recent durable T+0-eligible completed observation timelines, derives exact variability once per path, and applies M7.98 on demand. Invalid limits are rejected before repository access, and an empty durable cohort retains explicit null-median semantics.
+
+T+0-only timelines remain in the total sample while staying outside the transition-bearing sample. The aggregate is calculated transiently and adds no route, provider request, persistence, annualization, score, alert, signal, strategy simulation, or trading behavior.

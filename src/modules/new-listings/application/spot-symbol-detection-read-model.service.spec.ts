@@ -327,6 +327,71 @@ describe('SpotSymbolDetectionReadModelService', () => {
     expect(listCompletedObservationCohort).not.toHaveBeenCalled();
   });
 
+  it('loads a bounded durable cohort and calculates price variability', async () => {
+    const listCompletedObservationCohort = jest.fn(() =>
+      Promise.resolve([
+        [
+          completedObservation(),
+          completedObservation({
+            label: 'T+5s',
+            offsetMs: 5_000,
+            lastPrice: '120',
+          }),
+          completedObservation({
+            label: 'T+10s',
+            offsetMs: 10_000,
+            lastPrice: '90',
+          }),
+        ],
+        [completedObservation({ symbol: 'OTHERUSDT', lastPrice: '200' })],
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(
+      service.getPriceVariabilityCohort('binance', 25),
+    ).resolves.toEqual({
+      provider: 'binance',
+      sampleSize: 2,
+      transitionSampleSize: 1,
+      medianAverageAbsoluteReturnRate: '0.225',
+      medianMaximumAbsoluteReturnRate: '0.25',
+    });
+    expect(listCompletedObservationCohort).toHaveBeenCalledWith('binance', 25);
+  });
+
+  it('returns explicit empty price variability cohort semantics', async () => {
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        listCompletedObservationCohort: jest.fn(() => Promise.resolve([])),
+      }),
+    );
+
+    await expect(
+      service.getPriceVariabilityCohort('binance', 50),
+    ).resolves.toEqual({
+      provider: null,
+      sampleSize: 0,
+      transitionSampleSize: 0,
+      medianAverageAbsoluteReturnRate: null,
+      medianMaximumAbsoluteReturnRate: null,
+    });
+  });
+
+  it('rejects an invalid variability cohort limit before repository access', async () => {
+    const listCompletedObservationCohort = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(
+      service.getPriceVariabilityCohort('binance', 101),
+    ).rejects.toThrow('cohort limit must be an integer from 1 to 100');
+    expect(listCompletedObservationCohort).not.toHaveBeenCalled();
+  });
+
   it('loads a durable cohort and calculates pattern statistics', async () => {
     const listCompletedObservationCohort = jest.fn(() =>
       Promise.resolve([

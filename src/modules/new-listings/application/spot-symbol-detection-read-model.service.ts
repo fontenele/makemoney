@@ -18,6 +18,8 @@ import { ListingObservationPricePathCohort } from '../domain/listing-observation
 import { ListingObservationPricePathCohortCalculator } from './listing-observation-price-path-cohort-calculator';
 import { ListingObservationPriceVariability } from '../domain/listing-observation-price-variability';
 import { ListingObservationPriceVariabilityCalculator } from './listing-observation-price-variability-calculator';
+import { ListingObservationPriceVariabilityCohort } from '../domain/listing-observation-price-variability-cohort';
+import { ListingObservationPriceVariabilityCohortCalculator } from './listing-observation-price-variability-cohort-calculator';
 import { ListingObservationCohortPerformance } from '../domain/listing-observation-cohort-performance';
 import { ListingObservationCohortPerformanceCalculator } from './listing-observation-cohort-performance-calculator';
 import {
@@ -84,6 +86,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingObservationPricePathCohortCalculator();
   private readonly priceVariability =
     new ListingObservationPriceVariabilityCalculator();
+  private readonly priceVariabilityCohort =
+    new ListingObservationPriceVariabilityCohortCalculator();
   private readonly cohortPerformance =
     new ListingObservationCohortPerformanceCalculator();
   private readonly patternClassifier =
@@ -267,6 +271,26 @@ export class SpotSymbolDetectionReadModelService {
           throw new Error('Cohort timeline must include completed T+0');
         }
         return statistics;
+      }),
+    );
+  }
+
+  async getPriceVariabilityCohort(
+    provider: 'binance',
+    limit: number,
+  ): Promise<ListingObservationPriceVariabilityCohort> {
+    this.validateCohortLimit(limit);
+    const timelines = await this.repository.listCompletedObservationCohort(
+      provider,
+      limit,
+    );
+    return this.priceVariabilityCohort.calculate(
+      timelines.map((timeline) => {
+        const variability = this.priceVariability.calculate(timeline);
+        if (!variability) {
+          throw new Error('Cohort timeline must include completed T+0');
+        }
+        return variability;
       }),
     );
   }

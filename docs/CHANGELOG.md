@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.99 durable listing checkpoint price variability cohort composition completed
+
+- Added bounded internal read-model composition of M7.98 over recent durable T+0-eligible completed observation timelines.
+- Validates limits before persistence access, derives each exact variability path once, and preserves total versus transition-bearing sample semantics.
+- Added no route, provider request, persistence, annualization, score, alert, signal, strategy simulation, or trading behavior.
+- 870 unit tests across 96 suites and all 66 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.98 listing checkpoint price variability cohort calculation completed
 
 - Added a pure exact-decimal cohort calculator for median per-path average and maximum absolute consecutive returns.

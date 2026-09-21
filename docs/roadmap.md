@@ -207,6 +207,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.96 — complete:** the internal read model composes checkpoint-price variability on demand from one detection's durable completed timeline.
 - **M7.97 — complete:** local read-only HTTP access exposes exact non-annualized checkpoint-price variability for one durable detection.
 - **M7.98 — complete:** a pure exact-decimal cohort calculator reports median average and maximum absolute consecutive returns with explicit transition coverage.
+- **M7.99 — complete:** the internal read model composes variability statistics on demand over the bounded recent durable T+0-eligible observation cohort.
 
 ## M8 — Dashboard — planned
 
