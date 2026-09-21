@@ -75,6 +75,62 @@ describe('NewListingsController', () => {
     },
   );
 
+  it('returns the durable spread classification timing cohort', async () => {
+    const cohort = {
+      provider: 'binance' as const,
+      thresholds: { wideningBasisPoints: '100' },
+      wideningSampleSize: 1,
+      medianTimeToWideningMs: 5_000,
+    };
+    const getTopOfBookSpreadClassificationTimingCohort = jest.fn(() =>
+      Promise.resolve(cohort),
+    );
+    const controller = new NewListingsController({
+      getTopOfBookSpreadClassificationTimingCohort,
+    });
+
+    await expect(
+      controller.topOfBookSpreadClassificationTimingCohort(
+        undefined,
+        undefined,
+        '100',
+      ),
+    ).resolves.toBe(cohort);
+    expect(getTopOfBookSpreadClassificationTimingCohort).toHaveBeenCalledWith(
+      'binance',
+      50,
+      { wideningBasisPoints: '100' },
+    );
+  });
+
+  it.each([
+    ['0', undefined, '100'],
+    ['101', undefined, '100'],
+    [undefined, 'other', '100'],
+    [undefined, undefined, undefined],
+  ])(
+    'rejects invalid spread classification timing cohort query %s/%s/%s',
+    (limit, provider, wideningBasisPoints) => {
+      const getTopOfBookSpreadClassificationTimingCohort = jest.fn(() =>
+        Promise.resolve({}),
+      );
+      const controller = new NewListingsController({
+        getTopOfBookSpreadClassificationTimingCohort,
+      });
+
+      expect(() =>
+        controller.topOfBookSpreadClassificationTimingCohort(
+          limit,
+          provider,
+          wideningBasisPoints,
+        ),
+      ).toThrow(BadRequestException);
+      expect(
+        getTopOfBookSpreadClassificationTimingCohort,
+      ).not.toHaveBeenCalled();
+    },
+  );
+
   it('returns the durable spread classification magnitude cohort', async () => {
     const cohort = {
       provider: 'binance' as const,

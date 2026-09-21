@@ -196,6 +196,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.85 — complete:** local read-only HTTP access exposes the bounded durable maximum-widening magnitude with a mandatory explicit threshold and independent sample size.
 - **M7.86 — complete:** a pure cohort calculator reports median T+0-to-first-widening duration with an independent threshold-qualified sample and canonical schedule validation.
 - **M7.87 — complete:** the internal read model composes first-widening timing over the shared bounded recent durable spread-classification cohort.
+- **M7.88 — complete:** local read-only HTTP access exposes bounded durable first-widening timing with a mandatory explicit threshold and independent sample size.
 
 ## M8 — Dashboard — planned
 

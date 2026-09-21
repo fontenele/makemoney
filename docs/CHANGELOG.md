@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.88 durable top-of-book spread widening timing cohort API completed
+
+- Added local read-only `GET /new-listings/top-of-book/spread/classification/timing` with bounded provider/limit input and mandatory positive `wideningBasisPoints`.
+- Exposes the independent observed-widening sample size and nullable median T+0-to-first-widening milliseconds calculated on demand from durable books.
+- Updated the root API route table; the endpoint cannot collect data, persist a projection, score, alert, signal, or trade.
+- 827 unit tests across 92 suites and all 63 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.87 durable top-of-book spread widening timing cohort completed
 
 - Composed median T+0-to-first-widening timing over the shared bounded recent durable classification cohort.

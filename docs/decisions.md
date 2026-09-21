@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Keep spread timing on a separate explicit research route
+
+M7.88 exposes median first-widening timing separately from frequency and magnitude so its independent threshold-qualified sample remains visible. The route reuses the same mandatory positive `wideningBasisPoints`, provider, and bounded cohort limit contract.
+
+The result is calculated on demand from durable books and remains local, read-only, and descriptive. It cannot collect, persist a derived projection, score, alert, signal, or trade.
+
 ## 2026-09-21 — Reuse the durable spread-classification sample for timing
 
 M7.87 applies first-widening timing to the same bounded durable classification sample used by frequency and magnitude statistics. Limit and threshold validation, T+0 eligibility, spread derivation, and classification therefore cannot drift between the three analyses.
