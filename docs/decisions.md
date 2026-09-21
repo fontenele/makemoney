@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Compose selected round trips only from durable books
+
+M7.102 resolves a caller-selected forward checkpoint pair from one known detection's persisted top-of-book timeline and delegates exact arithmetic to M7.101. Selection and cost validation precede repository access, unknown detections retain not-found semantics, and a missing selected book is unavailable rather than silently replaced.
+
+The composition is transient and internal. Route exposure, automatic pair selection, optimization, depth and fill assumptions, signals, order simulation, and trading remain outside this increment.
+
 ## 2026-09-21 — Start listing strategy research with an explicit cost-adjusted round trip
 
 M7.101 evaluates one caller-selected forward checkpoint pair from stored entry ask to stored exit bid. This incorporates the observed spread directly, applies adverse slippage to each execution price and fees to both cash-flow sides, and reports exact gross and net return rates without requiring an arbitrary quantity.

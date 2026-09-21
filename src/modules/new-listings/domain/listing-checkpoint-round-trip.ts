@@ -5,6 +5,11 @@ export interface ListingCheckpointRoundTripConfiguration {
   slippageRate: string;
 }
 
+export interface ListingCheckpointRoundTripSelection extends ListingCheckpointRoundTripConfiguration {
+  entryLabel: ListingObservationCheckpointLabel;
+  exitLabel: ListingObservationCheckpointLabel;
+}
+
 export interface ListingCheckpointRoundTripEvent {
   label: ListingObservationCheckpointLabel;
   offsetMs: number;

@@ -2,6 +2,7 @@ import Decimal from 'decimal.js';
 import {
   ListingCheckpointRoundTrip,
   ListingCheckpointRoundTripConfiguration,
+  ListingCheckpointRoundTripSelection,
 } from '../domain/listing-checkpoint-round-trip';
 import { LISTING_OBSERVATION_CHECKPOINTS } from '../domain/listing-observation-schedule';
 import { validateListingTopOfBookObservation } from '../domain/listing-top-of-book-observation';
@@ -76,6 +77,22 @@ export class ListingCheckpointRoundTripCalculator {
       profitableAfterCosts: netReturnRate.greaterThan(0),
     };
   }
+}
+
+export function validateListingCheckpointRoundTripSelection(
+  selection: ListingCheckpointRoundTripSelection,
+): void {
+  const entry = LISTING_OBSERVATION_CHECKPOINTS.find(
+    ({ label }) => label === selection.entryLabel,
+  );
+  const exit = LISTING_OBSERVATION_CHECKPOINTS.find(
+    ({ label }) => label === selection.exitLabel,
+  );
+  if (!entry || !exit || exit.offsetMs <= entry.offsetMs) {
+    throw new Error('Listing round trip checkpoint selection is invalid');
+  }
+  rate(selection.feeRate, 'fee');
+  rate(selection.slippageRate, 'slippage');
 }
 
 function validateCheckpoint(

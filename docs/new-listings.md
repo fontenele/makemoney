@@ -599,3 +599,9 @@ The response preserves total-path and transition-bearing sample sizes plus exact
 A pure exact-decimal calculator evaluates one explicitly selected forward checkpoint pair. Entry uses the stored ask and exit uses the later stored bid, so the observed top-of-book spread is already included. Caller-supplied fee and adverse slippage rates are applied to both sides, producing reference and execution prices, duration, gross return, net return, and an exact profitable-after-costs flag.
 
 Both books must share one canonical identity, retain canonical schedule labels and offsets, have target times consistent with their offset distance, and pass the shared non-crossed-book validation. Cost rates must be canonical decimal strings from zero through less than one. This is a unit-quantity-independent research return, not a fill guarantee: it does not model depth, partial fills, notional rules, order mutation, automatic entry/exit selection, optimization, persistence, route exposure, strategy signals, or trading.
+
+## M7.102 durable listing checkpoint round-trip composition
+
+The internal detection read model now accepts one explicit forward entry/exit label pair plus fee and slippage rates, validates that request before persistence access, and loads the known detection's durable top-of-book timeline. When both selected books exist, it delegates to the M7.101 exact calculator rather than duplicating financial arithmetic.
+
+An unknown detection preserves the existing not-found error. A known detection missing either selected checkpoint returns an explicit unavailable result and never substitutes another book. The result remains transient: this increment adds no route, projection, automatic pair selection, optimization, depth or fill model, signal, order simulation, or trading behavior.

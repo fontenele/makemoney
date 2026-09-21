@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.102 durable listing checkpoint round-trip composition completed
+
+- Added internal read-model composition of an explicit forward checkpoint round trip from a known detection's durable top-of-book timeline.
+- Validates labels and cost rates before repository access, preserves unknown-detection errors, and returns unavailable when either selected book is missing.
+- Reuses the M7.101 exact calculator and adds no route, automatic selection, persistence, signal, fill simulation, or trading behavior.
+- 884 unit tests across 97 suites and all 67 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.101 exact cost-adjusted listing checkpoint round trip completed
 
 - Added a pure exact-decimal calculator for one explicit stored-ask-to-later-stored-bid checkpoint round trip.

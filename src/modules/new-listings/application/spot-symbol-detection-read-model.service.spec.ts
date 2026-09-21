@@ -772,6 +772,122 @@ describe('SpotSymbolDetectionReadModelService', () => {
     expect(listForDetection).not.toHaveBeenCalled();
   });
 
+  it('calculates a selected round trip from the durable top-of-book timeline', async () => {
+    const timeline = [
+      topOfBookCheckpoint('NEWUSDT', '99', '1', '101', '1'),
+      {
+        ...topOfBookCheckpoint('NEWUSDT', '109', '1', '111', '1'),
+        label: 'T+5s' as const,
+        offsetMs: 5_000,
+        targetAt: new Date('2026-09-14T02:00:05.000Z'),
+      },
+    ];
+    const findDetected = jest.fn(() => Promise.resolve(detection()));
+    const listForDetection = jest.fn(() => Promise.resolve(timeline));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ findDetected }),
+      {
+        store: jest.fn(),
+        listForDetection,
+        listCohort: jest.fn(),
+      },
+    );
+
+    await expect(
+      service.getCheckpointRoundTrip('binance', 'NEWUSDT', {
+        entryLabel: 'T+0',
+        exitLabel: 'T+5s',
+        feeRate: '0.001',
+        slippageRate: '0.002',
+      }),
+    ).resolves.toMatchObject({
+      provider: 'binance',
+      symbol: 'NEWUSDT',
+      entry: { label: 'T+0', referencePrice: '101' },
+      exit: { label: 'T+5s', referencePrice: '109' },
+      durationMs: 5_000,
+    });
+    expect(findDetected).toHaveBeenCalledWith('binance', 'NEWUSDT');
+    expect(listForDetection).toHaveBeenCalledWith('binance', 'NEWUSDT');
+  });
+
+  it('reports a selected round trip unavailable when either book is absent', async () => {
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+      {
+        store: jest.fn(),
+        listForDetection: jest.fn(() =>
+          Promise.resolve([
+            topOfBookCheckpoint('NEWUSDT', '99', '1', '101', '1'),
+          ]),
+        ),
+        listCohort: jest.fn(),
+      },
+    );
+
+    await expect(
+      service.getCheckpointRoundTrip('binance', 'NEWUSDT', {
+        entryLabel: 'T+0',
+        exitLabel: 'T+5s',
+        feeRate: '0',
+        slippageRate: '0',
+      }),
+    ).resolves.toBeNull();
+  });
+
+  it('validates round-trip selection and costs before repository access', async () => {
+    const findDetected = jest.fn(() => Promise.resolve(detection()));
+    const listForDetection = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ findDetected }),
+      {
+        store: jest.fn(),
+        listForDetection,
+        listCohort: jest.fn(),
+      },
+    );
+
+    await expect(
+      service.getCheckpointRoundTrip('binance', 'NEWUSDT', {
+        entryLabel: 'T+5s',
+        exitLabel: 'T+0',
+        feeRate: '0',
+        slippageRate: '0',
+      }),
+    ).rejects.toThrow('Listing round trip checkpoint selection is invalid');
+    await expect(
+      service.getCheckpointRoundTrip('binance', 'NEWUSDT', {
+        entryLabel: 'T+0',
+        exitLabel: 'T+5s',
+        feeRate: '1',
+        slippageRate: '0',
+      }),
+    ).rejects.toThrow('Listing round trip fee rate is invalid');
+    expect(findDetected).not.toHaveBeenCalled();
+    expect(listForDetection).not.toHaveBeenCalled();
+  });
+
+  it('rejects a selected round trip for an unknown detection', async () => {
+    const listForDetection = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection,
+      listCohort: jest.fn(),
+    });
+
+    await expect(
+      service.getCheckpointRoundTrip('binance', 'UNKNOWNUSDT', {
+        entryLabel: 'T+0',
+        exitLabel: 'T+5s',
+        feeRate: '0',
+        slippageRate: '0',
+      }),
+    ).rejects.toBeInstanceOf(DetectedSpotSymbolNotFoundError);
+    expect(listForDetection).not.toHaveBeenCalled();
+  });
+
   it('derives exact imbalance across a durable top-of-book timeline', async () => {
     const timeline = [
       topOfBookCheckpoint('NEWUSDT', '99', '2', '101', '1'),

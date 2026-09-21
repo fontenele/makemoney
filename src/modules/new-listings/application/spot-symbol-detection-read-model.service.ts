@@ -71,6 +71,14 @@ import { ListingTopOfBookSpreadClassificationMagnitudeCohort } from '../domain/l
 import { ListingTopOfBookSpreadClassificationMagnitudeCohortCalculator } from './listing-top-of-book-spread-classification-magnitude-cohort-calculator';
 import { ListingTopOfBookSpreadClassificationTimingCohort } from '../domain/listing-top-of-book-spread-classification-timing-cohort';
 import { ListingTopOfBookSpreadClassificationTimingCohortCalculator } from './listing-top-of-book-spread-classification-timing-cohort-calculator';
+import {
+  ListingCheckpointRoundTrip,
+  ListingCheckpointRoundTripSelection,
+} from '../domain/listing-checkpoint-round-trip';
+import {
+  ListingCheckpointRoundTripCalculator,
+  validateListingCheckpointRoundTripSelection,
+} from './listing-checkpoint-round-trip-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -121,6 +129,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingTopOfBookSpreadClassificationMagnitudeCohortCalculator();
   private readonly topOfBookSpreadClassificationTimingCohort =
     new ListingTopOfBookSpreadClassificationTimingCohortCalculator();
+  private readonly checkpointRoundTrip =
+    new ListingCheckpointRoundTripCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -196,6 +206,25 @@ export class SpotSymbolDetectionReadModelService {
       targetAt: checkpoint.targetAt,
       ...this.topOfBookImbalance.calculate(checkpoint),
     }));
+  }
+
+  async getCheckpointRoundTrip(
+    provider: 'binance',
+    symbol: string,
+    selection: ListingCheckpointRoundTripSelection,
+  ): Promise<ListingCheckpointRoundTrip | null> {
+    validateListingCheckpointRoundTripSelection(selection);
+    const timeline = await this.listTopOfBook(provider, symbol);
+    const entry = timeline.find(
+      (checkpoint) => checkpoint.label === selection.entryLabel,
+    );
+    const exit = timeline.find(
+      (checkpoint) => checkpoint.label === selection.exitLabel,
+    );
+    if (!entry || !exit) {
+      return null;
+    }
+    return this.checkpointRoundTrip.calculate(entry, exit, selection);
   }
 
   async getTopOfBookImbalanceEvolution(
