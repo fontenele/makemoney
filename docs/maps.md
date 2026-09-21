@@ -145,6 +145,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | listing checkpoint round trip, ask entry, bid exit, fee, slippage, net return, profitable after costs, M7.101 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-checkpoint-round-trip-calculator.ts`, `../src/modules/new-listings/domain/listing-checkpoint-round-trip.ts` |
 | durable checkpoint round trip, selected entry and exit, missing book, unavailable, M7.102 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-checkpoint-round-trip-calculator.ts` |
 | round-trip API, entryLabel, exitLabel, feeRate, slippageRate, URL-encoded plus, M7.103 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../README.md` |
+| round-trip cohort, availability coverage, profitable after costs rate, average net return, median net return, M7.104 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-checkpoint-round-trip-cohort-calculator.ts`, `../src/modules/new-listings/domain/listing-checkpoint-round-trip-cohort.ts` |
 
 ## Before every task
 

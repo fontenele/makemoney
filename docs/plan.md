@@ -1708,7 +1708,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.103 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.104 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -2378,6 +2378,7 @@ M7.100 Durable Listing Checkpoint Price Variability Cohort API: DONE
 M7.101 Exact Cost-Adjusted Listing Checkpoint Round Trip: DONE
 M7.102 Durable Listing Checkpoint Round-Trip Composition: DONE
 M7.103 Durable Listing Checkpoint Round-Trip API: DONE
+M7.104 Listing Checkpoint Round-Trip Cohort Calculation: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2396,5 +2397,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7.103 is complete. The next bounded increment may aggregate one fixed explicit checkpoint-pair configuration across a bounded durable cohort; automatic strategy selection, optimization, alerts, signals, order simulation, and trading remain separate.
+M7.104 is complete. The next bounded increment may compose one fixed explicit round-trip configuration over a bounded durable top-of-book cohort; automatic strategy selection, optimization, alerts, signals, order simulation, and trading remain separate.
 ```

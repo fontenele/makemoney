@@ -611,3 +611,9 @@ An unknown detection preserves the existing not-found error. A known detection m
 `GET /new-listings/:provider/:symbol/round-trip` exposes M7.102 through the local read-only API. It requires explicit `entryLabel`, `exitLabel`, `feeRate`, and `slippageRate` query values; because `+` is special in query strings, checkpoint labels must encode it as `%2B`, such as `entryLabel=T%2B0&exitLabel=T%2B5s`.
 
 Identity and selection are validated before read-model access. Invalid or missing input returns `400`, an unknown detection returns `404`, and absence of either selected durable book returns `503`. The response preserves exact reference/execution prices, gross/net returns, duration, configured costs, and profitability after costs. The route cannot select or optimize a pair, infer costs, model depth or fills, persist a projection, emit a signal, simulate an order, or trade.
+
+## M7.104 listing checkpoint round-trip cohort calculation
+
+A pure exact-decimal cohort calculator aggregates detection samples under one fixed explicit entry/exit and fee/slippage configuration. It reports total, available, and unavailable samples; profitable and non-profitable available counts; exact profitability-after-costs rate; average gross and net return; and median net return. Empty and all-unavailable inputs retain explicit nullable return/rate semantics instead of fabricated zero performance.
+
+Every sample identity must be canonical and unique. Each available result must match the sample and fixed configuration, retain the canonical checkpoint schedule and duration, reconcile adverse slippage into execution prices, reconcile gross and fee-adjusted net returns, and agree with its profitability flag. This increment adds no repository access, durable composition, route, pair search, ranking, optimization, depth or fill model, signal, order simulation, or trading behavior.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Keep round-trip cohort assumptions fixed and coverage explicit
+
+M7.104 aggregates only results sharing one caller-supplied checkpoint pair and fee/slippage configuration. Missing results remain part of total coverage but cannot contribute fabricated zero returns; available and unavailable sample counts are therefore reported separately.
+
+The calculator fully reconciles each available result before computing exact averages, median net return, and profitability-after-costs rate. It performs no loading, selection, ranking, optimization, persistence, route handling, signal generation, or trading.
+
 ## 2026-09-21 — Expose only explicitly configured checkpoint round trips
 
 M7.103 exposes the durable calculation through a local read-only GET whose entry label, exit label, fee rate, and slippage rate are all mandatory. This keeps assumptions visible to the caller and avoids implicit defaults or automatic checkpoint selection; plus signs in query labels must be URL-encoded.

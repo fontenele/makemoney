@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.104 listing checkpoint round-trip cohort calculation completed
+
+- Added a pure exact-decimal cohort calculator for one fixed entry/exit and fee/slippage configuration.
+- Reports explicit available/unavailable coverage, profitable/non-profitable counts, profitability rate, average gross/net return, and median net return.
+- Added strict sample identity, configuration, schedule, execution-price, return, and profitability reconciliation without repository or route behavior.
+- 894 unit tests across 98 suites and all 68 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.103 durable listing checkpoint round-trip API completed
 
 - Added local read-only `GET /new-listings/:provider/:symbol/round-trip` with mandatory entry/exit labels and explicit fee/slippage rates.
