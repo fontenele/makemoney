@@ -1708,7 +1708,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.97 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.98 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -2372,6 +2372,7 @@ M7.94 Durable Listing Price-Path Cohort API: DONE
 M7.95 Observed Listing Checkpoint Price Variability: DONE
 M7.96 Durable Listing Checkpoint Price Variability Composition: DONE
 M7.97 Durable Listing Checkpoint Price Variability API: DONE
+M7.98 Listing Checkpoint Price Variability Cohort Calculation: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2390,5 +2391,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7.97 is complete. Select the next bounded M7 research increment; cohort aggregation, annualization, scoring, alerts, signals, strategy simulation, and trading remain separate.
+M7.98 is complete. The next bounded increment may compose the variability cohort from durable timelines; annualization, scoring, alerts, signals, strategy simulation, and trading remain separate.
 ```

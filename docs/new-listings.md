@@ -575,3 +575,9 @@ The derived result remains transient and uses the shared observation repository 
 `GET /new-listings/:provider/:symbol/variability` exposes the M7.96 on-demand durable calculation through the local read-only API. Provider and symbol reuse the canonical observation identity validation; invalid identities return `400`, unknown detections return `404`, and known detections without completed T+0 return `503`.
 
 The response preserves exact consecutive returns, average absolute return, actual checkpoint duration, and the earliest maximum absolute transition. It describes sparse unevenly spaced observations and cannot collect data, persist a projection, aggregate a cohort, annualize volatility, score, alert, signal, simulate a strategy, or trade.
+
+## M7.98 listing checkpoint price variability cohort calculation
+
+A pure exact-decimal cohort calculator reports the median per-path average absolute consecutive return and median per-path maximum absolute consecutive return. It keeps the total path sample separate from the transition-bearing sample, so T+0-only paths remain visible while contributing no fabricated zero variability.
+
+Inputs require unique canonical identities, coherent transition counts and nullable values, canonical event schedules, exact duration and return reconciliation, and an average not exceeding the observed maximum. The aggregate remains non-annualized and descriptive. This increment adds no repository access, durable composition, route, persistence, score, alert, signal, strategy simulation, or trading behavior.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Aggregate variability with explicit transition coverage
+
+M7.98 reports exact medians of each path's average and maximum absolute consecutive return. These rates are comparable across differently priced assets, while absolute prices are not. The total path sample remains separate from the transition-bearing sample so a T+0-only path is visible but does not become an invented zero observation.
+
+The calculator validates identity uniqueness, event schedules, duration, exact returns, and internal magnitude consistency. It does not normalize uneven checkpoint intervals, annualize, rank assets, or assign a score; durable composition and HTTP exposure remain separate increments.
+
 ## 2026-09-21 — Expose checkpoint variability as a separate descriptive read
 
 M7.97 exposes the durable per-detection variability calculation at `GET /new-listings/:provider/:symbol/variability`. Keeping it separate from baseline-relative performance and price-path extrema makes its consecutive-transition semantics and non-annualized boundary explicit.

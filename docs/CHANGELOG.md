@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.98 listing checkpoint price variability cohort calculation completed
+
+- Added a pure exact-decimal cohort calculator for median per-path average and maximum absolute consecutive returns.
+- Kept total paths and transition-bearing paths as separate samples with explicit nullable empty-sample semantics.
+- Added strict identity, schedule, duration, return, and magnitude consistency validation without annualization or scoring.
+- 867 unit tests across 96 suites and all 66 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.97 durable listing checkpoint price variability API completed
 
 - Added local read-only `GET /new-listings/:provider/:symbol/variability` for one durable detection.

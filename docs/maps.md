@@ -139,6 +139,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | listing checkpoint price variability, consecutive return, average absolute return, maximum absolute transition, M7.95 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-observation-price-variability-calculator.ts`, `../src/modules/new-listings/domain/listing-observation-price-variability.ts` |
 | durable listing checkpoint price variability, detection variability read model, M7.96 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-observation-price-variability-calculator.ts` |
 | listing checkpoint variability API, GET /new-listings/:provider/:symbol/variability, M7.97 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
+| listing price variability cohort, median average absolute return, median maximum absolute return, transition sample, M7.98 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-observation-price-variability-cohort-calculator.ts`, `../src/modules/new-listings/domain/listing-observation-price-variability-cohort.ts` |
 
 ## Before every task
 
