@@ -141,6 +141,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | listing checkpoint variability API, GET /new-listings/:provider/:symbol/variability, M7.97 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
 | listing price variability cohort, median average absolute return, median maximum absolute return, transition sample, M7.98 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-observation-price-variability-cohort-calculator.ts`, `../src/modules/new-listings/domain/listing-observation-price-variability-cohort.ts` |
 | durable listing price variability cohort, bounded variability cohort loading, M7.99 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-observation-price-variability-calculator.ts`, `../src/modules/new-listings/application/listing-observation-price-variability-cohort-calculator.ts` |
+| listing variability cohort API, GET /new-listings/variability, M7.100 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
 
 ## Before every task
 

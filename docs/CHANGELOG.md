@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.100 durable listing checkpoint price variability cohort API completed
+
+- Added local read-only `GET /new-listings/variability` with optional bounded `limit` and Binance provider input.
+- Exposes total and transition-bearing samples with exact nullable medians for average and maximum absolute consecutive returns.
+- Updated the root API route table; the endpoint cannot collect, persist, annualize, rank, score, alert, signal, simulate, or trade.
+- 875 unit tests across 96 suites and all 67 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.99 durable listing checkpoint price variability cohort composition completed
 
 - Added bounded internal read-model composition of M7.98 over recent durable T+0-eligible completed observation timelines.

@@ -587,3 +587,9 @@ Inputs require unique canonical identities, coherent transition counts and nulla
 The internal detection read model now validates the requested cohort limit, loads the bounded recent durable T+0-eligible completed observation timelines, derives exact variability once per path, and applies M7.98 on demand. Invalid limits are rejected before repository access, and an empty durable cohort retains explicit null-median semantics.
 
 T+0-only timelines remain in the total sample while staying outside the transition-bearing sample. The aggregate is calculated transiently and adds no route, provider request, persistence, annualization, score, alert, signal, strategy simulation, or trading behavior.
+
+## M7.100 durable listing checkpoint price variability cohort API
+
+`GET /new-listings/variability` exposes the M7.99 bounded durable aggregate through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it. Invalid input returns `400` before read-model access.
+
+The response preserves total-path and transition-bearing sample sizes plus exact nullable medians for average and maximum absolute consecutive returns. The route cannot collect data, persist a projection, annualize, rank, score, alert, signal, simulate a strategy, or trade.

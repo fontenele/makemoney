@@ -42,6 +42,42 @@ describe('NewListingsController', () => {
     expect(getPricePathCohort).not.toHaveBeenCalled();
   });
 
+  it('returns the durable price variability cohort with bounded input', async () => {
+    const cohort = {
+      provider: 'binance' as const,
+      sampleSize: 0,
+      transitionSampleSize: 0,
+      medianAverageAbsoluteReturnRate: null,
+      medianMaximumAbsoluteReturnRate: null,
+    };
+    const getPriceVariabilityCohort = jest.fn(() => Promise.resolve(cohort));
+    const controller = new NewListingsController({
+      getPriceVariabilityCohort,
+    });
+
+    await expect(controller.priceVariabilityCohort()).resolves.toBe(cohort);
+    expect(getPriceVariabilityCohort).toHaveBeenLastCalledWith('binance', 50);
+    await controller.priceVariabilityCohort('25', 'binance');
+    expect(getPriceVariabilityCohort).toHaveBeenLastCalledWith('binance', 25);
+  });
+
+  it.each([
+    ['0', undefined],
+    ['101', undefined],
+    ['1.5', undefined],
+    [undefined, 'other'],
+  ])('rejects invalid variability cohort query %s/%s', (limit, provider) => {
+    const getPriceVariabilityCohort = jest.fn(() => Promise.resolve({}));
+    const controller = new NewListingsController({
+      getPriceVariabilityCohort,
+    });
+
+    expect(() => controller.priceVariabilityCohort(limit, provider)).toThrow(
+      BadRequestException,
+    );
+    expect(getPriceVariabilityCohort).not.toHaveBeenCalled();
+  });
+
   it('returns the durable top-of-book cohort with bounded input', async () => {
     const cohort = {
       provider: 'binance' as const,

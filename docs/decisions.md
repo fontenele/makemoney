@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Expose variability cohort statistics as a bounded descriptive read
+
+M7.100 exposes the durable aggregate at `GET /new-listings/variability` with the same provider and bounded limit contract as other observation cohorts. The response keeps total paths distinct from transition-bearing paths and preserves exact nullable medians.
+
+Input is rejected before read-model access when invalid. The endpoint is local, read-only, calculated on demand, and cannot collect, persist a projection, annualize, rank, score, alert, signal, simulate, or trade.
+
 ## 2026-09-21 — Reuse the bounded durable observation cohort for variability
 
 M7.99 derives each M7.95 variability path from the same bounded recent T+0-eligible durable timelines used by existing observation cohort research and then applies M7.98. Limit validation occurs before repository access, and each loaded timeline must preserve the repository's T+0 invariant.

@@ -25,6 +25,7 @@ import { ListingObservationPricePerformance } from '../domain/listing-observatio
 import { ListingObservationPricePathStatistics } from '../domain/listing-observation-price-path-statistics';
 import { ListingObservationPricePathCohort } from '../domain/listing-observation-price-path-cohort';
 import { ListingObservationPriceVariability } from '../domain/listing-observation-price-variability';
+import { ListingObservationPriceVariabilityCohort } from '../domain/listing-observation-price-variability-cohort';
 import { ListingObservationCohortPerformance } from '../domain/listing-observation-cohort-performance';
 import {
   ListingObservationPatternClassification,
@@ -75,6 +76,17 @@ export class NewListingsController {
     @Query('provider') provider?: string,
   ): Promise<ListingObservationPricePathCohort> {
     return this.detections.getPricePathCohort(
+      optionalProvider(provider) ?? 'binance',
+      validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
+    );
+  }
+
+  @Get('variability')
+  priceVariabilityCohort(
+    @Query('limit') limit?: string,
+    @Query('provider') provider?: string,
+  ): Promise<ListingObservationPriceVariabilityCohort> {
+    return this.detections.getPriceVariabilityCohort(
       optionalProvider(provider) ?? 'binance',
       validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
     );
