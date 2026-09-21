@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Aggregate only cross-asset comparable price-path measures
+
+M7.92 reports median scheduled extrema timing and median positive maximum-drawdown rate and duration. It does not average or compare absolute high, low, or drawdown prices because price levels across distinct listed assets have no common scale.
+
+The total path sample remains separate from the positive-drawdown sample, so zero-drawdown paths stay visible without distorting the conditional drawdown magnitude and duration. Inputs require unique canonical identities, valid checkpoint metadata, causal ordering, and exact price/rate reconciliation.
+
 ## 2026-09-21 — Expose price-path statistics as a separate descriptive read
 
 M7.91 exposes the durable per-detection price-path calculation at `GET /new-listings/:provider/:symbol/price-path`. Keeping it separate from raw observations and baseline-relative performance makes the causal drawdown contract explicit without changing either existing response.

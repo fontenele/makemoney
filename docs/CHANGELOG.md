@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-21 — M7.92 listing price-path cohort calculation completed
+
+- Added a pure cohort calculator for median observed-high and observed-low timing plus positive maximum-drawdown rate and duration.
+- Kept total trajectory and positive-drawdown samples independent, with explicit nullable empty-sample semantics and exact-decimal medians.
+- Added strict identity, schedule, causal-order, positive-price, and drawdown-reconciliation validation without comparing absolute prices across assets.
+- Added no repository access, durable composition, route, persistence, score, alert, signal, strategy simulation, or trading behavior.
+- 843 unit tests across 94 suites and all 64 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.91 durable listing price-path statistics API completed
 
 - Added local read-only `GET /new-listings/:provider/:symbol/price-path` for exact observed checkpoint-price extrema and maximum causal drawdown.

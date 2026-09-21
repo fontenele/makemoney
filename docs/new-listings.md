@@ -539,3 +539,9 @@ The calculation remains transient and reuses the repository ordering and exact-d
 `GET /new-listings/:provider/:symbol/price-path` exposes the M7.90 on-demand durable calculation through the local read-only API. Provider and symbol reuse the canonical observation identity validation; an unknown detection returns `404`, and a known detection without completed T+0 returns `503`.
 
 The response preserves exact prices, rates, checkpoint labels, and offsets for the observed high, observed low, and causal maximum drawdown. It describes sparse checkpoint observations and cannot collect data, persist a projection, aggregate a cohort, score, alert, signal, simulate a strategy, or trade.
+
+## M7.92 listing price-path cohort calculation
+
+A pure cohort calculator aggregates only measures that remain comparable across distinct assets: median scheduled offset of the observed high and low, plus median maximum-drawdown rate and peak-to-trough duration. It reports the total trajectory sample and an independent positive-drawdown sample; empty samples and cohorts containing only zero drawdowns retain explicit null medians.
+
+Every identity must be canonical and unique, event labels must match canonical checkpoint offsets, drawdown order must be causal, and exact absolute/rate values must reconcile with positive peak and trough prices. Absolute price levels are deliberately not aggregated. This increment adds no repository access, durable composition, route, persistence, score, alert, signal, strategy simulation, or trading behavior.
