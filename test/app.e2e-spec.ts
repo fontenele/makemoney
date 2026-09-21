@@ -205,6 +205,11 @@ describe('Application (e2e)', () => {
       .expect(400);
   });
 
+  it('/new-listings/round-trip (GET) requires an explicit configuration', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(server).get('/new-listings/round-trip').expect(400);
+  });
+
   it('/new-listings/top-of-book/imbalance/evolution (GET) validates bounded cohort input', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     await request(server)

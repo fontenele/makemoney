@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.106 durable listing checkpoint round-trip cohort API completed
+
+- Added local read-only `GET /new-listings/round-trip` for one explicit durable round-trip cohort configuration.
+- Requires entry/exit labels and fee/slippage rates, with established optional bounded `limit` and Binance `provider` inputs and `%2B` label encoding.
+- Updated the root API route table; the endpoint exposes coverage and exact summaries without selection, ranking, optimization, signals, simulation, or trading.
+- 904 unit tests across 98 suites and all 69 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.105 durable listing checkpoint round-trip cohort composition completed
 
 - Added bounded internal read-model composition of one fixed round-trip configuration over durable top-of-book timelines.

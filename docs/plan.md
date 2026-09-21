@@ -1708,7 +1708,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.105 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.106 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -2380,6 +2380,7 @@ M7.102 Durable Listing Checkpoint Round-Trip Composition: DONE
 M7.103 Durable Listing Checkpoint Round-Trip API: DONE
 M7.104 Listing Checkpoint Round-Trip Cohort Calculation: DONE
 M7.105 Durable Listing Checkpoint Round-Trip Cohort Composition: DONE
+M7.106 Durable Listing Checkpoint Round-Trip Cohort API: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2398,5 +2399,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7.105 is complete. The next bounded increment may expose one fixed explicit durable round-trip cohort through the local read-only API; automatic strategy selection, optimization, alerts, signals, order simulation, and trading remain separate.
+M7.106 is complete. A next bounded increment may add another explicitly defined descriptive research measure, but automatic checkpoint search, ranking, optimization, alerts, signals, order simulation, and trading remain separate.
 ```

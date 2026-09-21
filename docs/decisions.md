@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Require explicit assumptions on the round-trip cohort API
+
+M7.106 exposes one fixed durable cohort calculation only when the caller supplies entry and exit labels plus fee and slippage rates. Limit and provider follow existing bounded cohort conventions, while financial assumptions have no hidden defaults and label plus signs require URL encoding.
+
+The endpoint is local and read-only. It exposes coverage and descriptive exact return statistics without searching, ranking, optimizing, persisting a projection, signaling, simulating an order, or trading.
+
 ## 2026-09-21 — Retain incomplete durable timelines in round-trip coverage
 
 M7.105 applies one validated fixed configuration to the bounded recent durable top-of-book cohort. Each repository timeline contributes exactly one sample: both selected books produce an exact M7.101 result, while a missing entry or exit remains unavailable and is never replaced by another checkpoint.
