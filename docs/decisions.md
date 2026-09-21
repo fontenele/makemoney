@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Separate round-trip gains, losses, and exact break-even outcomes
+
+M7.107 decomposes available results only after the existing fixed-configuration cohort validator has reconciled their identities, schedules, execution prices, returns, and profitability flags. Positive and negative classes receive independent exact average net returns, while exact zero is reported separately and contributes to neither conditional average.
+
+Unavailable samples remain visible in coverage. The calculation is pure and descriptive, with no loading, pair search, ranking, optimization, persistence, route, signal, simulated order, or trading behavior.
+
 ## 2026-09-21 — Require explicit assumptions on the round-trip cohort API
 
 M7.106 exposes one fixed durable cohort calculation only when the caller supplies entry and exit labels plus fee and slippage rates. Limit and provider follow existing bounded cohort conventions, while financial assumptions have no hidden defaults and label plus signs require URL encoding.

@@ -629,3 +629,9 @@ An empty durable cohort preserves the explicit empty aggregate, and absence of t
 `GET /new-listings/round-trip` exposes M7.105 through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it. Explicit `entryLabel`, `exitLabel`, `feeRate`, and `slippageRate` are mandatory, and `+` in checkpoint labels must be encoded as `%2B`.
 
 Invalid or missing query input returns `400` before read-model access. The response preserves the fixed configuration, total/available/unavailable coverage, profitable/non-profitable counts, exact profitability-after-costs rate, and exact gross/net return summaries. The endpoint cannot choose or rank pairs, infer costs, optimize, model depth or fills, persist a projection, emit a signal, simulate an order, or trade.
+
+## M7.107 listing checkpoint round-trip outcome cohort calculation
+
+A pure exact-decimal outcome calculator reuses the fully validated M7.104 sample boundary and separates available net returns into profitable, losing, and exact break-even counts while preserving total and unavailable coverage. It reports the exact average positive net return only for profitable samples and the exact average negative net return only for losing samples.
+
+An absent outcome class has a nullable conditional average rather than a fabricated zero; break-even results enter neither conditional average. This is a descriptive decomposition of one fixed explicit configuration and adds no repository access, durable composition, route, checkpoint search, ranking, optimization, depth or fill model, signal, order simulation, or trading behavior.

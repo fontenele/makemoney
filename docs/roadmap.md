@@ -215,6 +215,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.104 — complete:** a pure exact-decimal cohort calculator aggregates one fixed explicit round-trip configuration with available/unavailable coverage, gross/net return summaries, and profitability-after-costs statistics.
 - **M7.105 — complete:** the internal read model composes one fixed explicit round-trip configuration over a bounded durable top-of-book cohort while retaining every incomplete timeline as unavailable coverage.
 - **M7.106 — complete:** local read-only HTTP access exposes the bounded durable round-trip cohort with mandatory explicit selection/cost inputs and established limit/provider validation.
+- **M7.107 — complete:** a pure exact-decimal outcome cohort separates profitable, losing, break-even, and unavailable round trips and reports conditional average net gains and losses.
 
 ## M8 — Dashboard — planned
 

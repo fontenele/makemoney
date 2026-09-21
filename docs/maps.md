@@ -148,6 +148,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | round-trip cohort, availability coverage, profitable after costs rate, average net return, median net return, M7.104 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-checkpoint-round-trip-cohort-calculator.ts`, `../src/modules/new-listings/domain/listing-checkpoint-round-trip-cohort.ts` |
 | durable round-trip cohort, bounded top-of-book cohort loading, unavailable selected books, M7.105 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-checkpoint-round-trip-calculator.ts`, `../src/modules/new-listings/application/listing-checkpoint-round-trip-cohort-calculator.ts` |
 | round-trip cohort API, GET /new-listings/round-trip, fixed configuration query, M7.106 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
+| round-trip outcome cohort, profitable, losing, break-even, conditional average net return, M7.107 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-checkpoint-round-trip-outcome-cohort-calculator.ts`, `../src/modules/new-listings/domain/listing-checkpoint-round-trip-outcome-cohort.ts` |
 
 ## Before every task
 

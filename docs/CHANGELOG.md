@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.107 listing checkpoint round-trip outcome cohort completed
+
+- Added a pure exact-decimal outcome cohort for profitable, losing, exact break-even, and unavailable fixed-configuration round trips.
+- Reports nullable exact conditional average net returns for profitable and losing samples without treating absent classes as zero.
+- Reuses strict M7.104 validation and adds no repository access, route, selection, ranking, optimization, simulation, or trading behavior.
+- 908 unit tests across 99 suites and all 69 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.106 durable listing checkpoint round-trip cohort API completed
 
 - Added local read-only `GET /new-listings/round-trip` for one explicit durable round-trip cohort configuration.
