@@ -563,3 +563,9 @@ The response preserves the total trajectory sample, independent positive-drawdow
 A pure exact-decimal calculator derives simple returns between each pair of consecutive canonical completed checkpoints. It reports the transition count, the average absolute consecutive return, and the earliest transition with the maximum absolute return; that transition retains its from/to schedule events, elapsed milliseconds, signed return, and absolute return.
 
 The calculation requires the explicit T+0 baseline and reuses the existing price-performance validation and canonical ordering. A T+0-only timeline has zero transitions and null variability measures, while a missing T+0 remains unavailable. Because checkpoints are sparse and unevenly spaced, this is descriptive observed variability: it is not annualized volatility, a forecast, or a risk/listing score. This increment adds no repository access, durable composition, route, persistence, cohort aggregate, alert, signal, strategy simulation, or trading behavior.
+
+## M7.96 durable listing checkpoint price variability composition
+
+The internal detection read model now loads one known detection's durable completed checkpoint timeline and applies M7.95 on demand. Unknown detection identities retain the existing not-found error, while a known detection without completed T+0 retains the explicit unavailable result.
+
+The derived result remains transient and uses the shared observation repository and calculator boundary rather than adding a projection or query. This increment adds no route, provider request, persistence, cohort aggregate, annualization, score, alert, signal, strategy simulation, or trading behavior.

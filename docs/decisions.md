@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Compose price variability through the durable observation timeline
+
+M7.96 adds the M7.95 calculation to the existing detection read model. It deliberately reuses the shared detection lookup and completed-observation query, keeping not-found behavior, T+0 availability, canonical validation, and exact arithmetic aligned with the other per-detection analyses.
+
+The variability result is calculated on demand and not persisted. HTTP exposure, cohort aggregation, annualization, scoring, alerts, signals, simulation, and trading remain outside this increment.
+
 ## 2026-09-21 — Describe checkpoint variability without annualization
 
 M7.95 measures exact simple returns only between consecutive canonical completed listing checkpoints. It exposes their average absolute magnitude and the earliest maximum absolute transition together with its real scheduled duration, preserving what the sparse observation data actually supports.

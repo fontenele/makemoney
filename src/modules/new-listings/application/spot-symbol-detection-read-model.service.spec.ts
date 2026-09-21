@@ -92,6 +92,64 @@ describe('SpotSymbolDetectionReadModelService', () => {
     ).rejects.toBeInstanceOf(DetectedSpotSymbolNotFoundError);
   });
 
+  it('loads the durable timeline and calculates price variability', async () => {
+    const repository = repositoryWith({
+      findDetected: jest.fn(() => Promise.resolve(detection())),
+      listCompletedObservations: jest.fn(() =>
+        Promise.resolve([
+          completedObservation(),
+          completedObservation({
+            label: 'T+5s',
+            offsetMs: 5_000,
+            lastPrice: '120',
+          }),
+          completedObservation({
+            label: 'T+10s',
+            offsetMs: 10_000,
+            lastPrice: '90',
+          }),
+        ]),
+      ),
+    });
+    const service = new SpotSymbolDetectionReadModelService(repository);
+
+    await expect(
+      service.getPriceVariability('binance', 'NEWUSDT'),
+    ).resolves.toEqual({
+      provider: 'binance',
+      symbol: 'NEWUSDT',
+      transitionCount: 2,
+      averageAbsoluteReturnRate: '0.225',
+      maximumAbsoluteReturn: {
+        from: { label: 'T+5s', offsetMs: 5_000, lastPrice: '120' },
+        to: { label: 'T+10s', offsetMs: 10_000, lastPrice: '90' },
+        durationMs: 5_000,
+        returnRate: '-0.25',
+        absoluteReturnRate: '0.25',
+      },
+    });
+  });
+
+  it('reports price variability unavailable until T+0 is complete', async () => {
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+    );
+
+    await expect(
+      service.getPriceVariability('binance', 'NEWUSDT'),
+    ).resolves.toBeNull();
+  });
+
+  it('rejects price variability for an unknown detection', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith());
+
+    await expect(
+      service.getPriceVariability('binance', 'MISSINGUSDT'),
+    ).rejects.toBeInstanceOf(DetectedSpotSymbolNotFoundError);
+  });
+
   it('loads durable performance and classifies an observed pattern', async () => {
     const repository = repositoryWith({
       findDetected: jest.fn(() => Promise.resolve(detection())),

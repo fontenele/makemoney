@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.96 durable listing checkpoint price variability composition completed
+
+- Added on-demand variability composition from one detection's durable completed observation timeline.
+- Preserved existing detection-not-found and missing-T+0 semantics through the shared read-model boundary.
+- Added no route, provider request, projection persistence, cohort aggregate, annualization, score, alert, signal, strategy simulation, or trading behavior.
+- 858 unit tests across 95 suites and all 65 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.95 observed listing checkpoint price variability completed
 
 - Added a pure exact-decimal calculator for consecutive checkpoint simple returns, average absolute return, and the earliest maximum absolute transition.

@@ -16,6 +16,8 @@ import { ListingObservationPricePathStatistics } from '../domain/listing-observa
 import { ListingObservationPricePathStatisticsCalculator } from './listing-observation-price-path-statistics-calculator';
 import { ListingObservationPricePathCohort } from '../domain/listing-observation-price-path-cohort';
 import { ListingObservationPricePathCohortCalculator } from './listing-observation-price-path-cohort-calculator';
+import { ListingObservationPriceVariability } from '../domain/listing-observation-price-variability';
+import { ListingObservationPriceVariabilityCalculator } from './listing-observation-price-variability-calculator';
 import { ListingObservationCohortPerformance } from '../domain/listing-observation-cohort-performance';
 import { ListingObservationCohortPerformanceCalculator } from './listing-observation-cohort-performance-calculator';
 import {
@@ -80,6 +82,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingObservationPricePathStatisticsCalculator();
   private readonly pricePathCohort =
     new ListingObservationPricePathCohortCalculator();
+  private readonly priceVariability =
+    new ListingObservationPriceVariabilityCalculator();
   private readonly cohortPerformance =
     new ListingObservationCohortPerformanceCalculator();
   private readonly patternClassifier =
@@ -234,6 +238,15 @@ export class SpotSymbolDetectionReadModelService {
     symbol: string,
   ): Promise<ListingObservationPricePathStatistics | null> {
     return this.pricePathStatistics.calculate(
+      await this.listObservations(provider, symbol),
+    );
+  }
+
+  async getPriceVariability(
+    provider: 'binance',
+    symbol: string,
+  ): Promise<ListingObservationPriceVariability | null> {
+    return this.priceVariability.calculate(
       await this.listObservations(provider, symbol),
     );
   }

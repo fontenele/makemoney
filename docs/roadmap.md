@@ -204,6 +204,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.93 — complete:** the internal read model composes price-path cohort statistics on demand over the bounded recent durable T+0-eligible observation sample.
 - **M7.94 — complete:** local read-only HTTP access exposes bounded durable price-path timing and positive-drawdown cohort statistics.
 - **M7.95 — complete:** a pure exact-decimal calculator describes consecutive checkpoint-price variability through average absolute return and the earliest maximum absolute transition.
+- **M7.96 — complete:** the internal read model composes checkpoint-price variability on demand from one detection's durable completed timeline.
 
 ## M8 — Dashboard — planned
 
