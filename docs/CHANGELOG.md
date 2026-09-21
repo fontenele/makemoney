@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.82 durable top-of-book spread widening classification cohort API completed
+
+- Added local read-only `GET /new-listings/top-of-book/spread/classification` with bounded provider/limit input and mandatory positive `wideningBasisPoints`.
+- Preserves explicit classification denominators, counts, exact observed rate, and empty-sample semantics without derived persistence.
+- Updated the root API route table; the endpoint cannot collect data, score, alert, signal, or trade.
+- 801 unit tests across 90 suites and all 61 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.81 durable top-of-book spread widening classification cohort completed
 
 - Composed exact spread evolution, explicit-threshold classification, and cohort statistics over the bounded recent durable top-of-book cohort.

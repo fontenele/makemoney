@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Require an explicit threshold for the spread cohort API
+
+M7.82 exposes the durable widening aggregate without selecting a market hypothesis: every request supplies positive decimal `wideningBasisPoints`. Provider and bounded limit follow the existing local aggregate-route contract, and all query input is validated before persistence access.
+
+The response keeps both classification counts and their denominator visible. It is calculated from current durable books, remains descriptive and read-only, and cannot collect, persist a projection, score, alert, signal, or trade.
+
 ## 2026-09-20 — Reuse the bounded durable book cohort for widening statistics
 
 M7.81 composes the existing durable cohort query, exact spread evolution, explicit-threshold classifier, and pure cohort calculator rather than adding a projection or another repository query. Both the limit and threshold fail before persistence access.

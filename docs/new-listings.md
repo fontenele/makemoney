@@ -479,3 +479,9 @@ Every non-empty input must contain unique canonical Binance symbols, coherent cl
 The internal detection read model validates a cohort limit from 1 through 100 and the caller-supplied positive `wideningBasisPoints` before persistence access. It loads the bounded recent durable top-of-book cohort, derives exact spread evolution for each usable timeline, applies the same threshold, and aggregates the classifications with M7.80.
 
 Timelines without a usable stored T+0 baseline are excluded defensively, and an empty eligible sample retains the explicit empty-cohort contract. Results are calculated on demand and not persisted. This increment adds no route, provider request, score, alert, signal, or trading behavior.
+
+## M7.82 durable top-of-book spread widening classification cohort API
+
+`GET /new-listings/top-of-book/spread/classification` exposes the M7.81 bounded durable aggregate through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it; every request must provide a positive decimal `wideningBasisPoints`.
+
+Invalid query input returns `400` before persistence access. The response preserves the explicit total, observed, and not-observed counts and exact observed rate, including nullable empty-sample semantics. The route cannot collect data, persist a derived result, score, alert, signal, or trade.

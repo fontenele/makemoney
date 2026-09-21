@@ -45,6 +45,7 @@ import {
   ListingTopOfBookSpreadThresholds,
 } from '../domain/listing-top-of-book-spread-classification';
 import { validateListingTopOfBookSpreadThresholds } from '../application/listing-top-of-book-spread-classifier';
+import { ListingTopOfBookSpreadClassificationCohort } from '../domain/listing-top-of-book-spread-classification-cohort';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -115,6 +116,19 @@ export class NewListingsController {
     return this.detections.getTopOfBookSpreadEvolutionCohort(
       optionalProvider(provider) ?? 'binance',
       validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
+    );
+  }
+
+  @Get('top-of-book/spread/classification')
+  topOfBookSpreadClassificationCohort(
+    @Query('limit') limit?: string,
+    @Query('provider') provider?: string,
+    @Query('wideningBasisPoints') wideningBasisPoints?: string,
+  ): Promise<ListingTopOfBookSpreadClassificationCohort> {
+    return this.detections.getTopOfBookSpreadClassificationCohort(
+      optionalProvider(provider) ?? 'binance',
+      validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
+      validSpreadThresholds(wideningBasisPoints),
     );
   }
 

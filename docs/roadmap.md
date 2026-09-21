@@ -190,6 +190,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.79 — complete:** local read-only HTTP access exposes one durable detection's explicit-threshold spread-widening classification with validated input and explicit unavailable semantics.
 - **M7.80 — complete:** a pure exact-decimal cohort calculator reports explicit spread-widening classification counts and observed rate under one caller-supplied threshold.
 - **M7.81 — complete:** the internal read model composes explicit-threshold spread-widening statistics over the bounded recent durable T+0-book cohort.
+- **M7.82 — complete:** local read-only HTTP access exposes bounded durable spread-widening classification statistics with a mandatory explicit threshold.
 
 ## M8 — Dashboard — planned
 
