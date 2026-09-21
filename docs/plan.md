@@ -1708,7 +1708,7 @@ M3 — Paper Trading                DONE (M3.1–M3.8)
 M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
-M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.90 DONE)
+M7 — New Listing Scanner          IN PROGRESS (M7.1–M7.91 DONE)
 M8 — Dashboard                    PLANNED
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
@@ -2365,6 +2365,7 @@ M7.87 Durable Top-of-Book Spread Widening Timing Cohort Loading: DONE
 M7.88 Durable Top-of-Book Spread Widening Timing Cohort API: DONE
 M7.89 Observed Listing Price-Path Statistics: DONE
 M7.90 Durable Listing Price-Path Statistics Composition: DONE
+M7.91 Durable Listing Price-Path Statistics API: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2383,5 +2384,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7.90 is complete. Select the next bounded M7 increment; API exposure, cohort aggregation, scoring, alerts, signals, strategy simulation, and trading remain separate.
+M7.91 is complete. Select the next bounded M7 increment; cohort aggregation, scoring, alerts, signals, strategy simulation, and trading remain separate.
 ```

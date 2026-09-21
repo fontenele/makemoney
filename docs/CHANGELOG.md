@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.91 durable listing price-path statistics API completed
+
+- Added local read-only `GET /new-listings/:provider/:symbol/price-path` for exact observed checkpoint-price extrema and maximum causal drawdown.
+- Reused canonical identity validation with `400` for invalid input, `404` for an unknown detection, and `503` until T+0 is complete.
+- Updated the root API route table; the endpoint cannot collect data, persist a projection, aggregate a cohort, score, alert, signal, simulate a strategy, or trade.
+- 838 unit tests across 93 suites and all 64 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.90 durable listing price-path statistics composition completed
 
 - Added on-demand internal read-model composition of M7.89 price-path statistics from a detection's durable completed checkpoint timeline.

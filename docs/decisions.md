@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Expose price-path statistics as a separate descriptive read
+
+M7.91 exposes the durable per-detection price-path calculation at `GET /new-listings/:provider/:symbol/price-path`. Keeping it separate from raw observations and baseline-relative performance makes the causal drawdown contract explicit without changing either existing response.
+
+The route reuses canonical identity validation and the established `404`/`503` semantics. It is local, read-only, calculated on demand, and adds no cohort aggregate, score, alert, signal, simulation, or trading path.
+
 ## 2026-09-21 — Compose price-path statistics through the existing durable timeline boundary
 
 M7.90 adds the price-path calculation to the detection read model instead of creating another repository query or persisting a derived projection. This keeps identity validation, canonical checkpoint ordering, and T+0 availability aligned with existing per-detection performance reads.

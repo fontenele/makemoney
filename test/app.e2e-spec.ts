@@ -282,6 +282,13 @@ describe('Application (e2e)', () => {
       .expect(400);
   });
 
+  it('/new-listings/:provider/:symbol/price-path validates identity', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(server)
+      .get('/new-listings/binance/newusdt/price-path')
+      .expect(400);
+  });
+
   it('/new-listings/:provider/:symbol/classification requires thresholds', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     await request(server)

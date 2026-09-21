@@ -533,3 +533,9 @@ Input validation and T+0 availability reuse the exact price-performance boundary
 The internal detection read model now loads one known detection's durable completed checkpoint timeline and applies M7.89 on demand. Unknown detection identities retain the existing not-found error, while a known detection without a completed T+0 baseline returns the explicit unavailable result.
 
 The calculation remains transient and reuses the repository ordering and exact-decimal analytical boundary. This increment adds no route, provider request, persistence, cohort aggregate, score, alert, signal, strategy simulation, or trading behavior.
+
+## M7.91 durable listing price-path statistics API
+
+`GET /new-listings/:provider/:symbol/price-path` exposes the M7.90 on-demand durable calculation through the local read-only API. Provider and symbol reuse the canonical observation identity validation; an unknown detection returns `404`, and a known detection without completed T+0 returns `503`.
+
+The response preserves exact prices, rates, checkpoint labels, and offsets for the observed high, observed low, and causal maximum drawdown. It describes sparse checkpoint observations and cannot collect data, persist a projection, aggregate a cohort, score, alert, signal, simulate a strategy, or trade.

@@ -649,6 +649,68 @@ describe('NewListingsController', () => {
     ).rejects.toThrow('detected symbol was not found');
   });
 
+  it('returns available listing price path statistics', async () => {
+    const statistics = {
+      provider: 'binance' as const,
+      symbol: 'NEWUSDT',
+      observedHigh: {
+        label: 'T+5s' as const,
+        offsetMs: 5_000,
+        lastPrice: '120',
+      },
+      observedLow: {
+        label: 'T+10s' as const,
+        offsetMs: 10_000,
+        lastPrice: '90',
+      },
+      maximumDrawdown: {
+        peak: { label: 'T+5s' as const, offsetMs: 5_000, lastPrice: '120' },
+        trough: { label: 'T+10s' as const, offsetMs: 10_000, lastPrice: '90' },
+        absolutePriceDrawdown: '30',
+        priceDrawdownRate: '0.25',
+      },
+    };
+    const getPricePathStatistics = jest.fn(() => Promise.resolve(statistics));
+    const controller = new NewListingsController({ getPricePathStatistics });
+
+    await expect(controller.pricePath('binance', 'NEWUSDT')).resolves.toBe(
+      statistics,
+    );
+    expect(getPricePathStatistics).toHaveBeenCalledWith('binance', 'NEWUSDT');
+  });
+
+  it('maps missing T+0 price path to service unavailable', async () => {
+    const controller = new NewListingsController({
+      getPricePathStatistics: jest.fn(() => Promise.resolve(null)),
+    });
+
+    await expect(controller.pricePath('binance', 'NEWUSDT')).rejects.toThrow(
+      'T+0 listing observation is not available',
+    );
+  });
+
+  it('maps an unknown price path identity to not found', async () => {
+    const controller = new NewListingsController({
+      getPricePathStatistics: jest.fn(() =>
+        Promise.reject(new DetectedSpotSymbolNotFoundError()),
+      ),
+    });
+
+    await expect(
+      controller.pricePath('binance', 'UNKNOWNUSDT'),
+    ).rejects.toThrow('detected symbol was not found');
+  });
+
+  it('rejects an invalid price path identity before read-model access', async () => {
+    const getPricePathStatistics = jest.fn(() => Promise.resolve(null));
+    const controller = new NewListingsController({ getPricePathStatistics });
+
+    await expect(
+      controller.pricePath('binance', 'newusdt'),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(getPricePathStatistics).not.toHaveBeenCalled();
+  });
+
   it('returns the completed observation timeline for a detected symbol', async () => {
     const listObservations = jest.fn(() => Promise.resolve([]));
     const controller = new NewListingsController({ listObservations });
