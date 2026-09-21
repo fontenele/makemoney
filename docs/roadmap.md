@@ -198,6 +198,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.87 — complete:** the internal read model composes first-widening timing over the shared bounded recent durable spread-classification cohort.
 - **M7.88 — complete:** local read-only HTTP access exposes bounded durable first-widening timing with a mandatory explicit threshold and independent sample size.
 - **M7.89 — complete:** a pure exact-decimal calculator derives observed checkpoint-price high, low, and maximum causal peak-to-trough drawdown without inventing a listing score.
+- **M7.90 — complete:** the internal read model composes price-path statistics on demand from one detection's durable completed checkpoint timeline while preserving not-found and unavailable semantics.
 
 ## M8 — Dashboard — planned
 

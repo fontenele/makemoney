@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.90 durable listing price-path statistics composition completed
+
+- Added on-demand internal read-model composition of M7.89 price-path statistics from a detection's durable completed checkpoint timeline.
+- Preserved explicit not-found handling for unknown identities and nullable unavailable semantics for known detections without T+0.
+- Added no route, provider request, persistence, cohort aggregate, score, alert, signal, strategy simulation, or trading behavior.
+- 834 unit tests across 93 suites and all 63 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.89 observed listing price-path statistics completed
 
 - Added a pure exact-decimal calculator for observed checkpoint-price high, low, and maximum causal peak-to-trough drawdown.

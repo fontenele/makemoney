@@ -12,6 +12,8 @@ import {
 import { CompletedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
 import { ListingObservationPricePerformance } from '../domain/listing-observation-price-performance';
 import { ListingObservationPricePerformanceCalculator } from './listing-observation-price-performance-calculator';
+import { ListingObservationPricePathStatistics } from '../domain/listing-observation-price-path-statistics';
+import { ListingObservationPricePathStatisticsCalculator } from './listing-observation-price-path-statistics-calculator';
 import { ListingObservationCohortPerformance } from '../domain/listing-observation-cohort-performance';
 import { ListingObservationCohortPerformanceCalculator } from './listing-observation-cohort-performance-calculator';
 import {
@@ -72,6 +74,8 @@ export const MAX_LISTING_OBSERVATION_COHORT_LIMIT = 100;
 export class SpotSymbolDetectionReadModelService {
   private readonly pricePerformance =
     new ListingObservationPricePerformanceCalculator();
+  private readonly pricePathStatistics =
+    new ListingObservationPricePathStatisticsCalculator();
   private readonly cohortPerformance =
     new ListingObservationCohortPerformanceCalculator();
   private readonly patternClassifier =
@@ -217,6 +221,15 @@ export class SpotSymbolDetectionReadModelService {
     symbol: string,
   ): Promise<ListingObservationPricePerformance | null> {
     return this.pricePerformance.calculate(
+      await this.listObservations(provider, symbol),
+    );
+  }
+
+  async getPricePathStatistics(
+    provider: 'binance',
+    symbol: string,
+  ): Promise<ListingObservationPricePathStatistics | null> {
+    return this.pricePathStatistics.calculate(
       await this.listObservations(provider, symbol),
     );
   }

@@ -35,6 +35,63 @@ describe('SpotSymbolDetectionReadModelService', () => {
     ).resolves.toBeNull();
   });
 
+  it('loads the durable timeline and calculates price path statistics', async () => {
+    const repository = repositoryWith({
+      findDetected: jest.fn(() => Promise.resolve(detection())),
+      listCompletedObservations: jest.fn(() =>
+        Promise.resolve([
+          completedObservation(),
+          completedObservation({
+            label: 'T+5s',
+            offsetMs: 5_000,
+            lastPrice: '120',
+          }),
+          completedObservation({
+            label: 'T+10s',
+            offsetMs: 10_000,
+            lastPrice: '90',
+          }),
+        ]),
+      ),
+    });
+    const service = new SpotSymbolDetectionReadModelService(repository);
+
+    await expect(
+      service.getPricePathStatistics('binance', 'NEWUSDT'),
+    ).resolves.toMatchObject({
+      provider: 'binance',
+      symbol: 'NEWUSDT',
+      observedHigh: { label: 'T+5s', lastPrice: '120' },
+      observedLow: { label: 'T+10s', lastPrice: '90' },
+      maximumDrawdown: {
+        peak: { label: 'T+5s' },
+        trough: { label: 'T+10s' },
+        absolutePriceDrawdown: '30',
+        priceDrawdownRate: '0.25',
+      },
+    });
+  });
+
+  it('reports price path statistics unavailable until T+0 is complete', async () => {
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+    );
+
+    await expect(
+      service.getPricePathStatistics('binance', 'NEWUSDT'),
+    ).resolves.toBeNull();
+  });
+
+  it('rejects price path statistics for an unknown detection', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith());
+
+    await expect(
+      service.getPricePathStatistics('binance', 'MISSINGUSDT'),
+    ).rejects.toBeInstanceOf(DetectedSpotSymbolNotFoundError);
+  });
+
   it('loads durable performance and classifies an observed pattern', async () => {
     const repository = repositoryWith({
       findDetected: jest.fn(() => Promise.resolve(detection())),

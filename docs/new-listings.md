@@ -527,3 +527,9 @@ Invalid query input returns `400` before read-model access. The response preserv
 A pure exact-decimal calculator derives one detection timeline's observed high, observed low, and maximum peak-to-trough drawdown from canonical completed checkpoint prices. High, low, drawdown peak, and drawdown trough retain their schedule labels, offsets, and exact prices; drawdown exposes both absolute price distance and rate from its preceding peak.
 
 Input validation and T+0 availability reuse the exact price-performance boundary. Equal extrema and drawdowns retain their earliest observation, while a path with no decline reports an explicit zero drawdown at T+0. These are sparse scheduled observations, not intracheckpoint candle extrema. This increment adds no durable composition, route, score, alert, signal, strategy simulation, or trading behavior.
+
+## M7.90 durable listing price-path statistics composition
+
+The internal detection read model now loads one known detection's durable completed checkpoint timeline and applies M7.89 on demand. Unknown detection identities retain the existing not-found error, while a known detection without a completed T+0 baseline returns the explicit unavailable result.
+
+The calculation remains transient and reuses the repository ordering and exact-decimal analytical boundary. This increment adds no route, provider request, persistence, cohort aggregate, score, alert, signal, strategy simulation, or trading behavior.

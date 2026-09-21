@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Compose price-path statistics through the existing durable timeline boundary
+
+M7.90 adds the price-path calculation to the detection read model instead of creating another repository query or persisting a derived projection. This keeps identity validation, canonical checkpoint ordering, and T+0 availability aligned with existing per-detection performance reads.
+
+Unknown identities still fail explicitly and known detections without T+0 still return an unavailable result. HTTP exposure, cohort aggregation, scoring, alerts, signals, and trading remain outside this increment.
+
 ## 2026-09-21 — Prefer descriptive price-path statistics over an arbitrary listing score
 
 M7.89 derives observed high, low, and maximum causal drawdown directly from the canonical checkpoint timeline. A drawdown always pairs an earlier running peak with a same-or-later trough, uses exact decimal arithmetic, and retains the earliest event when equal extrema or drawdowns repeat.
