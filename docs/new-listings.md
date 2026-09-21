@@ -491,3 +491,9 @@ Invalid query input returns `400` before persistence access. The response preser
 A pure exact-decimal calculator reports the median `maximumWidening.spreadBasisPointsChange` among classifications whose explicit widening threshold was reached. The response carries the independent widening sample size; empty cohorts and cohorts with no observed widening return a null median.
 
 The calculator reuses M7.80 cohort validation, requires each maximum magnitude to be finite and non-negative, and verifies that threshold crossing agrees with the classification status. Even-sized samples average the two central exact-decimal magnitudes. This increment adds no repository access, route, persistence, timing statistic, score, alert, signal, or trading behavior.
+
+## M7.84 durable top-of-book spread widening magnitude cohort loading
+
+The internal detection read model now applies M7.83 to the same bounded recent durable classification sample used by M7.81. A shared internal loader validates the cohort limit and explicit widening threshold before persistence access, loads T+0-eligible books, derives exact spread evolution, and classifies every usable timeline once per request.
+
+Empty or analytically unusable samples retain the explicit null-median contract. Results are calculated on demand and not persisted. This increment adds no route, provider request, timing statistic, score, alert, signal, or trading behavior.

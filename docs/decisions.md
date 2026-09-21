@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Share one durable classification sample across spread statistics
+
+M7.84 centralizes the bounded durable book-to-classification pipeline so classification counts and maximum-widening magnitude cannot drift through different limits, threshold validation, or T+0 eligibility rules. Each public read-model operation still performs one bounded repository query and calculates on demand.
+
+The magnitude remains an internal descriptive statistic with an explicit observed-widening sample. No projection, cache, route, timing metric, score, alert, signal, or trading behavior is introduced.
+
 ## 2026-09-20 — Measure widening magnitude only after threshold qualification
 
 M7.83 calculates median maximum widening only from classifications where widening was observed under the caller's explicit threshold. Publishing the independent sample size prevents the magnitude statistic from being confused with the full classification denominator.

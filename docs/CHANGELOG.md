@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.84 durable top-of-book spread widening magnitude cohort completed
+
+- Composed median maximum-widening magnitude over the bounded recent durable classification cohort.
+- Centralized durable spread-classification loading so count and magnitude statistics share validation and eligibility rules.
+- Added no route, derived persistence, timing statistic, score, alert, signal, or trading behavior.
+- 809 unit tests across 91 suites and all 61 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.83 top-of-book spread widening magnitude cohort calculation completed
 
 - Added a pure exact-decimal cohort calculator for median maximum widening among threshold-qualified classifications.

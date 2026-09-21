@@ -59,6 +59,8 @@ import {
 } from './listing-top-of-book-spread-classifier';
 import { ListingTopOfBookSpreadClassificationCohort } from '../domain/listing-top-of-book-spread-classification-cohort';
 import { ListingTopOfBookSpreadClassificationCohortCalculator } from './listing-top-of-book-spread-classification-cohort-calculator';
+import { ListingTopOfBookSpreadClassificationMagnitudeCohort } from '../domain/listing-top-of-book-spread-classification-magnitude-cohort';
+import { ListingTopOfBookSpreadClassificationMagnitudeCohortCalculator } from './listing-top-of-book-spread-classification-magnitude-cohort-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -97,6 +99,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingTopOfBookSpreadClassifier();
   private readonly topOfBookSpreadClassificationCohort =
     new ListingTopOfBookSpreadClassificationCohortCalculator();
+  private readonly topOfBookSpreadClassificationMagnitudeCohort =
+    new ListingTopOfBookSpreadClassificationMagnitudeCohortCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -355,6 +359,34 @@ export class SpotSymbolDetectionReadModelService {
     limit: number,
     thresholds: ListingTopOfBookSpreadThresholds,
   ): Promise<ListingTopOfBookSpreadClassificationCohort> {
+    return this.topOfBookSpreadClassificationCohort.calculate(
+      await this.loadTopOfBookSpreadClassifications(
+        provider,
+        limit,
+        thresholds,
+      ),
+    );
+  }
+
+  async getTopOfBookSpreadClassificationMagnitudeCohort(
+    provider: 'binance',
+    limit: number,
+    thresholds: ListingTopOfBookSpreadThresholds,
+  ): Promise<ListingTopOfBookSpreadClassificationMagnitudeCohort> {
+    return this.topOfBookSpreadClassificationMagnitudeCohort.calculate(
+      await this.loadTopOfBookSpreadClassifications(
+        provider,
+        limit,
+        thresholds,
+      ),
+    );
+  }
+
+  private async loadTopOfBookSpreadClassifications(
+    provider: 'binance',
+    limit: number,
+    thresholds: ListingTopOfBookSpreadThresholds,
+  ): Promise<ListingTopOfBookSpreadClassification[]> {
     this.validateCohortLimit(limit);
     validateListingTopOfBookSpreadThresholds(thresholds);
     if (!this.topOfBookRepository) {
@@ -364,14 +396,12 @@ export class SpotSymbolDetectionReadModelService {
       provider,
       limit,
     );
-    return this.topOfBookSpreadClassificationCohort.calculate(
-      timelines.flatMap((timeline) => {
-        const evolution = this.topOfBookSpreadEvolution.calculate(timeline);
-        return evolution
-          ? [this.topOfBookSpreadClassifier.classify(evolution, thresholds)]
-          : [];
-      }),
-    );
+    return timelines.flatMap((timeline) => {
+      const evolution = this.topOfBookSpreadEvolution.calculate(timeline);
+      return evolution
+        ? [this.topOfBookSpreadClassifier.classify(evolution, thresholds)]
+        : [];
+    });
   }
 
   private async loadPatternClassifications(
