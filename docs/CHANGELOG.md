@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.81 durable top-of-book spread widening classification cohort completed
+
+- Composed exact spread evolution, explicit-threshold classification, and cohort statistics over the bounded recent durable top-of-book cohort.
+- Validates the limit and threshold before repository access and excludes timelines without a usable T+0 book.
+- Added no route, derived persistence, score, alert, signal, or trading behavior.
+- 796 unit tests across 90 suites and all 60 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.80 top-of-book spread widening classification cohort calculation completed
 
 - Added a pure exact-decimal cohort calculator for explicit-threshold spread-widening classifications.

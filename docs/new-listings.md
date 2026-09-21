@@ -473,3 +473,9 @@ An unknown detection returns `404`, while a known detection without a stored T+0
 A pure exact-decimal calculator aggregates classifications produced under one numerically equal explicit `wideningBasisPoints` threshold. It reports total, widening-observed, and no-widening-observed counts plus the exact widening-observed rate; an empty input returns zero counts with null provider, threshold, and rate.
 
 Every non-empty input must contain unique canonical Binance symbols, coherent classification status/event presence, and matching valid thresholds. This increment adds no repository access, route, persistence, score, alert, signal, or trading behavior.
+
+## M7.81 durable top-of-book spread widening classification cohort loading
+
+The internal detection read model validates a cohort limit from 1 through 100 and the caller-supplied positive `wideningBasisPoints` before persistence access. It loads the bounded recent durable top-of-book cohort, derives exact spread evolution for each usable timeline, applies the same threshold, and aggregates the classifications with M7.80.
+
+Timelines without a usable stored T+0 baseline are excluded defensively, and an empty eligible sample retains the explicit empty-cohort contract. Results are calculated on demand and not persisted. This increment adds no route, provider request, score, alert, signal, or trading behavior.

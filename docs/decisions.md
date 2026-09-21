@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Reuse the bounded durable book cohort for widening statistics
+
+M7.81 composes the existing durable cohort query, exact spread evolution, explicit-threshold classifier, and pure cohort calculator rather than adding a projection or another repository query. Both the limit and threshold fail before persistence access.
+
+The repository bounds recent T+0-eligible detections before books enter memory, while any analytically unusable timeline is omitted defensively. The internal result remains current, read-only, and unavailable to HTTP until a separate increment.
+
 ## 2026-09-20 — Keep spread-classification cohort denominators explicit
 
 M7.80 calculates the widening-observed rate over the complete supplied classification sample and returns both observed and not-observed counts alongside that denominator. Empty samples use a null rate rather than implying that widening was absent.

@@ -1098,6 +1098,98 @@ describe('SpotSymbolDetectionReadModelService', () => {
     ).rejects.toThrow('top-of-book repository is unavailable');
   });
 
+  it('loads and classifies a bounded durable spread cohort', async () => {
+    const later = {
+      ...topOfBookCheckpoint('AUSDT', '98', '1', '102', '1'),
+      label: 'T+5s' as const,
+      offsetMs: 5_000,
+      targetAt: new Date('2026-09-14T02:00:05.000Z'),
+    };
+    const listCohort = jest.fn(() =>
+      Promise.resolve([
+        [topOfBookCheckpoint('AUSDT', '99', '1', '101', '1'), later],
+        [topOfBookCheckpoint('BUSDT', '198', '1', '202', '1')],
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort,
+    });
+
+    await expect(
+      service.getTopOfBookSpreadClassificationCohort('binance', 25, {
+        wideningBasisPoints: '100',
+      }),
+    ).resolves.toEqual({
+      provider: 'binance',
+      thresholds: { wideningBasisPoints: '100' },
+      classificationCount: 2,
+      noWideningObservedCount: 1,
+      wideningObservedCount: 1,
+      wideningObservedRate: '0.5',
+    });
+    expect(listCohort).toHaveBeenCalledWith('binance', 25);
+  });
+
+  it('validates spread classification cohort input before loading', async () => {
+    const listCohort = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort,
+    });
+
+    await expect(
+      service.getTopOfBookSpreadClassificationCohort('binance', 0, {
+        wideningBasisPoints: '100',
+      }),
+    ).rejects.toThrow('cohort limit must be an integer from 1 to 100');
+    await expect(
+      service.getTopOfBookSpreadClassificationCohort('binance', 25, {
+        wideningBasisPoints: '0',
+      }),
+    ).rejects.toThrow('threshold must be a positive decimal');
+    expect(listCohort).not.toHaveBeenCalled();
+  });
+
+  it('returns an empty spread classification cohort without T+0 books', async () => {
+    const later = {
+      ...topOfBookCheckpoint('AUSDT', '98', '1', '102', '1'),
+      label: 'T+5s' as const,
+      offsetMs: 5_000,
+      targetAt: new Date('2026-09-14T02:00:05.000Z'),
+    };
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection: jest.fn(),
+      listCohort: jest.fn(() => Promise.resolve([[later]])),
+    });
+
+    await expect(
+      service.getTopOfBookSpreadClassificationCohort('binance', 50, {
+        wideningBasisPoints: '100',
+      }),
+    ).resolves.toEqual({
+      provider: null,
+      thresholds: null,
+      classificationCount: 0,
+      noWideningObservedCount: 0,
+      wideningObservedCount: 0,
+      wideningObservedRate: null,
+    });
+  });
+
+  it('fails when durable spread classification cohort access is unavailable', async () => {
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith());
+
+    await expect(
+      service.getTopOfBookSpreadClassificationCohort('binance', 50, {
+        wideningBasisPoints: '100',
+      }),
+    ).rejects.toThrow('top-of-book repository is unavailable');
+  });
+
   it('delegates filtered aggregate summaries to the repository', async () => {
     const summary = {
       count: 2,

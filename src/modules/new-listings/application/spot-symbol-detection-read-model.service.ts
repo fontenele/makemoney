@@ -57,6 +57,8 @@ import {
   ListingTopOfBookSpreadClassifier,
   validateListingTopOfBookSpreadThresholds,
 } from './listing-top-of-book-spread-classifier';
+import { ListingTopOfBookSpreadClassificationCohort } from '../domain/listing-top-of-book-spread-classification-cohort';
+import { ListingTopOfBookSpreadClassificationCohortCalculator } from './listing-top-of-book-spread-classification-cohort-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -93,6 +95,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingTopOfBookSpreadEvolutionCohortCalculator();
   private readonly topOfBookSpreadClassifier =
     new ListingTopOfBookSpreadClassifier();
+  private readonly topOfBookSpreadClassificationCohort =
+    new ListingTopOfBookSpreadClassificationCohortCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -342,6 +346,30 @@ export class SpotSymbolDetectionReadModelService {
       timelines.flatMap((timeline) => {
         const evolution = this.topOfBookSpreadEvolution.calculate(timeline);
         return evolution ? [evolution] : [];
+      }),
+    );
+  }
+
+  async getTopOfBookSpreadClassificationCohort(
+    provider: 'binance',
+    limit: number,
+    thresholds: ListingTopOfBookSpreadThresholds,
+  ): Promise<ListingTopOfBookSpreadClassificationCohort> {
+    this.validateCohortLimit(limit);
+    validateListingTopOfBookSpreadThresholds(thresholds);
+    if (!this.topOfBookRepository) {
+      throw new Error('Listing top-of-book repository is unavailable');
+    }
+    const timelines = await this.topOfBookRepository.listCohort(
+      provider,
+      limit,
+    );
+    return this.topOfBookSpreadClassificationCohort.calculate(
+      timelines.flatMap((timeline) => {
+        const evolution = this.topOfBookSpreadEvolution.calculate(timeline);
+        return evolution
+          ? [this.topOfBookSpreadClassifier.classify(evolution, thresholds)]
+          : [];
       }),
     );
   }
