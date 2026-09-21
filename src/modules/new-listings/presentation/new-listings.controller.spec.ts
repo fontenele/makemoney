@@ -745,6 +745,61 @@ describe('NewListingsController', () => {
     expect(getPricePathStatistics).not.toHaveBeenCalled();
   });
 
+  it('returns available listing price variability', async () => {
+    const variability = {
+      provider: 'binance' as const,
+      symbol: 'NEWUSDT',
+      transitionCount: 1,
+      averageAbsoluteReturnRate: '0.2',
+      maximumAbsoluteReturn: {
+        from: { label: 'T+0' as const, offsetMs: 0, lastPrice: '100' },
+        to: { label: 'T+5s' as const, offsetMs: 5_000, lastPrice: '120' },
+        durationMs: 5_000,
+        returnRate: '0.2',
+        absoluteReturnRate: '0.2',
+      },
+    };
+    const getPriceVariability = jest.fn(() => Promise.resolve(variability));
+    const controller = new NewListingsController({ getPriceVariability });
+
+    await expect(controller.variability('binance', 'NEWUSDT')).resolves.toBe(
+      variability,
+    );
+    expect(getPriceVariability).toHaveBeenCalledWith('binance', 'NEWUSDT');
+  });
+
+  it('maps missing T+0 price variability to service unavailable', async () => {
+    const controller = new NewListingsController({
+      getPriceVariability: jest.fn(() => Promise.resolve(null)),
+    });
+
+    await expect(controller.variability('binance', 'NEWUSDT')).rejects.toThrow(
+      'T+0 listing observation is not available',
+    );
+  });
+
+  it('maps an unknown price variability identity to not found', async () => {
+    const controller = new NewListingsController({
+      getPriceVariability: jest.fn(() =>
+        Promise.reject(new DetectedSpotSymbolNotFoundError()),
+      ),
+    });
+
+    await expect(
+      controller.variability('binance', 'UNKNOWNUSDT'),
+    ).rejects.toThrow('detected symbol was not found');
+  });
+
+  it('rejects an invalid variability identity before read-model access', async () => {
+    const getPriceVariability = jest.fn(() => Promise.resolve(null));
+    const controller = new NewListingsController({ getPriceVariability });
+
+    await expect(
+      controller.variability('binance', 'newusdt'),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(getPriceVariability).not.toHaveBeenCalled();
+  });
+
   it('returns the completed observation timeline for a detected symbol', async () => {
     const listObservations = jest.fn(() => Promise.resolve([]));
     const controller = new NewListingsController({ listObservations });

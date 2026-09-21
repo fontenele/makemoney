@@ -24,6 +24,7 @@ import { CompletedListingObservationCheckpoint } from '../domain/listing-observa
 import { ListingObservationPricePerformance } from '../domain/listing-observation-price-performance';
 import { ListingObservationPricePathStatistics } from '../domain/listing-observation-price-path-statistics';
 import { ListingObservationPricePathCohort } from '../domain/listing-observation-price-path-cohort';
+import { ListingObservationPriceVariability } from '../domain/listing-observation-price-variability';
 import { ListingObservationCohortPerformance } from '../domain/listing-observation-cohort-performance';
 import {
   ListingObservationPatternClassification,
@@ -248,6 +249,31 @@ export class NewListingsController {
     const identity = validObservationIdentity(provider, symbol);
     try {
       const result = await this.detections.getPricePathStatistics(
+        identity.provider,
+        identity.symbol,
+      );
+      if (!result) {
+        throw new ServiceUnavailableException(
+          'T+0 listing observation is not available',
+        );
+      }
+      return result;
+    } catch (error) {
+      if (error instanceof DetectedSpotSymbolNotFoundError) {
+        throw new NotFoundException('detected symbol was not found');
+      }
+      throw error;
+    }
+  }
+
+  @Get(':provider/:symbol/variability')
+  async variability(
+    @Param('provider') provider: string,
+    @Param('symbol') symbol: string,
+  ): Promise<ListingObservationPriceVariability> {
+    const identity = validObservationIdentity(provider, symbol);
+    try {
+      const result = await this.detections.getPriceVariability(
         identity.provider,
         identity.symbol,
       );

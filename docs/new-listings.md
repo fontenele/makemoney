@@ -569,3 +569,9 @@ The calculation requires the explicit T+0 baseline and reuses the existing price
 The internal detection read model now loads one known detection's durable completed checkpoint timeline and applies M7.95 on demand. Unknown detection identities retain the existing not-found error, while a known detection without completed T+0 retains the explicit unavailable result.
 
 The derived result remains transient and uses the shared observation repository and calculator boundary rather than adding a projection or query. This increment adds no route, provider request, persistence, cohort aggregate, annualization, score, alert, signal, strategy simulation, or trading behavior.
+
+## M7.97 durable listing checkpoint price variability API
+
+`GET /new-listings/:provider/:symbol/variability` exposes the M7.96 on-demand durable calculation through the local read-only API. Provider and symbol reuse the canonical observation identity validation; invalid identities return `400`, unknown detections return `404`, and known detections without completed T+0 return `503`.
+
+The response preserves exact consecutive returns, average absolute return, actual checkpoint duration, and the earliest maximum absolute transition. It describes sparse unevenly spaced observations and cannot collect data, persist a projection, aggregate a cohort, annualize volatility, score, alert, signal, simulate a strategy, or trade.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Expose checkpoint variability as a separate descriptive read
+
+M7.97 exposes the durable per-detection variability calculation at `GET /new-listings/:provider/:symbol/variability`. Keeping it separate from baseline-relative performance and price-path extrema makes its consecutive-transition semantics and non-annualized boundary explicit.
+
+The route reuses canonical identity validation and established `404`/`503` behavior. It is local, read-only, calculated on demand, and adds no cohort aggregate, persistence, score, alert, signal, simulation, or trading path.
+
 ## 2026-09-21 — Compose price variability through the durable observation timeline
 
 M7.96 adds the M7.95 calculation to the existing detection read model. It deliberately reuses the shared detection lookup and completed-observation query, keeping not-found behavior, T+0 availability, canonical validation, and exact arithmetic aligned with the other per-detection analyses.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.97 durable listing checkpoint price variability API completed
+
+- Added local read-only `GET /new-listings/:provider/:symbol/variability` for one durable detection.
+- Preserved exact transition values and canonical identity validation with explicit `400`, `404`, and missing-T+0 `503` behavior.
+- Updated the root API route table; the endpoint cannot collect, persist a projection, aggregate, annualize, score, alert, signal, simulate, or trade.
+- 862 unit tests across 95 suites and all 66 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.96 durable listing checkpoint price variability composition completed
 
 - Added on-demand variability composition from one detection's durable completed observation timeline.
