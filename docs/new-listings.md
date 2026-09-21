@@ -521,3 +521,9 @@ Empty or non-widening samples retain the explicit null-median contract. Results 
 `GET /new-listings/top-of-book/spread/classification/timing` exposes the M7.87 bounded durable timing calculation through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it; every request must provide a positive decimal `wideningBasisPoints`.
 
 Invalid query input returns `400` before read-model access. The response preserves the independent observed-widening sample size and nullable median milliseconds. The route cannot collect data, persist a derived result, score, alert, signal, or trade.
+
+## M7.89 observed listing price-path statistics
+
+A pure exact-decimal calculator derives one detection timeline's observed high, observed low, and maximum peak-to-trough drawdown from canonical completed checkpoint prices. High, low, drawdown peak, and drawdown trough retain their schedule labels, offsets, and exact prices; drawdown exposes both absolute price distance and rate from its preceding peak.
+
+Input validation and T+0 availability reuse the exact price-performance boundary. Equal extrema and drawdowns retain their earliest observation, while a path with no decline reports an explicit zero drawdown at T+0. These are sparse scheduled observations, not intracheckpoint candle extrema. This increment adds no durable composition, route, score, alert, signal, strategy simulation, or trading behavior.

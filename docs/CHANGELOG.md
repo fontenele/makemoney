@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.89 observed listing price-path statistics completed
+
+- Added a pure exact-decimal calculator for observed checkpoint-price high, low, and maximum causal peak-to-trough drawdown.
+- Preserves the checkpoint events for every extremum, deterministic earliest-event tie handling, explicit zero drawdown, and unavailable-without-T+0 semantics.
+- Added no durable composition, route, score, alert, signal, strategy simulation, or trading behavior.
+- 831 unit tests across 93 suites and all 63 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.88 durable top-of-book spread widening timing cohort API completed
 
 - Added local read-only `GET /new-listings/top-of-book/spread/classification/timing` with bounded provider/limit input and mandatory positive `wideningBasisPoints`.

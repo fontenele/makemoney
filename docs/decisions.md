@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Prefer descriptive price-path statistics over an arbitrary listing score
+
+M7.89 derives observed high, low, and maximum causal drawdown directly from the canonical checkpoint timeline. A drawdown always pairs an earlier running peak with a same-or-later trough, uses exact decimal arithmetic, and retains the earliest event when equal extrema or drawdowns repeat.
+
+No project-approved weighting model exists for a listing score, so this increment does not invent one. The statistic describes sparse scheduled observations rather than intracheckpoint market extrema and adds no durable composition or HTTP exposure.
+
 ## 2026-09-21 — Keep spread timing on a separate explicit research route
 
 M7.88 exposes median first-widening timing separately from frequency and magnitude so its independent threshold-qualified sample remains visible. The route reuses the same mandatory positive `wideningBasisPoints`, provider, and bounded cohort limit contract.

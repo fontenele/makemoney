@@ -130,6 +130,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | spread widening timing cohort, median time to widening, first widening duration, M7.86 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-top-of-book-spread-classification-timing-cohort-calculator.ts`, `../src/modules/new-listings/domain/listing-top-of-book-spread-classification-timing-cohort.ts` |
 | durable spread widening timing cohort, bounded timing loading, M7.87 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-top-of-book-spread-classification-timing-cohort-calculator.ts` |
 | spread widening timing API, median time to widening route, widening timing query, M7.88 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
+| listing price path statistics, observed high, observed low, maximum drawdown, checkpoint extrema, M7.89 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-observation-price-path-statistics-calculator.ts`, `../src/modules/new-listings/domain/listing-observation-price-path-statistics.ts` |
 
 ## Before every task
 
