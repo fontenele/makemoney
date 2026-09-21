@@ -8,6 +8,40 @@ import {
 import { NewListingsController } from './new-listings.controller';
 
 describe('NewListingsController', () => {
+  it('returns the durable price path cohort with bounded input', async () => {
+    const cohort = {
+      provider: 'binance' as const,
+      sampleSize: 0,
+      medianObservedHighOffsetMs: null,
+      medianObservedLowOffsetMs: null,
+      drawdownSampleSize: 0,
+      medianMaximumDrawdownRate: null,
+      medianMaximumDrawdownDurationMs: null,
+    };
+    const getPricePathCohort = jest.fn(() => Promise.resolve(cohort));
+    const controller = new NewListingsController({ getPricePathCohort });
+
+    await expect(controller.pricePathCohort()).resolves.toBe(cohort);
+    expect(getPricePathCohort).toHaveBeenLastCalledWith('binance', 50);
+    await controller.pricePathCohort('25', 'binance');
+    expect(getPricePathCohort).toHaveBeenLastCalledWith('binance', 25);
+  });
+
+  it.each([
+    ['0', undefined],
+    ['101', undefined],
+    ['1.5', undefined],
+    [undefined, 'other'],
+  ])('rejects invalid price path cohort query %s/%s', (limit, provider) => {
+    const getPricePathCohort = jest.fn(() => Promise.resolve({}));
+    const controller = new NewListingsController({ getPricePathCohort });
+
+    expect(() => controller.pricePathCohort(limit, provider)).toThrow(
+      BadRequestException,
+    );
+    expect(getPricePathCohort).not.toHaveBeenCalled();
+  });
+
   it('returns the durable top-of-book cohort with bounded input', async () => {
     const cohort = {
       provider: 'binance' as const,

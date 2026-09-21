@@ -23,6 +23,7 @@ import {
 import { CompletedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
 import { ListingObservationPricePerformance } from '../domain/listing-observation-price-performance';
 import { ListingObservationPricePathStatistics } from '../domain/listing-observation-price-path-statistics';
+import { ListingObservationPricePathCohort } from '../domain/listing-observation-price-path-cohort';
 import { ListingObservationCohortPerformance } from '../domain/listing-observation-cohort-performance';
 import {
   ListingObservationPatternClassification,
@@ -62,6 +63,17 @@ export class NewListingsController {
     @Query('provider') provider?: string,
   ): Promise<ListingObservationCohortPerformance> {
     return this.detections.getCohortPerformance(
+      optionalProvider(provider) ?? 'binance',
+      validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
+    );
+  }
+
+  @Get('price-path')
+  pricePathCohort(
+    @Query('limit') limit?: string,
+    @Query('provider') provider?: string,
+  ): Promise<ListingObservationPricePathCohort> {
+    return this.detections.getPricePathCohort(
       optionalProvider(provider) ?? 'binance',
       validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
     );

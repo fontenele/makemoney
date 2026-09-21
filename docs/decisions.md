@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Expose price-path cohort statistics as a bounded descriptive read
+
+M7.94 exposes the durable aggregate at `GET /new-listings/price-path` with the same provider and bounded limit contract as other observation cohorts. The response keeps total paths distinct from positive drawdowns and does not expose cross-asset absolute-price aggregates.
+
+Input is rejected before read-model access when invalid. The endpoint is local, read-only, calculated on demand, and cannot collect, persist a projection, score, alert, signal, simulate, or trade.
+
 ## 2026-09-21 — Reuse the bounded durable observation cohort for price paths
 
 M7.93 derives each M7.89 price path from the same bounded recent T+0-eligible durable timelines used by existing observation cohort research. Limit validation occurs before repository access, and every loaded timeline must retain the repository's T+0 invariant.

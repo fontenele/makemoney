@@ -551,3 +551,9 @@ Every identity must be canonical and unique, event labels must match canonical c
 The internal detection read model now validates the requested cohort limit, loads the bounded recent durable T+0-eligible observation timelines, derives one exact price path per detection, and applies M7.92 on demand. The repository is not consulted for invalid limits, and an empty durable cohort retains the explicit null-median response.
 
 The derived aggregate remains transient and shares the existing completed-observation cohort boundary. This increment adds no route, provider request, persistence, score, alert, signal, strategy simulation, or trading behavior.
+
+## M7.94 durable listing price-path cohort API
+
+`GET /new-listings/price-path` exposes the M7.93 bounded durable aggregate through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it. Invalid input returns `400` before read-model access.
+
+The response preserves the total trajectory sample, independent positive-drawdown sample, exact median drawdown rate, and nullable timing medians. Absolute prices remain excluded. The route cannot collect data, persist a projection, score, alert, signal, simulate a strategy, or trade.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.94 durable listing price-path cohort API completed
+
+- Added local read-only `GET /new-listings/price-path` with optional bounded `limit` and Binance provider input.
+- Exposes total path and positive-drawdown samples with exact nullable extrema timing, drawdown-rate, and drawdown-duration medians.
+- Updated the root API route table; the endpoint cannot collect, persist a projection, score, alert, signal, simulate a strategy, or trade.
+- 851 unit tests across 94 suites and all 65 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.93 durable listing price-path cohort composition completed
 
 - Added bounded internal read-model composition of M7.92 over recent durable T+0-eligible completed observation timelines.
