@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Reuse the bounded durable observation cohort for price paths
+
+M7.93 derives each M7.89 price path from the same bounded recent T+0-eligible durable timelines used by existing observation cohort research. Limit validation occurs before repository access, and every loaded timeline must retain the repository's T+0 invariant.
+
+The aggregate is calculated on demand and not persisted. HTTP exposure, scoring, alerts, signals, simulation, and trading remain outside this increment.
+
 ## 2026-09-21 — Aggregate only cross-asset comparable price-path measures
 
 M7.92 reports median scheduled extrema timing and median positive maximum-drawdown rate and duration. It does not average or compare absolute high, low, or drawdown prices because price levels across distinct listed assets have no common scale.

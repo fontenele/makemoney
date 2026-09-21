@@ -14,6 +14,8 @@ import { ListingObservationPricePerformance } from '../domain/listing-observatio
 import { ListingObservationPricePerformanceCalculator } from './listing-observation-price-performance-calculator';
 import { ListingObservationPricePathStatistics } from '../domain/listing-observation-price-path-statistics';
 import { ListingObservationPricePathStatisticsCalculator } from './listing-observation-price-path-statistics-calculator';
+import { ListingObservationPricePathCohort } from '../domain/listing-observation-price-path-cohort';
+import { ListingObservationPricePathCohortCalculator } from './listing-observation-price-path-cohort-calculator';
 import { ListingObservationCohortPerformance } from '../domain/listing-observation-cohort-performance';
 import { ListingObservationCohortPerformanceCalculator } from './listing-observation-cohort-performance-calculator';
 import {
@@ -76,6 +78,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingObservationPricePerformanceCalculator();
   private readonly pricePathStatistics =
     new ListingObservationPricePathStatisticsCalculator();
+  private readonly pricePathCohort =
+    new ListingObservationPricePathCohortCalculator();
   private readonly cohortPerformance =
     new ListingObservationCohortPerformanceCalculator();
   private readonly patternClassifier =
@@ -231,6 +235,26 @@ export class SpotSymbolDetectionReadModelService {
   ): Promise<ListingObservationPricePathStatistics | null> {
     return this.pricePathStatistics.calculate(
       await this.listObservations(provider, symbol),
+    );
+  }
+
+  async getPricePathCohort(
+    provider: 'binance',
+    limit: number,
+  ): Promise<ListingObservationPricePathCohort> {
+    this.validateCohortLimit(limit);
+    const timelines = await this.repository.listCompletedObservationCohort(
+      provider,
+      limit,
+    );
+    return this.pricePathCohort.calculate(
+      timelines.map((timeline) => {
+        const statistics = this.pricePathStatistics.calculate(timeline);
+        if (!statistics) {
+          throw new Error('Cohort timeline must include completed T+0');
+        }
+        return statistics;
+      }),
     );
   }
 

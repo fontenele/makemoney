@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.93 durable listing price-path cohort composition completed
+
+- Added bounded internal read-model composition of M7.92 over recent durable T+0-eligible completed observation timelines.
+- Derives each exact price path once per request, validates limits before persistence access, and preserves explicit empty-cohort semantics.
+- Added no route, provider request, persistence, score, alert, signal, strategy simulation, or trading behavior.
+- 846 unit tests across 94 suites and all 64 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.92 listing price-path cohort calculation completed
 
 - Added a pure cohort calculator for median observed-high and observed-low timing plus positive maximum-drawdown rate and duration.

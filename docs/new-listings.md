@@ -545,3 +545,9 @@ The response preserves exact prices, rates, checkpoint labels, and offsets for t
 A pure cohort calculator aggregates only measures that remain comparable across distinct assets: median scheduled offset of the observed high and low, plus median maximum-drawdown rate and peak-to-trough duration. It reports the total trajectory sample and an independent positive-drawdown sample; empty samples and cohorts containing only zero drawdowns retain explicit null medians.
 
 Every identity must be canonical and unique, event labels must match canonical checkpoint offsets, drawdown order must be causal, and exact absolute/rate values must reconcile with positive peak and trough prices. Absolute price levels are deliberately not aggregated. This increment adds no repository access, durable composition, route, persistence, score, alert, signal, strategy simulation, or trading behavior.
+
+## M7.93 durable listing price-path cohort composition
+
+The internal detection read model now validates the requested cohort limit, loads the bounded recent durable T+0-eligible observation timelines, derives one exact price path per detection, and applies M7.92 on demand. The repository is not consulted for invalid limits, and an empty durable cohort retains the explicit null-median response.
+
+The derived aggregate remains transient and shares the existing completed-observation cohort boundary. This increment adds no route, provider request, persistence, score, alert, signal, strategy simulation, or trading behavior.

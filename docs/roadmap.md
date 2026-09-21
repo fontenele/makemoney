@@ -201,6 +201,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.90 — complete:** the internal read model composes price-path statistics on demand from one detection's durable completed checkpoint timeline while preserving not-found and unavailable semantics.
 - **M7.91 — complete:** local read-only HTTP access exposes one durable detection's observed checkpoint-price extrema and causal drawdown with validated identity and explicit unavailable semantics.
 - **M7.92 — complete:** a pure exact-decimal cohort calculator reports median extrema timing and positive maximum-drawdown rate and duration without comparing absolute prices across assets.
+- **M7.93 — complete:** the internal read model composes price-path cohort statistics on demand over the bounded recent durable T+0-eligible observation sample.
 
 ## M8 — Dashboard — planned
 
