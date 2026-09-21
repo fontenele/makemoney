@@ -503,3 +503,9 @@ Empty or analytically unusable samples retain the explicit null-median contract.
 `GET /new-listings/top-of-book/spread/classification/magnitudes` exposes the M7.84 bounded durable magnitude calculation through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it; every request must provide a positive decimal `wideningBasisPoints`.
 
 Invalid query input returns `400` before read-model access. The response preserves the independent observed-widening sample size and nullable exact median. The route cannot collect data, persist a derived result, calculate timing, score, alert, signal, or trade.
+
+## M7.86 top-of-book spread widening timing cohort calculation
+
+A pure cohort calculator reports the median scheduled duration from T+0 to the first threshold-qualified widening event. The response carries the independent widening sample size; empty cohorts and cohorts without observed widening return a null median.
+
+The calculator reuses the classification-cohort consistency rules, validates event and evaluation labels against the canonical checkpoint schedule, and rejects widening at T+0 or after the declared evaluation horizon. This increment adds no repository access, durable composition, route, persistence, score, alert, signal, or trading behavior.

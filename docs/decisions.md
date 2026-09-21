@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Measure first-widening timing from the scheduled T+0 baseline
+
+M7.86 treats a threshold-qualified classification's first widening checkpoint offset as its observed time to widening. The cohort median includes only observed widenings and publishes that independent sample size, avoiding any imputation for classifications without an event.
+
+Both the event and evaluation horizon must match the canonical schedule, and widening must occur after T+0 and no later than the evaluated-through checkpoint. The calculation remains pure and descriptive; durable composition and HTTP exposure are separate increments.
+
 ## 2026-09-21 — Keep spread magnitude on a separate explicit research route
 
 M7.85 exposes median maximum widening separately from the M7.82 frequency response so its independent threshold-qualified sample remains visible. The route reuses the same mandatory positive `wideningBasisPoints`, provider, and bounded cohort limit contract.

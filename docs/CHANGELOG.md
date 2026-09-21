@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.86 top-of-book spread widening timing cohort calculation completed
+
+- Added a pure cohort calculator for median T+0-to-first-observed-widening duration under one explicit threshold.
+- Publishes an independent widening sample size and null median when no widening qualified.
+- Validates canonical checkpoint metadata and causal event ordering without adding repository, HTTP, persistence, scoring, alerting, signaling, or trading behavior.
+- 818 unit tests across 92 suites and all 62 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.85 durable top-of-book spread widening magnitude cohort API completed
 
 - Added local read-only `GET /new-listings/top-of-book/spread/classification/magnitudes` with bounded provider/limit input and mandatory positive `wideningBasisPoints`.

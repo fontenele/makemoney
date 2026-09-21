@@ -127,6 +127,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | spread widening magnitude cohort, median maximum widening basis points, observed widening sample, M7.83 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-top-of-book-spread-classification-magnitude-cohort-calculator.ts`, `../src/modules/new-listings/domain/listing-top-of-book-spread-classification-magnitude-cohort.ts` |
 | durable spread widening magnitude cohort, bounded magnitude loading, M7.84 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-top-of-book-spread-classification-magnitude-cohort-calculator.ts` |
 | spread widening magnitude API, median maximum widening route, widening magnitude query, M7.85 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
+| spread widening timing cohort, median time to widening, first widening duration, M7.86 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-top-of-book-spread-classification-timing-cohort-calculator.ts`, `../src/modules/new-listings/domain/listing-top-of-book-spread-classification-timing-cohort.ts` |
 
 ## Before every task
 

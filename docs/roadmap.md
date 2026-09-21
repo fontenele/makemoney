@@ -194,6 +194,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.83 — complete:** a pure exact-decimal cohort calculator reports the median maximum widening magnitude among threshold-qualified classifications.
 - **M7.84 — complete:** the internal read model composes maximum-widening magnitude over the bounded recent durable classification cohort.
 - **M7.85 — complete:** local read-only HTTP access exposes the bounded durable maximum-widening magnitude with a mandatory explicit threshold and independent sample size.
+- **M7.86 — complete:** a pure cohort calculator reports median T+0-to-first-widening duration with an independent threshold-qualified sample and canonical schedule validation.
 
 ## M8 — Dashboard — planned
 
