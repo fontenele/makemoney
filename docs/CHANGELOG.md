@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.101 exact cost-adjusted listing checkpoint round trip completed
+
+- Added a pure exact-decimal calculator for one explicit stored-ask-to-later-stored-bid checkpoint round trip.
+- Includes observed spread, adverse two-sided slippage, two-sided fees, exact gross/net returns, duration, and profitability after costs.
+- Added strict book, identity, schedule, target-time, checkpoint-order, and cost-rate validation without order/fill simulation or automatic strategy selection.
+- 880 unit tests across 97 suites and all 67 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.100 durable listing checkpoint price variability cohort API completed
 
 - Added local read-only `GET /new-listings/variability` with optional bounded `limit` and Binance provider input.

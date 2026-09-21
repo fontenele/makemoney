@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Start listing strategy research with an explicit cost-adjusted round trip
+
+M7.101 evaluates one caller-selected forward checkpoint pair from stored entry ask to stored exit bid. This incorporates the observed spread directly, applies adverse slippage to each execution price and fees to both cash-flow sides, and reports exact gross and net return rates without requiring an arbitrary quantity.
+
+The calculator does not search checkpoint combinations or claim a strategy is generally profitable. It models neither depth nor fills and creates no order ledger, persistence, route, signal, or trading path; those require later bounded increments and, where appropriate, stronger liquidity assumptions.
+
 ## 2026-09-21 — Expose variability cohort statistics as a bounded descriptive read
 
 M7.100 exposes the durable aggregate at `GET /new-listings/variability` with the same provider and bounded limit contract as other observation cohorts. The response keeps total paths distinct from transition-bearing paths and preserves exact nullable medians.

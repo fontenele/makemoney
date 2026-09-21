@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.100 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path cohort statistics, and exact non-annualized consecutive checkpoint-price variability with bounded durable cohort exposure.
+- M6 is closed. M7.1–M7.101 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -325,6 +325,8 @@ M7.98 purely aggregates cross-asset comparable variability through exact medians
 M7.99 composes that variability aggregate on demand over the bounded recent durable T+0-eligible observation cohort without adding HTTP exposure or persistence.
 
 M7.100 exposes that durable aggregate at local read-only `GET /new-listings/variability` with bounded provider and limit input.
+
+M7.101 purely calculates one explicitly selected checkpoint round trip from stored ask to later stored bid, including observed spread, caller-supplied fees on both sides, and adverse slippage without placing or simulating an order ledger.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

@@ -593,3 +593,9 @@ T+0-only timelines remain in the total sample while staying outside the transiti
 `GET /new-listings/variability` exposes the M7.99 bounded durable aggregate through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it. Invalid input returns `400` before read-model access.
 
 The response preserves total-path and transition-bearing sample sizes plus exact nullable medians for average and maximum absolute consecutive returns. The route cannot collect data, persist a projection, annualize, rank, score, alert, signal, simulate a strategy, or trade.
+
+## M7.101 exact cost-adjusted listing checkpoint round trip
+
+A pure exact-decimal calculator evaluates one explicitly selected forward checkpoint pair. Entry uses the stored ask and exit uses the later stored bid, so the observed top-of-book spread is already included. Caller-supplied fee and adverse slippage rates are applied to both sides, producing reference and execution prices, duration, gross return, net return, and an exact profitable-after-costs flag.
+
+Both books must share one canonical identity, retain canonical schedule labels and offsets, have target times consistent with their offset distance, and pass the shared non-crossed-book validation. Cost rates must be canonical decimal strings from zero through less than one. This is a unit-quantity-independent research return, not a fill guarantee: it does not model depth, partial fills, notional rules, order mutation, automatic entry/exit selection, optimization, persistence, route exposure, strategy signals, or trading.
