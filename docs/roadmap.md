@@ -187,6 +187,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.76 — complete:** local read-only HTTP access exposes the bounded durable spread-evolution cohort with explicit checkpoint coverage.
 - **M7.77 — complete:** a pure exact-decimal classifier identifies explicitly thresholded observed spread widening and its maximum observed change.
 - **M7.78 — complete:** the internal read model classifies one detection's canonical durable stored-book timeline on demand with an explicit widening threshold.
+- **M7.79 — complete:** local read-only HTTP access exposes one durable detection's explicit-threshold spread-widening classification with validated input and explicit unavailable semantics.
 
 ## M8 — Dashboard — planned
 

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Require an explicit spread-widening threshold on every API request
+
+M7.79 does not embed a market hypothesis. Callers must provide a positive decimal `wideningBasisPoints`, which is validated before persistence access and passed unchanged to the existing durable classifier.
+
+The endpoint preserves established semantics: malformed input is `400`, an unknown durable detection is `404`, and a known detection without T+0 is `503`. It remains local, read-only, calculated on demand, and descriptive rather than a score, alert, signal, or trading instruction.
+
 ## 2026-09-20 — Derive durable spread classification on demand
 
 M7.78 validates the caller's positive widening threshold before repository access and composes the existing durable book timeline, exact spread evolution, and pure classifier. Unknown detection remains distinct from missing T+0, and no mutable classification projection is stored.

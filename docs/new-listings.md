@@ -461,3 +461,9 @@ The classifier validates the canonical identity, ordered schedule, explicit cohe
 The internal detection read model now validates the explicit widening threshold before persistence access, loads one detected symbol's canonical stored-book timeline, derives exact T+0-relative spread evolution, and applies the M7.77 classifier on demand.
 
 An unknown durable detection keeps the established not-found error, while a known detection without a stored T+0 book returns analytical unavailability (`null`). No classification is persisted, so newly stored checkpoints affect the next calculation immediately. This increment adds no route, cohort statistic, score, alert, signal, or trading behavior.
+
+## M7.79 durable top-of-book spread widening classification API
+
+`GET /new-listings/:provider/:symbol/top-of-book/spread/classification` exposes the M7.78 on-demand result through the local read-only API. Every request must provide a positive decimal `wideningBasisPoints`; malformed identity or threshold input returns `400` before persistence access.
+
+An unknown detection returns `404`, while a known detection without a stored T+0 book returns `503`. The route calculates from the current durable timeline and cannot collect data, persist a derived classification, score, alert, signal, or trade.

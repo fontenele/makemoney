@@ -40,6 +40,11 @@ import { ListingTopOfBookImbalanceEvolution } from '../domain/listing-top-of-boo
 import { ListingTopOfBookImbalanceEvolutionCohort } from '../domain/listing-top-of-book-imbalance-evolution-cohort';
 import { ListingTopOfBookSpreadEvolution } from '../domain/listing-top-of-book-spread-evolution';
 import { ListingTopOfBookSpreadEvolutionCohort } from '../domain/listing-top-of-book-spread-evolution-cohort';
+import {
+  ListingTopOfBookSpreadClassification,
+  ListingTopOfBookSpreadThresholds,
+} from '../domain/listing-top-of-book-spread-classification';
+import { validateListingTopOfBookSpreadThresholds } from '../application/listing-top-of-book-spread-classifier';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -319,6 +324,34 @@ export class NewListingsController {
     }
   }
 
+  @Get(':provider/:symbol/top-of-book/spread/classification')
+  async topOfBookSpreadClassification(
+    @Param('provider') provider: string,
+    @Param('symbol') symbol: string,
+    @Query('wideningBasisPoints') wideningBasisPoints?: string,
+  ): Promise<ListingTopOfBookSpreadClassification> {
+    const identity = validObservationIdentity(provider, symbol);
+    const thresholds = validSpreadThresholds(wideningBasisPoints);
+    try {
+      const result = await this.detections.getTopOfBookSpreadClassification(
+        identity.provider,
+        identity.symbol,
+        thresholds,
+      );
+      if (!result) {
+        throw new ServiceUnavailableException(
+          'T+0 top-of-book spread is not available',
+        );
+      }
+      return result;
+    } catch (error) {
+      if (error instanceof DetectedSpotSymbolNotFoundError) {
+        throw new NotFoundException('detected symbol was not found');
+      }
+      throw error;
+    }
+  }
+
   @Get('summary')
   summary(
     @Query('detectedFrom') detectedFrom?: string,
@@ -399,6 +432,23 @@ function validPatternThresholds(
   } catch (error) {
     throw new BadRequestException(
       error instanceof Error ? error.message : 'invalid pattern thresholds',
+    );
+  }
+  return thresholds;
+}
+
+function validSpreadThresholds(
+  wideningBasisPoints?: string,
+): ListingTopOfBookSpreadThresholds {
+  if (wideningBasisPoints === undefined) {
+    throw new BadRequestException('wideningBasisPoints is required');
+  }
+  const thresholds = { wideningBasisPoints };
+  try {
+    validateListingTopOfBookSpreadThresholds(thresholds);
+  } catch (error) {
+    throw new BadRequestException(
+      error instanceof Error ? error.message : 'invalid spread threshold',
     );
   }
   return thresholds;

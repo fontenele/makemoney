@@ -722,6 +722,76 @@ describe('NewListingsController', () => {
     ).rejects.toThrow('detected symbol was not found');
   });
 
+  it('returns durable top-of-book spread classification', async () => {
+    const classification = {
+      provider: 'binance' as const,
+      symbol: 'NEWUSDT',
+      status: 'widening-observed' as const,
+      thresholds: { wideningBasisPoints: '100' },
+      evaluatedThroughLabel: 'T+1h' as const,
+      widening: null,
+      maximumWidening: {},
+    };
+    const getTopOfBookSpreadClassification = jest.fn(() =>
+      Promise.resolve(classification),
+    );
+    const controller = new NewListingsController({
+      getTopOfBookSpreadClassification,
+    });
+
+    await expect(
+      controller.topOfBookSpreadClassification('binance', 'NEWUSDT', '100'),
+    ).resolves.toBe(classification);
+    expect(getTopOfBookSpreadClassification).toHaveBeenCalledWith(
+      'binance',
+      'NEWUSDT',
+      { wideningBasisPoints: '100' },
+    );
+  });
+
+  it.each([undefined, '0', 'not-a-number'])(
+    'rejects invalid top-of-book spread classification threshold %s',
+    async (wideningBasisPoints) => {
+      const getTopOfBookSpreadClassification = jest.fn(() =>
+        Promise.resolve({}),
+      );
+      const controller = new NewListingsController({
+        getTopOfBookSpreadClassification,
+      });
+
+      await expect(
+        controller.topOfBookSpreadClassification(
+          'binance',
+          'NEWUSDT',
+          wideningBasisPoints,
+        ),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(getTopOfBookSpreadClassification).not.toHaveBeenCalled();
+    },
+  );
+
+  it('reports spread classification unavailable without T+0', async () => {
+    const controller = new NewListingsController({
+      getTopOfBookSpreadClassification: jest.fn(() => Promise.resolve(null)),
+    });
+
+    await expect(
+      controller.topOfBookSpreadClassification('binance', 'NEWUSDT', '100'),
+    ).rejects.toThrow('T+0 top-of-book spread is not available');
+  });
+
+  it('maps unknown spread classification identity to not found', async () => {
+    const controller = new NewListingsController({
+      getTopOfBookSpreadClassification: jest.fn(() =>
+        Promise.reject(new DetectedSpotSymbolNotFoundError()),
+      ),
+    });
+
+    await expect(
+      controller.topOfBookSpreadClassification('binance', 'UNKNOWNUSDT', '100'),
+    ).rejects.toThrow('detected symbol was not found');
+  });
+
   it('returns a filtered detection summary without pagination input', async () => {
     const summarize = jest.fn(() =>
       Promise.resolve({

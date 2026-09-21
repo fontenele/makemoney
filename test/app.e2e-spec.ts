@@ -247,6 +247,13 @@ describe('Application (e2e)', () => {
       .expect(400);
   });
 
+  it('/new-listings/:provider/:symbol/top-of-book/spread/classification requires a threshold', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(server)
+      .get('/new-listings/binance/NEWUSDT/top-of-book/spread/classification')
+      .expect(400);
+  });
+
   it('/new-listings/:provider/:symbol/performance validates identity', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     await request(server)

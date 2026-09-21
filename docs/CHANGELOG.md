@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.79 durable top-of-book spread widening classification API completed
+
+- Added local read-only `GET /new-listings/:provider/:symbol/top-of-book/spread/classification` with a mandatory positive `wideningBasisPoints` threshold.
+- Preserved `400` malformed-input, `404` unknown-detection, and `503` missing-T+0 semantics without derived persistence.
+- Updated the root API route table; the endpoint cannot collect data, score, alert, signal, or trade.
+- 789 unit tests across 89 suites and all 60 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.78 durable top-of-book spread widening classification completed
 
 - Composed exact spread evolution and explicit-threshold widening classification over one durable detected-symbol book timeline.
