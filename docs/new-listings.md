@@ -455,3 +455,9 @@ The response preserves each checkpoint's independent sample size and exact avera
 A pure exact-decimal classifier consumes one validated spread-evolution timeline and a caller-supplied positive `wideningBasisPoints` threshold. It reports whether widening was observed, the first checkpoint whose T+0-relative spread change met the threshold, the maximum observed widening, and the last checkpoint evaluated.
 
 The classifier validates the canonical identity, ordered schedule, explicit coherent T+0 baseline, non-negative spreads, and exact baseline-relative changes. No threshold is embedded because the project has no universal widening hypothesis. This increment adds no durable composition, route, persistence, score, alert, signal, or trading behavior.
+
+## M7.78 durable top-of-book spread widening classification
+
+The internal detection read model now validates the explicit widening threshold before persistence access, loads one detected symbol's canonical stored-book timeline, derives exact T+0-relative spread evolution, and applies the M7.77 classifier on demand.
+
+An unknown durable detection keeps the established not-found error, while a known detection without a stored T+0 book returns analytical unavailability (`null`). No classification is persisted, so newly stored checkpoints affect the next calculation immediately. This increment adds no route, cohort statistic, score, alert, signal, or trading behavior.

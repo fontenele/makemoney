@@ -119,6 +119,8 @@ Use this keyword map to locate context before changing code. Read the listed doc
 
 | spread widening classification, explicit widening basis points threshold, first widening, maximum widening, M7.77 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-top-of-book-spread-classifier.ts`, `../src/modules/new-listings/domain/listing-top-of-book-spread-classification.ts` |
 
+| durable spread widening classification, stored-book threshold classification, M7.78 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-top-of-book-spread-evolution-calculator.ts`, `../src/modules/new-listings/application/listing-top-of-book-spread-classifier.ts` |
+
 ## Before every task
 
 1. Read `../AGENTS.md` and `../PROJECT_CONTEXT.md` completely.

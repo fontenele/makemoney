@@ -702,6 +702,104 @@ describe('SpotSymbolDetectionReadModelService', () => {
     expect(listForDetection).not.toHaveBeenCalled();
   });
 
+  it('classifies durable spread widening with an explicit threshold', async () => {
+    const later = {
+      ...topOfBookCheckpoint('NEWUSDT', '98', '1', '102', '1'),
+      label: 'T+5s' as const,
+      offsetMs: 5_000,
+      targetAt: new Date('2026-09-14T02:00:05.000Z'),
+    };
+    const listForDetection = jest.fn(() =>
+      Promise.resolve([
+        topOfBookCheckpoint('NEWUSDT', '99', '1', '101', '1'),
+        later,
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+      {
+        store: jest.fn(),
+        listForDetection,
+        listCohort: jest.fn(),
+      },
+    );
+
+    await expect(
+      service.getTopOfBookSpreadClassification('binance', 'NEWUSDT', {
+        wideningBasisPoints: '200',
+      }),
+    ).resolves.toMatchObject({
+      provider: 'binance',
+      symbol: 'NEWUSDT',
+      status: 'widening-observed',
+      widening: {
+        label: 'T+5s',
+        spreadBasisPointsChange: '200',
+      },
+      maximumWidening: {
+        label: 'T+5s',
+        spreadBasisPointsChange: '200',
+      },
+    });
+    expect(listForDetection).toHaveBeenCalledWith('binance', 'NEWUSDT');
+  });
+
+  it('reports durable spread classification unavailable without T+0', async () => {
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({
+        findDetected: jest.fn(() => Promise.resolve(detection())),
+      }),
+      {
+        store: jest.fn(),
+        listForDetection: jest.fn(() => Promise.resolve([])),
+        listCohort: jest.fn(),
+      },
+    );
+
+    await expect(
+      service.getTopOfBookSpreadClassification('binance', 'NEWUSDT', {
+        wideningBasisPoints: '100',
+      }),
+    ).resolves.toBeNull();
+  });
+
+  it('rejects an invalid spread threshold before durable access', async () => {
+    const findDetected = jest.fn(() => Promise.resolve(detection()));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ findDetected }),
+      {
+        store: jest.fn(),
+        listForDetection: jest.fn(),
+        listCohort: jest.fn(),
+      },
+    );
+
+    await expect(
+      service.getTopOfBookSpreadClassification('binance', 'NEWUSDT', {
+        wideningBasisPoints: '0',
+      }),
+    ).rejects.toThrow('threshold must be a positive decimal');
+    expect(findDetected).not.toHaveBeenCalled();
+  });
+
+  it('rejects spread classification for an unknown detection', async () => {
+    const listForDetection = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(repositoryWith(), {
+      store: jest.fn(),
+      listForDetection,
+      listCohort: jest.fn(),
+    });
+
+    await expect(
+      service.getTopOfBookSpreadClassification('binance', 'UNKNOWNUSDT', {
+        wideningBasisPoints: '100',
+      }),
+    ).rejects.toBeInstanceOf(DetectedSpotSymbolNotFoundError);
+    expect(listForDetection).not.toHaveBeenCalled();
+  });
+
   it('loads and calculates a bounded durable top-of-book cohort', async () => {
     const listCohort = jest.fn(() =>
       Promise.resolve([

@@ -49,6 +49,14 @@ import { ListingTopOfBookSpreadEvolution } from '../domain/listing-top-of-book-s
 import { ListingTopOfBookSpreadEvolutionCalculator } from './listing-top-of-book-spread-evolution-calculator';
 import { ListingTopOfBookSpreadEvolutionCohort } from '../domain/listing-top-of-book-spread-evolution-cohort';
 import { ListingTopOfBookSpreadEvolutionCohortCalculator } from './listing-top-of-book-spread-evolution-cohort-calculator';
+import {
+  ListingTopOfBookSpreadClassification,
+  ListingTopOfBookSpreadThresholds,
+} from '../domain/listing-top-of-book-spread-classification';
+import {
+  ListingTopOfBookSpreadClassifier,
+  validateListingTopOfBookSpreadThresholds,
+} from './listing-top-of-book-spread-classifier';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -83,6 +91,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingTopOfBookSpreadEvolutionCalculator();
   private readonly topOfBookSpreadEvolutionCohort =
     new ListingTopOfBookSpreadEvolutionCohortCalculator();
+  private readonly topOfBookSpreadClassifier =
+    new ListingTopOfBookSpreadClassifier();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -176,6 +186,18 @@ export class SpotSymbolDetectionReadModelService {
     return this.topOfBookSpreadEvolution.calculate(
       await this.listTopOfBook(provider, symbol),
     );
+  }
+
+  async getTopOfBookSpreadClassification(
+    provider: 'binance',
+    symbol: string,
+    thresholds: ListingTopOfBookSpreadThresholds,
+  ): Promise<ListingTopOfBookSpreadClassification | null> {
+    validateListingTopOfBookSpreadThresholds(thresholds);
+    const evolution = await this.getTopOfBookSpreadEvolution(provider, symbol);
+    return evolution
+      ? this.topOfBookSpreadClassifier.classify(evolution, thresholds)
+      : null;
   }
 
   async getPricePerformance(

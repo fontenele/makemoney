@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.78 durable top-of-book spread widening classification completed
+
+- Composed exact spread evolution and explicit-threshold widening classification over one durable detected-symbol book timeline.
+- Validates thresholds before persistence access and preserves unknown-detection versus missing-T+0 semantics.
+- Added no route, derived persistence, cohort statistic, score, alert, signal, or trading behavior.
+- 783 unit tests across 89 suites and all 59 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.77 explicit top-of-book spread widening classification completed
 
 - Added a pure exact-decimal classifier with a mandatory positive spread-widening threshold.

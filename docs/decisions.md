@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-20 — Derive durable spread classification on demand
+
+M7.78 validates the caller's positive widening threshold before repository access and composes the existing durable book timeline, exact spread evolution, and pure classifier. Unknown detection remains distinct from missing T+0, and no mutable classification projection is stored.
+
 ## 2026-09-20 — Require an explicit threshold for spread widening
 
 M7.77 treats widening as an observed descriptive condition, not a score or prediction. The caller must provide a positive basis-point threshold; the classifier records the first qualifying checkpoint and the maximum observed T+0-relative change. A timeline that has not crossed the threshold remains explicitly `no-widening-observed` rather than implying future behavior.
