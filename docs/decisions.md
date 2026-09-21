@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Keep spread magnitude on a separate explicit research route
+
+M7.85 exposes median maximum widening separately from the M7.82 frequency response so its independent threshold-qualified sample remains visible. The route reuses the same mandatory positive `wideningBasisPoints`, provider, and bounded cohort limit contract.
+
+The result is calculated on demand from durable books and remains local, read-only, exact-decimal, and descriptive. It cannot collect, persist a derived projection, score, alert, signal, or trade.
+
 ## 2026-09-20 — Share one durable classification sample across spread statistics
 
 M7.84 centralizes the bounded durable book-to-classification pipeline so classification counts and maximum-widening magnitude cannot drift through different limits, threshold validation, or T+0 eligibility rules. Each public read-model operation still performs one bounded repository query and calculates on demand.

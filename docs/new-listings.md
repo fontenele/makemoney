@@ -497,3 +497,9 @@ The calculator reuses M7.80 cohort validation, requires each maximum magnitude t
 The internal detection read model now applies M7.83 to the same bounded recent durable classification sample used by M7.81. A shared internal loader validates the cohort limit and explicit widening threshold before persistence access, loads T+0-eligible books, derives exact spread evolution, and classifies every usable timeline once per request.
 
 Empty or analytically unusable samples retain the explicit null-median contract. Results are calculated on demand and not persisted. This increment adds no route, provider request, timing statistic, score, alert, signal, or trading behavior.
+
+## M7.85 durable top-of-book spread widening magnitude cohort API
+
+`GET /new-listings/top-of-book/spread/classification/magnitudes` exposes the M7.84 bounded durable magnitude calculation through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it; every request must provide a positive decimal `wideningBasisPoints`.
+
+Invalid query input returns `400` before read-model access. The response preserves the independent observed-widening sample size and nullable exact median. The route cannot collect data, persist a derived result, calculate timing, score, alert, signal, or trade.

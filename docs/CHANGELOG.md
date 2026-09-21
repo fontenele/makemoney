@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.85 durable top-of-book spread widening magnitude cohort API completed
+
+- Added local read-only `GET /new-listings/top-of-book/spread/classification/magnitudes` with bounded provider/limit input and mandatory positive `wideningBasisPoints`.
+- Exposes the independent observed-widening sample size and nullable exact median calculated on demand from durable books.
+- Updated the root API route table; the endpoint cannot collect data, persist a projection, score, alert, signal, or trade.
+- 814 unit tests across 91 suites and all 62 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.84 durable top-of-book spread widening magnitude cohort completed
 
 - Composed median maximum-widening magnitude over the bounded recent durable classification cohort.
