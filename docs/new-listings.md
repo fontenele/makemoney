@@ -485,3 +485,9 @@ Timelines without a usable stored T+0 baseline are excluded defensively, and an 
 `GET /new-listings/top-of-book/spread/classification` exposes the M7.81 bounded durable aggregate through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it; every request must provide a positive decimal `wideningBasisPoints`.
 
 Invalid query input returns `400` before persistence access. The response preserves the explicit total, observed, and not-observed counts and exact observed rate, including nullable empty-sample semantics. The route cannot collect data, persist a derived result, score, alert, signal, or trade.
+
+## M7.83 top-of-book spread widening magnitude cohort calculation
+
+A pure exact-decimal calculator reports the median `maximumWidening.spreadBasisPointsChange` among classifications whose explicit widening threshold was reached. The response carries the independent widening sample size; empty cohorts and cohorts with no observed widening return a null median.
+
+The calculator reuses M7.80 cohort validation, requires each maximum magnitude to be finite and non-negative, and verifies that threshold crossing agrees with the classification status. Even-sized samples average the two central exact-decimal magnitudes. This increment adds no repository access, route, persistence, timing statistic, score, alert, signal, or trading behavior.

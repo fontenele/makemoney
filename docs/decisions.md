@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-20 — Measure widening magnitude only after threshold qualification
+
+M7.83 calculates median maximum widening only from classifications where widening was observed under the caller's explicit threshold. Publishing the independent sample size prevents the magnitude statistic from being confused with the full classification denominator.
+
+Maximum changes must be finite, non-negative, and consistent with the threshold-crossing status. The statistic remains exact-decimal and descriptive, with no durable composition, route, score, alert, signal, or trading behavior.
+
 ## 2026-09-20 — Require an explicit threshold for the spread cohort API
 
 M7.82 exposes the durable widening aggregate without selecting a market hypothesis: every request supplies positive decimal `wideningBasisPoints`. Provider and bounded limit follow the existing local aggregate-route contract, and all query input is validated before persistence access.

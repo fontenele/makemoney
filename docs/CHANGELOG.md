@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — M7.83 top-of-book spread widening magnitude cohort calculation completed
+
+- Added a pure exact-decimal cohort calculator for median maximum widening among threshold-qualified classifications.
+- Publishes an independent observed-widening sample size and null median when no widening qualified.
+- Rejects invalid or status-inconsistent maximum magnitudes without adding database or HTTP behavior.
+- 805 unit tests across 91 suites and all 61 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-20 — M7.82 durable top-of-book spread widening classification cohort API completed
 
 - Added local read-only `GET /new-listings/top-of-book/spread/classification` with bounded provider/limit input and mandatory positive `wideningBasisPoints`.
