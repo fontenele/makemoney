@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-21 — Describe checkpoint variability without annualization
+
+M7.95 measures exact simple returns only between consecutive canonical completed listing checkpoints. It exposes their average absolute magnitude and the earliest maximum absolute transition together with its real scheduled duration, preserving what the sparse observation data actually supports.
+
+The checkpoints are unevenly spaced, so the result is deliberately named variability rather than annualized volatility. It does not interpolate intracheckpoint prices, normalize by time, forecast, classify risk, or invent a listing score; durable composition and HTTP exposure remain separate increments.
+
 ## 2026-09-21 — Expose price-path cohort statistics as a bounded descriptive read
 
 M7.94 exposes the durable aggregate at `GET /new-listings/price-path` with the same provider and bounded limit contract as other observation cohorts. The response keeps total paths distinct from positive drawdowns and does not expose cross-asset absolute-price aggregates.

@@ -203,6 +203,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.92 — complete:** a pure exact-decimal cohort calculator reports median extrema timing and positive maximum-drawdown rate and duration without comparing absolute prices across assets.
 - **M7.93 — complete:** the internal read model composes price-path cohort statistics on demand over the bounded recent durable T+0-eligible observation sample.
 - **M7.94 — complete:** local read-only HTTP access exposes bounded durable price-path timing and positive-drawdown cohort statistics.
+- **M7.95 — complete:** a pure exact-decimal calculator describes consecutive checkpoint-price variability through average absolute return and the earliest maximum absolute transition.
 
 ## M8 — Dashboard — planned
 

@@ -136,6 +136,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | listing price path cohort, median extrema timing, median maximum drawdown, positive drawdown sample, M7.92 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-observation-price-path-cohort-calculator.ts`, `../src/modules/new-listings/domain/listing-observation-price-path-cohort.ts` |
 | durable listing price path cohort, bounded price path cohort loading, M7.93 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-observation-price-path-statistics-calculator.ts`, `../src/modules/new-listings/application/listing-observation-price-path-cohort-calculator.ts` |
 | listing price path cohort API, GET /new-listings/price-path, M7.94 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
+| listing checkpoint price variability, consecutive return, average absolute return, maximum absolute transition, M7.95 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/listing-observation-price-variability-calculator.ts`, `../src/modules/new-listings/domain/listing-observation-price-variability.ts` |
 
 ## Before every task
 

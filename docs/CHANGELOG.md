@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-21 — M7.95 observed listing checkpoint price variability completed
+
+- Added a pure exact-decimal calculator for consecutive checkpoint simple returns, average absolute return, and the earliest maximum absolute transition.
+- Preserved canonical schedule events and actual transition duration, with explicit T+0-only and missing-baseline semantics.
+- Kept the result descriptive and non-annualized; added no repository access, route, persistence, score, alert, signal, strategy simulation, or trading behavior.
+- 855 unit tests across 95 suites and all 65 isolated E2E tests passed together with all 15 migrations, build, lint, formatting, Compose, and diff validation.
+
 ## 2026-09-21 — M7.94 durable listing price-path cohort API completed
 
 - Added local read-only `GET /new-listings/price-path` with optional bounded `limit` and Binance provider input.

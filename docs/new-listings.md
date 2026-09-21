@@ -557,3 +557,9 @@ The derived aggregate remains transient and shares the existing completed-observ
 `GET /new-listings/price-path` exposes the M7.93 bounded durable aggregate through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it. Invalid input returns `400` before read-model access.
 
 The response preserves the total trajectory sample, independent positive-drawdown sample, exact median drawdown rate, and nullable timing medians. Absolute prices remain excluded. The route cannot collect data, persist a projection, score, alert, signal, simulate a strategy, or trade.
+
+## M7.95 observed listing checkpoint price variability
+
+A pure exact-decimal calculator derives simple returns between each pair of consecutive canonical completed checkpoints. It reports the transition count, the average absolute consecutive return, and the earliest transition with the maximum absolute return; that transition retains its from/to schedule events, elapsed milliseconds, signed return, and absolute return.
+
+The calculation requires the explicit T+0 baseline and reuses the existing price-performance validation and canonical ordering. A T+0-only timeline has zero transitions and null variability measures, while a missing T+0 remains unavailable. Because checkpoints are sparse and unevenly spaced, this is descriptive observed variability: it is not annualized volatility, a forecast, or a risk/listing score. This increment adds no repository access, durable composition, route, persistence, cohort aggregate, alert, signal, strategy simulation, or trading behavior.
