@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-26 — M8.6 persisted strategy signal timeline completed
+
+- Added an independent typed request for twenty recent persisted moving-average crossover signals.
+- Added a responsive observational timeline for buy, sell, and hold actions with evaluation times, configured periods, and current exact averages.
+- Added no evaluation, parameter mutation, position sizing, risk assessment, order submission, or real trading path.
+
 ## 2026-09-26 — M8.5 responsive dashboard section navigation completed
 
 - Added semantic header links for Overview, Executions, and New listings using native fragment navigation and explicit section targets.

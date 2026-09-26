@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-09-26 — Keep dashboard strategy history observational
+
+M8.6 reads the existing persisted recent-signal endpoint independently and renders only facts already produced by the strategy. Visual buy and sell markers never become commands and the browser cannot evaluate, configure, size, or execute a signal.
+
 ## 2026-09-26 — Keep first dashboard navigation native and dependency-free
 
 M8.5 uses semantic anchor links and stable section identifiers rather than introducing a client router for one local page. Native fragments preserve keyboard behavior, URL addressability, and browser history while CSS supplies responsive layout and motion preferences.

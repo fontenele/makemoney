@@ -54,3 +54,9 @@ The header exposes semantic anchor navigation to Overview, Executions, and New l
 On narrow screens the links move to a horizontally scrollable second header row rather than disappearing. Reduced-motion preferences continue to disable smooth scrolling through the existing global media rule.
 
 M8.5 adds no router dependency, separate page, browser state, backend request, mutation, authentication, or trading behavior.
+
+## M8.6 persisted strategy signal timeline
+
+The dashboard independently requests the twenty newest persisted moving-average crossover signals and displays action, evaluation time, configured periods, and current short/long averages in a responsive timeline. Buy and sell markers are visual observations only; hold remains neutral.
+
+Empty and unavailable signal histories are explicit and independent. M8.6 adds no strategy evaluation, parameter mutation, sizing, Risk Engine call, order submission, or real trading.

@@ -83,6 +83,25 @@ export interface DetectedSpotSymbol {
   lastObservedAt: string;
 }
 
+export interface StrategySignal {
+  strategy: 'moving_average_crossover';
+  symbol: 'BTC/USDT';
+  action: 'buy' | 'sell' | 'hold';
+  reason:
+    | 'bullish_moving_average_crossover'
+    | 'bearish_moving_average_crossover'
+    | 'no_moving_average_crossover'
+    | 'insufficient_closed_candles';
+  shortPeriod: number;
+  longPeriod: number;
+  previousShortAverage: string | null;
+  previousLongAverage: string | null;
+  currentShortAverage: string | null;
+  currentLongAverage: string | null;
+  latestCandleCloseTime: string | null;
+  evaluatedAt: string;
+}
+
 export type Resource<T> =
   { status: 'available'; data: T } | { status: 'unavailable'; message: string };
 
@@ -93,6 +112,7 @@ export interface DashboardSnapshot {
   performance: Resource<PaperTradingPerformance>;
   executions: Resource<PaperExecution[]>;
   newListings: Resource<DetectedSpotSymbol[]>;
+  strategySignals: Resource<StrategySignal[]>;
   loadedAt: string;
 }
 
@@ -101,21 +121,29 @@ type FetchLike = typeof fetch;
 export async function loadDashboard(
   request: FetchLike = fetch,
 ): Promise<DashboardSnapshot> {
-  const [health, valuation, position, performance, executions, newListings] =
-    await Promise.all([
-      loadResource<HealthResponse>('/api/health', request),
-      loadResource<PortfolioValuation>('/api/paper-wallet/valuation', request),
-      loadResource<PaperPosition>('/api/paper-trading/position', request),
-      loadResource<PaperTradingPerformance>(
-        '/api/paper-trading/performance',
-        request,
-      ),
-      loadResource<PaperExecution[]>(
-        '/api/paper-trading/executions?limit=12',
-        request,
-      ),
-      loadResource<DetectedSpotSymbol[]>('/api/new-listings?limit=8', request),
-    ]);
+  const [
+    health,
+    valuation,
+    position,
+    performance,
+    executions,
+    newListings,
+    strategySignals,
+  ] = await Promise.all([
+    loadResource<HealthResponse>('/api/health', request),
+    loadResource<PortfolioValuation>('/api/paper-wallet/valuation', request),
+    loadResource<PaperPosition>('/api/paper-trading/position', request),
+    loadResource<PaperTradingPerformance>(
+      '/api/paper-trading/performance',
+      request,
+    ),
+    loadResource<PaperExecution[]>(
+      '/api/paper-trading/executions?limit=12',
+      request,
+    ),
+    loadResource<DetectedSpotSymbol[]>('/api/new-listings?limit=8', request),
+    loadResource<StrategySignal[]>('/api/strategies/signals?limit=20', request),
+  ]);
 
   return {
     health,
@@ -124,6 +152,7 @@ export async function loadDashboard(
     performance,
     executions,
     newListings,
+    strategySignals,
     loadedAt: new Date().toISOString(),
   };
 }

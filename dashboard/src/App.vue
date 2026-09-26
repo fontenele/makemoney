@@ -90,6 +90,7 @@ onUnmounted(() => autoRefresh.stop());
       <nav class="section-nav" aria-label="Dashboard sections">
         <a href="#overview">Overview</a>
         <a href="#executions">Executions</a>
+        <a href="#strategy">Strategy</a>
         <a href="#new-listings">New listings</a>
       </nav>
 
@@ -353,6 +354,57 @@ onUnmounted(() => autoRefresh.stop());
       </template>
       <p v-else class="empty-state execution-empty">
         {{ snapshot?.executions.message ?? 'Loading execution history…' }}
+      </p>
+    </section>
+
+    <section
+      id="strategy"
+      class="panel strategy-panel"
+      aria-labelledby="strategy-title"
+    >
+      <div class="panel-heading execution-heading">
+        <div>
+          <p class="eyebrow">Observed only · never executed</p>
+          <h2 id="strategy-title">Strategy signal history</h2>
+        </div>
+        <span class="history-limit">Latest 20 · MA crossover</span>
+      </div>
+
+      <template v-if="available(snapshot?.strategySignals)">
+        <p
+          v-if="snapshot.strategySignals.data.length === 0"
+          class="empty-state execution-empty"
+        >
+          No persisted strategy signals yet.
+        </p>
+        <ol v-else class="signal-timeline">
+          <li
+            v-for="signal in snapshot.strategySignals.data"
+            :key="`${signal.strategy}:${signal.latestCandleCloseTime ?? signal.evaluatedAt}`"
+            :class="`signal-${signal.action}`"
+          >
+            <span class="signal-marker" aria-hidden="true"></span>
+            <div class="signal-summary">
+              <b>{{ signal.action }}</b>
+              <time :datetime="signal.evaluatedAt">
+                {{ timestamp(signal.evaluatedAt) }}
+              </time>
+            </div>
+            <div class="signal-averages">
+              <span>
+                Short {{ signal.shortPeriod }}
+                <strong>{{ decimal(signal.currentShortAverage) }}</strong>
+              </span>
+              <span>
+                Long {{ signal.longPeriod }}
+                <strong>{{ decimal(signal.currentLongAverage) }}</strong>
+              </span>
+            </div>
+          </li>
+        </ol>
+      </template>
+      <p v-else class="empty-state execution-empty">
+        {{ snapshot?.strategySignals.message ?? 'Loading strategy signals…' }}
       </p>
     </section>
 

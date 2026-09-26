@@ -485,6 +485,7 @@ h1 em {
 
 #overview,
 #executions,
+#strategy,
 #new-listings {
   scroll-margin-top: 24px;
 }
@@ -568,6 +569,82 @@ h1 em {
 
 .execution-empty {
   margin: 30px 0 8px;
+}
+
+.strategy-panel {
+  min-height: 0;
+  margin-bottom: 64px;
+}
+
+.signal-timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.signal-timeline li {
+  display: grid;
+  grid-template-columns: 14px 1fr 1fr;
+  gap: 18px;
+  align-items: center;
+  min-height: 62px;
+  border-top: 1px solid var(--line);
+}
+
+.signal-marker {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #60726b;
+}
+
+.signal-buy .signal-marker {
+  background: var(--green-bright);
+  box-shadow: 0 0 12px rgba(56, 232, 143, 0.45);
+}
+
+.signal-sell .signal-marker {
+  background: var(--red);
+}
+
+.signal-summary,
+.signal-averages {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.signal-summary b {
+  min-width: 34px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.signal-buy .signal-summary b {
+  color: var(--green-bright);
+}
+
+.signal-sell .signal-summary b {
+  color: var(--red);
+}
+
+.signal-summary time,
+.signal-averages {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 10px;
+}
+
+.signal-averages {
+  justify-content: flex-end;
+  gap: 28px;
+}
+
+.signal-averages strong {
+  margin-left: 6px;
+  color: var(--ink);
+  font-weight: 400;
 }
 
 .listings-panel {
@@ -738,6 +815,16 @@ footer {
   .listing-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .signal-timeline li {
+    grid-template-columns: 14px 1fr;
+    padding: 14px 0;
+  }
+
+  .signal-averages {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 480px) {
@@ -784,6 +871,17 @@ footer {
 
   .listings-panel {
     margin-bottom: 48px;
+  }
+
+  .strategy-panel {
+    margin-bottom: 48px;
+  }
+
+  .signal-summary,
+  .signal-averages {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
   }
 
   .listing-grid {
