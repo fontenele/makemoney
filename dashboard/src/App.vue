@@ -53,6 +53,18 @@ function tone(value: string | null | undefined): string {
   return parsed > 0 ? 'positive' : parsed < 0 ? 'negative' : 'neutral';
 }
 
+function timestamp(value: string): string {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return '—';
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(parsed);
+}
+
 function available<T>(resource: Resource<T> | undefined): resource is {
   status: 'available';
   data: T;
@@ -263,6 +275,75 @@ onUnmounted(() => autoRefresh.stop());
           {{ snapshot?.performance.message ?? 'Loading performance…' }}
         </p>
       </article>
+    </section>
+
+    <section class="panel execution-panel" aria-labelledby="execution-title">
+      <div class="panel-heading execution-heading">
+        <div>
+          <p class="eyebrow">Immutable paper ledger</p>
+          <h2 id="execution-title">Recent executions</h2>
+        </div>
+        <span class="history-limit">Latest 12</span>
+      </div>
+
+      <template v-if="available(snapshot?.executions)">
+        <p
+          v-if="snapshot.executions.data.length === 0"
+          class="empty-state execution-empty"
+        >
+          No fictional executions recorded yet.
+        </p>
+        <div
+          v-else
+          class="execution-table"
+          role="table"
+          aria-label="Recent fictional executions"
+        >
+          <div class="execution-row execution-header" role="row">
+            <span role="columnheader">Side / time</span>
+            <span role="columnheader">Quantity</span>
+            <span role="columnheader">Price</span>
+            <span role="columnheader">Settlement</span>
+          </div>
+          <div
+            v-for="execution in snapshot.executions.data"
+            :key="execution.id"
+            class="execution-row"
+            role="row"
+          >
+            <span class="execution-identity" role="cell">
+              <b :class="execution.side">{{ execution.side }}</b>
+              <time :datetime="execution.executedAt">
+                {{ timestamp(execution.executedAt) }}
+              </time>
+            </span>
+            <span role="cell">
+              <small>Quantity</small>
+              {{ decimal(execution.quantity, 8) }} BTC
+            </span>
+            <span role="cell">
+              <small>Price</small>
+              {{ decimal(execution.price) }} USDT
+            </span>
+            <span role="cell">
+              <small>
+                {{ execution.side === 'buy' ? 'Total cost' : 'Net proceeds' }}
+              </small>
+              {{
+                decimal(
+                  execution.side === 'buy'
+                    ? execution.totalCost
+                    : execution.netProceeds,
+                )
+              }}
+              USDT
+            </span>
+          </div>
+        </div>
+      </template>
+      <p v-else class="empty-state execution-empty">
+        {{ snapshot?.executions.message ?? 'Loading execution history…' }}
+      </p>
     </section>
 
     <footer>

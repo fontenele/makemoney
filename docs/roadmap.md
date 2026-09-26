@@ -225,6 +225,7 @@ Vue 3/Vite interface and market/portfolio visualizations.
 
 - **M8.1 — complete:** a separate loopback-only Vue 3/Vite dashboard reads local health, fictional portfolio valuation, BTC paper position, and realized paper performance with typed independent unavailable states and no mutation or execution path.
 - **M8.2 — complete:** the overview refreshes immediately and then on a non-overlapping completion-relative 15-second cadence, pauses pending work while hidden, and refreshes when the tab becomes visible again.
+- **M8.3 — complete:** a responsive read-only ledger displays the twelve most recent immutable fictional executions with side-specific settlement values and an independent unavailable state.
 - Historical charts, new-listing research views, navigation, and production serving remain deferred to separately verified increments.
 
 ## M9 — Polymarket — planned

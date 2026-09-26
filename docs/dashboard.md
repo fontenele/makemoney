@@ -30,3 +30,11 @@ The overview loads immediately and schedules its next refresh 15 seconds after t
 The scheduler cancels pending work while the document is hidden. When the tab becomes visible, it refreshes immediately and starts a new completion-relative interval. Component teardown removes the visibility listener and pending timer.
 
 M8.2 adds no backend route, persistent browser state, background work while hidden, mutation control, order path, authenticated exchange access, or real trading.
+
+## M8.3 recent fictional execution ledger
+
+The overview independently requests `GET /paper-trading/executions?limit=12` and displays the newest immutable paper executions as a responsive ledger. Each row identifies the buy or sell side, execution time, BTC quantity, execution price, and the side-appropriate total cost or net proceeds.
+
+An empty history is distinct from an unavailable history. A history request failure affects only the ledger; health, valuation, position, and performance remain visible when their requests succeed. Decimal formatting is presentational and the backend remains the source of all stored financial values.
+
+M8.3 adds no chart inference, pagination, mutation, execution control, browser persistence, backend route, authenticated exchange access, or real trading.

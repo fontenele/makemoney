@@ -46,6 +46,32 @@ export interface PaperTradingPerformance {
   totalFees: string;
 }
 
+interface PaperExecutionBase {
+  id: string;
+  symbol: 'BTC/USDT';
+  quantity: string;
+  price: string;
+  notional: string;
+  feeRate: string;
+  fee: string;
+  quotedAt: string;
+  marketDataReceivedAt: string;
+  executedAt: string;
+  replayed: false;
+}
+
+export interface PaperBuyExecution extends PaperExecutionBase {
+  side: 'buy';
+  totalCost: string;
+}
+
+export interface PaperSellExecution extends PaperExecutionBase {
+  side: 'sell';
+  netProceeds: string;
+}
+
+export type PaperExecution = PaperBuyExecution | PaperSellExecution;
+
 export type Resource<T> =
   { status: 'available'; data: T } | { status: 'unavailable'; message: string };
 
@@ -54,6 +80,7 @@ export interface DashboardSnapshot {
   valuation: Resource<PortfolioValuation>;
   position: Resource<PaperPosition>;
   performance: Resource<PaperTradingPerformance>;
+  executions: Resource<PaperExecution[]>;
   loadedAt: string;
 }
 
@@ -62,21 +89,27 @@ type FetchLike = typeof fetch;
 export async function loadDashboard(
   request: FetchLike = fetch,
 ): Promise<DashboardSnapshot> {
-  const [health, valuation, position, performance] = await Promise.all([
-    loadResource<HealthResponse>('/api/health', request),
-    loadResource<PortfolioValuation>('/api/paper-wallet/valuation', request),
-    loadResource<PaperPosition>('/api/paper-trading/position', request),
-    loadResource<PaperTradingPerformance>(
-      '/api/paper-trading/performance',
-      request,
-    ),
-  ]);
+  const [health, valuation, position, performance, executions] =
+    await Promise.all([
+      loadResource<HealthResponse>('/api/health', request),
+      loadResource<PortfolioValuation>('/api/paper-wallet/valuation', request),
+      loadResource<PaperPosition>('/api/paper-trading/position', request),
+      loadResource<PaperTradingPerformance>(
+        '/api/paper-trading/performance',
+        request,
+      ),
+      loadResource<PaperExecution[]>(
+        '/api/paper-trading/executions?limit=12',
+        request,
+      ),
+    ]);
 
   return {
     health,
     valuation,
     position,
     performance,
+    executions,
     loadedAt: new Date().toISOString(),
   };
 }

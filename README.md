@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M7 and M8.1–M8.2 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M7 and M8.1–M8.3 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -37,7 +37,7 @@ Start the read-only dashboard separately after the API is listening on port 3000
 npm run dashboard:dev
 ```
 
-Open `http://127.0.0.1:5173`. The Vite development server is loopback-only and proxies `/api` to the local NestJS API. The dashboard shows health, fictional portfolio valuation, BTC paper position, and realized paper performance; each unavailable API resource remains explicitly unavailable instead of being replaced with fabricated data. It refreshes every 15 seconds after the preceding load completes, pauses while the tab is hidden, and refreshes immediately when the tab becomes visible again.
+Open `http://127.0.0.1:5173`. The Vite development server is loopback-only and proxies `/api` to the local NestJS API. The dashboard shows health, fictional portfolio valuation, BTC paper position, realized paper performance, and the twelve most recent fictional executions; each unavailable API resource remains explicitly unavailable instead of being replaced with fabricated data. It refreshes every 15 seconds after the preceding load completes, pauses while the tab is hidden, and refreshes immediately when the tab becomes visible again.
 
 ## Docker Compose
 

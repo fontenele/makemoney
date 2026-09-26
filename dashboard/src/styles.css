@@ -433,6 +433,92 @@ h1 em {
   border-top: 1px solid var(--line);
 }
 
+.execution-panel {
+  min-height: 0;
+  margin-bottom: 64px;
+}
+
+.execution-heading {
+  align-items: center;
+  padding-bottom: 26px;
+}
+
+.history-limit {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.execution-table {
+  border-top: 1px solid var(--line);
+}
+
+.execution-row {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr 1.15fr;
+  gap: 24px;
+  align-items: center;
+  min-height: 72px;
+  border-bottom: 1px solid var(--line);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 12px;
+}
+
+.execution-row > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.execution-row small {
+  display: none;
+}
+
+.execution-header {
+  min-height: 38px;
+  color: #60726b;
+  font-family: Inter, Avenir, 'Segoe UI', system-ui, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.execution-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.execution-identity b {
+  min-width: 42px;
+  padding: 5px 7px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.execution-identity b.buy {
+  color: var(--green-bright);
+}
+
+.execution-identity b.sell {
+  color: var(--red);
+}
+
+.execution-identity time {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.execution-empty {
+  margin: 30px 0 8px;
+}
+
 .empty-state {
   color: var(--muted) !important;
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
@@ -495,6 +581,15 @@ footer {
   .detail-grid {
     gap: 14px;
   }
+
+  .execution-row {
+    grid-template-columns: 1.2fr 1fr 1fr;
+  }
+
+  .execution-row > span:last-child,
+  .execution-header > span:last-child {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -533,6 +628,34 @@ footer {
     align-items: flex-start;
     flex-direction: column;
     gap: 12px;
+  }
+
+  .execution-panel {
+    margin-bottom: 48px;
+  }
+
+  .execution-header {
+    display: none;
+  }
+
+  .execution-row {
+    grid-template-columns: 1fr;
+    gap: 13px;
+    padding: 20px 0;
+  }
+
+  .execution-row > span:last-child {
+    display: block;
+  }
+
+  .execution-row small {
+    display: block;
+    margin-bottom: 5px;
+    color: #60726b;
+    font-family: Inter, Avenir, 'Segoe UI', system-ui, sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
   }
 
   footer {

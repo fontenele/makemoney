@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-26 — Reuse immutable paper executions for the first dashboard history
+
+M8.3 reads the existing bounded `GET /paper-trading/executions` audit surface instead of introducing a dashboard-specific backend or reconstructing history from portfolio totals. The client requests twelve newest records as a separate resource and preserves the backend's buy/sell settlement distinction.
+
+Execution history has its own unavailable and empty states, so a history failure cannot hide health, valuation, position, or performance. The ledger is observational only and introduces no mutation control, chart-derived inference, browser persistence, or execution coupling.
+
 ## 2026-09-26 — Make dashboard refresh completion-relative and visibility-aware
 
 M8.2 keeps refresh scheduling in a small browser-side lifecycle boundary. The next 15-second timer begins only after the preceding load settles, and all refresh entry points share the existing execution guard. This avoids overlapping API batches when a request is slow.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-26 — M8.3 recent fictional execution ledger completed
+
+- Added an independent typed request for the twelve newest persisted paper executions.
+- Added a responsive read-only ledger showing side, execution time, BTC quantity, price, and side-specific total cost or net proceeds, with explicit empty and unavailable states.
+- Added focused client coverage proving an unavailable execution history does not suppress the healthy overview resources.
+- Added no backend route, mutation, order action, browser persistence, provider request, authenticated exchange access, or real trading path.
+
 ## 2026-09-26 — M8.2 visibility-aware automatic dashboard refresh completed
 
 - Added immediate and completion-relative 15-second overview refreshes without overlapping requests.
