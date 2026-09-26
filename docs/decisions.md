@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-26 — Serve compiled dashboard under a dedicated local prefix
+
+M8.10 uses the already installed NestJS Express adapter to serve dashboard-dist under /dashboard/ instead of adding another server or dependency. Vite applies that base only during production builds, so the loopback-only development server remains unchanged.
+
+Production dashboard requests target the established root API routes on the same origin. No /api alias is added to the NestJS application, keeping the public route contract unchanged. Static files inherit the application's existing loopback binding and do not broaden network exposure.
+
 ## 2026-09-26 — Plot persisted backtest equity without recalculation
 
 M8.9 requests the established stored-run list with limit one instead of adding a dashboard-specific route or triggering a simulation. The immutable snapshot already contains the exact fee-adjusted candle-close equity curve and all displayed summary values.

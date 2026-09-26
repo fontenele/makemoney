@@ -219,7 +219,7 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 - **M7.108 — complete:** the internal read model composes the outcome cohort on demand over the bounded recent durable top-of-book cohort without adding an HTTP route or trading behavior.
 - **M7.109 — complete:** local read-only HTTP access exposes the bounded durable round-trip outcome cohort with mandatory explicit selection/cost inputs and established limit/provider validation.
 
-## M8 — Dashboard — in progress
+## M8 — Dashboard — complete
 
 Vue 3/Vite interface and market/portfolio visualizations.
 
@@ -232,7 +232,8 @@ Vue 3/Vite interface and market/portfolio visualizations.
 - **M8.7 — complete:** a chronological read-only SVG chart compares the persisted short and long moving averages on one scale and marks observed buy/sell signals without recalculating strategy decisions.
 - **M8.8 — complete:** selecting a recent detection loads its existing exact T+0 checkpoint performance and displays a zero-anchored return chart plus checkpoint facts without ranking or recommendation.
 - **M8.9 — complete:** the newest immutable stored backtest is displayed with its backend-calculated fee-adjusted equity curve, ROI, drawdown, and closed-trade facts without simulation or mutation controls.
-- Live price/portfolio-equity history, additional new-listing research views, and production serving remain deferred to separately verified increments.
+- **M8.10 — complete:** compiled Vite assets are served from the loopback-bound NestJS application at /dashboard/, with a build-only asset base and same-origin root API requests.
+- Live price/portfolio-equity history and additional research views remain optional post-M8 enhancements.
 
 ## M9 — Polymarket — planned
 

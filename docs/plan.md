@@ -1709,7 +1709,7 @@ M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
-M8 — Dashboard                    IN PROGRESS (M8.1–M8.9 DONE)
+M8 — Dashboard                    DONE (M8.1–M8.10)
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
 ```
@@ -2393,6 +2393,7 @@ M8.6 Persisted Strategy Signal Timeline: DONE
 M8.7 Moving-Average Signal Chart: DONE
 M8.8 Selected-Listing Checkpoint Research: DONE
 M8.9 Latest Persisted Backtest Equity: DONE
+M8.10 Compiled Dashboard Serving: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2411,5 +2412,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M8.9 is complete. The next bounded dashboard increment may add another existing read-only research surface or production asset serving; automatic execution controls, authenticated exchange access, and real trading remain separate.
+M8 is complete through M8.10. M9 Polymarket remains the next planned milestone; automatic execution controls, authenticated exchange access, and real trading remain separate M10 work.
 ```

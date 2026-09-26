@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M7 and M8.1–M8.9 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M8 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -39,6 +39,15 @@ npm run dashboard:dev
 
 Open `http://127.0.0.1:5173`. The Vite development server is loopback-only and proxies `/api` to the local NestJS API. The dashboard shows health, fictional portfolio valuation, BTC paper position, realized paper performance, the twelve most recent fictional executions, and eight recent application-detected new listings; responsive header links navigate among those sections. Each unavailable API resource remains explicitly unavailable instead of being replaced with fabricated data. It refreshes every 15 seconds after the preceding load completes, pauses while the tab is hidden, and refreshes immediately when the tab becomes visible again.
 
+For the compiled same-origin dashboard, build both applications and start the production entry point:
+
+```bash
+npm run build:all
+npm run start:prod
+```
+
+Open `http://127.0.0.1:3000/dashboard/`. The generated assets and existing API share the same loopback-bound NestJS listener; no separate dashboard server or API alias is used.
+
 ## Docker Compose
 
 Start Docker Desktop (or another Docker daemon), then run. The API container applies pending Prisma migrations before starting:
@@ -61,6 +70,7 @@ Local base URL: `http://localhost:3000`. Docker Compose publishes it on host loo
 
 | Method   | Route                                                             | Purpose                                                                                                     | Access and parameters                                                                                                                                                                                                                                                                               |
 | -------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET`    | `/dashboard/`                                                      | Compiled read-only local dashboard                                                                          | Local static assets on the existing loopback-bound application; run `npm run build:all` before `npm run start:prod`                                                                                                                                                                               |
 | `GET`    | `/health`                                                         | API, PostgreSQL, and Redis health                                                                           | Local, read-only                                                                                                                                                                                                                                                                                    |
 | `GET`    | `/paper-wallet/balances`                                          | Current fictional BTC and USDT balances                                                                     | Local, read-only                                                                                                                                                                                                                                                                                    |
 | `GET`    | `/paper-wallet/valuation`                                         | Fictional portfolio valuation in USDT                                                                       | Local, read-only; returns `503` without a fresh market price                                                                                                                                                                                                                                        |
@@ -107,7 +117,7 @@ Local base URL: `http://localhost:3000`. Docker Compose publishes it on host loo
 | `GET`    | `/backtesting/runs/:id`                                           | Retrieve one immutable fictional simulation snapshot                                                        | Local, read-only; UUID path parameter; returns `400` for an invalid UUID, `404` when absent, and `503` when unavailable                                                                                                                                                                             |
 | `DELETE` | `/backtesting/runs/:id`                                           | Delete one stored fictional simulation snapshot                                                             | Local, destructive; UUID path parameter; returns `204` when deleted, `400` for an invalid UUID, `404` when absent, and `503` when unavailable; historical candles are preserved                                                                                                                     |
 
-There are no public balance-mutation, order-submission, strategy-mutation, dashboard, exchange-account, or real-trading routes.
+There are no public balance-mutation, order-submission, strategy-mutation, exchange-account, or real-trading routes. The dashboard route serves static read-only assets only.
 
 ## Quality checks
 
@@ -115,7 +125,7 @@ There are no public balance-mutation, order-submission, strategy-mutation, dashb
 npm run format:check
 npm run lint
 npm test
-npm run build
+npm run build:all
 docker compose config
 ```
 

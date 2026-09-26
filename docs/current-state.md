@@ -74,7 +74,7 @@ M7.33 exposes explicit-threshold durable classification through a local read-onl
 
 M7.34 calculates descriptive pump/correction cohort counts and exact rates as a pure internal research rule. M7.35 composes that rule over the bounded durable T+0-eligible cohort, M7.36 exposes it through a local read-only route, M7.37–M7.39 calculate, durably compose, and expose median observed magnitudes, M7.40–M7.42 calculate, durably compose, and expose median observed pattern timing, M7.43–M7.45 calculate, durably compose, and expose descriptive rolling-window market activity, M7.46–M7.88 establish listing top-of-book collection and descriptive analysis through spread-widening timing exposure, M7.89–M7.100 establish descriptive price-path and variability calculations, durable composition, and local exposure, and M7.101–M7.109 establish explicit cost-adjusted checkpoint round-trip calculation, durable composition, local exposure, cohort calculation/composition/exposure, outcome cohort calculation/composition, and local exposure.
 
-M0 through M7 are complete. M8.1–M8.9 provide a read-only local dashboard with independent portfolio, execution, listing, persisted strategy-signal, selected-listing checkpoint research, and latest stored-backtest views, chronological charts, visibility-aware refresh, and responsive navigation. No dashboard mutation, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M8 are complete. The read-only local dashboard provides independent portfolio, execution, listing, persisted strategy-signal, selected-listing checkpoint research, and latest stored-backtest views, chronological charts, visibility-aware refresh, responsive navigation, and compiled same-origin serving. No dashboard mutation, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -196,6 +196,7 @@ M0 through M7 are complete. M8.1–M8.9 provide a read-only local dashboard with
 - M8.7 derives a chronological shared-scale SVG chart of the persisted short and long averages and marks observed buy/sell points without recalculating signals.
 - M8.8 loads one explicitly selected detection's existing exact T+0-relative performance and displays its zero-anchored checkpoint return path with explicit pending/unavailable states.
 - M8.9 independently loads only the newest immutable stored simulation and displays its backend-calculated fee-adjusted equity curve, capital, ROI, drawdown, closed-trade count, and win rate.
+- M8.10 serves generated Vite assets under /dashboard/ from the existing loopback-bound NestJS Express application while production assets call the unchanged same-origin root API routes.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -313,6 +314,7 @@ M0 through M7 are complete. M8.1–M8.9 provide a read-only local dashboard with
 ## Local endpoints and ports
 
 - API: `http://localhost:3000` (Compose host-loopback only)
+- Compiled dashboard: `http://localhost:3000/dashboard/`
 - Health: `http://localhost:3000/health`
 - Paper balances: `http://localhost:3000/paper-wallet/balances`
 - Paper valuation: `http://localhost:3000/paper-wallet/valuation`
@@ -353,14 +355,14 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-26 after M8.9:
+The following passed on 2026-09-26 after M8.10:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
 - `npm test -- --runInBand` — 918 backend tests passed across 99 suites
-- `npm run test:dashboard` — 18 dashboard client, refresh-scheduler, API-isolation, and chart-transformation tests passed
-- `npm run build:dashboard`
+- `npm run test:dashboard` — 19 dashboard client, refresh-scheduler, API-path, API-isolation, and chart-transformation tests passed
+- `npm run build:all`
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -370,6 +372,7 @@ The complete database-backed integration validation passed after E2E isolation:
 - The E2E global setup recreates and migrates only its dedicated schema; local application balances, executions, controls, signals, candles, and runs are not read or changed.
 - `npx prisma migrate deploy` — all fifteen migrations applied, including exact checkpoint top-of-book storage
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
+- Live production entry point — `GET /dashboard/` returned HTML, its hashed asset returned 200 under `/dashboard/assets/`, production API paths omitted the development proxy prefix, and `GET /health` remained healthy.
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live Binance historical-candle smoke test — the public market-data-only kline endpoint returned ordered BTCUSDT one-minute rows with the documented 12 fields and no credentials
 - Live paper wallet initialization — reported BTC `0` and USDT `1000` from the default configuration
@@ -379,7 +382,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.109 and M8.1–M8.9 are implemented and verified milestone increments. Automated browser visual inspection was not completed for M8.9; type-check, production build, and client behavior tests passed.
+M0 through M8.10 are implemented and verified milestone increments. The production entry point served dashboard HTML and its hashed asset at /dashboard/ while the unchanged health API remained available. Automated browser visual inspection was not completed for M8.10; type-check, production build, live HTTP, and client behavior tests passed.
 
 ## Known issues and cautions
 

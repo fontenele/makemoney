@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-26 — M8.10 compiled dashboard serving completed
+
+- Served generated dashboard assets from the existing loopback-bound NestJS Express application under /dashboard/.
+- Added build-only Vite asset paths and same-origin production API paths while retaining the separate development proxy.
+- Added a complete build script and corrected the production entry point to the actual TypeScript output path.
+- Verified the production script, dashboard HTML, hashed asset, and health API live without adding mutation, authentication changes, external exposure, or trading behavior.
+
 ## 2026-09-26 — M8.9 latest persisted backtest equity completed
 
 - Added an independent bounded request for the newest immutable stored simulation snapshot.

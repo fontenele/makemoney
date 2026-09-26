@@ -84,3 +84,16 @@ The dashboard independently requests only the newest immutable simulation snapsh
 An empty stored-run list and an unavailable run resource are explicit and do not suppress any other dashboard section. Browser numeric conversion is limited to chart coordinates and labels; the exact result strings remain authoritative.
 
 M8.9 adds no backtest execution control, simulation request, run persistence or deletion, recalculation, market-data request, wallet effect, recommendation, order submission, or real trading.
+
+## M8.10 compiled dashboard serving
+
+The NestJS Express adapter serves generated dashboard assets under /dashboard/. Vite production builds use /dashboard/ as their asset base and call the existing same-origin root API routes directly, while the development server remains at 127.0.0.1:5173 with its /api proxy.
+
+Run the complete build and production entry point:
+
+    npm run build:all
+    npm run start:prod
+
+Then open http://127.0.0.1:3000/dashboard/. Static serving remains on the application's existing loopback-bound listener and does not create API aliases or change controller routes.
+
+M8.10 adds no client-side router, external hosting, authentication change, mutation control, order submission, exchange credentials, or real trading.

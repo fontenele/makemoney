@@ -1,5 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
-import { loadDashboard, loadListingPerformance } from './api';
+import { dashboardApiPath, loadDashboard, loadListingPerformance } from './api';
+
+describe('dashboardApiPath', () => {
+  it('uses the Vite proxy only during development', () => {
+    expect(dashboardApiPath('/health', true)).toBe('/api/health');
+    expect(dashboardApiPath('/health', false)).toBe('/health');
+  });
+});
 
 describe('loadDashboard', () => {
   it('loads every read-only resource independently', async () => {

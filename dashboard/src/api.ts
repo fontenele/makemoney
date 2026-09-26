@@ -181,6 +181,13 @@ export interface DashboardSnapshot {
 
 type FetchLike = typeof fetch;
 
+export function dashboardApiPath(
+  path: string,
+  development = import.meta.env.DEV,
+): string {
+  return development ? '/api' + path : path;
+}
+
 export async function loadDashboard(
   request: FetchLike = fetch,
 ): Promise<DashboardSnapshot> {
@@ -194,20 +201,35 @@ export async function loadDashboard(
     strategySignals,
     backtestRuns,
   ] = await Promise.all([
-    loadResource<HealthResponse>('/api/health', request),
-    loadResource<PortfolioValuation>('/api/paper-wallet/valuation', request),
-    loadResource<PaperPosition>('/api/paper-trading/position', request),
+    loadResource<HealthResponse>(dashboardApiPath('/health'), request),
+    loadResource<PortfolioValuation>(
+      dashboardApiPath('/paper-wallet/valuation'),
+      request,
+    ),
+    loadResource<PaperPosition>(
+      dashboardApiPath('/paper-trading/position'),
+      request,
+    ),
     loadResource<PaperTradingPerformance>(
-      '/api/paper-trading/performance',
+      dashboardApiPath('/paper-trading/performance'),
       request,
     ),
     loadResource<PaperExecution[]>(
-      '/api/paper-trading/executions?limit=12',
+      dashboardApiPath('/paper-trading/executions?limit=12'),
       request,
     ),
-    loadResource<DetectedSpotSymbol[]>('/api/new-listings?limit=8', request),
-    loadResource<StrategySignal[]>('/api/strategies/signals?limit=20', request),
-    loadResource<StoredBacktestRun[]>('/api/backtesting/runs?limit=1', request),
+    loadResource<DetectedSpotSymbol[]>(
+      dashboardApiPath('/new-listings?limit=8'),
+      request,
+    ),
+    loadResource<StrategySignal[]>(
+      dashboardApiPath('/strategies/signals?limit=20'),
+      request,
+    ),
+    loadResource<StoredBacktestRun[]>(
+      dashboardApiPath('/backtesting/runs?limit=1'),
+      request,
+    ),
   ]);
 
   return {
@@ -229,7 +251,13 @@ export function loadListingPerformance(
   request: FetchLike = fetch,
 ): Promise<Resource<ListingPerformance>> {
   return loadResource<ListingPerformance>(
-    `/api/new-listings/${encodeURIComponent(provider)}/${encodeURIComponent(symbol)}/performance`,
+    dashboardApiPath(
+      '/new-listings/' +
+        encodeURIComponent(provider) +
+        '/' +
+        encodeURIComponent(symbol) +
+        '/performance',
+    ),
     request,
   );
 }
