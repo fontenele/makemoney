@@ -230,7 +230,8 @@ Vue 3/Vite interface and market/portfolio visualizations.
 - **M8.5 — complete:** semantic responsive header navigation links the overview, recent executions, and new-listing sections with keyboard focus and native fragment behavior.
 - **M8.6 — complete:** a responsive read-only timeline displays the twenty newest persisted moving-average signals and their exact current averages without connecting signals to execution.
 - **M8.7 — complete:** a chronological read-only SVG chart compares the persisted short and long moving averages on one scale and marks observed buy/sell signals without recalculating strategy decisions.
-- Price/equity charts, deeper new-listing research views, and production serving remain deferred to separately verified increments.
+- **M8.8 — complete:** selecting a recent detection loads its existing exact T+0 checkpoint performance and displays a zero-anchored return chart plus checkpoint facts without ranking or recommendation.
+- Price/equity charts, additional new-listing research views, and production serving remain deferred to separately verified increments.
 
 ## M9 — Polymarket — planned
 

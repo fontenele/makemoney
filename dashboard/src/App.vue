@@ -1,14 +1,26 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { loadDashboard, type DashboardSnapshot, type Resource } from './api';
+import {
+  loadDashboard,
+  loadListingPerformance,
+  type DashboardSnapshot,
+  type DetectedSpotSymbol,
+  type ListingPerformance,
+  type Resource,
+} from './api';
 import {
   createDashboardAutoRefresh,
   DASHBOARD_REFRESH_INTERVAL_MS,
 } from './auto-refresh';
 import { buildSignalChart } from './signal-chart';
+import { buildListingPerformanceChart } from './listing-performance-chart';
 
 const snapshot = ref<DashboardSnapshot | null>(null);
 const refreshing = ref(false);
+const selectedListing = ref<DetectedSpotSymbol | null>(null);
+const listingPerformance = ref<Resource<ListingPerformance> | null>(null);
+const listingPerformanceLoading = ref(false);
+let listingPerformanceRequest = 0;
 
 const apiOnline = computed(() => snapshot.value?.health.status === 'available');
 const signalChart = computed(() =>
@@ -16,12 +28,48 @@ const signalChart = computed(() =>
     ? buildSignalChart(snapshot.value.strategySignals.data)
     : null,
 );
+const listingChart = computed(() =>
+  listingPerformance.value?.status === 'available'
+    ? buildListingPerformanceChart(listingPerformance.value.data)
+    : null,
+);
+const availableListingPerformance = computed(() =>
+  listingPerformance.value?.status === 'available'
+    ? listingPerformance.value.data
+    : null,
+);
+const listingPerformanceMessage = computed(() => {
+  if (listingPerformance.value?.status !== 'unavailable') return null;
+  return listingPerformance.value.message === 'Unavailable (503)'
+    ? 'Awaiting the durable T+0 observation.'
+    : listingPerformance.value.message;
+});
+
+async function refreshListingPerformance(
+  listing: DetectedSpotSymbol,
+): Promise<void> {
+  const request = ++listingPerformanceRequest;
+  listingPerformanceLoading.value = true;
+  const result = await loadListingPerformance(listing.provider, listing.symbol);
+  if (request !== listingPerformanceRequest) return;
+  listingPerformance.value = result;
+  listingPerformanceLoading.value = false;
+}
+
+function selectListing(listing: DetectedSpotSymbol): void {
+  selectedListing.value = listing;
+  listingPerformance.value = null;
+  void refreshListingPerformance(listing);
+}
 
 async function refresh(): Promise<void> {
   if (refreshing.value) return;
   refreshing.value = true;
   try {
     snapshot.value = await loadDashboard();
+    if (selectedListing.value) {
+      await refreshListingPerformance(selectedListing.value);
+    }
   } finally {
     refreshing.value = false;
   }
@@ -57,6 +105,12 @@ function tone(value: string | null | undefined): string {
   if (value === null || value === undefined) return 'neutral';
   const parsed = Number(value);
   return parsed > 0 ? 'positive' : parsed < 0 ? 'negative' : 'neutral';
+}
+
+function percentage(value: string): string {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return '—';
+  return (parsed > 0 ? '+' : '') + (parsed * 100).toFixed(2) + '%';
 }
 
 function timestamp(value: string): string {
@@ -500,8 +554,110 @@ onUnmounted(() => autoRefresh.stop());
                   : 'Spot unavailable'
               }}
             </span>
+            <button
+              type="button"
+              class="listing-research-button"
+              :class="{
+                selected: selectedListing?.symbol === listing.symbol,
+              }"
+              :aria-pressed="selectedListing?.symbol === listing.symbol"
+              @click="selectListing(listing)"
+            >
+              {{
+                selectedListing?.symbol === listing.symbol
+                  ? 'Research selected'
+                  : 'View T+0 research'
+              }}
+            </button>
           </article>
         </div>
+        <article
+          v-if="selectedListing"
+          class="listing-research"
+          aria-live="polite"
+        >
+          <div class="listing-research-heading">
+            <div>
+              <p class="eyebrow">Observed checkpoint path</p>
+              <h3>{{ selectedListing.symbol }} after T+0</h3>
+            </div>
+            <span>Descriptive only</span>
+          </div>
+
+          <p
+            v-if="listingPerformanceLoading"
+            class="empty-state listing-research-state"
+          >
+            Loading durable checkpoint research…
+          </p>
+          <template v-else-if="availableListingPerformance">
+            <figure v-if="listingChart" class="listing-performance-chart">
+              <div class="signal-chart-legend">
+                <span><i class="performance-line"></i>Return from T+0</span>
+                <small>
+                  {{ listingChart.minimumPercent }}%–{{
+                    listingChart.maximumPercent
+                  }}%
+                </small>
+              </div>
+              <svg
+                viewBox="0 0 100 44"
+                role="img"
+                :aria-label="
+                  selectedListing.symbol +
+                  ' checkpoint return history relative to T+0'
+                "
+                preserveAspectRatio="none"
+              >
+                <path
+                  class="chart-grid"
+                  :d="
+                    'M 3 ' + listingChart.zeroY + ' L 97 ' + listingChart.zeroY
+                  "
+                />
+                <path
+                  class="chart-line chart-performance"
+                  :d="listingChart.path"
+                />
+                <circle
+                  v-for="point in listingChart.points"
+                  :key="point.label"
+                  :cx="point.x"
+                  :cy="point.y"
+                  r="1"
+                  class="listing-chart-point"
+                >
+                  <title>
+                    {{ point.label }} · {{ percentage(point.rate) }}
+                  </title>
+                </circle>
+              </svg>
+            </figure>
+            <div class="checkpoint-grid">
+              <div
+                v-for="point in availableListingPerformance.points"
+                :key="point.label"
+                class="checkpoint-card"
+              >
+                <strong>{{ point.label }}</strong>
+                <span :class="tone(point.priceReturnRate)">
+                  {{ percentage(point.priceReturnRate) }}
+                </span>
+                <small>{{ decimal(point.lastPrice, 8) }} USDT</small>
+              </div>
+            </div>
+            <p class="listing-baseline">
+              T+0 baseline:
+              {{ decimal(availableListingPerformance.baselinePrice, 8) }} USDT
+            </p>
+          </template>
+          <p v-else class="empty-state listing-research-state">
+            {{
+              listingPerformanceMessage ??
+              'Select a listing to load checkpoint research.'
+            }}
+          </p>
+        </article>
       </template>
       <p v-else class="empty-state execution-empty">
         {{ snapshot?.newListings.message ?? 'Loading new listings…' }}

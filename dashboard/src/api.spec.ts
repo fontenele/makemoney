@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { loadDashboard } from './api';
+import { loadDashboard, loadListingPerformance } from './api';
 
 describe('loadDashboard', () => {
   it('loads every read-only resource independently', async () => {
@@ -146,5 +146,45 @@ describe('loadDashboard', () => {
     expect(snapshot.executions.status).toBe('unavailable');
     expect(snapshot.newListings.status).toBe('unavailable');
     expect(snapshot.strategySignals.status).toBe('unavailable');
+  });
+});
+
+describe('loadListingPerformance', () => {
+  it('loads one selected detection through the read-only performance route', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json({
+          provider: 'binance',
+          symbol: 'NEWUSDT',
+          baselineLabel: 'T+0',
+          baselinePrice: '1',
+          points: [],
+        }),
+      ),
+    );
+
+    await expect(
+      loadListingPerformance('binance', 'NEWUSDT', request),
+    ).resolves.toMatchObject({
+      status: 'available',
+      data: { symbol: 'NEWUSDT', baselinePrice: '1' },
+    });
+    expect(request).toHaveBeenCalledWith(
+      '/api/new-listings/binance/NEWUSDT/performance',
+      { headers: { Accept: 'application/json' } },
+    );
+  });
+
+  it('keeps a missing T+0 observation explicit', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(new Response(null, { status: 503 })),
+    );
+
+    await expect(
+      loadListingPerformance('binance', 'NEWUSDT', request),
+    ).resolves.toEqual({
+      status: 'unavailable',
+      message: 'Unavailable (503)',
+    });
   });
 });

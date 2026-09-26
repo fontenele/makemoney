@@ -83,6 +83,24 @@ export interface DetectedSpotSymbol {
   lastObservedAt: string;
 }
 
+export interface ListingPerformancePoint {
+  label: string;
+  offsetMs: number;
+  targetAt: string;
+  completedAt: string;
+  lastPrice: string;
+  absolutePriceChange: string;
+  priceReturnRate: string;
+}
+
+export interface ListingPerformance {
+  provider: 'binance';
+  symbol: string;
+  baselineLabel: 'T+0';
+  baselinePrice: string;
+  points: ListingPerformancePoint[];
+}
+
 export interface StrategySignal {
   strategy: 'moving_average_crossover';
   symbol: 'BTC/USDT';
@@ -155,6 +173,17 @@ export async function loadDashboard(
     strategySignals,
     loadedAt: new Date().toISOString(),
   };
+}
+
+export function loadListingPerformance(
+  provider: DetectedSpotSymbol['provider'],
+  symbol: string,
+  request: FetchLike = fetch,
+): Promise<Resource<ListingPerformance>> {
+  return loadResource<ListingPerformance>(
+    `/api/new-listings/${encodeURIComponent(provider)}/${encodeURIComponent(symbol)}/performance`,
+    request,
+  );
 }
 
 async function loadResource<T>(

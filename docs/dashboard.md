@@ -68,3 +68,11 @@ The strategy section derives a chronological SVG chart from the same bounded per
 Only signals containing finite short and long averages are charted. Decimal conversion is limited to browser coordinates and labels; the backend's exact decimal strings remain the source facts, and the chart performs no financial, strategy, sizing, or execution calculation.
 
 M8.7 adds no backend route, price inference, signal generation, recommendation, mutation, Risk Engine call, order submission, or real trading.
+
+## M8.8 selected-listing checkpoint research
+
+Each recent detection card can explicitly load its existing T+0-relative price-performance resource. The selected research panel plots the durable checkpoint return path around a visible zero line and lists each exact checkpoint label, return, and observed price.
+
+Selection is browser-local and read-only. The selected resource refreshes with the dashboard while remaining independent from the recent-detection list and all portfolio resources. HTTP 503 is presented as an expected wait for the durable T+0 observation rather than as a fabricated zero or missing detection.
+
+Numeric conversion is limited to SVG coordinates and formatted labels. M8.8 adds no backend route, live provider request from the browser, ranking, score, recommendation, alert, signal, mutation, order submission, or real trading.

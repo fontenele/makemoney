@@ -346,6 +346,8 @@ M7.109 exposes that bounded outcome aggregate at local read-only `GET /new-listi
 
 M8.1 establishes a separate Vue 3/Vite read-only dashboard. Its typed client independently loads local health, fictional portfolio valuation, BTC paper position, and realized paper performance so one unavailable resource does not hide the others. M8.2 adds visibility-aware refresh, M8.3 a recent paper ledger, M8.4 recent new-listing detections, M8.5 responsive section navigation, M8.6 a read-only timeline of persisted moving-average signals, and M8.7 a chronological chart of their short and long averages. It has no mutation, authentication, order, wallet, or provider access of its own.
 
+M8.8 adds on-demand selected-listing T+0 checkpoint research to the dashboard by reusing an existing read-only API. It introduces no ranking, recommendation, mutation, or trading path.
+
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 
 ## Non-negotiable safety

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-26 — M8.8 selected-listing checkpoint research completed
+
+- Added explicit per-card loading of the existing exact T+0-relative listing performance route.
+- Added a zero-anchored checkpoint return chart, observed-price cards, and baseline context for the selected durable detection.
+- Preserved independent resource failures and translated an unavailable T+0 baseline into an explicit waiting state.
+- Added focused API and chart coverage without adding a backend route, ranking, recommendation, mutation, signal, or trading path.
+
 ## 2026-09-26 — M8.7 moving-average signal chart completed
 
 - Added a chronological shared-scale SVG chart for the short and long averages already present in persisted strategy signals.

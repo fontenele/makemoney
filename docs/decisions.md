@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-26 — Load listing research only after explicit selection
+
+M8.8 reuses the established per-detection performance route after the operator selects one of the bounded recent cards. It does not issue eight speculative detail requests on every refresh, and the selected request remains isolated from portfolio, signal, execution, and listing-summary availability.
+
+The panel plots only backend-derived T+0-relative returns with an explicit zero line. A 503 means the durable T+0 sample is still pending; the client neither substitutes a later checkpoint nor turns the chart into a rank, score, recommendation, alert, or trading input.
+
 ## 2026-09-26 — Keep moving-average chart transformation presentational
 
 M8.7 derives SVG coordinates only from the exact short and long average strings already returned with persisted signals. Both series share one scale and are reordered chronologically for display; incomplete or non-finite pairs are omitted instead of invented.
