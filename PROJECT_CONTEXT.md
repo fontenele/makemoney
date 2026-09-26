@@ -8,8 +8,8 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 
 ## Current position
 
-- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, and **M6 — Backtesting (M6.1–M6.32)**.
-- M6 is closed. M7.1–M7.107 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
+- Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, **M6 — Backtesting (M6.1–M6.32)**, and **M7 — New Listing Scanner (M7.1–M7.109)**.
+- M6 is closed. M7.1–M7.109 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
 - PostgreSQL is exposed on host port `5433` because port `5432` is occupied by another local project.
@@ -340,6 +340,12 @@ M7.106 exposes that bounded aggregate at local read-only `GET /new-listings/roun
 
 M7.107 purely decomposes one fixed round-trip cohort into profitable, losing, break-even, and unavailable samples after costs, with exact conditional average net returns for profitable and losing classes. It reuses M7.104 validation and adds no repository or route behavior.
 
+M7.108 composes that outcome decomposition on demand over the bounded recent durable top-of-book cohort. It validates limit, selected labels, and cost rates before repository access and retains incomplete timelines as unavailable coverage without adding an HTTP route or trading behavior.
+
+M7.109 exposes that bounded outcome aggregate at local read-only `GET /new-listings/round-trip/outcomes`. It requires explicit entry/exit labels and fee/slippage rates, supports only the established bounded limit and Binance provider inputs, and adds no defaults, pair search, ranking, or execution behavior.
+
+M8.1 establishes a separate Vue 3/Vite read-only dashboard. Its typed client independently loads local health, fictional portfolio valuation, BTC paper position, and realized paper performance so one unavailable resource does not hide the others. It has no mutation, authentication, order, wallet, or provider access of its own.
+
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 
 ## Non-negotiable safety
@@ -368,3 +374,4 @@ M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retenti
 - `docs/strategies.md`: M5.1 strategy contract, crossover semantics, and isolation boundary.
 - `docs/backtesting.md`: M6.1 deterministic replay contract, no-lookahead boundary, result, and deferred scope.
 - `docs/new-listings.md`: M7 public catalog baseline and deferred detection scope.
+- `docs/dashboard.md`: M8 read-only Vue/Vite dashboard boundary and local operation.

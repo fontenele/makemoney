@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-26 — M8.1 read-only dashboard foundation completed
+
+- Added a separate Vue 3/Vite dashboard with a responsive local research overview for API health, fictional portfolio valuation, BTC paper position, and realized paper performance.
+- Added a typed client that loads resources independently and preserves explicit unavailable states when market data or the local API is unavailable.
+- Added dashboard type-check/build scripts, Vitest coverage for success, partial availability, and unreachable API behavior, local Vite proxying, and operating documentation.
+- No backend route, mutation, authentication, provider request, signal, order simulation, paper execution, or real trading path was added.
+
+## 2026-09-26 — M7.109 durable listing checkpoint round-trip outcome cohort API completed
+
+- Added local read-only `GET /new-listings/round-trip/outcomes` for one explicit durable round-trip outcome cohort configuration.
+- Requires entry/exit labels and fee/slippage rates, with established optional bounded `limit` and Binance `provider` inputs and `%2B` label encoding.
+- Updated the root API route table; the endpoint exposes coverage, winning/losing/break-even counts, and conditional average net returns without selection, ranking, optimization, signals, simulation, or trading.
+
+## 2026-09-26 — M7.108 durable listing checkpoint round-trip outcome cohort completed
+
+- Composed M7.107 outcome decomposition over the bounded recent durable top-of-book cohort in the detection read model.
+- Shared sample-loading boundary with existing round-trip cohort aggregation and retained incomplete timelines as unavailable coverage.
+- Added no route, provider request, projection, selection, ranking, optimization, simulation, or trading behavior.
+
 ## 2026-09-21 — M7.107 listing checkpoint round-trip outcome cohort completed
 
 - Added a pure exact-decimal outcome cohort for profitable, losing, exact break-even, and unavailable fixed-configuration round trips.

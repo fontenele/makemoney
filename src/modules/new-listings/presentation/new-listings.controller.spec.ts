@@ -147,6 +147,78 @@ describe('NewListingsController', () => {
     },
   );
 
+  it('returns the durable round-trip outcome cohort with explicit bounded input', async () => {
+    const cohort = {
+      provider: 'binance' as const,
+      selection: {
+        entryLabel: 'T+0' as const,
+        exitLabel: 'T+5s' as const,
+        feeRate: '0.001',
+        slippageRate: '0.002',
+      },
+      sampleSize: 0,
+      availableSampleSize: 0,
+      unavailableSampleSize: 0,
+      profitableAfterCostsCount: 0,
+      losingAfterCostsCount: 0,
+      breakEvenAfterCostsCount: 0,
+      averageProfitableNetReturnRate: null,
+      averageLosingNetReturnRate: null,
+    };
+    const getCheckpointRoundTripOutcomeCohort = jest.fn(() =>
+      Promise.resolve(cohort),
+    );
+    const controller = new NewListingsController({
+      getCheckpointRoundTripOutcomeCohort,
+    });
+
+    await expect(
+      controller.checkpointRoundTripOutcomeCohort(
+        '25',
+        'binance',
+        'T+0',
+        'T+5s',
+        '0.001',
+        '0.002',
+      ),
+    ).resolves.toBe(cohort);
+    expect(getCheckpointRoundTripOutcomeCohort).toHaveBeenCalledWith(
+      'binance',
+      25,
+      cohort.selection,
+    );
+  });
+
+  it.each([
+    ['0', 'binance', 'T+0', 'T+5s', '0', '0'],
+    ['25', 'other', 'T+0', 'T+5s', '0', '0'],
+    ['25', 'binance', undefined, 'T+5s', '0', '0'],
+    ['25', 'binance', 'T+5s', 'T+0', '0', '0'],
+    ['25', 'binance', 'T+0', 'T+5s', '1', '0'],
+  ])(
+    'rejects invalid round-trip outcome cohort query %#',
+    (limit, provider, entryLabel, exitLabel, feeRate, slippageRate) => {
+      const getCheckpointRoundTripOutcomeCohort = jest.fn(() =>
+        Promise.resolve({}),
+      );
+      const controller = new NewListingsController({
+        getCheckpointRoundTripOutcomeCohort,
+      });
+
+      expect(() =>
+        controller.checkpointRoundTripOutcomeCohort(
+          limit,
+          provider,
+          entryLabel,
+          exitLabel,
+          feeRate,
+          slippageRate,
+        ),
+      ).toThrow(BadRequestException);
+      expect(getCheckpointRoundTripOutcomeCohort).not.toHaveBeenCalled();
+    },
+  );
+
   it('returns the durable top-of-book cohort with bounded input', async () => {
     const cohort = {
       provider: 'binance' as const,

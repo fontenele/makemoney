@@ -1,8 +1,9 @@
 # Crypto Trader
 
-Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M6 and M7.1–M7.107 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
+Local, personal platform for crypto market research, realistic paper trading, and strategy validation. M0 through M7 and M8.1 are complete. Market feeds and bounded historical candles are public and unauthenticated; historical candles, capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
+
 
 ## Safety boundaries
 
@@ -29,6 +30,14 @@ npm run start:dev
 ```
 
 PostgreSQL and Redis must be reachable using the URLs in `.env`.
+
+Start the read-only dashboard separately after the API is listening on port 3000:
+
+```bash
+npm run dashboard:dev
+```
+
+Open `http://127.0.0.1:5173`. The Vite development server is loopback-only and proxies `/api` to the local NestJS API. The M8.1 dashboard shows health, fictional portfolio valuation, BTC paper position, and realized paper performance; each unavailable API resource remains explicitly unavailable instead of being replaced with fabricated data.
 
 ## Docker Compose
 
@@ -68,6 +77,7 @@ Local base URL: `http://localhost:3000`. Docker Compose publishes it on host loo
 | `GET`    | `/new-listings/price-path`                                        | Median extrema timing and positive maximum-drawdown statistics for a recent durable detection cohort         | Local, read-only; optional `limit=1..100` (default `50`) and `provider=binance`; reports total path and positive-drawdown samples separately; absolute prices are not aggregated                                                                                                                     |
 | `GET`    | `/new-listings/variability`                                       | Median non-annualized checkpoint-price variability for a recent durable detection cohort                     | Local, read-only; optional `limit=1..100` (default `50`) and `provider=binance`; reports total path and transition-bearing samples separately with exact median average and maximum absolute consecutive returns                                                                                      |
 | `GET`    | `/new-listings/round-trip`                                        | Cost-adjusted return statistics for one explicit checkpoint pair across a recent durable book cohort         | Local, read-only; optional `limit=1..100` (default `50`) and `provider=binance`; requires `entryLabel`, `exitLabel`, `feeRate`, and `slippageRate`; encode label `+` as `%2B`; reports available/unavailable coverage, exact return summaries, and profitability-after-costs statistics                |
+| `GET`    | `/new-listings/round-trip/outcomes`                               | Outcome classification and conditional net gain/loss averages for one checkpoint pair across a durable book cohort | Local, read-only; optional `limit=1..100` (default `50`) and `provider=binance`; requires `entryLabel`, `exitLabel`, `feeRate`, and `slippageRate`; encode label `+` as `%2B`; reports available/unavailable coverage, winning/losing/break-even counts, and average winning/losing net returns |
 | `GET`    | `/new-listings/activity`                                          | Average rolling-window market activity by checkpoint for a recent durable detection cohort                  | Local, read-only; optional `limit=1..100` (default `50`) and `provider=binance`; reports exact base-volume, quote-volume, and trade-count averages and does not represent executable liquidity                                                                                                      |
 | `GET`    | `/new-listings/top-of-book`                                       | Average top-of-book spread and displayed quote notional by checkpoint for a recent durable detection cohort | Local, read-only; optional `limit=1..100` (default `50`) and `provider=binance`; includes only detections with stored `T+0` books and reports independent checkpoint samples; displayed level-one notional is not depth or guaranteed executable liquidity                                          |
 | `GET`    | `/new-listings/top-of-book/imbalance`                             | Average normalized displayed level-one imbalance by checkpoint for a recent durable detection cohort        | Local, read-only; optional `limit=1..100` (default `50`) and `provider=binance`; reports stored-book, calculable, and unavailable sample coverage separately; descriptive only and does not imply pressure or a signal                                                                              |

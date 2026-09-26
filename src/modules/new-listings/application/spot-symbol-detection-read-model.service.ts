@@ -79,8 +79,13 @@ import {
   ListingCheckpointRoundTripCalculator,
   validateListingCheckpointRoundTripSelection,
 } from './listing-checkpoint-round-trip-calculator';
-import { ListingCheckpointRoundTripCohort } from '../domain/listing-checkpoint-round-trip-cohort';
+import {
+  ListingCheckpointRoundTripCohort,
+  ListingCheckpointRoundTripCohortSample,
+} from '../domain/listing-checkpoint-round-trip-cohort';
 import { ListingCheckpointRoundTripCohortCalculator } from './listing-checkpoint-round-trip-cohort-calculator';
+import { ListingCheckpointRoundTripOutcomeCohort } from '../domain/listing-checkpoint-round-trip-outcome-cohort';
+import { ListingCheckpointRoundTripOutcomeCohortCalculator } from './listing-checkpoint-round-trip-outcome-cohort-calculator';
 
 export const DEFAULT_DETECTED_SPOT_SYMBOL_LIMIT = 50;
 export const MAX_DETECTED_SPOT_SYMBOL_LIMIT = 100;
@@ -135,6 +140,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingCheckpointRoundTripCalculator();
   private readonly checkpointRoundTripCohort =
     new ListingCheckpointRoundTripCohortCalculator();
+  private readonly checkpointRoundTripOutcomeCohort =
+    new ListingCheckpointRoundTripOutcomeCohortCalculator();
 
   constructor(
     @Inject(SPOT_SYMBOL_REPOSITORY)
@@ -417,6 +424,28 @@ export class SpotSymbolDetectionReadModelService {
     limit: number,
     selection: ListingCheckpointRoundTripSelection,
   ): Promise<ListingCheckpointRoundTripCohort> {
+    return this.checkpointRoundTripCohort.calculate(
+      selection,
+      await this.loadCheckpointRoundTripSamples(provider, limit, selection),
+    );
+  }
+
+  async getCheckpointRoundTripOutcomeCohort(
+    provider: 'binance',
+    limit: number,
+    selection: ListingCheckpointRoundTripSelection,
+  ): Promise<ListingCheckpointRoundTripOutcomeCohort> {
+    return this.checkpointRoundTripOutcomeCohort.calculate(
+      selection,
+      await this.loadCheckpointRoundTripSamples(provider, limit, selection),
+    );
+  }
+
+  private async loadCheckpointRoundTripSamples(
+    provider: 'binance',
+    limit: number,
+    selection: ListingCheckpointRoundTripSelection,
+  ): Promise<ListingCheckpointRoundTripCohortSample[]> {
     this.validateCohortLimit(limit);
     validateListingCheckpointRoundTripSelection(selection);
     if (!this.topOfBookRepository) {
@@ -426,29 +455,26 @@ export class SpotSymbolDetectionReadModelService {
       provider,
       limit,
     );
-    return this.checkpointRoundTripCohort.calculate(
-      selection,
-      timelines.map((timeline) => {
-        const first = timeline[0];
-        if (!first) {
-          throw new Error('Listing top-of-book cohort timeline is empty');
-        }
-        const entry = timeline.find(
-          (checkpoint) => checkpoint.label === selection.entryLabel,
-        );
-        const exit = timeline.find(
-          (checkpoint) => checkpoint.label === selection.exitLabel,
-        );
-        return {
-          provider: first.provider,
-          symbol: first.symbol,
-          roundTrip:
-            entry && exit
-              ? this.checkpointRoundTrip.calculate(entry, exit, selection)
-              : null,
-        };
-      }),
-    );
+    return timelines.map((timeline) => {
+      const first = timeline[0];
+      if (!first) {
+        throw new Error('Listing top-of-book cohort timeline is empty');
+      }
+      const entry = timeline.find(
+        (checkpoint) => checkpoint.label === selection.entryLabel,
+      );
+      const exit = timeline.find(
+        (checkpoint) => checkpoint.label === selection.exitLabel,
+      );
+      return {
+        provider: first.provider,
+        symbol: first.symbol,
+        roundTrip:
+          entry && exit
+            ? this.checkpointRoundTrip.calculate(entry, exit, selection)
+            : null,
+      };
+    });
   }
 
   async getTopOfBookImbalanceCohort(

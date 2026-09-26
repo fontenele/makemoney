@@ -635,3 +635,15 @@ Invalid or missing query input returns `400` before read-model access. The respo
 A pure exact-decimal outcome calculator reuses the fully validated M7.104 sample boundary and separates available net returns into profitable, losing, and exact break-even counts while preserving total and unavailable coverage. It reports the exact average positive net return only for profitable samples and the exact average negative net return only for losing samples.
 
 An absent outcome class has a nullable conditional average rather than a fabricated zero; break-even results enter neither conditional average. This is a descriptive decomposition of one fixed explicit configuration and adds no repository access, durable composition, route, checkpoint search, ranking, optimization, depth or fill model, signal, order simulation, or trading behavior.
+
+## M7.108 durable listing checkpoint round-trip outcome cohort composition
+
+The internal detection read model now validates the bounded cohort limit and fixed entry/exit plus fee/slippage configuration before durable access, loads the recent top-of-book cohort, derives each available round trip with M7.101, and aggregates outcomes with M7.107. Missing selected checkpoints produce unavailable samples in the denominator rather than being substituted.
+
+An empty durable cohort preserves the explicit empty aggregate, and absence of the top-of-book repository fails rather than silently falling back. The composition is transient and adds no route, provider request, projection, automatic pair selection, ranking, optimization, depth or fill model, signal, order simulation, or trading behavior.
+
+## M7.109 durable listing checkpoint round-trip outcome cohort API
+
+`GET /new-listings/round-trip/outcomes` exposes M7.108 through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it. Explicit `entryLabel`, `exitLabel`, `feeRate`, and `slippageRate` are mandatory, and `+` in checkpoint labels must be encoded as `%2B`.
+
+Invalid or missing query input returns `400` before read-model access. The response preserves the fixed configuration, total/available/unavailable coverage, profitable/losing/break-even counts, and exact conditional average winning and losing net return rates. The endpoint cannot choose or rank pairs, infer costs, optimize, model depth or fills, persist a projection, emit a signal, simulate an order, or trade.

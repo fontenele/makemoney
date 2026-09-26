@@ -1,6 +1,6 @@
 # Current State
 
-Last validated: 2026-09-21
+Last validated: 2026-09-26
 
 The startup validator accepts strictly positive canonical fractional values such as `0.01` for risk limits, matching the documented defaults and `.env.example`.
 
@@ -72,9 +72,9 @@ M7.32 loads and classifies one durable detection internally without persisting d
 
 M7.33 exposes explicit-threshold durable classification through a local read-only endpoint.
 
-M7.34 calculates descriptive pump/correction cohort counts and exact rates as a pure internal research rule. M7.35 composes that rule over the bounded durable T+0-eligible cohort, M7.36 exposes it through a local read-only route, M7.37–M7.39 calculate, durably compose, and expose median observed magnitudes, M7.40–M7.42 calculate, durably compose, and expose median observed pattern timing, M7.43–M7.45 calculate, durably compose, and expose descriptive rolling-window market activity, M7.46–M7.88 establish listing top-of-book collection and descriptive analysis through spread-widening timing exposure, M7.89–M7.100 establish descriptive price-path and variability calculations, durable composition, and local exposure, and M7.101–M7.107 establish explicit cost-adjusted checkpoint round-trip calculation, durable composition, local exposure, cohort calculation/composition/exposure, and pure outcome decomposition.
+M7.34 calculates descriptive pump/correction cohort counts and exact rates as a pure internal research rule. M7.35 composes that rule over the bounded durable T+0-eligible cohort, M7.36 exposes it through a local read-only route, M7.37–M7.39 calculate, durably compose, and expose median observed magnitudes, M7.40–M7.42 calculate, durably compose, and expose median observed pattern timing, M7.43–M7.45 calculate, durably compose, and expose descriptive rolling-window market activity, M7.46–M7.88 establish listing top-of-book collection and descriptive analysis through spread-widening timing exposure, M7.89–M7.100 establish descriptive price-path and variability calculations, durable composition, and local exposure, and M7.101–M7.109 establish explicit cost-adjusted checkpoint round-trip calculation, durable composition, local exposure, cohort calculation/composition/exposure, outcome cohort calculation/composition, and local exposure.
 
-M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. No dashboard, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M7 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. M8.1 adds a read-only local dashboard. No dashboard mutation, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -185,6 +185,9 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M7.105 composes that fixed configuration over bounded durable book timelines and retains missing selected books as explicit unavailable coverage.
 - M7.106 exposes the bounded durable round-trip cohort through a local read-only route with mandatory explicit financial assumptions.
 - M7.107 purely separates fixed-configuration round trips into profitable, losing, break-even, and unavailable outcomes with exact conditional gain/loss averages.
+- M7.108 composes that outcome decomposition on demand over the bounded recent durable top-of-book cohort.
+- M7.109 exposes that bounded outcome cohort through a local read-only endpoint with explicit checkpoint and cost assumptions.
+- M8.1 provides a separate loopback-only Vue 3/Vite dashboard that independently reads API health, fictional portfolio valuation, BTC paper position, and realized paper performance.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -317,6 +320,24 @@ M0 through M6 are complete. M1 provides unauthenticated public BTC/USDT market d
 - Stored historical simulation run: `GET http://localhost:3000/backtesting/runs/:id`
 - Delete stored historical simulation run: `DELETE http://localhost:3000/backtesting/runs/:id`
 - Recent stored historical simulation runs: `GET http://localhost:3000/backtesting/runs`
+- New listings recent detections: `GET http://localhost:3000/new-listings`
+- New listings summary: `GET http://localhost:3000/new-listings/summary`
+- New listings cohort performance: `GET http://localhost:3000/new-listings/performance`
+- New listings price path cohort: `GET http://localhost:3000/new-listings/price-path`
+- New listings price variability cohort: `GET http://localhost:3000/new-listings/variability`
+- New listings round trip cohort: `GET http://localhost:3000/new-listings/round-trip`
+- New listings round trip outcome cohort: `GET http://localhost:3000/new-listings/round-trip/outcomes`
+- New listings market activity cohort: `GET http://localhost:3000/new-listings/activity`
+- New listings top of book cohort: `GET http://localhost:3000/new-listings/top-of-book`
+- New listings top of book imbalance cohort: `GET http://localhost:3000/new-listings/top-of-book/imbalance`
+- New listings top of book imbalance evolution cohort: `GET http://localhost:3000/new-listings/top-of-book/imbalance/evolution`
+- New listings top of book spread evolution cohort: `GET http://localhost:3000/new-listings/top-of-book/spread/evolution`
+- New listings top of book spread classification cohort: `GET http://localhost:3000/new-listings/top-of-book/spread/classification`
+- New listings top of book spread classification magnitudes: `GET http://localhost:3000/new-listings/top-of-book/spread/classification/magnitudes`
+- New listings top of book spread classification timing: `GET http://localhost:3000/new-listings/top-of-book/spread/classification/timing`
+- New listings pattern classification cohort: `GET http://localhost:3000/new-listings/classification`
+- New listings pattern classification magnitudes: `GET http://localhost:3000/new-listings/classification/magnitudes`
+- New listings pattern classification timing: `GET http://localhost:3000/new-listings/classification/timing`
 - PostgreSQL host port: `5433` mapped to container port `5432`
 - Redis host port: `6379`
 
@@ -324,12 +345,14 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-21 after M7.107:
+The following passed on 2026-09-26 after M8.1:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 908 tests passed across 99 suites
+- `npm test -- --runInBand` — 918 backend tests passed across 99 suites
+- `npm run test:dashboard` — 3 dashboard client tests passed
+- `npm run build:dashboard`
 - `docker compose config --quiet`
 - `git diff --check`
 
@@ -348,7 +371,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.107 are implemented and fully verified milestone increments.
+M0 through M7.109 and M8.1 are implemented and verified milestone increments. Automated browser visual inspection was not completed because the Windows control approval expired; type-check, production build, and client behavior tests passed.
 
 ## Known issues and cautions
 

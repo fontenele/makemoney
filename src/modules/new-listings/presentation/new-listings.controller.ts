@@ -58,6 +58,7 @@ import {
 } from '../domain/listing-checkpoint-round-trip';
 import { validateListingCheckpointRoundTripSelection } from '../application/listing-checkpoint-round-trip-calculator';
 import { ListingCheckpointRoundTripCohort } from '../domain/listing-checkpoint-round-trip-cohort';
+import { ListingCheckpointRoundTripOutcomeCohort } from '../domain/listing-checkpoint-round-trip-outcome-cohort';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -119,6 +120,22 @@ export class NewListingsController {
     @Query('slippageRate') slippageRate?: string,
   ): Promise<ListingCheckpointRoundTripCohort> {
     return this.detections.getCheckpointRoundTripCohort(
+      optionalProvider(provider) ?? 'binance',
+      validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
+      validRoundTripSelection(entryLabel, exitLabel, feeRate, slippageRate),
+    );
+  }
+
+  @Get('round-trip/outcomes')
+  checkpointRoundTripOutcomeCohort(
+    @Query('limit') limit?: string,
+    @Query('provider') provider?: string,
+    @Query('entryLabel') entryLabel?: string,
+    @Query('exitLabel') exitLabel?: string,
+    @Query('feeRate') feeRate?: string,
+    @Query('slippageRate') slippageRate?: string,
+  ): Promise<ListingCheckpointRoundTripOutcomeCohort> {
+    return this.detections.getCheckpointRoundTripOutcomeCohort(
       optionalProvider(provider) ?? 'binance',
       validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
       validRoundTripSelection(entryLabel, exitLabel, feeRate, slippageRate),

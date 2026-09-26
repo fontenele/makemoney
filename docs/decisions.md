@@ -1,5 +1,23 @@
 # Technical Decisions
 
+## 2026-09-26 — Isolate the first dashboard increment as a read-only Vue/Vite client
+
+M8.1 introduces the dashboard under `dashboard/` with its own browser TypeScript configuration and Vite build while retaining the NestJS API as the only backend. Development binds Vite to loopback and proxies `/api` to the existing loopback API, avoiding CORS changes and avoiding a new server-side module.
+
+The client requests health, valuation, position, and performance independently. A stale price, missing top of book, or unavailable service is shown as unavailable only for the affected panel; the UI does not synthesize financial values. The dashboard exposes no mutation, credentials, exchange access, order action, or execution path.
+
+## 2026-09-26 — Expose round-trip outcome cohort through dedicated read-only endpoint
+
+M7.109 exposes the M7.108 durable outcome composition at `GET /new-listings/round-trip/outcomes`. Mandatory entry/exit labels and cost rates ensure callers state all assumptions explicitly; limit and provider validations match the established bounded cohort pattern.
+
+The endpoint is local and read-only. It reports sample coverage, winning/losing/break-even counts, and conditional average net gains/losses without searching pairs, ranking, optimizing, emitting signals, simulating orders, or trading.
+
+## 2026-09-26 — Reuse durable round-trip cohort loading for outcome decomposition
+
+M7.108 composes M7.107 outcome statistics over the bounded recent durable top-of-book cohort using the shared sample-loading boundary established by M7.105. Limit and selection validations occur before repository access, and incomplete timelines remain explicit unavailable samples.
+
+The composition is calculated on demand and not persisted. HTTP exposure, pair search, ranking, optimization, signals, order simulation, and trading remain outside this increment.
+
 ## 2026-09-21 — Separate round-trip gains, losses, and exact break-even outcomes
 
 M7.107 decomposes available results only after the existing fixed-configuration cohort validator has reconciled their identities, schedules, execution prices, returns, and profitability flags. Positive and negative classes receive independent exact average net returns, while exact zero is reported separately and contributes to neither conditional average.
