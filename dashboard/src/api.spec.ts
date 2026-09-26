@@ -13,20 +13,28 @@ describe('loadDashboard', () => {
             ? { symbol: 'BTC/USDT', totalPnl: '25.5' }
             : path.endsWith('/performance')
               ? { symbol: 'BTC/USDT', executionCount: 4 }
-              : [
-                  {
-                    id: 'execution-1',
-                    symbol: 'BTC/USDT',
-                    side: 'buy',
-                    quantity: '0.001',
-                  },
-                ];
+              : path.includes('/executions')
+                ? [
+                    {
+                      id: 'execution-1',
+                      symbol: 'BTC/USDT',
+                      side: 'buy',
+                      quantity: '0.001',
+                    },
+                  ]
+                : [
+                    {
+                      provider: 'binance',
+                      symbol: 'NEWUSDT',
+                      detectedAt: '2026-09-26T12:00:00.000Z',
+                    },
+                  ];
       return Promise.resolve(Response.json(body));
     });
 
     const snapshot = await loadDashboard(request);
 
-    expect(request).toHaveBeenCalledTimes(5);
+    expect(request).toHaveBeenCalledTimes(6);
     expect(snapshot.health.status).toBe('available');
     expect(snapshot.valuation).toMatchObject({
       status: 'available',
@@ -37,6 +45,10 @@ describe('loadDashboard', () => {
     expect(snapshot.executions).toMatchObject({
       status: 'available',
       data: [{ id: 'execution-1', side: 'buy' }],
+    });
+    expect(snapshot.newListings).toMatchObject({
+      status: 'available',
+      data: [{ provider: 'binance', symbol: 'NEWUSDT' }],
     });
   });
 
@@ -59,6 +71,7 @@ describe('loadDashboard', () => {
     expect(snapshot.position.status).toBe('available');
     expect(snapshot.performance.status).toBe('available');
     expect(snapshot.executions.status).toBe('available');
+    expect(snapshot.newListings.status).toBe('available');
   });
 
   it('keeps the overview available when execution history is unavailable', async () => {
@@ -79,6 +92,28 @@ describe('loadDashboard', () => {
     expect(snapshot.valuation.status).toBe('available');
     expect(snapshot.position.status).toBe('available');
     expect(snapshot.performance.status).toBe('available');
+    expect(snapshot.newListings.status).toBe('available');
+  });
+
+  it('keeps portfolio resources available when new listings are unavailable', async () => {
+    const request = vi.fn((input: string | URL | Request) => {
+      if (input.toString().includes('/new-listings')) {
+        return Promise.resolve(new Response(null, { status: 503 }));
+      }
+      return Promise.resolve(Response.json([]));
+    });
+
+    const snapshot = await loadDashboard(request);
+
+    expect(snapshot.newListings).toEqual({
+      status: 'unavailable',
+      message: 'Unavailable (503)',
+    });
+    expect(snapshot.health.status).toBe('available');
+    expect(snapshot.valuation.status).toBe('available');
+    expect(snapshot.position.status).toBe('available');
+    expect(snapshot.performance.status).toBe('available');
+    expect(snapshot.executions.status).toBe('available');
   });
 
   it('reports an unreachable local API without rejecting the refresh', async () => {
@@ -94,5 +129,6 @@ describe('loadDashboard', () => {
     expect(snapshot.position.status).toBe('unavailable');
     expect(snapshot.performance.status).toBe('unavailable');
     expect(snapshot.executions.status).toBe('unavailable');
+    expect(snapshot.newListings.status).toBe('unavailable');
   });
 });

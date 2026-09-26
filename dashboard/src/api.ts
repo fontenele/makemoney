@@ -72,6 +72,17 @@ export interface PaperSellExecution extends PaperExecutionBase {
 
 export type PaperExecution = PaperBuyExecution | PaperSellExecution;
 
+export interface DetectedSpotSymbol {
+  provider: 'binance';
+  symbol: string;
+  baseAsset: string;
+  quoteAsset: 'USDT';
+  status: string;
+  spotTradingAllowed: boolean;
+  detectedAt: string;
+  lastObservedAt: string;
+}
+
 export type Resource<T> =
   { status: 'available'; data: T } | { status: 'unavailable'; message: string };
 
@@ -81,6 +92,7 @@ export interface DashboardSnapshot {
   position: Resource<PaperPosition>;
   performance: Resource<PaperTradingPerformance>;
   executions: Resource<PaperExecution[]>;
+  newListings: Resource<DetectedSpotSymbol[]>;
   loadedAt: string;
 }
 
@@ -89,7 +101,7 @@ type FetchLike = typeof fetch;
 export async function loadDashboard(
   request: FetchLike = fetch,
 ): Promise<DashboardSnapshot> {
-  const [health, valuation, position, performance, executions] =
+  const [health, valuation, position, performance, executions, newListings] =
     await Promise.all([
       loadResource<HealthResponse>('/api/health', request),
       loadResource<PortfolioValuation>('/api/paper-wallet/valuation', request),
@@ -102,6 +114,7 @@ export async function loadDashboard(
         '/api/paper-trading/executions?limit=12',
         request,
       ),
+      loadResource<DetectedSpotSymbol[]>('/api/new-listings?limit=8', request),
     ]);
 
   return {
@@ -110,6 +123,7 @@ export async function loadDashboard(
     position,
     performance,
     executions,
+    newListings,
     loadedAt: new Date().toISOString(),
   };
 }

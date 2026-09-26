@@ -38,3 +38,11 @@ The overview independently requests `GET /paper-trading/executions?limit=12` and
 An empty history is distinct from an unavailable history. A history request failure affects only the ledger; health, valuation, position, and performance remain visible when their requests succeed. Decimal formatting is presentational and the backend remains the source of all stored financial values.
 
 M8.3 adds no chart inference, pagination, mutation, execution control, browser persistence, backend route, authenticated exchange access, or real trading.
+
+## M8.4 recent new-listing detections
+
+The dashboard independently requests `GET /new-listings?limit=8` and presents recent application detections as responsive cards. Each card exposes provider, pair, application detection time, current provider status, and current Spot availability without implying an official exchange listing timestamp.
+
+An empty result explicitly states that no post-baseline listing has been detected. Failure remains local to this view and does not suppress portfolio or execution resources.
+
+M8.4 adds no symbol ranking, recommendation, alert, checkpoint analysis, mutation, provider request from the browser, execution behavior, authenticated exchange access, or real trading.

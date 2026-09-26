@@ -74,7 +74,7 @@ M7.33 exposes explicit-threshold durable classification through a local read-onl
 
 M7.34 calculates descriptive pump/correction cohort counts and exact rates as a pure internal research rule. M7.35 composes that rule over the bounded durable T+0-eligible cohort, M7.36 exposes it through a local read-only route, M7.37–M7.39 calculate, durably compose, and expose median observed magnitudes, M7.40–M7.42 calculate, durably compose, and expose median observed pattern timing, M7.43–M7.45 calculate, durably compose, and expose descriptive rolling-window market activity, M7.46–M7.88 establish listing top-of-book collection and descriptive analysis through spread-widening timing exposure, M7.89–M7.100 establish descriptive price-path and variability calculations, durable composition, and local exposure, and M7.101–M7.109 establish explicit cost-adjusted checkpoint round-trip calculation, durable composition, local exposure, cohort calculation/composition/exposure, outcome cohort calculation/composition, and local exposure.
 
-M0 through M7 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. M8.1–M8.3 add a read-only local dashboard with visibility-aware automatic refresh and recent fictional execution history. No dashboard mutation, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M7 are complete. M1 provides unauthenticated public BTC/USDT market data. M2 provides a fictional, PostgreSQL-backed wallet and valuation. M3 provides internal paper trading and performance measurement. M4 adds independent pre-execution safeguards. M5 provides a configurable deterministic moving-average crossover, live observation, PostgreSQL signal persistence, and read-only access to its latest and recent signals. M6 provides deterministic no-lookahead replay, resilient durable historical loading, explicit stored-only replay, gap-aware cache reuse, local replay and simulation APIs, idempotent simulation-run persistence, retrieval, cursor pagination, inclusive creation-time filtering, and explicit single-run deletion, capital-constrained simulation, explicit fill costs, precision, order and causal volume-participation constraints, candle-close equity, drawdown, ROI, trade statistics, and temporal exposure measurement. Its database-backed E2E suite is isolated from local application data. M8.1–M8.4 add a read-only local dashboard with visibility-aware automatic refresh, recent fictional execution history, and recent new-listing detections. No dashboard mutation, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -190,6 +190,7 @@ M0 through M7 are complete. M1 provides unauthenticated public BTC/USDT market d
 - M8.1 provides a separate loopback-only Vue 3/Vite dashboard that independently reads API health, fictional portfolio valuation, BTC paper position, and realized paper performance.
 - M8.2 refreshes that overview immediately and then 15 seconds after each completed load, prevents overlapping manual or automatic refreshes, pauses pending work while hidden, and refreshes when visibility returns.
 - M8.3 independently loads the twelve most recent immutable fictional executions and renders a responsive side-aware ledger with explicit empty and unavailable states.
+- M8.4 independently loads eight recent durable application detections and renders provider state and Spot availability without claiming official listing time or recommendation.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -347,13 +348,13 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-26 after M8.3:
+The following passed on 2026-09-26 after M8.4:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
 - `npm test -- --runInBand` — 918 backend tests passed across 99 suites
-- `npm run test:dashboard` — 7 dashboard client and refresh-scheduler tests passed
+- `npm run test:dashboard` — 8 dashboard client and refresh-scheduler tests passed
 - `npm run build:dashboard`
 - `docker compose config --quiet`
 - `git diff --check`
@@ -373,7 +374,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.109 and M8.1–M8.3 are implemented and verified milestone increments. Automated browser visual inspection was not completed for M8.3; type-check, production build, and client behavior tests passed.
+M0 through M7.109 and M8.1–M8.4 are implemented and verified milestone increments. Automated browser visual inspection was not completed for M8.4; type-check, production build, and client behavior tests passed.
 
 ## Known issues and cautions
 

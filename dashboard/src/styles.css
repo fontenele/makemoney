@@ -519,6 +519,75 @@ h1 em {
   margin: 30px 0 8px;
 }
 
+.listings-panel {
+  min-height: 0;
+  margin-bottom: 64px;
+}
+
+.listing-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.listing-card {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.listing-provider {
+  display: block;
+  margin-bottom: 18px;
+  color: var(--green);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.listing-card strong {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.listing-card > div > small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.listing-card dl {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.listing-card dt {
+  margin-bottom: 4px;
+  color: #60726b;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.listing-card dd {
+  margin: 0;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.trading-state {
+  color: var(--red);
+  font-size: 9px;
+}
+
+.trading-state.enabled {
+  color: var(--green-bright);
+}
+
 .empty-state {
   color: var(--muted) !important;
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
@@ -590,6 +659,10 @@ footer {
   .execution-header > span:last-child {
     display: none;
   }
+
+  .listing-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 480px) {
@@ -632,6 +705,14 @@ footer {
 
   .execution-panel {
     margin-bottom: 48px;
+  }
+
+  .listings-panel {
+    margin-bottom: 48px;
+  }
+
+  .listing-grid {
+    grid-template-columns: 1fr;
   }
 
   .execution-header {

@@ -346,6 +346,61 @@ onUnmounted(() => autoRefresh.stop());
       </p>
     </section>
 
+    <section class="panel listings-panel" aria-labelledby="listings-title">
+      <div class="panel-heading execution-heading">
+        <div>
+          <p class="eyebrow">Application detections</p>
+          <h2 id="listings-title">Recent new listings</h2>
+        </div>
+        <span class="history-limit">Latest 8</span>
+      </div>
+
+      <template v-if="available(snapshot?.newListings)">
+        <p
+          v-if="snapshot.newListings.data.length === 0"
+          class="empty-state execution-empty"
+        >
+          No post-baseline listings detected yet.
+        </p>
+        <div v-else class="listing-grid">
+          <article
+            v-for="listing in snapshot.newListings.data"
+            :key="`${listing.provider}:${listing.symbol}`"
+            class="listing-card"
+          >
+            <div>
+              <span class="listing-provider">{{ listing.provider }}</span>
+              <strong>{{ listing.baseAsset }}</strong>
+              <small>/ {{ listing.quoteAsset }}</small>
+            </div>
+            <dl>
+              <div>
+                <dt>Detected</dt>
+                <dd>{{ timestamp(listing.detectedAt) }}</dd>
+              </div>
+              <div>
+                <dt>Provider status</dt>
+                <dd>{{ listing.status }}</dd>
+              </div>
+            </dl>
+            <span
+              class="trading-state"
+              :class="{ enabled: listing.spotTradingAllowed }"
+            >
+              {{
+                listing.spotTradingAllowed
+                  ? 'Spot available'
+                  : 'Spot unavailable'
+              }}
+            </span>
+          </article>
+        </div>
+      </template>
+      <p v-else class="empty-state execution-empty">
+        {{ snapshot?.newListings.message ?? 'Loading new listings…' }}
+      </p>
+    </section>
+
     <footer>
       <span>Research surface · no real funds</span>
       <span>Data remains local to this machine</span>

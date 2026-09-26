@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-26 — M8.4 recent new-listing detection view completed
+
+- Added an independent typed dashboard request for eight recent durable application detections.
+- Added responsive cards for provider, pair, detection time, provider status, and current Spot availability with explicit empty and unavailable states.
+- Preserved application-detection semantics and independent portfolio/execution availability without adding ranking, recommendation, alerts, mutation, or trading.
+
 ## 2026-09-26 — M8.3 recent fictional execution ledger completed
 
 - Added an independent typed request for the twelve newest persisted paper executions.

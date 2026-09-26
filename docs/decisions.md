@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-26 — Present recent listing detections without ranking
+
+M8.4 reads the existing bounded detection endpoint as an independent dashboard resource. It exposes only durable provider facts and application detection time, explicitly avoiding an official listing-time claim, recommendation, score, or implied opportunity.
+
+The browser does not contact Binance and does not request checkpoint analytics. Empty and unavailable states remain distinct, and a listing-view failure cannot hide portfolio or execution information.
+
 ## 2026-09-26 — Reuse immutable paper executions for the first dashboard history
 
 M8.3 reads the existing bounded `GET /paper-trading/executions` audit surface instead of introducing a dashboard-specific backend or reconstructing history from portfolio totals. The client requests twelve newest records as a separate resource and preserves the backend's buy/sell settlement distinction.
