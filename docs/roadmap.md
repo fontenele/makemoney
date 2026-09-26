@@ -224,7 +224,8 @@ Collect and statistically analyze newly listed assets without assuming the hypot
 Vue 3/Vite interface and market/portfolio visualizations.
 
 - **M8.1 — complete:** a separate loopback-only Vue 3/Vite dashboard reads local health, fictional portfolio valuation, BTC paper position, and realized paper performance with typed independent unavailable states and no mutation or execution path.
-- Historical charts, new-listing research views, navigation, production serving, and automatic refresh remain deferred to separately verified increments.
+- **M8.2 — complete:** the overview refreshes immediately and then on a non-overlapping completion-relative 15-second cadence, pauses pending work while hidden, and refreshes when the tab becomes visible again.
+- Historical charts, new-listing research views, navigation, and production serving remain deferred to separately verified increments.
 
 ## M9 — Polymarket — planned
 

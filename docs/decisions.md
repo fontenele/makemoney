@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-26 — Make dashboard refresh completion-relative and visibility-aware
+
+M8.2 keeps refresh scheduling in a small browser-side lifecycle boundary. The next 15-second timer begins only after the preceding load settles, and all refresh entry points share the existing execution guard. This avoids overlapping API batches when a request is slow.
+
+Pending timers are canceled while the document is hidden. Visibility restoration triggers one immediate load and resumes the completion-relative cadence; component teardown removes both timer and listener. The behavior remains read-only and adds no service worker, persistent browser state, backend route, or server-side scheduler.
+
 ## 2026-09-26 — Isolate the first dashboard increment as a read-only Vue/Vite client
 
 M8.1 introduces the dashboard under `dashboard/` with its own browser TypeScript configuration and Vite build while retaining the NestJS API as the only backend. Development binds Vite to loopback and proxies `/api` to the existing loopback API, avoiding CORS changes and avoiding a new server-side module.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-26 — M8.2 visibility-aware automatic dashboard refresh completed
+
+- Added immediate and completion-relative 15-second overview refreshes without overlapping requests.
+- Paused pending refresh work while the browser document is hidden and added an immediate refresh when visibility returns.
+- Preserved manual refresh, independent resource availability, and teardown cleanup, with focused fake-timer tests for cadence, overlap prevention, and visibility behavior.
+- Added no backend route, mutation, persistent browser state, provider request, signal, order simulation, paper execution, authenticated exchange access, or real trading path.
+
 ## 2026-09-26 — M8.1 read-only dashboard foundation completed
 
 - Added a separate Vue 3/Vite dashboard with a responsive local research overview for API health, fictional portfolio valuation, BTC paper position, and realized paper performance.

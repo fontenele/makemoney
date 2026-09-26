@@ -115,6 +115,14 @@ a:focus-visible {
   font-size: 12px;
 }
 
+.refresh-cadence {
+  color: #60726b;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .connection i {
   width: 7px;
   height: 7px;
@@ -453,6 +461,10 @@ footer {
   }
 
   .connection {
+    display: none;
+  }
+
+  .refresh-cadence {
     display: none;
   }
 

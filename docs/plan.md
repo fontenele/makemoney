@@ -1709,7 +1709,7 @@ M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
-M8 — Dashboard                    IN PROGRESS (M8.1 DONE)
+M8 — Dashboard                    IN PROGRESS (M8.1–M8.2 DONE)
 M9 — Polymarket                   PLANNED
 M10 — Agentic Wallet / Real Trading PLANNED
 ```
@@ -2385,6 +2385,7 @@ M7.107 Listing Checkpoint Round-Trip Outcome Cohort Calculation: DONE
 M7.108 Durable Listing Checkpoint Round-Trip Outcome Cohort Composition: DONE
 M7.109 Durable Listing Checkpoint Round-Trip Outcome Cohort API: DONE
 M8.1 Read-Only Vue/Vite Dashboard Foundation: DONE
+M8.2 Visibility-Aware Automatic Dashboard Refresh: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2403,5 +2404,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M8.1 is complete. The next bounded dashboard increment may add read-only historical visualization or new-listing research views; automatic execution controls, authenticated exchange access, and real trading remain separate.
+M8.2 is complete. The next bounded dashboard increment may add read-only historical visualization or new-listing research views; automatic execution controls, authenticated exchange access, and real trading remain separate.
 ```

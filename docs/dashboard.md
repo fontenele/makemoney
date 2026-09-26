@@ -21,4 +21,12 @@ The overview reads four existing endpoints:
 
 Requests are independent. An unavailable or stale valuation or position does not suppress healthy resources, and the dashboard displays no invented fallback amount. Amount formatting in the browser is presentational only; every financial calculation remains in the exact-decimal backend.
 
-M8.1 adds no automatic polling, charts, new-listing views, backend route, API authentication, mutation control, signal generation, order simulation, wallet mutation, paper execution, authenticated exchange access, or real trading.
+M8.1 adds no charts, new-listing views, backend route, API authentication, mutation control, signal generation, order simulation, wallet mutation, paper execution, authenticated exchange access, or real trading.
+
+## M8.2 visibility-aware automatic refresh
+
+The overview loads immediately and schedules its next refresh 15 seconds after the current refresh completes. Manual and automatic refreshes share the same non-overlapping execution guard.
+
+The scheduler cancels pending work while the document is hidden. When the tab becomes visible, it refreshes immediately and starts a new completion-relative interval. Component teardown removes the visibility listener and pending timer.
+
+M8.2 adds no backend route, persistent browser state, background work while hidden, mutation control, order path, authenticated exchange access, or real trading.

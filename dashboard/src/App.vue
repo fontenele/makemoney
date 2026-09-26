@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { loadDashboard, type DashboardSnapshot, type Resource } from './api';
+import {
+  createDashboardAutoRefresh,
+  DASHBOARD_REFRESH_INTERVAL_MS,
+} from './auto-refresh';
 
 const snapshot = ref<DashboardSnapshot | null>(null);
 const refreshing = ref(false);
@@ -15,6 +19,15 @@ async function refresh(): Promise<void> {
   } finally {
     refreshing.value = false;
   }
+}
+
+const autoRefresh = createDashboardAutoRefresh({
+  refresh,
+  visibilitySource: document,
+});
+
+function refreshNow(): void {
+  void autoRefresh.refreshNow();
 }
 
 function decimal(value: string | null | undefined, digits = 2): string {
@@ -47,7 +60,8 @@ function available<T>(resource: Resource<T> | undefined): resource is {
   return resource?.status === 'available';
 }
 
-onMounted(() => void refresh());
+onMounted(() => autoRefresh.start());
+onUnmounted(() => autoRefresh.stop());
 </script>
 
 <template>
@@ -66,7 +80,10 @@ onMounted(() => void refresh());
           <i aria-hidden="true"></i>
           {{ apiOnline ? 'Local API online' : 'API unavailable' }}
         </span>
-        <button type="button" :disabled="refreshing" @click="refresh">
+        <span class="refresh-cadence">
+          Auto {{ DASHBOARD_REFRESH_INTERVAL_MS / 1000 }}s
+        </span>
+        <button type="button" :disabled="refreshing" @click="refreshNow">
           {{ refreshing ? 'Refreshing…' : 'Refresh data' }}
         </button>
       </div>
