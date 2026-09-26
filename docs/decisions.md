@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-26 — Keep moving-average chart transformation presentational
+
+M8.7 derives SVG coordinates only from the exact short and long average strings already returned with persisted signals. Both series share one scale and are reordered chronologically for display; incomplete or non-finite pairs are omitted instead of invented.
+
+The browser's numeric conversion is limited to visual coordinates and labels. It does not recalculate averages or actions, infer prices, make recommendations, size positions, or connect chart markers to execution.
+
 ## 2026-09-26 — Keep dashboard strategy history observational
 
 M8.6 reads the existing persisted recent-signal endpoint independently and renders only facts already produced by the strategy. Visual buy and sell markers never become commands and the browser cannot evaluate, configure, size, or execute a signal.

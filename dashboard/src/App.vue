@@ -5,11 +5,17 @@ import {
   createDashboardAutoRefresh,
   DASHBOARD_REFRESH_INTERVAL_MS,
 } from './auto-refresh';
+import { buildSignalChart } from './signal-chart';
 
 const snapshot = ref<DashboardSnapshot | null>(null);
 const refreshing = ref(false);
 
 const apiOnline = computed(() => snapshot.value?.health.status === 'available');
+const signalChart = computed(() =>
+  snapshot.value?.strategySignals.status === 'available'
+    ? buildSignalChart(snapshot.value.strategySignals.data)
+    : null,
+);
 
 async function refresh(): Promise<void> {
   if (refreshing.value) return;
@@ -377,31 +383,66 @@ onUnmounted(() => autoRefresh.stop());
         >
           No persisted strategy signals yet.
         </p>
-        <ol v-else class="signal-timeline">
-          <li
-            v-for="signal in snapshot.strategySignals.data"
-            :key="`${signal.strategy}:${signal.latestCandleCloseTime ?? signal.evaluatedAt}`"
-            :class="`signal-${signal.action}`"
-          >
-            <span class="signal-marker" aria-hidden="true"></span>
-            <div class="signal-summary">
-              <b>{{ signal.action }}</b>
-              <time :datetime="signal.evaluatedAt">
-                {{ timestamp(signal.evaluatedAt) }}
-              </time>
+        <template v-else>
+          <figure v-if="signalChart" class="signal-chart">
+            <div class="signal-chart-legend">
+              <span><i class="short-line"></i>Short average</span>
+              <span><i class="long-line"></i>Long average</span>
+              <small
+                >{{ signalChart.minimum }}–{{ signalChart.maximum }} USDT</small
+              >
             </div>
-            <div class="signal-averages">
-              <span>
-                Short {{ signal.shortPeriod }}
-                <strong>{{ decimal(signal.currentShortAverage) }}</strong>
-              </span>
-              <span>
-                Long {{ signal.longPeriod }}
-                <strong>{{ decimal(signal.currentLongAverage) }}</strong>
-              </span>
-            </div>
-          </li>
-        </ol>
+            <svg
+              viewBox="0 0 100 44"
+              role="img"
+              aria-label="Chronological short and long moving-average history"
+              preserveAspectRatio="none"
+            >
+              <path class="chart-grid" d="M 3 22 L 97 22" />
+              <path class="chart-line chart-long" :d="signalChart.longPath" />
+              <path class="chart-line chart-short" :d="signalChart.shortPath" />
+              <circle
+                v-for="point in signalChart.points.filter(
+                  (item) => item.action !== 'hold',
+                )"
+                :key="`${point.evaluatedAt}:${point.action}`"
+                :cx="point.x"
+                :cy="point.shortY"
+                r="1.1"
+                :class="`chart-event chart-event-${point.action}`"
+              >
+                <title>
+                  {{ point.action }} · {{ timestamp(point.evaluatedAt) }}
+                </title>
+              </circle>
+            </svg>
+          </figure>
+          <ol class="signal-timeline">
+            <li
+              v-for="signal in snapshot.strategySignals.data"
+              :key="`${signal.strategy}:${signal.latestCandleCloseTime ?? signal.evaluatedAt}`"
+              :class="`signal-${signal.action}`"
+            >
+              <span class="signal-marker" aria-hidden="true"></span>
+              <div class="signal-summary">
+                <b>{{ signal.action }}</b>
+                <time :datetime="signal.evaluatedAt">
+                  {{ timestamp(signal.evaluatedAt) }}
+                </time>
+              </div>
+              <div class="signal-averages">
+                <span>
+                  Short {{ signal.shortPeriod }}
+                  <strong>{{ decimal(signal.currentShortAverage) }}</strong>
+                </span>
+                <span>
+                  Long {{ signal.longPeriod }}
+                  <strong>{{ decimal(signal.currentLongAverage) }}</strong>
+                </span>
+              </div>
+            </li>
+          </ol>
+        </template>
       </template>
       <p v-else class="empty-state execution-empty">
         {{ snapshot?.strategySignals.message ?? 'Loading strategy signals…' }}

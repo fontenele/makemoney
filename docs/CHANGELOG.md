@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-26 — M8.7 moving-average signal chart completed
+
+- Added a chronological shared-scale SVG chart for the short and long averages already present in persisted strategy signals.
+- Added observational buy/sell point markers while retaining the exact signal timeline and explicit empty/unavailable states.
+- Added focused chart-transformation coverage for chronology, shared scaling, and incomplete signal exclusion.
+- Added no backend route, signal evaluation, financial calculation, recommendation, mutation, order submission, or real trading path.
+
 ## 2026-09-26 — M8.6 persisted strategy signal timeline completed
 
 - Added an independent typed request for twenty recent persisted moving-average crossover signals.

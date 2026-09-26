@@ -74,7 +74,7 @@ M7.33 exposes explicit-threshold durable classification through a local read-onl
 
 M7.34 calculates descriptive pump/correction cohort counts and exact rates as a pure internal research rule. M7.35 composes that rule over the bounded durable T+0-eligible cohort, M7.36 exposes it through a local read-only route, M7.37–M7.39 calculate, durably compose, and expose median observed magnitudes, M7.40–M7.42 calculate, durably compose, and expose median observed pattern timing, M7.43–M7.45 calculate, durably compose, and expose descriptive rolling-window market activity, M7.46–M7.88 establish listing top-of-book collection and descriptive analysis through spread-widening timing exposure, M7.89–M7.100 establish descriptive price-path and variability calculations, durable composition, and local exposure, and M7.101–M7.109 establish explicit cost-adjusted checkpoint round-trip calculation, durable composition, local exposure, cohort calculation/composition/exposure, outcome cohort calculation/composition, and local exposure.
 
-M0 through M7 are complete. M8.1–M8.6 provide a read-only local dashboard with independent portfolio, execution, listing, and persisted strategy-signal views, visibility-aware refresh, and responsive navigation. No dashboard mutation, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
+M0 through M7 are complete. M8.1–M8.7 provide a read-only local dashboard with independent portfolio, execution, listing, and persisted strategy-signal views, a chronological moving-average chart, visibility-aware refresh, and responsive navigation. No dashboard mutation, order mutation endpoint, strategy execution, authenticated exchange integration, or real order execution exists.
 
 ## Implemented application
 
@@ -193,6 +193,7 @@ M0 through M7 are complete. M8.1–M8.6 provide a read-only local dashboard with
 - M8.4 independently loads eight recent durable application detections and renders provider state and Spot availability without claiming official listing time or recommendation.
 - M8.5 adds semantic keyboard-accessible anchor navigation across overview, execution, and new-listing sections, retaining all links on narrow screens.
 - M8.6 independently loads twenty persisted moving-average signals and renders their actions and exact current averages as an observational timeline.
+- M8.7 derives a chronological shared-scale SVG chart of the persisted short and long averages and marks observed buy/sell points without recalculating signals.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -350,13 +351,13 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-26 after M8.6:
+The following passed on 2026-09-26 after M8.7:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
 - `npm test -- --runInBand` — 918 backend tests passed across 99 suites
-- `npm run test:dashboard` — 8 dashboard client and refresh-scheduler tests passed
+- `npm run test:dashboard` — 10 dashboard client, refresh-scheduler, and chart-transformation tests passed
 - `npm run build:dashboard`
 - `docker compose config --quiet`
 - `git diff --check`
@@ -376,7 +377,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M7.109 and M8.1–M8.6 are implemented and verified milestone increments. Automated browser visual inspection was not completed for M8.6; type-check, production build, and client behavior tests passed.
+M0 through M7.109 and M8.1–M8.7 are implemented and verified milestone increments. Automated browser visual inspection was not completed for M8.7; type-check, production build, and client behavior tests passed.
 
 ## Known issues and cautions
 

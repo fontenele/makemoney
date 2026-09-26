@@ -576,6 +576,90 @@ h1 em {
   margin-bottom: 64px;
 }
 
+.signal-chart {
+  margin: 0 0 26px;
+  padding: 18px 18px 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.signal-chart svg {
+  display: block;
+  width: 100%;
+  height: 190px;
+  overflow: visible;
+}
+
+.signal-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.signal-chart-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.signal-chart-legend i {
+  width: 14px;
+  height: 2px;
+}
+
+.short-line {
+  background: var(--green-bright);
+}
+
+.long-line {
+  background: #86a6ff;
+}
+
+.signal-chart-legend small {
+  margin-left: auto;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+}
+
+.chart-grid,
+.chart-line {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.chart-line {
+  stroke-width: 1.5;
+}
+
+.chart-short {
+  stroke: var(--green-bright);
+}
+
+.chart-long {
+  stroke: #86a6ff;
+}
+
+.chart-event {
+  stroke: #07110f;
+  stroke-width: 0.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-event-buy {
+  fill: var(--green-bright);
+}
+
+.chart-event-sell {
+  fill: var(--red);
+}
+
 .signal-timeline {
   margin: 0;
   padding: 0;

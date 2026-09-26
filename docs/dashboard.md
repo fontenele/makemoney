@@ -60,3 +60,11 @@ M8.5 adds no router dependency, separate page, browser state, backend request, m
 The dashboard independently requests the twenty newest persisted moving-average crossover signals and displays action, evaluation time, configured periods, and current short/long averages in a responsive timeline. Buy and sell markers are visual observations only; hold remains neutral.
 
 Empty and unavailable signal histories are explicit and independent. M8.6 adds no strategy evaluation, parameter mutation, sizing, Risk Engine call, order submission, or real trading.
+
+## M8.7 moving-average signal chart
+
+The strategy section derives a chronological SVG chart from the same bounded persisted signal response. Short and long averages share one visible scale, while buy and sell points are marked on the short-average line. The exact timeline remains available below the chart.
+
+Only signals containing finite short and long averages are charted. Decimal conversion is limited to browser coordinates and labels; the backend's exact decimal strings remain the source facts, and the chart performs no financial, strategy, sizing, or execution calculation.
+
+M8.7 adds no backend route, price inference, signal generation, recommendation, mutation, Risk Engine call, order submission, or real trading.
