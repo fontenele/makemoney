@@ -46,3 +46,11 @@ The dashboard independently requests `GET /new-listings?limit=8` and presents re
 An empty result explicitly states that no post-baseline listing has been detected. Failure remains local to this view and does not suppress portfolio or execution resources.
 
 M8.4 adds no symbol ranking, recommendation, alert, checkpoint analysis, mutation, provider request from the browser, execution behavior, authenticated exchange access, or real trading.
+
+## M8.5 responsive section navigation
+
+The header exposes semantic anchor navigation to Overview, Executions, and New listings. Each link targets a named page section, respects keyboard focus, uses native URL fragments, and applies scroll offsets so destinations remain visible.
+
+On narrow screens the links move to a horizontally scrollable second header row rather than disappearing. Reduced-motion preferences continue to disable smooth scrolling through the existing global media rule.
+
+M8.5 adds no router dependency, separate page, browser state, backend request, mutation, authentication, or trading behavior.

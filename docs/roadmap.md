@@ -227,7 +227,8 @@ Vue 3/Vite interface and market/portfolio visualizations.
 - **M8.2 — complete:** the overview refreshes immediately and then on a non-overlapping completion-relative 15-second cadence, pauses pending work while hidden, and refreshes when the tab becomes visible again.
 - **M8.3 — complete:** a responsive read-only ledger displays the twelve most recent immutable fictional executions with side-specific settlement values and an independent unavailable state.
 - **M8.4 — complete:** a responsive read-only view displays eight recent durable application-detected new listings with provider state, Spot availability, and an independent empty/unavailable state.
-- Historical charts, deeper new-listing research views, navigation, and production serving remain deferred to separately verified increments.
+- **M8.5 — complete:** semantic responsive header navigation links the overview, recent executions, and new-listing sections with keyboard focus and native fragment behavior.
+- Historical charts, deeper new-listing research views, and production serving remain deferred to separately verified increments.
 
 ## M9 — Polymarket — planned
 

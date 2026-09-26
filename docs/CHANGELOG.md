@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-26 — M8.5 responsive dashboard section navigation completed
+
+- Added semantic header links for Overview, Executions, and New listings using native fragment navigation and explicit section targets.
+- Added keyboard focus, destination scroll offsets, smooth scrolling with reduced-motion compatibility, and a narrow-screen scrollable navigation row.
+- Added no router dependency, new API request, mutation, authentication, execution behavior, or real trading path.
+
 ## 2026-09-26 — M8.4 recent new-listing detection view completed
 
 - Added an independent typed dashboard request for eight recent durable application detections.

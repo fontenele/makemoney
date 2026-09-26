@@ -87,6 +87,12 @@ onUnmounted(() => autoRefresh.stop());
         </span>
       </a>
 
+      <nav class="section-nav" aria-label="Dashboard sections">
+        <a href="#overview">Overview</a>
+        <a href="#executions">Executions</a>
+        <a href="#new-listings">New listings</a>
+      </nav>
+
       <div class="topbar-actions">
         <span class="connection" :class="{ online: apiOnline }">
           <i aria-hidden="true"></i>
@@ -277,7 +283,11 @@ onUnmounted(() => autoRefresh.stop());
       </article>
     </section>
 
-    <section class="panel execution-panel" aria-labelledby="execution-title">
+    <section
+      id="executions"
+      class="panel execution-panel"
+      aria-labelledby="execution-title"
+    >
       <div class="panel-heading execution-heading">
         <div>
           <p class="eyebrow">Immutable paper ledger</p>
@@ -346,7 +356,11 @@ onUnmounted(() => autoRefresh.stop());
       </p>
     </section>
 
-    <section class="panel listings-panel" aria-labelledby="listings-title">
+    <section
+      id="new-listings"
+      class="panel listings-panel"
+      aria-labelledby="listings-title"
+    >
       <div class="panel-heading execution-heading">
         <div>
           <p class="eyebrow">Application detections</p>

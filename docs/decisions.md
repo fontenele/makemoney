@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-26 — Keep first dashboard navigation native and dependency-free
+
+M8.5 uses semantic anchor links and stable section identifiers rather than introducing a client router for one local page. Native fragments preserve keyboard behavior, URL addressability, and browser history while CSS supplies responsive layout and motion preferences.
+
+A router remains deferred until multiple dashboard pages justify route state, loading boundaries, and an additional dependency.
+
 ## 2026-09-26 — Present recent listing detections without ranking
 
 M8.4 reads the existing bounded detection endpoint as an independent dashboard resource. It exposes only durable provider facts and application detection time, explicitly avoiding an official listing-time claim, recommendation, score, or implied opportunity.
