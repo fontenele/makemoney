@@ -14,6 +14,7 @@ import {
 } from './auto-refresh';
 import { buildSignalChart } from './signal-chart';
 import { buildListingPerformanceChart } from './listing-performance-chart';
+import { buildEquityChart } from './equity-chart';
 
 const snapshot = ref<DashboardSnapshot | null>(null);
 const refreshing = ref(false);
@@ -44,6 +45,16 @@ const listingPerformanceMessage = computed(() => {
     ? 'Awaiting the durable T+0 observation.'
     : listingPerformance.value.message;
 });
+const latestBacktest = computed(() =>
+  snapshot.value?.backtestRuns.status === 'available'
+    ? (snapshot.value.backtestRuns.data[0] ?? null)
+    : null,
+);
+const equityChart = computed(() =>
+  latestBacktest.value
+    ? buildEquityChart(latestBacktest.value.result.simulation.equity.curve)
+    : null,
+);
 
 async function refreshListingPerformance(
   listing: DetectedSpotSymbol,
@@ -151,6 +162,7 @@ onUnmounted(() => autoRefresh.stop());
         <a href="#overview">Overview</a>
         <a href="#executions">Executions</a>
         <a href="#strategy">Strategy</a>
+        <a href="#backtests">Backtests</a>
         <a href="#new-listings">New listings</a>
       </nav>
 
@@ -500,6 +512,143 @@ onUnmounted(() => autoRefresh.stop());
       </template>
       <p v-else class="empty-state execution-empty">
         {{ snapshot?.strategySignals.message ?? 'Loading strategy signals…' }}
+      </p>
+    </section>
+
+    <section
+      id="backtests"
+      class="panel backtest-panel"
+      aria-labelledby="backtest-title"
+    >
+      <div class="panel-heading execution-heading">
+        <div>
+          <p class="eyebrow">Immutable historical research</p>
+          <h2 id="backtest-title">Latest backtest equity</h2>
+        </div>
+        <span class="history-limit">Newest saved run</span>
+      </div>
+
+      <template v-if="available(snapshot?.backtestRuns)">
+        <p
+          v-if="snapshot.backtestRuns.data.length === 0"
+          class="empty-state execution-empty"
+        >
+          No persisted backtest run yet.
+        </p>
+        <template v-else-if="latestBacktest">
+          <div class="backtest-context">
+            <span>
+              {{ latestBacktest.request.symbol }} ·
+              {{ latestBacktest.request.interval }}
+            </span>
+            <span>Saved {{ timestamp(latestBacktest.createdAt) }}</span>
+            <span>
+              {{ latestBacktest.result.replay.candleCount }} closed candles
+            </span>
+          </div>
+
+          <figure v-if="equityChart" class="equity-chart">
+            <div class="signal-chart-legend">
+              <span><i class="equity-line"></i>Fee-adjusted equity</span>
+              <small>
+                {{ equityChart.minimum }}–{{ equityChart.maximum }} USDT
+              </small>
+            </div>
+            <svg
+              viewBox="0 0 100 44"
+              role="img"
+              aria-label="Chronological fee-adjusted equity from the latest persisted backtest"
+              preserveAspectRatio="none"
+            >
+              <path class="chart-grid" d="M 3 41 L 97 41" />
+              <path class="chart-line chart-equity" :d="equityChart.path" />
+            </svg>
+            <figcaption>
+              <span>{{ timestamp(latestBacktest.request.startTime) }}</span>
+              <span>{{ timestamp(latestBacktest.request.endTime) }}</span>
+            </figcaption>
+          </figure>
+
+          <div class="backtest-metrics">
+            <div>
+              <span>Initial capital</span>
+              <strong>
+                {{
+                  decimal(
+                    latestBacktest.result.simulation.capital.initialCapitalUsdt,
+                  )
+                }}
+                USDT
+              </strong>
+            </div>
+            <div>
+              <span>Final equity</span>
+              <strong
+                :class="
+                  tone(
+                    latestBacktest.result.simulation.capital.totalNetReturnUsdt,
+                  )
+                "
+              >
+                {{
+                  decimal(
+                    latestBacktest.result.simulation.capital.finalEquityUsdt,
+                  )
+                }}
+                USDT
+              </strong>
+            </div>
+            <div>
+              <span>Total ROI</span>
+              <strong
+                :class="tone(latestBacktest.result.simulation.capital.totalRoi)"
+              >
+                {{
+                  percentage(latestBacktest.result.simulation.capital.totalRoi)
+                }}
+              </strong>
+            </div>
+            <div>
+              <span>Maximum drawdown</span>
+              <strong class="negative">
+                {{
+                  percentage(
+                    '-' +
+                      latestBacktest.result.simulation.equity
+                        .maximumPercentageDrawdown.rate,
+                  )
+                }}
+              </strong>
+            </div>
+            <div>
+              <span>Closed trades</span>
+              <strong>
+                {{
+                  latestBacktest.result.simulation.performance.closedTradeCount
+                }}
+              </strong>
+            </div>
+            <div>
+              <span>Realized win rate</span>
+              <strong>
+                {{
+                  latestBacktest.result.simulation.performance.winRate === null
+                    ? '—'
+                    : percentage(
+                        latestBacktest.result.simulation.performance.winRate,
+                      )
+                }}
+              </strong>
+            </div>
+          </div>
+          <p class="backtest-note">
+            Stored simulation snapshot · historical research only · no paper
+            wallet effect
+          </p>
+        </template>
+      </template>
+      <p v-else class="empty-state execution-empty">
+        {{ snapshot?.backtestRuns.message ?? 'Loading stored backtests…' }}
       </p>
     </section>
 

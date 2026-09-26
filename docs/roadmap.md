@@ -231,7 +231,8 @@ Vue 3/Vite interface and market/portfolio visualizations.
 - **M8.6 — complete:** a responsive read-only timeline displays the twenty newest persisted moving-average signals and their exact current averages without connecting signals to execution.
 - **M8.7 — complete:** a chronological read-only SVG chart compares the persisted short and long moving averages on one scale and marks observed buy/sell signals without recalculating strategy decisions.
 - **M8.8 — complete:** selecting a recent detection loads its existing exact T+0 checkpoint performance and displays a zero-anchored return chart plus checkpoint facts without ranking or recommendation.
-- Price/equity charts, additional new-listing research views, and production serving remain deferred to separately verified increments.
+- **M8.9 — complete:** the newest immutable stored backtest is displayed with its backend-calculated fee-adjusted equity curve, ROI, drawdown, and closed-trade facts without simulation or mutation controls.
+- Live price/portfolio-equity history, additional new-listing research views, and production serving remain deferred to separately verified increments.
 
 ## M9 — Polymarket — planned
 

@@ -731,6 +731,83 @@ h1 em {
   font-weight: 400;
 }
 
+.backtest-panel {
+  margin-bottom: 20px;
+}
+
+.backtest-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin-bottom: 24px;
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+}
+
+.equity-chart {
+  margin: 0 0 20px;
+  padding: 18px 18px 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.equity-chart svg {
+  display: block;
+  width: 100%;
+  height: 210px;
+  margin-top: 10px;
+}
+
+.equity-chart figcaption {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 7px;
+  color: #60726b;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+}
+
+.equity-line {
+  background: #f0be5b;
+}
+
+.chart-equity {
+  stroke: #f0be5b;
+}
+
+.backtest-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+}
+
+.backtest-metrics > div {
+  display: grid;
+  gap: 8px;
+  padding: 17px;
+  background: var(--panel);
+}
+
+.backtest-metrics span,
+.backtest-note {
+  color: var(--muted);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.backtest-metrics strong {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.backtest-note {
+  margin: 18px 0 0;
+}
+
 .listings-panel {
   min-height: 0;
   margin-bottom: 64px;
@@ -1014,6 +1091,10 @@ footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .backtest-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .checkpoint-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1079,6 +1160,10 @@ footer {
     margin-bottom: 48px;
   }
 
+  .backtest-panel {
+    margin-bottom: 48px;
+  }
+
   .signal-summary,
   .signal-averages {
     align-items: flex-start;
@@ -1087,6 +1172,10 @@ footer {
   }
 
   .listing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .backtest-metrics {
     grid-template-columns: 1fr;
   }
 

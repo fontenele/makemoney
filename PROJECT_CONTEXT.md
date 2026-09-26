@@ -348,6 +348,8 @@ M8.1 establishes a separate Vue 3/Vite read-only dashboard. Its typed client ind
 
 M8.8 adds on-demand selected-listing T+0 checkpoint research to the dashboard by reusing an existing read-only API. It introduces no ranking, recommendation, mutation, or trading path.
 
+M8.9 reads only the newest immutable stored backtest and presents its backend-calculated fee-adjusted equity curve, ROI, drawdown, and closed-trade summary. It does not run a simulation or mutate historical, paper, or real financial state.
+
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 
 ## Non-negotiable safety

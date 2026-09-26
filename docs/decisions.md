@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-26 — Plot persisted backtest equity without recalculation
+
+M8.9 requests the established stored-run list with limit one instead of adding a dashboard-specific route or triggering a simulation. The immutable snapshot already contains the exact fee-adjusted candle-close equity curve and all displayed summary values.
+
+Every valid curve point is retained in chronological order. Browser number conversion supplies only SVG coordinates and labels; it does not reconstruct cash, positions, fees, PnL, ROI, or drawdown. An unavailable or absent backtest remains independent from every operational dashboard resource.
+
 ## 2026-09-26 — Load listing research only after explicit selection
 
 M8.8 reuses the established per-detection performance route after the operator selects one of the bounded recent cards. It does not issue eight speculative detail requests on every refresh, and the selected request remains isolated from portfolio, signal, execution, and listing-summary availability.

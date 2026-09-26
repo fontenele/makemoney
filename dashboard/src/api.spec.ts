@@ -30,19 +30,26 @@ describe('loadDashboard', () => {
                         detectedAt: '2026-09-26T12:00:00.000Z',
                       },
                     ]
-                  : [
-                      {
-                        strategy: 'moving_average_crossover',
-                        symbol: 'BTC/USDT',
-                        action: 'hold',
-                      },
-                    ];
+                  : path.includes('/backtesting/runs')
+                    ? [
+                        {
+                          id: 'run-1',
+                          createdAt: '2026-09-26T12:00:00.000Z',
+                        },
+                      ]
+                    : [
+                        {
+                          strategy: 'moving_average_crossover',
+                          symbol: 'BTC/USDT',
+                          action: 'hold',
+                        },
+                      ];
       return Promise.resolve(Response.json(body));
     });
 
     const snapshot = await loadDashboard(request);
 
-    expect(request).toHaveBeenCalledTimes(7);
+    expect(request).toHaveBeenCalledTimes(8);
     expect(snapshot.health.status).toBe('available');
     expect(snapshot.valuation).toMatchObject({
       status: 'available',
@@ -61,6 +68,10 @@ describe('loadDashboard', () => {
     expect(snapshot.strategySignals).toMatchObject({
       status: 'available',
       data: [{ action: 'hold' }],
+    });
+    expect(snapshot.backtestRuns).toMatchObject({
+      status: 'available',
+      data: [{ id: 'run-1' }],
     });
   });
 
@@ -85,6 +96,7 @@ describe('loadDashboard', () => {
     expect(snapshot.executions.status).toBe('available');
     expect(snapshot.newListings.status).toBe('available');
     expect(snapshot.strategySignals.status).toBe('available');
+    expect(snapshot.backtestRuns.status).toBe('available');
   });
 
   it('keeps the overview available when execution history is unavailable', async () => {
@@ -107,6 +119,7 @@ describe('loadDashboard', () => {
     expect(snapshot.performance.status).toBe('available');
     expect(snapshot.newListings.status).toBe('available');
     expect(snapshot.strategySignals.status).toBe('available');
+    expect(snapshot.backtestRuns.status).toBe('available');
   });
 
   it('keeps portfolio resources available when new listings are unavailable', async () => {
@@ -129,6 +142,7 @@ describe('loadDashboard', () => {
     expect(snapshot.performance.status).toBe('available');
     expect(snapshot.executions.status).toBe('available');
     expect(snapshot.strategySignals.status).toBe('available');
+    expect(snapshot.backtestRuns.status).toBe('available');
   });
 
   it('reports an unreachable local API without rejecting the refresh', async () => {
@@ -146,6 +160,28 @@ describe('loadDashboard', () => {
     expect(snapshot.executions.status).toBe('unavailable');
     expect(snapshot.newListings.status).toBe('unavailable');
     expect(snapshot.strategySignals.status).toBe('unavailable');
+    expect(snapshot.backtestRuns.status).toBe('unavailable');
+  });
+
+  it('keeps the dashboard available when stored backtests are unavailable', async () => {
+    const request = vi.fn((input: string | URL | Request) => {
+      if (input.toString().includes('/backtesting/runs')) {
+        return Promise.resolve(new Response(null, { status: 503 }));
+      }
+      return Promise.resolve(Response.json([]));
+    });
+
+    const snapshot = await loadDashboard(request);
+
+    expect(snapshot.backtestRuns).toEqual({
+      status: 'unavailable',
+      message: 'Unavailable (503)',
+    });
+    expect(snapshot.health.status).toBe('available');
+    expect(snapshot.valuation.status).toBe('available');
+    expect(snapshot.executions.status).toBe('available');
+    expect(snapshot.newListings.status).toBe('available');
+    expect(snapshot.strategySignals.status).toBe('available');
   });
 });
 

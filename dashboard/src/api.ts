@@ -120,6 +120,50 @@ export interface StrategySignal {
   evaluatedAt: string;
 }
 
+export interface BacktestEquityPoint {
+  markedAt: string;
+  equityUsdt: string;
+  drawdownRate: string;
+}
+
+export interface StoredBacktestRun {
+  id: string;
+  createdAt: string;
+  request: {
+    symbol: 'BTC/USDT';
+    interval: '1m';
+    startTime: string;
+    endTime: string;
+    limit: number;
+  };
+  result: {
+    replay: {
+      candleCount: number;
+      startedAt: string | null;
+      endedAt: string | null;
+    };
+    simulation: {
+      capital: {
+        initialCapitalUsdt: string;
+        finalEquityUsdt: string;
+        totalNetReturnUsdt: string;
+        totalRoi: string;
+      };
+      equity: {
+        curve: BacktestEquityPoint[];
+        maximumPercentageDrawdown: {
+          rate: string;
+        };
+      };
+      performance: {
+        closedTradeCount: number;
+        winRate: string | null;
+        totalFees: string;
+      };
+    };
+  };
+}
+
 export type Resource<T> =
   { status: 'available'; data: T } | { status: 'unavailable'; message: string };
 
@@ -131,6 +175,7 @@ export interface DashboardSnapshot {
   executions: Resource<PaperExecution[]>;
   newListings: Resource<DetectedSpotSymbol[]>;
   strategySignals: Resource<StrategySignal[]>;
+  backtestRuns: Resource<StoredBacktestRun[]>;
   loadedAt: string;
 }
 
@@ -147,6 +192,7 @@ export async function loadDashboard(
     executions,
     newListings,
     strategySignals,
+    backtestRuns,
   ] = await Promise.all([
     loadResource<HealthResponse>('/api/health', request),
     loadResource<PortfolioValuation>('/api/paper-wallet/valuation', request),
@@ -161,6 +207,7 @@ export async function loadDashboard(
     ),
     loadResource<DetectedSpotSymbol[]>('/api/new-listings?limit=8', request),
     loadResource<StrategySignal[]>('/api/strategies/signals?limit=20', request),
+    loadResource<StoredBacktestRun[]>('/api/backtesting/runs?limit=1', request),
   ]);
 
   return {
@@ -171,6 +218,7 @@ export async function loadDashboard(
     executions,
     newListings,
     strategySignals,
+    backtestRuns,
     loadedAt: new Date().toISOString(),
   };
 }

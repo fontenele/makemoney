@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-26 — M8.9 latest persisted backtest equity completed
+
+- Added an independent bounded request for the newest immutable stored simulation snapshot.
+- Added its complete fee-adjusted equity curve and stored capital, ROI, drawdown, trade-count, and win-rate facts.
+- Added explicit empty and unavailable states plus responsive navigation and layout.
+- Added focused API isolation and chart coverage without adding simulation, persistence, deletion, wallet mutation, recommendation, or trading controls.
+
 ## 2026-09-26 — M8.8 selected-listing checkpoint research completed
 
 - Added explicit per-card loading of the existing exact T+0-relative listing performance route.
