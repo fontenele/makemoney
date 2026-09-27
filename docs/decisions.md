@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-27 — Bound related-tag traversal to one identity-only level
+
+M9.17 uses Gamma's tag-detail relation endpoint rather than recursively composing selected-tag requests. The provider response is capped at 100 unique tags and reduced to the existing identity-only shape; malformed, duplicate, oversized, or self-referential collections fail closed.
+
+The route keeps the requested source ID explicit and treats an empty relationship set as valid. It does not infer relationship strength, recursively traverse a graph, or use related tags as an implicit event or market filter.
+
 ## 2026-09-27 — Verify selected-tag identity inside the catalog provider
 
 M9.16 extends the dedicated global tag provider with lookup by positive numeric ID rather than coupling selected tags to event or market taxonomy. A successful Gamma response is accepted only when its normalized string ID exactly matches the requested canonical ID.

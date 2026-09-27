@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, **M6 — Backtesting (M6.1–M6.32)**, **M7 — New Listing Scanner (M7.1–M7.109)**, and **M8 — Dashboard (M8.1–M8.11)**.
-- M9 is in progress through **M9.16 — Selected Tag Details**.
+- M9 is in progress through **M9.17 — Related Tag Details**.
 - M6 is closed. M7.1–M7.109 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -386,6 +386,8 @@ M9.14 loads the bounded public taxonomy attached to one selected market at `GET 
 M9.15 loads one bounded public global tag-catalog page at `GET /polymarket/tags`. It validates `limit` and `offset`, asks Gamma for ascending provider-ID order, exposes offset continuation as explicitly unstable, and retains only unique tag IDs with nullable labels/slugs without adding tag relationships, filtering, persistence, accounts, or execution behavior.
 
 M9.16 loads one selected public tag at `GET /polymarket/tags/:id`. It validates a positive numeric Gamma tag ID, requires the returned identity to match exactly, preserves only ID and nullable label/slug plus receipt time, and distinguishes absence from provider or contract failure without adding slug lookup, relationships, filtering, persistence, accounts, or execution behavior.
+
+M9.17 loads the public tags related to one selected tag at `GET /polymarket/tags/:id/related`. It bounds the provider collection to 100 unique identity-only tags, rejects the source tag inside its own related set, and distinguishes source absence from provider or contract failure without adding recursive traversal, filtering, persistence, accounts, or execution behavior.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

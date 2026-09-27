@@ -148,6 +148,72 @@ describe('PolymarketController', () => {
     );
   });
 
+  it('loads related tags by validated source id', async () => {
+    const getRelatedById = jest
+      .fn<PredictionTagProvider['getRelatedById']>()
+      .mockResolvedValue(relatedTags());
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getRelatedById },
+    );
+
+    await expect(controller.getRelatedTags('2')).resolves.toEqual(
+      relatedTags(),
+    );
+    expect(getRelatedById).toHaveBeenCalledWith('2', undefined);
+  });
+
+  it.each(['0', '-1', '01', 'abc'])(
+    'rejects invalid related-tag source id %s',
+    async (id) => {
+      await expect(controllerWith({}).getRelatedTags(id)).rejects.toThrow(
+        BadRequestException,
+      );
+    },
+  );
+
+  it('maps absent related-tag source to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getRelatedById: () =>
+          Promise.reject(new PredictionTagNotFoundError('2')),
+      },
+    );
+
+    await expect(controller.getRelatedTags('2')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps related-tag provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getRelatedById: () => Promise.reject(new Error('network unavailable')),
+      },
+    );
+
+    await expect(controller.getRelatedTags('2')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
   it('loads the default bounded active-event page', async () => {
     const calls: unknown[] = [];
     const controller = controllerWith(
@@ -1060,6 +1126,9 @@ function controllerWith(
     getById:
       tagProvider.getById ??
       (() => Promise.reject(new Error('unexpected tag detail call'))),
+    getRelatedById:
+      tagProvider.getRelatedById ??
+      (() => Promise.reject(new Error('unexpected related-tag call'))),
   });
   return new PolymarketController(
     events,
@@ -1094,6 +1163,15 @@ function tagDetails() {
     label: 'Politics',
     slug: 'politics',
     receivedAt: new Date('2026-09-27T22:00:00.000Z'),
+  };
+}
+
+function relatedTags() {
+  return {
+    provider: 'polymarket' as const,
+    tagId: '2',
+    tags: [{ id: '3', label: 'Elections', slug: 'elections' }],
+    receivedAt: new Date('2026-09-27T23:00:00.000Z'),
   };
 }
 

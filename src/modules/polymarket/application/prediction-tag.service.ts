@@ -5,6 +5,7 @@ import {
   PredictionTagPage,
   PredictionTagProvider,
   PredictionTagQuery,
+  PredictionRelatedTags,
 } from '../domain/prediction-tag';
 
 @Injectable()
@@ -23,5 +24,12 @@ export class PredictionTagService {
 
   getById(id: string, signal?: AbortSignal): Promise<PredictionTagDetails> {
     return this.provider.getById(id, signal);
+  }
+
+  getRelatedById(
+    id: string,
+    signal?: AbortSignal,
+  ): Promise<PredictionRelatedTags> {
+    return this.provider.getRelatedById(id, signal);
   }
 }

@@ -111,6 +111,84 @@ describe('PolymarketGammaTagClient', () => {
     },
   );
 
+  it('loads a bounded related-tag collection', async () => {
+    const http = jest.fn<typeof fetch>().mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          { id: '3', label: 'Elections', slug: 'elections' },
+          { id: '4', label: null, slug: 'government' },
+        ]),
+      ),
+    );
+    const receivedAt = new Date('2026-09-27T23:00:00.000Z');
+    const client = new PolymarketGammaTagClient(
+      'https://example.com/',
+      http,
+      () => receivedAt,
+    );
+
+    await expect(client.getRelatedById('2')).resolves.toEqual({
+      provider: 'polymarket',
+      tagId: '2',
+      tags: [
+        { id: '3', label: 'Elections', slug: 'elections' },
+        { id: '4', label: null, slug: 'government' },
+      ],
+      receivedAt,
+    });
+    expect(http).toHaveBeenCalledWith(
+      'https://example.com/tags/2/related-tags/tags',
+      expect.objectContaining({ headers: { accept: 'application/json' } }),
+    );
+  });
+
+  it.each([
+    ['non-array payload', {}],
+    [
+      'duplicate identity',
+      [
+        { id: '3', label: null, slug: null },
+        { id: '3', label: null, slug: null },
+      ],
+    ],
+    ['source identity', [{ id: '2', label: null, slug: null }]],
+    [
+      'oversized collection',
+      Array.from({ length: 101 }, (_, index) => ({
+        id: `${index + 3}`,
+        label: null,
+        slug: null,
+      })),
+    ],
+  ])('rejects related tags with %s', (_scenario, payload) => {
+    expect(() =>
+      new PolymarketGammaTagClient('https://example.com').normalizeRelated(
+        '2',
+        payload,
+      ),
+    ).toThrow('Invalid Polymarket related-tag payload');
+  });
+
+  it.each([404, 503])(
+    'rejects related-tag provider status %s',
+    async (status) => {
+      const http = jest
+        .fn<typeof fetch>()
+        .mockResolvedValue(new Response('', { status }));
+
+      await expect(
+        new PolymarketGammaTagClient(
+          'https://example.com',
+          http,
+        ).getRelatedById('2'),
+      ).rejects.toThrow(
+        status === 404
+          ? 'Polymarket tag 2 was not found'
+          : 'Polymarket related-tag request failed: 503',
+      );
+    },
+  );
+
   it.each([
     ['non-array payload', {}],
     ['missing identity', [{ label: 'Politics', slug: 'politics' }]],

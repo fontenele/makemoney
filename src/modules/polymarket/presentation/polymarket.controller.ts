@@ -71,6 +71,7 @@ import {
   PredictionTagDetails,
   PredictionTagNotFoundError,
   PredictionTagPage,
+  PredictionRelatedTags,
 } from '../domain/prediction-tag';
 
 const DEFAULT_LIMIT = 20;
@@ -123,6 +124,23 @@ export class PolymarketController {
       }
       throw new ServiceUnavailableException(
         'Polymarket tag detail is unavailable',
+      );
+    }
+  }
+
+  @Get('tags/:id/related')
+  async getRelatedTags(
+    @Param('id') id: string,
+  ): Promise<PredictionRelatedTags> {
+    const parsedId = validTagId(id);
+    try {
+      return await this.tags.getRelatedById(parsedId);
+    } catch (error) {
+      if (error instanceof PredictionTagNotFoundError) {
+        throw new NotFoundException('Polymarket tag was not found');
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket related tags are unavailable',
       );
     }
   }

@@ -5,6 +5,7 @@ import {
   PredictionTagPage,
   PredictionTagProvider,
   PredictionTagQuery,
+  PredictionRelatedTags,
 } from '../domain/prediction-tag';
 
 type HttpClient = (input: string, init?: RequestInit) => Promise<Response>;
@@ -74,6 +75,32 @@ export class PolymarketGammaTagClient implements PredictionTagProvider {
     return { provider: 'polymarket', ...tag, receivedAt: this.clock() };
   }
 
+  async getRelatedById(
+    id: string,
+    signal?: AbortSignal,
+  ): Promise<PredictionRelatedTags> {
+    const timeout = AbortSignal.timeout(TIMEOUT_MS);
+    const response = await this.http(
+      `${this.baseUrl.replace(/\/$/, '')}/tags/${encodeURIComponent(id)}/related-tags/tags`,
+      {
+        headers: { accept: 'application/json' },
+        signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+      },
+    );
+    if (response.status === 404) {
+      throw new PredictionTagNotFoundError(id);
+    }
+    if (!response.ok) {
+      throw new Error(
+        `Polymarket related-tag request failed: ${response.status}`,
+      );
+    }
+    return this.normalizeRelated(
+      id,
+      JSON.parse(await response.text()) as unknown,
+    );
+  }
+
   normalize(payload: unknown, query: PredictionTagQuery): PredictionTagPage {
     if (
       !Array.isArray(payload) ||
@@ -96,6 +123,25 @@ export class PolymarketGammaTagClient implements PredictionTagProvider {
           ? candidateOffset
           : null,
       stablePagination: false,
+      receivedAt: this.clock(),
+    };
+  }
+
+  normalizeRelated(id: string, payload: unknown): PredictionRelatedTags {
+    if (!Array.isArray(payload) || payload.length > MAXIMUM_TAGS) {
+      throw new Error('Invalid Polymarket related-tag payload');
+    }
+    const tags = payload.map(normalizeTag);
+    if (
+      new Set(tags.map((tag) => tag.id)).size !== tags.length ||
+      tags.some((tag) => tag.id === id)
+    ) {
+      throw new Error('Invalid Polymarket related-tag payload');
+    }
+    return {
+      provider: 'polymarket',
+      tagId: id,
+      tags,
       receivedAt: this.clock(),
     };
   }

@@ -18,6 +18,13 @@ export interface PredictionTagDetails extends PredictionTag {
   receivedAt: Date;
 }
 
+export interface PredictionRelatedTags {
+  provider: 'polymarket';
+  tagId: string;
+  tags: PredictionTag[];
+  receivedAt: Date;
+}
+
 export interface PredictionTagQuery {
   limit: number;
   offset: number;
@@ -31,6 +38,10 @@ export interface PredictionTagProvider {
     signal?: AbortSignal,
   ): Promise<PredictionTagPage>;
   getById(id: string, signal?: AbortSignal): Promise<PredictionTagDetails>;
+  getRelatedById(
+    id: string,
+    signal?: AbortSignal,
+  ): Promise<PredictionRelatedTags>;
 }
 
 export class PredictionTagNotFoundError extends Error {

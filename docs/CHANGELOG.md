@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-27 — M9.17 bounded public Polymarket related tags completed
+
+- Added `GET /polymarket/tags/:id/related` for one validated positive numeric Gamma source-tag ID.
+- Loads at most 100 related tags and preserves only unique IDs with nullable labels/slugs plus receipt time.
+- Maps provider `404` to local `404` and fails closed on malformed, duplicate, oversized, self-referential, or unavailable provider data.
+- Adds no recursive traversal, relationship weighting, filters, polling, persistence, accounts, orders, wallet, or execution behavior.
+
 ## 2026-09-27 — M9.16 selected public Polymarket tag details completed
 
 - Added `GET /polymarket/tags/:id` for one validated positive numeric Gamma tag ID.
