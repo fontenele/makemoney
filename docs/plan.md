@@ -1259,7 +1259,7 @@ Futuramente pode ser usado para estudar:
 - information edge;
 - mercados correlacionados.
 
-M9.1–M9.2 implement bounded unauthenticated active-market discovery and selected YES/NO outcome identities only. Prices, order books, persistence, strategies, accounts, authentication, and execution remain later explicit increments.
+M9.1–M9.3 implement bounded unauthenticated active-market discovery, selected YES/NO outcome identities, and one non-executable public CLOB midpoint observation. Order books, persistence, strategies, accounts, authentication, and execution remain later explicit increments.
 
 ---
 
@@ -1710,7 +1710,7 @@ M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.10)
-M9 — Polymarket                   IN PROGRESS (M9.1–M9.2)
+M9 — Polymarket                   IN PROGRESS (M9.1–M9.3)
 M10 — Agentic Wallet / Real Trading PLANNED
 ```
 
@@ -2396,6 +2396,7 @@ M8.9 Latest Persisted Backtest Equity: DONE
 M8.10 Compiled Dashboard Serving: DONE
 M9.1 Public Active-Market Discovery: DONE
 M9.2 Selected-Market Outcome Identities: DONE
+M9.3 Public Outcome Midpoint Observation: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2414,5 +2415,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is in progress through M9.2 selected-market outcome identities. A later safe increment may add one public observational outcome price with exact-decimal and freshness semantics; authentication, accounts, automatic execution controls, and real trading remain separate future work.
+M9 is in progress through M9.3 public outcome midpoint observation. A later safe increment may expose one public top-of-book with strict price, quantity, spread, and missing-liquidity semantics; authentication, accounts, automatic execution controls, and real trading remain separate future work.
 ```

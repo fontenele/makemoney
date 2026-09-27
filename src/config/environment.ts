@@ -8,6 +8,7 @@ interface Environment {
   BINANCE_WS_BASE_URL: string;
   BINANCE_REST_BASE_URL: string;
   POLYMARKET_GAMMA_BASE_URL: string;
+  POLYMARKET_CLOB_BASE_URL: string;
   NEW_LISTINGS_POLL_INTERVAL_MS: number;
   NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED: boolean;
   NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: number;
@@ -49,6 +50,9 @@ const environmentSchema = Joi.object<Environment>({
   POLYMARKET_GAMMA_BASE_URL: Joi.string()
     .uri({ scheme: ['https'] })
     .default('https://gamma-api.polymarket.com'),
+  POLYMARKET_CLOB_BASE_URL: Joi.string()
+    .uri({ scheme: ['https'] })
+    .default('https://clob.polymarket.com'),
   NEW_LISTINGS_POLL_INTERVAL_MS: Joi.number()
     .integer()
     .min(5000)

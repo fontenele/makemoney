@@ -4,6 +4,11 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
+import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
+import {
+  PredictionMarketMidpointProvider,
+  PredictionMarketMidpointUnavailableError,
+} from '../domain/prediction-market-midpoint';
 import {
   PredictionMarketNotFoundError,
   PredictionMarketProvider,
@@ -118,10 +123,65 @@ describe('PolymarketController', () => {
       ServiceUnavailableException,
     );
   });
+
+  it('loads one exact non-executable outcome midpoint', async () => {
+    const calls: string[] = [];
+    const controller = controllerWith(
+      {},
+      {
+        getMidpoint: (tokenId) => {
+          calls.push(tokenId);
+          return Promise.resolve(midpoint());
+        },
+      },
+    );
+
+    await expect(controller.getOutcomeMidpoint('111')).resolves.toEqual(
+      midpoint(),
+    );
+    expect(calls).toEqual(['111']);
+  });
+
+  it.each(['', '01', '-1', '1.5', 'abc', '1'.repeat(79)])(
+    'rejects invalid midpoint token id %s',
+    async (tokenId) => {
+      await expect(
+        controllerWith({}).getOutcomeMidpoint(tokenId),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it('maps an unavailable midpoint to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {
+        getMidpoint: (tokenId) =>
+          Promise.reject(new PredictionMarketMidpointUnavailableError(tokenId)),
+      },
+    );
+
+    await expect(controller.getOutcomeMidpoint('111')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps midpoint provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {
+        getMidpoint: () => Promise.reject(new Error('network unavailable')),
+      },
+    );
+
+    await expect(controller.getOutcomeMidpoint('111')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
 });
 
 function controllerWith(
   provider: Partial<PredictionMarketProvider>,
+  midpointProvider: Partial<PredictionMarketMidpointProvider> = {},
 ): PolymarketController {
   return new PolymarketController(
     new PredictionMarketDiscoveryService({
@@ -131,6 +191,11 @@ function controllerWith(
       getById:
         provider.getById ??
         (() => Promise.reject(new Error('unexpected detail call'))),
+    }),
+    new PredictionMarketPricingService({
+      getMidpoint:
+        midpointProvider.getMidpoint ??
+        (() => Promise.reject(new Error('unexpected midpoint call'))),
     }),
   );
 }
@@ -152,5 +217,17 @@ function marketDetails() {
       no: { label: 'No', tokenId: '222' },
     },
     receivedAt: new Date('2026-09-26T12:00:00.000Z'),
+  };
+}
+
+function midpoint() {
+  return {
+    provider: 'polymarket' as const,
+    tokenId: '111',
+    price: '0.45',
+    source: 'clob-midpoint' as const,
+    executable: false as const,
+    providerTimestamp: null,
+    receivedAt: new Date('2026-09-26T18:00:00.000Z'),
   };
 }

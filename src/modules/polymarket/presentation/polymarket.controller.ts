@@ -8,6 +8,12 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
+import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
+import {
+  isPredictionMarketTokenId,
+  PredictionMarketMidpointUnavailableError,
+  PredictionMarketOutcomeMidpoint,
+} from '../domain/prediction-market-midpoint';
 import {
   PredictionMarketDetails,
   PredictionMarketNotFoundError,
@@ -20,7 +26,10 @@ const CURSOR = /^\S{1,4096}$/u;
 
 @Controller('polymarket')
 export class PolymarketController {
-  constructor(private readonly discovery: PredictionMarketDiscoveryService) {}
+  constructor(
+    private readonly discovery: PredictionMarketDiscoveryService,
+    private readonly pricing: PredictionMarketPricingService,
+  ) {}
 
   @Get('markets')
   async listActiveMarkets(
@@ -51,6 +60,29 @@ export class PolymarketController {
       }
       throw new ServiceUnavailableException(
         'Polymarket market detail is unavailable',
+      );
+    }
+  }
+
+  @Get('outcomes/:tokenId/midpoint')
+  async getOutcomeMidpoint(
+    @Param('tokenId') tokenId: string,
+  ): Promise<PredictionMarketOutcomeMidpoint> {
+    if (!isPredictionMarketTokenId(tokenId)) {
+      throw new BadRequestException(
+        'tokenId must be a canonical Polymarket decimal token identifier',
+      );
+    }
+    try {
+      return await this.pricing.getMidpoint(tokenId);
+    } catch (error) {
+      if (error instanceof PredictionMarketMidpointUnavailableError) {
+        throw new NotFoundException(
+          'Polymarket outcome midpoint is unavailable',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket outcome midpoint provider is unavailable',
       );
     }
   }

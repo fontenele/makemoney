@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-26 — Treat the public CLOB midpoint as non-executable receipt-time data
+
+M9.3 uses the unauthenticated CLOB midpoint endpoint instead of Gamma's parallel `outcomePrices` array. The endpoint defines the value precisely as the average of best bid and best ask and returns it as a decimal string for one explicit outcome token.
+
+The domain preserves that exact string and labels the observation `executable: false`. It records local `receivedAt` but sets `providerTimestamp` to null because the endpoint supplies no source timestamp; therefore the API makes no upstream-age, fill, depth, or liquidity claim. Every request goes to CLOB directly, with no cache or persistence.
+
 ## 2026-09-26 — Normalize Polymarket outcomes by documented index
 
 M9.2 reads one public Gamma market by numeric ID and decodes the provider's JSON-encoded `outcomes` and `clobTokenIds` arrays together. The documented index contract maps entry zero to YES and entry one to NO; both arrays must contain exactly two valid entries or the complete response is rejected.

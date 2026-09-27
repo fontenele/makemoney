@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-26 — M9.3 public Polymarket outcome midpoint completed
+
+- Added a public read-only route for one selected outcome token's CLOB midpoint.
+- Preserved the provider decimal string exactly and constrained it to the documented zero-through-one range.
+- Marked the midpoint non-executable and exposed local receipt time separately from an explicitly unavailable provider timestamp.
+- Distinguished malformed input, invalid tokens or missing books, and provider failures without adding credentials, persistence, orders, accounts, or wallets.
+
 ## 2026-09-26 — M9.2 selected Polymarket outcome identities completed
 
 - Added public lookup of one selected market by validated Gamma market ID.

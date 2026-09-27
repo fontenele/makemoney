@@ -40,6 +40,7 @@ describe('validateEnvironment Polymarket public API', () => {
   it('uses the official Gamma API default', () => {
     expect(validateEnvironment(required)).toMatchObject({
       POLYMARKET_GAMMA_BASE_URL: 'https://gamma-api.polymarket.com',
+      POLYMARKET_CLOB_BASE_URL: 'https://clob.polymarket.com',
     });
   });
 
@@ -56,6 +57,23 @@ describe('validateEnvironment Polymarket public API', () => {
       validateEnvironment({
         ...required,
         POLYMARKET_GAMMA_BASE_URL: 'http://gamma-api.example.com',
+      }),
+    ).toThrow('Invalid environment configuration');
+  });
+
+  it('accepts a custom HTTPS CLOB endpoint and rejects HTTP', () => {
+    expect(
+      validateEnvironment({
+        ...required,
+        POLYMARKET_CLOB_BASE_URL: 'https://clob.example.com',
+      }),
+    ).toMatchObject({
+      POLYMARKET_CLOB_BASE_URL: 'https://clob.example.com',
+    });
+    expect(() =>
+      validateEnvironment({
+        ...required,
+        POLYMARKET_CLOB_BASE_URL: 'http://clob.example.com',
       }),
     ).toThrow('Invalid environment configuration');
   });
