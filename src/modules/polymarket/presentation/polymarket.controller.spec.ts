@@ -4,11 +4,16 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
+import { PredictionMarketOrderBookService } from '../application/prediction-market-order-book.service';
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
 import {
   PredictionMarketMidpointProvider,
   PredictionMarketMidpointUnavailableError,
 } from '../domain/prediction-market-midpoint';
+import {
+  PredictionMarketOrderBookProvider,
+  PredictionMarketOrderBookUnavailableError,
+} from '../domain/prediction-market-top-of-book';
 import {
   PredictionMarketNotFoundError,
   PredictionMarketProvider,
@@ -177,11 +182,71 @@ describe('PolymarketController', () => {
       ServiceUnavailableException,
     );
   });
+
+  it('loads one exact non-executable outcome top of book', async () => {
+    const calls: string[] = [];
+    const controller = controllerWith(
+      {},
+      {},
+      {
+        getTopOfBook: (tokenId) => {
+          calls.push(tokenId);
+          return Promise.resolve(topOfBook());
+        },
+      },
+    );
+
+    await expect(controller.getOutcomeTopOfBook('111')).resolves.toEqual(
+      topOfBook(),
+    );
+    expect(calls).toEqual(['111']);
+  });
+
+  it.each(['', '01', '-1', '1.5', 'abc', '1'.repeat(79)])(
+    'rejects invalid order-book token id %s',
+    async (tokenId) => {
+      await expect(
+        controllerWith({}).getOutcomeTopOfBook(tokenId),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it('maps an unavailable order book to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {
+        getTopOfBook: (tokenId) =>
+          Promise.reject(
+            new PredictionMarketOrderBookUnavailableError(tokenId),
+          ),
+      },
+    );
+
+    await expect(controller.getOutcomeTopOfBook('111')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps order-book provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {
+        getTopOfBook: () => Promise.reject(new Error('network unavailable')),
+      },
+    );
+
+    await expect(controller.getOutcomeTopOfBook('111')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
 });
 
 function controllerWith(
   provider: Partial<PredictionMarketProvider>,
   midpointProvider: Partial<PredictionMarketMidpointProvider> = {},
+  orderBookProvider: Partial<PredictionMarketOrderBookProvider> = {},
 ): PolymarketController {
   return new PolymarketController(
     new PredictionMarketDiscoveryService({
@@ -196,6 +261,11 @@ function controllerWith(
       getMidpoint:
         midpointProvider.getMidpoint ??
         (() => Promise.reject(new Error('unexpected midpoint call'))),
+    }),
+    new PredictionMarketOrderBookService({
+      getTopOfBook:
+        orderBookProvider.getTopOfBook ??
+        (() => Promise.reject(new Error('unexpected order-book call'))),
     }),
   );
 }
@@ -229,5 +299,21 @@ function midpoint() {
     executable: false as const,
     providerTimestamp: null,
     receivedAt: new Date('2026-09-26T18:00:00.000Z'),
+  };
+}
+
+function topOfBook() {
+  return {
+    provider: 'polymarket' as const,
+    tokenId: '111',
+    conditionId: '0xcondition',
+    snapshotHash: '0xhash',
+    bid: { price: '0.45', quantity: '100' },
+    ask: { price: '0.46', quantity: '150' },
+    spread: '0.01',
+    source: 'clob-order-book' as const,
+    executable: false as const,
+    providerTimestamp: '1758920000123',
+    receivedAt: new Date('2026-09-26T20:00:00.000Z'),
   };
 }

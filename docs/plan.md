@@ -1259,7 +1259,7 @@ Futuramente pode ser usado para estudar:
 - information edge;
 - mercados correlacionados.
 
-M9.1–M9.3 implement bounded unauthenticated active-market discovery, selected YES/NO outcome identities, and one non-executable public CLOB midpoint observation. Order books, persistence, strategies, accounts, authentication, and execution remain later explicit increments.
+M9.1–M9.4 implement bounded unauthenticated market discovery, selected YES/NO outcome identities, a non-executable CLOB midpoint, and exact public top-of-book observations. Full depth, persistence, strategies, accounts, authentication, and execution remain later explicit increments.
 
 ---
 
@@ -1710,7 +1710,7 @@ M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.10)
-M9 — Polymarket                   IN PROGRESS (M9.1–M9.3)
+M9 — Polymarket                   IN PROGRESS (M9.1–M9.4)
 M10 — Agentic Wallet / Real Trading PLANNED
 ```
 
@@ -2397,6 +2397,7 @@ M8.10 Compiled Dashboard Serving: DONE
 M9.1 Public Active-Market Discovery: DONE
 M9.2 Selected-Market Outcome Identities: DONE
 M9.3 Public Outcome Midpoint Observation: DONE
+M9.4 Public Outcome Top of Book: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2415,5 +2416,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is in progress through M9.3 public outcome midpoint observation. A later safe increment may expose one public top-of-book with strict price, quantity, spread, and missing-liquidity semantics; authentication, accounts, automatic execution controls, and real trading remain separate future work.
+M9 is in progress through M9.4 public outcome top of book. A later safe increment may reconcile midpoint and top-of-book observations with explicit snapshot-coherence semantics; authentication, accounts, automatic execution controls, and real trading remain separate future work.
 ```

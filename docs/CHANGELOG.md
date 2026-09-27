@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-26 — M9.4 public Polymarket top of book completed
+
+- Added a public read-only route for one outcome token's best bid, best ask, displayed quantities, and spread.
+- Strictly validated snapshot identity, metadata, exact decimals, documented side ordering, and non-crossed books.
+- Preserved the provider snapshot timestamp and hash while representing missing bid or ask liquidity explicitly.
+- Marked the observation non-executable and added no persistence, authentication, account, wallet, signal, or order path.
+- Recorded Apache ECharts as the preferred library for future dashboard chart work without adding the dependency before a concrete visual increment.
+
 ## 2026-09-26 — M9.3 public Polymarket outcome midpoint completed
 
 - Added a public read-only route for one selected outcome token's CLOB midpoint.

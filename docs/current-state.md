@@ -6,6 +6,8 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
+M9.4 is complete: one public CLOB snapshot can be loaded by outcome-token ID and strictly reduced to exact best bid/ask prices, displayed quantities, and spread. Snapshot identity, ordering, and book coherence are validated; absent sides remain explicit and the observation is non-executable.
+
 M9.3 is complete: one public CLOB midpoint can be requested by canonical outcome-token ID, with its exact decimal string, non-executable provenance, local receipt time, and absent provider timestamp represented explicitly. No price is cached or persisted.
 
 M9.2 is complete: one selected public Gamma market can be loaded by validated numeric ID, with its indexed outcome arrays strictly normalized into explicit YES and NO labels and nullable CLOB token identities. Provider prices remain outside that detail endpoint.
@@ -357,6 +359,7 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - Public active Polymarket markets: `GET http://localhost:3000/polymarket/markets`
 - Public selected Polymarket market: `GET http://localhost:3000/polymarket/markets/:id`
 - Public Polymarket outcome midpoint: `GET http://localhost:3000/polymarket/outcomes/:tokenId/midpoint`
+- Public Polymarket outcome top of book: `GET http://localhost:3000/polymarket/outcomes/:tokenId/top-of-book`
 - PostgreSQL host port: `5433` mapped to container port `5432`
 - Redis host port: `6379`
 
@@ -364,12 +367,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-26 after M9.3:
+The following passed on 2026-09-26 after M9.4:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 983 backend tests passed across 103 suites
+- `npm test -- --runInBand` — 1021 backend tests passed across 104 suites
 - `npm run test:dashboard` — 19 dashboard client, refresh-scheduler, API-path, API-isolation, and chart-transformation tests passed
 - `npm run build:all`
 - `docker compose config --quiet`
@@ -392,7 +395,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.10 are complete, and M9 is implemented through M9.3. Public Polymarket discovery, outcome identities, and non-executable midpoint observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
+M0 through M8.10 are complete, and M9 is implemented through M9.4. Public Polymarket discovery, outcome identities, midpoint, and level-one book observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
 
 ## Known issues and cautions
 

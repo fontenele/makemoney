@@ -1,5 +1,15 @@
 # Technical Decisions
 
+## 2026-09-26 — Normalize only level one from the public Polymarket book
+
+M9.4 requests the unauthenticated CLOB `/book` snapshot but exposes only the best bid and ask. The adapter validates the complete returned level ordering before selecting level one, verifies response token identity, rejects crossed books, preserves exact decimal strings, and calculates exact spread without native floating point.
+
+An empty side is valid missing liquidity rather than a fabricated zero. Provider snapshot timestamp and hash remain visible, while `executable: false` prevents a displayed level from becoming a fill claim. Full depth, caching, persistence, aggregation, and trading remain separate decisions.
+
+## 2026-09-26 — Prefer Apache ECharts for future dashboard charts
+
+Future dashboard chart increments should prefer Apache ECharts for its broader chart catalog, flexible Canvas/SVG rendering, responsive configuration, and accessibility support. The dependency is not added until a concrete chart is implemented or migrated, so the current bundle does not grow speculatively and existing SVG views remain unchanged for now.
+
 ## 2026-09-26 — Treat the public CLOB midpoint as non-executable receipt-time data
 
 M9.3 uses the unauthenticated CLOB midpoint endpoint instead of Gamma's parallel `outcomePrices` array. The endpoint defines the value precisely as the average of best bid and best ask and returns it as a decimal string for one explicit outcome token.

@@ -8,12 +8,17 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
+import { PredictionMarketOrderBookService } from '../application/prediction-market-order-book.service';
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
 import {
   isPredictionMarketTokenId,
   PredictionMarketMidpointUnavailableError,
   PredictionMarketOutcomeMidpoint,
 } from '../domain/prediction-market-midpoint';
+import {
+  PredictionMarketOrderBookUnavailableError,
+  PredictionMarketTopOfBook,
+} from '../domain/prediction-market-top-of-book';
 import {
   PredictionMarketDetails,
   PredictionMarketNotFoundError,
@@ -29,6 +34,7 @@ export class PolymarketController {
   constructor(
     private readonly discovery: PredictionMarketDiscoveryService,
     private readonly pricing: PredictionMarketPricingService,
+    private readonly orderBook: PredictionMarketOrderBookService,
   ) {}
 
   @Get('markets')
@@ -83,6 +89,29 @@ export class PolymarketController {
       }
       throw new ServiceUnavailableException(
         'Polymarket outcome midpoint provider is unavailable',
+      );
+    }
+  }
+
+  @Get('outcomes/:tokenId/top-of-book')
+  async getOutcomeTopOfBook(
+    @Param('tokenId') tokenId: string,
+  ): Promise<PredictionMarketTopOfBook> {
+    if (!isPredictionMarketTokenId(tokenId)) {
+      throw new BadRequestException(
+        'tokenId must be a canonical Polymarket decimal token identifier',
+      );
+    }
+    try {
+      return await this.orderBook.getTopOfBook(tokenId);
+    } catch (error) {
+      if (error instanceof PredictionMarketOrderBookUnavailableError) {
+        throw new NotFoundException(
+          'Polymarket outcome order book is unavailable',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket outcome order-book provider is unavailable',
       );
     }
   }

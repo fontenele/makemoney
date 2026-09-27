@@ -35,12 +35,22 @@ Each request goes directly to the provider and is not cached. `receivedAt` recor
 
 Malformed token IDs return `400`. Provider `400` for an invalid token and `404` for a missing order book become local `404`; transport, other HTTP, JSON, or decimal-contract failures become `503`.
 
+## M9.4 — Public outcome top of book
+
+`GET /polymarket/outcomes/:tokenId/top-of-book` requests the public CLOB order-book snapshot for one canonical outcome-token ID and retains only its best bid and best ask.
+
+The adapter verifies that `asset_id` matches the request, preserves the condition ID, snapshot hash, raw provider timestamp, and local receipt time, and validates every returned level. Bids must follow the documented descending-price order, asks must follow ascending-price order, quantities must be positive exact decimal strings, and the best bid cannot exceed the best ask.
+
+Bid and ask expose exact `price` and `quantity` strings. The spread is calculated as exact ask minus bid using an isolated 40-digit decimal context. If either side is empty, that side is `null` and spread is `null`; the API does not invent liquidity. The complete observation is marked `executable: false` because displayed liquidity can change before any hypothetical fill.
+
+The provider timestamp remains raw text because the official endpoint identifies it as the snapshot timestamp without defining its unit in the response contract. No timestamp conversion or freshness precision is invented.
+
 ## Boundaries
 
-M9.1–M9.3 do not persist or poll markets. M9.3 exposes only one current midpoint observation, not an order book, executable quote, historical series, liquidity measure, or probability guarantee. The increments do not load events, trades, resolution data, positions, or accounts. They have no authentication, signing, wallet, order, strategy, signal, paper execution, real execution, or dashboard path.
+M9.1–M9.4 do not persist or poll markets. M9.3–M9.4 expose current public observations, not executable quotes, fill guarantees, historical series, or probability guarantees. M9.4 retains only level one and does not expose full depth. The increments do not load events, trades, resolution data, positions, or accounts. They have no authentication, signing, wallet, order, strategy, signal, paper execution, real execution, or dashboard path.
 
 Provider failure is exposed locally as `503`. Runtime validation against a real Gamma response was attempted but the development environment could not resolve the provider hostname; the client contract is covered with the current official documented response shape and focused automated tests.
 
 ## Next safe increment
 
-A later M9 increment may expose the selected market's public top-of-book bid and ask with strict price, quantity, spread, and missing-liquidity semantics. It must remain observational and separate from every trading executor.
+A later M9 increment may compare the CLOB midpoint with the independently normalized top of book and reject incoherent provider snapshots without introducing persistence or execution.

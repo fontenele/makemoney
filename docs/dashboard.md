@@ -1,5 +1,9 @@
 # Dashboard
 
+## Visualization direction
+
+Future chart work should prefer Apache ECharts when it materially improves the visualization. Its flexible chart types, Canvas/SVG renderers, responsive configuration, and accessibility features fit the research dashboard. Existing SVG charts remain in place until a specific migration or new view is planned and tested; no ECharts dependency is installed speculatively.
+
 ## M8.1 read-only foundation
 
 The first dashboard increment is a separate Vue 3/Vite browser application under `dashboard/`. It is an observational client of the existing NestJS API and does not share domain implementation code with the backend.
