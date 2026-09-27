@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-27 — Verify exact tag membership on filtered event discovery
+
+M9.18 extends the existing event keyset query with an optional canonical `tagId` instead of creating another route or pagination model. The adapter sends Gamma's `tag_id` plus `include_tag=true`, then requires each returned event's bounded unique tag collection to contain the requested identity before discarding those provider relations from the public summary.
+
+This verification prevents a silently ignored or incoherent provider filter from being presented as trusted taxonomy. Only the explicit tag is used; related tags are not expanded automatically, an empty page makes no claim about tag existence, and public response shapes remain unchanged.
+
 ## 2026-09-27 — Bound related-tag traversal to one identity-only level
 
 M9.17 uses Gamma's tag-detail relation endpoint rather than recursively composing selected-tag requests. The provider response is capped at 100 unique tags and reduced to the existing identity-only shape; malformed, duplicate, oversized, or self-referential collections fail closed.

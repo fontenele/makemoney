@@ -68,6 +68,63 @@ describe('PolymarketGammaEventClient', () => {
     expect(http.mock.calls[0]?.[1]?.signal).toBeInstanceOf(AbortSignal);
   });
 
+  it('loads active events by tag and verifies returned membership', async () => {
+    const http = jest
+      .fn<(input: string, init?: RequestInit) => Promise<Response>>()
+      .mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            events: [
+              {
+                ...eventPayload(),
+                tags: [{ id: '2', label: 'Politics', slug: 'politics' }],
+              },
+            ],
+            next_cursor: null,
+          }),
+        ),
+      );
+    const client = new PolymarketGammaEventClient(
+      'https://gamma-api.polymarket.com/',
+      http,
+      () => receivedAt,
+    );
+
+    await expect(
+      client.listActive({ limit: 20, tagId: '2' }),
+    ).resolves.toMatchObject({ events: [{ id: '1000' }] });
+    expect(http.mock.calls[0]?.[0]).toBe(
+      'https://gamma-api.polymarket.com/events/keyset?closed=false&limit=20&tag_id=2&include_tag=true',
+    );
+  });
+
+  it.each([
+    ['missing tags', eventPayload()],
+    [
+      'missing requested membership',
+      {
+        ...eventPayload(),
+        tags: [{ id: '3', label: 'Elections', slug: 'elections' }],
+      },
+    ],
+    [
+      'duplicate tag identity',
+      {
+        ...eventPayload(),
+        tags: [
+          { id: '2', label: 'Politics', slug: 'politics' },
+          { id: '2', label: 'Politics', slug: 'politics' },
+        ],
+      },
+    ],
+  ])('rejects tag-filtered event with %s', (_scenario, event) => {
+    const client = new PolymarketGammaEventClient('https://example.com');
+
+    expect(() =>
+      client.normalizePage({ events: [event], next_cursor: null }, '2'),
+    ).toThrow(/Invalid Polymarket/);
+  });
+
   it.each([
     {},
     { events: 'invalid', next_cursor: null },

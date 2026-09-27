@@ -33,6 +33,10 @@ export class PolymarketGammaEventClient implements PredictionEventProvider {
       closed: 'false',
       limit: query.limit.toString(),
     });
+    if (query.tagId) {
+      parameters.set('tag_id', query.tagId);
+      parameters.set('include_tag', 'true');
+    }
     if (query.afterCursor) {
       parameters.set('after_cursor', query.afterCursor);
     }
@@ -49,7 +53,10 @@ export class PolymarketGammaEventClient implements PredictionEventProvider {
         `Polymarket event discovery request failed: ${response.status}`,
       );
     }
-    return this.normalizePage(JSON.parse(await response.text()) as unknown);
+    return this.normalizePage(
+      JSON.parse(await response.text()) as unknown,
+      query.tagId,
+    );
   }
 
   async getById(
@@ -142,7 +149,7 @@ export class PolymarketGammaEventClient implements PredictionEventProvider {
     };
   }
 
-  normalizePage(payload: unknown): PredictionEventPage {
+  normalizePage(payload: unknown, requiredTagId?: string): PredictionEventPage {
     if (
       !isRecord(payload) ||
       !Array.isArray(payload.events) ||
@@ -151,25 +158,23 @@ export class PolymarketGammaEventClient implements PredictionEventProvider {
       throw new Error('Invalid Polymarket event page payload');
     }
     return {
-      events: payload.events.map(normalizeEvent),
+      events: payload.events.map((event) =>
+        normalizeEvent(event, requiredTagId),
+      ),
       nextCursor: payload.next_cursor ?? null,
       receivedAt: this.clock(),
     };
   }
 
   normalizeTags(payload: unknown): PredictionEventTag[] {
-    if (!Array.isArray(payload) || payload.length > MAXIMUM_TAGS) {
-      throw new Error('Invalid Polymarket event tags payload');
-    }
-    const tags = payload.map(normalizeTag);
-    if (new Set(tags.map((tag) => tag.id)).size !== tags.length) {
-      throw new Error('Invalid Polymarket event tags payload');
-    }
-    return tags;
+    return normalizeTags(payload);
   }
 }
 
-function normalizeEvent(value: unknown): PredictionEvent {
+function normalizeEvent(
+  value: unknown,
+  requiredTagId?: string,
+): PredictionEvent {
   if (
     !isRecord(value) ||
     !validRequiredString(value.id, 100) ||
@@ -183,6 +188,12 @@ function normalizeEvent(value: unknown): PredictionEvent {
     typeof value.restricted !== 'boolean'
   ) {
     throw new Error('Invalid Polymarket event payload');
+  }
+  if (requiredTagId !== undefined) {
+    const tags = normalizeTags(value.tags);
+    if (!tags.some((tag) => tag.id === requiredTagId)) {
+      throw new Error('Invalid Polymarket tag-filtered event payload');
+    }
   }
   return {
     provider: 'polymarket',
@@ -232,6 +243,17 @@ function normalizeTag(value: unknown): PredictionEventTag {
     label: value.label,
     slug: value.slug,
   };
+}
+
+function normalizeTags(value: unknown): PredictionEventTag[] {
+  if (!Array.isArray(value) || value.length > MAXIMUM_TAGS) {
+    throw new Error('Invalid Polymarket event tags payload');
+  }
+  const tags = value.map(normalizeTag);
+  if (new Set(tags.map((tag) => tag.id)).size !== tags.length) {
+    throw new Error('Invalid Polymarket event tags payload');
+  }
+  return tags;
 }
 
 function validRequiredString(value: unknown, maximum: number): value is string {

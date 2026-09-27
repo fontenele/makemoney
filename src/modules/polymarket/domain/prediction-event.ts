@@ -58,6 +58,7 @@ export interface PredictionEventTags {
 export interface ActivePredictionEventQuery {
   limit: number;
   afterCursor?: string;
+  tagId?: string;
 }
 
 export const PREDICTION_EVENT_PROVIDER = Symbol('PREDICTION_EVENT_PROVIDER');

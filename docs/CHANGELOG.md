@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-27 — M9.18 exact-tag Polymarket event discovery completed
+
+- Added optional positive numeric `tagId` filtering to `GET /polymarket/events` while retaining the existing bounded keyset pagination contract.
+- Requests Gamma's exact `tag_id` with tag relations and verifies every returned event contains the selected identity before exposing its reduced discovery summary.
+- Fails closed on missing, malformed, duplicate, or mismatched provider tag relations; an empty filtered page remains valid.
+- Adds no implicit related-tag expansion, ranking, recommendation, polling, persistence, accounts, orders, wallet, or execution behavior.
+
 ## 2026-09-27 — M9.17 bounded public Polymarket related tags completed
 
 - Added `GET /polymarket/tags/:id/related` for one validated positive numeric Gamma source-tag ID.

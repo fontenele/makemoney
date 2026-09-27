@@ -6,6 +6,8 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
+M9.18 is complete: the public event-discovery route accepts an optional validated tag ID, applies it to the existing Gamma keyset request, and verifies each returned event contains the exact tag before exposing the unchanged summary. Related tags are not expanded implicitly; ranking, persistence, accounts, and execution behavior remain excluded.
+
 M9.17 is complete: one public route loads at most 100 identity-only tags related to a selected Gamma tag, rejects malformed, duplicate, oversized, and self-referential collections, and distinguishes source absence from provider failure. Recursive traversal, filters, persistence, accounts, and execution behavior are excluded.
 
 M9.16 is complete: one public route loads a selected Gamma tag by validated positive numeric ID, verifies exact response identity, and exposes only ID, nullable label/slug, and receipt time. Slug lookup, relationships, editorial metadata, persistence, accounts, and execution behavior are excluded.
@@ -383,7 +385,7 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - New listings pattern classification cohort: `GET http://localhost:3000/new-listings/classification`
 - New listings pattern classification magnitudes: `GET http://localhost:3000/new-listings/classification/magnitudes`
 - New listings pattern classification timing: `GET http://localhost:3000/new-listings/classification/timing`
-- Public active Polymarket events: `GET http://localhost:3000/polymarket/events`
+- Public active Polymarket events, optionally filtered by exact tag: `GET http://localhost:3000/polymarket/events`
 - Public global Polymarket tag catalog: `GET http://localhost:3000/polymarket/tags`
 - Public selected Polymarket tag: `GET http://localhost:3000/polymarket/tags/:id`
 - Public related Polymarket tags: `GET http://localhost:3000/polymarket/tags/:id/related`
@@ -407,12 +409,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-27 after M8.11 and M9.17:
+The following passed on 2026-09-27 after M8.11 and M9.18:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 1271 backend tests passed across 116 suites
+- `npm test -- --runInBand` — 1281 backend tests passed across 116 suites
 - `npm run test:dashboard` — 19 dashboard client, refresh-scheduler, API-path, API-isolation, and chart-transformation tests passed
 - `npm run build:all`
 - `docker compose config --quiet`
@@ -435,7 +437,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.17. Public Polymarket event and market discovery, selected event and tag details, selected/global/related tag taxonomy, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
+M0 through M8.11 are complete, and M9 is implemented through M9.18. Public Polymarket event and market discovery, exact-tag event filtering, selected event and tag details, selected/global/related tag taxonomy, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
 
 ## Known issues and cautions
 

@@ -264,6 +264,41 @@ describe('PolymarketController', () => {
     expect(calls).toEqual([{ limit: 100, afterCursor: 'page_2-cursor' }]);
   });
 
+  it('passes a validated tag filter for event discovery', async () => {
+    const calls: unknown[] = [];
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        listActive: (query) => {
+          calls.push(query);
+          return Promise.resolve({
+            events: [],
+            nextCursor: null,
+            receivedAt: new Date('2026-09-27T20:00:00.000Z'),
+          });
+        },
+      },
+    );
+
+    await controller.listActiveEvents('20', 'page_2-cursor', '2');
+    expect(calls).toEqual([
+      { limit: 20, afterCursor: 'page_2-cursor', tagId: '2' },
+    ]);
+  });
+
+  it.each(['0', '-1', '01', 'abc'])(
+    'rejects invalid event-discovery tag id %s',
+    async (tagId) => {
+      await expect(
+        controllerWith({}).listActiveEvents(undefined, undefined, tagId),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
   it.each(['0', '-1', '1.5', 'abc', '101'])(
     'rejects invalid event-discovery limit %s',
     async (limit) => {

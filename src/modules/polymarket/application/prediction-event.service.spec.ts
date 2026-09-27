@@ -27,6 +27,30 @@ describe('PredictionEventService', () => {
     );
   });
 
+  it('delegates tag-filtered active-event discovery', async () => {
+    const page = {
+      events: [],
+      nextCursor: null,
+      receivedAt: new Date('2026-09-27T20:00:00.000Z'),
+    };
+    const listActive = jest
+      .fn<PredictionEventProvider['listActive']>()
+      .mockResolvedValue(page);
+    const service = new PredictionEventService({
+      listActive,
+      getById: () => Promise.reject(new Error('unexpected detail call')),
+      getTagsById: () => Promise.reject(new Error('unexpected tags call')),
+    });
+
+    await expect(service.listActive({ limit: 20, tagId: '2' })).resolves.toBe(
+      page,
+    );
+    expect(listActive).toHaveBeenCalledWith(
+      { limit: 20, tagId: '2' },
+      undefined,
+    );
+  });
+
   it('delegates selected-event lookup without changing the normalized result', async () => {
     const event = {
       provider: 'polymarket' as const,

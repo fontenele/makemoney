@@ -154,7 +154,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 
 ## Before every task
 
-Related-tag and tag-relationship work is part of the Polymarket/M9 row above and starts in `polymarket.md`, `roadmap.md`, `decisions.md`, and `../README.md`; current code is under `../src/modules/polymarket`.
+Related-tag, tag-relationship, and tag-filtered event-discovery work is part of the Polymarket/M9 row above and starts in `polymarket.md`, `roadmap.md`, `decisions.md`, and `../README.md`; current code is under `../src/modules/polymarket`.
 
 1. Read `../AGENTS.md` and `../PROJECT_CONTEXT.md` completely.
 2. Find the task keywords in this map.

@@ -149,10 +149,12 @@ export class PolymarketController {
   async listActiveEvents(
     @Query('limit') limit?: string,
     @Query('cursor') cursor?: string,
+    @Query('tagId') tagId?: string,
   ): Promise<PredictionEventPage> {
     const query = {
       limit: validLimit(limit),
       ...(cursor === undefined ? {} : { afterCursor: validCursor(cursor) }),
+      ...(tagId === undefined ? {} : { tagId: validTagId(tagId) }),
     };
     try {
       return await this.events.listActive(query);
