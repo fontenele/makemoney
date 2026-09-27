@@ -1,10 +1,22 @@
 # Current State
 
-Last validated: 2026-09-26
+Last validated: 2026-09-27
 
 The startup validator accepts strictly positive canonical fractional values such as `0.01` for risk limits, matching the documented defaults and `.env.example`.
 
 ## Milestone status
+
+M9.10 is complete: one public market route reconciles its canonical condition and indexed YES/NO identities with a recognized terminal binary payout vector. It exposes exact payout rates and winner/loser/split classification for YES, NO, and rare 50/50 results without loading positions or executing redemption.
+
+M9.9 is complete: one public condition route loads the Data API resolution lifecycle row, verifies its exact condition identity, and preserves status, extended-review, dispute, arbitration, nullable resolution time, and local receipt time. It does not infer a winning outcome or payout.
+
+M9.8 is complete: one public market route loads its indexed YES and NO midpoints, calculates their exact sum and signed deviation from one, and classifies the independent observations descriptively as balanced, below one, or above one. The result is explicitly non-atomic and non-executable and makes no arbitrage or probability-coherence claim.
+
+M9.7 is complete: one aggregate public route compares the independently loaded latest trade with the current displayed top of book, reports an exact descriptive spread position and signed bid/ask distances, and explicitly denies atomic-snapshot and execution semantics. Missing book sides remain unverifiable rather than inferred.
+
+M9.6 is complete: one public route loads the latest CLOB trade price and provider-reported side for an outcome token, strictly rejects malformed data and the documented never-traded placeholder, and exposes receipt-only freshness without claiming executability, liquidity, or history.
+
+M9.5 is complete: one aggregate public route loads midpoint and top of book concurrently, verifies their exact decimal relationship when both sides exist, fails closed on divergence, and reports absent-side coherence as explicitly unverifiable. The observations remain independently timed, stateless, and non-executable.
 
 M9.4 is complete: one public CLOB snapshot can be loaded by outcome-token ID and strictly reduced to exact best bid/ask prices, displayed quantities, and spread. Snapshot identity, ordering, and book coherence are validated; absent sides remain explicit and the observation is non-executable.
 
@@ -359,8 +371,14 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - New listings pattern classification timing: `GET http://localhost:3000/new-listings/classification/timing`
 - Public active Polymarket markets: `GET http://localhost:3000/polymarket/markets`
 - Public selected Polymarket market: `GET http://localhost:3000/polymarket/markets/:id`
+- Descriptive binary Polymarket midpoint complement: `GET http://localhost:3000/polymarket/markets/:id/midpoint-complement`
+- Public Polymarket condition resolution state: `GET http://localhost:3000/polymarket/conditions/:conditionId/resolution`
+- Indexed binary Polymarket resolution result: `GET http://localhost:3000/polymarket/markets/:id/resolution`
 - Public Polymarket outcome midpoint: `GET http://localhost:3000/polymarket/outcomes/:tokenId/midpoint`
 - Public Polymarket outcome top of book: `GET http://localhost:3000/polymarket/outcomes/:tokenId/top-of-book`
+- Coherent public Polymarket outcome market data: `GET http://localhost:3000/polymarket/outcomes/:tokenId/market-data`
+- Public Polymarket outcome last trade: `GET http://localhost:3000/polymarket/outcomes/:tokenId/last-trade`
+- Descriptive Polymarket last-trade book context: `GET http://localhost:3000/polymarket/outcomes/:tokenId/last-trade/context`
 - PostgreSQL host port: `5433` mapped to container port `5432`
 - Redis host port: `6379`
 
@@ -368,12 +386,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-26 after M8.11 and M9.4:
+The following passed on 2026-09-27 after M8.11 and M9.10:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 1021 backend tests passed across 104 suites
+- `npm test -- --runInBand` — 1153 backend tests passed across 111 suites
 - `npm run test:dashboard` — 19 dashboard client, refresh-scheduler, API-path, API-isolation, and chart-transformation tests passed
 - `npm run build:all`
 - `docker compose config --quiet`
@@ -396,7 +414,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.4. Public Polymarket discovery, outcome identities, midpoint, and level-one book observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
+M0 through M8.11 are complete, and M9 is implemented through M9.10. Public Polymarket discovery, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
 
 ## Known issues and cautions
 

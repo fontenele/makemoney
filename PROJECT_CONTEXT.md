@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, **M6 — Backtesting (M6.1–M6.32)**, **M7 — New Listing Scanner (M7.1–M7.109)**, and **M8 — Dashboard (M8.1–M8.11)**.
-- M9 is in progress through **M9.4 — Public Outcome Top of Book**.
+- M9 is in progress through **M9.10 — Binary Resolution Result**.
 - M6 is closed. M7.1–M7.109 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -362,6 +362,18 @@ M9.2 loads one public market by its Gamma ID at `GET /polymarket/markets/:id` an
 M9.3 loads one public CLOB midpoint at `GET /polymarket/outcomes/:tokenId/midpoint`. It preserves the exact decimal string, identifies the source as the non-executable average of best bid and ask, records local receipt time, and explicitly reports that the endpoint supplies no provider timestamp. It adds no cache, persistence, order book exposure, account, wallet, signal, or execution behavior.
 
 M9.4 loads one public CLOB order-book snapshot at `GET /polymarket/outcomes/:tokenId/top-of-book` and retains only the validated best bid and ask, their exact quantities, exact spread, provider snapshot identity and timestamp, and local receipt time. Missing sides remain explicit nulls. The observation is non-executable and adds no cache, persistence, strategy, account, wallet, or order behavior.
+
+M9.5 loads the public midpoint and top of book concurrently at `GET /polymarket/outcomes/:tokenId/market-data`. When both book sides exist, exact decimal arithmetic requires the independent midpoint to equal their average or the response fails closed. Missing liquidity produces an explicit unverifiable coherence state. The combined observation remains non-executable and stateless.
+
+M9.6 loads the public CLOB last-trade price and provider side at `GET /polymarket/outcomes/:tokenId/last-trade`. It rejects the documented never-traded placeholder as unavailable, preserves receipt-only freshness, and makes no claim about current price, liquidity, execution, or trade history.
+
+M9.7 loads the independent last-trade and top-of-book observations concurrently at `GET /polymarket/outcomes/:tokenId/last-trade/context`. It classifies the historical trade price relative to the current displayed spread with exact signed distances while explicitly denying atomic-snapshot and execution semantics.
+
+M9.8 loads one binary market's YES and NO outcome midpoints at `GET /polymarket/markets/:id/midpoint-complement`. It reports their exact sum and signed deviation from one as a descriptive, independently timed observation without claiming arbitrage, probability coherence, or executability.
+
+M9.9 loads one public condition-grain resolution state from the Polymarket Data API at `GET /polymarket/conditions/:conditionId/resolution`. It preserves the provider status, review/dispute/arbitration flags, nullable resolution time, and receipt time without inferring a winning outcome or payout.
+
+M9.10 reconciles one selected market's indexed YES/NO outcomes with its condition payout vector at `GET /polymarket/markets/:id/resolution`. It interprets only the documented `[1,0]`, `[0,1]`, and rare `[0.5,0.5]` terminal binary results, without accessing positions or executing redemption.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

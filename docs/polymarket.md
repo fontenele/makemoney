@@ -45,12 +45,60 @@ Bid and ask expose exact `price` and `quantity` strings. The spread is calculate
 
 The provider timestamp remains raw text because the official endpoint identifies it as the snapshot timestamp without defining its unit in the response contract. No timestamp conversion or freshness precision is invented.
 
+## M9.5 — Coherent outcome market data
+
+`GET /polymarket/outcomes/:tokenId/market-data` requests the M9.3 midpoint and M9.4 top of book concurrently through their existing provider-neutral services. The response retains both independently normalized observations and never claims that the two provider endpoints share one atomic snapshot.
+
+When bid and ask both exist, the application calculates `(bid + ask) / 2` with an isolated 40-digit decimal context. The provider midpoint must be numerically equal to that calculated value, including when the provider uses a different trailing-zero representation. A mismatch or response-token identity mismatch fails closed with `503` instead of returning inconsistent market data.
+
+If bid, ask, or both are missing, coherence is explicitly `unverifiable` with a precise reason. No price or liquidity is invented. A verified response exposes the exact normalized `bookMidpoint`; every response remains `executable: false`.
+
+## M9.6 — Public outcome last trade
+
+`GET /polymarket/outcomes/:tokenId/last-trade` requests the unauthenticated public CLOB `last-trade-price` endpoint for one canonical outcome-token ID. It preserves the exact price string, normalizes the documented provider side from `BUY` or `SELL` to `buy` or `sell`, and marks the observation non-executable.
+
+The endpoint supplies no trade ID, quantity, or timestamp. The response therefore exposes `providerTimestamp: null` and a separate local `receivedAt`; it must not be treated as current book state, a fill guarantee, complete trade history, or evidence of available liquidity.
+
+The provider documents `price: "0.5"` with an empty side as a placeholder when the token has never traded and its order book is empty. The adapter maps that sentinel to explicit unavailability, producing local `404`, rather than inventing a trade at `0.5`.
+
+## M9.7 — Descriptive last-trade book context
+
+`GET /polymarket/outcomes/:tokenId/last-trade/context` concurrently requests the independently normalized M9.6 last trade and M9.4 top of book. When both displayed sides exist, it classifies the trade price as `below_bid`, `at_bid`, `at_bid_and_ask`, `inside_spread`, `at_ask`, or `above_ask` and reports exact signed `priceMinusBid` and `askMinusPrice` distances.
+
+This classification describes two independently timed observations. A last trade outside the current displayed spread is not treated as provider inconsistency because the book may have changed after that trade. The response therefore exposes `atomicSnapshot: false` and `executable: false` explicitly. It does not infer price freshness, direction, momentum, signal quality, or available liquidity.
+
+If either displayed book side is absent, the relation is `unverifiable` with a precise missing-side reason and no distances. Component token-identity divergence fails closed with `503`; an unavailable trade or book produces `404`.
+
+## M9.8 — Descriptive binary midpoint complement
+
+`GET /polymarket/markets/:id/midpoint-complement` first loads the M9.2 selected binary market, requires present and distinct indexed YES and NO token IDs, and then requests both M9.3 midpoint observations concurrently. Response-token identity divergence fails closed.
+
+The result calculates `midpointSum` and signed `deviationFromOne` with isolated 40-digit decimal arithmetic and classifies the sum as `balanced`, `below_one`, or `above_one`. It retains the market and both independently normalized midpoint observations for provenance.
+
+The comparison does not imply that the two midpoint requests share one provider instant. A midpoint is not an executable price, so a deviation from one is not labeled arbitrage, profit, incoherence, or a recommendation. Every result exposes `atomicSnapshot: false` and `executable: false`. Missing outcome tokens, market absence, or unavailable midpoint observations produce `404`; malformed or incoherent upstream identity produces `503`.
+
+## M9.9 — Public condition resolution state
+
+`GET /polymarket/conditions/:conditionId/resolution` requests the public Data API `v2/resolutions` endpoint with exactly one condition selector. The identifier must be a `0x`-prefixed 32-byte hexadecimal value and the returned condition identity must match it exactly.
+
+The normalized observation preserves the provider's status, extended-review, dispute, and arbitration flags, nullable raw resolution timestamp, and local receipt time. The provider documentation does not define the timestamp string format, so the application does not invent a conversion or precision. An empty documented result becomes local `404`; malformed, duplicate, mismatched, or unavailable provider data becomes `503`.
+
+M9.9 deliberately does not interpret the provider payout array, infer YES or NO as the winner, or claim redemption value. Those semantics require a separate contract joining condition-grain resolution data to indexed outcomes.
+
+## M9.10 — Indexed binary resolution result
+
+`GET /polymarket/markets/:id/resolution` first loads the M9.2 selected market, requires its condition ID, and then loads the M9.9 condition-grain record. The canonical condition identities must match before the payout vector can be correlated by the documented outcome indexes: index `0` is YES and index `1` is NO.
+
+Only three explicitly documented binary results are interpreted: `[1,0]` means YES winner/NO loser, `[0,1]` means NO winner/YES loser, and the rare `[0.5,0.5]` result marks both outcomes as split with an exact `0.5` payout rate. Missing, incomplete, non-binary, or unsupported vectors return `404` instead of inventing a result; identity divergence returns `503`.
+
+The raw vector remains internal, so the condition-lifecycle response introduced in M9.9 does not change. M9.10 exposes a public read model only. It does not inspect a wallet or position, determine a user's entitlement, call a contract, or redeem tokens; `executable: false` makes that boundary explicit.
+
 ## Boundaries
 
-M9.1–M9.4 do not persist or poll markets. M9.3–M9.4 expose current public observations, not executable quotes, fill guarantees, historical series, or probability guarantees. M9.4 retains only level one and does not expose full depth. The increments do not load events, trades, resolution data, positions, or accounts. They have no authentication, signing, wallet, order, strategy, signal, paper execution, real execution, or dashboard path.
+M9.1–M9.10 do not persist or poll markets. M9.3–M9.8 expose public observations, not executable quotes, fill guarantees, historical series, or probability guarantees. M9.4, M9.5, and M9.7 retain only level one and do not expose full depth. M9.6–M9.7 use only the latest reported trade price and side, not trade history. M9.8 compares only independently observed binary midpoints. M9.9 exposes resolution lifecycle state, while M9.10 separately interprets only recognized terminal binary payout vectors. The increments do not load events, positions, or accounts. They have no authentication, signing, wallet, order, redemption, strategy, signal, paper execution, real execution, or dashboard path.
 
 Provider failure is exposed locally as `503`. Runtime validation against a real Gamma response was attempted but the development environment could not resolve the provider hostname; the client contract is covered with the current official documented response shape and focused automated tests.
 
 ## Next safe increment
 
-A later M9 increment may compare the CLOB midpoint with the independently normalized top of book and reject incoherent provider snapshots without introducing persistence or execution.
+A later M9 increment may add another independently defined public research observation without introducing positions, redemption, trade history, persistence, authentication, accounts, or execution.

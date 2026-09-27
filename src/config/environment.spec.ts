@@ -41,6 +41,7 @@ describe('validateEnvironment Polymarket public API', () => {
     expect(validateEnvironment(required)).toMatchObject({
       POLYMARKET_GAMMA_BASE_URL: 'https://gamma-api.polymarket.com',
       POLYMARKET_CLOB_BASE_URL: 'https://clob.polymarket.com',
+      POLYMARKET_DATA_BASE_URL: 'https://data-api.polymarket.com',
     });
   });
 
@@ -74,6 +75,23 @@ describe('validateEnvironment Polymarket public API', () => {
       validateEnvironment({
         ...required,
         POLYMARKET_CLOB_BASE_URL: 'http://clob.example.com',
+      }),
+    ).toThrow('Invalid environment configuration');
+  });
+
+  it('accepts a custom HTTPS Data API endpoint and rejects HTTP', () => {
+    expect(
+      validateEnvironment({
+        ...required,
+        POLYMARKET_DATA_BASE_URL: 'https://data-api.example.com',
+      }),
+    ).toMatchObject({
+      POLYMARKET_DATA_BASE_URL: 'https://data-api.example.com',
+    });
+    expect(() =>
+      validateEnvironment({
+        ...required,
+        POLYMARKET_DATA_BASE_URL: 'http://data-api.example.com',
       }),
     ).toThrow('Invalid environment configuration');
   });

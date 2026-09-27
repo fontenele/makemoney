@@ -1,5 +1,41 @@
 # Technical Decisions
 
+## 2026-09-27 — Interpret only recognized indexed binary payout vectors
+
+M9.10 composes the existing selected-market and condition-resolution contracts. It requires the canonical condition identities to agree and correlates payout index zero with the already documented YES outcome and index one with NO. The only accepted terminal vectors are `[1,0]`, `[0,1]`, and the documented rare 50/50 result `[0.5,0.5]`.
+
+Any missing, malformed, incomplete, non-binary, or otherwise unsupported vector remains unavailable rather than being rounded or inferred. Payout values are exposed as exact decimal strings and the raw provider vector remains internal, preserving the M9.9 public lifecycle contract. The result is a non-executable read model and creates no wallet, position, entitlement, contract-call, or redemption path.
+
+## 2026-09-27 — Keep resolution lifecycle separate from winner interpretation
+
+M9.9 uses the public Data API `v2/resolutions` endpoint with exactly one condition selector. The adapter requires one condition-grain row with the exact canonical requested identity and preserves only the provider status, review/dispute/arbitration flags, nullable raw resolution time, source, and local receipt time. The provider documentation does not define that timestamp string's format, so no conversion or precision is inferred.
+
+The provider also returns payout-oriented fields, but their mapping to the existing indexed YES and NO outcomes is not assumed in this increment. An empty result means unavailable, while duplicate or mismatched rows fail closed. Winner and redemption interpretation remain a separate decision and contract.
+
+## 2026-09-27 — Describe binary midpoint complement without arbitrage semantics
+
+M9.8 loads the selected market before concurrently requesting its indexed YES and NO midpoints. It requires two present, distinct token identities and matching normalized responses, then uses isolated 40-digit decimal arithmetic to report `midpointSum`, signed `deviationFromOne`, and `balanced`, `below_one`, or `above_one`.
+
+The official binary outcome structure and complementary matching example motivate the comparison, but midpoint observations are neither executable prices nor one atomic snapshot. A sum different from one is therefore descriptive rather than an inconsistency, opportunity, or profitability claim. The response explicitly exposes `atomicSnapshot: false` and `executable: false`.
+
+## 2026-09-27 — Treat last-trade/book position as descriptive, not coherent
+
+M9.7 requests the existing last-trade and top-of-book observations concurrently and classifies the trade price relative to the displayed bid and ask with isolated 40-digit decimal arithmetic. The result includes signed `priceMinusBid` and `askMinusPrice` distances and handles a locked book explicitly instead of arbitrarily assigning the price to one side.
+
+The comparison is never called coherent or atomic: the last-trade endpoint provides no timestamp, the book has its own snapshot identity, and the two requests can observe different provider moments. Prices outside the current spread are valid descriptive outcomes rather than failures. Missing book sides make the relation unverifiable, and every response remains non-executable.
+
+## 2026-09-27 — Treat the CLOB never-traded placeholder as unavailable
+
+M9.6 uses the unauthenticated public CLOB last-trade endpoint for one outcome token. A documented `price: "0.5"` with an empty side means that the token has never traded and its book is empty, so the adapter converts that sentinel into domain unavailability rather than fabricating a trade.
+
+Only exact prices from zero through one and the documented `BUY` or `SELL` sides are accepted. The normalized observation preserves the provider-reported side without interpreting maker/taker intent, exposes no provider timestamp because the response has none, and remains receipt-timed, stateless, and non-executable.
+
+## 2026-09-27 — Fail closed on independently inconsistent Polymarket prices
+
+M9.5 requests the existing public midpoint and top-of-book observations concurrently, but does not call them one atomic provider snapshot because the midpoint endpoint exposes neither timestamp nor book hash. When both sides exist, an isolated 40-digit decimal calculation requires the reported midpoint to equal `(bid + ask) / 2`; identity or price divergence fails the aggregate route with `503`.
+
+Missing bid or ask liquidity is not itself fabricated into an inconsistency. The response instead reports coherence as `unverifiable` with a precise missing-side reason. Verified and unverifiable aggregate observations remain stateless and explicitly non-executable.
+
 ## 2026-09-26 — Normalize only level one from the public Polymarket book
 
 M9.4 requests the unauthenticated CLOB `/book` snapshot but exposes only the best bid and ask. The adapter validates the complete returned level ordering before selecting level one, verifies response token identity, rejects crossed books, preserves exact decimal strings, and calculates exact spread without native floating point.

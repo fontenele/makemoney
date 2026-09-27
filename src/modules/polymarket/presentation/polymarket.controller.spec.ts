@@ -4,8 +4,22 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
+import { PredictionMarketBinaryResolutionService } from '../application/prediction-market-binary-resolution.service';
+import { PredictionMarketDataObservationService } from '../application/prediction-market-data-observation.service';
+import { PredictionMarketLastTradeService } from '../application/prediction-market-last-trade.service';
+import { PredictionMarketLastTradeContextService } from '../application/prediction-market-last-trade-context.service';
+import { PredictionMarketMidpointComplementService } from '../application/prediction-market-midpoint-complement.service';
 import { PredictionMarketOrderBookService } from '../application/prediction-market-order-book.service';
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
+import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
+import {
+  PredictionMarketBinaryResolutionIncoherentError,
+  PredictionMarketBinaryResolutionUnavailableError,
+} from '../domain/prediction-market-binary-resolution';
+import {
+  PredictionMarketLastTradeProvider,
+  PredictionMarketLastTradeUnavailableError,
+} from '../domain/prediction-market-last-trade';
 import {
   PredictionMarketMidpointProvider,
   PredictionMarketMidpointUnavailableError,
@@ -14,6 +28,10 @@ import {
   PredictionMarketOrderBookProvider,
   PredictionMarketOrderBookUnavailableError,
 } from '../domain/prediction-market-top-of-book';
+import {
+  PredictionMarketResolutionProvider,
+  PredictionMarketResolutionUnavailableError,
+} from '../domain/prediction-market-resolution';
 import {
   PredictionMarketNotFoundError,
   PredictionMarketProvider,
@@ -241,32 +259,437 @@ describe('PolymarketController', () => {
       ServiceUnavailableException,
     );
   });
+
+  it('loads independently normalized coherent outcome market data', async () => {
+    const controller = controllerWith(
+      {},
+      {
+        getMidpoint: () => Promise.resolve({ ...midpoint(), price: '0.455' }),
+      },
+      { getTopOfBook: () => Promise.resolve(topOfBook()) },
+    );
+
+    await expect(controller.getOutcomeMarketData('111')).resolves.toMatchObject(
+      {
+        tokenId: '111',
+        coherence: {
+          status: 'verified',
+          bookMidpoint: '0.455',
+          reason: null,
+        },
+        executable: false,
+      },
+    );
+  });
+
+  it.each(['', '01', '-1', '1.5', 'abc', '1'.repeat(79)])(
+    'rejects invalid market-data token id %s',
+    async (tokenId) => {
+      await expect(
+        controllerWith({}).getOutcomeMarketData(tokenId),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it('maps an unavailable component observation to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {
+        getMidpoint: (tokenId) =>
+          Promise.reject(new PredictionMarketMidpointUnavailableError(tokenId)),
+      },
+      { getTopOfBook: () => Promise.resolve(topOfBook()) },
+    );
+
+    await expect(controller.getOutcomeMarketData('111')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps incoherent component observations to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      { getMidpoint: () => Promise.resolve(midpoint()) },
+      { getTopOfBook: () => Promise.resolve(topOfBook()) },
+    );
+
+    await expect(controller.getOutcomeMarketData('111')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
+  it('loads one exact non-executable outcome last trade', async () => {
+    const calls: string[] = [];
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {
+        getLastTrade: (tokenId) => {
+          calls.push(tokenId);
+          return Promise.resolve(lastTrade());
+        },
+      },
+    );
+
+    await expect(controller.getOutcomeLastTrade('111')).resolves.toEqual(
+      lastTrade(),
+    );
+    expect(calls).toEqual(['111']);
+  });
+
+  it.each(['', '01', '-1', '1.5', 'abc', '1'.repeat(79)])(
+    'rejects invalid last-trade token id %s',
+    async (tokenId) => {
+      await expect(
+        controllerWith({}).getOutcomeLastTrade(tokenId),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it('maps an unavailable last trade to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {
+        getLastTrade: (tokenId) =>
+          Promise.reject(
+            new PredictionMarketLastTradeUnavailableError(tokenId),
+          ),
+      },
+    );
+
+    await expect(controller.getOutcomeLastTrade('111')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps last-trade provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {
+        getLastTrade: () => Promise.reject(new Error('network unavailable')),
+      },
+    );
+
+    await expect(controller.getOutcomeLastTrade('111')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
+  it('loads descriptive last-trade context without atomicity claims', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      { getTopOfBook: () => Promise.resolve(topOfBook()) },
+      { getLastTrade: () => Promise.resolve(lastTrade()) },
+    );
+
+    await expect(
+      controller.getOutcomeLastTradeContext('111'),
+    ).resolves.toMatchObject({
+      tokenId: '111',
+      relation: {
+        status: 'comparable',
+        position: 'below_bid',
+        priceMinusBid: '-0.01',
+        askMinusPrice: '0.02',
+      },
+      atomicSnapshot: false,
+      executable: false,
+    });
+  });
+
+  it.each(['', '01', '-1', '1.5', 'abc', '1'.repeat(79)])(
+    'rejects invalid last-trade-context token id %s',
+    async (tokenId) => {
+      await expect(
+        controllerWith({}).getOutcomeLastTradeContext(tokenId),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it('maps unavailable last-trade context components to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      { getTopOfBook: () => Promise.resolve(topOfBook()) },
+      {
+        getLastTrade: (tokenId) =>
+          Promise.reject(
+            new PredictionMarketLastTradeUnavailableError(tokenId),
+          ),
+      },
+    );
+
+    await expect(controller.getOutcomeLastTradeContext('111')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps incoherent last-trade context to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      { getTopOfBook: () => Promise.resolve(topOfBook()) },
+      {
+        getLastTrade: () => Promise.resolve({ ...lastTrade(), tokenId: '222' }),
+      },
+    );
+
+    await expect(controller.getOutcomeLastTradeContext('111')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
+  it('loads a descriptive binary-market midpoint complement', async () => {
+    const controller = controllerWith(
+      { getById: () => Promise.resolve(marketDetails()) },
+      {
+        getMidpoint: (tokenId) =>
+          Promise.resolve({
+            ...midpoint(),
+            tokenId,
+            price: tokenId === '111' ? '0.4' : '0.59',
+          }),
+      },
+    );
+
+    await expect(
+      controller.getMarketMidpointComplement('703257'),
+    ).resolves.toMatchObject({
+      midpointSum: '0.99',
+      deviationFromOne: '-0.01',
+      status: 'below_one',
+      atomicSnapshot: false,
+      executable: false,
+    });
+  });
+
+  it.each(['', '0', '-1', '1.5', 'abc'])(
+    'rejects invalid midpoint-complement market id %s',
+    async (id) => {
+      await expect(
+        controllerWith({}).getMarketMidpointComplement(id),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it('maps incomplete outcome-token identities to not found', async () => {
+    const details = marketDetails();
+    const controller = controllerWith({
+      getById: () =>
+        Promise.resolve({
+          ...details,
+          outcomes: {
+            ...details.outcomes,
+            no: { ...details.outcomes.no, tokenId: null },
+          },
+        }),
+    });
+
+    await expect(
+      controller.getMarketMidpointComplement('703257'),
+    ).rejects.toThrow(NotFoundException);
+  });
+
+  it('maps duplicate outcome-token identities to service unavailable', async () => {
+    const details = marketDetails();
+    const controller = controllerWith({
+      getById: () =>
+        Promise.resolve({
+          ...details,
+          outcomes: {
+            ...details.outcomes,
+            no: { ...details.outcomes.no, tokenId: '111' },
+          },
+        }),
+    });
+
+    await expect(
+      controller.getMarketMidpointComplement('703257'),
+    ).rejects.toThrow(ServiceUnavailableException);
+  });
+
+  it('loads one public condition resolution state', async () => {
+    const calls: string[] = [];
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {
+        getResolution: (condition) => {
+          calls.push(condition);
+          return Promise.resolve(resolutionRecord());
+        },
+      },
+    );
+
+    await expect(
+      controller.getConditionResolution(conditionId()),
+    ).resolves.toEqual(resolution());
+    expect(calls).toEqual([conditionId()]);
+  });
+
+  it.each(['', '0x1234', `0x${'g'.repeat(64)}`, 'a'.repeat(64)])(
+    'rejects invalid condition id %s',
+    async (condition) => {
+      await expect(
+        controllerWith({}).getConditionResolution(condition),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it('maps an absent condition resolution to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {
+        getResolution: () =>
+          Promise.reject(
+            new PredictionMarketResolutionUnavailableError(conditionId()),
+          ),
+      },
+    );
+
+    await expect(
+      controller.getConditionResolution(conditionId()),
+    ).rejects.toThrow(NotFoundException);
+  });
+
+  it('maps resolution provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {
+        getResolution: () => Promise.reject(new Error('provider unavailable')),
+      },
+    );
+
+    await expect(
+      controller.getConditionResolution(conditionId()),
+    ).rejects.toThrow(ServiceUnavailableException);
+  });
+
+  it('loads one indexed binary market resolution result', async () => {
+    const details = marketDetails();
+    const controller = controllerWith(
+      { getById: () => Promise.resolve(details) },
+      {},
+      {},
+      {},
+      {
+        getResolution: () =>
+          Promise.resolve(resolutionRecord(['1', '0'], details.conditionId)),
+      },
+    );
+
+    await expect(
+      controller.getMarketResolution('703257'),
+    ).resolves.toMatchObject({
+      result: 'yes',
+      payouts: {
+        yes: { payoutRate: '1', status: 'winner', tokenId: '111' },
+        no: { payoutRate: '0', status: 'loser', tokenId: '222' },
+      },
+      executable: false,
+    });
+  });
+
+  it.each(['', '0', '-1', '1.5', 'abc'])(
+    'rejects invalid resolution market id %s',
+    async (id) => {
+      await expect(controllerWith({}).getMarketResolution(id)).rejects.toThrow(
+        BadRequestException,
+      );
+    },
+  );
+
+  it.each([
+    new PredictionMarketBinaryResolutionUnavailableError('703257'),
+    new PredictionMarketResolutionUnavailableError(conditionId()),
+    new PredictionMarketNotFoundError('703257'),
+  ])('maps unavailable binary resolution to not found', async (error) => {
+    const controller = controllerWith({
+      getById: () => Promise.reject(error),
+    });
+
+    await expect(controller.getMarketResolution('703257')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps incoherent binary resolution to service unavailable', async () => {
+    const controller = controllerWith({
+      getById: () =>
+        Promise.reject(
+          new PredictionMarketBinaryResolutionIncoherentError('703257'),
+        ),
+    });
+
+    await expect(controller.getMarketResolution('703257')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
 });
 
 function controllerWith(
   provider: Partial<PredictionMarketProvider>,
   midpointProvider: Partial<PredictionMarketMidpointProvider> = {},
   orderBookProvider: Partial<PredictionMarketOrderBookProvider> = {},
+  lastTradeProvider: Partial<PredictionMarketLastTradeProvider> = {},
+  resolutionProvider: Partial<PredictionMarketResolutionProvider> = {},
 ): PolymarketController {
+  const pricing = new PredictionMarketPricingService({
+    getMidpoint:
+      midpointProvider.getMidpoint ??
+      (() => Promise.reject(new Error('unexpected midpoint call'))),
+  });
+  const orderBook = new PredictionMarketOrderBookService({
+    getTopOfBook:
+      orderBookProvider.getTopOfBook ??
+      (() => Promise.reject(new Error('unexpected order-book call'))),
+  });
+  const discovery = new PredictionMarketDiscoveryService({
+    listActive:
+      provider.listActive ??
+      (() => Promise.reject(new Error('unexpected list call'))),
+    getById:
+      provider.getById ??
+      (() => Promise.reject(new Error('unexpected detail call'))),
+  });
+  const lastTrade = new PredictionMarketLastTradeService({
+    getLastTrade:
+      lastTradeProvider.getLastTrade ??
+      (() => Promise.reject(new Error('unexpected last-trade call'))),
+  });
+  const resolutionService = new PredictionMarketResolutionService({
+    getResolution:
+      resolutionProvider.getResolution ??
+      (() => Promise.reject(new Error('unexpected resolution call'))),
+  });
+  const binaryResolution = new PredictionMarketBinaryResolutionService(
+    discovery,
+    resolutionService,
+  );
   return new PolymarketController(
-    new PredictionMarketDiscoveryService({
-      listActive:
-        provider.listActive ??
-        (() => Promise.reject(new Error('unexpected list call'))),
-      getById:
-        provider.getById ??
-        (() => Promise.reject(new Error('unexpected detail call'))),
-    }),
-    new PredictionMarketPricingService({
-      getMidpoint:
-        midpointProvider.getMidpoint ??
-        (() => Promise.reject(new Error('unexpected midpoint call'))),
-    }),
-    new PredictionMarketOrderBookService({
-      getTopOfBook:
-        orderBookProvider.getTopOfBook ??
-        (() => Promise.reject(new Error('unexpected order-book call'))),
-    }),
+    discovery,
+    binaryResolution,
+    pricing,
+    orderBook,
+    new PredictionMarketDataObservationService(pricing, orderBook),
+    lastTrade,
+    new PredictionMarketLastTradeContextService(lastTrade, orderBook),
+    new PredictionMarketMidpointComplementService(discovery, pricing),
+    resolutionService,
   );
 }
 
@@ -315,5 +738,47 @@ function topOfBook() {
     executable: false as const,
     providerTimestamp: '1758920000123',
     receivedAt: new Date('2026-09-26T20:00:00.000Z'),
+  };
+}
+
+function lastTrade() {
+  return {
+    provider: 'polymarket' as const,
+    tokenId: '111',
+    price: '0.44',
+    side: 'sell' as const,
+    source: 'clob-last-trade' as const,
+    executable: false as const,
+    providerTimestamp: null,
+    receivedAt: new Date('2026-09-27T12:00:00.000Z'),
+  };
+}
+
+function conditionId(): string {
+  return `0x${'a'.repeat(64)}`;
+}
+
+function resolution() {
+  return {
+    provider: 'polymarket' as const,
+    conditionId: conditionId(),
+    status: 'resolved',
+    extendedReview: false,
+    wasDisputed: true,
+    wasArbitrated: false,
+    resolvedAt: '2026-09-27T17:00:00Z',
+    source: 'data-api-resolution' as const,
+    receivedAt: new Date('2026-09-27T18:00:00.000Z'),
+  };
+}
+
+function resolutionRecord(
+  payouts: readonly string[] | null = ['0', '1'],
+  condition = conditionId(),
+) {
+  return {
+    ...resolution(),
+    conditionId: condition,
+    payouts,
   };
 }

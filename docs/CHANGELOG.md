@@ -1,5 +1,47 @@
 # Changelog
 
+## 2026-09-27 — M9.10 indexed binary Polymarket resolution result completed
+
+- Added a read-only market route that reconciles selected-market identity and indexed YES/NO outcomes with its condition-grain resolution record.
+- Interprets only exact recognized terminal vectors: `[1,0]` for YES, `[0,1]` for NO, and `[0.5,0.5]` for the rare split result.
+- Exposes exact payout rates and winner/loser/split classification while keeping the raw vector internal and the M9.9 lifecycle response unchanged.
+- Adds no position lookup, user entitlement, redemption, authentication, persistence, account, wallet, order, or execution behavior.
+
+## 2026-09-27 — M9.9 public Polymarket condition resolution state completed
+
+- Added a read-only condition route backed by the unauthenticated public Data API resolution endpoint.
+- Strictly validates the requested and returned condition identity and preserves provider status, review/dispute/arbitration flags, nullable resolution time, and receipt time.
+- Maps the documented empty response to explicit absence and fails closed on duplicate, mismatched, malformed, or unavailable provider data.
+- Does not interpret payouts, infer a winning outcome, persist observations, or add authentication, account, wallet, order, or execution behavior.
+
+## 2026-09-27 — M9.8 binary midpoint complement completed
+
+- Added a read-only market route that loads the indexed YES and NO CLOB midpoints concurrently after selected-market discovery.
+- Reports their exact sum, signed deviation from one, and descriptive `balanced`, `below_one`, or `above_one` status using isolated 40-digit decimal arithmetic.
+- Rejects absent or duplicate outcome-token identities and mismatched midpoint responses explicitly.
+- Exposes `atomicSnapshot: false` and `executable: false` without claiming arbitrage, probability coherence, recommendation, persistence, account, wallet, or execution behavior.
+
+## 2026-09-27 — M9.7 descriptive last-trade book context completed
+
+- Added a read-only aggregate route that concurrently loads the latest reported trade and current displayed top of book.
+- Classifies the trade price as below bid, at bid, at both locked sides, inside spread, at ask, or above ask with exact signed decimal distances.
+- Represents incomplete displayed liquidity as explicitly unverifiable and rejects component identity divergence.
+- Exposes `atomicSnapshot: false` and `executable: false`; the comparison is descriptive and creates no signal, recommendation, persistence, account, wallet, or execution path.
+
+## 2026-09-27 — M9.6 public Polymarket last trade completed
+
+- Added a read-only route for one outcome token's latest public CLOB trade price and provider-reported side.
+- Strictly validates exact prices from zero through one, normalizes only documented `BUY` and `SELL` sides, and exposes receipt-only freshness with `executable: false`.
+- Converts the documented `0.5` plus empty-side never-traded placeholder into explicit unavailability instead of presenting it as an observed trade.
+- Adds no trade history, cache, persistence, authentication, account, wallet, or execution behavior.
+
+## 2026-09-27 — M9.5 coherent outcome market data completed
+
+- Added a read-only aggregate route that loads the public Polymarket midpoint and top of book concurrently.
+- Verifies the independent midpoint against the exact bid/ask average with 40-digit decimal arithmetic and fails closed on price or token-identity divergence.
+- Represents missing bid/ask liquidity as explicitly unverifiable rather than inventing coherence or liquidity.
+- Keeps both source observations, provider timing limitations, and `executable: false` visible without adding persistence, authentication, accounts, wallet access, or execution.
+
 ## 2026-09-26 — M8.11 Apache ECharts dashboard migration completed
 
 - Replaced all three manual SVG dashboard plots with Apache ECharts 6.1.

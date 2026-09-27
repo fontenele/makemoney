@@ -8,8 +8,37 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
+import { PredictionMarketBinaryResolutionService } from '../application/prediction-market-binary-resolution.service';
+import { PredictionMarketDataObservationService } from '../application/prediction-market-data-observation.service';
+import { PredictionMarketLastTradeService } from '../application/prediction-market-last-trade.service';
+import { PredictionMarketLastTradeContextService } from '../application/prediction-market-last-trade-context.service';
+import { PredictionMarketMidpointComplementService } from '../application/prediction-market-midpoint-complement.service';
 import { PredictionMarketOrderBookService } from '../application/prediction-market-order-book.service';
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
+import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
+import {
+  PredictionMarketDataIncoherentError,
+  PredictionMarketDataObservation,
+} from '../domain/prediction-market-data-observation';
+import {
+  PredictionMarketBinaryResolution,
+  PredictionMarketBinaryResolutionIncoherentError,
+  PredictionMarketBinaryResolutionUnavailableError,
+  PredictionMarketConditionUnavailableError,
+} from '../domain/prediction-market-binary-resolution';
+import {
+  PredictionMarketLastTradeContext,
+  PredictionMarketLastTradeContextIncoherentError,
+} from '../domain/prediction-market-last-trade-context';
+import {
+  PredictionMarketLastTradeObservation,
+  PredictionMarketLastTradeUnavailableError,
+} from '../domain/prediction-market-last-trade';
+import {
+  PredictionMarketMidpointComplement,
+  PredictionMarketMidpointComplementIncoherentError,
+  PredictionMarketOutcomeTokensUnavailableError,
+} from '../domain/prediction-market-midpoint-complement';
 import {
   isPredictionMarketTokenId,
   PredictionMarketMidpointUnavailableError,
@@ -19,6 +48,11 @@ import {
   PredictionMarketOrderBookUnavailableError,
   PredictionMarketTopOfBook,
 } from '../domain/prediction-market-top-of-book';
+import {
+  isPredictionMarketConditionId,
+  PredictionMarketResolutionState,
+  PredictionMarketResolutionUnavailableError,
+} from '../domain/prediction-market-resolution';
 import {
   PredictionMarketDetails,
   PredictionMarketNotFoundError,
@@ -33,8 +67,14 @@ const CURSOR = /^\S{1,4096}$/u;
 export class PolymarketController {
   constructor(
     private readonly discovery: PredictionMarketDiscoveryService,
+    private readonly binaryResolution: PredictionMarketBinaryResolutionService,
     private readonly pricing: PredictionMarketPricingService,
     private readonly orderBook: PredictionMarketOrderBookService,
+    private readonly marketData: PredictionMarketDataObservationService,
+    private readonly lastTrade: PredictionMarketLastTradeService,
+    private readonly lastTradeContext: PredictionMarketLastTradeContextService,
+    private readonly midpointComplement: PredictionMarketMidpointComplementService,
+    private readonly resolution: PredictionMarketResolutionService,
   ) {}
 
   @Get('markets')
@@ -55,6 +95,29 @@ export class PolymarketController {
     }
   }
 
+  @Get('conditions/:conditionId/resolution')
+  async getConditionResolution(
+    @Param('conditionId') conditionId: string,
+  ): Promise<PredictionMarketResolutionState> {
+    if (!isPredictionMarketConditionId(conditionId)) {
+      throw new BadRequestException(
+        'conditionId must be a Polymarket 0x-prefixed 32-byte hexadecimal identifier',
+      );
+    }
+    try {
+      return await this.resolution.getResolution(conditionId.toLowerCase());
+    } catch (error) {
+      if (error instanceof PredictionMarketResolutionUnavailableError) {
+        throw new NotFoundException(
+          'Polymarket condition resolution is unavailable',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket condition resolution provider is unavailable',
+      );
+    }
+  }
+
   @Get('markets/:id')
   async getMarket(@Param('id') id: string): Promise<PredictionMarketDetails> {
     const parsedId = validMarketId(id);
@@ -66,6 +129,63 @@ export class PolymarketController {
       }
       throw new ServiceUnavailableException(
         'Polymarket market detail is unavailable',
+      );
+    }
+  }
+
+  @Get('markets/:id/resolution')
+  async getMarketResolution(
+    @Param('id') id: string,
+  ): Promise<PredictionMarketBinaryResolution> {
+    const parsedId = validMarketId(id);
+    try {
+      return await this.binaryResolution.getResolution(parsedId);
+    } catch (error) {
+      if (
+        error instanceof PredictionMarketNotFoundError ||
+        error instanceof PredictionMarketConditionUnavailableError ||
+        error instanceof PredictionMarketResolutionUnavailableError ||
+        error instanceof PredictionMarketBinaryResolutionUnavailableError
+      ) {
+        throw new NotFoundException(
+          'Polymarket binary market resolution is unavailable',
+        );
+      }
+      if (error instanceof PredictionMarketBinaryResolutionIncoherentError) {
+        throw new ServiceUnavailableException(
+          'Polymarket binary market resolution is incoherent',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket binary market resolution providers are unavailable',
+      );
+    }
+  }
+
+  @Get('markets/:id/midpoint-complement')
+  async getMarketMidpointComplement(
+    @Param('id') id: string,
+  ): Promise<PredictionMarketMidpointComplement> {
+    const parsedId = validMarketId(id);
+    try {
+      return await this.midpointComplement.getComplement(parsedId);
+    } catch (error) {
+      if (
+        error instanceof PredictionMarketNotFoundError ||
+        error instanceof PredictionMarketOutcomeTokensUnavailableError ||
+        error instanceof PredictionMarketMidpointUnavailableError
+      ) {
+        throw new NotFoundException(
+          'Polymarket market midpoint complement is unavailable',
+        );
+      }
+      if (error instanceof PredictionMarketMidpointComplementIncoherentError) {
+        throw new ServiceUnavailableException(
+          'Polymarket market midpoint complement is incoherent',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket market midpoint-complement providers are unavailable',
       );
     }
   }
@@ -112,6 +232,91 @@ export class PolymarketController {
       }
       throw new ServiceUnavailableException(
         'Polymarket outcome order-book provider is unavailable',
+      );
+    }
+  }
+
+  @Get('outcomes/:tokenId/market-data')
+  async getOutcomeMarketData(
+    @Param('tokenId') tokenId: string,
+  ): Promise<PredictionMarketDataObservation> {
+    if (!isPredictionMarketTokenId(tokenId)) {
+      throw new BadRequestException(
+        'tokenId must be a canonical Polymarket decimal token identifier',
+      );
+    }
+    try {
+      return await this.marketData.getObservation(tokenId);
+    } catch (error) {
+      if (
+        error instanceof PredictionMarketMidpointUnavailableError ||
+        error instanceof PredictionMarketOrderBookUnavailableError
+      ) {
+        throw new NotFoundException(
+          'Polymarket outcome market data is unavailable',
+        );
+      }
+      if (error instanceof PredictionMarketDataIncoherentError) {
+        throw new ServiceUnavailableException(
+          'Polymarket outcome market data is incoherent',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket outcome market-data providers are unavailable',
+      );
+    }
+  }
+
+  @Get('outcomes/:tokenId/last-trade')
+  async getOutcomeLastTrade(
+    @Param('tokenId') tokenId: string,
+  ): Promise<PredictionMarketLastTradeObservation> {
+    if (!isPredictionMarketTokenId(tokenId)) {
+      throw new BadRequestException(
+        'tokenId must be a canonical Polymarket decimal token identifier',
+      );
+    }
+    try {
+      return await this.lastTrade.getLastTrade(tokenId);
+    } catch (error) {
+      if (error instanceof PredictionMarketLastTradeUnavailableError) {
+        throw new NotFoundException(
+          'Polymarket outcome last trade is unavailable',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket outcome last-trade provider is unavailable',
+      );
+    }
+  }
+
+  @Get('outcomes/:tokenId/last-trade/context')
+  async getOutcomeLastTradeContext(
+    @Param('tokenId') tokenId: string,
+  ): Promise<PredictionMarketLastTradeContext> {
+    if (!isPredictionMarketTokenId(tokenId)) {
+      throw new BadRequestException(
+        'tokenId must be a canonical Polymarket decimal token identifier',
+      );
+    }
+    try {
+      return await this.lastTradeContext.getContext(tokenId);
+    } catch (error) {
+      if (
+        error instanceof PredictionMarketLastTradeUnavailableError ||
+        error instanceof PredictionMarketOrderBookUnavailableError
+      ) {
+        throw new NotFoundException(
+          'Polymarket outcome last-trade context is unavailable',
+        );
+      }
+      if (error instanceof PredictionMarketLastTradeContextIncoherentError) {
+        throw new ServiceUnavailableException(
+          'Polymarket outcome last-trade context is incoherent',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket outcome last-trade context providers are unavailable',
       );
     }
   }
