@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-26 — M8.11 Apache ECharts dashboard migration completed
+
+- Replaced all three manual SVG dashboard plots with Apache ECharts 6.1.
+- Added one reusable Vue chart component with reactive updates, SVG rendering, responsive resizing, accessibility labels, and lifecycle cleanup.
+- Preserved chronological signal, equity, and checkpoint-return transformations with updated focused tests.
+- Removed manual chart paths and styles and split application, ECharts, and ZRender into bounded production chunks.
+- Verified the added ECharts dependency is not involved in the four current npm audit findings; the existing Prisma dependency-chain findings remain separately tracked without a forced breaking downgrade.
+
 ## 2026-09-26 — M9.4 public Polymarket top of book completed
 
 - Added a public read-only route for one outcome token's best bid, best ask, displayed quantities, and spread.

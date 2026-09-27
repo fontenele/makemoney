@@ -6,9 +6,11 @@ M9.4 requests the unauthenticated CLOB `/book` snapshot but exposes only the bes
 
 An empty side is valid missing liquidity rather than a fabricated zero. Provider snapshot timestamp and hash remain visible, while `executable: false` prevents a displayed level from becoming a fill claim. Full depth, caching, persistence, aggregation, and trading remain separate decisions.
 
-## 2026-09-26 — Prefer Apache ECharts for future dashboard charts
+## 2026-09-26 — Standardize dashboard charts on Apache ECharts
 
-Future dashboard chart increments should prefer Apache ECharts for its broader chart catalog, flexible Canvas/SVG rendering, responsive configuration, and accessibility support. The dependency is not added until a concrete chart is implemented or migrated, so the current bundle does not grow speculatively and existing SVG views remain unchanged for now.
+M8.11 replaces every existing hand-built SVG plot with Apache ECharts 6.1 and establishes it as the only dashboard chart library. One Vue component centralizes ECharts registration, SVG rendering, reactive updates, accessibility, resize handling, and disposal while each existing transformation module owns only its typed chart options and source-data validation.
+
+Only required ECharts modules are registered. Vite separates application code, ECharts, and ZRender so no generated chunk exceeds the configured default warning boundary. Backend decimal strings remain authoritative; numeric conversion is still restricted to browser presentation.
 
 ## 2026-09-26 — Treat the public CLOB midpoint as non-executable receipt-time data
 

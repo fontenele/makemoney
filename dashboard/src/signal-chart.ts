@@ -1,79 +1,111 @@
+import type { EChartsCoreOption } from 'echarts/core';
 import type { StrategySignal } from './api';
 
 export interface SignalChartPoint {
-  x: number;
-  shortY: number;
-  longY: number;
   action: StrategySignal['action'];
   evaluatedAt: string;
+  shortAverage: number;
+  longAverage: number;
 }
 
 export interface SignalChart {
-  shortPath: string;
-  longPath: string;
+  option: EChartsCoreOption;
   points: SignalChartPoint[];
   minimum: string;
   maximum: string;
 }
 
-const WIDTH = 100;
-const HEIGHT = 44;
-const PADDING = 3;
-
 export function buildSignalChart(
   newestFirstSignals: readonly StrategySignal[],
 ): SignalChart | null {
-  const values = newestFirstSignals
-    .map((signal) => ({
-      signal,
-      short: Number(signal.currentShortAverage),
-      long: Number(signal.currentLongAverage),
-    }))
-    .filter(
-      (value) =>
-        value.signal.currentShortAverage !== null &&
-        value.signal.currentLongAverage !== null &&
-        Number.isFinite(value.short) &&
-        Number.isFinite(value.long),
-    )
+  const points = newestFirstSignals
+    .map((signal): SignalChartPoint | null => {
+      if (
+        signal.currentShortAverage === null ||
+        signal.currentLongAverage === null
+      ) {
+        return null;
+      }
+      const shortAverage = Number(signal.currentShortAverage);
+      const longAverage = Number(signal.currentLongAverage);
+      return Number.isFinite(shortAverage) && Number.isFinite(longAverage)
+        ? {
+            action: signal.action,
+            evaluatedAt: signal.evaluatedAt,
+            shortAverage,
+            longAverage,
+          }
+        : null;
+    })
+    .filter((point): point is SignalChartPoint => point !== null)
     .reverse();
 
-  if (values.length === 0) return null;
-  const allAverages = values.flatMap((value) => [value.short, value.long]);
-  const minimum = Math.min(...allAverages);
-  const maximum = Math.max(...allAverages);
-  const range = maximum === minimum ? 1 : maximum - minimum;
-  const chartWidth = WIDTH - PADDING * 2;
-  const chartHeight = HEIGHT - PADDING * 2;
-
-  const points = values.map((value, index): SignalChartPoint => ({
-    x:
-      values.length === 1
-        ? WIDTH / 2
-        : PADDING + (index / (values.length - 1)) * chartWidth,
-    shortY: PADDING + ((maximum - value.short) / range) * chartHeight,
-    longY: PADDING + ((maximum - value.long) / range) * chartHeight,
-    action: value.signal.action,
-    evaluatedAt: value.signal.evaluatedAt,
-  }));
+  if (points.length === 0) return null;
+  const values = points.flatMap((point) => [
+    point.shortAverage,
+    point.longAverage,
+  ]);
+  const minimum = Math.min(...values);
+  const maximum = Math.max(...values);
+  const padding =
+    minimum === maximum ? Math.max(Math.abs(minimum) * 0.01, 1) : 0;
 
   return {
-    shortPath: path(points, 'shortY'),
-    longPath: path(points, 'longY'),
-    points,
     minimum: minimum.toFixed(2),
     maximum: maximum.toFixed(2),
+    points,
+    option: {
+      animation: false,
+      aria: { enabled: true, decal: { show: true } },
+      grid: { left: 8, right: 8, top: 12, bottom: 10 },
+      tooltip: { trigger: 'axis' },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: points.map((point) => point.evaluatedAt),
+        show: false,
+      },
+      yAxis: {
+        type: 'value',
+        min: minimum - padding,
+        max: maximum + padding,
+        show: false,
+        splitLine: { show: true, lineStyle: { color: '#24312d' } },
+      },
+      series: [
+        {
+          name: 'Short average',
+          type: 'line',
+          data: points.map((point) => point.shortAverage),
+          symbol: 'none',
+          lineStyle: { color: '#7fffc4', width: 2 },
+        },
+        {
+          name: 'Long average',
+          type: 'line',
+          data: points.map((point) => point.longAverage),
+          symbol: 'none',
+          lineStyle: { color: '#86a6ff', width: 2 },
+        },
+        {
+          name: 'Signal',
+          type: 'scatter',
+          symbolSize: 9,
+          data: points.map((point) =>
+            point.action === 'hold'
+              ? null
+              : {
+                  name: point.action,
+                  value: [point.evaluatedAt, point.shortAverage],
+                  itemStyle: {
+                    color: point.action === 'buy' ? '#7fffc4' : '#ff6b73',
+                    borderColor: '#07110f',
+                    borderWidth: 1,
+                  },
+                },
+          ),
+        },
+      ],
+    },
   };
-}
-
-function path(
-  points: readonly SignalChartPoint[],
-  key: 'shortY' | 'longY',
-): string {
-  return points
-    .map(
-      (point, index) =>
-        `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(3)} ${point[key].toFixed(3)}`,
-    )
-    .join(' ');
 }

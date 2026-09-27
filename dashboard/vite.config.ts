@@ -9,6 +9,15 @@ export default defineConfig(({ command }) => ({
   build: {
     outDir: fileURLToPath(new URL('../dashboard-dist', import.meta.url)),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('/node_modules/zrender/')) return 'zrender';
+          if (id.includes('/node_modules/echarts/')) return 'echarts';
+          return undefined;
+        },
+      },
+    },
   },
   server: {
     host: '127.0.0.1',

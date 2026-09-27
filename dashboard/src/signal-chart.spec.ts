@@ -13,9 +13,10 @@ describe('buildSignalChart', () => {
     expect(chart?.minimum).toBe('9.00');
     expect(chart?.maximum).toBe('12.00');
     expect(chart?.points.map((point) => point.action)).toEqual(['buy', 'sell']);
-    expect(chart?.points[0]?.x).toBe(3);
-    expect(chart?.points[1]?.x).toBe(97);
-    expect(chart?.shortPath).toMatch(/^M 3\.000/);
+    expect(chart?.points.map((point) => point.shortAverage)).toEqual([9, 12]);
+    expect(seriesData(chart?.option, 0)).toEqual([9, 12]);
+    expect(seriesData(chart?.option, 1)).toEqual([10, 11]);
+    expect(seriesData(chart?.option, 2)).toHaveLength(2);
   });
 
   it('returns null when no signal has both averages', () => {
@@ -29,6 +30,10 @@ describe('buildSignalChart', () => {
     ).toBeNull();
   });
 });
+
+function seriesData(option: unknown, index: number): unknown {
+  return (option as { series: Array<{ data: unknown }> }).series[index]?.data;
+}
 
 function signal(
   evaluatedAt: string,

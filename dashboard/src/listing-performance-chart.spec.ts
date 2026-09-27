@@ -20,8 +20,9 @@ describe('buildListingPerformanceChart', () => {
     ]);
     expect(chart?.minimumPercent).toBe('-5.00');
     expect(chart?.maximumPercent).toBe('10.00');
-    expect(chart?.points[0]?.y).toBe(chart?.zeroY);
-    expect(chart?.path).toMatch(/^M 3\.000/);
+    expect(chart?.points.map((point) => point.percent)).toEqual([0, 10, -5]);
+    expect(seriesData(chart?.option, 0)).toEqual([0, 10, -5]);
+    expect(seriesData(chart?.option, 1)).toEqual([0, 0, 0]);
   });
 
   it('returns null when no checkpoint contains a finite return', () => {
@@ -30,6 +31,10 @@ describe('buildListingPerformanceChart', () => {
     ).toBe(null);
   });
 });
+
+function seriesData(option: unknown, index: number): unknown {
+  return (option as { series: Array<{ data: unknown }> }).series[index]?.data;
+}
 
 function performance(
   points: Array<[label: string, rate: string]>,

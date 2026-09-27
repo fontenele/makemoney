@@ -583,11 +583,11 @@ h1 em {
   background: rgba(255, 255, 255, 0.018);
 }
 
-.signal-chart svg {
+.signal-chart .dashboard-chart {
   display: block;
   width: 100%;
   height: 190px;
-  overflow: visible;
+  margin-top: 10px;
 }
 
 .signal-chart-legend {
@@ -621,43 +621,6 @@ h1 em {
   margin-left: auto;
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   font-size: 9px;
-}
-
-.chart-grid,
-.chart-line {
-  fill: none;
-  vector-effect: non-scaling-stroke;
-}
-
-.chart-grid {
-  stroke: var(--line);
-  stroke-width: 1;
-}
-
-.chart-line {
-  stroke-width: 1.5;
-}
-
-.chart-short {
-  stroke: var(--green-bright);
-}
-
-.chart-long {
-  stroke: #86a6ff;
-}
-
-.chart-event {
-  stroke: #07110f;
-  stroke-width: 0.5;
-  vector-effect: non-scaling-stroke;
-}
-
-.chart-event-buy {
-  fill: var(--green-bright);
-}
-
-.chart-event-sell {
-  fill: var(--red);
 }
 
 .signal-timeline {
@@ -752,7 +715,7 @@ h1 em {
   background: rgba(255, 255, 255, 0.018);
 }
 
-.equity-chart svg {
+.equity-chart .dashboard-chart {
   display: block;
   width: 100%;
   height: 210px;
@@ -770,10 +733,6 @@ h1 em {
 
 .equity-line {
   background: #f0be5b;
-}
-
-.chart-equity {
-  stroke: #f0be5b;
 }
 
 .backtest-metrics {
@@ -931,27 +890,15 @@ h1 em {
   margin: 24px 0 18px;
 }
 
-.listing-performance-chart svg {
+.listing-performance-chart .dashboard-chart {
   display: block;
   width: 100%;
   height: 180px;
   margin-top: 12px;
-  overflow: visible;
 }
 
 .performance-line {
   background: #f0be5b;
-}
-
-.chart-performance {
-  stroke: #f0be5b;
-}
-
-.listing-chart-point {
-  fill: #f0be5b;
-  stroke: #07110f;
-  stroke-width: 0.5;
-  vector-effect: non-scaling-stroke;
 }
 
 .checkpoint-grid {

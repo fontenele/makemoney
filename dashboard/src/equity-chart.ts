@@ -1,67 +1,70 @@
+import type { EChartsCoreOption } from 'echarts/core';
 import type { BacktestEquityPoint } from './api';
 
 export interface EquityChartPoint {
-  x: number;
-  y: number;
   markedAt: string;
   equityUsdt: string;
+  value: number;
 }
 
 export interface EquityChart {
-  path: string;
+  option: EChartsCoreOption;
   points: EquityChartPoint[];
   minimum: string;
   maximum: string;
 }
 
-const WIDTH = 100;
-const HEIGHT = 44;
-const PADDING = 3;
-
 export function buildEquityChart(
   curve: readonly BacktestEquityPoint[],
 ): EquityChart | null {
-  const values = curve
-    .map((point) => ({ point, equity: Number(point.equityUsdt) }))
-    .filter((value) => Number.isFinite(value.equity));
+  const points = curve
+    .map((point): EquityChartPoint | null => {
+      const value = Number(point.equityUsdt);
+      return Number.isFinite(value) ? { ...point, value } : null;
+    })
+    .filter((point): point is EquityChartPoint => point !== null);
 
-  if (values.length === 0) return null;
-
-  const observedMinimum = Math.min(...values.map((value) => value.equity));
-  const observedMaximum = Math.max(...values.map((value) => value.equity));
-  const scalePadding =
-    observedMinimum === observedMaximum
-      ? Math.max(Math.abs(observedMinimum) * 0.01, 1)
-      : 0;
-  const scaleMinimum = observedMinimum - scalePadding;
-  const scaleMaximum = observedMaximum + scalePadding;
-  const range = scaleMaximum - scaleMinimum;
-  const chartWidth = WIDTH - PADDING * 2;
-  const chartHeight = HEIGHT - PADDING * 2;
-
-  const points = values.map((value, index): EquityChartPoint => ({
-    x:
-      values.length === 1
-        ? WIDTH / 2
-        : PADDING + (index / (values.length - 1)) * chartWidth,
-    y: PADDING + ((scaleMaximum - value.equity) / range) * chartHeight,
-    markedAt: value.point.markedAt,
-    equityUsdt: value.point.equityUsdt,
-  }));
+  if (points.length === 0) return null;
+  const values = points.map((point) => point.value);
+  const minimum = Math.min(...values);
+  const maximum = Math.max(...values);
+  const padding =
+    minimum === maximum ? Math.max(Math.abs(minimum) * 0.01, 1) : 0;
 
   return {
-    path: points
-      .map(
-        (point, index) =>
-          (index === 0 ? 'M' : 'L') +
-          ' ' +
-          point.x.toFixed(3) +
-          ' ' +
-          point.y.toFixed(3),
-      )
-      .join(' '),
+    minimum: minimum.toFixed(2),
+    maximum: maximum.toFixed(2),
     points,
-    minimum: observedMinimum.toFixed(2),
-    maximum: observedMaximum.toFixed(2),
+    option: {
+      animation: false,
+      aria: { enabled: true, decal: { show: true } },
+      grid: { left: 8, right: 8, top: 12, bottom: 10 },
+      tooltip: { trigger: 'axis' },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: points.map((point) => point.markedAt),
+        show: false,
+      },
+      yAxis: {
+        type: 'value',
+        min: minimum - padding,
+        max: maximum + padding,
+        show: false,
+        splitLine: { show: true, lineStyle: { color: '#24312d' } },
+      },
+      series: [
+        {
+          name: 'Fee-adjusted equity',
+          type: 'line',
+          data: values,
+          symbol: points.length === 1 ? 'circle' : 'none',
+          symbolSize: 7,
+          lineStyle: { color: '#f0be5b', width: 2 },
+          itemStyle: { color: '#f0be5b' },
+          areaStyle: { color: 'rgba(240, 190, 91, 0.08)' },
+        },
+      ],
+    },
   };
 }

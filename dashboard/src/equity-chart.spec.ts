@@ -18,9 +18,8 @@ describe('buildEquityChart', () => {
       '990',
       '1015',
     ]);
-    expect(chart?.points[0]?.x).toBe(3);
-    expect(chart?.points[2]?.x).toBe(97);
-    expect(chart?.path).toMatch(/^M 3\.000/);
+    expect(chart?.points.map((item) => item.value)).toEqual([1000, 990, 1015]);
+    expect(seriesData(chart?.option)).toEqual([1000, 990, 1015]);
   });
 
   it('centers a constant curve instead of inventing variation', () => {
@@ -28,7 +27,10 @@ describe('buildEquityChart', () => {
 
     expect(chart?.minimum).toBe('1000.00');
     expect(chart?.maximum).toBe('1000.00');
-    expect(chart?.points[0]).toMatchObject({ x: 50, y: 22 });
+    expect(chart?.points[0]).toMatchObject({ value: 1000 });
+    expect(chart?.option).toMatchObject({
+      yAxis: { min: 990, max: 1010 },
+    });
   });
 
   it('returns null when no point contains finite equity', () => {
@@ -37,6 +39,10 @@ describe('buildEquityChart', () => {
     ).toBeNull();
   });
 });
+
+function seriesData(option: unknown): unknown {
+  return (option as { series: Array<{ data: unknown }> }).series[0]?.data;
+}
 
 function point(markedAt: string, equityUsdt: string): BacktestEquityPoint {
   return {

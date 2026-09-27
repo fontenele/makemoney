@@ -1709,7 +1709,7 @@ M4 — Risk Engine                  DONE
 M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
-M8 — Dashboard                    DONE (M8.1–M8.10)
+M8 — Dashboard                    DONE (M8.1–M8.11)
 M9 — Polymarket                   IN PROGRESS (M9.1–M9.4)
 M10 — Agentic Wallet / Real Trading PLANNED
 ```
@@ -2394,6 +2394,7 @@ M8.7 Moving-Average Signal Chart: DONE
 M8.8 Selected-Listing Checkpoint Research: DONE
 M8.9 Latest Persisted Backtest Equity: DONE
 M8.10 Compiled Dashboard Serving: DONE
+M8.11 Apache ECharts Migration: DONE
 M9.1 Public Active-Market Discovery: DONE
 M9.2 Selected-Market Outcome Identities: DONE
 M9.3 Public Outcome Midpoint Observation: DONE

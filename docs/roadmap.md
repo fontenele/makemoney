@@ -229,10 +229,11 @@ Vue 3/Vite interface and market/portfolio visualizations.
 - **M8.4 — complete:** a responsive read-only view displays eight recent durable application-detected new listings with provider state, Spot availability, and an independent empty/unavailable state.
 - **M8.5 — complete:** semantic responsive header navigation links the overview, recent executions, and new-listing sections with keyboard focus and native fragment behavior.
 - **M8.6 — complete:** a responsive read-only timeline displays the twenty newest persisted moving-average signals and their exact current averages without connecting signals to execution.
-- **M8.7 — complete:** a chronological read-only SVG chart compares the persisted short and long moving averages on one scale and marks observed buy/sell signals without recalculating strategy decisions.
+- **M8.7 — complete:** a chronological read-only chart compares the persisted short and long moving averages on one scale and marks observed buy/sell signals without recalculating strategy decisions; M8.11 later migrates its original manual SVG implementation to ECharts.
 - **M8.8 — complete:** selecting a recent detection loads its existing exact T+0 checkpoint performance and displays a zero-anchored return chart plus checkpoint facts without ranking or recommendation.
 - **M8.9 — complete:** the newest immutable stored backtest is displayed with its backend-calculated fee-adjusted equity curve, ROI, drawdown, and closed-trade facts without simulation or mutation controls.
 - **M8.10 — complete:** compiled Vite assets are served from the loopback-bound NestJS application at /dashboard/, with a build-only asset base and same-origin root API requests.
+- **M8.11 — complete:** every existing dashboard plot uses Apache ECharts through one responsive accessible Vue lifecycle component; manual chart SVG paths are removed and Vite splits the application, ECharts, and ZRender into bounded chunks.
 - Live price/portfolio-equity history and additional research views remain optional post-M8 enhancements.
 
 ## M9 — Polymarket — in progress

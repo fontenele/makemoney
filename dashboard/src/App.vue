@@ -15,6 +15,7 @@ import {
 import { buildSignalChart } from './signal-chart';
 import { buildListingPerformanceChart } from './listing-performance-chart';
 import { buildEquityChart } from './equity-chart';
+import DashboardChart from './DashboardChart.vue';
 
 const snapshot = ref<DashboardSnapshot | null>(null);
 const refreshing = ref(false);
@@ -458,30 +459,10 @@ onUnmounted(() => autoRefresh.stop());
                 >{{ signalChart.minimum }}–{{ signalChart.maximum }} USDT</small
               >
             </div>
-            <svg
-              viewBox="0 0 100 44"
-              role="img"
-              aria-label="Chronological short and long moving-average history"
-              preserveAspectRatio="none"
-            >
-              <path class="chart-grid" d="M 3 22 L 97 22" />
-              <path class="chart-line chart-long" :d="signalChart.longPath" />
-              <path class="chart-line chart-short" :d="signalChart.shortPath" />
-              <circle
-                v-for="point in signalChart.points.filter(
-                  (item) => item.action !== 'hold',
-                )"
-                :key="`${point.evaluatedAt}:${point.action}`"
-                :cx="point.x"
-                :cy="point.shortY"
-                r="1.1"
-                :class="`chart-event chart-event-${point.action}`"
-              >
-                <title>
-                  {{ point.action }} · {{ timestamp(point.evaluatedAt) }}
-                </title>
-              </circle>
-            </svg>
+            <DashboardChart
+              :option="signalChart.option"
+              label="Chronological short and long moving-average history"
+            />
           </figure>
           <ol class="signal-timeline">
             <li
@@ -554,15 +535,10 @@ onUnmounted(() => autoRefresh.stop());
                 {{ equityChart.minimum }}–{{ equityChart.maximum }} USDT
               </small>
             </div>
-            <svg
-              viewBox="0 0 100 44"
-              role="img"
-              aria-label="Chronological fee-adjusted equity from the latest persisted backtest"
-              preserveAspectRatio="none"
-            >
-              <path class="chart-grid" d="M 3 41 L 97 41" />
-              <path class="chart-line chart-equity" :d="equityChart.path" />
-            </svg>
+            <DashboardChart
+              :option="equityChart.option"
+              label="Chronological fee-adjusted equity from the latest persisted backtest"
+            />
             <figcaption>
               <span>{{ timestamp(latestBacktest.request.startTime) }}</span>
               <span>{{ timestamp(latestBacktest.request.endTime) }}</span>
@@ -749,38 +725,13 @@ onUnmounted(() => autoRefresh.stop());
                   }}%
                 </small>
               </div>
-              <svg
-                viewBox="0 0 100 44"
-                role="img"
-                :aria-label="
+              <DashboardChart
+                :option="listingChart.option"
+                :label="
                   selectedListing.symbol +
                   ' checkpoint return history relative to T+0'
                 "
-                preserveAspectRatio="none"
-              >
-                <path
-                  class="chart-grid"
-                  :d="
-                    'M 3 ' + listingChart.zeroY + ' L 97 ' + listingChart.zeroY
-                  "
-                />
-                <path
-                  class="chart-line chart-performance"
-                  :d="listingChart.path"
-                />
-                <circle
-                  v-for="point in listingChart.points"
-                  :key="point.label"
-                  :cx="point.x"
-                  :cy="point.y"
-                  r="1"
-                  class="listing-chart-point"
-                >
-                  <title>
-                    {{ point.label }} · {{ percentage(point.rate) }}
-                  </title>
-                </circle>
-              </svg>
+              />
             </figure>
             <div class="checkpoint-grid">
               <div

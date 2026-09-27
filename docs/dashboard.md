@@ -1,8 +1,8 @@
 # Dashboard
 
-## Visualization direction
+## Visualization standard
 
-Future chart work should prefer Apache ECharts when it materially improves the visualization. Its flexible chart types, Canvas/SVG renderers, responsive configuration, and accessibility features fit the research dashboard. Existing SVG charts remain in place until a specific migration or new view is planned and tested; no ECharts dependency is installed speculatively.
+Apache ECharts is the dashboard's only chart library. New charts and material chart changes must use it instead of adding another charting package or hand-building SVG plots. Browser conversion of exact backend decimal strings remains presentational only.
 
 ## M8.1 read-only foundation
 
@@ -67,7 +67,7 @@ Empty and unavailable signal histories are explicit and independent. M8.6 adds n
 
 ## M8.7 moving-average signal chart
 
-The strategy section derives a chronological SVG chart from the same bounded persisted signal response. Short and long averages share one visible scale, while buy and sell points are marked on the short-average line. The exact timeline remains available below the chart.
+The strategy section derives a chronological chart from the same bounded persisted signal response. Short and long averages share one visible scale, while buy and sell points are marked on the short-average line. The exact timeline remains available below the chart. M8.11 later migrates its original manual SVG implementation to ECharts.
 
 Only signals containing finite short and long averages are charted. Decimal conversion is limited to browser coordinates and labels; the backend's exact decimal strings remain the source facts, and the chart performs no financial, strategy, sizing, or execution calculation.
 
@@ -101,3 +101,11 @@ Run the complete build and production entry point:
 Then open http://127.0.0.1:3000/dashboard/. Static serving remains on the application's existing loopback-bound listener and does not create API aliases or change controller routes.
 
 M8.10 adds no client-side router, external hosting, authentication change, mutation control, order submission, exchange credentials, or real trading.
+
+## M8.11 Apache ECharts migration
+
+The moving-average signal chart, latest backtest equity curve, and selected-listing checkpoint return chart now use Apache ECharts 6.1 through one reusable Vue component. The component registers only the required line, scatter, grid, tooltip, accessibility, and SVG-renderer modules; it updates reactively, resizes through `ResizeObserver`, falls back to the window resize event, and disposes its instance on unmount.
+
+The three existing chart transformation modules now create ECharts options while preserving their prior chronological filtering, displayed ranges, signal markers, zero baseline, exact source strings, and empty-data behavior. Existing hand-built chart SVG paths and styles were removed.
+
+Vite emits the application, ECharts, and ZRender as separate bounded chunks. M8.11 adds no backend route, financial calculation, signal generation, recommendation, mutation, order submission, provider credential, or real-trading behavior.

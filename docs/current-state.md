@@ -201,10 +201,11 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - M8.4 independently loads eight recent durable application detections and renders provider state and Spot availability without claiming official listing time or recommendation.
 - M8.5 adds semantic keyboard-accessible anchor navigation across overview, execution, and new-listing sections, retaining all links on narrow screens.
 - M8.6 independently loads twenty persisted moving-average signals and renders their actions and exact current averages as an observational timeline.
-- M8.7 derives a chronological shared-scale SVG chart of the persisted short and long averages and marks observed buy/sell points without recalculating signals.
+- M8.7 derives a chronological shared-scale chart of the persisted short and long averages and marks observed buy/sell points without recalculating signals.
 - M8.8 loads one explicitly selected detection's existing exact T+0-relative performance and displays its zero-anchored checkpoint return path with explicit pending/unavailable states.
 - M8.9 independently loads only the newest immutable stored simulation and displays its backend-calculated fee-adjusted equity curve, capital, ROI, drawdown, closed-trade count, and win rate.
 - M8.10 serves generated Vite assets under /dashboard/ from the existing loopback-bound NestJS Express application while production assets call the unchanged same-origin root API routes.
+- M8.11 migrates the moving-average, backtest-equity, and selected-listing-return plots to Apache ECharts 6.1 through one reusable responsive and accessible Vue lifecycle component. No manual chart SVG implementation or second chart library remains.
 
 - NestJS 12 application using TypeScript strict mode.
 - Startup configuration validation for `NODE_ENV`, `PORT`, `DATABASE_URL`, and `REDIS_URL`.
@@ -367,7 +368,7 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-26 after M9.4:
+The following passed on 2026-09-26 after M8.11 and M9.4:
 
 - `npm run build`
 - `npm run lint`
@@ -395,11 +396,11 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.10 are complete, and M9 is implemented through M9.4. Public Polymarket discovery, outcome identities, midpoint, and level-one book observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
+M0 through M8.11 are complete, and M9 is implemented through M9.4. Public Polymarket discovery, outcome identities, midpoint, and level-one book observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
 
 ## Known issues and cautions
 
 - Jest requires Node's `--experimental-vm-modules` flag because NestJS 12 packages are ESM.
-- The Docker build reported eight high-severity findings in the dependency audit. They have not been automatically changed because `npm audit fix --force` may introduce breaking upgrades; review them separately.
+- `npm audit --omit=dev` currently reports four high-severity findings in the Prisma toolchain dependency path (`prisma` through `@prisma/config`, `deepmerge-ts`, and `mysql2`). ECharts is not involved. The suggested fix is a breaking Prisma downgrade, so it was not applied automatically.
 - A transitive Angular DevKit package recommends Node `24.15.0` or newer while the machine has Node `24.14.1`. Current build, lint, and tests pass, but a Node 24 LTS patch update is advisable.
 - The advisory lock is global to the single local paper portfolio. Multiple portfolios may eventually require partitioned lock keys, but no such abstraction is needed yet.
