@@ -6,6 +6,8 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
+M9.2 is complete: one selected public Gamma market can be loaded by validated numeric ID, with its indexed outcome arrays strictly normalized into explicit YES and NO labels and nullable CLOB token identities. Provider prices remain out of scope.
+
 M9.1 is complete: a dedicated Polymarket module loads one bounded cursor-aware page of active public Gamma markets, strictly normalizes prediction-market identities, and exposes them through a local read-only route without credentials or persistence.
 
 M7.1 is complete: the application loads one public provider-neutral Binance Spot/USDT symbol catalog at startup and retains it in memory as a future detection baseline. It does not yet claim that any observed symbol is newly listed.
@@ -351,6 +353,7 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - New listings pattern classification magnitudes: `GET http://localhost:3000/new-listings/classification/magnitudes`
 - New listings pattern classification timing: `GET http://localhost:3000/new-listings/classification/timing`
 - Public active Polymarket markets: `GET http://localhost:3000/polymarket/markets`
+- Public selected Polymarket market: `GET http://localhost:3000/polymarket/markets/:id`
 - PostgreSQL host port: `5433` mapped to container port `5432`
 - Redis host port: `6379`
 
@@ -358,12 +361,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-26 after M9.1:
+The following passed on 2026-09-26 after M9.2:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 937 backend tests passed across 102 suites
+- `npm test -- --runInBand` — 954 backend tests passed across 102 suites
 - `npm run test:dashboard` — 19 dashboard client, refresh-scheduler, API-path, API-isolation, and chart-transformation tests passed
 - `npm run build:all`
 - `docker compose config --quiet`
@@ -386,7 +389,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.10 are complete, and M9 is implemented through M9.1. Public Polymarket discovery is isolated from Spot crypto and every execution path. A live Gamma response could not be validated because provider DNS resolution failed in the development environment; the official documented response contract, focused adapter tests, and local compilation passed.
+M0 through M8.10 are complete, and M9 is implemented through M9.2. Public Polymarket discovery and outcome identities are isolated from Spot crypto and every execution path. A live Gamma response could not be validated because provider DNS resolution failed in the development environment; the official documented response contracts, focused adapter tests, and local compilation passed.
 
 ## Known issues and cautions
 

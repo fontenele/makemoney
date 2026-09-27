@@ -3,6 +3,7 @@ import {
   ActivePredictionMarketQuery,
   PREDICTION_MARKET_PROVIDER,
   PredictionMarketPage,
+  PredictionMarketDetails,
   PredictionMarketProvider,
 } from '../domain/prediction-market';
 
@@ -18,5 +19,9 @@ export class PredictionMarketDiscoveryService {
     signal?: AbortSignal,
   ): Promise<PredictionMarketPage> {
     return this.provider.listActive(query, signal);
+  }
+
+  getById(id: string, signal?: AbortSignal): Promise<PredictionMarketDetails> {
+    return this.provider.getById(id, signal);
   }
 }

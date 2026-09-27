@@ -2,11 +2,17 @@ import {
   BadRequestException,
   Controller,
   Get,
+  NotFoundException,
+  Param,
   Query,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
-import { PredictionMarketPage } from '../domain/prediction-market';
+import {
+  PredictionMarketDetails,
+  PredictionMarketNotFoundError,
+  PredictionMarketPage,
+} from '../domain/prediction-market';
 
 const DEFAULT_LIMIT = 20;
 const MAXIMUM_LIMIT = 100;
@@ -33,6 +39,30 @@ export class PolymarketController {
       );
     }
   }
+
+  @Get('markets/:id')
+  async getMarket(@Param('id') id: string): Promise<PredictionMarketDetails> {
+    const parsedId = validMarketId(id);
+    try {
+      return await this.discovery.getById(parsedId);
+    } catch (error) {
+      if (error instanceof PredictionMarketNotFoundError) {
+        throw new NotFoundException('Polymarket market was not found');
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket market detail is unavailable',
+      );
+    }
+  }
+}
+
+function validMarketId(value: string): string {
+  if (!/^[1-9]\d{0,99}$/.test(value)) {
+    throw new BadRequestException(
+      'market id must be a positive Polymarket numeric identifier',
+    );
+  }
+  return value;
 }
 
 function validLimit(value?: string): number {

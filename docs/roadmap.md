@@ -247,9 +247,10 @@ Vue 3/Vite interface and market/portfolio visualizations.
 
 **Tests and acceptance:** each public provider payload is normalized and strictly validated behind an interface; local inputs are bounded; provider failure is explicit; builds, unit tests, lint, formatting, and route documentation must pass.
 
-**Known limitations:** M9.1 is stateless and loads identities/questions only. It does not yet expose outcome tokens, prices, order books, liquidity, resolution, events, or historical observations. Live provider validation is environment-dependent.
+**Known limitations:** M9.1–M9.2 are stateless and load market and outcome identities only. They do not yet expose prices, order books, liquidity, resolution, events, or historical observations. Live provider validation is environment-dependent.
 
 - **M9.1 — complete:** `GET /polymarket/markets` loads one bounded cursor-aware page of active markets from the unauthenticated public Gamma API, normalizes it into a separate prediction-market domain, applies a request timeout, and fails closed on malformed or unavailable provider data.
+- **M9.2 — complete:** `GET /polymarket/markets/:id` loads a selected public market by validated Gamma ID, strictly decodes its indexed outcome arrays into explicit YES and NO labels and nullable CLOB token identities, and distinguishes absence from provider unavailability without exposing prices or execution paths.
 
 ## M10 — Agentic Wallet / Real Trading — planned
 

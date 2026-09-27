@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-26 — Normalize Polymarket outcomes by documented index
+
+M9.2 reads one public Gamma market by numeric ID and decodes the provider's JSON-encoded `outcomes` and `clobTokenIds` arrays together. The documented index contract maps entry zero to YES and entry one to NO; both arrays must contain exactly two valid entries or the complete response is rejected.
+
+Outcome labels are retained rather than rewritten, while token IDs use canonical decimal strings and may be null when Gamma has not assigned CLOB identities. The provider's parallel price array is intentionally ignored until an exact-decimal price, provenance, and freshness contract is designed in a separate increment.
+
 ## 2026-09-26 — Start Polymarket with public market identities
 
 M9.1 uses the public Gamma keyset market-discovery endpoint directly behind a provider-neutral contract. A dedicated module models prediction markets instead of forcing Polymarket questions into Binance-style trading pairs.

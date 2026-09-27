@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-26 — M9.2 selected Polymarket outcome identities completed
+
+- Added public lookup of one selected market by validated Gamma market ID.
+- Strictly decoded the provider's indexed outcome-label and CLOB-token arrays into explicit YES and NO identities.
+- Preserved unavailable token IDs as null and distinguished invalid input, missing markets, and provider unavailability.
+- Deliberately ignored provider outcome prices and added no persistence, account, wallet, order, signal, or execution behavior.
+
 ## 2026-09-26 — M9.1 public Polymarket market discovery completed
 
 - Added a dedicated prediction-market module and provider-neutral active-market page contract, separate from Spot crypto semantics.
