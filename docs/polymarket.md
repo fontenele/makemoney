@@ -125,9 +125,25 @@ The adapter rejects duplicate IDs, malformed identity, and oversized collections
 
 The local market contract deliberately discards editorial visibility, publishing/update timestamps, and authoring metadata. It is separate from the event taxonomy model and adds no global catalog, tag relationships, filters, persistence, financial metric, position, account, or execution behavior.
 
+## M9.15 — Bounded public global tag catalog
+
+`GET /polymarket/tags` loads one public Gamma tag-catalog page. The local route accepts `limit=1..100`, defaulting to 20, and `offset=0..10000`, defaulting to 0. The adapter requests ascending provider-ID order and reduces every tag to required ID plus nullable label and slug.
+
+The successful response preserves the requested offset, supplies `nextOffset` only when Gamma returned a full page and continuation remains within the local offset bound, and always sets `stablePagination: false`. Gamma exposes no snapshot token for this offset contract, so concurrent catalog changes can shift later pages and callers must not treat traversal as a stable snapshot.
+
+Malformed identities, duplicate IDs, and pages larger than either the requested limit or the local maximum fail closed. Transport, non-success HTTP, and successful-response contract failures become local `503`. Editorial metadata, tag relationships, templates, carousel state, server-side filters, polling, and persistence remain outside this increment.
+
+## M9.16 — Selected public tag details
+
+`GET /polymarket/tags/:id` loads one tag from Gamma using a canonical positive numeric ID. The adapter normalizes the returned object through the same identity-only tag contract used by the catalog and then requires its ID to match the request exactly.
+
+The response contains provider name, ID, nullable label and slug, and local receipt time. Invalid local IDs return `400`; provider `404` becomes local `404`; transport, other HTTP, malformed successful response, and identity divergence become `503`.
+
+Gamma editorial flags, publishing and authoring fields, templates, carousel state, slug lookup, related-tag traversal, filtering, polling, and persistence remain excluded. The route adds no financial, position, account, order, wallet, or execution semantics.
+
 ## Boundaries
 
-M9.1–M9.14 do not persist or poll markets or events. M9.3–M9.8 expose public observations, not executable quotes, fill guarantees, historical series, or probability guarantees. M9.4, M9.5, and M9.7 retain only level one and do not expose full depth. M9.6–M9.7 use only the latest reported trade price and side, not trade history. M9.8 compares only independently observed binary midpoints. M9.9 exposes resolution lifecycle state, while M9.10 separately interprets only recognized terminal binary payout vectors. M9.11 loads one selected event and bounded market references; M9.12 adds bounded event discovery summaries without nested relations or financial metrics; M9.13 and M9.14 expose only bounded selected-event and selected-market taxonomy identity. The increments do not load positions or accounts. They have no authentication, signing, wallet, order, redemption, strategy, signal, paper execution, real execution, or dashboard path.
+M9.1–M9.16 do not persist or poll markets, events, or tags. M9.3–M9.8 expose public observations, not executable quotes, fill guarantees, historical series, or probability guarantees. M9.4, M9.5, and M9.7 retain only level one and do not expose full depth. M9.6–M9.7 use only the latest reported trade price and side, not trade history. M9.8 compares only independently observed binary midpoints. M9.9 exposes resolution lifecycle state, while M9.10 separately interprets only recognized terminal binary payout vectors. M9.11 loads one selected event and bounded market references; M9.12 adds bounded event discovery summaries without nested relations or financial metrics; M9.13 and M9.14 expose only bounded selected-event and selected-market taxonomy identity; M9.15 adds identity-only global catalog traversal with explicitly unstable offset pagination; M9.16 adds one identity-checked selected tag. The increments do not load positions or accounts. They have no authentication, signing, wallet, order, redemption, strategy, signal, paper execution, real execution, or dashboard path.
 
 Provider failure is exposed locally as `503`. Runtime validation against a real Gamma response was attempted but the development environment could not resolve the provider hostname; the client contract is covered with the current official documented response shape and focused automated tests.
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-27 — M9.16 selected public Polymarket tag details completed
+
+- Added `GET /polymarket/tags/:id` for one validated positive numeric Gamma tag ID.
+- Requires exact response-identity agreement and strictly normalizes only ID, nullable label/slug, and receipt time.
+- Maps provider `404` to local `404`; malformed identity, other provider failures, and successful-response contract violations fail closed as `503`.
+- Adds no slug lookup, tag relationships, filters, editorial metadata, polling, persistence, accounts, orders, wallet, or execution behavior.
+
+## 2026-09-27 — M9.15 bounded public Polymarket tag catalog completed
+
+- Added `GET /polymarket/tags` for bounded, unauthenticated global taxonomy discovery.
+- Validates `limit=1..100` and `offset=0..10000`, requests ascending provider-ID order, and exposes continuation only as explicitly unstable offset pagination.
+- Strictly normalizes unique tag IDs with nullable labels/slugs and rejects malformed, duplicate, or oversized successful responses.
+- Keeps the catalog contract separate from selected event and market taxonomy and adds no relationships, filtering, polling, persistence, accounts, orders, wallet, or execution behavior.
+
 ## 2026-09-27 — M9.14 selected public Polymarket market taxonomy completed
 
 - Added read-only retrieval of the public tags attached to one validated Gamma market ID.

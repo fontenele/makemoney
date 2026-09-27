@@ -17,6 +17,7 @@ import { PredictionMarketMidpointComplementService } from '../application/predic
 import { PredictionMarketOrderBookService } from '../application/prediction-market-order-book.service';
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
+import { PredictionTagService } from '../application/prediction-tag.service';
 import {
   PredictionMarketDataIncoherentError,
   PredictionMarketDataObservation,
@@ -66,15 +67,22 @@ import {
   PredictionEventPage,
   PredictionEventTags,
 } from '../domain/prediction-event';
+import {
+  PredictionTagDetails,
+  PredictionTagNotFoundError,
+  PredictionTagPage,
+} from '../domain/prediction-tag';
 
 const DEFAULT_LIMIT = 20;
 const MAXIMUM_LIMIT = 100;
+const MAXIMUM_OFFSET = 10_000;
 const CURSOR = /^\S{1,4096}$/u;
 
 @Controller('polymarket')
 export class PolymarketController {
   constructor(
     private readonly events: PredictionEventService,
+    private readonly tags: PredictionTagService,
     private readonly discovery: PredictionMarketDiscoveryService,
     private readonly binaryResolution: PredictionMarketBinaryResolutionService,
     private readonly pricing: PredictionMarketPricingService,
@@ -85,6 +93,39 @@ export class PolymarketController {
     private readonly midpointComplement: PredictionMarketMidpointComplementService,
     private readonly resolution: PredictionMarketResolutionService,
   ) {}
+
+  @Get('tags')
+  async listTags(
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ): Promise<PredictionTagPage> {
+    const query = {
+      limit: validLimit(limit),
+      offset: validOffset(offset),
+    };
+    try {
+      return await this.tags.list(query);
+    } catch {
+      throw new ServiceUnavailableException(
+        'Polymarket tag catalog is unavailable',
+      );
+    }
+  }
+
+  @Get('tags/:id')
+  async getTag(@Param('id') id: string): Promise<PredictionTagDetails> {
+    const parsedId = validTagId(id);
+    try {
+      return await this.tags.getById(parsedId);
+    } catch (error) {
+      if (error instanceof PredictionTagNotFoundError) {
+        throw new NotFoundException('Polymarket tag was not found');
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket tag detail is unavailable',
+      );
+    }
+  }
 
   @Get('events')
   async listActiveEvents(
@@ -412,6 +453,15 @@ function validEventId(value: string): string {
   return value;
 }
 
+function validTagId(value: string): string {
+  if (!/^[1-9]\d{0,99}$/.test(value)) {
+    throw new BadRequestException(
+      'tag id must be a positive Polymarket numeric identifier',
+    );
+  }
+  return value;
+}
+
 function validLimit(value?: string): number {
   if (value === undefined) return DEFAULT_LIMIT;
   if (!/^[1-9]\d*$/.test(value)) {
@@ -420,6 +470,18 @@ function validLimit(value?: string): number {
   const parsed = Number(value);
   if (parsed > MAXIMUM_LIMIT) {
     throw new BadRequestException('limit must be an integer from 1 to 100');
+  }
+  return parsed;
+}
+
+function validOffset(value?: string): number {
+  if (value === undefined) return 0;
+  if (!/^(?:0|[1-9]\d*)$/.test(value)) {
+    throw new BadRequestException('offset must be an integer from 0 to 10000');
+  }
+  const parsed = Number(value);
+  if (parsed > MAXIMUM_OFFSET) {
+    throw new BadRequestException('offset must be an integer from 0 to 10000');
   }
   return parsed;
 }

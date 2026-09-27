@@ -6,6 +6,10 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
+M9.16 is complete: one public route loads a selected Gamma tag by validated positive numeric ID, verifies exact response identity, and exposes only ID, nullable label/slug, and receipt time. Slug lookup, relationships, editorial metadata, persistence, accounts, and execution behavior are excluded.
+
+M9.15 is complete: one public route loads a bounded global Gamma tag-catalog page in ascending provider-ID order, exposes only unique tag IDs with nullable labels/slugs, and declares its offset continuation unstable. Relationships, filters, editorial metadata, persistence, accounts, and execution behavior are excluded.
+
 M9.14 is complete: one public route loads the tags attached to a selected Gamma market, bounds the collection to 100, and exposes only unique tag IDs with nullable labels and slugs behind the market provider contract. Editorial metadata, persistence, accounts, and execution behavior are excluded.
 
 M9.13 is complete: one public route loads the tags attached to a selected Gamma event, bounds the collection to 100, and exposes only unique tag IDs with nullable labels and slugs. Provider editorial flags, authoring metadata, persistence, positions, and execution behavior are excluded.
@@ -378,6 +382,8 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - New listings pattern classification magnitudes: `GET http://localhost:3000/new-listings/classification/magnitudes`
 - New listings pattern classification timing: `GET http://localhost:3000/new-listings/classification/timing`
 - Public active Polymarket events: `GET http://localhost:3000/polymarket/events`
+- Public global Polymarket tag catalog: `GET http://localhost:3000/polymarket/tags`
+- Public selected Polymarket tag: `GET http://localhost:3000/polymarket/tags/:id`
 - Public selected Polymarket event taxonomy: `GET http://localhost:3000/polymarket/events/:id/tags`
 - Public active Polymarket markets: `GET http://localhost:3000/polymarket/markets`
 - Public selected Polymarket market taxonomy: `GET http://localhost:3000/polymarket/markets/:id/tags`
@@ -398,12 +404,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-27 after M8.11 and M9.14:
+The following passed on 2026-09-27 after M8.11 and M9.16:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 1227 backend tests passed across 114 suites
+- `npm test -- --runInBand` — 1256 backend tests passed across 116 suites
 - `npm run test:dashboard` — 19 dashboard client, refresh-scheduler, API-path, API-isolation, and chart-transformation tests passed
 - `npm run build:all`
 - `docker compose config --quiet`
@@ -426,7 +432,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.14. Public Polymarket event and market discovery, selected event details, event and market taxonomy, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
+M0 through M8.11 are complete, and M9 is implemented through M9.16. Public Polymarket event and market discovery, selected event and tag details, selected and global tag taxonomy, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
 
 ## Known issues and cautions
 

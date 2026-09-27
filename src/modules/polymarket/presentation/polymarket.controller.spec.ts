@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import { jest } from '@jest/globals';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
 import { PredictionEventService } from '../application/prediction-event.service';
 import { PredictionMarketBinaryResolutionService } from '../application/prediction-market-binary-resolution.service';
@@ -13,6 +14,7 @@ import { PredictionMarketMidpointComplementService } from '../application/predic
 import { PredictionMarketOrderBookService } from '../application/prediction-market-order-book.service';
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
+import { PredictionTagService } from '../application/prediction-tag.service';
 import {
   PredictionMarketBinaryResolutionIncoherentError,
   PredictionMarketBinaryResolutionUnavailableError,
@@ -41,9 +43,111 @@ import {
   PredictionEventNotFoundError,
   PredictionEventProvider,
 } from '../domain/prediction-event';
+import {
+  PredictionTagNotFoundError,
+  PredictionTagProvider,
+} from '../domain/prediction-tag';
 import { PolymarketController } from './polymarket.controller';
 
 describe('PolymarketController', () => {
+  it('loads the default bounded global tag page', async () => {
+    const list = jest
+      .fn<PredictionTagProvider['list']>()
+      .mockResolvedValue(tagPage());
+    const controller = controllerWith({}, {}, {}, {}, {}, {}, { list });
+
+    await expect(controller.listTags()).resolves.toEqual(tagPage());
+    expect(list).toHaveBeenCalledWith({ limit: 20, offset: 0 }, undefined);
+  });
+
+  it('accepts bounded tag limit and offset', async () => {
+    const list = jest
+      .fn<PredictionTagProvider['list']>()
+      .mockResolvedValue(tagPage());
+    const controller = controllerWith({}, {}, {}, {}, {}, {}, { list });
+
+    await controller.listTags('100', '10000');
+    expect(list).toHaveBeenCalledWith({ limit: 100, offset: 10000 }, undefined);
+  });
+
+  it.each([
+    ['0', undefined],
+    ['101', undefined],
+    [undefined, '-1'],
+    [undefined, '01'],
+    [undefined, '10001'],
+  ])('rejects invalid tag pagination (%s, %s)', async (limit, offset) => {
+    await expect(controllerWith({}).listTags(limit, offset)).rejects.toThrow(
+      BadRequestException,
+    );
+  });
+
+  it('maps tag catalog provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        list: () => Promise.reject(new Error('network unavailable')),
+      },
+    );
+
+    await expect(controller.listTags()).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
+  it('loads one selected tag by validated id', async () => {
+    const getById = jest
+      .fn<PredictionTagProvider['getById']>()
+      .mockResolvedValue(tagDetails());
+    const controller = controllerWith({}, {}, {}, {}, {}, {}, { getById });
+
+    await expect(controller.getTag('2')).resolves.toEqual(tagDetails());
+    expect(getById).toHaveBeenCalledWith('2', undefined);
+  });
+
+  it.each(['0', '-1', '01', 'abc'])('rejects invalid tag id %s', async (id) => {
+    await expect(controllerWith({}).getTag(id)).rejects.toThrow(
+      BadRequestException,
+    );
+  });
+
+  it('maps absent selected tag to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getById: () => Promise.reject(new PredictionTagNotFoundError('2')),
+      },
+    );
+
+    await expect(controller.getTag('2')).rejects.toThrow(NotFoundException);
+  });
+
+  it('maps selected-tag provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getById: () => Promise.reject(new Error('network unavailable')) },
+    );
+
+    await expect(controller.getTag('2')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
   it('loads the default bounded active-event page', async () => {
     const calls: unknown[] = [];
     const controller = controllerWith(
@@ -901,6 +1005,7 @@ function controllerWith(
   lastTradeProvider: Partial<PredictionMarketLastTradeProvider> = {},
   resolutionProvider: Partial<PredictionMarketResolutionProvider> = {},
   eventProvider: Partial<PredictionEventProvider> = {},
+  tagProvider: Partial<PredictionTagProvider> = {},
 ): PolymarketController {
   const pricing = new PredictionMarketPricingService({
     getMidpoint:
@@ -948,8 +1053,17 @@ function controllerWith(
       eventProvider.getTagsById ??
       (() => Promise.reject(new Error('unexpected event tags call'))),
   });
+  const tags = new PredictionTagService({
+    list:
+      tagProvider.list ??
+      (() => Promise.reject(new Error('unexpected tag catalog call'))),
+    getById:
+      tagProvider.getById ??
+      (() => Promise.reject(new Error('unexpected tag detail call'))),
+  });
   return new PolymarketController(
     events,
+    tags,
     discovery,
     binaryResolution,
     pricing,
@@ -960,6 +1074,27 @@ function controllerWith(
     new PredictionMarketMidpointComplementService(discovery, pricing),
     resolutionService,
   );
+}
+
+function tagPage() {
+  return {
+    provider: 'polymarket' as const,
+    tags: [{ id: '2', label: 'Politics', slug: 'politics' }],
+    offset: 0,
+    nextOffset: null,
+    stablePagination: false as const,
+    receivedAt: new Date('2026-09-27T21:00:00.000Z'),
+  };
+}
+
+function tagDetails() {
+  return {
+    provider: 'polymarket' as const,
+    id: '2',
+    label: 'Politics',
+    slug: 'politics',
+    receivedAt: new Date('2026-09-27T22:00:00.000Z'),
+  };
 }
 
 function unusedProvider(): Partial<PredictionMarketProvider> {

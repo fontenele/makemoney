@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-09-27 — Verify selected-tag identity inside the catalog provider
+
+M9.16 extends the dedicated global tag provider with lookup by positive numeric ID rather than coupling selected tags to event or market taxonomy. A successful Gamma response is accepted only when its normalized string ID exactly matches the requested canonical ID.
+
+The local detail remains identity-only: ID, nullable label/slug, provider name, and receipt time. Provider `404` is a distinct absence; malformed payload, identity divergence, transport failure, and other HTTP status fail closed. Slug lookup, relationships, templates, and editorial metadata remain separate future concerns.
+
+## 2026-09-27 — Isolate the global tag catalog and disclose offset instability
+
+M9.15 introduces a dedicated tag-catalog provider instead of adding global traversal to either the event or market contract. The local route accepts only `limit=1..100` and `offset=0..10000`, requests ascending provider-ID order, and retains identity-only data.
+
+Gamma's list-tags contract exposes offset pagination without a snapshot token. A full page therefore yields a convenient `nextOffset`, but the response always declares `stablePagination: false`; concurrent provider changes can shift later pages. Duplicate identities, malformed fields, and responses larger than the requested limit fail the complete request.
+
 ## 2026-09-27 — Keep market taxonomy owned by the market contract
 
 M9.14 adds selected-market taxonomy to the existing market provider instead of importing the event-tag model or introducing a generic taxonomy abstraction. Although Gamma currently returns the same external tag shape for events and markets, separate contracts preserve aggregate ownership and allow either representation to evolve independently.

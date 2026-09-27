@@ -1259,7 +1259,7 @@ Futuramente pode ser usado para estudar:
 - information edge;
 - mercados correlacionados.
 
-M9.1–M9.14 implement bounded unauthenticated event and market discovery, selected event details, bounded event and market taxonomy and event-to-market references, selected YES/NO outcome identities, a non-executable CLOB midpoint, descriptive binary midpoint complement, exact public top-of-book observations, fail-closed midpoint/book coherence, one exact last-trade observation, descriptive non-atomic trade/book context, public condition-grain resolution lifecycle state, and recognized indexed binary payout results. Full depth, positions, redemption, trade history, persistence, strategies, accounts, authentication, and execution remain later explicit increments.
+M9.1–M9.16 implement bounded unauthenticated event and market discovery, selected event details, bounded event and market taxonomy, an identity-only global tag catalog with explicitly unstable offset pagination, selected tag details with exact identity verification, event-to-market references, selected YES/NO outcome identities, a non-executable CLOB midpoint, descriptive binary midpoint complement, exact public top-of-book observations, fail-closed midpoint/book coherence, one exact last-trade observation, descriptive non-atomic trade/book context, public condition-grain resolution lifecycle state, and recognized indexed binary payout results. Full depth, positions, redemption, trade history, persistence, strategies, accounts, authentication, and execution remain later explicit increments.
 
 ---
 
@@ -1710,7 +1710,7 @@ M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.11)
-M9 — Polymarket                   IN PROGRESS (M9.1–M9.14)
+M9 — Polymarket                   IN PROGRESS (M9.1–M9.16)
 M10 — Agentic Wallet / Real Trading PLANNED
 ```
 
@@ -2409,6 +2409,8 @@ M9.11 Selected Event Details: DONE
 M9.12 Active Event Discovery: DONE
 M9.13 Selected Event Taxonomy: DONE
 M9.14 Selected Market Taxonomy: DONE
+M9.15 Bounded Global Tag Catalog: DONE
+M9.16 Selected Tag Details: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2427,5 +2429,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is in progress through M9.14 selected public market taxonomy. Positions, redemption, trade history, authentication, accounts, automatic execution controls, and real trading remain separate future work.
+M9 is in progress through M9.16 selected public tag details. Positions, redemption, trade history, authentication, accounts, automatic execution controls, and real trading remain separate future work.
 ```
