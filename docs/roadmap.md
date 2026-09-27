@@ -235,9 +235,21 @@ Vue 3/Vite interface and market/portfolio visualizations.
 - **M8.10 — complete:** compiled Vite assets are served from the loopback-bound NestJS application at /dashboard/, with a build-only asset base and same-origin root API requests.
 - Live price/portfolio-equity history and additional research views remain optional post-M8 enhancements.
 
-## M9 — Polymarket — planned
+## M9 — Polymarket — in progress
 
-Prediction-market support modeled separately from spot crypto semantics.
+**Goal:** establish trustworthy, public prediction-market research while modeling markets, outcomes, probabilities, resolution, and liquidity separately from Spot crypto.
+
+**Scope:** unauthenticated public discovery first, followed incrementally by selected-market details and observational market data only when each prior contract is verified.
+
+**Non-goals:** authentication, accounts, positions, signing, order submission, wallet integration, automated execution, prediction-market strategies, or real capital.
+
+**Architecture impact:** a dedicated `polymarket` module owns provider-neutral prediction-market contracts and a Gamma API adapter; it does not implement or reuse the Spot `TradingPair` model or any trading executor.
+
+**Tests and acceptance:** each public provider payload is normalized and strictly validated behind an interface; local inputs are bounded; provider failure is explicit; builds, unit tests, lint, formatting, and route documentation must pass.
+
+**Known limitations:** M9.1 is stateless and loads identities/questions only. It does not yet expose outcome tokens, prices, order books, liquidity, resolution, events, or historical observations. Live provider validation is environment-dependent.
+
+- **M9.1 — complete:** `GET /polymarket/markets` loads one bounded cursor-aware page of active markets from the unauthenticated public Gamma API, normalizes it into a separate prediction-market domain, applies a request timeout, and fails closed on malformed or unavailable provider data.
 
 ## M10 — Agentic Wallet / Real Trading — planned
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-26 — M9.1 public Polymarket market discovery completed
+
+- Added a dedicated prediction-market module and provider-neutral active-market page contract, separate from Spot crypto semantics.
+- Added a timeout-bounded public Gamma API adapter with strict payload normalization and keyset cursor propagation.
+- Added local `GET /polymarket/markets` with bounded input validation and explicit `503` provider failure.
+- Added no credentials, persistence, polling, prices, order books, positions, wallet access, signals, or execution behavior.
+
 ## 2026-09-26 — M8.10 compiled dashboard serving completed
 
 - Served generated dashboard assets from the existing loopback-bound NestJS Express application under /dashboard/.

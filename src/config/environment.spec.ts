@@ -36,6 +36,31 @@ describe('validateEnvironment positive risk decimals', () => {
   );
 });
 
+describe('validateEnvironment Polymarket public API', () => {
+  it('uses the official Gamma API default', () => {
+    expect(validateEnvironment(required)).toMatchObject({
+      POLYMARKET_GAMMA_BASE_URL: 'https://gamma-api.polymarket.com',
+    });
+  });
+
+  it('accepts a custom HTTPS endpoint and rejects HTTP', () => {
+    expect(
+      validateEnvironment({
+        ...required,
+        POLYMARKET_GAMMA_BASE_URL: 'https://gamma-api.example.com',
+      }),
+    ).toMatchObject({
+      POLYMARKET_GAMMA_BASE_URL: 'https://gamma-api.example.com',
+    });
+    expect(() =>
+      validateEnvironment({
+        ...required,
+        POLYMARKET_GAMMA_BASE_URL: 'http://gamma-api.example.com',
+      }),
+    ).toThrow('Invalid environment configuration');
+  });
+});
+
 describe('validateEnvironment strategy periods', () => {
   it('uses conservative 3/5 defaults', () => {
     expect(validateEnvironment(required)).toMatchObject({

@@ -1221,7 +1221,7 @@ opportunities
 
 # 37. Polymarket — M9
 
-Polymarket foi discutido como possível expansão.
+Polymarket is now the active M9 expansion, developed incrementally through public read-only research first.
 
 Mas prediction markets NÃO são simplesmente outra cryptocurrency exchange.
 
@@ -1259,7 +1259,7 @@ Futuramente pode ser usado para estudar:
 - information edge;
 - mercados correlacionados.
 
-Não implementar no estágio atual.
+M9.1 implements bounded unauthenticated active-market discovery only. Outcome details, prices, order books, persistence, strategies, accounts, authentication, and execution remain later explicit increments.
 
 ---
 
@@ -1710,7 +1710,7 @@ M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.10)
-M9 — Polymarket                   PLANNED
+M9 — Polymarket                   IN PROGRESS (M9.1)
 M10 — Agentic Wallet / Real Trading PLANNED
 ```
 
@@ -2394,6 +2394,7 @@ M8.7 Moving-Average Signal Chart: DONE
 M8.8 Selected-Listing Checkpoint Research: DONE
 M8.9 Latest Persisted Backtest Equity: DONE
 M8.10 Compiled Dashboard Serving: DONE
+M9.1 Public Active-Market Discovery: DONE
 
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
@@ -2412,5 +2413,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M8 is complete through M8.10. M9 Polymarket remains the next planned milestone; automatic execution controls, authenticated exchange access, and real trading remain separate M10 work.
+M9 is in progress through M9.1 public active-market discovery. The next safe increment is selected-market outcome identity research; authentication, accounts, automatic execution controls, and real trading remain separate future work.
 ```

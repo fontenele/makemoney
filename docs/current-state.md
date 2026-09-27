@@ -6,6 +6,8 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
+M9.1 is complete: a dedicated Polymarket module loads one bounded cursor-aware page of active public Gamma markets, strictly normalizes prediction-market identities, and exposes them through a local read-only route without credentials or persistence.
+
 M7.1 is complete: the application loads one public provider-neutral Binance Spot/USDT symbol catalog at startup and retains it in memory as a future detection baseline. It does not yet claim that any observed symbol is newly listed.
 
 M7.2 persists each successful catalog observation transactionally, preserving first observation time while updating latest observation time and current provider state.
@@ -348,6 +350,7 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - New listings pattern classification cohort: `GET http://localhost:3000/new-listings/classification`
 - New listings pattern classification magnitudes: `GET http://localhost:3000/new-listings/classification/magnitudes`
 - New listings pattern classification timing: `GET http://localhost:3000/new-listings/classification/timing`
+- Public active Polymarket markets: `GET http://localhost:3000/polymarket/markets`
 - PostgreSQL host port: `5433` mapped to container port `5432`
 - Redis host port: `6379`
 
@@ -355,12 +358,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-26 after M8.10:
+The following passed on 2026-09-26 after M9.1:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 918 backend tests passed across 99 suites
+- `npm test -- --runInBand` — 937 backend tests passed across 102 suites
 - `npm run test:dashboard` — 19 dashboard client, refresh-scheduler, API-path, API-isolation, and chart-transformation tests passed
 - `npm run build:all`
 - `docker compose config --quiet`
@@ -373,6 +376,7 @@ The complete database-backed integration validation passed after E2E isolation:
 - `npx prisma migrate deploy` — all fifteen migrations applied, including exact checkpoint top-of-book storage
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live production entry point — `GET /dashboard/` returned HTML, its hashed asset returned 200 under `/dashboard/assets/`, production API paths omitted the development proxy prefix, and `GET /health` remained healthy.
+- Public Polymarket Gamma live-contract attempt — blocked by provider DNS resolution in the development environment; no live response was claimed, and the current official documented keyset shape is covered by focused adapter and controller tests.
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live Binance historical-candle smoke test — the public market-data-only kline endpoint returned ordered BTCUSDT one-minute rows with the documented 12 fields and no credentials
 - Live paper wallet initialization — reported BTC `0` and USDT `1000` from the default configuration
@@ -382,7 +386,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.10 are implemented and verified milestone increments. The production entry point served dashboard HTML and its hashed asset at /dashboard/ while the unchanged health API remained available. Automated browser visual inspection was not completed for M8.10; type-check, production build, live HTTP, and client behavior tests passed.
+M0 through M8.10 are complete, and M9 is implemented through M9.1. Public Polymarket discovery is isolated from Spot crypto and every execution path. A live Gamma response could not be validated because provider DNS resolution failed in the development environment; the official documented response contract, focused adapter tests, and local compilation passed.
 
 ## Known issues and cautions
 

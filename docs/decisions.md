@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## 2026-09-26 — Start Polymarket with public market identities
+
+M9.1 uses the public Gamma keyset market-discovery endpoint directly behind a provider-neutral contract. A dedicated module models prediction markets instead of forcing Polymarket questions into Binance-style trading pairs.
+
+The first response deliberately retains only market identity, nullable descriptive fields, the condition identity, explicit open state, provider cursor, and receipt time. Outcome tokens, probabilities, price and book data, persistence, polling, authentication, positions, and execution require later independently reviewed increments.
+
+The base URL is validated as HTTPS and the request has a ten-second timeout. Provider HTTP failure or malformed JSON becomes local unavailability rather than partial or fabricated market data.
+
 ## 2026-09-26 — Serve compiled dashboard under a dedicated local prefix
 
 M8.10 uses the already installed NestJS Express adapter to serve dashboard-dist under /dashboard/ instead of adding another server or dependency. Vite applies that base only during production builds, so the loopback-only development server remains unchanged.

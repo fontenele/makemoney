@@ -7,6 +7,7 @@ interface Environment {
   REDIS_URL: string;
   BINANCE_WS_BASE_URL: string;
   BINANCE_REST_BASE_URL: string;
+  POLYMARKET_GAMMA_BASE_URL: string;
   NEW_LISTINGS_POLL_INTERVAL_MS: number;
   NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED: boolean;
   NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: number;
@@ -45,6 +46,9 @@ const environmentSchema = Joi.object<Environment>({
   BINANCE_REST_BASE_URL: Joi.string()
     .uri({ scheme: ['https'] })
     .default('https://data-api.binance.vision'),
+  POLYMARKET_GAMMA_BASE_URL: Joi.string()
+    .uri({ scheme: ['https'] })
+    .default('https://gamma-api.polymarket.com'),
   NEW_LISTINGS_POLL_INTERVAL_MS: Joi.number()
     .integer()
     .min(5000)
