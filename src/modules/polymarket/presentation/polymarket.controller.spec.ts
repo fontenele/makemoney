@@ -4,6 +4,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
+import { PredictionEventService } from '../application/prediction-event.service';
 import { PredictionMarketBinaryResolutionService } from '../application/prediction-market-binary-resolution.service';
 import { PredictionMarketDataObservationService } from '../application/prediction-market-data-observation.service';
 import { PredictionMarketLastTradeService } from '../application/prediction-market-last-trade.service';
@@ -36,9 +37,89 @@ import {
   PredictionMarketNotFoundError,
   PredictionMarketProvider,
 } from '../domain/prediction-market';
+import {
+  PredictionEventNotFoundError,
+  PredictionEventProvider,
+} from '../domain/prediction-event';
 import { PolymarketController } from './polymarket.controller';
 
 describe('PolymarketController', () => {
+  it('loads the default bounded active-event page', async () => {
+    const calls: unknown[] = [];
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        listActive: (query) => {
+          calls.push(query);
+          return Promise.resolve({
+            events: [],
+            nextCursor: null,
+            receivedAt: new Date('2026-09-27T20:00:00.000Z'),
+          });
+        },
+      },
+    );
+
+    await expect(controller.listActiveEvents()).resolves.toMatchObject({
+      events: [],
+    });
+    expect(calls).toEqual([{ limit: 20 }]);
+  });
+
+  it('passes a validated limit and opaque cursor for event discovery', async () => {
+    const calls: unknown[] = [];
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        listActive: (query) => {
+          calls.push(query);
+          return Promise.resolve({
+            events: [],
+            nextCursor: null,
+            receivedAt: new Date('2026-09-27T20:00:00.000Z'),
+          });
+        },
+      },
+    );
+
+    await controller.listActiveEvents('100', 'page_2-cursor');
+    expect(calls).toEqual([{ limit: 100, afterCursor: 'page_2-cursor' }]);
+  });
+
+  it.each(['0', '-1', '1.5', 'abc', '101'])(
+    'rejects invalid event-discovery limit %s',
+    async (limit) => {
+      await expect(controllerWith({}).listActiveEvents(limit)).rejects.toThrow(
+        BadRequestException,
+      );
+    },
+  );
+
+  it('maps event-discovery provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        listActive: () => Promise.reject(new Error('network unavailable')),
+      },
+    );
+
+    await expect(controller.listActiveEvents()).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
   it('loads the default bounded active-market page', async () => {
     const calls: unknown[] = [];
     const controller = controllerWith({
@@ -103,6 +184,133 @@ describe('PolymarketController', () => {
     );
   });
 
+  it('loads one selected event with lifecycle and market references', async () => {
+    const calls: string[] = [];
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getById: (id) => {
+          calls.push(id);
+          return Promise.resolve(eventDetails());
+        },
+      },
+    );
+
+    await expect(controller.getEvent('1000')).resolves.toEqual(eventDetails());
+    expect(calls).toEqual(['1000']);
+  });
+
+  it.each(['', '0', '-1', '1.5', 'abc'])(
+    'rejects invalid event id %s',
+    async (id) => {
+      await expect(controllerWith({}).getEvent(id)).rejects.toThrow(
+        BadRequestException,
+      );
+    },
+  );
+
+  it('maps an absent selected event to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getById: () => Promise.reject(new PredictionEventNotFoundError('1000')),
+      },
+    );
+
+    await expect(controller.getEvent('1000')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps selected-event provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getById: () => Promise.reject(new Error('network unavailable')),
+      },
+    );
+
+    await expect(controller.getEvent('1000')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
+  it('loads bounded taxonomy for one selected event', async () => {
+    const calls: string[] = [];
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getTagsById: (id) => {
+          calls.push(id);
+          return Promise.resolve(eventTags());
+        },
+      },
+    );
+
+    await expect(controller.getEventTags('1000')).resolves.toEqual(eventTags());
+    expect(calls).toEqual(['1000']);
+  });
+
+  it.each(['', '0', '-1', '1.5', 'abc'])(
+    'rejects invalid event-tag event id %s',
+    async (id) => {
+      await expect(controllerWith({}).getEventTags(id)).rejects.toThrow(
+        BadRequestException,
+      );
+    },
+  );
+
+  it('maps absent event taxonomy to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getTagsById: () =>
+          Promise.reject(new PredictionEventNotFoundError('1000')),
+      },
+    );
+
+    await expect(controller.getEventTags('1000')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps event-taxonomy provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getTagsById: () => Promise.reject(new Error('network unavailable')),
+      },
+    );
+
+    await expect(controller.getEventTags('1000')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
   it('loads one selected market with YES and NO token identities', async () => {
     const calls: string[] = [];
     const controller = controllerWith({
@@ -143,6 +351,51 @@ describe('PolymarketController', () => {
     });
 
     await expect(controller.getMarket('703257')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
+  it('loads bounded taxonomy for one selected market', async () => {
+    const calls: string[] = [];
+    const controller = controllerWith({
+      getTagsById: (id) => {
+        calls.push(id);
+        return Promise.resolve(marketTags());
+      },
+    });
+
+    await expect(controller.getMarketTags('703257')).resolves.toEqual(
+      marketTags(),
+    );
+    expect(calls).toEqual(['703257']);
+  });
+
+  it.each(['', '0', '-1', '1.5', 'abc'])(
+    'rejects invalid market-tag market id %s',
+    async (id) => {
+      await expect(controllerWith({}).getMarketTags(id)).rejects.toThrow(
+        BadRequestException,
+      );
+    },
+  );
+
+  it('maps absent market taxonomy to not found', async () => {
+    const controller = controllerWith({
+      getTagsById: () =>
+        Promise.reject(new PredictionMarketNotFoundError('703257')),
+    });
+
+    await expect(controller.getMarketTags('703257')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps market-taxonomy provider failure to service unavailable', async () => {
+    const controller = controllerWith({
+      getTagsById: () => Promise.reject(new Error('network unavailable')),
+    });
+
+    await expect(controller.getMarketTags('703257')).rejects.toThrow(
       ServiceUnavailableException,
     );
   });
@@ -647,6 +900,7 @@ function controllerWith(
   orderBookProvider: Partial<PredictionMarketOrderBookProvider> = {},
   lastTradeProvider: Partial<PredictionMarketLastTradeProvider> = {},
   resolutionProvider: Partial<PredictionMarketResolutionProvider> = {},
+  eventProvider: Partial<PredictionEventProvider> = {},
 ): PolymarketController {
   const pricing = new PredictionMarketPricingService({
     getMidpoint:
@@ -665,6 +919,9 @@ function controllerWith(
     getById:
       provider.getById ??
       (() => Promise.reject(new Error('unexpected detail call'))),
+    getTagsById:
+      provider.getTagsById ??
+      (() => Promise.reject(new Error('unexpected market tags call'))),
   });
   const lastTrade = new PredictionMarketLastTradeService({
     getLastTrade:
@@ -680,7 +937,19 @@ function controllerWith(
     discovery,
     resolutionService,
   );
+  const events = new PredictionEventService({
+    listActive:
+      eventProvider.listActive ??
+      (() => Promise.reject(new Error('unexpected event list call'))),
+    getById:
+      eventProvider.getById ??
+      (() => Promise.reject(new Error('unexpected event call'))),
+    getTagsById:
+      eventProvider.getTagsById ??
+      (() => Promise.reject(new Error('unexpected event tags call'))),
+  });
   return new PolymarketController(
+    events,
     discovery,
     binaryResolution,
     pricing,
@@ -710,6 +979,51 @@ function marketDetails() {
       no: { label: 'No', tokenId: '222' },
     },
     receivedAt: new Date('2026-09-26T12:00:00.000Z'),
+  };
+}
+
+function marketTags() {
+  return {
+    provider: 'polymarket' as const,
+    marketId: '703257',
+    tags: [{ id: '2', label: 'Politics', slug: 'politics' }],
+    receivedAt: new Date('2026-09-27T20:00:00.000Z'),
+  };
+}
+
+function eventDetails() {
+  return {
+    provider: 'polymarket' as const,
+    id: '1000',
+    slug: 'example-event',
+    title: 'Example event',
+    description: 'An event grouping one market.',
+    resolutionSource: 'Official source',
+    startDate: '2026-09-01T00:00:00Z',
+    endDate: '2026-12-31T23:59:59Z',
+    active: true,
+    closed: false,
+    archived: false,
+    restricted: false,
+    markets: [
+      {
+        id: '703257',
+        slug: 'will-example-happen',
+        question: 'Will the example happen?',
+        conditionId: conditionId(),
+        closed: false,
+      },
+    ],
+    receivedAt: new Date('2026-09-27T20:00:00.000Z'),
+  };
+}
+
+function eventTags() {
+  return {
+    provider: 'polymarket' as const,
+    eventId: '1000',
+    tags: [{ id: '2', label: 'Politics', slug: 'politics' }],
+    receivedAt: new Date('2026-09-27T20:00:00.000Z'),
   };
 }
 

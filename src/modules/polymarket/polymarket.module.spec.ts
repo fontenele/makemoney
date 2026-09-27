@@ -3,6 +3,7 @@ import { MODULE_METADATA } from '@nestjs/common/constants';
 import { Provider } from '@nestjs/common';
 import { jest } from '@jest/globals';
 import { PREDICTION_MARKET_PROVIDER } from './domain/prediction-market';
+import { PREDICTION_EVENT_PROVIDER } from './domain/prediction-event';
 import { PREDICTION_MARKET_MIDPOINT_PROVIDER } from './domain/prediction-market-midpoint';
 import { PREDICTION_MARKET_ORDER_BOOK_PROVIDER } from './domain/prediction-market-top-of-book';
 import { PREDICTION_MARKET_RESOLUTION_PROVIDER } from './domain/prediction-market-resolution';
@@ -10,9 +11,39 @@ import { PolymarketClobMidpointClient } from './infrastructure/polymarket-clob-m
 import { PolymarketClobOrderBookClient } from './infrastructure/polymarket-clob-order-book.client';
 import { PolymarketDataResolutionClient } from './infrastructure/polymarket-data-resolution.client';
 import { PolymarketGammaMarketClient } from './infrastructure/polymarket-gamma-market.client';
+import { PolymarketGammaEventClient } from './infrastructure/polymarket-gamma-event.client';
 import { PolymarketModule } from './polymarket.module';
 
 describe('PolymarketModule', () => {
+  it('registers the public Gamma event adapter', () => {
+    const providers = Reflect.getMetadata(
+      MODULE_METADATA.PROVIDERS,
+      PolymarketModule,
+    ) as Provider[];
+    const registration = providers.find(
+      (provider) =>
+        typeof provider === 'object' &&
+        provider !== null &&
+        'provide' in provider &&
+        provider.provide === PREDICTION_EVENT_PROVIDER,
+    );
+    if (
+      typeof registration !== 'object' ||
+      registration === null ||
+      !('useFactory' in registration)
+    ) {
+      throw new Error('Polymarket event provider factory is missing');
+    }
+    const getOrThrow = jest
+      .fn<ConfigService['getOrThrow']>()
+      .mockReturnValue('https://gamma-api.polymarket.test');
+    const config = { getOrThrow } as unknown as ConfigService;
+    const provider = registration.useFactory(config) as unknown;
+
+    expect(getOrThrow).toHaveBeenCalledWith('POLYMARKET_GAMMA_BASE_URL');
+    expect(provider).toBeInstanceOf(PolymarketGammaEventClient);
+  });
+
   it('registers the public Gamma market adapter', () => {
     const providers = Reflect.getMetadata(
       MODULE_METADATA.PROVIDERS,

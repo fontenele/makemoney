@@ -194,6 +194,98 @@ describe('PolymarketGammaMarketClient', () => {
       ),
     ).rejects.toThrow(PredictionMarketNotFoundError);
   });
+
+  it('normalizes only bounded market-tag identity', () => {
+    const client = new PolymarketGammaMarketClient('https://example.com');
+
+    expect(
+      client.normalizeTags([
+        {
+          id: '2',
+          label: 'Politics',
+          slug: 'politics',
+          forceShow: true,
+          publishedAt: '2026-01-01T00:00:00Z',
+        },
+        { id: '9', label: null, slug: null, forceHide: false },
+      ]),
+    ).toEqual([
+      { id: '2', label: 'Politics', slug: 'politics' },
+      { id: '9', label: null, slug: null },
+    ]);
+  });
+
+  it('loads tags for one unauthenticated market by Gamma ID', async () => {
+    const http = jest
+      .fn<(input: string, init?: RequestInit) => Promise<Response>>()
+      .mockResolvedValue(
+        new Response(
+          JSON.stringify([{ id: '2', label: 'Politics', slug: 'politics' }]),
+        ),
+      );
+    const client = new PolymarketGammaMarketClient(
+      'https://gamma-api.polymarket.com/',
+      http,
+      () => receivedAt,
+    );
+
+    await expect(client.getTagsById('703257')).resolves.toEqual({
+      provider: 'polymarket',
+      marketId: '703257',
+      tags: [{ id: '2', label: 'Politics', slug: 'politics' }],
+      receivedAt,
+    });
+    expect(http.mock.calls[0]?.[0]).toBe(
+      'https://gamma-api.polymarket.com/markets/703257/tags',
+    );
+    expect(http.mock.calls[0]?.[1]).toMatchObject({
+      headers: { accept: 'application/json' },
+    });
+    expect(http.mock.calls[0]?.[1]?.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it.each([
+    {},
+    [{ id: '', label: 'Politics', slug: 'politics' }],
+    [{ id: '2', label: 1, slug: 'politics' }],
+    [
+      { id: '2', label: 'Politics', slug: 'politics' },
+      { id: '2', label: 'Duplicate', slug: 'duplicate' },
+    ],
+    Array.from({ length: 101 }, (_, index) => ({
+      id: `${index + 1}`,
+      label: `Tag ${index + 1}`,
+      slug: `tag-${index + 1}`,
+    })),
+  ])('rejects malformed or unbounded market tags payload %#', (payload) => {
+    const client = new PolymarketGammaMarketClient('https://example.com');
+
+    expect(() => client.normalizeTags(payload)).toThrow(
+      /Invalid Polymarket market tag/,
+    );
+  });
+
+  it('distinguishes absent market tags from provider failure', async () => {
+    const absent = jest
+      .fn<(input: string) => Promise<Response>>()
+      .mockResolvedValue(new Response(null, { status: 404 }));
+    const failed = jest
+      .fn<(input: string) => Promise<Response>>()
+      .mockResolvedValue(new Response(null, { status: 500 }));
+
+    await expect(
+      new PolymarketGammaMarketClient(
+        'https://example.com',
+        absent,
+      ).getTagsById('703257'),
+    ).rejects.toThrow(PredictionMarketNotFoundError);
+    await expect(
+      new PolymarketGammaMarketClient(
+        'https://example.com',
+        failed,
+      ).getTagsById('703257'),
+    ).rejects.toThrow('500');
+  });
 });
 
 function market() {

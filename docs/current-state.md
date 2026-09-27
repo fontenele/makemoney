@@ -6,6 +6,14 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
+M9.14 is complete: one public route loads the tags attached to a selected Gamma market, bounds the collection to 100, and exposes only unique tag IDs with nullable labels and slugs behind the market provider contract. Editorial metadata, persistence, accounts, and execution behavior are excluded.
+
+M9.13 is complete: one public route loads the tags attached to a selected Gamma event, bounds the collection to 100, and exposes only unique tag IDs with nullable labels and slugs. Provider editorial flags, authoring metadata, persistence, positions, and execution behavior are excluded.
+
+M9.12 is complete: one public route loads a bounded cursor-aware page of non-closed Gamma events and reduces each relation-heavy provider object to validated identity, dates, and lifecycle flags. Nested markets, series, tags, prices, volume, liquidity, positions, and execution behavior are not exposed.
+
+M9.11 is complete: one public route loads a selected Gamma event and strictly normalizes its identity, descriptive resolution context, lifecycle flags, and bounded market references. It does not import nested prices, volume, liquidity, positions, or execution behavior.
+
 M9.10 is complete: one public market route reconciles its canonical condition and indexed YES/NO identities with a recognized terminal binary payout vector. It exposes exact payout rates and winner/loser/split classification for YES, NO, and rare 50/50 results without loading positions or executing redemption.
 
 M9.9 is complete: one public condition route loads the Data API resolution lifecycle row, verifies its exact condition identity, and preserves status, extended-review, dispute, arbitration, nullable resolution time, and local receipt time. It does not infer a winning outcome or payout.
@@ -369,7 +377,11 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - New listings pattern classification cohort: `GET http://localhost:3000/new-listings/classification`
 - New listings pattern classification magnitudes: `GET http://localhost:3000/new-listings/classification/magnitudes`
 - New listings pattern classification timing: `GET http://localhost:3000/new-listings/classification/timing`
+- Public active Polymarket events: `GET http://localhost:3000/polymarket/events`
+- Public selected Polymarket event taxonomy: `GET http://localhost:3000/polymarket/events/:id/tags`
 - Public active Polymarket markets: `GET http://localhost:3000/polymarket/markets`
+- Public selected Polymarket market taxonomy: `GET http://localhost:3000/polymarket/markets/:id/tags`
+- Public selected Polymarket event: `GET http://localhost:3000/polymarket/events/:id`
 - Public selected Polymarket market: `GET http://localhost:3000/polymarket/markets/:id`
 - Descriptive binary Polymarket midpoint complement: `GET http://localhost:3000/polymarket/markets/:id/midpoint-complement`
 - Public Polymarket condition resolution state: `GET http://localhost:3000/polymarket/conditions/:conditionId/resolution`
@@ -386,12 +398,12 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-27 after M8.11 and M9.10:
+The following passed on 2026-09-27 after M8.11 and M9.14:
 
 - `npm run build`
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 1153 backend tests passed across 111 suites
+- `npm test -- --runInBand` — 1227 backend tests passed across 114 suites
 - `npm run test:dashboard` — 19 dashboard client, refresh-scheduler, API-path, API-isolation, and chart-transformation tests passed
 - `npm run build:all`
 - `docker compose config --quiet`
@@ -414,7 +426,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.10. Public Polymarket discovery, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
+M0 through M8.11 are complete, and M9 is implemented through M9.14. Public Polymarket event and market discovery, selected event details, event and market taxonomy, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
 
 ## Known issues and cautions
 

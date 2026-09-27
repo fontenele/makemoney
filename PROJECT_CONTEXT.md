@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, **M6 — Backtesting (M6.1–M6.32)**, **M7 — New Listing Scanner (M7.1–M7.109)**, and **M8 — Dashboard (M8.1–M8.11)**.
-- M9 is in progress through **M9.10 — Binary Resolution Result**.
+- M9 is in progress through **M9.14 — Selected Market Taxonomy**.
 - M6 is closed. M7.1–M7.109 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -374,6 +374,14 @@ M9.8 loads one binary market's YES and NO outcome midpoints at `GET /polymarket/
 M9.9 loads one public condition-grain resolution state from the Polymarket Data API at `GET /polymarket/conditions/:conditionId/resolution`. It preserves the provider status, review/dispute/arbitration flags, nullable resolution time, and receipt time without inferring a winning outcome or payout.
 
 M9.10 reconciles one selected market's indexed YES/NO outcomes with its condition payout vector at `GET /polymarket/markets/:id/resolution`. It interprets only the documented `[1,0]`, `[0,1]`, and rare `[0.5,0.5]` terminal binary results, without accessing positions or executing redemption.
+
+M9.11 loads one selected public event at `GET /polymarket/events/:id`, preserving its identity, descriptive resolution context, lifecycle flags, bounded market references, and receipt time without importing event prices, volume, positions, or execution behavior.
+
+M9.12 loads one bounded cursor-aware page of non-closed public events at `GET /polymarket/events`. It reduces Gamma's relation-heavy event records to identity, dates, lifecycle flags, an opaque next cursor, and local receipt time without exposing nested markets, financial metrics, persistence, positions, or execution behavior.
+
+M9.13 loads the bounded public taxonomy attached to one selected event at `GET /polymarket/events/:id/tags`. It preserves only tag ID and nullable label/slug, rejects malformed or duplicate identities, and discards provider editorial and authoring metadata without adding persistence or execution behavior.
+
+M9.14 loads the bounded public taxonomy attached to one selected market at `GET /polymarket/markets/:id/tags`. It preserves only tag ID and nullable label/slug behind the market provider contract, rejects malformed or duplicate identities, and adds no catalog traversal, persistence, account, or execution behavior.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

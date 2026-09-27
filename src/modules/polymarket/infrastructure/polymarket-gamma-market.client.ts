@@ -5,12 +5,15 @@ import {
   PredictionMarketNotFoundError,
   PredictionMarketPage,
   PredictionMarketProvider,
+  PredictionMarketTag,
+  PredictionMarketTags,
 } from '../domain/prediction-market';
 
 type HttpClient = (input: string, init?: RequestInit) => Promise<Response>;
 type Clock = () => Date;
 
 const TIMEOUT_MS = 10_000;
+const MAXIMUM_TAGS = 100;
 const CONDITION_ID = /^0x[a-fA-F0-9]{64}$/;
 const TOKEN_ID = /^(?:0|[1-9]\d{0,77})$/;
 
@@ -78,6 +81,34 @@ export class PolymarketGammaMarketClient implements PredictionMarketProvider {
     return details;
   }
 
+  async getTagsById(
+    id: string,
+    signal?: AbortSignal,
+  ): Promise<PredictionMarketTags> {
+    const timeout = AbortSignal.timeout(TIMEOUT_MS);
+    const response = await this.http(
+      `${this.baseUrl.replace(/\/$/, '')}/markets/${encodeURIComponent(id)}/tags`,
+      {
+        headers: { accept: 'application/json' },
+        signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+      },
+    );
+    if (response.status === 404) {
+      throw new PredictionMarketNotFoundError(id);
+    }
+    if (!response.ok) {
+      throw new Error(
+        `Polymarket market tags request failed: ${response.status}`,
+      );
+    }
+    return {
+      provider: 'polymarket',
+      marketId: id,
+      tags: this.normalizeTags(JSON.parse(await response.text()) as unknown),
+      receivedAt: this.clock(),
+    };
+  }
+
   normalize(payload: unknown): PredictionMarketPage {
     if (
       !isRecord(payload) ||
@@ -114,6 +145,17 @@ export class PolymarketGammaMarketClient implements PredictionMarketProvider {
       receivedAt: this.clock(),
     };
   }
+
+  normalizeTags(payload: unknown): PredictionMarketTag[] {
+    if (!Array.isArray(payload) || payload.length > MAXIMUM_TAGS) {
+      throw new Error('Invalid Polymarket market tags payload');
+    }
+    const tags = payload.map(normalizeTag);
+    if (new Set(tags.map((tag) => tag.id)).size !== tags.length) {
+      throw new Error('Invalid Polymarket market tags payload');
+    }
+    return tags;
+  }
 }
 
 function normalizeMarket(value: unknown): PredictionMarket {
@@ -144,6 +186,22 @@ function normalizeMarketIdentity(value: Record<string, unknown>) {
     slug: value.slug,
     question: value.question,
     conditionId: value.conditionId,
+  };
+}
+
+function normalizeTag(value: unknown): PredictionMarketTag {
+  if (
+    !isRecord(value) ||
+    !validRequiredString(value.id, 100) ||
+    !validOptionalString(value.label, 500) ||
+    !validOptionalString(value.slug, 500)
+  ) {
+    throw new Error('Invalid Polymarket market tag payload');
+  }
+  return {
+    id: value.id,
+    label: value.label,
+    slug: value.slug,
   };
 }
 

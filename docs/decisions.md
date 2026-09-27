@@ -1,5 +1,29 @@
 # Technical Decisions
 
+## 2026-09-27 — Keep market taxonomy owned by the market contract
+
+M9.14 adds selected-market taxonomy to the existing market provider instead of importing the event-tag model or introducing a generic taxonomy abstraction. Although Gamma currently returns the same external tag shape for events and markets, separate contracts preserve aggregate ownership and allow either representation to evolve independently.
+
+The same safety policy applies: at most 100 entries, unique required tag IDs, nullable labels/slugs, and no provider editorial, publishing, or authoring metadata. Empty taxonomy is valid; malformed or ambiguous identity fails the complete request.
+
+## 2026-09-27 — Expose selected-event taxonomy as identity-only data
+
+M9.13 extends the event provider contract with a separate selected-event taxonomy read model. The Gamma response includes editorial visibility flags, publishing timestamps, and authoring fields; the local contract retains only tag ID, nullable label, and nullable slug because those are sufficient for classification research.
+
+The adapter bounds the provider array at 100 entries and rejects duplicate tag IDs or malformed identity fields instead of silently producing ambiguous taxonomy. An empty array remains a valid event with no attached tags, while provider `404` remains distinct from transport or contract failure.
+
+## 2026-09-27 — Keep event discovery summaries separate from selected-event details
+
+M9.12 extends the event provider contract with bounded keyset discovery but does not return the selected-event detail model for every result. Gamma's keyset endpoint always includes relation-heavy event records, so the adapter deliberately reduces each item to identity, dates, and lifecycle flags and discards nested markets, series, tags, and financial metrics.
+
+Discovery requests always apply `closed=false`, use an opaque cursor, and accept at most 100 results. The adapter still verifies that each returned event is non-closed and rejects the complete page when identity, timestamps, lifecycle flags, or cursor shape is malformed.
+
+## 2026-09-27 — Model selected events separately from markets
+
+M9.11 introduces a dedicated provider-neutral event contract instead of treating a Gamma event as a market. It preserves only event identity, descriptive resolution context, lifecycle flags, documented timestamps, and a bounded collection of market references.
+
+Nested markets are reduced to ID, nullable slug/question/condition identity, and closed state. Prices, volume, liquidity, outcome arrays, and trading flags remain owned by their existing or future explicit contracts. The adapter rejects more than 1,000 nested references and fails the complete request on malformed identity or lifecycle data.
+
 ## 2026-09-27 — Interpret only recognized indexed binary payout vectors
 
 M9.10 composes the existing selected-market and condition-resolution contracts. It requires the canonical condition identities to agree and correlates payout index zero with the already documented YES outcome and index one with NO. The only accepted terminal vectors are `[1,0]`, `[0,1]`, and the documented rare 50/50 result `[0.5,0.5]`.

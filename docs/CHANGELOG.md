@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-09-27 — M9.14 selected public Polymarket market taxonomy completed
+
+- Added read-only retrieval of the public tags attached to one validated Gamma market ID.
+- Bounds each market taxonomy to 100 entries and strictly normalizes unique tag IDs with nullable labels and slugs.
+- Keeps the market taxonomy contract separate from event taxonomy and discards provider editorial, timestamp, and authoring metadata.
+- Adds no polling, persistence, prices, positions, accounts, wallet, order, strategy, signal, or execution behavior.
+
+## 2026-09-27 — M9.13 selected public Polymarket event taxonomy completed
+
+- Added read-only retrieval of the public tags attached to one validated Gamma event ID.
+- Bounds each taxonomy to 100 entries and strictly normalizes unique tag IDs with nullable labels and slugs.
+- Discards provider editorial flags, timestamps, and authoring metadata from the local read model.
+- Adds no polling, persistence, prices, positions, accounts, wallet, order, strategy, signal, or execution behavior.
+
+## 2026-09-27 — M9.12 bounded public Polymarket event discovery completed
+
+- Added a read-only active-event discovery route backed by Gamma keyset pagination with default limit 20, maximum 100, and an opaque cursor.
+- Strictly normalizes only event identity, dates, and lifecycle summaries; relation-heavy nested markets, series, tags, and financial metrics are not exposed.
+- Accepts the documented omitted final-page cursor and fails closed on malformed, closed, or unavailable provider data.
+- Adds no polling, persistence, prices, positions, accounts, wallet, order, strategy, signal, or execution behavior.
+
+## 2026-09-27 — M9.11 selected public Polymarket event details completed
+
+- Added read-only lookup of one public Gamma event by validated numeric ID.
+- Strictly normalizes event identity, descriptive resolution context, lifecycle flags, timestamps, and receipt time.
+- Bounds nested markets to 1,000 and reduces them to validated identity, condition, and closed-state references without importing prices, volume, liquidity, or trading flags.
+- Adds no event discovery, polling, persistence, position, account, wallet, order, strategy, signal, or execution behavior.
+
 ## 2026-09-27 — M9.10 indexed binary Polymarket resolution result completed
 
 - Added a read-only market route that reconciles selected-market identity and indexed YES/NO outcomes with its condition-grain resolution record.

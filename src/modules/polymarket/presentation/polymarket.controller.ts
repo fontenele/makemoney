@@ -8,6 +8,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
+import { PredictionEventService } from '../application/prediction-event.service';
 import { PredictionMarketBinaryResolutionService } from '../application/prediction-market-binary-resolution.service';
 import { PredictionMarketDataObservationService } from '../application/prediction-market-data-observation.service';
 import { PredictionMarketLastTradeService } from '../application/prediction-market-last-trade.service';
@@ -57,7 +58,14 @@ import {
   PredictionMarketDetails,
   PredictionMarketNotFoundError,
   PredictionMarketPage,
+  PredictionMarketTags,
 } from '../domain/prediction-market';
+import {
+  PredictionEventDetails,
+  PredictionEventNotFoundError,
+  PredictionEventPage,
+  PredictionEventTags,
+} from '../domain/prediction-event';
 
 const DEFAULT_LIMIT = 20;
 const MAXIMUM_LIMIT = 100;
@@ -66,6 +74,7 @@ const CURSOR = /^\S{1,4096}$/u;
 @Controller('polymarket')
 export class PolymarketController {
   constructor(
+    private readonly events: PredictionEventService,
     private readonly discovery: PredictionMarketDiscoveryService,
     private readonly binaryResolution: PredictionMarketBinaryResolutionService,
     private readonly pricing: PredictionMarketPricingService,
@@ -76,6 +85,54 @@ export class PolymarketController {
     private readonly midpointComplement: PredictionMarketMidpointComplementService,
     private readonly resolution: PredictionMarketResolutionService,
   ) {}
+
+  @Get('events')
+  async listActiveEvents(
+    @Query('limit') limit?: string,
+    @Query('cursor') cursor?: string,
+  ): Promise<PredictionEventPage> {
+    const query = {
+      limit: validLimit(limit),
+      ...(cursor === undefined ? {} : { afterCursor: validCursor(cursor) }),
+    };
+    try {
+      return await this.events.listActive(query);
+    } catch {
+      throw new ServiceUnavailableException(
+        'Polymarket event discovery is unavailable',
+      );
+    }
+  }
+
+  @Get('events/:id')
+  async getEvent(@Param('id') id: string): Promise<PredictionEventDetails> {
+    const parsedId = validEventId(id);
+    try {
+      return await this.events.getById(parsedId);
+    } catch (error) {
+      if (error instanceof PredictionEventNotFoundError) {
+        throw new NotFoundException('Polymarket event was not found');
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket event detail is unavailable',
+      );
+    }
+  }
+
+  @Get('events/:id/tags')
+  async getEventTags(@Param('id') id: string): Promise<PredictionEventTags> {
+    const parsedId = validEventId(id);
+    try {
+      return await this.events.getTagsById(parsedId);
+    } catch (error) {
+      if (error instanceof PredictionEventNotFoundError) {
+        throw new NotFoundException('Polymarket event was not found');
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket event tags are unavailable',
+      );
+    }
+  }
 
   @Get('markets')
   async listActiveMarkets(
@@ -129,6 +186,21 @@ export class PolymarketController {
       }
       throw new ServiceUnavailableException(
         'Polymarket market detail is unavailable',
+      );
+    }
+  }
+
+  @Get('markets/:id/tags')
+  async getMarketTags(@Param('id') id: string): Promise<PredictionMarketTags> {
+    const parsedId = validMarketId(id);
+    try {
+      return await this.discovery.getTagsById(parsedId);
+    } catch (error) {
+      if (error instanceof PredictionMarketNotFoundError) {
+        throw new NotFoundException('Polymarket market was not found');
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket market tags are unavailable',
       );
     }
   }
@@ -326,6 +398,15 @@ function validMarketId(value: string): string {
   if (!/^[1-9]\d{0,99}$/.test(value)) {
     throw new BadRequestException(
       'market id must be a positive Polymarket numeric identifier',
+    );
+  }
+  return value;
+}
+
+function validEventId(value: string): string {
+  if (!/^[1-9]\d{0,99}$/.test(value)) {
+    throw new BadRequestException(
+      'event id must be a positive Polymarket numeric identifier',
     );
   }
   return value;

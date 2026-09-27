@@ -5,6 +5,7 @@ import {
   PredictionMarketPage,
   PredictionMarketDetails,
   PredictionMarketProvider,
+  PredictionMarketTags,
 } from '../domain/prediction-market';
 
 @Injectable()
@@ -23,5 +24,9 @@ export class PredictionMarketDiscoveryService {
 
   getById(id: string, signal?: AbortSignal): Promise<PredictionMarketDetails> {
     return this.provider.getById(id, signal);
+  }
+
+  getTagsById(id: string, signal?: AbortSignal): Promise<PredictionMarketTags> {
+    return this.provider.getTagsById(id, signal);
   }
 }

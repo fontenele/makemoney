@@ -98,6 +98,7 @@ function createService(
     new PredictionMarketDiscoveryService({
       listActive: () => Promise.reject(new Error('unexpected list call')),
       getById: () => Promise.resolve(details),
+      getTagsById: () => Promise.reject(new Error('unexpected tags call')),
     }),
     new PredictionMarketResolutionService({
       getResolution: () => Promise.resolve(record),

@@ -93,12 +93,44 @@ Only three explicitly documented binary results are interpreted: `[1,0]` means Y
 
 The raw vector remains internal, so the condition-lifecycle response introduced in M9.9 does not change. M9.10 exposes a public read model only. It does not inspect a wallet or position, determine a user's entitlement, call a contract, or redeem tokens; `executable: false` makes that boundary explicit.
 
+## M9.11 — Selected public event details
+
+`GET /polymarket/events/:id` loads one public Gamma event using a validated positive numeric event ID. Events are modeled separately from markets: the normalized result preserves the event ID, nullable slug, title, nullable description and resolution source, nullable start/end timestamps, active/closed/archived/restricted flags, and local receipt time.
+
+The nested market collection is bounded to at most 1,000 entries and reduced to references containing only market ID, nullable slug and question, nullable condition ID, and closed state. Every reference is validated as a complete unit; the route does not import nested prices, volume, liquidity, outcome arrays, or trading flags.
+
+Provider `404` becomes local `404`, malformed IDs return `400`, and transport, other HTTP, identity, or normalization failures return `503`. M9.11 adds no event listing, persistence, polling, account, position, wallet, order, strategy, signal, or execution behavior.
+
+## M9.12 — Bounded public event discovery
+
+`GET /polymarket/events` loads one cursor-aware page from Gamma's public event keyset endpoint. The local API accepts an optional opaque `cursor` and a `limit` from 1 to 100, defaulting to 20, while the adapter always sends `closed=false` and verifies every returned event remains non-closed.
+
+Gamma's keyset response includes relation-heavy records. The local discovery model intentionally retains only event ID, nullable slug, title, nullable start/end timestamps, active/closed/archived/restricted flags, next cursor, and receipt time. Nested markets, series, tags, event creators, chats, descriptions, resolution sources, prices, volume, liquidity, and trading flags are discarded from discovery; selected descriptive details and bounded market references remain available only through M9.11's ID route.
+
+The documented final page may omit `next_cursor`; the adapter normalizes that case to `nextCursor: null`. Malformed pages, closed events, transport failures, and non-success provider responses fail closed and become local `503` responses.
+
+## M9.13 — Selected public event taxonomy
+
+`GET /polymarket/events/:id/tags` loads the public tags attached to one event using the same validated positive numeric Gamma event ID contract. The provider collection is bounded to at most 100 entries and each tag is reduced to its required ID plus nullable label and slug.
+
+Duplicate IDs, malformed identities, oversized collections, transport failures, and invalid successful responses fail closed. Provider `404` becomes local `404`; other provider failures become `503`. An empty array is valid and means the provider returned no tags for the selected event.
+
+Gamma editorial flags, publishing and update timestamps, and authoring fields are deliberately discarded. The route provides classification metadata only and adds no global tag catalog, related-tag traversal, filtering, polling, persistence, financial metric, position, account, or execution behavior.
+
+## M9.14 — Selected public market taxonomy
+
+`GET /polymarket/markets/:id/tags` loads the public tags attached to one market using the validated positive numeric Gamma market ID contract. The market provider owns a dedicated taxonomy read model with market identity, local receipt time, and at most 100 unique tag identities containing required ID plus nullable label and slug.
+
+The adapter rejects duplicate IDs, malformed identity, and oversized collections. Provider `404` becomes local `404`; transport, other HTTP, and successful-response contract failures become `503`. An empty array remains a valid selected market with no attached tags.
+
+The local market contract deliberately discards editorial visibility, publishing/update timestamps, and authoring metadata. It is separate from the event taxonomy model and adds no global catalog, tag relationships, filters, persistence, financial metric, position, account, or execution behavior.
+
 ## Boundaries
 
-M9.1–M9.10 do not persist or poll markets. M9.3–M9.8 expose public observations, not executable quotes, fill guarantees, historical series, or probability guarantees. M9.4, M9.5, and M9.7 retain only level one and do not expose full depth. M9.6–M9.7 use only the latest reported trade price and side, not trade history. M9.8 compares only independently observed binary midpoints. M9.9 exposes resolution lifecycle state, while M9.10 separately interprets only recognized terminal binary payout vectors. The increments do not load events, positions, or accounts. They have no authentication, signing, wallet, order, redemption, strategy, signal, paper execution, real execution, or dashboard path.
+M9.1–M9.14 do not persist or poll markets or events. M9.3–M9.8 expose public observations, not executable quotes, fill guarantees, historical series, or probability guarantees. M9.4, M9.5, and M9.7 retain only level one and do not expose full depth. M9.6–M9.7 use only the latest reported trade price and side, not trade history. M9.8 compares only independently observed binary midpoints. M9.9 exposes resolution lifecycle state, while M9.10 separately interprets only recognized terminal binary payout vectors. M9.11 loads one selected event and bounded market references; M9.12 adds bounded event discovery summaries without nested relations or financial metrics; M9.13 and M9.14 expose only bounded selected-event and selected-market taxonomy identity. The increments do not load positions or accounts. They have no authentication, signing, wallet, order, redemption, strategy, signal, paper execution, real execution, or dashboard path.
 
 Provider failure is exposed locally as `503`. Runtime validation against a real Gamma response was attempted but the development environment could not resolve the provider hostname; the client contract is covered with the current official documented response shape and focused automated tests.
 
 ## Next safe increment
 
-A later M9 increment may add another independently defined public research observation without introducing positions, redemption, trade history, persistence, authentication, accounts, or execution.
+A later M9 increment may add another narrowly bounded public research observation without introducing positions, redemption, trade history, persistence, authentication, accounts, or execution.

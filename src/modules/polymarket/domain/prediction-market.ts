@@ -13,6 +13,19 @@ export interface PredictionMarketPage {
   receivedAt: Date;
 }
 
+export interface PredictionMarketTag {
+  id: string;
+  label: string | null;
+  slug: string | null;
+}
+
+export interface PredictionMarketTags {
+  provider: 'polymarket';
+  marketId: string;
+  tags: PredictionMarketTag[];
+  receivedAt: Date;
+}
+
 export interface PredictionMarketOutcomeIdentity {
   label: string;
   tokenId: string | null;
@@ -44,6 +57,7 @@ export interface PredictionMarketProvider {
     signal?: AbortSignal,
   ): Promise<PredictionMarketPage>;
   getById(id: string, signal?: AbortSignal): Promise<PredictionMarketDetails>;
+  getTagsById(id: string, signal?: AbortSignal): Promise<PredictionMarketTags>;
 }
 
 export class PredictionMarketNotFoundError extends Error {
