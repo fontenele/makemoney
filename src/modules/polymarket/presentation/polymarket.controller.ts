@@ -10,12 +10,15 @@ import {
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
 import { PredictionDataFreshnessService } from '../application/prediction-data-freshness.service';
 import { PredictionEventService } from '../application/prediction-event.service';
+import { PredictionEventLiveVolumeService } from '../application/prediction-event-live-volume.service';
+import { PredictionGlobalOpenInterestService } from '../application/prediction-global-open-interest.service';
 import { PredictionMarketBinaryResolutionService } from '../application/prediction-market-binary-resolution.service';
 import { PredictionMarketDataObservationService } from '../application/prediction-market-data-observation.service';
 import { PredictionMarketLastTradeService } from '../application/prediction-market-last-trade.service';
 import { PredictionMarketLastTradeContextService } from '../application/prediction-market-last-trade-context.service';
 import { PredictionMarketMidpointComplementService } from '../application/prediction-market-midpoint-complement.service';
 import { PredictionMarketOrderBookService } from '../application/prediction-market-order-book.service';
+import { PredictionMarketOpenInterestService } from '../application/prediction-market-open-interest.service';
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
@@ -54,6 +57,12 @@ import {
   PredictionMarketTopOfBook,
 } from '../domain/prediction-market-top-of-book';
 import {
+  PredictionGlobalOpenInterest,
+  PredictionMarketOpenInterest,
+  PredictionMarketOpenInterestIncoherentError,
+  PredictionMarketOpenInterestUnavailableError,
+} from '../domain/prediction-market-open-interest';
+import {
   isPredictionMarketConditionId,
   PredictionMarketResolutionState,
   PredictionMarketResolutionUnavailableError,
@@ -70,6 +79,11 @@ import {
   PredictionEventPage,
   PredictionEventTags,
 } from '../domain/prediction-event';
+import {
+  PredictionEventLiveVolume,
+  PredictionEventLiveVolumeIncoherentError,
+  PredictionEventLiveVolumeUnavailableError,
+} from '../domain/prediction-event-live-volume';
 import {
   PredictionTagDetails,
   PredictionTagNotFoundError,
@@ -104,6 +118,9 @@ export class PolymarketController {
     private readonly midpointComplement: PredictionMarketMidpointComplementService,
     private readonly resolution: PredictionMarketResolutionService,
     private readonly dataFreshness: PredictionDataFreshnessService,
+    private readonly openInterest: PredictionMarketOpenInterestService,
+    private readonly eventLiveVolume: PredictionEventLiveVolumeService,
+    private readonly globalOpenInterest: PredictionGlobalOpenInterestService,
   ) {}
 
   @Get('data-freshness')
@@ -113,6 +130,17 @@ export class PolymarketController {
     } catch {
       throw new ServiceUnavailableException(
         'Polymarket Data API freshness is unavailable',
+      );
+    }
+  }
+
+  @Get('open-interest')
+  async getGlobalOpenInterest(): Promise<PredictionGlobalOpenInterest> {
+    try {
+      return await this.globalOpenInterest.getGlobalOpenInterest();
+    } catch {
+      throw new ServiceUnavailableException(
+        'Polymarket global open interest is unavailable',
       );
     }
   }
@@ -271,6 +299,33 @@ export class PolymarketController {
     }
   }
 
+  @Get('events/:id/live-volume')
+  async getEventLiveVolume(
+    @Param('id') id: string,
+  ): Promise<PredictionEventLiveVolume> {
+    const parsedId = validEventId(id);
+    try {
+      return await this.eventLiveVolume.getLiveVolume(parsedId);
+    } catch (error) {
+      if (
+        error instanceof PredictionEventNotFoundError ||
+        error instanceof PredictionEventLiveVolumeUnavailableError
+      ) {
+        throw new NotFoundException(
+          'Polymarket event live volume is unavailable',
+        );
+      }
+      if (error instanceof PredictionEventLiveVolumeIncoherentError) {
+        throw new ServiceUnavailableException(
+          'Polymarket event live volume is incoherent',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket event live-volume providers are unavailable',
+      );
+    }
+  }
+
   @Get('markets')
   async listActiveMarkets(
     @Query('limit') limit?: string,
@@ -369,6 +424,34 @@ export class PolymarketController {
       }
       throw new ServiceUnavailableException(
         'Polymarket binary market resolution providers are unavailable',
+      );
+    }
+  }
+
+  @Get('markets/:id/open-interest')
+  async getMarketOpenInterest(
+    @Param('id') id: string,
+  ): Promise<PredictionMarketOpenInterest> {
+    const parsedId = validMarketId(id);
+    try {
+      return await this.openInterest.getOpenInterest(parsedId);
+    } catch (error) {
+      if (
+        error instanceof PredictionMarketNotFoundError ||
+        error instanceof PredictionMarketConditionUnavailableError ||
+        error instanceof PredictionMarketOpenInterestUnavailableError
+      ) {
+        throw new NotFoundException(
+          'Polymarket market open interest is unavailable',
+        );
+      }
+      if (error instanceof PredictionMarketOpenInterestIncoherentError) {
+        throw new ServiceUnavailableException(
+          'Polymarket market open interest is incoherent',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket market open-interest providers are unavailable',
       );
     }
   }

@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-28 — M9.27 global Polymarket open interest completed
+
+- Added parameter-free `GET /polymarket/open-interest` backed by the unauthenticated Data API `v2/oi` endpoint without condition filters.
+- Added a dedicated global open-interest provider contract and service while reusing the strictly validated Data API adapter from M9.25.
+- Require exactly one row with `condition_id: null` and preserve its non-negative aggregate USDC value as a decimal string with local receipt time.
+- Map provider, JSON, cardinality, identity, and decimal failures to local `503` rather than presenting market-grain data as a global total.
+- Kept market expansion, holders, wallet positions, accounts, persistence, polling, orders, wallets, and execution outside the increment.
+
+## 2026-09-28 — M9.26 selected-event Polymarket live volume completed
+
+- Added `GET /polymarket/events/:id/live-volume` backed by the unauthenticated Data API `v2/live-volume` endpoint.
+- Added a provider-neutral event live-volume contract, strict Data API adapter, and selected-event composition service.
+- Preserve total and per-market taker volume as non-negative decimal share quantities, enforce a 1,000-row bound, unique condition identities, descending provider order, and exact total reconciliation.
+- Reject identified provider conditions outside the selected Gamma event and preserve one explicitly unidentified source row without inventing market identity.
+- Kept individual trades, holders, wallet positions, PnL, accounts, persistence, polling, orders, wallets, and execution outside the increment.
+
+## 2026-09-28 — M9.25 selected-market Polymarket open interest completed
+
+- Added `GET /polymarket/markets/:id/open-interest` backed by the unauthenticated Data API `v2/oi` endpoint.
+- Added a provider-neutral condition open-interest contract, strict Data API adapter, and selected-market composition service.
+- Require one identity-matched provider row and preserve its non-negative USDC value as a decimal string with explicit provenance and local receipt time.
+- Map absent market, missing condition identity, and an empty provider result to local `404`; malformed, duplicate, mismatched, and unavailable provider data fail closed as `503`.
+- Kept holders, per-wallet positions, PnL, accounts, persistence, polling, orders, wallets, and execution outside the increment.
+
 ## 2026-09-27 — M9.24 public Polymarket Data API freshness completed
 
 - Added parameter-free `GET /polymarket/data-freshness` backed by the unauthenticated Data API `v2/status` endpoint.

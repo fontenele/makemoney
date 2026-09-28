@@ -7,12 +7,15 @@ import { jest } from '@jest/globals';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
 import { PredictionDataFreshnessService } from '../application/prediction-data-freshness.service';
 import { PredictionEventService } from '../application/prediction-event.service';
+import { PredictionEventLiveVolumeService } from '../application/prediction-event-live-volume.service';
+import { PredictionGlobalOpenInterestService } from '../application/prediction-global-open-interest.service';
 import { PredictionMarketBinaryResolutionService } from '../application/prediction-market-binary-resolution.service';
 import { PredictionMarketDataObservationService } from '../application/prediction-market-data-observation.service';
 import { PredictionMarketLastTradeService } from '../application/prediction-market-last-trade.service';
 import { PredictionMarketLastTradeContextService } from '../application/prediction-market-last-trade-context.service';
 import { PredictionMarketMidpointComplementService } from '../application/prediction-market-midpoint-complement.service';
 import { PredictionMarketOrderBookService } from '../application/prediction-market-order-book.service';
+import { PredictionMarketOpenInterestService } from '../application/prediction-market-open-interest.service';
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
@@ -39,6 +42,12 @@ import {
   PredictionMarketResolutionUnavailableError,
 } from '../domain/prediction-market-resolution';
 import {
+  PredictionGlobalOpenInterestProvider,
+  PredictionMarketOpenInterestIncoherentError,
+  PredictionMarketOpenInterestProvider,
+  PredictionMarketOpenInterestUnavailableError,
+} from '../domain/prediction-market-open-interest';
+import {
   PredictionMarketNotFoundError,
   PredictionMarketProvider,
 } from '../domain/prediction-market';
@@ -46,6 +55,11 @@ import {
   PredictionEventNotFoundError,
   PredictionEventProvider,
 } from '../domain/prediction-event';
+import {
+  PredictionEventLiveVolumeIncoherentError,
+  PredictionEventLiveVolumeProvider,
+  PredictionEventLiveVolumeUnavailableError,
+} from '../domain/prediction-event-live-volume';
 import {
   PredictionTagNotFoundError,
   PredictionTagProvider,
@@ -1390,6 +1404,226 @@ describe('PolymarketController', () => {
       ServiceUnavailableException,
     );
   });
+
+  it('loads public open interest for one selected market', async () => {
+    const getById = jest
+      .fn<PredictionMarketProvider['getById']>()
+      .mockResolvedValue(marketDetails());
+    const getOpenInterest = jest
+      .fn<PredictionMarketOpenInterestProvider['getOpenInterest']>()
+      .mockResolvedValue({
+        provider: 'polymarket',
+        conditionId: marketDetails().conditionId,
+        openInterestUsdc: '7113116.142022',
+        source: 'data-api-open-interest',
+        receivedAt: new Date('2026-09-28T04:00:00.000Z'),
+      });
+    const controller = controllerWith(
+      { getById },
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getOpenInterest },
+    );
+
+    await expect(
+      controller.getMarketOpenInterest('703257'),
+    ).resolves.toMatchObject({
+      conditionId: marketDetails().conditionId,
+      openInterestUsdc: '7113116.142022',
+      executable: false,
+    });
+  });
+
+  it.each(['0', '-1', 'abc'])(
+    'rejects invalid open-interest market id %s',
+    async (id) => {
+      await expect(
+        controllerWith({}).getMarketOpenInterest(id),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it('maps unavailable open interest to not found', async () => {
+    const controller = controllerWith(
+      { getById: () => Promise.resolve(marketDetails()) },
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getOpenInterest: () =>
+          Promise.reject(
+            new PredictionMarketOpenInterestUnavailableError(conditionId()),
+          ),
+      },
+    );
+
+    await expect(controller.getMarketOpenInterest('703257')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps incoherent open interest to service unavailable', async () => {
+    const controller = controllerWith(
+      { getById: () => Promise.resolve(marketDetails()) },
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getOpenInterest: () =>
+          Promise.reject(
+            new PredictionMarketOpenInterestIncoherentError('703257'),
+          ),
+      },
+    );
+
+    await expect(controller.getMarketOpenInterest('703257')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
+  it('loads public live volume for one selected event', async () => {
+    const getById = jest
+      .fn<PredictionEventProvider['getById']>()
+      .mockResolvedValue(eventDetails());
+    const getLiveVolume = jest
+      .fn<PredictionEventLiveVolumeProvider['getLiveVolume']>()
+      .mockResolvedValue(eventLiveVolume());
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getById },
+      {},
+      {},
+      {},
+      {},
+      { getLiveVolume },
+    );
+
+    await expect(controller.getEventLiveVolume('1000')).resolves.toMatchObject({
+      event: eventDetails(),
+      takerVolumeTotalShares: '10',
+      executable: false,
+    });
+  });
+
+  it.each(['0', '-1', 'abc'])(
+    'rejects invalid live-volume event id %s',
+    async (id) => {
+      await expect(controllerWith({}).getEventLiveVolume(id)).rejects.toThrow(
+        BadRequestException,
+      );
+    },
+  );
+
+  it('maps unavailable event live volume to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getById: () => Promise.resolve(eventDetails()) },
+      {},
+      {},
+      {},
+      {},
+      {
+        getLiveVolume: () =>
+          Promise.reject(new PredictionEventLiveVolumeUnavailableError('1000')),
+      },
+    );
+
+    await expect(controller.getEventLiveVolume('1000')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps incoherent event live volume to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getById: () => Promise.resolve(eventDetails()) },
+      {},
+      {},
+      {},
+      {},
+      {
+        getLiveVolume: () =>
+          Promise.reject(new PredictionEventLiveVolumeIncoherentError('1000')),
+      },
+    );
+
+    await expect(controller.getEventLiveVolume('1000')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
+  it('loads public global open interest', async () => {
+    const getGlobalOpenInterest = jest
+      .fn<PredictionGlobalOpenInterestProvider['getGlobalOpenInterest']>()
+      .mockResolvedValue(globalOpenInterest());
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getGlobalOpenInterest },
+    );
+
+    await expect(controller.getGlobalOpenInterest()).resolves.toEqual(
+      globalOpenInterest(),
+    );
+  });
+
+  it('maps global open-interest failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getGlobalOpenInterest: () => Promise.reject(new Error('unavailable')) },
+    );
+
+    await expect(controller.getGlobalOpenInterest()).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
 });
 
 function controllerWith(
@@ -1402,6 +1636,9 @@ function controllerWith(
   tagProvider: Partial<PredictionTagProvider> = {},
   seriesProvider: Partial<PredictionSeriesProvider> = {},
   dataFreshnessProvider: Partial<PredictionDataFreshnessProvider> = {},
+  openInterestProvider: Partial<PredictionMarketOpenInterestProvider> = {},
+  eventLiveVolumeProvider: Partial<PredictionEventLiveVolumeProvider> = {},
+  globalOpenInterestProvider: Partial<PredictionGlobalOpenInterestProvider> = {},
 ): PolymarketController {
   const pricing = new PredictionMarketPricingService({
     getMidpoint:
@@ -1476,6 +1713,21 @@ function controllerWith(
       dataFreshnessProvider.getFreshness ??
       (() => Promise.reject(new Error('unexpected data freshness call'))),
   });
+  const openInterest = new PredictionMarketOpenInterestService(discovery, {
+    getOpenInterest:
+      openInterestProvider.getOpenInterest ??
+      (() => Promise.reject(new Error('unexpected open-interest call'))),
+  });
+  const eventLiveVolume = new PredictionEventLiveVolumeService(events, {
+    getLiveVolume:
+      eventLiveVolumeProvider.getLiveVolume ??
+      (() => Promise.reject(new Error('unexpected event live-volume call'))),
+  });
+  const globalOpenInterest = new PredictionGlobalOpenInterestService({
+    getGlobalOpenInterest:
+      globalOpenInterestProvider.getGlobalOpenInterest ??
+      (() => Promise.reject(new Error('unexpected global open-interest call'))),
+  });
   return new PolymarketController(
     events,
     tags,
@@ -1490,7 +1742,31 @@ function controllerWith(
     new PredictionMarketMidpointComplementService(discovery, pricing),
     resolutionService,
     dataFreshness,
+    openInterest,
+    eventLiveVolume,
+    globalOpenInterest,
   );
+}
+
+function globalOpenInterest() {
+  return {
+    provider: 'polymarket' as const,
+    openInterestUsdc: '356037494.1056115',
+    source: 'data-api-open-interest' as const,
+    receivedAt: new Date('2026-09-28T06:00:00.000Z'),
+    executable: false as const,
+  };
+}
+
+function eventLiveVolume() {
+  return {
+    provider: 'polymarket' as const,
+    eventId: '1000',
+    takerVolumeTotalShares: '10',
+    markets: [{ conditionId: conditionId(), takerVolumeShares: '10' }],
+    source: 'data-api-live-volume' as const,
+    receivedAt: new Date('2026-09-28T05:00:00.000Z'),
+  };
 }
 
 function dataFreshness() {

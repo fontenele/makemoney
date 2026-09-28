@@ -1,10 +1,16 @@
 # Current State
 
-Last validated: 2026-09-27
+Last validated: 2026-09-28
 
 The startup validator accepts strictly positive canonical fractional values such as `0.01` for risk limits, matching the documented defaults and `.env.example`.
 
 ## Milestone status
+
+M9.27 is complete: one parameter-free public route loads platform-wide Data API open interest and accepts only the documented single row with a null condition identity. It exposes the non-negative aggregate USDC value as a decimal string without market expansion, holders, wallet positions, accounts, persistence, polling, or execution behavior.
+
+M9.26 is complete: one public route reconciles a selected Gamma event with its Data API live-volume breakdown, preserving total and per-market taker volume in shares. The adapter validates bounded unique conditions, descending volume order, and an exact total; the service rejects identified conditions outside the selected event. Individual trades, holders, wallet positions, accounts, persistence, polling, and execution behavior remain excluded.
+
+M9.25 is complete: one public route reconciles a selected Gamma market with exactly one Data API open-interest row for its condition and exposes the non-negative USDC value as a decimal string. Holders, wallet positions, accounts, persistence, polling, and execution behavior remain excluded.
 
 M9.24 is complete: one parameter-free public route loads the Data API status snapshot and strictly validates bounded serving and ingestion freshness metadata. It does not load the named feeds, positions, profiles, accounts, persistence, or execution behavior, and unavailable or not-yet-measured upstream state remains explicit `503`.
 
@@ -413,6 +419,9 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - Descriptive binary Polymarket midpoint complement: `GET http://localhost:3000/polymarket/markets/:id/midpoint-complement`
 - Public Polymarket condition resolution state: `GET http://localhost:3000/polymarket/conditions/:conditionId/resolution`
 - Indexed binary Polymarket resolution result: `GET http://localhost:3000/polymarket/markets/:id/resolution`
+- Selected-market Polymarket open interest: `GET http://localhost:3000/polymarket/markets/:id/open-interest`
+- Selected-event Polymarket live volume: `GET http://localhost:3000/polymarket/events/:id/live-volume`
+- Global Polymarket open interest: `GET http://localhost:3000/polymarket/open-interest`
 - Public Polymarket outcome midpoint: `GET http://localhost:3000/polymarket/outcomes/:tokenId/midpoint`
 - Public Polymarket outcome top of book: `GET http://localhost:3000/polymarket/outcomes/:tokenId/top-of-book`
 - Coherent public Polymarket outcome market data: `GET http://localhost:3000/polymarket/outcomes/:tokenId/market-data`
@@ -454,7 +463,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.24. Public Polymarket Data API freshness, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
+M0 through M8.11 are complete, and M9 is implemented through M9.27. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
 
 ## Known issues and cautions
 

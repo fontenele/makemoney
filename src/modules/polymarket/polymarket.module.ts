@@ -4,11 +4,14 @@ import { PredictionMarketDiscoveryService } from './application/prediction-marke
 import { PredictionDataFreshnessService } from './application/prediction-data-freshness.service';
 import { PredictionMarketBinaryResolutionService } from './application/prediction-market-binary-resolution.service';
 import { PredictionEventService } from './application/prediction-event.service';
+import { PredictionEventLiveVolumeService } from './application/prediction-event-live-volume.service';
+import { PredictionGlobalOpenInterestService } from './application/prediction-global-open-interest.service';
 import { PredictionMarketDataObservationService } from './application/prediction-market-data-observation.service';
 import { PredictionMarketLastTradeService } from './application/prediction-market-last-trade.service';
 import { PredictionMarketLastTradeContextService } from './application/prediction-market-last-trade-context.service';
 import { PredictionMarketMidpointComplementService } from './application/prediction-market-midpoint-complement.service';
 import { PredictionMarketOrderBookService } from './application/prediction-market-order-book.service';
+import { PredictionMarketOpenInterestService } from './application/prediction-market-open-interest.service';
 import { PredictionMarketPricingService } from './application/prediction-market-pricing.service';
 import { PredictionMarketResolutionService } from './application/prediction-market-resolution.service';
 import { PredictionTagService } from './application/prediction-tag.service';
@@ -19,14 +22,21 @@ import { PREDICTION_MARKET_ORDER_BOOK_PROVIDER } from './domain/prediction-marke
 import { PREDICTION_MARKET_RESOLUTION_PROVIDER } from './domain/prediction-market-resolution';
 import { PREDICTION_MARKET_PROVIDER } from './domain/prediction-market';
 import { PREDICTION_EVENT_PROVIDER } from './domain/prediction-event';
+import { PREDICTION_EVENT_LIVE_VOLUME_PROVIDER } from './domain/prediction-event-live-volume';
 import { PREDICTION_TAG_PROVIDER } from './domain/prediction-tag';
 import { PREDICTION_SERIES_PROVIDER } from './domain/prediction-series';
 import { PREDICTION_DATA_FRESHNESS_PROVIDER } from './domain/prediction-data-freshness';
+import {
+  PREDICTION_GLOBAL_OPEN_INTEREST_PROVIDER,
+  PREDICTION_MARKET_OPEN_INTEREST_PROVIDER,
+} from './domain/prediction-market-open-interest';
 import { PolymarketClobMidpointClient } from './infrastructure/polymarket-clob-midpoint.client';
 import { PolymarketClobLastTradeClient } from './infrastructure/polymarket-clob-last-trade.client';
 import { PolymarketClobOrderBookClient } from './infrastructure/polymarket-clob-order-book.client';
 import { PolymarketDataResolutionClient } from './infrastructure/polymarket-data-resolution.client';
 import { PolymarketDataFreshnessClient } from './infrastructure/polymarket-data-freshness.client';
+import { PolymarketDataOpenInterestClient } from './infrastructure/polymarket-data-open-interest.client';
+import { PolymarketDataEventLiveVolumeClient } from './infrastructure/polymarket-data-event-live-volume.client';
 import { PolymarketGammaMarketClient } from './infrastructure/polymarket-gamma-market.client';
 import { PolymarketGammaEventClient } from './infrastructure/polymarket-gamma-event.client';
 import { PolymarketGammaTagClient } from './infrastructure/polymarket-gamma-tag.client';
@@ -108,15 +118,42 @@ import { PolymarketController } from './presentation/polymarket.controller';
           config.getOrThrow<string>('POLYMARKET_DATA_BASE_URL'),
         ),
     },
+    {
+      provide: PREDICTION_MARKET_OPEN_INTEREST_PROVIDER,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new PolymarketDataOpenInterestClient(
+          config.getOrThrow<string>('POLYMARKET_DATA_BASE_URL'),
+        ),
+    },
+    {
+      provide: PREDICTION_EVENT_LIVE_VOLUME_PROVIDER,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new PolymarketDataEventLiveVolumeClient(
+          config.getOrThrow<string>('POLYMARKET_DATA_BASE_URL'),
+        ),
+    },
+    {
+      provide: PREDICTION_GLOBAL_OPEN_INTEREST_PROVIDER,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new PolymarketDataOpenInterestClient(
+          config.getOrThrow<string>('POLYMARKET_DATA_BASE_URL'),
+        ),
+    },
     PredictionMarketDiscoveryService,
     PredictionDataFreshnessService,
     PredictionEventService,
+    PredictionEventLiveVolumeService,
+    PredictionGlobalOpenInterestService,
     PredictionMarketBinaryResolutionService,
     PredictionMarketDataObservationService,
     PredictionMarketLastTradeContextService,
     PredictionMarketLastTradeService,
     PredictionMarketMidpointComplementService,
     PredictionMarketOrderBookService,
+    PredictionMarketOpenInterestService,
     PredictionMarketPricingService,
     PredictionMarketResolutionService,
     PredictionTagService,

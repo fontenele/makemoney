@@ -5,15 +5,22 @@ import { jest } from '@jest/globals';
 import { PREDICTION_MARKET_PROVIDER } from './domain/prediction-market';
 import { PREDICTION_DATA_FRESHNESS_PROVIDER } from './domain/prediction-data-freshness';
 import { PREDICTION_EVENT_PROVIDER } from './domain/prediction-event';
+import { PREDICTION_EVENT_LIVE_VOLUME_PROVIDER } from './domain/prediction-event-live-volume';
 import { PREDICTION_TAG_PROVIDER } from './domain/prediction-tag';
 import { PREDICTION_SERIES_PROVIDER } from './domain/prediction-series';
 import { PREDICTION_MARKET_MIDPOINT_PROVIDER } from './domain/prediction-market-midpoint';
 import { PREDICTION_MARKET_ORDER_BOOK_PROVIDER } from './domain/prediction-market-top-of-book';
 import { PREDICTION_MARKET_RESOLUTION_PROVIDER } from './domain/prediction-market-resolution';
+import {
+  PREDICTION_GLOBAL_OPEN_INTEREST_PROVIDER,
+  PREDICTION_MARKET_OPEN_INTEREST_PROVIDER,
+} from './domain/prediction-market-open-interest';
 import { PolymarketClobMidpointClient } from './infrastructure/polymarket-clob-midpoint.client';
 import { PolymarketClobOrderBookClient } from './infrastructure/polymarket-clob-order-book.client';
 import { PolymarketDataResolutionClient } from './infrastructure/polymarket-data-resolution.client';
 import { PolymarketDataFreshnessClient } from './infrastructure/polymarket-data-freshness.client';
+import { PolymarketDataOpenInterestClient } from './infrastructure/polymarket-data-open-interest.client';
+import { PolymarketDataEventLiveVolumeClient } from './infrastructure/polymarket-data-event-live-volume.client';
 import { PolymarketGammaMarketClient } from './infrastructure/polymarket-gamma-market.client';
 import { PolymarketGammaEventClient } from './infrastructure/polymarket-gamma-event.client';
 import { PolymarketGammaTagClient } from './infrastructure/polymarket-gamma-tag.client';
@@ -258,5 +265,96 @@ describe('PolymarketModule', () => {
 
     expect(getOrThrow).toHaveBeenCalledWith('POLYMARKET_DATA_BASE_URL');
     expect(provider).toBeInstanceOf(PolymarketDataFreshnessClient);
+  });
+
+  it('registers the public Data API open-interest adapter', () => {
+    const providers = Reflect.getMetadata(
+      MODULE_METADATA.PROVIDERS,
+      PolymarketModule,
+    ) as Provider[];
+    const registration = providers.find(
+      (provider) =>
+        typeof provider === 'object' &&
+        provider !== null &&
+        'provide' in provider &&
+        provider.provide === PREDICTION_MARKET_OPEN_INTEREST_PROVIDER,
+    );
+    if (
+      typeof registration !== 'object' ||
+      registration === null ||
+      !('useFactory' in registration)
+    ) {
+      throw new Error('Polymarket open-interest provider factory is missing');
+    }
+    const getOrThrow = jest
+      .fn<ConfigService['getOrThrow']>()
+      .mockReturnValue('https://data-api.polymarket.test');
+    const config = { getOrThrow } as unknown as ConfigService;
+    const provider = registration.useFactory(config) as unknown;
+
+    expect(getOrThrow).toHaveBeenCalledWith('POLYMARKET_DATA_BASE_URL');
+    expect(provider).toBeInstanceOf(PolymarketDataOpenInterestClient);
+  });
+
+  it('registers the public Data API event live-volume adapter', () => {
+    const providers = Reflect.getMetadata(
+      MODULE_METADATA.PROVIDERS,
+      PolymarketModule,
+    ) as Provider[];
+    const registration = providers.find(
+      (provider) =>
+        typeof provider === 'object' &&
+        provider !== null &&
+        'provide' in provider &&
+        provider.provide === PREDICTION_EVENT_LIVE_VOLUME_PROVIDER,
+    );
+    if (
+      typeof registration !== 'object' ||
+      registration === null ||
+      !('useFactory' in registration)
+    ) {
+      throw new Error(
+        'Polymarket event live-volume provider factory is missing',
+      );
+    }
+    const getOrThrow = jest
+      .fn<ConfigService['getOrThrow']>()
+      .mockReturnValue('https://data-api.polymarket.test');
+    const config = { getOrThrow } as unknown as ConfigService;
+    const provider = registration.useFactory(config) as unknown;
+
+    expect(getOrThrow).toHaveBeenCalledWith('POLYMARKET_DATA_BASE_URL');
+    expect(provider).toBeInstanceOf(PolymarketDataEventLiveVolumeClient);
+  });
+
+  it('registers the public Data API global open-interest adapter', () => {
+    const providers = Reflect.getMetadata(
+      MODULE_METADATA.PROVIDERS,
+      PolymarketModule,
+    ) as Provider[];
+    const registration = providers.find(
+      (provider) =>
+        typeof provider === 'object' &&
+        provider !== null &&
+        'provide' in provider &&
+        provider.provide === PREDICTION_GLOBAL_OPEN_INTEREST_PROVIDER,
+    );
+    if (
+      typeof registration !== 'object' ||
+      registration === null ||
+      !('useFactory' in registration)
+    ) {
+      throw new Error(
+        'Polymarket global open-interest provider factory is missing',
+      );
+    }
+    const getOrThrow = jest
+      .fn<ConfigService['getOrThrow']>()
+      .mockReturnValue('https://data-api.polymarket.test');
+    const config = { getOrThrow } as unknown as ConfigService;
+    const provider = registration.useFactory(config) as unknown;
+
+    expect(getOrThrow).toHaveBeenCalledWith('POLYMARKET_DATA_BASE_URL');
+    expect(provider).toBeInstanceOf(PolymarketDataOpenInterestClient);
   });
 });

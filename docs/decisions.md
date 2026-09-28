@@ -1,5 +1,23 @@
 # Technical Decisions
 
+## 2026-09-28 — Keep global and condition open-interest contracts distinct
+
+M9.27 reuses the M9.25 Data API adapter but introduces a separate provider token, application service, and public read model. The global request intentionally omits condition filters and requires exactly one provider row whose condition identity is null; a condition-grain row can never be relabeled as the platform total.
+
+Both contracts preserve non-negative USDC values as decimal strings and local receipt time, but only the selected-market composition carries market provenance. The global value remains a non-executable aggregate and does not imply liquidity, available collateral, or any user's position.
+
+## 2026-09-28 — Reconcile event live volume as share activity
+
+M9.26 exposes Data API live volume only after loading the existing selected-event aggregate. Every identified condition in the provider breakdown must belong to that event; one documented unidentified row may remain explicitly null instead of receiving an invented market identity.
+
+The adapter treats the values as taker volume in shares, not USDC turnover, liquidity, or a fill claim. It bounds and uniquely identifies the breakdown, requires descending volume order, and uses isolated decimal arithmetic to verify that the provider total equals the sum of all returned rows before marking the observation non-executable.
+
+## 2026-09-28 — Join public open interest through selected-market identity
+
+M9.25 exposes open interest through `GET /polymarket/markets/:id/open-interest` instead of accepting an arbitrary condition query. The application first loads the existing selected-market contract, requires its canonical condition ID, and then asks the Data API for exactly that condition. This retains market provenance and prevents an unchecked caller-supplied condition from being presented as belonging to a market.
+
+The adapter requires exactly one identity-matched row and preserves the non-negative value as a decimal string without financial arithmetic. Open interest is labeled in USDC and marked non-executable; it is aggregate outstanding-position value, not displayed liquidity, a wallet balance, a user position, or permission to trade.
+
 ## 2026-09-27 — Treat Data API freshness as a provider observation
 
 M9.24 introduces a dedicated provider-neutral freshness contract instead of folding upstream status into the local `/health` endpoint. Local health describes this application and its dependencies, while `GET /polymarket/data-freshness` reports the age and lag of the public Polymarket Data API snapshot.

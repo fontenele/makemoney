@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, **M6 — Backtesting (M6.1–M6.32)**, **M7 — New Listing Scanner (M7.1–M7.109)**, and **M8 — Dashboard (M8.1–M8.11)**.
-- M9 is in progress through **M9.24 — Public Data API Freshness**.
+- M9 is in progress through **M9.27 — Global Open Interest**.
 - M6 is closed. M7.1–M7.109 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -402,6 +402,12 @@ M9.22 adds an optional validated `recurrence` filter to `GET /polymarket/series`
 M9.23 loads at most 1,000 public event references attached to one selected series at `GET /polymarket/series/:id/events`. It verifies the series identity and unique event identities, preserving only event slug/title, dates, and lifecycle flags without importing markets, prices, liquidity, volume, persistence, accounts, or execution behavior.
 
 M9.24 exposes the public Data API freshness snapshot at `GET /polymarket/data-freshness`. It strictly validates snapshot age and computation time, bounded ingestion lag details, and bounded serving-mechanism lag details without loading feeds, positions, account data, persistence, or execution behavior.
+
+M9.25 loads one selected market's public Data API open interest at `GET /polymarket/markets/:id/open-interest`. It reconciles the market's condition identity with exactly one provider row and exposes the non-negative USDC value as a decimal string without loading holders, wallet positions, accounts, persistence, or execution behavior.
+
+M9.26 loads one selected event's public Data API live volume at `GET /polymarket/events/:id/live-volume`. It preserves total and per-market taker volume in shares, verifies descending order and exact total reconciliation, and rejects conditions outside the selected event without loading trades, holders, wallet positions, persistence, or execution behavior.
+
+M9.27 loads the public platform-wide Data API open interest at `GET /polymarket/open-interest`. It accepts only the documented single row with a null condition identity and exposes the aggregate USDC value as a non-executable decimal string without loading market details, holders, wallet positions, accounts, persistence, or execution behavior.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 
