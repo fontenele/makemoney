@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-28 — M9.30 binary point-in-time price complement completed
+
+- Added `GET /polymarket/markets/:id/price-complement-at` for one selected binary market and canonical whole-second UTC instant.
+- Concurrently compose the indexed YES and NO M9.29 observations only after validating market tokens, response identities, and echoed requested times.
+- Calculate exact price sum and signed deviation from one with isolated decimal arithmetic, classify the result, and disclose observed-time and resolution alignment without claiming an atomic snapshot, arbitrage, recommendation, or execution.
+
+## 2026-09-28 — M9.29 point-in-time Polymarket outcome price completed
+
+- Added `GET /polymarket/outcomes/:tokenId/price-at` with one required canonical whole-second UTC `at` parameter.
+- Extended the Data API price-history contract with a fixed `as_of`/`limit=1` lookup that requires exactly one terminal non-future observation and preserves exact decimal price plus provider resolution.
+- Exposed requested and observed timestamps separately with `exactTimestamp`, while retaining stateless, public, non-executable semantics and no trade, book-history, account, persistence, order, or strategy path.
+
+## 2026-09-28 — M9.28 bounded Polymarket outcome price history completed
+
+- Added `GET /polymarket/outcomes/:tokenId/price-history` with required canonical whole-second UTC bounds, a maximum 31-day window, explicit supported resolution, bounded page size, and opaque continuation cursor.
+- Added a dedicated Data API price-history provider contract, application service, and adapter that validate oldest-first in-window timestamps, exact prices from zero through one, provider resolution, response cardinality, and cursor coherence.
+- Kept historical observations stateless and explicitly non-executable, without bid/ask history, individual trades, persistence, accounts, positions, orders, or strategy/execution paths.
+
 ## 2026-09-28 — M9.27 global Polymarket open interest completed
 
 - Added parameter-free `GET /polymarket/open-interest` backed by the unauthenticated Data API `v2/oi` endpoint without condition filters.

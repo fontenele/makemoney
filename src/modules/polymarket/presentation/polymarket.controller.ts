@@ -20,6 +20,8 @@ import { PredictionMarketMidpointComplementService } from '../application/predic
 import { PredictionMarketOrderBookService } from '../application/prediction-market-order-book.service';
 import { PredictionMarketOpenInterestService } from '../application/prediction-market-open-interest.service';
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
+import { PredictionMarketPriceHistoryService } from '../application/prediction-market-price-history.service';
+import { PredictionMarketPriceComplementAtService } from '../application/prediction-market-price-complement-at.service';
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
 import { PredictionSeriesService } from '../application/prediction-series.service';
@@ -74,6 +76,17 @@ import {
   PredictionMarketTags,
 } from '../domain/prediction-market';
 import {
+  PredictionMarketHistoricalPriceObservation,
+  PredictionMarketHistoricalPriceUnavailableError,
+  PredictionMarketPriceHistoryPage,
+  PredictionMarketPriceHistoryResolution,
+  PredictionMarketPriceHistoryUnavailableError,
+} from '../domain/prediction-market-price-history';
+import {
+  PredictionMarketPriceComplementAt,
+  PredictionMarketPriceComplementAtIncoherentError,
+} from '../domain/prediction-market-price-complement-at';
+import {
   PredictionEventDetails,
   PredictionEventNotFoundError,
   PredictionEventPage,
@@ -121,6 +134,8 @@ export class PolymarketController {
     private readonly openInterest: PredictionMarketOpenInterestService,
     private readonly eventLiveVolume: PredictionEventLiveVolumeService,
     private readonly globalOpenInterest: PredictionGlobalOpenInterestService,
+    private readonly priceHistory: PredictionMarketPriceHistoryService,
+    private readonly priceComplementAt: PredictionMarketPriceComplementAtService,
   ) {}
 
   @Get('data-freshness')
@@ -484,6 +499,39 @@ export class PolymarketController {
     }
   }
 
+  @Get('markets/:id/price-complement-at')
+  async getMarketPriceComplementAt(
+    @Param('id') id: string,
+    @Query('at') at: string | undefined,
+  ): Promise<PredictionMarketPriceComplementAt> {
+    const parsedId = validMarketId(id);
+    const requestedAt = validUtcSecond(at, 'at');
+    try {
+      return await this.priceComplementAt.getComplementAt(
+        parsedId,
+        requestedAt,
+      );
+    } catch (error) {
+      if (
+        error instanceof PredictionMarketNotFoundError ||
+        error instanceof PredictionMarketOutcomeTokensUnavailableError ||
+        error instanceof PredictionMarketHistoricalPriceUnavailableError
+      ) {
+        throw new NotFoundException(
+          'Polymarket market point-in-time price complement is unavailable',
+        );
+      }
+      if (error instanceof PredictionMarketPriceComplementAtIncoherentError) {
+        throw new ServiceUnavailableException(
+          'Polymarket market point-in-time price complement is incoherent',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket market point-in-time price providers are unavailable',
+      );
+    }
+  }
+
   @Get('outcomes/:tokenId/midpoint')
   async getOutcomeMidpoint(
     @Param('tokenId') tokenId: string,
@@ -503,6 +551,76 @@ export class PolymarketController {
       }
       throw new ServiceUnavailableException(
         'Polymarket outcome midpoint provider is unavailable',
+      );
+    }
+  }
+
+  @Get('outcomes/:tokenId/price-history')
+  async getOutcomePriceHistory(
+    @Param('tokenId') tokenId: string,
+    @Query('start') start: string | undefined,
+    @Query('end') end: string | undefined,
+    @Query('resolution') resolution: string | undefined,
+    @Query('limit') limit?: string,
+    @Query('cursor') cursor?: string,
+  ): Promise<PredictionMarketPriceHistoryPage> {
+    if (!isPredictionMarketTokenId(tokenId)) {
+      throw new BadRequestException(
+        'tokenId must be a canonical Polymarket decimal token identifier',
+      );
+    }
+    const parsedStart = validUtcSecond(start, 'start');
+    const parsedEnd = validUtcSecond(end, 'end');
+    if (
+      parsedEnd.getTime() <= parsedStart.getTime() ||
+      parsedEnd.getTime() - parsedStart.getTime() > 31 * 24 * 60 * 60 * 1000
+    ) {
+      throw new BadRequestException(
+        'price-history window must be positive and no longer than 31 days',
+      );
+    }
+    const query = {
+      start: parsedStart,
+      end: parsedEnd,
+      resolution: validPriceHistoryResolution(resolution),
+      limit: validLimit(limit),
+      ...(cursor === undefined ? {} : { afterCursor: validCursor(cursor) }),
+    };
+    try {
+      return await this.priceHistory.getPriceHistory(tokenId, query);
+    } catch (error) {
+      if (error instanceof PredictionMarketPriceHistoryUnavailableError) {
+        throw new NotFoundException(
+          'Polymarket outcome price history is unavailable',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket outcome price-history provider is unavailable',
+      );
+    }
+  }
+
+  @Get('outcomes/:tokenId/price-at')
+  async getOutcomePriceAt(
+    @Param('tokenId') tokenId: string,
+    @Query('at') at: string | undefined,
+  ): Promise<PredictionMarketHistoricalPriceObservation> {
+    if (!isPredictionMarketTokenId(tokenId)) {
+      throw new BadRequestException(
+        'tokenId must be a canonical Polymarket decimal token identifier',
+      );
+    }
+    const requestedAt = validUtcSecond(at, 'at');
+    try {
+      return await this.priceHistory.getPriceAt(tokenId, requestedAt);
+    } catch (error) {
+      if (error instanceof PredictionMarketHistoricalPriceUnavailableError) {
+        throw new NotFoundException(
+          'Polymarket historical outcome price is unavailable',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket historical outcome-price provider is unavailable',
       );
     }
   }
@@ -701,6 +819,45 @@ function validCursor(value: string): string {
   if (!CURSOR.test(value)) {
     throw new BadRequestException(
       'cursor must be a non-empty Polymarket keyset cursor',
+    );
+  }
+  return value;
+}
+
+function validUtcSecond(value: string | undefined, field: string): Date {
+  if (
+    value === undefined ||
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u.test(value)
+  ) {
+    throw new BadRequestException(
+      `${field} must be a canonical UTC timestamp with whole-second precision`,
+    );
+  }
+  const parsed = new Date(value);
+  if (
+    Number.isNaN(parsed.getTime()) ||
+    parsed.getTime() <= 0 ||
+    parsed.toISOString() !== value.replace('Z', '.000Z')
+  ) {
+    throw new BadRequestException(
+      `${field} must be a canonical UTC timestamp with whole-second precision`,
+    );
+  }
+  return parsed;
+}
+
+function validPriceHistoryResolution(
+  value: string | undefined,
+): PredictionMarketPriceHistoryResolution {
+  if (
+    value !== '1m' &&
+    value !== '5m' &&
+    value !== '30m' &&
+    value !== '3h' &&
+    value !== '12h'
+  ) {
+    throw new BadRequestException(
+      'resolution must be one of 1m, 5m, 30m, 3h, or 12h',
     );
   }
   return value;

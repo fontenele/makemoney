@@ -1,5 +1,23 @@
 # Technical Decisions
 
+## 2026-09-28 — Preserve independent clocks in historical binary comparison
+
+M9.30 composes the indexed YES and NO M9.29 observations only after loading the selected market and verifying both token identities and requested instants. The two provider lookups run concurrently, but their observed timestamps and resolutions remain independent and are never relabeled as one synchronized snapshot.
+
+Exact decimal sum and deviation are descriptive. Separate alignment flags expose whether the two selected historical points happen to share time and grain, while `atomicSnapshot: false` remains invariant and prevents the comparison from implying arbitrage or executability.
+
+## 2026-09-28 — Use provider as-of lookup for point-in-time prices
+
+M9.29 extends the existing public price-history provider with the Data API `as_of` mode instead of walking cursor pages and choosing a local predecessor. The provider request is fixed to one row, and the adapter requires a terminal page plus an observation timestamp no later than the caller's canonical UTC instant.
+
+The read model exposes requested and observed time separately, retains the actual provider resolution, and marks exact timestamp equality explicitly. It does not reinterpret the historical price as a quote, book snapshot, fill, or individual trade.
+
+## 2026-09-28 — Bound public outcome price history by explicit window and grain
+
+M9.28 uses the public Data API `v2/prices-history` contract behind a dedicated provider-neutral token instead of treating historical observations as current CLOB quotes. The local route requires canonical whole-second UTC bounds no more than 31 days apart, one named supported grain, and at most 100 points per cursor-aware page.
+
+Every point retains the provider's actual resolution and exact decimal price, while strict oldest-first ordering and in-window timestamps fail closed. The read model is explicitly non-executable and cannot imply historical spread, depth, liquidity, fills, or individual trades.
+
 ## 2026-09-28 — Keep global and condition open-interest contracts distinct
 
 M9.27 reuses the M9.25 Data API adapter but introduces a separate provider token, application service, and public read model. The global request intentionally omits condition filters and requires exactly one provider row whose condition identity is null; a condition-grain row can never be relabeled as the platform total.

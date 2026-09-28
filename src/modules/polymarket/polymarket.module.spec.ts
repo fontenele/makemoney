@@ -20,6 +20,8 @@ import { PolymarketClobOrderBookClient } from './infrastructure/polymarket-clob-
 import { PolymarketDataResolutionClient } from './infrastructure/polymarket-data-resolution.client';
 import { PolymarketDataFreshnessClient } from './infrastructure/polymarket-data-freshness.client';
 import { PolymarketDataOpenInterestClient } from './infrastructure/polymarket-data-open-interest.client';
+import { PolymarketDataPriceHistoryClient } from './infrastructure/polymarket-data-price-history.client';
+import { PREDICTION_MARKET_PRICE_HISTORY_PROVIDER } from './domain/prediction-market-price-history';
 import { PolymarketDataEventLiveVolumeClient } from './infrastructure/polymarket-data-event-live-volume.client';
 import { PolymarketGammaMarketClient } from './infrastructure/polymarket-gamma-market.client';
 import { PolymarketGammaEventClient } from './infrastructure/polymarket-gamma-event.client';
@@ -356,5 +358,34 @@ describe('PolymarketModule', () => {
 
     expect(getOrThrow).toHaveBeenCalledWith('POLYMARKET_DATA_BASE_URL');
     expect(provider).toBeInstanceOf(PolymarketDataOpenInterestClient);
+  });
+
+  it('registers the public Data API price-history adapter', () => {
+    const providers = Reflect.getMetadata(
+      MODULE_METADATA.PROVIDERS,
+      PolymarketModule,
+    ) as Provider[];
+    const registration = providers.find(
+      (provider) =>
+        typeof provider === 'object' &&
+        provider !== null &&
+        'provide' in provider &&
+        provider.provide === PREDICTION_MARKET_PRICE_HISTORY_PROVIDER,
+    );
+    if (
+      typeof registration !== 'object' ||
+      registration === null ||
+      !('useFactory' in registration)
+    ) {
+      throw new Error('Polymarket price-history provider factory is missing');
+    }
+    const getOrThrow = jest
+      .fn<ConfigService['getOrThrow']>()
+      .mockReturnValue('https://data-api.polymarket.test');
+    const config = { getOrThrow } as unknown as ConfigService;
+    const provider = registration.useFactory(config) as unknown;
+
+    expect(getOrThrow).toHaveBeenCalledWith('POLYMARKET_DATA_BASE_URL');
+    expect(provider).toBeInstanceOf(PolymarketDataPriceHistoryClient);
   });
 });

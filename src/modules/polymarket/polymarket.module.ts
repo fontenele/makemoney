@@ -13,6 +13,8 @@ import { PredictionMarketMidpointComplementService } from './application/predict
 import { PredictionMarketOrderBookService } from './application/prediction-market-order-book.service';
 import { PredictionMarketOpenInterestService } from './application/prediction-market-open-interest.service';
 import { PredictionMarketPricingService } from './application/prediction-market-pricing.service';
+import { PredictionMarketPriceHistoryService } from './application/prediction-market-price-history.service';
+import { PredictionMarketPriceComplementAtService } from './application/prediction-market-price-complement-at.service';
 import { PredictionMarketResolutionService } from './application/prediction-market-resolution.service';
 import { PredictionTagService } from './application/prediction-tag.service';
 import { PredictionSeriesService } from './application/prediction-series.service';
@@ -21,6 +23,7 @@ import { PREDICTION_MARKET_LAST_TRADE_PROVIDER } from './domain/prediction-marke
 import { PREDICTION_MARKET_ORDER_BOOK_PROVIDER } from './domain/prediction-market-top-of-book';
 import { PREDICTION_MARKET_RESOLUTION_PROVIDER } from './domain/prediction-market-resolution';
 import { PREDICTION_MARKET_PROVIDER } from './domain/prediction-market';
+import { PREDICTION_MARKET_PRICE_HISTORY_PROVIDER } from './domain/prediction-market-price-history';
 import { PREDICTION_EVENT_PROVIDER } from './domain/prediction-event';
 import { PREDICTION_EVENT_LIVE_VOLUME_PROVIDER } from './domain/prediction-event-live-volume';
 import { PREDICTION_TAG_PROVIDER } from './domain/prediction-tag';
@@ -36,6 +39,7 @@ import { PolymarketClobOrderBookClient } from './infrastructure/polymarket-clob-
 import { PolymarketDataResolutionClient } from './infrastructure/polymarket-data-resolution.client';
 import { PolymarketDataFreshnessClient } from './infrastructure/polymarket-data-freshness.client';
 import { PolymarketDataOpenInterestClient } from './infrastructure/polymarket-data-open-interest.client';
+import { PolymarketDataPriceHistoryClient } from './infrastructure/polymarket-data-price-history.client';
 import { PolymarketDataEventLiveVolumeClient } from './infrastructure/polymarket-data-event-live-volume.client';
 import { PolymarketGammaMarketClient } from './infrastructure/polymarket-gamma-market.client';
 import { PolymarketGammaEventClient } from './infrastructure/polymarket-gamma-event.client';
@@ -142,6 +146,14 @@ import { PolymarketController } from './presentation/polymarket.controller';
           config.getOrThrow<string>('POLYMARKET_DATA_BASE_URL'),
         ),
     },
+    {
+      provide: PREDICTION_MARKET_PRICE_HISTORY_PROVIDER,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new PolymarketDataPriceHistoryClient(
+          config.getOrThrow<string>('POLYMARKET_DATA_BASE_URL'),
+        ),
+    },
     PredictionMarketDiscoveryService,
     PredictionDataFreshnessService,
     PredictionEventService,
@@ -155,6 +167,8 @@ import { PolymarketController } from './presentation/polymarket.controller';
     PredictionMarketOrderBookService,
     PredictionMarketOpenInterestService,
     PredictionMarketPricingService,
+    PredictionMarketPriceHistoryService,
+    PredictionMarketPriceComplementAtService,
     PredictionMarketResolutionService,
     PredictionTagService,
     PredictionSeriesService,

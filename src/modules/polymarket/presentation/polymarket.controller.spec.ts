@@ -17,6 +17,8 @@ import { PredictionMarketMidpointComplementService } from '../application/predic
 import { PredictionMarketOrderBookService } from '../application/prediction-market-order-book.service';
 import { PredictionMarketOpenInterestService } from '../application/prediction-market-open-interest.service';
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
+import { PredictionMarketPriceHistoryService } from '../application/prediction-market-price-history.service';
+import { PredictionMarketPriceComplementAtService } from '../application/prediction-market-price-complement-at.service';
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
 import { PredictionSeriesService } from '../application/prediction-series.service';
@@ -47,6 +49,12 @@ import {
   PredictionMarketOpenInterestProvider,
   PredictionMarketOpenInterestUnavailableError,
 } from '../domain/prediction-market-open-interest';
+import {
+  PredictionMarketHistoricalPriceUnavailableError,
+  PredictionMarketPriceHistoryProvider,
+  PredictionMarketPriceHistoryUnavailableError,
+} from '../domain/prediction-market-price-history';
+import { PredictionMarketPriceComplementAtIncoherentError } from '../domain/prediction-market-price-complement-at';
 import {
   PredictionMarketNotFoundError,
   PredictionMarketProvider,
@@ -1624,6 +1632,256 @@ describe('PolymarketController', () => {
       ServiceUnavailableException,
     );
   });
+
+  it('loads a validated bounded outcome price-history page', async () => {
+    const getPriceHistory = jest
+      .fn<PredictionMarketPriceHistoryProvider['getPriceHistory']>()
+      .mockResolvedValue(priceHistory());
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getPriceHistory },
+    );
+
+    await expect(
+      controller.getOutcomePriceHistory(
+        '111',
+        '2026-09-27T00:00:00Z',
+        '2026-09-28T00:00:00Z',
+        '5m',
+        '100',
+        'next',
+      ),
+    ).resolves.toEqual(priceHistory());
+    expect(getPriceHistory).toHaveBeenCalledWith(
+      '111',
+      {
+        start: new Date('2026-09-27T00:00:00Z'),
+        end: new Date('2026-09-28T00:00:00Z'),
+        resolution: '5m',
+        limit: 100,
+        afterCursor: 'next',
+      },
+      undefined,
+    );
+  });
+
+  it.each([
+    ['01', '2026-09-27T00:00:00Z', '2026-09-28T00:00:00Z', '5m'],
+    ['111', undefined, '2026-09-28T00:00:00Z', '5m'],
+    ['111', '2026-09-27T00:00:00.000Z', '2026-09-28T00:00:00Z', '5m'],
+    ['111', '2026-09-28T00:00:00Z', '2026-09-27T00:00:00Z', '5m'],
+    ['111', '2026-08-01T00:00:00Z', '2026-09-28T00:00:00Z', '5m'],
+    ['111', '2026-09-27T00:00:00Z', '2026-09-28T00:00:00Z', '15m'],
+  ])(
+    'rejects invalid price-history query %#',
+    async (tokenId, start, end, resolution) => {
+      await expect(
+        controllerWith({}).getOutcomePriceHistory(
+          tokenId,
+          start,
+          end,
+          resolution,
+        ),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it('maps unavailable price history to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getPriceHistory: () =>
+          Promise.reject(
+            new PredictionMarketPriceHistoryUnavailableError('111'),
+          ),
+      },
+    );
+    await expect(
+      controller.getOutcomePriceHistory(
+        '111',
+        '2026-09-27T00:00:00Z',
+        '2026-09-28T00:00:00Z',
+        '5m',
+      ),
+    ).rejects.toThrow(NotFoundException);
+  });
+
+  it('loads one validated point-in-time outcome price', async () => {
+    const getPriceAt = jest
+      .fn<PredictionMarketPriceHistoryProvider['getPriceAt']>()
+      .mockResolvedValue(historicalPrice());
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getPriceAt },
+    );
+
+    await expect(
+      controller.getOutcomePriceAt('111', '2026-09-27T00:07:00Z'),
+    ).resolves.toEqual(historicalPrice());
+    expect(getPriceAt).toHaveBeenCalledWith(
+      '111',
+      new Date('2026-09-27T00:07:00Z'),
+      undefined,
+    );
+  });
+
+  it.each([
+    ['01', '2026-09-27T00:07:00Z'],
+    ['111', undefined],
+    ['111', '2026-09-27T00:07:00.000Z'],
+    ['111', '1970-01-01T00:00:00Z'],
+    ['111', 'invalid'],
+  ])('rejects invalid point-in-time query %#', async (tokenId, at) => {
+    await expect(
+      controllerWith({}).getOutcomePriceAt(tokenId, at),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('maps unavailable point-in-time price to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getPriceAt: () =>
+          Promise.reject(
+            new PredictionMarketHistoricalPriceUnavailableError(
+              '111',
+              new Date('2026-09-27T00:07:00Z'),
+            ),
+          ),
+      },
+    );
+    await expect(
+      controller.getOutcomePriceAt('111', '2026-09-27T00:07:00Z'),
+    ).rejects.toThrow(NotFoundException);
+  });
+
+  it('maps point-in-time provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getPriceAt: () => Promise.reject(new Error('unavailable')) },
+    );
+    await expect(
+      controller.getOutcomePriceAt('111', '2026-09-27T00:07:00Z'),
+    ).rejects.toThrow(ServiceUnavailableException);
+  });
+
+  it('loads a binary market point-in-time price complement', async () => {
+    const getPriceAt = jest
+      .fn<PredictionMarketPriceHistoryProvider['getPriceAt']>()
+      .mockImplementation((tokenId, at) =>
+        Promise.resolve({
+          ...historicalPrice(),
+          tokenId,
+          requestedAt: at,
+          price: tokenId === '111' ? '0.4' : '0.6',
+        }),
+      );
+    const controller = controllerWith(
+      { getById: () => Promise.resolve(marketDetails()) },
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getPriceAt },
+    );
+
+    await expect(
+      controller.getMarketPriceComplementAt('703257', '2026-09-27T00:07:00Z'),
+    ).resolves.toMatchObject({
+      priceSum: '1',
+      deviationFromOne: '0',
+      status: 'balanced',
+      sameObservedTimestamp: true,
+      sameResolution: true,
+      atomicSnapshot: false,
+      executable: false,
+    });
+    expect(getPriceAt).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    ['0', '2026-09-27T00:07:00Z'],
+    ['703257', undefined],
+    ['703257', 'invalid'],
+  ])('rejects invalid point-in-time complement query %#', async (id, at) => {
+    await expect(
+      controllerWith({}).getMarketPriceComplementAt(id, at),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('maps an incoherent point-in-time complement to service unavailable', async () => {
+    const controller = controllerWith({
+      getById: () =>
+        Promise.reject(
+          new PredictionMarketPriceComplementAtIncoherentError('703257'),
+        ),
+    });
+    await expect(
+      controller.getMarketPriceComplementAt('703257', '2026-09-27T00:07:00Z'),
+    ).rejects.toThrow(ServiceUnavailableException);
+  });
 });
 
 function controllerWith(
@@ -1639,6 +1897,7 @@ function controllerWith(
   openInterestProvider: Partial<PredictionMarketOpenInterestProvider> = {},
   eventLiveVolumeProvider: Partial<PredictionEventLiveVolumeProvider> = {},
   globalOpenInterestProvider: Partial<PredictionGlobalOpenInterestProvider> = {},
+  priceHistoryProvider: Partial<PredictionMarketPriceHistoryProvider> = {},
 ): PolymarketController {
   const pricing = new PredictionMarketPricingService({
     getMidpoint:
@@ -1728,6 +1987,18 @@ function controllerWith(
       globalOpenInterestProvider.getGlobalOpenInterest ??
       (() => Promise.reject(new Error('unexpected global open-interest call'))),
   });
+  const priceHistoryService = new PredictionMarketPriceHistoryService({
+    getPriceHistory:
+      priceHistoryProvider.getPriceHistory ??
+      (() => Promise.reject(new Error('unexpected price-history call'))),
+    getPriceAt:
+      priceHistoryProvider.getPriceAt ??
+      (() => Promise.reject(new Error('unexpected price-at call'))),
+  });
+  const priceComplementAt = new PredictionMarketPriceComplementAtService(
+    discovery,
+    priceHistoryService,
+  );
   return new PolymarketController(
     events,
     tags,
@@ -1745,7 +2016,39 @@ function controllerWith(
     openInterest,
     eventLiveVolume,
     globalOpenInterest,
+    priceHistoryService,
+    priceComplementAt,
   );
+}
+
+function priceHistory() {
+  return {
+    provider: 'polymarket' as const,
+    tokenId: '111',
+    start: new Date('2026-09-27T00:00:00Z'),
+    end: new Date('2026-09-28T00:00:00Z'),
+    resolution: '5m' as const,
+    points: [],
+    nextCursor: null,
+    source: 'data-api-price-history' as const,
+    receivedAt: new Date('2026-09-28T08:00:00Z'),
+    executable: false as const,
+  };
+}
+
+function historicalPrice() {
+  return {
+    provider: 'polymarket' as const,
+    tokenId: '111',
+    requestedAt: new Date('2026-09-27T00:07:00Z'),
+    observedAt: new Date('2026-09-27T00:05:00Z'),
+    price: '0.25',
+    resolutionSeconds: 300,
+    exactTimestamp: false,
+    source: 'data-api-price-history' as const,
+    receivedAt: new Date('2026-09-28T09:00:00Z'),
+    executable: false as const,
+  };
 }
 
 function globalOpenInterest() {

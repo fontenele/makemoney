@@ -6,6 +6,12 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
+M9.30 is complete: one selected-binary-market route concurrently composes the indexed YES and NO point-in-time prices for the same requested UTC instant. It calculates their exact sum and deviation from one, preserves independent observed times and resolutions, and exposes alignment flags with explicit non-atomic, non-executable, non-arbitrage semantics.
+
+M9.29 is complete: one public route loads the latest Data API outcome-price observation at or before an explicit canonical UTC instant. It validates one terminal non-future point and preserves the requested and observed timestamps, exact price, actual resolution, and exact-match status without scanning pages, inferring a quote, or exposing trades, persistence, accounts, positions, orders, or execution behavior.
+
+M9.28 is complete: one public route loads a cursor-aware Data API price-history page for a canonical outcome token inside an explicit UTC window of at most 31 days. It validates at most 100 oldest-first exact price observations and preserves provider resolution without exposing bid/ask history, individual trades, persistence, accounts, positions, orders, or execution behavior.
+
 M9.27 is complete: one parameter-free public route loads platform-wide Data API open interest and accepts only the documented single row with a null condition identity. It exposes the non-negative aggregate USDC value as a decimal string without market expansion, holders, wallet positions, accounts, persistence, polling, or execution behavior.
 
 M9.26 is complete: one public route reconciles a selected Gamma event with its Data API live-volume breakdown, preserving total and per-market taker volume in shares. The adapter validates bounded unique conditions, descending volume order, and an exact total; the service rejects identified conditions outside the selected event. Individual trades, holders, wallet positions, accounts, persistence, polling, and execution behavior remain excluded.
@@ -422,6 +428,9 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - Selected-market Polymarket open interest: `GET http://localhost:3000/polymarket/markets/:id/open-interest`
 - Selected-event Polymarket live volume: `GET http://localhost:3000/polymarket/events/:id/live-volume`
 - Global Polymarket open interest: `GET http://localhost:3000/polymarket/open-interest`
+- Bounded Polymarket outcome price history: `GET http://localhost:3000/polymarket/outcomes/:tokenId/price-history?start=2026-09-27T00:00:00Z&end=2026-09-28T00:00:00Z&resolution=5m`
+- Point-in-time Polymarket outcome price: `GET http://localhost:3000/polymarket/outcomes/:tokenId/price-at?at=2026-09-27T00:07:00Z`
+- Binary Polymarket point-in-time price complement: `GET http://localhost:3000/polymarket/markets/:id/price-complement-at?at=2026-09-27T00:07:00Z`
 - Public Polymarket outcome midpoint: `GET http://localhost:3000/polymarket/outcomes/:tokenId/midpoint`
 - Public Polymarket outcome top of book: `GET http://localhost:3000/polymarket/outcomes/:tokenId/top-of-book`
 - Coherent public Polymarket outcome market data: `GET http://localhost:3000/polymarket/outcomes/:tokenId/market-data`
@@ -433,6 +442,36 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 PostgreSQL uses `5433` because another local Docker project already occupies `5432`.
 
 ## Verification evidence
+
+The following passed on 2026-09-28 after M9.30:
+
+- focused M9.28–M9.30 Jest validation — 257 tests passed across 5 suites
+- `npm test -- --runInBand` — 1,467 backend tests passed across 128 suites
+- `npm run lint`
+- `npm run format:check`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
+The following passed on 2026-09-28 after M9.29:
+
+- focused M9.28–M9.29 Jest validation — 245 tests passed across 4 suites
+- `npm test -- --runInBand` — 1,455 backend tests passed across 127 suites
+- `npm run lint`
+- `npm run format:check`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
+The following passed on 2026-09-28 after M9.28:
+
+- focused M9.28 Jest validation — 229 tests passed across 4 suites
+- `npm test -- --runInBand` — 1,439 backend tests passed across 127 suites
+- `npm run lint`
+- `npm run format:check`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
 
 The following passed on 2026-09-27 after M8.11 and M9.24:
 
@@ -463,7 +502,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.27. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
+M0 through M8.11 are complete, and M9 is implemented through M9.30. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary historical price comparison, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
 
 ## Known issues and cautions
 
