@@ -20,6 +20,25 @@ export interface PredictionSeriesPage {
   receivedAt: Date;
 }
 
+export interface PredictionSeriesEvent {
+  id: string;
+  slug: string | null;
+  title: string;
+  startDate: string | null;
+  endDate: string | null;
+  active: boolean;
+  closed: boolean;
+  archived: boolean;
+  restricted: boolean;
+}
+
+export interface PredictionSeriesEvents {
+  provider: 'polymarket';
+  seriesId: string;
+  events: PredictionSeriesEvent[];
+  receivedAt: Date;
+}
+
 export interface PredictionSeriesQuery {
   limit: number;
   offset: number;
@@ -34,6 +53,10 @@ export interface PredictionSeriesProvider {
     signal?: AbortSignal,
   ): Promise<PredictionSeriesPage>;
   getById(id: string, signal?: AbortSignal): Promise<PredictionSeriesDetails>;
+  getEventsById(
+    id: string,
+    signal?: AbortSignal,
+  ): Promise<PredictionSeriesEvents>;
 }
 
 export class PredictionSeriesNotFoundError extends Error {

@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, **M6 — Backtesting (M6.1–M6.32)**, **M7 — New Listing Scanner (M7.1–M7.109)**, and **M8 — Dashboard (M8.1–M8.11)**.
-- M9 is in progress through **M9.22 — Recurrence-Filtered Series Discovery**.
+- M9 is in progress through **M9.24 — Public Data API Freshness**.
 - M6 is closed. M7.1–M7.109 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -398,6 +398,10 @@ M9.20 loads one selected public series at `GET /polymarket/series/:id`. It valid
 M9.21 loads one bounded page of active public series at `GET /polymarket/series`. It validates `limit` and `offset`, requests ascending provider-ID order with nested events excluded, verifies unique open-series identities, and exposes offset continuation as explicitly unstable without adding recurrence filtering, relation expansion, persistence, accounts, or execution behavior.
 
 M9.22 adds an optional validated `recurrence` filter to `GET /polymarket/series`. The Gamma request includes the exact caller value, while the adapter verifies every returned series has that exact recurrence before exposing the unchanged bounded summary. It adds no fuzzy matching, recurrence catalog, relation expansion, persistence, accounts, or execution behavior.
+
+M9.23 loads at most 1,000 public event references attached to one selected series at `GET /polymarket/series/:id/events`. It verifies the series identity and unique event identities, preserving only event slug/title, dates, and lifecycle flags without importing markets, prices, liquidity, volume, persistence, accounts, or execution behavior.
+
+M9.24 exposes the public Data API freshness snapshot at `GET /polymarket/data-freshness`. It strictly validates snapshot age and computation time, bounded ingestion lag details, and bounded serving-mechanism lag details without loading feeds, positions, account data, persistence, or execution behavior.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

@@ -6,6 +6,10 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
+M9.24 is complete: one parameter-free public route loads the Data API status snapshot and strictly validates bounded serving and ingestion freshness metadata. It does not load the named feeds, positions, profiles, accounts, persistence, or execution behavior, and unavailable or not-yet-measured upstream state remains explicit `503`.
+
+M9.23 is complete: one public route loads at most 1,000 event references attached to a selected Gamma series, verifies the series and unique event identities, and exposes only event slug/title, dates, and lifecycle flags. Nested markets, prices, volume, liquidity, persistence, accounts, and execution behavior are excluded.
+
 M9.22 is complete: active-series discovery accepts an optional validated recurrence string, applies it to the Gamma request, and verifies every returned series has the exact requested recurrence. Fuzzy matching, a recurrence catalog, relation expansion, metrics, persistence, accounts, and execution behavior are excluded.
 
 M9.21 is complete: one public route loads a bounded offset page of open Gamma series, requests deterministic ascending provider-ID order with nested events excluded, validates unique open identities, and declares continuation unstable. Recurrence filtering, relation expansion, metrics, persistence, accounts, and execution behavior are excluded.
@@ -399,6 +403,8 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - Public related Polymarket tags: `GET http://localhost:3000/polymarket/tags/:id/related`
 - Public active Polymarket series: `GET http://localhost:3000/polymarket/series`
 - Public selected Polymarket series: `GET http://localhost:3000/polymarket/series/:id`
+- Public selected Polymarket series events: `GET http://localhost:3000/polymarket/series/:id/events`
+- Public Polymarket Data API freshness: `GET http://localhost:3000/polymarket/data-freshness`
 - Public selected Polymarket event taxonomy: `GET http://localhost:3000/polymarket/events/:id/tags`
 - Public active Polymarket markets: `GET http://localhost:3000/polymarket/markets`
 - Public selected Polymarket market taxonomy: `GET http://localhost:3000/polymarket/markets/:id/tags`
@@ -419,13 +425,13 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-27 after M8.11 and M9.22:
+The following passed on 2026-09-27 after M8.11 and M9.24:
 
 - `npm run build`
-- focused M9.22 Jest validation — 201 tests passed across 4 suites
+- focused M9.24 Jest validation — 207 tests passed across 4 suites
 - `npm run lint`
 - `npm run format:check`
-- `npm test -- --runInBand` — 1330 backend tests passed across 118 suites
+- `npm test -- --runInBand` — 1366 backend tests passed across 120 suites
 - `npm run test:dashboard` — 19 dashboard client, refresh-scheduler, API-path, API-isolation, and chart-transformation tests passed
 - `npm run build:all`
 - `docker compose config --quiet`
@@ -448,7 +454,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.22. Public Polymarket event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, selected/global/related tag taxonomy, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
+M0 through M8.11 are complete, and M9 is implemented through M9.24. Public Polymarket Data API freshness, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, outcome identities, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
 
 ## Known issues and cautions
 

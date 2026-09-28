@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PredictionMarketDiscoveryService } from './application/prediction-market-discovery.service';
+import { PredictionDataFreshnessService } from './application/prediction-data-freshness.service';
 import { PredictionMarketBinaryResolutionService } from './application/prediction-market-binary-resolution.service';
 import { PredictionEventService } from './application/prediction-event.service';
 import { PredictionMarketDataObservationService } from './application/prediction-market-data-observation.service';
@@ -20,10 +21,12 @@ import { PREDICTION_MARKET_PROVIDER } from './domain/prediction-market';
 import { PREDICTION_EVENT_PROVIDER } from './domain/prediction-event';
 import { PREDICTION_TAG_PROVIDER } from './domain/prediction-tag';
 import { PREDICTION_SERIES_PROVIDER } from './domain/prediction-series';
+import { PREDICTION_DATA_FRESHNESS_PROVIDER } from './domain/prediction-data-freshness';
 import { PolymarketClobMidpointClient } from './infrastructure/polymarket-clob-midpoint.client';
 import { PolymarketClobLastTradeClient } from './infrastructure/polymarket-clob-last-trade.client';
 import { PolymarketClobOrderBookClient } from './infrastructure/polymarket-clob-order-book.client';
 import { PolymarketDataResolutionClient } from './infrastructure/polymarket-data-resolution.client';
+import { PolymarketDataFreshnessClient } from './infrastructure/polymarket-data-freshness.client';
 import { PolymarketGammaMarketClient } from './infrastructure/polymarket-gamma-market.client';
 import { PolymarketGammaEventClient } from './infrastructure/polymarket-gamma-event.client';
 import { PolymarketGammaTagClient } from './infrastructure/polymarket-gamma-tag.client';
@@ -90,6 +93,14 @@ import { PolymarketController } from './presentation/polymarket.controller';
         ),
     },
     {
+      provide: PREDICTION_DATA_FRESHNESS_PROVIDER,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new PolymarketDataFreshnessClient(
+          config.getOrThrow<string>('POLYMARKET_DATA_BASE_URL'),
+        ),
+    },
+    {
       provide: PREDICTION_MARKET_RESOLUTION_PROVIDER,
       inject: [ConfigService],
       useFactory: (config: ConfigService) =>
@@ -98,6 +109,7 @@ import { PolymarketController } from './presentation/polymarket.controller';
         ),
     },
     PredictionMarketDiscoveryService,
+    PredictionDataFreshnessService,
     PredictionEventService,
     PredictionMarketBinaryResolutionService,
     PredictionMarketDataObservationService,

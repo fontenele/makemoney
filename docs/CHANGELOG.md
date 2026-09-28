@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-27 — M9.24 public Polymarket Data API freshness completed
+
+- Added parameter-free `GET /polymarket/data-freshness` backed by the unauthenticated Data API `v2/status` endpoint.
+- Added a dedicated provider contract, service, and adapter for the documented serving and ingestion freshness snapshot.
+- Strictly validate snapshot age and computation time, ingestion block bounds and bounded unique lagging cursors, and bounded unique serving mechanisms with a resolvable worst mechanism.
+- Map provider `503`, other HTTP failures, transport failures, and malformed or incoherent successful responses to local `503` without presenting missing measurements as healthy data.
+- Kept feeds, positions, profiles, account activity, persistence, polling, orders, wallets, and execution outside the increment.
+
+## 2026-09-27 — M9.23 selected Polymarket series events completed
+
+- Added `GET /polymarket/series/:id/events` for one validated positive numeric Gamma series ID.
+- Extended the series provider contract and adapter to load and normalize at most 1,000 unique event references from the selected series detail payload.
+- Preserve only event ID, nullable slug and dates, required title, and lifecycle flags while rejecting malformed, duplicate, oversized, or identity-divergent payloads.
+- Kept nested markets, prices, volume, liquidity, metrics, persistence, accounts, orders, wallets, and execution outside the increment.
+- Added focused service, adapter, and controller tests and synchronized the API route table and milestone documentation.
+
 ## 2026-09-27 — M9.22 recurrence-filtered Polymarket series discovery completed
 
 - Added optional bounded `recurrence` filtering to `GET /polymarket/series` while retaining its existing offset pagination contract.

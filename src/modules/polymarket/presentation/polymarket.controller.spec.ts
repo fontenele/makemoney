@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { jest } from '@jest/globals';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
+import { PredictionDataFreshnessService } from '../application/prediction-data-freshness.service';
 import { PredictionEventService } from '../application/prediction-event.service';
 import { PredictionMarketBinaryResolutionService } from '../application/prediction-market-binary-resolution.service';
 import { PredictionMarketDataObservationService } from '../application/prediction-market-data-observation.service';
@@ -16,6 +17,7 @@ import { PredictionMarketPricingService } from '../application/prediction-market
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
 import { PredictionSeriesService } from '../application/prediction-series.service';
+import { PredictionDataFreshnessProvider } from '../domain/prediction-data-freshness';
 import {
   PredictionMarketBinaryResolutionIncoherentError,
   PredictionMarketBinaryResolutionUnavailableError,
@@ -55,6 +57,46 @@ import {
 import { PolymarketController } from './polymarket.controller';
 
 describe('PolymarketController', () => {
+  it('loads the public Data API freshness observation', async () => {
+    const getFreshness = jest
+      .fn<PredictionDataFreshnessProvider['getFreshness']>()
+      .mockResolvedValue(dataFreshness());
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getFreshness },
+    );
+
+    await expect(controller.getDataFreshness()).resolves.toEqual(
+      dataFreshness(),
+    );
+    expect(getFreshness).toHaveBeenCalledWith(undefined);
+  });
+
+  it('maps Data API freshness failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getFreshness: () => Promise.reject(new Error('not measured yet')) },
+    );
+
+    await expect(controller.getDataFreshness()).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
   it('loads the default bounded active-series page', async () => {
     const listActive = jest
       .fn<PredictionSeriesProvider['listActive']>()
@@ -194,6 +236,77 @@ describe('PolymarketController', () => {
     );
 
     await expect(controller.getSeries('1')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
+  it('loads bounded event references for a validated series id', async () => {
+    const getEventsById = jest
+      .fn<PredictionSeriesProvider['getEventsById']>()
+      .mockResolvedValue(seriesEvents());
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getEventsById,
+      },
+    );
+
+    await expect(controller.getSeriesEvents('1')).resolves.toEqual(
+      seriesEvents(),
+    );
+    expect(getEventsById).toHaveBeenCalledWith('1', undefined);
+  });
+
+  it.each(['0', '-1', '01', 'abc'])(
+    'rejects invalid series-event source id %s',
+    async (id) => {
+      await expect(controllerWith({}).getSeriesEvents(id)).rejects.toThrow(
+        BadRequestException,
+      );
+    },
+  );
+
+  it('maps absent series-event source to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getEventsById: () =>
+          Promise.reject(new PredictionSeriesNotFoundError('1')),
+      },
+    );
+
+    await expect(controller.getSeriesEvents('1')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps series-event provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getEventsById: () => Promise.reject(new Error('network unavailable')),
+      },
+    );
+
+    await expect(controller.getSeriesEvents('1')).rejects.toThrow(
       ServiceUnavailableException,
     );
   });
@@ -1288,6 +1401,7 @@ function controllerWith(
   eventProvider: Partial<PredictionEventProvider> = {},
   tagProvider: Partial<PredictionTagProvider> = {},
   seriesProvider: Partial<PredictionSeriesProvider> = {},
+  dataFreshnessProvider: Partial<PredictionDataFreshnessProvider> = {},
 ): PolymarketController {
   const pricing = new PredictionMarketPricingService({
     getMidpoint:
@@ -1353,6 +1467,14 @@ function controllerWith(
     getById:
       seriesProvider.getById ??
       (() => Promise.reject(new Error('unexpected series detail call'))),
+    getEventsById:
+      seriesProvider.getEventsById ??
+      (() => Promise.reject(new Error('unexpected series events call'))),
+  });
+  const dataFreshness = new PredictionDataFreshnessService({
+    getFreshness:
+      dataFreshnessProvider.getFreshness ??
+      (() => Promise.reject(new Error('unexpected data freshness call'))),
   });
   return new PolymarketController(
     events,
@@ -1367,7 +1489,32 @@ function controllerWith(
     new PredictionMarketLastTradeContextService(lastTrade, orderBook),
     new PredictionMarketMidpointComplementService(discovery, pricing),
     resolutionService,
+    dataFreshness,
   );
+}
+
+function dataFreshness() {
+  return {
+    provider: 'polymarket' as const,
+    snapshotAgeSeconds: 2,
+    computedAt: '2026-09-27T22:00:00Z',
+    ingestion: {
+      chainId: 137,
+      cursorCount: 2,
+      lagging: [{ behindMax: 3, block: 100, source: 'orders' }],
+      maxSyncedBlock: 103,
+      minSyncedBlock: 100,
+      mostLagged: { behindMax: 3, block: 100, source: 'orders' },
+      network: 'polygon',
+    },
+    serving: {
+      mechanisms: [{ ageSeconds: 4, name: 'activity_feed', blocksBehind: 1 }],
+      lagSeconds: 4,
+      worst: 'activity_feed',
+    },
+    source: 'data-api-status' as const,
+    receivedAt: new Date('2026-09-27T22:00:02Z'),
+  };
 }
 
 function seriesPage() {
@@ -1386,6 +1533,27 @@ function seriesPage() {
     nextOffset: null,
     stablePagination: false as const,
     receivedAt: new Date('2026-09-28T00:00:00.000Z'),
+  };
+}
+
+function seriesEvents() {
+  return {
+    provider: 'polymarket' as const,
+    seriesId: '1',
+    events: [
+      {
+        id: '100',
+        slug: 'nfl-week-one',
+        title: 'NFL Week One',
+        startDate: '2026-09-01T00:00:00Z',
+        endDate: '2026-09-08T00:00:00Z',
+        active: true,
+        closed: false,
+        archived: false,
+        restricted: false,
+      },
+    ],
+    receivedAt: new Date('2026-09-28T01:30:00.000Z'),
   };
 }
 

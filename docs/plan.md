@@ -1259,7 +1259,7 @@ Futuramente pode ser usado para estudar:
 - information edge;
 - mercados correlacionados.
 
-M9.1–M9.22 implement bounded unauthenticated event, market, and active-series discovery, exact-tag event and market filtering with returned-membership verification, exact-recurrence series filtering, selected event and series details, bounded event and market taxonomy, an identity-only global tag catalog with explicitly unstable offset pagination, selected tag details with exact identity verification, one bounded level of related-tag identities, event-to-market references, selected YES/NO outcome identities, a non-executable CLOB midpoint, descriptive binary midpoint complement, exact public top-of-book observations, fail-closed midpoint/book coherence, one exact last-trade observation, descriptive non-atomic trade/book context, public condition-grain resolution lifecycle state, and recognized indexed binary payout results. Full depth, implicit related-tag expansion, recursive tag traversal, recurrence catalog discovery, series relation expansion, positions, redemption, trade history, persistence, strategies, accounts, authentication, and execution remain later explicit increments.
+M9.1–M9.24 implement bounded unauthenticated event, market, and active-series discovery, exact-tag event and market filtering with returned-membership verification, exact-recurrence series filtering, selected event and series details, bounded event and market taxonomy, bounded selected-series event references, one public Data API freshness snapshot, an identity-only global tag catalog with explicitly unstable offset pagination, selected tag details with exact identity verification, one bounded level of related-tag identities, event-to-market references, selected YES/NO outcome identities, a non-executable CLOB midpoint, descriptive binary midpoint complement, exact public top-of-book observations, fail-closed midpoint/book coherence, one exact last-trade observation, descriptive non-atomic trade/book context, public condition-grain resolution lifecycle state, and recognized indexed binary payout results. Full depth, named Data API feeds, implicit related-tag expansion, recursive tag traversal, recurrence catalog discovery, nested series-event market expansion, positions, redemption, trade history, persistence, strategies, accounts, authentication, and execution remain later explicit increments.
 
 ---
 
@@ -1710,7 +1710,7 @@ M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.11)
-M9 — Polymarket                   IN PROGRESS (M9.1–M9.22)
+M9 — Polymarket                   IN PROGRESS (M9.1–M9.24)
 M10 — Agentic Wallet / Real Trading PLANNED
 ```
 
@@ -2431,5 +2431,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is in progress through M9.18 exact-tag public event discovery. Implicit related-tag expansion, recursive traversal, positions, redemption, trade history, authentication, accounts, automatic execution controls, and real trading remain separate future work.
+M9 is in progress through M9.24 public Data API freshness. Named Data API feeds, implicit related-tag expansion, recursive traversal, positions, redemption, trade history, authentication, accounts, automatic execution controls, and real trading remain separate future work.
 ```

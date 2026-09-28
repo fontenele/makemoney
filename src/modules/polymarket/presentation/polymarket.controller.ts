@@ -8,6 +8,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
+import { PredictionDataFreshnessService } from '../application/prediction-data-freshness.service';
 import { PredictionEventService } from '../application/prediction-event.service';
 import { PredictionMarketBinaryResolutionService } from '../application/prediction-market-binary-resolution.service';
 import { PredictionMarketDataObservationService } from '../application/prediction-market-data-observation.service';
@@ -19,6 +20,7 @@ import { PredictionMarketPricingService } from '../application/prediction-market
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
 import { PredictionSeriesService } from '../application/prediction-series.service';
+import { PredictionDataFreshnessObservation } from '../domain/prediction-data-freshness';
 import {
   PredictionMarketDataIncoherentError,
   PredictionMarketDataObservation,
@@ -76,6 +78,7 @@ import {
 } from '../domain/prediction-tag';
 import {
   PredictionSeriesDetails,
+  PredictionSeriesEvents,
   PredictionSeriesNotFoundError,
   PredictionSeriesPage,
 } from '../domain/prediction-series';
@@ -100,7 +103,19 @@ export class PolymarketController {
     private readonly lastTradeContext: PredictionMarketLastTradeContextService,
     private readonly midpointComplement: PredictionMarketMidpointComplementService,
     private readonly resolution: PredictionMarketResolutionService,
+    private readonly dataFreshness: PredictionDataFreshnessService,
   ) {}
+
+  @Get('data-freshness')
+  async getDataFreshness(): Promise<PredictionDataFreshnessObservation> {
+    try {
+      return await this.dataFreshness.getFreshness();
+    } catch {
+      throw new ServiceUnavailableException(
+        'Polymarket Data API freshness is unavailable',
+      );
+    }
+  }
 
   @Get('series')
   async listActiveSeries(
@@ -135,6 +150,23 @@ export class PolymarketController {
       }
       throw new ServiceUnavailableException(
         'Polymarket series detail is unavailable',
+      );
+    }
+  }
+
+  @Get('series/:id/events')
+  async getSeriesEvents(
+    @Param('id') id: string,
+  ): Promise<PredictionSeriesEvents> {
+    const parsedId = validSeriesId(id);
+    try {
+      return await this.series.getEventsById(parsedId);
+    } catch (error) {
+      if (error instanceof PredictionSeriesNotFoundError) {
+        throw new NotFoundException('Polymarket series was not found');
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket series events are unavailable',
       );
     }
   }

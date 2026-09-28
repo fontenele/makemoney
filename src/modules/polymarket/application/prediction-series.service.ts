@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   PREDICTION_SERIES_PROVIDER,
   PredictionSeriesDetails,
+  PredictionSeriesEvents,
   PredictionSeriesPage,
   PredictionSeriesProvider,
   PredictionSeriesQuery,
@@ -23,5 +24,12 @@ export class PredictionSeriesService {
 
   getById(id: string, signal?: AbortSignal): Promise<PredictionSeriesDetails> {
     return this.provider.getById(id, signal);
+  }
+
+  getEventsById(
+    id: string,
+    signal?: AbortSignal,
+  ): Promise<PredictionSeriesEvents> {
+    return this.provider.getEventsById(id, signal);
   }
 }

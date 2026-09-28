@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-09-27 — Treat Data API freshness as a provider observation
+
+M9.24 introduces a dedicated provider-neutral freshness contract instead of folding upstream status into the local `/health` endpoint. Local health describes this application and its dependencies, while `GET /polymarket/data-freshness` reports the age and lag of the public Polymarket Data API snapshot.
+
+The adapter preserves both documented halves: serving clocks can reveal a total stall, while ingestion cursor positions describe relative chain lag. It bounds collections, validates block and identity coherence, and maps the provider's documented pre-measurement `503` to local `503`; absence is never presented as zero lag or healthy state.
+
+## 2026-09-27 — Project selected-series events as bounded references
+
+M9.23 reads the documented `events` relation from one selected Gamma series but exposes it through a dedicated route and read model. The adapter verifies the series identity, caps the relation at 1,000 unique events, and retains only event identity, nullable dates, and lifecycle flags.
+
+Nested markets, further series relations, financial metrics, and editorial metadata are discarded. This makes series navigation available without turning a single detail request into an unbounded relation graph or coupling series research to pricing or execution contracts.
+
 ## 2026-09-27 — Verify exact recurrence on filtered series discovery
 
 M9.22 extends the existing active-series route and provider query with one optional recurrence string rather than creating another route or pagination model. Local input must be non-empty, trimmed, free of control characters, and no longer than 100 characters.

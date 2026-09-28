@@ -121,6 +121,86 @@ describe('PolymarketGammaSeriesClient', () => {
     );
   });
 
+  it('loads bounded event references for one selected series', async () => {
+    const http = jest
+      .fn<typeof fetch>()
+      .mockResolvedValue(
+        new Response(
+          JSON.stringify({ ...seriesPayload(), events: [eventPayload()] }),
+        ),
+      );
+    const receivedAt = new Date('2026-09-28T01:30:00.000Z');
+    const client = new PolymarketGammaSeriesClient(
+      'https://example.com/',
+      http,
+      () => receivedAt,
+    );
+
+    await expect(client.getEventsById('1')).resolves.toEqual({
+      provider: 'polymarket',
+      seriesId: '1',
+      events: [eventPayload()],
+      receivedAt,
+    });
+    expect(http).toHaveBeenCalledWith(
+      'https://example.com/series/1',
+      expect.objectContaining({ headers: { accept: 'application/json' } }),
+    );
+  });
+
+  it.each([
+    ['identity divergence', { ...seriesPayload(), id: '2', events: [] }],
+    ['missing events', seriesPayload()],
+    [
+      'duplicate event identity',
+      { ...seriesPayload(), events: [eventPayload(), eventPayload()] },
+    ],
+    [
+      'malformed event',
+      {
+        ...seriesPayload(),
+        events: [{ ...eventPayload(), active: 'true' }],
+      },
+    ],
+    [
+      'oversized events',
+      {
+        ...seriesPayload(),
+        events: Array.from({ length: 1_001 }, (_, index) => ({
+          ...eventPayload(),
+          id: `${index + 1}`,
+        })),
+      },
+    ],
+  ])('rejects series events with %s', (_scenario, payload) => {
+    expect(() =>
+      new PolymarketGammaSeriesClient('https://example.com').normalizeEvents(
+        '1',
+        payload,
+      ),
+    ).toThrow();
+  });
+
+  it.each([404, 503])(
+    'rejects series-event provider status %s',
+    async (status) => {
+      const http = jest
+        .fn<typeof fetch>()
+        .mockResolvedValue(new Response('', { status }));
+
+      await expect(
+        new PolymarketGammaSeriesClient(
+          'https://example.com',
+          http,
+        ).getEventsById('1'),
+      ).rejects.toThrow(
+        status === 404
+          ? 'Polymarket series 1 was not found'
+          : 'Polymarket series events request failed: 503',
+      );
+    },
+  );
+
   it.each([404, 503])('rejects provider status %s', async (status) => {
     const http = jest
       .fn<typeof fetch>()
@@ -186,5 +266,19 @@ function seriesPayload() {
     title: 'NFL',
     recurrence: 'weekly',
     closed: false,
+  };
+}
+
+function eventPayload() {
+  return {
+    id: '100',
+    slug: 'nfl-week-one',
+    title: 'NFL Week One',
+    startDate: '2026-09-01T00:00:00Z',
+    endDate: '2026-09-08T00:00:00Z',
+    active: true,
+    closed: false,
+    archived: false,
+    restricted: false,
   };
 }
