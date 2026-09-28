@@ -157,9 +157,41 @@ The successful provider payload must include a bounded unique tag collection for
 
 Filtering uses only the explicitly selected tag. Related tags from M9.17 are not expanded implicitly, and an empty page is valid; no tag-existence claim, ranking, recommendation, persistence, polling, position, account, order, wallet, or execution behavior is added.
 
+## M9.19 — Exact-tag active-market discovery
+
+`GET /polymarket/markets` accepts the same optional canonical positive numeric `tagId` alongside its existing `limit` and `cursor`. The adapter sends Gamma's `tag_id` and requests tag relations on the bounded keyset page.
+
+Every returned market must include a bounded unique tag collection containing the exact requested identity. Missing relations, malformed or duplicate tags, and markets outside the selected taxonomy fail the complete request as `503`; the public market summary remains unchanged.
+
+Related tags are never expanded implicitly. An empty page is valid and makes no tag-existence claim, and the filter adds no ranking, recommendation, persistence, polling, position, account, order, wallet, or execution behavior.
+
+## M9.20 — Selected public series details
+
+`GET /polymarket/series/:id` loads one public Gamma series using a canonical positive numeric ID. The adapter calls the unauthenticated `series/{id}` endpoint with the established ten-second timeout and requires the normalized response identity to match the request exactly.
+
+The response preserves only provider, ID, nullable slug, nullable title, nullable recurrence, closed state, and local receipt time. Provider `404` becomes local `404`; malformed IDs return `400`; other HTTP, transport, JSON, identity, or field-contract failures return `503`.
+
+Nested events and markets, financial metrics, rankings, filters, polling, persistence, accounts, positions, orders, wallets, and execution remain excluded.
+
+## M9.21 — Bounded active-series discovery
+
+`GET /polymarket/series` loads one public Gamma series page. The local route accepts `limit=1..100`, defaulting to 20, and `offset=0..10000`, defaulting to zero. The adapter fixes ascending provider-ID order, `closed=false`, and `exclude_events=true` so discovery does not import the provider's relation-heavy event graph.
+
+Each result uses the M9.20 identity summary and must have a unique required ID, valid nullable slug/title/recurrence, and explicit `closed: false`. Malformed, duplicate, oversized, or closed results fail the complete request as `503`.
+
+A full page exposes `nextOffset` only while continuation remains within the local offset bound. The response always declares `stablePagination: false` because Gamma provides no snapshot identity and concurrent catalog changes can shift later pages. Recurrence filtering, nested events or markets, metrics, polling, persistence, accounts, positions, orders, wallets, and execution remain excluded.
+
+## M9.22 — Exact-recurrence active-series discovery
+
+`GET /polymarket/series` accepts an optional `recurrence` alongside its existing `limit` and `offset`. The value must be non-empty, already trimmed, free of control characters, and no longer than 100 characters. It is sent unchanged through Gamma's documented recurrence query parameter.
+
+When filtering, every normalized provider result must contain the exact requested recurrence. A missing or divergent recurrence fails the complete page as `503` rather than presenting a silently ignored or fuzzy provider filter as trustworthy. The public series summary and unstable offset pagination remain unchanged.
+
+The application does not infer a recurrence vocabulary, normalize aliases, perform fuzzy matching, expand series relations, or add metrics, polling, persistence, accounts, positions, orders, wallets, or execution.
+
 ## Boundaries
 
-M9.1–M9.18 do not persist or poll markets, events, or tags. M9.3–M9.8 expose public observations, not executable quotes, fill guarantees, historical series, or probability guarantees. M9.4, M9.5, and M9.7 retain only level one and do not expose full depth. M9.6–M9.7 use only the latest reported trade price and side, not trade history. M9.8 compares only independently observed binary midpoints. M9.9 exposes resolution lifecycle state, while M9.10 separately interprets only recognized terminal binary payout vectors. M9.11 loads one selected event and bounded market references; M9.12 adds bounded event discovery summaries without nested relations or financial metrics; M9.13 and M9.14 expose only bounded selected-event and selected-market taxonomy identity; M9.15 adds identity-only global catalog traversal with explicitly unstable offset pagination; M9.16 adds one identity-checked selected tag; M9.17 adds one bounded level of related identity-only tags; M9.18 adds exact-tag event filtering with provider-response membership verification. The increments do not load positions or accounts. They have no authentication, signing, wallet, order, redemption, strategy, signal, paper execution, real execution, or dashboard path.
+M9.1–M9.22 do not persist or poll markets, events, tags, or series. M9.3–M9.8 expose public observations, not executable quotes, fill guarantees, historical series, or probability guarantees. M9.4, M9.5, and M9.7 retain only level one and do not expose full depth. M9.6–M9.7 use only the latest reported trade price and side, not trade history. M9.8 compares only independently observed binary midpoints. M9.9 exposes resolution lifecycle state, while M9.10 separately interprets only recognized terminal binary payout vectors. M9.11 loads one selected event and bounded market references; M9.12 adds bounded event discovery summaries without nested relations or financial metrics; M9.13 and M9.14 expose only bounded selected-event and selected-market taxonomy identity; M9.15 adds identity-only global catalog traversal with explicitly unstable offset pagination; M9.16 adds one identity-checked selected tag; M9.17 adds one bounded level of related identity-only tags; M9.18 and M9.19 add exact-tag event and market filtering with provider-response membership verification; M9.20 adds one identity-checked selected series; M9.21 adds bounded active-series discovery; M9.22 adds exact-recurrence filtering without relation expansion. The increments do not load positions or accounts. They have no authentication, signing, wallet, order, redemption, strategy, signal, paper execution, real execution, or dashboard path.
 
 Provider failure is exposed locally as `503`. Runtime validation against a real Gamma response was attempted but the development environment could not resolve the provider hostname; the client contract is covered with the current official documented response shape and focused automated tests.
 

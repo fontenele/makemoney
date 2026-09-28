@@ -15,6 +15,7 @@ import { PredictionMarketOrderBookService } from '../application/prediction-mark
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
+import { PredictionSeriesService } from '../application/prediction-series.service';
 import {
   PredictionMarketBinaryResolutionIncoherentError,
   PredictionMarketBinaryResolutionUnavailableError,
@@ -47,9 +48,156 @@ import {
   PredictionTagNotFoundError,
   PredictionTagProvider,
 } from '../domain/prediction-tag';
+import {
+  PredictionSeriesNotFoundError,
+  PredictionSeriesProvider,
+} from '../domain/prediction-series';
 import { PolymarketController } from './polymarket.controller';
 
 describe('PolymarketController', () => {
+  it('loads the default bounded active-series page', async () => {
+    const listActive = jest
+      .fn<PredictionSeriesProvider['listActive']>()
+      .mockResolvedValue(seriesPage());
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        listActive,
+      },
+    );
+
+    await expect(controller.listActiveSeries()).resolves.toEqual(seriesPage());
+    expect(listActive).toHaveBeenCalledWith(
+      { limit: 20, offset: 0 },
+      undefined,
+    );
+  });
+
+  it('accepts bounded series limit and offset', async () => {
+    const listActive = jest
+      .fn<PredictionSeriesProvider['listActive']>()
+      .mockResolvedValue(seriesPage());
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        listActive,
+      },
+    );
+
+    await controller.listActiveSeries('100', '10000', 'weekly');
+    expect(listActive).toHaveBeenCalledWith(
+      { limit: 100, offset: 10000, recurrence: 'weekly' },
+      undefined,
+    );
+  });
+
+  it.each(['', ' weekly', 'weekly ', 'week\nly', 'x'.repeat(101)])(
+    'rejects invalid series recurrence %s',
+    async (recurrence) => {
+      await expect(
+        controllerWith({}).listActiveSeries(undefined, undefined, recurrence),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it.each([
+    ['0', undefined],
+    ['101', undefined],
+    [undefined, '-1'],
+    [undefined, '01'],
+    [undefined, '10001'],
+  ])('rejects invalid series pagination (%s, %s)', async (limit, offset) => {
+    await expect(
+      controllerWith({}).listActiveSeries(limit, offset),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('maps series-discovery failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        listActive: () => Promise.reject(new Error('network unavailable')),
+      },
+    );
+
+    await expect(controller.listActiveSeries()).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
+  it('loads one selected series by validated id', async () => {
+    const getById = jest
+      .fn<PredictionSeriesProvider['getById']>()
+      .mockResolvedValue(seriesDetails());
+    const controller = controllerWith({}, {}, {}, {}, {}, {}, {}, { getById });
+
+    await expect(controller.getSeries('1')).resolves.toEqual(seriesDetails());
+    expect(getById).toHaveBeenCalledWith('1', undefined);
+  });
+
+  it.each(['0', '-1', '01', 'abc'])(
+    'rejects invalid series id %s',
+    async (id) => {
+      await expect(controllerWith({}).getSeries(id)).rejects.toThrow(
+        BadRequestException,
+      );
+    },
+  );
+
+  it('maps absent selected series to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getById: () => Promise.reject(new PredictionSeriesNotFoundError('1')),
+      },
+    );
+
+    await expect(controller.getSeries('1')).rejects.toThrow(NotFoundException);
+  });
+
+  it('maps selected-series provider failure to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getById: () => Promise.reject(new Error('network unavailable')),
+      },
+    );
+
+    await expect(controller.getSeries('1')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
   it('loads the default bounded global tag page', async () => {
     const list = jest
       .fn<PredictionTagProvider['list']>()
@@ -360,6 +508,38 @@ describe('PolymarketController', () => {
     await controller.listActiveMarkets('100', 'page_2-cursor');
     expect(calls).toEqual([{ limit: 100, afterCursor: 'page_2-cursor' }]);
   });
+
+  it('passes a validated tag filter for market discovery', async () => {
+    const calls: unknown[] = [];
+    const controller = controllerWith({
+      listActive: (query) => {
+        calls.push(query);
+        return Promise.resolve({
+          markets: [],
+          nextCursor: null,
+          receivedAt: new Date('2026-09-27T20:00:00.000Z'),
+        });
+      },
+    });
+
+    await controller.listActiveMarkets('20', 'page_2-cursor', '2');
+    expect(calls).toEqual([
+      { limit: 20, afterCursor: 'page_2-cursor', tagId: '2' },
+    ]);
+  });
+
+  it.each(['0', '-1', '01', 'abc'])(
+    'rejects invalid market-discovery tag id %s',
+    async (tagId) => {
+      await expect(
+        controllerWith(unusedProvider()).listActiveMarkets(
+          undefined,
+          undefined,
+          tagId,
+        ),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
 
   it.each(['0', '-1', '1.5', 'abc', '101'])(
     'rejects invalid limit %s',
@@ -1107,6 +1287,7 @@ function controllerWith(
   resolutionProvider: Partial<PredictionMarketResolutionProvider> = {},
   eventProvider: Partial<PredictionEventProvider> = {},
   tagProvider: Partial<PredictionTagProvider> = {},
+  seriesProvider: Partial<PredictionSeriesProvider> = {},
 ): PolymarketController {
   const pricing = new PredictionMarketPricingService({
     getMidpoint:
@@ -1165,9 +1346,18 @@ function controllerWith(
       tagProvider.getRelatedById ??
       (() => Promise.reject(new Error('unexpected related-tag call'))),
   });
+  const series = new PredictionSeriesService({
+    listActive:
+      seriesProvider.listActive ??
+      (() => Promise.reject(new Error('unexpected series list call'))),
+    getById:
+      seriesProvider.getById ??
+      (() => Promise.reject(new Error('unexpected series detail call'))),
+  });
   return new PolymarketController(
     events,
     tags,
+    series,
     discovery,
     binaryResolution,
     pricing,
@@ -1178,6 +1368,37 @@ function controllerWith(
     new PredictionMarketMidpointComplementService(discovery, pricing),
     resolutionService,
   );
+}
+
+function seriesPage() {
+  return {
+    provider: 'polymarket' as const,
+    series: [
+      {
+        id: '1',
+        slug: 'nfl',
+        title: 'NFL',
+        recurrence: 'weekly',
+        closed: false,
+      },
+    ],
+    offset: 0,
+    nextOffset: null,
+    stablePagination: false as const,
+    receivedAt: new Date('2026-09-28T00:00:00.000Z'),
+  };
+}
+
+function seriesDetails() {
+  return {
+    provider: 'polymarket' as const,
+    id: '1',
+    slug: 'nfl',
+    title: 'NFL',
+    recurrence: 'weekly',
+    closed: false,
+    receivedAt: new Date('2026-09-27T23:30:00.000Z'),
+  };
 }
 
 function tagPage() {

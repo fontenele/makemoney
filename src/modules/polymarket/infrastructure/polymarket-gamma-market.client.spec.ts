@@ -90,6 +90,55 @@ describe('PolymarketGammaMarketClient', () => {
     expect(http.mock.calls[0]?.[1]?.signal).toBeInstanceOf(AbortSignal);
   });
 
+  it('requests and verifies an exact market tag filter', async () => {
+    const http = jest
+      .fn<(input: string, init?: RequestInit) => Promise<Response>>()
+      .mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            markets: [
+              {
+                ...market(),
+                tags: [{ id: '2', label: 'Politics', slug: 'politics' }],
+              },
+            ],
+            next_cursor: null,
+          }),
+        ),
+      );
+    const client = new PolymarketGammaMarketClient(
+      'https://gamma-api.polymarket.com/',
+      http,
+      () => receivedAt,
+    );
+
+    await expect(
+      client.listActive({ limit: 20, tagId: '2' }),
+    ).resolves.toMatchObject({ markets: [{ id: '703257' }] });
+    expect(http.mock.calls[0]?.[0]).toBe(
+      'https://gamma-api.polymarket.com/markets/keyset?closed=false&limit=20&tag_id=2&include_tag=true',
+    );
+  });
+
+  it('rejects a market page without the exact requested tag', () => {
+    const client = new PolymarketGammaMarketClient('https://example.com');
+
+    expect(() =>
+      client.normalize(
+        {
+          markets: [
+            {
+              ...market(),
+              tags: [{ id: '3', label: 'Elections', slug: 'elections' }],
+            },
+          ],
+          next_cursor: null,
+        },
+        '2',
+      ),
+    ).toThrow('Invalid Polymarket tag-filtered market payload');
+  });
+
   it('rejects non-success responses', async () => {
     const http = jest
       .fn<(input: string, init?: RequestInit) => Promise<Response>>()

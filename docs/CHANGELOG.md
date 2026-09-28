@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-09-27 — M9.22 recurrence-filtered Polymarket series discovery completed
+
+- Added optional bounded `recurrence` filtering to `GET /polymarket/series` while retaining its existing offset pagination contract.
+- Validate recurrence as non-empty, trimmed, control-free text of at most 100 characters before provider access.
+- Apply the exact recurrence to Gamma and reject a complete page if any returned series does not match it exactly.
+- Kept fuzzy matching, recurrence catalog discovery, relation expansion, metrics, persistence, accounts, orders, wallets, and execution outside the increment.
+- Added focused service, adapter, and controller tests and synchronized the API route table and milestone documentation.
+
+## 2026-09-27 — M9.21 active Polymarket series discovery completed
+
+- Added `GET /polymarket/series` with bounded `limit=1..100` and `offset=0..10000` inputs.
+- Extended the provider-neutral series contract and Gamma adapter to request open series in ascending provider-ID order with nested events excluded.
+- Reject malformed, duplicate, oversized, or closed results and expose offset continuation with `stablePagination: false`.
+- Kept recurrence filters, event and market expansion, metrics, persistence, accounts, orders, wallets, and execution outside the increment.
+- Added focused adapter, service, and controller tests and synchronized the API route table and milestone documentation.
+
+## 2026-09-27 — M9.20 selected Polymarket series details completed
+
+- Added `GET /polymarket/series/:id` for one validated positive numeric Gamma series ID.
+- Added a dedicated provider-neutral series contract, application service, and unauthenticated Gamma adapter with a ten-second request timeout.
+- Strictly validate the returned identity, nullable slug/title/recurrence, and closed state; provider `404` remains distinct from provider or payload failure.
+- Kept nested events and markets, metrics, persistence, accounts, orders, wallets, and execution outside the increment.
+- Added focused adapter, service, controller, and module tests and synchronized the API route table and milestone documentation.
+
+## 2026-09-27 — M9.19 exact-tag Polymarket market discovery completed
+
+- Added optional positive numeric `tagId` filtering to `GET /polymarket/markets` while retaining the existing bounded keyset pagination contract.
+- Sent Gamma's explicit tag filter and requested tag relations, then failed closed unless every returned market proved exact membership in the requested tag.
+- Added focused adapter and controller coverage for query construction, exact membership, and invalid public input.
+- Kept related-tag expansion, ranking, persistence, polling, accounts, positions, orders, wallets, and execution outside the increment.
+
 ## 2026-09-27 — M9.18 exact-tag Polymarket event discovery completed
 
 - Added optional positive numeric `tagId` filtering to `GET /polymarket/events` while retaining the existing bounded keyset pagination contract.

@@ -32,6 +32,10 @@ export class PolymarketGammaMarketClient implements PredictionMarketProvider {
       closed: 'false',
       limit: query.limit.toString(),
     });
+    if (query.tagId) {
+      parameters.set('tag_id', query.tagId);
+      parameters.set('include_tag', 'true');
+    }
     if (query.afterCursor) {
       parameters.set('after_cursor', query.afterCursor);
     }
@@ -49,7 +53,10 @@ export class PolymarketGammaMarketClient implements PredictionMarketProvider {
         `Polymarket market discovery request failed: ${response.status}`,
       );
     }
-    return this.normalize(JSON.parse(await response.text()) as unknown);
+    return this.normalize(
+      JSON.parse(await response.text()) as unknown,
+      query.tagId,
+    );
   }
 
   async getById(
@@ -109,7 +116,7 @@ export class PolymarketGammaMarketClient implements PredictionMarketProvider {
     };
   }
 
-  normalize(payload: unknown): PredictionMarketPage {
+  normalize(payload: unknown, requiredTagId?: string): PredictionMarketPage {
     if (
       !isRecord(payload) ||
       !Array.isArray(payload.markets) ||
@@ -119,7 +126,9 @@ export class PolymarketGammaMarketClient implements PredictionMarketProvider {
     }
 
     return {
-      markets: payload.markets.map(normalizeMarket),
+      markets: payload.markets.map((market) =>
+        normalizeMarket(market, requiredTagId),
+      ),
       nextCursor: payload.next_cursor,
       receivedAt: this.clock(),
     };
@@ -158,17 +167,37 @@ export class PolymarketGammaMarketClient implements PredictionMarketProvider {
   }
 }
 
-function normalizeMarket(value: unknown): PredictionMarket {
+function normalizeMarket(
+  value: unknown,
+  requiredTagId?: string,
+): PredictionMarket {
   if (!isRecord(value)) {
     throw new Error('Invalid Polymarket market payload');
   }
 
   const identity = normalizeMarketIdentity(value);
+  if (requiredTagId !== undefined) {
+    const tags = normalizeMarketTags(value.tags);
+    if (!tags.some((tag) => tag.id === requiredTagId)) {
+      throw new Error('Invalid Polymarket tag-filtered market payload');
+    }
+  }
 
   return {
     ...identity,
     closed: false,
   };
+}
+
+function normalizeMarketTags(value: unknown): PredictionMarketTag[] {
+  if (!Array.isArray(value) || value.length > MAXIMUM_TAGS) {
+    throw new Error('Invalid Polymarket market tags payload');
+  }
+  const tags = value.map(normalizeTag);
+  if (new Set(tags.map((tag) => tag.id)).size !== tags.length) {
+    throw new Error('Invalid Polymarket market tags payload');
+  }
+  return tags;
 }
 
 function normalizeMarketIdentity(value: Record<string, unknown>) {

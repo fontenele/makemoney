@@ -1,5 +1,29 @@
 # Technical Decisions
 
+## 2026-09-27 — Verify exact recurrence on filtered series discovery
+
+M9.22 extends the existing active-series route and provider query with one optional recurrence string rather than creating another route or pagination model. Local input must be non-empty, trimmed, free of control characters, and no longer than 100 characters.
+
+The adapter sends the exact value to Gamma and requires every returned series to preserve that same recurrence. A mismatched or missing recurrence fails the complete page instead of trusting a silently ignored filter. No fuzzy matching or recurrence vocabulary is inferred.
+
+## 2026-09-27 — Exclude event relations from active-series discovery
+
+M9.21 extends the dedicated series provider with bounded offset discovery. The Gamma request fixes `closed=false`, ascending ID order, and `exclude_events=true`; the adapter then verifies that every normalized result remains open and unique before returning the page.
+
+The local `nextOffset` is only a convenience when a full page was returned and remains within the 10,000 bound. Because Gamma supplies no snapshot identity for this endpoint, the response declares `stablePagination: false`. Recurrence filters and relation expansion remain separate future increments.
+
+## 2026-09-27 — Model selected series as an identity-only aggregate
+
+M9.20 introduces a dedicated series provider rather than attaching series fields to event discovery. A successful Gamma detail response must match the requested positive numeric ID exactly and is reduced to nullable slug, title, recurrence, closed state, and local receipt time.
+
+Series relations and financial fields are deliberately excluded. This preserves the separate event and market aggregates and prevents a selected-series lookup from implicitly expanding an unbounded event graph or creating persistence, account, order, or execution behavior.
+
+## 2026-09-27 — Verify exact tag membership on filtered market discovery
+
+M9.19 mirrors the M9.18 event-filter boundary for the market keyset endpoint. The adapter sends Gamma's `tag_id` plus `include_tag=true`, then requires every returned market's bounded unique tag collection to contain the requested identity before discarding those relations from the public summary.
+
+The response shape and pagination contract remain unchanged. Related tags are not expanded automatically, an empty page makes no tag-existence claim, and malformed or incoherent membership fails closed.
+
 ## 2026-09-27 — Verify exact tag membership on filtered event discovery
 
 M9.18 extends the existing event keyset query with an optional canonical `tagId` instead of creating another route or pagination model. The adapter sends Gamma's `tag_id` plus `include_tag=true`, then requires each returned event's bounded unique tag collection to contain the requested identity before discarding those provider relations from the public summary.

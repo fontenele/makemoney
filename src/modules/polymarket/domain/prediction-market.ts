@@ -47,6 +47,7 @@ export interface PredictionMarketDetails {
 export interface ActivePredictionMarketQuery {
   limit: number;
   afterCursor?: string;
+  tagId?: string;
 }
 
 export const PREDICTION_MARKET_PROVIDER = Symbol('PREDICTION_MARKET_PROVIDER');

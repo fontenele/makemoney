@@ -18,6 +18,7 @@ import { PredictionMarketOrderBookService } from '../application/prediction-mark
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
+import { PredictionSeriesService } from '../application/prediction-series.service';
 import {
   PredictionMarketDataIncoherentError,
   PredictionMarketDataObservation,
@@ -73,6 +74,11 @@ import {
   PredictionTagPage,
   PredictionRelatedTags,
 } from '../domain/prediction-tag';
+import {
+  PredictionSeriesDetails,
+  PredictionSeriesNotFoundError,
+  PredictionSeriesPage,
+} from '../domain/prediction-series';
 
 const DEFAULT_LIMIT = 20;
 const MAXIMUM_LIMIT = 100;
@@ -84,6 +90,7 @@ export class PolymarketController {
   constructor(
     private readonly events: PredictionEventService,
     private readonly tags: PredictionTagService,
+    private readonly series: PredictionSeriesService,
     private readonly discovery: PredictionMarketDiscoveryService,
     private readonly binaryResolution: PredictionMarketBinaryResolutionService,
     private readonly pricing: PredictionMarketPricingService,
@@ -94,6 +101,43 @@ export class PolymarketController {
     private readonly midpointComplement: PredictionMarketMidpointComplementService,
     private readonly resolution: PredictionMarketResolutionService,
   ) {}
+
+  @Get('series')
+  async listActiveSeries(
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+    @Query('recurrence') recurrence?: string,
+  ): Promise<PredictionSeriesPage> {
+    const query = {
+      limit: validLimit(limit),
+      offset: validOffset(offset),
+      ...(recurrence === undefined
+        ? {}
+        : { recurrence: validRecurrence(recurrence) }),
+    };
+    try {
+      return await this.series.listActive(query);
+    } catch {
+      throw new ServiceUnavailableException(
+        'Polymarket series discovery is unavailable',
+      );
+    }
+  }
+
+  @Get('series/:id')
+  async getSeries(@Param('id') id: string): Promise<PredictionSeriesDetails> {
+    const parsedId = validSeriesId(id);
+    try {
+      return await this.series.getById(parsedId);
+    } catch (error) {
+      if (error instanceof PredictionSeriesNotFoundError) {
+        throw new NotFoundException('Polymarket series was not found');
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket series detail is unavailable',
+      );
+    }
+  }
 
   @Get('tags')
   async listTags(
@@ -199,10 +243,12 @@ export class PolymarketController {
   async listActiveMarkets(
     @Query('limit') limit?: string,
     @Query('cursor') cursor?: string,
+    @Query('tagId') tagId?: string,
   ): Promise<PredictionMarketPage> {
     const query = {
       limit: validLimit(limit),
       ...(cursor === undefined ? {} : { afterCursor: validCursor(cursor) }),
+      ...(tagId === undefined ? {} : { tagId: validTagId(tagId) }),
     };
     try {
       return await this.discovery.listActive(query);
@@ -480,6 +526,36 @@ function validTagId(value: string): string {
     );
   }
   return value;
+}
+
+function validSeriesId(value: string): string {
+  if (!/^[1-9]\d{0,99}$/.test(value)) {
+    throw new BadRequestException(
+      'series id must be a positive Polymarket numeric identifier',
+    );
+  }
+  return value;
+}
+
+function validRecurrence(value: string): string {
+  if (
+    value.length === 0 ||
+    value.length > 100 ||
+    value !== value.trim() ||
+    containsControlCharacter(value)
+  ) {
+    throw new BadRequestException(
+      'recurrence must be a non-empty Polymarket series recurrence up to 100 characters',
+    );
+  }
+  return value;
+}
+
+function containsControlCharacter(value: string): boolean {
+  return Array.from(value).some((character) => {
+    const code = character.charCodeAt(0);
+    return code <= 31 || code === 127;
+  });
 }
 
 function validLimit(value?: string): number {
