@@ -9,6 +9,7 @@ import { PredictionDataFreshnessService } from '../application/prediction-data-f
 import { PredictionEventService } from '../application/prediction-event.service';
 import { PredictionEventLiveVolumeService } from '../application/prediction-event-live-volume.service';
 import { PredictionGlobalOpenInterestService } from '../application/prediction-global-open-interest.service';
+import { PredictionMarketBinaryPriceChangeService } from '../application/prediction-market-binary-price-change.service';
 import { PredictionMarketBinaryResolutionService } from '../application/prediction-market-binary-resolution.service';
 import { PredictionMarketDataObservationService } from '../application/prediction-market-data-observation.service';
 import { PredictionMarketLastTradeService } from '../application/prediction-market-last-trade.service';
@@ -17,12 +18,14 @@ import { PredictionMarketMidpointComplementService } from '../application/predic
 import { PredictionMarketOrderBookService } from '../application/prediction-market-order-book.service';
 import { PredictionMarketOpenInterestService } from '../application/prediction-market-open-interest.service';
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
+import { PredictionMarketPriceChangeService } from '../application/prediction-market-price-change.service';
 import { PredictionMarketPriceHistoryService } from '../application/prediction-market-price-history.service';
 import { PredictionMarketPriceComplementAtService } from '../application/prediction-market-price-complement-at.service';
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
 import { PredictionSeriesService } from '../application/prediction-series.service';
 import { PredictionDataFreshnessProvider } from '../domain/prediction-data-freshness';
+import { PredictionMarketBinaryPriceChangeIncoherentError } from '../domain/prediction-market-binary-price-change';
 import {
   PredictionMarketBinaryResolutionIncoherentError,
   PredictionMarketBinaryResolutionUnavailableError,
@@ -54,6 +57,7 @@ import {
   PredictionMarketPriceHistoryProvider,
   PredictionMarketPriceHistoryUnavailableError,
 } from '../domain/prediction-market-price-history';
+import { PredictionMarketPriceChangeIncoherentError } from '../domain/prediction-market-price-change';
 import { PredictionMarketPriceComplementAtIncoherentError } from '../domain/prediction-market-price-complement-at';
 import {
   PredictionMarketNotFoundError,
@@ -1820,6 +1824,129 @@ describe('PolymarketController', () => {
     ).rejects.toThrow(ServiceUnavailableException);
   });
 
+  it('loads an exact outcome price change between two instants', async () => {
+    const getPriceAt = jest
+      .fn<PredictionMarketPriceHistoryProvider['getPriceAt']>()
+      .mockImplementation((tokenId, at) =>
+        Promise.resolve({
+          ...historicalPrice(),
+          tokenId,
+          requestedAt: at,
+          observedAt: at,
+          price:
+            at.getTime() === new Date('2026-09-27T00:05:00Z').getTime()
+              ? '0.2'
+              : '0.35',
+          exactTimestamp: true,
+        }),
+      );
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getPriceAt },
+    );
+
+    await expect(
+      controller.getOutcomePriceChange(
+        '111',
+        '2026-09-27T00:05:00Z',
+        '2026-09-27T00:07:00Z',
+      ),
+    ).resolves.toMatchObject({
+      tokenId: '111',
+      priceChange: '0.15',
+      direction: 'up',
+      sameObservedTimestamp: false,
+      sameResolution: true,
+      executable: false,
+    });
+    expect(getPriceAt).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    ['01', '2026-09-27T00:05:00Z', '2026-09-27T00:07:00Z'],
+    ['111', undefined, '2026-09-27T00:07:00Z'],
+    ['111', 'invalid', '2026-09-27T00:07:00Z'],
+    ['111', '2026-09-27T00:07:00Z', '2026-09-27T00:07:00Z'],
+    ['111', '2026-09-27T00:08:00Z', '2026-09-27T00:07:00Z'],
+    ['111', '2026-08-01T00:00:00Z', '2026-09-27T00:07:00Z'],
+  ])('rejects invalid price-change query %#', async (tokenId, from, to) => {
+    await expect(
+      controllerWith({}).getOutcomePriceChange(tokenId, from, to),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('maps unavailable price-change observations to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getPriceAt: () =>
+          Promise.reject(
+            new PredictionMarketHistoricalPriceUnavailableError(
+              '111',
+              new Date('2026-09-27T00:05:00Z'),
+            ),
+          ),
+      },
+    );
+    await expect(
+      controller.getOutcomePriceChange(
+        '111',
+        '2026-09-27T00:05:00Z',
+        '2026-09-27T00:07:00Z',
+      ),
+    ).rejects.toThrow(NotFoundException);
+  });
+
+  it('maps incoherent price changes to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getPriceAt: () =>
+          Promise.reject(new PredictionMarketPriceChangeIncoherentError('111')),
+      },
+    );
+    await expect(
+      controller.getOutcomePriceChange(
+        '111',
+        '2026-09-27T00:05:00Z',
+        '2026-09-27T00:07:00Z',
+      ),
+    ).rejects.toThrow(ServiceUnavailableException);
+  });
+
   it('loads a binary market point-in-time price complement', async () => {
     const getPriceAt = jest
       .fn<PredictionMarketPriceHistoryProvider['getPriceAt']>()
@@ -1880,6 +2007,94 @@ describe('PolymarketController', () => {
     });
     await expect(
       controller.getMarketPriceComplementAt('703257', '2026-09-27T00:07:00Z'),
+    ).rejects.toThrow(ServiceUnavailableException);
+  });
+
+  it('loads binary outcome price changes over one interval', async () => {
+    const getPriceAt = jest
+      .fn<PredictionMarketPriceHistoryProvider['getPriceAt']>()
+      .mockImplementation((tokenId, at) => {
+        const isFrom =
+          at.getTime() === new Date('2026-09-27T00:05:00Z').getTime();
+        return Promise.resolve({
+          ...historicalPrice(),
+          tokenId,
+          requestedAt: at,
+          observedAt: at,
+          price:
+            tokenId === '111'
+              ? isFrom
+                ? '0.4'
+                : '0.5'
+              : isFrom
+                ? '0.6'
+                : '0.55',
+          exactTimestamp: true,
+        });
+      });
+    const controller = controllerWith(
+      { getById: () => Promise.resolve(marketDetails()) },
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getPriceAt },
+    );
+
+    await expect(
+      controller.getMarketPriceChange(
+        '703257',
+        '2026-09-27T00:05:00Z',
+        '2026-09-27T00:07:00Z',
+      ),
+    ).resolves.toMatchObject({
+      outcomes: {
+        yes: { tokenId: '111', priceChange: '0.1', direction: 'up' },
+        no: { tokenId: '222', priceChange: '-0.05', direction: 'down' },
+      },
+      combinedPriceChange: '0.05',
+      combinedDirection: 'up',
+      sameFromObservedTimestamp: true,
+      sameToObservedTimestamp: true,
+      sameFromResolution: true,
+      sameToResolution: true,
+      atomicSnapshot: false,
+      executable: false,
+    });
+    expect(getPriceAt).toHaveBeenCalledTimes(4);
+  });
+
+  it.each([
+    ['0', '2026-09-27T00:05:00Z', '2026-09-27T00:07:00Z'],
+    ['703257', undefined, '2026-09-27T00:07:00Z'],
+    ['703257', 'invalid', '2026-09-27T00:07:00Z'],
+    ['703257', '2026-09-27T00:07:00Z', '2026-09-27T00:07:00Z'],
+  ])('rejects invalid binary price-change query %#', async (id, from, to) => {
+    await expect(
+      controllerWith({}).getMarketPriceChange(id, from, to),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('maps incoherent binary price changes to service unavailable', async () => {
+    const controller = controllerWith({
+      getById: () =>
+        Promise.reject(
+          new PredictionMarketBinaryPriceChangeIncoherentError('703257'),
+        ),
+    });
+    await expect(
+      controller.getMarketPriceChange(
+        '703257',
+        '2026-09-27T00:05:00Z',
+        '2026-09-27T00:07:00Z',
+      ),
     ).rejects.toThrow(ServiceUnavailableException);
   });
 });
@@ -1999,6 +2214,13 @@ function controllerWith(
     discovery,
     priceHistoryService,
   );
+  const priceChange = new PredictionMarketPriceChangeService(
+    priceHistoryService,
+  );
+  const binaryPriceChange = new PredictionMarketBinaryPriceChangeService(
+    discovery,
+    priceChange,
+  );
   return new PolymarketController(
     events,
     tags,
@@ -2018,6 +2240,8 @@ function controllerWith(
     globalOpenInterest,
     priceHistoryService,
     priceComplementAt,
+    priceChange,
+    binaryPriceChange,
   );
 }
 

@@ -12,6 +12,7 @@ import { PredictionDataFreshnessService } from '../application/prediction-data-f
 import { PredictionEventService } from '../application/prediction-event.service';
 import { PredictionEventLiveVolumeService } from '../application/prediction-event-live-volume.service';
 import { PredictionGlobalOpenInterestService } from '../application/prediction-global-open-interest.service';
+import { PredictionMarketBinaryPriceChangeService } from '../application/prediction-market-binary-price-change.service';
 import { PredictionMarketBinaryResolutionService } from '../application/prediction-market-binary-resolution.service';
 import { PredictionMarketDataObservationService } from '../application/prediction-market-data-observation.service';
 import { PredictionMarketLastTradeService } from '../application/prediction-market-last-trade.service';
@@ -20,6 +21,7 @@ import { PredictionMarketMidpointComplementService } from '../application/predic
 import { PredictionMarketOrderBookService } from '../application/prediction-market-order-book.service';
 import { PredictionMarketOpenInterestService } from '../application/prediction-market-open-interest.service';
 import { PredictionMarketPricingService } from '../application/prediction-market-pricing.service';
+import { PredictionMarketPriceChangeService } from '../application/prediction-market-price-change.service';
 import { PredictionMarketPriceHistoryService } from '../application/prediction-market-price-history.service';
 import { PredictionMarketPriceComplementAtService } from '../application/prediction-market-price-complement-at.service';
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
@@ -30,6 +32,10 @@ import {
   PredictionMarketDataIncoherentError,
   PredictionMarketDataObservation,
 } from '../domain/prediction-market-data-observation';
+import {
+  PredictionMarketBinaryPriceChange,
+  PredictionMarketBinaryPriceChangeIncoherentError,
+} from '../domain/prediction-market-binary-price-change';
 import {
   PredictionMarketBinaryResolution,
   PredictionMarketBinaryResolutionIncoherentError,
@@ -82,6 +88,10 @@ import {
   PredictionMarketPriceHistoryResolution,
   PredictionMarketPriceHistoryUnavailableError,
 } from '../domain/prediction-market-price-history';
+import {
+  PredictionMarketPriceChange,
+  PredictionMarketPriceChangeIncoherentError,
+} from '../domain/prediction-market-price-change';
 import {
   PredictionMarketPriceComplementAt,
   PredictionMarketPriceComplementAtIncoherentError,
@@ -136,6 +146,8 @@ export class PolymarketController {
     private readonly globalOpenInterest: PredictionGlobalOpenInterestService,
     private readonly priceHistory: PredictionMarketPriceHistoryService,
     private readonly priceComplementAt: PredictionMarketPriceComplementAtService,
+    private readonly priceChange: PredictionMarketPriceChangeService,
+    private readonly binaryPriceChange: PredictionMarketBinaryPriceChangeService,
   ) {}
 
   @Get('data-freshness')
@@ -532,6 +544,44 @@ export class PolymarketController {
     }
   }
 
+  @Get('markets/:id/price-change')
+  async getMarketPriceChange(
+    @Param('id') id: string,
+    @Query('from') from: string | undefined,
+    @Query('to') to: string | undefined,
+  ): Promise<PredictionMarketBinaryPriceChange> {
+    const parsedId = validMarketId(id);
+    const window = validPriceChangeWindow(from, to);
+    try {
+      return await this.binaryPriceChange.getPriceChange(
+        parsedId,
+        window.from,
+        window.to,
+      );
+    } catch (error) {
+      if (
+        error instanceof PredictionMarketNotFoundError ||
+        error instanceof PredictionMarketOutcomeTokensUnavailableError ||
+        error instanceof PredictionMarketHistoricalPriceUnavailableError
+      ) {
+        throw new NotFoundException(
+          'Polymarket binary historical price change is unavailable',
+        );
+      }
+      if (
+        error instanceof PredictionMarketBinaryPriceChangeIncoherentError ||
+        error instanceof PredictionMarketPriceChangeIncoherentError
+      ) {
+        throw new ServiceUnavailableException(
+          'Polymarket binary historical price change is incoherent',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket binary historical price-change providers are unavailable',
+      );
+    }
+  }
+
   @Get('outcomes/:tokenId/midpoint')
   async getOutcomeMidpoint(
     @Param('tokenId') tokenId: string,
@@ -617,6 +667,41 @@ export class PolymarketController {
       if (error instanceof PredictionMarketHistoricalPriceUnavailableError) {
         throw new NotFoundException(
           'Polymarket historical outcome price is unavailable',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket historical outcome-price provider is unavailable',
+      );
+    }
+  }
+
+  @Get('outcomes/:tokenId/price-change')
+  async getOutcomePriceChange(
+    @Param('tokenId') tokenId: string,
+    @Query('from') from: string | undefined,
+    @Query('to') to: string | undefined,
+  ): Promise<PredictionMarketPriceChange> {
+    if (!isPredictionMarketTokenId(tokenId)) {
+      throw new BadRequestException(
+        'tokenId must be a canonical Polymarket decimal token identifier',
+      );
+    }
+    const window = validPriceChangeWindow(from, to);
+    try {
+      return await this.priceChange.getPriceChange(
+        tokenId,
+        window.from,
+        window.to,
+      );
+    } catch (error) {
+      if (error instanceof PredictionMarketHistoricalPriceUnavailableError) {
+        throw new NotFoundException(
+          'Polymarket historical outcome price is unavailable',
+        );
+      }
+      if (error instanceof PredictionMarketPriceChangeIncoherentError) {
+        throw new ServiceUnavailableException(
+          'Polymarket historical outcome-price change is incoherent',
         );
       }
       throw new ServiceUnavailableException(
@@ -844,6 +929,23 @@ function validUtcSecond(value: string | undefined, field: string): Date {
     );
   }
   return parsed;
+}
+
+function validPriceChangeWindow(
+  from: string | undefined,
+  to: string | undefined,
+): { from: Date; to: Date } {
+  const parsedFrom = validUtcSecond(from, 'from');
+  const parsedTo = validUtcSecond(to, 'to');
+  if (
+    parsedTo.getTime() <= parsedFrom.getTime() ||
+    parsedTo.getTime() - parsedFrom.getTime() > 31 * 24 * 60 * 60 * 1000
+  ) {
+    throw new BadRequestException(
+      'price-change window must be positive and no longer than 31 days',
+    );
+  }
+  return { from: parsedFrom, to: parsedTo };
 }
 
 function validPriceHistoryResolution(

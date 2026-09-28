@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PredictionMarketDiscoveryService } from './application/prediction-market-discovery.service';
 import { PredictionDataFreshnessService } from './application/prediction-data-freshness.service';
+import { PredictionMarketBinaryPriceChangeService } from './application/prediction-market-binary-price-change.service';
 import { PredictionMarketBinaryResolutionService } from './application/prediction-market-binary-resolution.service';
 import { PredictionEventService } from './application/prediction-event.service';
 import { PredictionEventLiveVolumeService } from './application/prediction-event-live-volume.service';
@@ -13,6 +14,7 @@ import { PredictionMarketMidpointComplementService } from './application/predict
 import { PredictionMarketOrderBookService } from './application/prediction-market-order-book.service';
 import { PredictionMarketOpenInterestService } from './application/prediction-market-open-interest.service';
 import { PredictionMarketPricingService } from './application/prediction-market-pricing.service';
+import { PredictionMarketPriceChangeService } from './application/prediction-market-price-change.service';
 import { PredictionMarketPriceHistoryService } from './application/prediction-market-price-history.service';
 import { PredictionMarketPriceComplementAtService } from './application/prediction-market-price-complement-at.service';
 import { PredictionMarketResolutionService } from './application/prediction-market-resolution.service';
@@ -159,6 +161,7 @@ import { PolymarketController } from './presentation/polymarket.controller';
     PredictionEventService,
     PredictionEventLiveVolumeService,
     PredictionGlobalOpenInterestService,
+    PredictionMarketBinaryPriceChangeService,
     PredictionMarketBinaryResolutionService,
     PredictionMarketDataObservationService,
     PredictionMarketLastTradeContextService,
@@ -167,6 +170,7 @@ import { PolymarketController } from './presentation/polymarket.controller';
     PredictionMarketOrderBookService,
     PredictionMarketOpenInterestService,
     PredictionMarketPricingService,
+    PredictionMarketPriceChangeService,
     PredictionMarketPriceHistoryService,
     PredictionMarketPriceComplementAtService,
     PredictionMarketResolutionService,

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-28 — M9.32 binary point-in-time price change completed
+
+- Added `GET /polymarket/markets/:id/price-change` for one selected binary market and a required positive whole-second UTC interval of at most 31 days.
+- Concurrently compose the indexed YES and NO M9.31 changes only after validating present, distinct token identities and returned interval coherence.
+- Preserve all four historical observations and expose cross-outcome timestamp and resolution alignment independently at the interval's start and end.
+- Calculate the exact combined YES/NO price change and direction with isolated decimal arithmetic while keeping `atomicSnapshot: false` and `executable: false` invariant.
+
+## 2026-09-28 — M9.31 outcome point-in-time price change completed
+
+- Added `GET /polymarket/outcomes/:tokenId/price-change` for one canonical token and a required positive whole-second UTC interval of at most 31 days.
+- Concurrently compose two M9.29 observations only after validating token identities, echoed requested times, and nondecreasing provider observation time.
+- Calculate the exact signed price change with isolated decimal arithmetic and classify it as `up`, `down`, or `unchanged`.
+- Preserve both complete observations and expose same-observed-time and same-resolution flags with invariant non-executable semantics and no percentage-return, quote, trade, or recommendation claim.
+
 ## 2026-09-28 — M9.30 binary point-in-time price complement completed
 
 - Added `GET /polymarket/markets/:id/price-complement-at` for one selected binary market and canonical whole-second UTC instant.

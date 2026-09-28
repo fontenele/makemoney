@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, **M6 — Backtesting (M6.1–M6.32)**, **M7 — New Listing Scanner (M7.1–M7.109)**, and **M8 — Dashboard (M8.1–M8.11)**.
-- M9 is in progress through **M9.30 — Binary Point-in-Time Price Complement**.
+- M9 is in progress through **M9.32 — Binary Point-in-Time Price Change**.
 - M6 is closed. M7.1–M7.109 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -414,6 +414,10 @@ M9.28 loads one bounded public Data API price-history page at `GET /polymarket/o
 M9.29 loads the last public Data API outcome-price observation at or before one explicit instant through `GET /polymarket/outcomes/:tokenId/price-at`. It preserves requested and observed timestamps, exact decimal price, actual provider resolution, and whether the timestamp matched exactly without scanning history, inferring a price, or adding trade, account, persistence, or execution behavior.
 
 M9.30 composes the indexed YES and NO M9.29 observations for one selected binary market at `GET /polymarket/markets/:id/price-complement-at`. It calculates their exact sum and deviation from one while preserving independent observed times and resolutions and explicitly denying atomic-snapshot, quote, arbitrage, recommendation, or execution semantics.
+
+M9.31 composes two M9.29 observations for one outcome token at `GET /polymarket/outcomes/:tokenId/price-change`. It requires a positive canonical UTC interval of at most 31 days, calculates the exact signed price change and direction, preserves both independently selected observations, and exposes timestamp and resolution alignment without inferring returns, trades, quotes, or execution.
+
+M9.32 composes the indexed YES and NO M9.31 changes for one selected binary market at `GET /polymarket/markets/:id/price-change`. It reports each exact outcome change plus their exact combined change while preserving cross-outcome timestamp and resolution alignment at both interval boundaries and explicitly denying atomic-snapshot, probability, recommendation, or execution semantics.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

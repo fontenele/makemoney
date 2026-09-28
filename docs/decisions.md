@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-09-28 — Binary historical movement preserves four independent observations
+
+M9.32 loads the selected market once, requires distinct indexed YES and NO tokens, and concurrently composes one M9.31 change per outcome over the same bounded interval. Returned token identities and requested interval endpoints must match the selected market and caller exactly.
+
+The response keeps all four provider-selected observations and reports cross-outcome timestamp and resolution alignment separately at the start and end. Exact combined change is descriptive only: `atomicSnapshot: false` remains invariant, and neither the combined direction nor opposing outcome directions imply probability coherence, arbitrage, recommendation, or executability.
+
+## 2026-09-28 — Historical price change composes point observations without inventing a return
+
+M9.31 reuses two concurrent M9.29 point-in-time lookups for one canonical outcome token instead of scanning a history page. The local route bounds the requested interval to 31 days and requires the later request instant to be strictly greater than the earlier one.
+
+Both returned token identities and requested instants must match, and the later request must not yield an earlier provider observation. The response preserves both observations and their resolution/timestamp alignment while reporting only the exact signed price difference and `up`, `down`, or `unchanged`. It deliberately omits percentage change because a valid starting price may be zero and makes no quote, trade, fill, recommendation, or execution claim.
+
 ## 2026-09-28 — Preserve independent clocks in historical binary comparison
 
 M9.30 composes the indexed YES and NO M9.29 observations only after loading the selected market and verifying both token identities and requested instants. The two provider lookups run concurrently, but their observed timestamps and resolutions remain independent and are never relabeled as one synchronized snapshot.
