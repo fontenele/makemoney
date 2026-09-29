@@ -6,6 +6,8 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
+M9.35 is complete: every local Polymarket route now fails closed behind `POLYMARKET_ENABLED`, whose application and Compose default is `false`. Disabled requests return a sanitized `503` before any provider call; explicit enablement requires a process restart and remains a local operational choice for use only when access is permitted and the required VPN is active.
+
 M9.34 is complete: the local dashboard now lists eight active Polymarket questions and lets the user select one to view its indexed outcome labels, independent YES/NO midpoint percentages, and aggregate open interest. Resource failures remain isolated, sanitized backend diagnostics are displayed for unavailable resources, and the surface has no recommendation, account, mutation, order, or execution controls.
 
 M9.33 is complete: one public route resolves a canonical outcome token to its CLOB condition plus distinct indexed YES and NO token identities. It verifies exact requested-token membership, reports the requested outcome side, and remains stateless, identity-only, and non-executable without positions or accounts.
@@ -452,10 +454,10 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-29 after M9.34:
+The following passed on 2026-09-29 after M9.35:
 
 - `npm run test:dashboard` — 22 tests passed across 5 files
-- `npm test -- --runInBand` — 1,533 backend tests passed across 132 suites
+- `npm test -- --runInBand` — 1,540 backend tests passed across 133 suites
 - `npm run lint`
 - `npm run format:check`
 - `npm run build:all`
@@ -542,6 +544,7 @@ The complete database-backed integration validation passed after E2E isolation:
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live production entry point — `GET /dashboard/` returned HTML, its hashed asset returned 200 under `/dashboard/assets/`, production API paths omitted the development proxy prefix, and `GET /health` remained healthy.
 - Public Polymarket live-contract check — with the development VPN active, Gamma returned eight real active-market summaries and selected-market identity, the Data API returned real open interest, and CLOB returned the documented `mid` response used by the corrected midpoint adapter.
+- Polymarket operational guard live check — an explicitly enabled VPN-backed Compose API returned `200` from real market discovery; the API was then recreated with the default disabled state, where both the direct route and Vite proxy returned sanitized `503` before provider access while `/health` remained `ok`.
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live Binance historical-candle smoke test — the public market-data-only kline endpoint returned ordered BTCUSDT one-minute rows with the documented 12 fields and no credentials
 - Live paper wallet initialization — reported BTC `0` and USDT `1000` from the default configuration
@@ -551,7 +554,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.34. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the first read-only dashboard research surface are isolated from Spot crypto and every execution path. Live Gamma, Data API, and CLOB dashboard paths passed with the development VPN active.
+M0 through M8.11 are complete, and M9 is implemented through M9.35. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the first read-only dashboard research surface are isolated from Spot crypto and every execution path. Live Gamma, Data API, and CLOB dashboard paths passed with the development VPN active; normal runtime now defaults to disabled.
 
 ## Known issues and cautions
 

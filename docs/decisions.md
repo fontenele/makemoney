@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-29 — Default Polymarket provider access to disabled
+
+M9.35 uses one controller-wide NestJS guard instead of duplicating checks across every route or adapter. `POLYMARKET_ENABLED` defaults to `false`, and the guard returns a sanitized `503` before route-handler execution, guaranteeing that a disabled request cannot contact Gamma, CLOB, or the Data API.
+
+Enablement remains startup-only and explicit. The application does not attempt to detect, start, configure, or bypass a VPN or jurisdictional network restriction; operators enable the flag only when access is locally permitted and the required network setup is already active.
+
 ## 2026-09-29 — Compose the first Polymarket dashboard from independent resources
 
 M9.34 uses the existing bounded market-discovery route for visible questions and loads selected-market detail, open interest, and midpoint complement independently. It does not introduce an aggregate backend endpoint because the component observations have different freshness and availability contracts.

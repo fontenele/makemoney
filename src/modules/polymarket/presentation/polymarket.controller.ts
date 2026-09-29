@@ -6,6 +6,7 @@ import {
   Param,
   Query,
   ServiceUnavailableException,
+  UseGuards,
 } from '@nestjs/common';
 import { PredictionMarketDiscoveryService } from '../application/prediction-market-discovery.service';
 import { PredictionDataFreshnessService } from '../application/prediction-data-freshness.service';
@@ -28,6 +29,7 @@ import { PredictionMarketResolutionService } from '../application/prediction-mar
 import { PredictionMarketTokenParentService } from '../application/prediction-market-token-parent.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
 import { PredictionSeriesService } from '../application/prediction-series.service';
+import { PolymarketEnabledGuard } from './polymarket-enabled.guard';
 import { PredictionDataFreshnessObservation } from '../domain/prediction-data-freshness';
 import {
   PredictionMarketDataIncoherentError,
@@ -132,6 +134,7 @@ const MAXIMUM_OFFSET = 10_000;
 const CURSOR = /^\S{1,4096}$/u;
 
 @Controller('polymarket')
+@UseGuards(PolymarketEnabledGuard)
 export class PolymarketController {
   constructor(
     private readonly events: PredictionEventService,

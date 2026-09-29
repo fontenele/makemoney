@@ -51,6 +51,7 @@ import { PolymarketGammaEventClient } from './infrastructure/polymarket-gamma-ev
 import { PolymarketGammaTagClient } from './infrastructure/polymarket-gamma-tag.client';
 import { PolymarketGammaSeriesClient } from './infrastructure/polymarket-gamma-series.client';
 import { PolymarketController } from './presentation/polymarket.controller';
+import { PolymarketEnabledGuard } from './presentation/polymarket-enabled.guard';
 
 @Module({
   controllers: [PolymarketController],
@@ -188,6 +189,7 @@ import { PolymarketController } from './presentation/polymarket.controller';
     PredictionMarketTokenParentService,
     PredictionTagService,
     PredictionSeriesService,
+    PolymarketEnabledGuard,
   ],
 })
 export class PolymarketModule {}

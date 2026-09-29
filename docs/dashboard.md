@@ -118,4 +118,6 @@ Selecting one market concurrently loads its existing detail, open-interest, and 
 
 Unavailable responses display a bounded, sanitized message returned by the local API when one exists. In particular, active-market discovery distinguishes provider DNS-resolution failure from an otherwise generic `503`; malformed or non-JSON errors retain the HTTP-status fallback.
 
+M9.35 makes the complete Polymarket API fail closed by default. With `POLYMARKET_ENABLED=false`, the section displays `Polymarket research is disabled by configuration`, and no provider request is attempted. The flag is enabled only through local startup configuration while permitted provider access and the required VPN are already available.
+
 Selection remains browser-local and refreshes with the established visibility-aware dashboard cadence. Midpoints remain explicitly non-executable, are not atomic quotes, and are not recommendations or probability guarantees. The view does not yet display event-level volume, price history, full order-book depth, last trades, holders, positions, accounts, orders, or execution controls.

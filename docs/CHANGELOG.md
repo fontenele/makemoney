@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-29 — M9.35 Polymarket operational availability guard completed
+
+- Added one controller-wide guard covering every `/polymarket` route before any Gamma, CLOB, or Data API call.
+- Added validated `POLYMARKET_ENABLED` configuration with fail-closed `false` defaults in application and Compose configuration.
+- Return a sanitized local `503` while disabled so the dashboard reports the operational state without attempting provider access.
+- Documented explicit enablement only when local access is permitted and the required VPN is already active; no network-block bypass or automatic VPN detection was introduced.
+
 ## 2026-09-29 — M9.34 Polymarket dashboard research completed
 
 - Added a responsive Polymarket dashboard section backed only by existing local read-only APIs.
