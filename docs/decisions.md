@@ -1,5 +1,23 @@
 # Technical Decisions
 
+## 2026-09-29 — Keep provider freshness descriptive and feed-specific
+
+M9.41 displays the established Data API freshness observation separately from local application health and from Gamma/CLOB resources. Snapshot age, serving lag, ingestion lag, and cursor coverage are provider facts; the dashboard does not invent green/amber/red thresholds or generalize them to APIs the status endpoint does not measure.
+
+The freshness request participates in the general dashboard refresh but retains an independent unavailable state. Provider-status failure therefore cannot hide settings, discovery, or selected-market research.
+
+## 2026-09-29 — Chart bounded outcome histories on a fixed probability scale
+
+M9.40 requests the established outcome price-history route independently for YES and NO with a trailing 24-hour window, 30-minute resolution, and a 100-point cap. At most 49 bucket observations fit that interval, so one page is sufficient without adding browser pagination or hidden provider traffic.
+
+The ECharts vertical axis remains fixed from zero to one. This preserves the outcome-price domain and prevents a narrow dynamic scale from visually exaggerating small movements. The two pages are displayed together but never treated as synchronized snapshots; either valid series can render without its peer.
+
+## 2026-09-29 — Reuse the binary comparison for dashboard movement
+
+M9.39 calls the existing market-level price-change route once per selected-market refresh over a trailing 24-hour UTC window truncated to whole seconds. Reusing the composed backend contract keeps market identity reconciliation, exact decimal subtraction, and historical alignment semantics outside the browser.
+
+The view labels each value as an absolute percentage-point change rather than a percentage return because the established API deliberately supports an earlier price of zero. The historical resource remains independent from current midpoint, book, trade, and open-interest observations, so its failure does not hide them.
+
 ## 2026-09-29 — Keep dashboard latest trades separate from current books
 
 M9.38 requests the existing latest-trade route independently for each indexed YES and NO token after selected-market identity is available. It does not use the last-trade context route or merge a trade with the displayed level-one book because the provider observations are non-atomic and the dashboard does not need to infer a book-relative classification.

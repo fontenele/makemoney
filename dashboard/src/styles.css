@@ -582,6 +582,47 @@ h1 em {
   margin: 0 0 20px;
 }
 
+.polymarket-freshness {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin-bottom: 20px;
+  background: var(--line);
+}
+
+.polymarket-freshness > div {
+  display: grid;
+  min-height: 94px;
+  gap: 9px;
+  padding: 15px;
+  background: var(--panel);
+}
+
+.polymarket-freshness span,
+.polymarket-freshness small,
+.polymarket-freshness-unavailable {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.polymarket-freshness span {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.polymarket-freshness strong {
+  align-self: end;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.polymarket-freshness-unavailable {
+  margin: 0 0 20px;
+}
+
 .polymarket-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -630,6 +671,122 @@ h1 em {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin-top: 12px;
+}
+
+.polymarket-change-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.polymarket-change {
+  display: grid;
+  min-height: 112px;
+  gap: 12px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.polymarket-change span,
+.polymarket-change small,
+.polymarket-change-unavailable {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.polymarket-change strong {
+  align-self: end;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.polymarket-change strong.up {
+  color: var(--green-bright);
+}
+
+.polymarket-change strong.down {
+  color: var(--red);
+}
+
+.polymarket-change-unavailable {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 17px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  text-transform: none;
+}
+
+.polymarket-price-chart {
+  margin: 12px 0 0;
+  padding: 18px 18px 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.polymarket-price-chart .dashboard-chart {
+  display: block;
+  width: 100%;
+  height: 210px;
+  margin-top: 10px;
+}
+
+.polymarket-price-legend {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.polymarket-price-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.polymarket-price-legend i {
+  width: 14px;
+  height: 2px;
+}
+
+.polymarket-price-legend .yes-line {
+  background: var(--green-bright);
+}
+
+.polymarket-price-legend .no-line {
+  background: var(--red);
+}
+
+.polymarket-price-legend small {
+  margin-left: auto;
+}
+
+.polymarket-price-diagnostics {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.polymarket-price-unavailable {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
 }
 
 .polymarket-trade {
@@ -1317,7 +1474,8 @@ footer {
   }
 
   .polymarket-grid,
-  .polymarket-stat-grid {
+  .polymarket-stat-grid,
+  .polymarket-freshness {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1336,6 +1494,20 @@ footer {
 
   .polymarket-trade-grid {
     grid-template-columns: 1fr;
+  }
+
+  .polymarket-change-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .polymarket-price-legend {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .polymarket-price-legend small {
+    margin-left: 0;
   }
 
   .backtest-metrics {
@@ -1364,6 +1536,10 @@ footer {
 
   .brand small {
     display: none;
+  }
+
+  .polymarket-freshness {
+    grid-template-columns: 1fr;
   }
 
   .topbar-actions {

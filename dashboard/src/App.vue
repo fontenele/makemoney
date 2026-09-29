@@ -19,6 +19,7 @@ import {
 import { buildSignalChart } from './signal-chart';
 import { buildListingPerformanceChart } from './listing-performance-chart';
 import { buildEquityChart } from './equity-chart';
+import { buildPolymarketPriceChart } from './polymarket-price-chart';
 import DashboardChart from './DashboardChart.vue';
 
 const snapshot = ref<DashboardSnapshot | null>(null);
@@ -67,6 +68,18 @@ const equityChart = computed(() =>
     ? buildEquityChart(latestBacktest.value.result.simulation.equity.curve)
     : null,
 );
+const polymarketPriceChart = computed(() => {
+  const research = polymarketResearch.value;
+  if (!research) return null;
+  return buildPolymarketPriceChart(
+    available(research.yesPriceHistory24h)
+      ? research.yesPriceHistory24h.data
+      : null,
+    available(research.noPriceHistory24h)
+      ? research.noPriceHistory24h.data
+      : null,
+  );
+});
 
 async function refreshListingPerformance(
   listing: DetectedSpotSymbol,
@@ -186,6 +199,12 @@ function probability(value: string): string {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return '—';
   return (parsed * 100).toFixed(1) + '%';
+}
+
+function probabilityChange(value: string): string {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return '—';
+  return `${parsed > 0 ? '+' : ''}${(parsed * 100).toFixed(1)} pp`;
 }
 
 function timestamp(value: string): string {
@@ -767,6 +786,77 @@ onUnmounted(() => autoRefresh.stop());
         }}
       </p>
 
+      <div
+        v-if="available(snapshot?.polymarketDataFreshness)"
+        class="polymarket-freshness"
+      >
+        <div>
+          <span>Data API snapshot age</span>
+          <strong>
+            {{
+              decimal(
+                String(
+                  snapshot.polymarketDataFreshness.data.snapshotAgeSeconds,
+                ),
+                0,
+              )
+            }}s
+          </strong>
+          <small>
+            Computed
+            {{ timestamp(snapshot.polymarketDataFreshness.data.computedAt) }}
+          </small>
+        </div>
+        <div>
+          <span>Serving lag</span>
+          <strong>
+            {{
+              decimal(
+                String(
+                  snapshot.polymarketDataFreshness.data.serving.lagSeconds,
+                ),
+                0,
+              )
+            }}s
+          </strong>
+          <small>
+            Worst mechanism:
+            {{ snapshot.polymarketDataFreshness.data.serving.worst }}
+          </small>
+        </div>
+        <div>
+          <span>Ingestion lag</span>
+          <strong>
+            {{
+              snapshot.polymarketDataFreshness.data.ingestion.mostLagged
+                .behindMax
+            }}
+            blocks
+          </strong>
+          <small>
+            {{
+              snapshot.polymarketDataFreshness.data.ingestion.mostLagged.source
+            }}
+            · {{ snapshot.polymarketDataFreshness.data.ingestion.network }}
+          </small>
+        </div>
+        <div>
+          <span>Coverage</span>
+          <strong>
+            {{ snapshot.polymarketDataFreshness.data.ingestion.cursorCount }}
+            cursors
+          </strong>
+          <small>Public Data API status · not local health</small>
+        </div>
+      </div>
+      <p v-else class="empty-state polymarket-freshness-unavailable">
+        Data API freshness:
+        {{
+          snapshot?.polymarketDataFreshness.message ??
+          'Loading provider freshness…'
+        }}
+      </p>
+
       <template v-if="available(snapshot?.polymarketMarkets)">
         <p
           v-if="snapshot.polymarketMarkets.data.markets.length === 0"
@@ -937,11 +1027,89 @@ onUnmounted(() => autoRefresh.stop());
               <small v-else>{{ trade.resource.message }}</small>
             </article>
           </div>
+          <div v-if="polymarketResearch" class="polymarket-change-grid">
+            <article
+              v-for="change in available(polymarketResearch.priceChange24h)
+                ? [
+                    {
+                      label: 'YES',
+                      data: polymarketResearch.priceChange24h.data.outcomes.yes,
+                    },
+                    {
+                      label: 'NO',
+                      data: polymarketResearch.priceChange24h.data.outcomes.no,
+                    },
+                  ]
+                : []"
+              :key="change.label"
+              class="polymarket-change"
+            >
+              <span>{{ change.label }} 24-hour price change</span>
+              <strong :class="change.data.direction">
+                {{ probabilityChange(change.data.priceChange) }}
+              </strong>
+              <small>
+                {{ change.data.direction }} · independently selected historical
+                observations
+              </small>
+            </article>
+            <p
+              v-if="!available(polymarketResearch.priceChange24h)"
+              class="polymarket-change-unavailable"
+            >
+              24-hour price change:
+              {{ polymarketResearch.priceChange24h.message }}
+            </p>
+          </div>
+          <figure
+            v-if="polymarketResearch && polymarketPriceChart"
+            class="polymarket-price-chart"
+          >
+            <div class="polymarket-price-legend">
+              <span v-if="polymarketPriceChart.yesPoints.length > 0">
+                <i class="yes-line"></i>YES ·
+                {{ polymarketPriceChart.yesPoints.length }} points
+              </span>
+              <span v-if="polymarketPriceChart.noPoints.length > 0">
+                <i class="no-line"></i>NO ·
+                {{ polymarketPriceChart.noPoints.length }} points
+              </span>
+              <small>Trailing 24h · 30m resolution</small>
+            </div>
+            <DashboardChart
+              :option="polymarketPriceChart.option"
+              label="Polymarket YES and NO historical prices over the trailing 24 hours"
+            />
+            <div class="polymarket-price-diagnostics">
+              <small v-if="!available(polymarketResearch.yesPriceHistory24h)">
+                YES history: {{ polymarketResearch.yesPriceHistory24h.message }}
+              </small>
+              <small v-if="!available(polymarketResearch.noPriceHistory24h)">
+                NO history: {{ polymarketResearch.noPriceHistory24h.message }}
+              </small>
+            </div>
+          </figure>
+          <div
+            v-else-if="polymarketResearch"
+            class="polymarket-price-unavailable"
+          >
+            <small v-if="!available(polymarketResearch.yesPriceHistory24h)">
+              YES history: {{ polymarketResearch.yesPriceHistory24h.message }}
+            </small>
+            <small v-else>YES history returned no plottable points</small>
+            <small v-if="!available(polymarketResearch.noPriceHistory24h)">
+              NO history: {{ polymarketResearch.noPriceHistory24h.message }}
+            </small>
+            <small v-else>NO history returned no plottable points</small>
+          </div>
           <p class="polymarket-note">
-            Midpoints, level-one books, and latest reported trades are
-            independent observations. Trades have no provider timestamp or
-            quantity; none of these values are executable quotes, depth, fill
-            guarantees, or recommendations.
+            Midpoints, level-one books, latest reported trades, and 24-hour
+            historical comparisons are independent observations. The chart uses
+            bounded 30-minute history pages and does not imply synchronized
+            YES/NO snapshots. Trades have no provider timestamp or quantity;
+            changes are absolute percentage points, not returns. None of these
+            values are executable quotes, depth, fill guarantees, signals, or
+            recommendations.
           </p>
         </article>
       </template>

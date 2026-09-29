@@ -4,6 +4,12 @@ Last validated: 2026-09-29
 
 The startup validator accepts strictly positive canonical fractional values such as `0.01` for risk limits, matching the documented defaults and `.env.example`.
 
+M9.41 is complete: the dashboard now displays the public Polymarket Data API freshness snapshot independently from local health and market discovery. Snapshot age, serving lag, worst ingestion cursor, network, and cursor count remain descriptive provider facts without invented thresholds, Gamma/CLOB freshness claims, alerts, recommendations, or execution behavior.
+
+M9.40 is complete: selected Polymarket markets now plot independently loaded YES and NO price histories over the trailing 24-hour UTC window at 30-minute resolution. Each first page is bounded to 100 points, either outcome can render alone, and the fixed zero-to-one scale adds no synchronized-snapshot, probability-guarantee, signal, recommendation, or execution claim.
+
+M9.39 is complete: selected Polymarket markets now display the existing binary historical comparison over a trailing 24-hour UTC window. YES and NO movements are shown as exact absolute percentage-point changes, historical unavailability remains isolated from current observations, and the view makes no percentage-return, atomic-snapshot, signal, recommendation, or execution claim.
+
 ## Milestone status
 
 M9.38 is complete: selected Polymarket markets now display independently loaded YES and NO latest reported trades with exact price, provider-reported side, and local receipt time. Each outcome retains isolated unavailability, and the view explicitly states that the provider supplies neither trade quantity nor timestamp. These observations are not quotes, fill guarantees, signals, recommendations, or trade history.
@@ -460,6 +466,36 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
+The following passed on 2026-09-29 after M9.41:
+
+- `npm run test:dashboard` — 32 tests passed across 6 files
+- `npm test -- --runInBand` — 1,551 backend tests passed across 135 suites
+- `npm run format:check`
+- `npm run lint`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
+The following passed on 2026-09-29 after M9.40:
+
+- `npm run test:dashboard` — 31 tests passed across 6 files
+- `npm test -- --runInBand` — 1,551 backend tests passed across 135 suites; M9.40 changes no backend code
+- `npm run format:check`
+- `npm run lint`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
+The following passed on 2026-09-29 after M9.39:
+
+- `npm run test:dashboard` — 27 tests passed across 5 files
+- `npm test -- --runInBand` — 1,551 backend tests passed across 135 suites
+- `npm run format:check`
+- `npm run lint`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
 The following passed on 2026-09-29 after M9.38:
 
 - `npm run test:dashboard` — 26 tests passed across 5 files
@@ -581,7 +617,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.38. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the dashboard's selected-market midpoint, open-interest, level-one liquidity, latest reported trades, and process-local availability control are isolated from Spot crypto and every execution path. Live Gamma, Data API, and CLOB dashboard paths passed with the development VPN active; startup and post-restart behavior defaults to disabled.
+M0 through M8.11 are complete, and M9 is implemented through M9.41. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the dashboard's Data API freshness, selected-market midpoint, open-interest, level-one liquidity, latest reported trades, trailing 24-hour price change and history chart, and process-local availability control are isolated from Spot crypto and every execution path. Live Gamma, Data API, and CLOB dashboard paths passed with the development VPN active; startup and post-restart behavior defaults to disabled.
 
 ## Known issues and cautions
 

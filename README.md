@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M8 are complete, and M9 is in progress through bounded outcome and binary point-in-time Polymarket price comparison. Market feeds and bounded historical observations are public and unauthenticated; capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
+Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M8 are complete, and M9 is in progress through selected-market Polymarket dashboard research, including Data API freshness plus bounded 24-hour price comparison and history charts. Market feeds and bounded historical observations are public and unauthenticated; capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -37,7 +37,7 @@ Start the read-only dashboard separately after the API is listening on port 3000
 npm run dashboard:dev
 ```
 
-Open `http://127.0.0.1:5173`. The Vite development server is loopback-only and proxies `/api` to the local NestJS API. The dashboard shows health, fictional portfolio valuation, BTC paper position, realized paper performance, the twelve most recent fictional executions, eight recent application-detected new listings, and eight active public Polymarket questions with selectable read-only YES/NO midpoint, open-interest, and level-one bid/ask research; responsive header links navigate among those sections. Each unavailable API resource remains explicitly unavailable instead of being replaced with fabricated data. It refreshes every 15 seconds after the preceding load completes, pauses while the tab is hidden, and refreshes immediately when the tab becomes visible again.
+Open `http://127.0.0.1:5173`. The Vite development server is loopback-only and proxies `/api` to the local NestJS API. The dashboard shows health, fictional portfolio valuation, BTC paper position, realized paper performance, the twelve most recent fictional executions, eight recent application-detected new listings, and eight active public Polymarket questions with Data API freshness plus selectable read-only YES/NO midpoint, open-interest, level-one bid/ask, latest-trade, trailing 24-hour price change, and bounded 30-minute history charts; responsive header links navigate among those sections. Each unavailable API resource remains explicitly unavailable instead of being replaced with fabricated data. It refreshes every 15 seconds after the preceding load completes, pauses while the tab is hidden, and refreshes immediately when the tab becomes visible again.
 
 For the compiled same-origin dashboard, build both applications and start the production entry point:
 

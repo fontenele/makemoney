@@ -69,19 +69,45 @@ describe('loadDashboard', () => {
                             ],
                             nextCursor: null,
                           }
-                        : [
-                            {
-                              strategy: 'moving_average_crossover',
-                              symbol: 'BTC/USDT',
-                              action: 'hold',
-                            },
-                          ];
+                        : path.endsWith('/polymarket/data-freshness')
+                          ? {
+                              provider: 'polymarket',
+                              snapshotAgeSeconds: 3,
+                              computedAt: '2026-09-29T18:00:00.000Z',
+                              ingestion: {
+                                chainId: 137,
+                                cursorCount: 4,
+                                lagging: [],
+                                maxSyncedBlock: 100,
+                                minSyncedBlock: 98,
+                                mostLagged: {
+                                  behindMax: 2,
+                                  block: 98,
+                                  source: 'positions',
+                                },
+                                network: 'polygon',
+                              },
+                              serving: {
+                                mechanisms: [],
+                                lagSeconds: 5,
+                                worst: 'trades',
+                              },
+                              source: 'data-api-status',
+                              receivedAt: '2026-09-29T18:00:01.000Z',
+                            }
+                          : [
+                              {
+                                strategy: 'moving_average_crossover',
+                                symbol: 'BTC/USDT',
+                                action: 'hold',
+                              },
+                            ];
       return Promise.resolve(Response.json(body));
     });
 
     const snapshot = await loadDashboard(request);
 
-    expect(request).toHaveBeenCalledTimes(10);
+    expect(request).toHaveBeenCalledTimes(11);
     expect(snapshot.health.status).toBe('available');
     expect(snapshot.valuation).toMatchObject({
       status: 'available',
@@ -108,6 +134,14 @@ describe('loadDashboard', () => {
     expect(snapshot.polymarketSettings).toMatchObject({
       status: 'available',
       data: { enabled: false, source: 'startup' },
+    });
+    expect(snapshot.polymarketDataFreshness).toMatchObject({
+      status: 'available',
+      data: {
+        snapshotAgeSeconds: 3,
+        serving: { lagSeconds: 5, worst: 'trades' },
+        ingestion: { network: 'polygon' },
+      },
     });
     expect(snapshot.polymarketMarkets).toMatchObject({
       status: 'available',
@@ -205,6 +239,7 @@ describe('loadDashboard', () => {
     expect(snapshot.strategySignals.status).toBe('unavailable');
     expect(snapshot.backtestRuns.status).toBe('unavailable');
     expect(snapshot.polymarketSettings.status).toBe('unavailable');
+    expect(snapshot.polymarketDataFreshness.status).toBe('unavailable');
     expect(snapshot.polymarketMarkets.status).toBe('unavailable');
   });
 
@@ -231,6 +266,29 @@ describe('loadDashboard', () => {
       message:
         'Polymarket market discovery is unavailable because provider DNS resolution failed',
     });
+  });
+
+  it('keeps Data API freshness failure isolated from market discovery', async () => {
+    const request = vi.fn((input: string | URL | Request) => {
+      if (input.toString().endsWith('/polymarket/data-freshness')) {
+        return Promise.resolve(
+          Response.json(
+            { message: 'Polymarket Data API freshness is unavailable' },
+            { status: 503 },
+          ),
+        );
+      }
+      return Promise.resolve(Response.json({ status: 'ok' }));
+    });
+
+    const snapshot = await loadDashboard(request);
+
+    expect(snapshot.polymarketDataFreshness).toEqual({
+      status: 'unavailable',
+      message: 'Polymarket Data API freshness is unavailable',
+    });
+    expect(snapshot.polymarketMarkets.status).toBe('available');
+    expect(snapshot.health.status).toBe('available');
   });
 
   it('keeps the dashboard available when stored backtests are unavailable', async () => {
@@ -305,7 +363,7 @@ describe('updatePolymarketSettings', () => {
 });
 
 describe('loadPolymarketMarketResearch', () => {
-  it('loads identity, market statistics, indexed books, and latest trades', async () => {
+  it('loads identity, market statistics, current observations, and bounded 24-hour history', async () => {
     const request = vi.fn((input: string | URL | Request) => {
       const path = input.toString();
       if (path.endsWith('/open-interest')) {
@@ -315,6 +373,36 @@ describe('loadPolymarketMarketResearch', () => {
         return Promise.resolve(
           Response.json({
             outcomes: { yes: { price: '0.62' }, no: { price: '0.38' } },
+          }),
+        );
+      }
+      if (path.includes('/price-change?')) {
+        return Promise.resolve(
+          Response.json({
+            requestedFrom: '2026-09-28T12:34:56.000Z',
+            requestedTo: '2026-09-29T12:34:56.000Z',
+            outcomes: {
+              yes: { priceChange: '0.04', direction: 'up' },
+              no: { priceChange: '-0.04', direction: 'down' },
+            },
+          }),
+        );
+      }
+      if (path.includes('/outcomes/111/price-history?')) {
+        return Promise.resolve(
+          Response.json({
+            tokenId: '111',
+            resolution: '30m',
+            points: [{ timestamp: '2026-09-29T12:00:00.000Z', price: '0.62' }],
+          }),
+        );
+      }
+      if (path.includes('/outcomes/222/price-history?')) {
+        return Promise.resolve(
+          Response.json({
+            tokenId: '222',
+            resolution: '30m',
+            points: [{ timestamp: '2026-09-29T12:00:00.000Z', price: '0.38' }],
           }),
         );
       }
@@ -345,9 +433,13 @@ describe('loadPolymarketMarketResearch', () => {
       );
     });
 
-    const research = await loadPolymarketMarketResearch('42', request);
+    const research = await loadPolymarketMarketResearch(
+      '42',
+      request,
+      new Date('2026-09-29T12:34:56.789Z'),
+    );
 
-    expect(request).toHaveBeenCalledTimes(7);
+    expect(request).toHaveBeenCalledTimes(10);
     expect(research.details.status).toBe('available');
     expect(research.openInterest).toMatchObject({
       status: 'available',
@@ -373,6 +465,31 @@ describe('loadPolymarketMarketResearch', () => {
       status: 'available',
       data: { price: '0.38', side: 'sell' },
     });
+    expect(research.priceChange24h).toMatchObject({
+      status: 'available',
+      data: {
+        outcomes: {
+          yes: { priceChange: '0.04', direction: 'up' },
+          no: { priceChange: '-0.04', direction: 'down' },
+        },
+      },
+    });
+    expect(research.yesPriceHistory24h).toMatchObject({
+      status: 'available',
+      data: { tokenId: '111', resolution: '30m' },
+    });
+    expect(research.noPriceHistory24h).toMatchObject({
+      status: 'available',
+      data: { tokenId: '222', resolution: '30m' },
+    });
+    expect(request).toHaveBeenCalledWith(
+      '/api/polymarket/markets/42/price-change?from=2026-09-28T12%3A34%3A56.000Z&to=2026-09-29T12%3A34%3A56.000Z',
+      { headers: { Accept: 'application/json' } },
+    );
+    expect(request).toHaveBeenCalledWith(
+      '/api/polymarket/outcomes/111/price-history?start=2026-09-28T12%3A34%3A56.000Z&end=2026-09-29T12%3A34%3A56.000Z&resolution=30m&limit=100',
+      { headers: { Accept: 'application/json' } },
+    );
     expect(request).toHaveBeenCalledWith('/api/polymarket/markets/42', {
       headers: { Accept: 'application/json' },
     });
@@ -406,6 +523,10 @@ describe('loadPolymarketMarketResearch', () => {
       message: 'Outcome token is unavailable',
     });
     expect(research.yesLastTrade).toEqual({
+      status: 'unavailable',
+      message: 'Outcome token is unavailable',
+    });
+    expect(research.yesPriceHistory24h).toEqual({
       status: 'unavailable',
       message: 'Outcome token is unavailable',
     });
@@ -481,6 +602,85 @@ describe('loadPolymarketMarketResearch', () => {
       status: 'available',
       data: { price: '0.41', side: 'sell' },
     });
+  });
+
+  it('keeps the historical change failure isolated from current observations', async () => {
+    const request = vi.fn((input: string | URL | Request) => {
+      const path = input.toString();
+      if (path.includes('/price-change?')) {
+        return Promise.resolve(
+          Response.json(
+            { message: 'Historical comparison is unavailable' },
+            { status: 404 },
+          ),
+        );
+      }
+      if (path.endsWith('/polymarket/markets/42')) {
+        return Promise.resolve(
+          Response.json({
+            id: '42',
+            outcomes: {
+              yes: { label: 'Yes', tokenId: '111' },
+              no: { label: 'No', tokenId: '222' },
+            },
+          }),
+        );
+      }
+      return Promise.resolve(Response.json({}));
+    });
+
+    const research = await loadPolymarketMarketResearch('42', request);
+
+    expect(research.priceChange24h).toEqual({
+      status: 'unavailable',
+      message: 'Historical comparison is unavailable',
+    });
+    expect(research.details.status).toBe('available');
+    expect(research.yesTopOfBook.status).toBe('available');
+    expect(research.yesLastTrade.status).toBe('available');
+  });
+
+  it('keeps YES and NO price-history failures isolated', async () => {
+    const request = vi.fn((input: string | URL | Request) => {
+      const path = input.toString();
+      if (path.includes('/outcomes/111/price-history?')) {
+        return Promise.resolve(
+          Response.json(
+            { message: 'YES history is unavailable' },
+            { status: 404 },
+          ),
+        );
+      }
+      if (path.includes('/outcomes/222/price-history?')) {
+        return Promise.resolve(
+          Response.json({ tokenId: '222', resolution: '30m', points: [] }),
+        );
+      }
+      if (path.endsWith('/polymarket/markets/42')) {
+        return Promise.resolve(
+          Response.json({
+            id: '42',
+            outcomes: {
+              yes: { label: 'Yes', tokenId: '111' },
+              no: { label: 'No', tokenId: '222' },
+            },
+          }),
+        );
+      }
+      return Promise.resolve(Response.json({}));
+    });
+
+    const research = await loadPolymarketMarketResearch('42', request);
+
+    expect(research.yesPriceHistory24h).toEqual({
+      status: 'unavailable',
+      message: 'YES history is unavailable',
+    });
+    expect(research.noPriceHistory24h).toMatchObject({
+      status: 'available',
+      data: { tokenId: '222', points: [] },
+    });
+    expect(research.priceChange24h.status).toBe('available');
   });
 });
 

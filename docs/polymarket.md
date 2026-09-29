@@ -289,7 +289,7 @@ The override is held only in the current API process. Restarting restores `POLYM
 
 ## Boundaries
 
-M9.1–M9.38 do not persist or poll markets, events, tags, series, or provider status. M9.3–M9.36 expose bounded public observations and dashboard research without executable quote, fill, recommendation, or probability-guarantee semantics. M9.37 stores only a process-local availability override and adds no market-data retention. M9.38 displays only the existing latest reported trade per indexed outcome, without trade history, identity, quantity, or provider time. The increments do not load user positions or accounts and have no authentication, signing, wallet, order, redemption, strategy, signal, paper execution, or real execution path.
+M9.1–M9.41 do not persist or poll markets, events, tags, series, or provider status. M9.3–M9.36 expose bounded public observations and dashboard research without executable quote, fill, recommendation, or probability-guarantee semantics. M9.37 stores only a process-local availability override and adds no market-data retention. M9.38 displays only the existing latest reported trade per indexed outcome, without trade history, identity, quantity, or provider time. M9.39 displays one on-demand trailing 24-hour M9.32 comparison as absolute percentage-point changes, not percentage returns or an atomic historical series. M9.40 independently loads the first bounded 30-minute history page for each outcome and charts available values without joining timestamps into atomic pairs or retaining data. M9.41 surfaces the existing Data API freshness snapshot without extending it to Gamma, CLOB, or local-health claims. The increments do not load user positions or accounts and have no authentication, signing, wallet, order, redemption, strategy, signal, paper execution, or real execution path.
 
 ## M9.35 operational availability
 
@@ -299,4 +299,4 @@ Provider failure is exposed locally as `503`. Market discovery additionally clas
 
 ## Next safe increment
 
-A later M9 increment may add another narrowly bounded public research observation without introducing positions, redemption, trade history, persistence, authentication, accounts, or execution.
+A later M9 increment may add another narrowly bounded public research view without introducing positions, redemption, trade history, persistence, authentication, accounts, or execution. M10 real-trading design remains separate and requires current official Binance research plus explicit safeguards.

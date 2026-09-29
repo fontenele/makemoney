@@ -139,3 +139,27 @@ The override exists only in the current API process and resets to `POLYMARKET_EN
 After selected-market details provide indexed non-null outcome tokens, the dashboard requests the existing latest-trade resource independently for YES and NO alongside their level-one books. Each card displays the exact reported price as a percentage, the provider-reported buy or sell side, and the application's local receipt time. A never-traded or otherwise unavailable outcome remains isolated and does not hide its peer or either book.
 
 The CLOB endpoint supplies neither trade quantity nor provider timestamp. The dashboard states those omissions and does not infer freshness, direction, momentum, current liquidity, execution price, or trade history. Latest trades and books remain independent non-atomic observations and provide no recommendation, signal, account, order, or execution control.
+
+## M9.39 selected-market 24-hour price change
+
+Each selected-market refresh now requests the existing binary price-change route over a trailing 24-hour UTC interval. The browser truncates the current instant to a whole second and derives the earlier boundary exactly 24 hours before it, matching the backend's canonical input contract.
+
+The dashboard displays the backend-calculated exact YES and NO absolute changes as percentage points with their `up`, `down`, or `unchanged` direction. It does not divide by the earlier price or present a percentage return. If the historical comparison is unavailable, its diagnostic is isolated and current identity, midpoint, open-interest, level-one book, and latest-trade resources remain visible.
+
+The four underlying historical observations are independently selected by the provider and do not form atomic snapshots. M9.39 adds no retained history, chart, polling beyond the existing dashboard refresh, signal, recommendation, account, order, or execution behavior.
+
+## M9.40 selected-market 24-hour price history chart
+
+After selected-market detail supplies indexed token identities, the dashboard requests one existing price-history page independently for YES and NO over the same trailing 24-hour UTC window. Both requests explicitly use 30-minute resolution and a 100-point limit; a complete window needs at most 49 observations, so the browser does not follow provider cursors.
+
+The chart uses the shared ECharts component and a fixed zero-to-one vertical scale. This preserves the meaning of outcome prices and avoids visually amplifying small changes through a dynamically narrowed axis. A valid single outcome remains visible when its peer is unavailable, and each missing series retains its own diagnostic.
+
+The histories are independent provider pages and are not joined into synchronized YES/NO snapshots. Browser number conversion is limited to plotting validated price strings. M9.40 adds no persistence, historical order book, trade history, percentage-return calculation, signal, recommendation, account, order, or execution behavior.
+
+## M9.41 public Data API freshness context
+
+The dashboard independently requests the existing parameter-free `GET /polymarket/data-freshness` resource during each general refresh. A compact provider-status grid shows snapshot age and computation time, serving lag and worst mechanism, the most-lagged ingestion cursor with its block distance and network, and total cursor coverage.
+
+This observation describes the public Data API only. It remains separate from the application's `/health` resource and does not claim freshness for Gamma discovery, CLOB books, midpoints, or latest trades. The dashboard applies no warning threshold or traffic-light classification because the provider contract supplies measurements rather than a locally approved operational policy.
+
+Freshness failure is isolated from provider settings, market discovery, and selected-market resources. M9.41 adds no persistence, alert, automated response, VPN action, recommendation, account, order, or execution behavior.

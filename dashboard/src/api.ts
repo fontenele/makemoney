@@ -238,11 +238,103 @@ export interface PolymarketLastTrade {
   receivedAt: string;
 }
 
+export interface PolymarketPriceChangeObservation {
+  provider: 'polymarket';
+  tokenId: string;
+  requestedAt: string;
+  observedAt: string;
+  price: string;
+  resolutionSeconds: number;
+  exactTimestamp: boolean;
+  source: 'data-api-price-history';
+  receivedAt: string;
+  executable: false;
+}
+
+export interface PolymarketOutcomePriceChange {
+  provider: 'polymarket';
+  tokenId: string;
+  requestedFrom: string;
+  requestedTo: string;
+  observations: {
+    from: PolymarketPriceChangeObservation;
+    to: PolymarketPriceChangeObservation;
+  };
+  priceChange: string;
+  direction: 'down' | 'unchanged' | 'up';
+  sameObservedTimestamp: boolean;
+  sameResolution: boolean;
+  executable: false;
+}
+
+export interface PolymarketBinaryPriceChange {
+  provider: 'polymarket';
+  requestedFrom: string;
+  requestedTo: string;
+  outcomes: {
+    yes: PolymarketOutcomePriceChange;
+    no: PolymarketOutcomePriceChange;
+  };
+  combinedPriceChange: string;
+  combinedDirection: 'down' | 'unchanged' | 'up';
+  sameFromObservedTimestamp: boolean;
+  sameToObservedTimestamp: boolean;
+  sameFromResolution: boolean;
+  sameToResolution: boolean;
+  atomicSnapshot: false;
+  executable: false;
+}
+
+export interface PolymarketPriceHistoryPoint {
+  timestamp: string;
+  price: string;
+  resolutionSeconds: number;
+}
+
+export interface PolymarketPriceHistoryPage {
+  provider: 'polymarket';
+  tokenId: string;
+  start: string;
+  end: string;
+  resolution: '1m' | '5m' | '30m' | '3h' | '12h';
+  points: PolymarketPriceHistoryPoint[];
+  nextCursor: string | null;
+  source: 'data-api-price-history';
+  receivedAt: string;
+  executable: false;
+}
+
 export interface PolymarketSettings {
   enabled: boolean;
   startupDefault: boolean;
   source: 'startup' | 'runtime';
   changedAt: string | null;
+}
+
+export interface PolymarketDataFreshness {
+  provider: 'polymarket';
+  snapshotAgeSeconds: number;
+  computedAt: string;
+  ingestion: {
+    chainId: number;
+    cursorCount: number;
+    lagging: Array<{ behindMax: number; block: number; source: string }>;
+    maxSyncedBlock: number;
+    minSyncedBlock: number;
+    mostLagged: { behindMax: number; block: number; source: string };
+    network: string;
+  };
+  serving: {
+    mechanisms: Array<{
+      ageSeconds: number;
+      name: string;
+      blocksBehind: number;
+    }>;
+    lagSeconds: number;
+    worst: string;
+  };
+  source: 'data-api-status';
+  receivedAt: string;
 }
 
 export type Resource<T> =
@@ -258,6 +350,7 @@ export interface DashboardSnapshot {
   strategySignals: Resource<StrategySignal[]>;
   backtestRuns: Resource<StoredBacktestRun[]>;
   polymarketSettings: Resource<PolymarketSettings>;
+  polymarketDataFreshness: Resource<PolymarketDataFreshness>;
   polymarketMarkets: Resource<PolymarketMarketPage>;
   loadedAt: string;
 }
@@ -270,6 +363,9 @@ export interface PolymarketMarketResearch {
   noTopOfBook: Resource<PolymarketTopOfBook>;
   yesLastTrade: Resource<PolymarketLastTrade>;
   noLastTrade: Resource<PolymarketLastTrade>;
+  priceChange24h: Resource<PolymarketBinaryPriceChange>;
+  yesPriceHistory24h: Resource<PolymarketPriceHistoryPage>;
+  noPriceHistory24h: Resource<PolymarketPriceHistoryPage>;
 }
 
 type FetchLike = typeof fetch;
@@ -294,6 +390,7 @@ export async function loadDashboard(
     strategySignals,
     backtestRuns,
     polymarketSettings,
+    polymarketDataFreshness,
     polymarketMarkets,
   ] = await Promise.all([
     loadResource<HealthResponse>(dashboardApiPath('/health'), request),
@@ -329,6 +426,10 @@ export async function loadDashboard(
       dashboardApiPath('/polymarket/settings'),
       request,
     ),
+    loadResource<PolymarketDataFreshness>(
+      dashboardApiPath('/polymarket/data-freshness'),
+      request,
+    ),
     loadResource<PolymarketMarketPage>(
       dashboardApiPath('/polymarket/markets?limit=8'),
       request,
@@ -345,6 +446,7 @@ export async function loadDashboard(
     strategySignals,
     backtestRuns,
     polymarketSettings,
+    polymarketDataFreshness,
     polymarketMarkets,
     loadedAt: new Date().toISOString(),
   };
@@ -384,22 +486,45 @@ export async function updatePolymarketSettings(
 export async function loadPolymarketMarketResearch(
   marketId: string,
   request: FetchLike = fetch,
+  now: Date = new Date(),
 ): Promise<PolymarketMarketResearch> {
   const encodedId = encodeURIComponent(marketId);
-  const [details, openInterest, midpointComplement] = await Promise.all([
-    loadResource<PolymarketMarketDetails>(
-      dashboardApiPath(`/polymarket/markets/${encodedId}`),
-      request,
-    ),
-    loadResource<PolymarketMarketOpenInterest>(
-      dashboardApiPath(`/polymarket/markets/${encodedId}/open-interest`),
-      request,
-    ),
-    loadResource<PolymarketMidpointComplement>(
-      dashboardApiPath(`/polymarket/markets/${encodedId}/midpoint-complement`),
-      request,
-    ),
-  ]);
+  const requestedTo = new Date(now);
+  requestedTo.setMilliseconds(0);
+  const requestedFrom = new Date(requestedTo.getTime() - 24 * 60 * 60 * 1000);
+  const priceChangeQuery = new URLSearchParams({
+    from: requestedFrom.toISOString(),
+    to: requestedTo.toISOString(),
+  });
+  const priceHistoryQuery = new URLSearchParams({
+    start: requestedFrom.toISOString(),
+    end: requestedTo.toISOString(),
+    resolution: '30m',
+    limit: '100',
+  });
+  const [details, openInterest, midpointComplement, priceChange24h] =
+    await Promise.all([
+      loadResource<PolymarketMarketDetails>(
+        dashboardApiPath(`/polymarket/markets/${encodedId}`),
+        request,
+      ),
+      loadResource<PolymarketMarketOpenInterest>(
+        dashboardApiPath(`/polymarket/markets/${encodedId}/open-interest`),
+        request,
+      ),
+      loadResource<PolymarketMidpointComplement>(
+        dashboardApiPath(
+          `/polymarket/markets/${encodedId}/midpoint-complement`,
+        ),
+        request,
+      ),
+      loadResource<PolymarketBinaryPriceChange>(
+        dashboardApiPath(
+          `/polymarket/markets/${encodedId}/price-change?${priceChangeQuery.toString()}`,
+        ),
+        request,
+      ),
+    ]);
 
   const unavailableIdentity: Resource<PolymarketTopOfBook> = {
     status: 'unavailable',
@@ -407,6 +532,10 @@ export async function loadPolymarketMarketResearch(
   };
   if (details.status === 'unavailable') {
     const unavailableLastTrade: Resource<PolymarketLastTrade> = {
+      status: 'unavailable',
+      message: 'Outcome identity is unavailable',
+    };
+    const unavailablePriceHistory: Resource<PolymarketPriceHistoryPage> = {
       status: 'unavailable',
       message: 'Outcome identity is unavailable',
     };
@@ -418,16 +547,35 @@ export async function loadPolymarketMarketResearch(
       noTopOfBook: unavailableIdentity,
       yesLastTrade: unavailableLastTrade,
       noLastTrade: unavailableLastTrade,
+      priceChange24h,
+      yesPriceHistory24h: unavailablePriceHistory,
+      noPriceHistory24h: unavailablePriceHistory,
     };
   }
 
-  const [yesTopOfBook, noTopOfBook, yesLastTrade, noLastTrade] =
-    await Promise.all([
-      loadOutcomeTopOfBook(details.data.outcomes.yes.tokenId, request),
-      loadOutcomeTopOfBook(details.data.outcomes.no.tokenId, request),
-      loadOutcomeLastTrade(details.data.outcomes.yes.tokenId, request),
-      loadOutcomeLastTrade(details.data.outcomes.no.tokenId, request),
-    ]);
+  const [
+    yesTopOfBook,
+    noTopOfBook,
+    yesLastTrade,
+    noLastTrade,
+    yesPriceHistory24h,
+    noPriceHistory24h,
+  ] = await Promise.all([
+    loadOutcomeTopOfBook(details.data.outcomes.yes.tokenId, request),
+    loadOutcomeTopOfBook(details.data.outcomes.no.tokenId, request),
+    loadOutcomeLastTrade(details.data.outcomes.yes.tokenId, request),
+    loadOutcomeLastTrade(details.data.outcomes.no.tokenId, request),
+    loadOutcomePriceHistory(
+      details.data.outcomes.yes.tokenId,
+      priceHistoryQuery,
+      request,
+    ),
+    loadOutcomePriceHistory(
+      details.data.outcomes.no.tokenId,
+      priceHistoryQuery,
+      request,
+    ),
+  ]);
   return {
     details,
     openInterest,
@@ -436,7 +584,29 @@ export async function loadPolymarketMarketResearch(
     noTopOfBook,
     yesLastTrade,
     noLastTrade,
+    priceChange24h,
+    yesPriceHistory24h,
+    noPriceHistory24h,
   };
+}
+
+function loadOutcomePriceHistory(
+  tokenId: string | null,
+  query: URLSearchParams,
+  request: FetchLike,
+): Promise<Resource<PolymarketPriceHistoryPage>> {
+  if (tokenId === null) {
+    return Promise.resolve({
+      status: 'unavailable',
+      message: 'Outcome token is unavailable',
+    });
+  }
+  return loadResource<PolymarketPriceHistoryPage>(
+    dashboardApiPath(
+      `/polymarket/outcomes/${encodeURIComponent(tokenId)}/price-history?${query.toString()}`,
+    ),
+    request,
+  );
 }
 
 function loadOutcomeTopOfBook(

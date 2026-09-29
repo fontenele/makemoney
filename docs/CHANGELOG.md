@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-29 — M9.41 Polymarket dashboard Data API freshness completed
+
+- Loaded the existing parameter-free public Data API freshness snapshot independently during each dashboard refresh.
+- Displayed snapshot age/computation time, serving lag/worst mechanism, most-lagged ingestion cursor/network, and cursor count.
+- Kept provider freshness separate from local health and avoided extending Data API measurements to Gamma or CLOB.
+- Added no thresholds, alerting, persistence, automated response, recommendation, account, order, or execution behavior.
+- Verified 32 dashboard tests, 1,551 backend tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
+## 2026-09-29 — M9.40 Polymarket dashboard 24-hour price history chart completed
+
+- Loaded one bounded 30-minute price-history page independently for selected-market YES and NO tokens over the trailing 24-hour UTC window.
+- Added a fixed zero-to-one ECharts view that can display either valid outcome without requiring its peer.
+- Preserved per-outcome unavailable diagnostics and avoided treating independently bucketed pages as synchronized snapshots.
+- Added no backend route, pagination, persistence, historical order book, percentage return, signal, recommendation, account, order, or execution behavior.
+- Verified 31 dashboard tests, the unchanged 1,551-test backend suite, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
+## 2026-09-29 — M9.39 Polymarket dashboard 24-hour price change completed
+
+- Reused the existing binary price-change route for a trailing 24-hour UTC comparison on each selected-market refresh.
+- Displayed exact YES and NO absolute changes as percentage points with provider-derived direction.
+- Kept historical comparison failures isolated from current midpoint, open-interest, book, and latest-trade observations.
+- Added no backend route, persistence, historical chart, percentage return, signal, recommendation, account, order, or execution behavior.
+- Verified 27 dashboard tests, 1,551 backend tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
 ## 2026-09-29 — M9.38 Polymarket dashboard latest trades completed
 
 - Extended selected-market research with the existing public latest-trade route for indexed YES and NO outcomes.
