@@ -6,9 +6,13 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
+M9.38 is complete: selected Polymarket markets now display independently loaded YES and NO latest reported trades with exact price, provider-reported side, and local receipt time. Each outcome retains isolated unavailability, and the view explicitly states that the provider supplies neither trade quantity nor timestamp. These observations are not quotes, fill guarantees, signals, recommendations, or trade history.
+
+M9.37 is complete: the local dashboard exposes current Polymarket provider availability and can apply a process-local runtime override. Enabling requires explicit confirmation that access is permitted and the required VPN is active; disabling is immediate, restart discards the override, and provider-backed routes remain fail-closed. The settings routes themselves stay reachable while disabled so local recovery does not require an API restart.
+
 M9.36 is complete: selected Polymarket markets now display independently loaded YES and NO level-one books with best bid/ask prices and quantities plus spread. Token identity is loaded before the two concurrent book requests, failures remain isolated per outcome, and the view makes no full-depth, executable-quote, fill, recommendation, or execution claim. The CLOB adapter now follows the live provider ordering (ascending bids and descending asks) and selects the final level of each side.
 
-M9.35 is complete: every local Polymarket route now fails closed behind `POLYMARKET_ENABLED`, whose application and Compose default is `false`. Disabled requests return a sanitized `503` before any provider call; explicit enablement requires a process restart and remains a local operational choice for use only when access is permitted and the required VPN is active.
+M9.35 is complete: every provider-backed Polymarket route fails closed behind an availability guard whose application and Compose startup default is `false`. Disabled requests return a sanitized `503` before any provider call; M9.37 later added an always-local process override without weakening that provider boundary.
 
 M9.34 is complete: the local dashboard now lists eight active Polymarket questions and lets the user select one to view its indexed outcome labels, independent YES/NO midpoint percentages, and aggregate open interest. Resource failures remain isolated, sanitized backend diagnostics are displayed for unavailable resources, and the surface has no recommendation, account, mutation, order, or execution controls.
 
@@ -456,6 +460,26 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
+The following passed on 2026-09-29 after M9.38:
+
+- `npm run test:dashboard` — 26 tests passed across 5 files
+- `npm run format:check`
+- `npm run lint`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
+The following passed on 2026-09-29 after M9.37:
+
+- focused availability service, settings controller, and provider guard validation — 14 tests passed across 3 suites
+- `npm run test:dashboard` — 25 tests passed across 5 files
+- `npm test -- --runInBand` — 1,551 backend tests passed across 135 suites
+- `npm run format:check`
+- `npm run lint`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
 The following passed on 2026-09-29 after M9.36:
 
 - live VPN-enabled dashboard-proxy validation returned coherent two-sided YES and NO books for market `559651`, each with exact `0.001` spread; the final runtime was returned to `POLYMARKET_ENABLED=false`
@@ -557,7 +581,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.36. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the dashboard's selected-market midpoint, open-interest, and level-one liquidity surface are isolated from Spot crypto and every execution path. Live Gamma, Data API, and CLOB dashboard paths passed with the development VPN active; normal runtime defaults to disabled.
+M0 through M8.11 are complete, and M9 is implemented through M9.38. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the dashboard's selected-market midpoint, open-interest, level-one liquidity, latest reported trades, and process-local availability control are isolated from Spot crypto and every execution path. Live Gamma, Data API, and CLOB dashboard paths passed with the development VPN active; startup and post-restart behavior defaults to disabled.
 
 ## Known issues and cautions
 

@@ -227,6 +227,24 @@ export interface PolymarketTopOfBook {
   receivedAt: string;
 }
 
+export interface PolymarketLastTrade {
+  provider: 'polymarket';
+  tokenId: string;
+  price: string;
+  side: 'buy' | 'sell';
+  source: 'clob-last-trade';
+  executable: false;
+  providerTimestamp: null;
+  receivedAt: string;
+}
+
+export interface PolymarketSettings {
+  enabled: boolean;
+  startupDefault: boolean;
+  source: 'startup' | 'runtime';
+  changedAt: string | null;
+}
+
 export type Resource<T> =
   { status: 'available'; data: T } | { status: 'unavailable'; message: string };
 
@@ -239,6 +257,7 @@ export interface DashboardSnapshot {
   newListings: Resource<DetectedSpotSymbol[]>;
   strategySignals: Resource<StrategySignal[]>;
   backtestRuns: Resource<StoredBacktestRun[]>;
+  polymarketSettings: Resource<PolymarketSettings>;
   polymarketMarkets: Resource<PolymarketMarketPage>;
   loadedAt: string;
 }
@@ -249,6 +268,8 @@ export interface PolymarketMarketResearch {
   midpointComplement: Resource<PolymarketMidpointComplement>;
   yesTopOfBook: Resource<PolymarketTopOfBook>;
   noTopOfBook: Resource<PolymarketTopOfBook>;
+  yesLastTrade: Resource<PolymarketLastTrade>;
+  noLastTrade: Resource<PolymarketLastTrade>;
 }
 
 type FetchLike = typeof fetch;
@@ -272,6 +293,7 @@ export async function loadDashboard(
     newListings,
     strategySignals,
     backtestRuns,
+    polymarketSettings,
     polymarketMarkets,
   ] = await Promise.all([
     loadResource<HealthResponse>(dashboardApiPath('/health'), request),
@@ -303,6 +325,10 @@ export async function loadDashboard(
       dashboardApiPath('/backtesting/runs?limit=1'),
       request,
     ),
+    loadResource<PolymarketSettings>(
+      dashboardApiPath('/polymarket/settings'),
+      request,
+    ),
     loadResource<PolymarketMarketPage>(
       dashboardApiPath('/polymarket/markets?limit=8'),
       request,
@@ -318,9 +344,41 @@ export async function loadDashboard(
     newListings,
     strategySignals,
     backtestRuns,
+    polymarketSettings,
     polymarketMarkets,
     loadedAt: new Date().toISOString(),
   };
+}
+
+export async function updatePolymarketSettings(
+  enabled: boolean,
+  accessConfirmed: boolean,
+  request: FetchLike = fetch,
+): Promise<Resource<PolymarketSettings>> {
+  try {
+    const response = await request(dashboardApiPath('/polymarket/settings'), {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ enabled, accessConfirmed }),
+    });
+    if (!response.ok) {
+      return {
+        status: 'unavailable',
+        message:
+          (await readProviderErrorMessage(response)) ??
+          `Unavailable (${response.status})`,
+      };
+    }
+    return {
+      status: 'available',
+      data: (await response.json()) as PolymarketSettings,
+    };
+  } catch {
+    return { status: 'unavailable', message: 'Local API is unreachable' };
+  }
 }
 
 export async function loadPolymarketMarketResearch(
@@ -348,25 +406,36 @@ export async function loadPolymarketMarketResearch(
     message: 'Outcome identity is unavailable',
   };
   if (details.status === 'unavailable') {
+    const unavailableLastTrade: Resource<PolymarketLastTrade> = {
+      status: 'unavailable',
+      message: 'Outcome identity is unavailable',
+    };
     return {
       details,
       openInterest,
       midpointComplement,
       yesTopOfBook: unavailableIdentity,
       noTopOfBook: unavailableIdentity,
+      yesLastTrade: unavailableLastTrade,
+      noLastTrade: unavailableLastTrade,
     };
   }
 
-  const [yesTopOfBook, noTopOfBook] = await Promise.all([
-    loadOutcomeTopOfBook(details.data.outcomes.yes.tokenId, request),
-    loadOutcomeTopOfBook(details.data.outcomes.no.tokenId, request),
-  ]);
+  const [yesTopOfBook, noTopOfBook, yesLastTrade, noLastTrade] =
+    await Promise.all([
+      loadOutcomeTopOfBook(details.data.outcomes.yes.tokenId, request),
+      loadOutcomeTopOfBook(details.data.outcomes.no.tokenId, request),
+      loadOutcomeLastTrade(details.data.outcomes.yes.tokenId, request),
+      loadOutcomeLastTrade(details.data.outcomes.no.tokenId, request),
+    ]);
   return {
     details,
     openInterest,
     midpointComplement,
     yesTopOfBook,
     noTopOfBook,
+    yesLastTrade,
+    noLastTrade,
   };
 }
 
@@ -383,6 +452,24 @@ function loadOutcomeTopOfBook(
   return loadResource<PolymarketTopOfBook>(
     dashboardApiPath(
       `/polymarket/outcomes/${encodeURIComponent(tokenId)}/top-of-book`,
+    ),
+    request,
+  );
+}
+
+function loadOutcomeLastTrade(
+  tokenId: string | null,
+  request: FetchLike,
+): Promise<Resource<PolymarketLastTrade>> {
+  if (tokenId === null) {
+    return Promise.resolve({
+      status: 'unavailable',
+      message: 'Outcome token is unavailable',
+    });
+  }
+  return loadResource<PolymarketLastTrade>(
+    dashboardApiPath(
+      `/polymarket/outcomes/${encodeURIComponent(tokenId)}/last-trade`,
     ),
     request,
   );

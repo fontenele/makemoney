@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-09-29 — Keep dashboard latest trades separate from current books
+
+M9.38 requests the existing latest-trade route independently for each indexed YES and NO token after selected-market identity is available. It does not use the last-trade context route or merge a trade with the displayed level-one book because the provider observations are non-atomic and the dashboard does not need to infer a book-relative classification.
+
+Each outcome keeps its own unavailable state. The view displays exact price and provider-reported side together with local receipt time, while explicitly preserving the missing provider timestamp and quantity. It makes no freshness, direction, momentum, quote, fill, recommendation, signal, or trade-history claim.
+
+## 2026-09-29 — Keep runtime Polymarket enablement process-local
+
+M9.37 centralizes the startup default and optional runtime override in one application service consumed by the existing guard. `GET /polymarket/settings` and `PUT /polymarket/settings` deliberately live outside that guard: settings must remain observable and recoverable while every Gamma, CLOB, and Data API route is blocked.
+
+The override is memory-only and resets to the validated `POLYMARKET_ENABLED` startup value on restart. Enabling requires the caller to send a separate explicit access confirmation; the dashboard exposes that acknowledgement before enabling. The application still does not detect, start, configure, or bypass a VPN, and the control grants no credentials, account, wallet, order, or execution capability.
+
 ## 2026-09-29 — Load dashboard books only after indexed token identity
 
 M9.36 keeps market identity as the source of YES and NO token mapping. The dashboard first loads the selected market's existing detail resource, then concurrently requests one existing top-of-book resource per non-null indexed token. It does not infer sides from prices or introduce a new aggregate backend route.
@@ -12,7 +24,7 @@ Live validation also corrected an earlier assumption in the M9.4 adapter: CLOB `
 
 M9.35 uses one controller-wide NestJS guard instead of duplicating checks across every route or adapter. `POLYMARKET_ENABLED` defaults to `false`, and the guard returns a sanitized `503` before route-handler execution, guaranteeing that a disabled request cannot contact Gamma, CLOB, or the Data API.
 
-Enablement remains startup-only and explicit. The application does not attempt to detect, start, configure, or bypass a VPN or jurisdictional network restriction; operators enable the flag only when access is locally permitted and the required network setup is already active.
+Enablement was initially startup-only and explicit. M9.37 later added a process-local override with explicit access confirmation while preserving the same safe default and provider guard. The application does not attempt to detect, start, configure, or bypass a VPN or jurisdictional network restriction.
 
 ## 2026-09-29 — Compose the first Polymarket dashboard from independent resources
 

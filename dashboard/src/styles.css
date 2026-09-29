@@ -496,6 +496,92 @@ h1 em {
   margin-bottom: 20px;
 }
 
+.polymarket-access {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(280px, 1.4fr) auto;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 20px;
+  padding: 18px;
+  border: 1px solid rgba(255, 187, 92, 0.35);
+  background: rgba(255, 187, 92, 0.05);
+}
+
+.polymarket-access.enabled {
+  border-color: rgba(166, 244, 197, 0.45);
+  background: rgba(166, 244, 197, 0.05);
+}
+
+.polymarket-access > div {
+  display: grid;
+  gap: 6px;
+}
+
+.polymarket-access span,
+.polymarket-access small,
+.polymarket-access p {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.polymarket-access > div > span {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.polymarket-access strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.polymarket-access label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.polymarket-access input {
+  margin-top: 3px;
+  accent-color: var(--accent);
+}
+
+.polymarket-access button {
+  min-width: 126px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.polymarket-access button:hover:not(:disabled),
+.polymarket-access button:focus-visible {
+  border-color: var(--green);
+  color: var(--green-bright);
+}
+
+.polymarket-access button:disabled {
+  cursor: wait;
+  opacity: 0.45;
+}
+
+.polymarket-access p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--negative);
+}
+
+.polymarket-access-unavailable {
+  margin: 0 0 20px;
+}
+
 .polymarket-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -537,6 +623,39 @@ h1 em {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin-top: 12px;
+}
+
+.polymarket-trade-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.polymarket-trade {
+  display: grid;
+  min-height: 112px;
+  gap: 12px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.polymarket-trade span,
+.polymarket-trade small {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.polymarket-trade strong {
+  align-self: end;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .polymarket-book {
@@ -1202,7 +1321,20 @@ footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .polymarket-access {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .polymarket-access button {
+    justify-self: start;
+  }
+
   .polymarket-book-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .polymarket-trade-grid {
     grid-template-columns: 1fr;
   }
 

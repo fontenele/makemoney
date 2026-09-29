@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-29 — M9.38 Polymarket dashboard latest trades completed
+
+- Extended selected-market research with the existing public latest-trade route for indexed YES and NO outcomes.
+- Load both trades only after selected-market token identity is available and preserve independent unavailable states.
+- Display exact reported price, provider side, and local receipt time while stating that provider quantity and timestamp are unavailable.
+- Kept trades separate from independently loaded books and added no trade history, freshness inference, quote, signal, recommendation, account, order, or execution behavior.
+- Verified 26 dashboard tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
+## 2026-09-29 — M9.37 Polymarket runtime availability control completed
+
+- Added always-available local `GET` and `PUT /polymarket/settings` routes for current availability and a process-local override.
+- Required an explicit access/VPN acknowledgement before runtime enablement; disabling remains immediate.
+- Added a responsive dashboard control that reports startup versus runtime state, enables only after acknowledgement, and refreshes provider research after a successful change.
+- Centralized the existing provider guard on the availability service; all Gamma, CLOB, and Data API routes still fail before provider access while disabled.
+- Kept the safe `false` startup default, reset-on-restart behavior, and complete separation from credentials, accounts, wallets, orders, and execution.
+
 ## 2026-09-29 — M9.36 Polymarket dashboard level-one liquidity completed
 
 - Extended selected-market research with existing public CLOB top-of-book routes for indexed YES and NO outcomes.

@@ -4,6 +4,7 @@ import {
   loadDashboard,
   loadListingPerformance,
   loadPolymarketMarketResearch,
+  updatePolymarketSettings,
   type DashboardSnapshot,
   type DetectedSpotSymbol,
   type ListingPerformance,
@@ -30,6 +31,9 @@ const selectedPolymarketMarket = ref<PolymarketMarketSummary | null>(null);
 const polymarketResearch = ref<PolymarketMarketResearch | null>(null);
 const polymarketResearchLoading = ref(false);
 let polymarketResearchRequest = 0;
+const polymarketAccessConfirmed = ref(false);
+const polymarketSettingsUpdating = ref(false);
+const polymarketSettingsMessage = ref<string | null>(null);
 
 const apiOnline = computed(() => snapshot.value?.health.status === 'available');
 const signalChart = computed(() =>
@@ -96,6 +100,32 @@ function selectPolymarketMarket(market: PolymarketMarketSummary): void {
   selectedPolymarketMarket.value = market;
   polymarketResearch.value = null;
   void refreshPolymarketResearch(market);
+}
+
+async function changePolymarketAvailability(enabled: boolean): Promise<void> {
+  if (polymarketSettingsUpdating.value) return;
+  polymarketSettingsUpdating.value = true;
+  polymarketSettingsMessage.value = null;
+  try {
+    const result = await updatePolymarketSettings(
+      enabled,
+      enabled && polymarketAccessConfirmed.value,
+    );
+    if (result.status === 'unavailable') {
+      polymarketSettingsMessage.value = result.message;
+      return;
+    }
+    if (snapshot.value) snapshot.value.polymarketSettings = result;
+    polymarketAccessConfirmed.value = false;
+    if (!enabled) {
+      selectedPolymarketMarket.value = null;
+      polymarketResearch.value = null;
+      polymarketResearchRequest += 1;
+    }
+    await refresh();
+  } finally {
+    polymarketSettingsUpdating.value = false;
+  }
 }
 
 async function refresh(): Promise<void> {
@@ -681,6 +711,62 @@ onUnmounted(() => autoRefresh.stop());
         </span>
       </div>
 
+      <div
+        v-if="available(snapshot?.polymarketSettings)"
+        class="polymarket-access"
+        :class="{ enabled: snapshot.polymarketSettings.data.enabled }"
+      >
+        <div>
+          <span>Provider access</span>
+          <strong>
+            {{
+              snapshot.polymarketSettings.data.enabled
+                ? 'Enabled for this API process'
+                : 'Disabled — no provider requests'
+            }}
+          </strong>
+          <small>
+            {{
+              snapshot.polymarketSettings.data.source === 'runtime'
+                ? 'Runtime override; resets when the API restarts.'
+                : 'Using the safe startup configuration.'
+            }}
+          </small>
+        </div>
+        <label v-if="!snapshot.polymarketSettings.data.enabled">
+          <input v-model="polymarketAccessConfirmed" type="checkbox" />
+          <span
+            >I confirm local access is permitted and the required VPN is
+            active.</span
+          >
+        </label>
+        <button
+          v-if="snapshot.polymarketSettings.data.enabled"
+          type="button"
+          :disabled="polymarketSettingsUpdating"
+          @click="changePolymarketAvailability(false)"
+        >
+          {{ polymarketSettingsUpdating ? 'Updating…' : 'Disable access' }}
+        </button>
+        <button
+          v-else
+          type="button"
+          :disabled="polymarketSettingsUpdating || !polymarketAccessConfirmed"
+          @click="changePolymarketAvailability(true)"
+        >
+          {{ polymarketSettingsUpdating ? 'Updating…' : 'Enable access' }}
+        </button>
+        <p v-if="polymarketSettingsMessage" role="alert">
+          {{ polymarketSettingsMessage }}
+        </p>
+      </div>
+      <p v-else class="empty-state polymarket-access-unavailable">
+        {{
+          snapshot?.polymarketSettings.message ??
+          'Loading local Polymarket settings…'
+        }}
+      </p>
+
       <template v-if="available(snapshot?.polymarketMarkets)">
         <p
           v-if="snapshot.polymarketMarkets.data.markets.length === 0"
@@ -827,9 +913,35 @@ onUnmounted(() => autoRefresh.stop());
               <p v-else>{{ book.resource.message }}</p>
             </article>
           </div>
+          <div v-if="polymarketResearch" class="polymarket-trade-grid">
+            <article
+              v-for="trade in [
+                { label: 'YES', resource: polymarketResearch.yesLastTrade },
+                { label: 'NO', resource: polymarketResearch.noLastTrade },
+              ]"
+              :key="trade.label"
+              class="polymarket-trade"
+            >
+              <span>{{ trade.label }} latest reported trade</span>
+              <template v-if="available(trade.resource)">
+                <strong>
+                  {{ probability(trade.resource.data.price) }} ·
+                  {{ trade.resource.data.side.toUpperCase() }}
+                </strong>
+                <small>
+                  Received locally
+                  {{ timestamp(trade.resource.data.receivedAt) }} · provider
+                  time unavailable
+                </small>
+              </template>
+              <small v-else>{{ trade.resource.message }}</small>
+            </article>
+          </div>
           <p class="polymarket-note">
-            Midpoints and level-one books are independent observations, not
-            executable quotes, depth, fill guarantees, or recommendations.
+            Midpoints, level-one books, and latest reported trades are
+            independent observations. Trades have no provider timestamp or
+            quantity; none of these values are executable quotes, depth, fill
+            guarantees, or recommendations.
           </p>
         </article>
       </template>

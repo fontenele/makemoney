@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, **M6 — Backtesting (M6.1–M6.32)**, **M7 — New Listing Scanner (M7.1–M7.109)**, and **M8 — Dashboard (M8.1–M8.11)**.
-- M9 is in progress through **M9.36 — Polymarket Dashboard Level-One Liquidity**.
+- M9 is in progress through **M9.38 — Polymarket Dashboard Latest Trades**.
 - M6 is closed. M7.1–M7.109 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -426,6 +426,10 @@ M9.34 adds a read-only Polymarket section to the local dashboard. It displays ei
 M9.35 places every local Polymarket route behind the fail-closed `POLYMARKET_ENABLED` configuration flag. The default is disabled and blocks before any provider call; enablement is an explicit local operational choice made only when provider access is permitted and the required VPN is already active.
 
 M9.36 extends selected-market dashboard research with independently loaded YES and NO public top-of-book observations. It displays only best bid/ask price and quantity plus spread, preserves per-outcome unavailable states, and corrects the CLOB adapter to validate ascending bids and descending asks before selecting each final best level. It makes no full-depth, fill, recommendation, or execution claim.
+
+M9.37 adds an always-local provider-availability read/write setting and dashboard control. A runtime enable requires explicit access/VPN confirmation, affects only the current API process, and resets to the safe startup default on restart; all provider-backed routes remain guarded and no provider credentials, accounts, wallets, orders, or execution paths are introduced.
+
+M9.38 extends selected-market dashboard research with independently loaded YES and NO latest reported trades. It preserves exact prices, provider-reported sides, explicit per-outcome unavailability, receipt-only timing, and the absence of provider quantity/timestamp without treating the observation as a quote, fill, signal, or recommendation.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

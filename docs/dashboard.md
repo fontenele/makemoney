@@ -118,7 +118,7 @@ Selecting one market concurrently loads its existing detail, open-interest, and 
 
 Unavailable responses display a bounded, sanitized message returned by the local API when one exists. In particular, active-market discovery distinguishes provider DNS-resolution failure from an otherwise generic `503`; malformed or non-JSON errors retain the HTTP-status fallback.
 
-M9.35 makes the complete Polymarket API fail closed by default. With `POLYMARKET_ENABLED=false`, the section displays `Polymarket research is disabled by configuration`, and no provider request is attempted. The flag is enabled only through local startup configuration while permitted provider access and the required VPN are already available.
+M9.35 makes provider-backed Polymarket research fail closed by default. With effective availability disabled, the section displays `Polymarket research is disabled by local settings`, and no provider request is attempted. M9.37 later adds the explicit process-local control documented below.
 
 ## M9.36 selected-market level-one liquidity
 
@@ -126,4 +126,16 @@ After selected-market details provide indexed non-null outcome tokens, the dashb
 
 These are independent public level-one observations. The view does not expose full depth, aggregate available liquidity, executable quotes, fill guarantees, recommendation logic, account state, orders, or execution controls. M9.35 still prevents every request while Polymarket is disabled.
 
-Selection remains browser-local and refreshes with the established visibility-aware dashboard cadence. Midpoints remain explicitly non-executable, are not atomic quotes, and are not recommendations or probability guarantees. The view does not yet display event-level volume, price history, full order-book depth, last trades, holders, positions, accounts, orders, or execution controls.
+Selection remains browser-local and refreshes with the established visibility-aware dashboard cadence. Midpoints remain explicitly non-executable, are not atomic quotes, and are not recommendations or probability guarantees. The view does not yet display event-level volume, price history, full order-book depth, trade history, holders, positions, accounts, orders, or execution controls.
+
+## M9.37 process-local Polymarket availability
+
+The dashboard independently reads `GET /polymarket/settings` even while provider research is disabled. It shows whether the current state comes from the safe startup configuration or a runtime override. Enabling requires the operator to acknowledge that local access is permitted and the required VPN is active before `PUT /polymarket/settings` is sent; disabling needs no acknowledgement and immediately clears browser-local market selection.
+
+The override exists only in the current API process and resets to `POLYMARKET_ENABLED` on restart. The dashboard does not detect or control a VPN, persist consent, bypass a network restriction, or gain credentials, accounts, positions, wallet, order, or execution access. All provider-backed resources remain behind the same fail-closed guard.
+
+## M9.38 selected-market latest reported trades
+
+After selected-market details provide indexed non-null outcome tokens, the dashboard requests the existing latest-trade resource independently for YES and NO alongside their level-one books. Each card displays the exact reported price as a percentage, the provider-reported buy or sell side, and the application's local receipt time. A never-traded or otherwise unavailable outcome remains isolated and does not hide its peer or either book.
+
+The CLOB endpoint supplies neither trade quantity nor provider timestamp. The dashboard states those omissions and does not infer freshness, direction, momentum, current liquidity, execution price, or trade history. Latest trades and books remain independent non-atomic observations and provide no recommendation, signal, account, order, or execution control.

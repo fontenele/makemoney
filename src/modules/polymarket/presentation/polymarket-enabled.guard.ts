@@ -3,16 +3,16 @@ import {
   Injectable,
   ServiceUnavailableException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { PolymarketAvailabilityService } from '../application/polymarket-availability.service';
 
 @Injectable()
 export class PolymarketEnabledGuard implements CanActivate {
-  constructor(private readonly config: ConfigService) {}
+  constructor(private readonly availability: PolymarketAvailabilityService) {}
 
   canActivate(): boolean {
-    if (!this.config.getOrThrow<boolean>('POLYMARKET_ENABLED')) {
+    if (!this.availability.isEnabled()) {
       throw new ServiceUnavailableException(
-        'Polymarket research is disabled by configuration',
+        'Polymarket research is disabled by local settings',
       );
     }
     return true;

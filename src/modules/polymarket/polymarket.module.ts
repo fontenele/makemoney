@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PredictionMarketDiscoveryService } from './application/prediction-market-discovery.service';
+import { PolymarketAvailabilityService } from './application/polymarket-availability.service';
 import { PredictionDataFreshnessService } from './application/prediction-data-freshness.service';
 import { PredictionMarketBinaryPriceChangeService } from './application/prediction-market-binary-price-change.service';
 import { PredictionMarketBinaryResolutionService } from './application/prediction-market-binary-resolution.service';
@@ -52,9 +53,10 @@ import { PolymarketGammaTagClient } from './infrastructure/polymarket-gamma-tag.
 import { PolymarketGammaSeriesClient } from './infrastructure/polymarket-gamma-series.client';
 import { PolymarketController } from './presentation/polymarket.controller';
 import { PolymarketEnabledGuard } from './presentation/polymarket-enabled.guard';
+import { PolymarketSettingsController } from './presentation/polymarket-settings.controller';
 
 @Module({
-  controllers: [PolymarketController],
+  controllers: [PolymarketController, PolymarketSettingsController],
   providers: [
     {
       provide: PREDICTION_EVENT_PROVIDER,
@@ -169,6 +171,7 @@ import { PolymarketEnabledGuard } from './presentation/polymarket-enabled.guard'
         ),
     },
     PredictionMarketDiscoveryService,
+    PolymarketAvailabilityService,
     PredictionDataFreshnessService,
     PredictionEventService,
     PredictionEventLiveVolumeService,
