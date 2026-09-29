@@ -486,8 +486,110 @@ h1 em {
 #overview,
 #executions,
 #strategy,
+#polymarket,
 #new-listings {
   scroll-margin-top: 24px;
+}
+
+.polymarket-panel {
+  min-height: 0;
+  margin-bottom: 20px;
+}
+
+.polymarket-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.polymarket-card {
+  display: grid;
+  min-height: 150px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.018);
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+.polymarket-card:hover,
+.polymarket-card:focus-visible,
+.polymarket-card.selected {
+  border-color: rgba(166, 244, 197, 0.6);
+  background: rgba(166, 244, 197, 0.06);
+}
+
+.polymarket-card span,
+.polymarket-card small,
+.polymarket-stat-grid span,
+.polymarket-stat-grid small,
+.polymarket-note {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.polymarket-card strong {
+  align-self: center;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.polymarket-research {
+  margin-top: 20px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: rgba(4, 12, 10, 0.5);
+}
+
+.polymarket-research h3 {
+  max-width: 760px;
+  margin: 5px 0 0;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.polymarket-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 24px;
+  background: var(--line);
+}
+
+.polymarket-stat-grid > div {
+  display: grid;
+  min-height: 100px;
+  gap: 12px;
+  padding: 17px;
+  background: var(--panel);
+}
+
+.polymarket-stat-grid strong {
+  align-self: end;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 15px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.polymarket-stat-grid small {
+  align-self: end;
+  text-transform: none;
+}
+
+.polymarket-note {
+  margin: 18px 0 0;
+  line-height: 1.6;
+}
+
+.polymarket-state {
+  margin: 44px 0 22px;
 }
 
 .execution-heading {
@@ -1038,6 +1140,11 @@ footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .polymarket-grid,
+  .polymarket-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .backtest-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1119,6 +1226,11 @@ footer {
   }
 
   .listing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .polymarket-grid,
+  .polymarket-stat-grid {
     grid-template-columns: 1fr;
   }
 

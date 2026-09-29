@@ -164,6 +164,55 @@ export interface StoredBacktestRun {
   };
 }
 
+export interface PolymarketMarketSummary {
+  provider: 'polymarket';
+  id: string;
+  slug: string | null;
+  question: string | null;
+  conditionId: string | null;
+  closed: false;
+}
+
+export interface PolymarketMarketPage {
+  markets: PolymarketMarketSummary[];
+  nextCursor: string | null;
+  receivedAt: string;
+}
+
+export interface PolymarketMarketDetails {
+  provider: 'polymarket';
+  id: string;
+  slug: string | null;
+  question: string | null;
+  conditionId: string | null;
+  outcomes: {
+    yes: { label: string; tokenId: string | null };
+    no: { label: string; tokenId: string | null };
+  };
+  receivedAt: string;
+}
+
+export interface PolymarketMarketOpenInterest {
+  provider: 'polymarket';
+  conditionId: string;
+  openInterestUsdc: string;
+  receivedAt: string;
+  executable: false;
+}
+
+export interface PolymarketMidpointComplement {
+  provider: 'polymarket';
+  outcomes: {
+    yes: { price: string; receivedAt: string };
+    no: { price: string; receivedAt: string };
+  };
+  midpointSum: string;
+  deviationFromOne: string;
+  status: 'balanced' | 'below_one' | 'above_one';
+  atomicSnapshot: false;
+  executable: false;
+}
+
 export type Resource<T> =
   { status: 'available'; data: T } | { status: 'unavailable'; message: string };
 
@@ -176,7 +225,14 @@ export interface DashboardSnapshot {
   newListings: Resource<DetectedSpotSymbol[]>;
   strategySignals: Resource<StrategySignal[]>;
   backtestRuns: Resource<StoredBacktestRun[]>;
+  polymarketMarkets: Resource<PolymarketMarketPage>;
   loadedAt: string;
+}
+
+export interface PolymarketMarketResearch {
+  details: Resource<PolymarketMarketDetails>;
+  openInterest: Resource<PolymarketMarketOpenInterest>;
+  midpointComplement: Resource<PolymarketMidpointComplement>;
 }
 
 type FetchLike = typeof fetch;
@@ -200,6 +256,7 @@ export async function loadDashboard(
     newListings,
     strategySignals,
     backtestRuns,
+    polymarketMarkets,
   ] = await Promise.all([
     loadResource<HealthResponse>(dashboardApiPath('/health'), request),
     loadResource<PortfolioValuation>(
@@ -230,6 +287,10 @@ export async function loadDashboard(
       dashboardApiPath('/backtesting/runs?limit=1'),
       request,
     ),
+    loadResource<PolymarketMarketPage>(
+      dashboardApiPath('/polymarket/markets?limit=8'),
+      request,
+    ),
   ]);
 
   return {
@@ -241,8 +302,31 @@ export async function loadDashboard(
     newListings,
     strategySignals,
     backtestRuns,
+    polymarketMarkets,
     loadedAt: new Date().toISOString(),
   };
+}
+
+export async function loadPolymarketMarketResearch(
+  marketId: string,
+  request: FetchLike = fetch,
+): Promise<PolymarketMarketResearch> {
+  const encodedId = encodeURIComponent(marketId);
+  const [details, openInterest, midpointComplement] = await Promise.all([
+    loadResource<PolymarketMarketDetails>(
+      dashboardApiPath(`/polymarket/markets/${encodedId}`),
+      request,
+    ),
+    loadResource<PolymarketMarketOpenInterest>(
+      dashboardApiPath(`/polymarket/markets/${encodedId}/open-interest`),
+      request,
+    ),
+    loadResource<PolymarketMidpointComplement>(
+      dashboardApiPath(`/polymarket/markets/${encodedId}/midpoint-complement`),
+      request,
+    ),
+  ]);
+  return { details, openInterest, midpointComplement };
 }
 
 export function loadListingPerformance(

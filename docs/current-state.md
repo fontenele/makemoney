@@ -6,6 +6,8 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
+M9.34 is complete: the local dashboard now lists eight active Polymarket questions and lets the user select one to view its indexed outcome labels, independent YES/NO midpoint percentages, and aggregate open interest. Resource failures remain isolated and the surface has no recommendation, account, mutation, order, or execution controls.
+
 M9.33 is complete: one public route resolves a canonical outcome token to its CLOB condition plus distinct indexed YES and NO token identities. It verifies exact requested-token membership, reports the requested outcome side, and remains stateless, identity-only, and non-executable without positions or accounts.
 
 M9.32 is complete: one selected-binary-market route composes the indexed YES and NO historical price changes over the same bounded interval. It preserves all four independently selected observations, calculates their exact combined change and direction, exposes cross-outcome alignment at each boundary, and remains explicitly non-atomic and non-executable.
@@ -450,6 +452,16 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
+The following passed on 2026-09-29 after M9.34:
+
+- `npm run test:dashboard` — 21 tests passed across 5 files
+- `npm test -- --runInBand` — 1,529 backend tests passed across 132 suites
+- `npm run lint`
+- `npm run format:check`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
 The following passed on 2026-09-29 after M9.33:
 
 - focused M9.33 Jest validation — 273 tests passed across 4 suites
@@ -539,7 +551,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.33. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, and indexed binary payout-result observations are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
+M0 through M8.11 are complete, and M9 is implemented through M9.34. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the first read-only dashboard research surface are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
 
 ## Known issues and cautions
 

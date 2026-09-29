@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-29 — Compose the first Polymarket dashboard from independent resources
+
+M9.34 uses the existing bounded market-discovery route for visible questions and loads selected-market detail, open interest, and midpoint complement independently. It does not introduce an aggregate backend endpoint because the component observations have different freshness and availability contracts.
+
+The dashboard keeps those unavailable states separate and labels midpoint data non-executable. Selection is browser-local and follows the existing visibility-aware refresh lifecycle; no provider credentials, recommendation logic, account state, mutation, order, or execution control enters the frontend.
+
 ## 2026-09-29 — Resolve outcome parentage through the CLOB identity contract
 
 M9.33 uses the public CLOB market-by-token endpoint rather than searching Gamma catalogs or inferring parentage from price observations. The adapter accepts only one canonical condition plus distinct primary/YES and secondary/NO token identities and requires the requested token to match exactly one side.

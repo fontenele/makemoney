@@ -3,9 +3,12 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import {
   loadDashboard,
   loadListingPerformance,
+  loadPolymarketMarketResearch,
   type DashboardSnapshot,
   type DetectedSpotSymbol,
   type ListingPerformance,
+  type PolymarketMarketResearch,
+  type PolymarketMarketSummary,
   type Resource,
 } from './api';
 import {
@@ -23,6 +26,10 @@ const selectedListing = ref<DetectedSpotSymbol | null>(null);
 const listingPerformance = ref<Resource<ListingPerformance> | null>(null);
 const listingPerformanceLoading = ref(false);
 let listingPerformanceRequest = 0;
+const selectedPolymarketMarket = ref<PolymarketMarketSummary | null>(null);
+const polymarketResearch = ref<PolymarketMarketResearch | null>(null);
+const polymarketResearchLoading = ref(false);
+let polymarketResearchRequest = 0;
 
 const apiOnline = computed(() => snapshot.value?.health.status === 'available');
 const signalChart = computed(() =>
@@ -74,6 +81,23 @@ function selectListing(listing: DetectedSpotSymbol): void {
   void refreshListingPerformance(listing);
 }
 
+async function refreshPolymarketResearch(
+  market: PolymarketMarketSummary,
+): Promise<void> {
+  const request = ++polymarketResearchRequest;
+  polymarketResearchLoading.value = true;
+  const result = await loadPolymarketMarketResearch(market.id);
+  if (request !== polymarketResearchRequest) return;
+  polymarketResearch.value = result;
+  polymarketResearchLoading.value = false;
+}
+
+function selectPolymarketMarket(market: PolymarketMarketSummary): void {
+  selectedPolymarketMarket.value = market;
+  polymarketResearch.value = null;
+  void refreshPolymarketResearch(market);
+}
+
 async function refresh(): Promise<void> {
   if (refreshing.value) return;
   refreshing.value = true;
@@ -81,6 +105,9 @@ async function refresh(): Promise<void> {
     snapshot.value = await loadDashboard();
     if (selectedListing.value) {
       await refreshListingPerformance(selectedListing.value);
+    }
+    if (selectedPolymarketMarket.value) {
+      await refreshPolymarketResearch(selectedPolymarketMarket.value);
     }
   } finally {
     refreshing.value = false;
@@ -125,6 +152,12 @@ function percentage(value: string): string {
   return (parsed > 0 ? '+' : '') + (parsed * 100).toFixed(2) + '%';
 }
 
+function probability(value: string): string {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return '—';
+  return (parsed * 100).toFixed(1) + '%';
+}
+
 function timestamp(value: string): string {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return '—';
@@ -164,6 +197,7 @@ onUnmounted(() => autoRefresh.stop());
         <a href="#executions">Executions</a>
         <a href="#strategy">Strategy</a>
         <a href="#backtests">Backtests</a>
+        <a href="#polymarket">Polymarket</a>
         <a href="#new-listings">New listings</a>
       </nav>
 
@@ -625,6 +659,135 @@ onUnmounted(() => autoRefresh.stop());
       </template>
       <p v-else class="empty-state execution-empty">
         {{ snapshot?.backtestRuns.message ?? 'Loading stored backtests…' }}
+      </p>
+    </section>
+
+    <section
+      id="polymarket"
+      class="panel polymarket-panel"
+      aria-labelledby="polymarket-title"
+    >
+      <div class="panel-heading execution-heading">
+        <div>
+          <p class="eyebrow">Public prediction-market research</p>
+          <h2 id="polymarket-title">Active Polymarket markets</h2>
+        </div>
+        <span class="history-limit">8 active · read only</span>
+      </div>
+
+      <template v-if="available(snapshot?.polymarketMarkets)">
+        <p
+          v-if="snapshot.polymarketMarkets.data.markets.length === 0"
+          class="empty-state execution-empty"
+        >
+          No active public markets returned.
+        </p>
+        <div v-else class="polymarket-grid">
+          <button
+            v-for="market in snapshot.polymarketMarkets.data.markets"
+            :key="market.id"
+            type="button"
+            class="polymarket-card"
+            :class="{ selected: selectedPolymarketMarket?.id === market.id }"
+            :aria-pressed="selectedPolymarketMarket?.id === market.id"
+            @click="selectPolymarketMarket(market)"
+          >
+            <span>Market {{ market.id }}</span>
+            <strong>{{
+              market.question ?? market.slug ?? 'Untitled market'
+            }}</strong>
+            <small>{{
+              market.conditionId ? 'Condition available' : 'Awaiting condition'
+            }}</small>
+          </button>
+        </div>
+
+        <article
+          v-if="selectedPolymarketMarket"
+          class="polymarket-research"
+          aria-live="polite"
+        >
+          <div class="listing-research-heading">
+            <div>
+              <p class="eyebrow">Selected public market</p>
+              <h3>
+                {{
+                  selectedPolymarketMarket.question ??
+                  selectedPolymarketMarket.slug ??
+                  `Market ${selectedPolymarketMarket.id}`
+                }}
+              </h3>
+            </div>
+            <span>Non-executable</span>
+          </div>
+
+          <p
+            v-if="polymarketResearchLoading"
+            class="empty-state polymarket-state"
+          >
+            Loading market identity and statistics…
+          </p>
+          <div v-else-if="polymarketResearch" class="polymarket-stat-grid">
+            <div>
+              <span>YES midpoint</span>
+              <strong v-if="available(polymarketResearch.midpointComplement)">
+                {{
+                  probability(
+                    polymarketResearch.midpointComplement.data.outcomes.yes
+                      .price,
+                  )
+                }}
+              </strong>
+              <small v-else>{{
+                polymarketResearch.midpointComplement.message
+              }}</small>
+            </div>
+            <div>
+              <span>NO midpoint</span>
+              <strong v-if="available(polymarketResearch.midpointComplement)">
+                {{
+                  probability(
+                    polymarketResearch.midpointComplement.data.outcomes.no
+                      .price,
+                  )
+                }}
+              </strong>
+              <small v-else>{{
+                polymarketResearch.midpointComplement.message
+              }}</small>
+            </div>
+            <div>
+              <span>Open interest</span>
+              <strong v-if="available(polymarketResearch.openInterest)">
+                {{
+                  decimal(polymarketResearch.openInterest.data.openInterestUsdc)
+                }}
+                USDC
+              </strong>
+              <small v-else>{{
+                polymarketResearch.openInterest.message
+              }}</small>
+            </div>
+            <div>
+              <span>Outcome identities</span>
+              <strong v-if="available(polymarketResearch.details)">
+                {{ polymarketResearch.details.data.outcomes.yes.label }} /
+                {{ polymarketResearch.details.data.outcomes.no.label }}
+              </strong>
+              <small v-else>{{ polymarketResearch.details.message }}</small>
+            </div>
+          </div>
+          <p class="polymarket-note">
+            Midpoints are independent observations, not executable quotes or
+            recommendations.
+          </p>
+        </article>
+      </template>
+      <p v-else class="empty-state execution-empty">
+        {{
+          snapshot?.polymarketMarkets.message ??
+          'Loading public Polymarket markets…'
+        }}
       </p>
     </section>
 

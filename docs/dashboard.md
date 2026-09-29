@@ -109,3 +109,11 @@ The moving-average signal chart, latest backtest equity curve, and selected-list
 The three existing chart transformation modules now create ECharts options while preserving their prior chronological filtering, displayed ranges, signal markers, zero baseline, exact source strings, and empty-data behavior. Existing hand-built chart SVG paths and styles were removed.
 
 Vite emits the application, ECharts, and ZRender as separate bounded chunks. M8.11 adds no backend route, financial calculation, signal generation, recommendation, mutation, order submission, provider credential, or real-trading behavior.
+
+## M9.34 Polymarket market research
+
+The dashboard independently requests `GET /polymarket/markets?limit=8` and displays the returned active market questions as a responsive, keyboard-accessible selection grid. This is the first visible Polymarket surface; it reuses the existing local APIs and adds no backend route.
+
+Selecting one market concurrently loads its existing detail, open-interest, and midpoint-complement resources. The panel shows indexed YES/NO labels, independently observed midpoint percentages, and aggregate open interest in USDC. Each resource retains an isolated unavailable state, so an absent open-interest measurement does not hide valid identity or midpoint data.
+
+Selection remains browser-local and refreshes with the established visibility-aware dashboard cadence. Midpoints remain explicitly non-executable, are not atomic quotes, and are not recommendations or probability guarantees. The view does not yet display event-level volume, price history, full order-book depth, last trades, holders, positions, accounts, orders, or execution controls.
