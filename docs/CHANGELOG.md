@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-09-29 — M9.45 Polymarket dashboard binary midpoint relationship completed
+
+- Reused the selected market's existing midpoint-complement response without adding a provider request or backend route.
+- Displayed the exact midpoint sum, signed deviation from one, percentage presentation, and descriptive relationship classification.
+- Preserved independent-receipt, non-atomic, and non-executable semantics without arbitrage, coherence, recommendation, account, order, or execution claims.
+- Added focused coverage for all three relationship labels and strengthened the dashboard API contract assertion.
+- Verified 39 dashboard tests, 1,551 backend tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
+## 2026-09-29 — M9.44 Polymarket dashboard explicit related taxonomy completed
+
+- Made direct selected-market tags explicit controls that load one existing bounded first-level related-tag resource.
+- Displayed related labels with slug and identity fallbacks plus distinct loading, empty, and unavailable states.
+- Prevented recursive traversal by keeping related results display-only and suppressed stale responses after newer selections.
+- Cleared browser-local relationship state when changing market or disabling provider access.
+- Added no backend route, implicit expansion, discovery filtering, ranking, persistence, recommendation, account, order, or execution behavior.
+- Verified 36 dashboard tests, 1,551 backend tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
+## 2026-09-29 — M9.43 Polymarket dashboard selected-market taxonomy completed
+
+- Loaded the existing bounded direct market-tag resource independently for each selected market.
+- Displayed provider tag labels with slug and identity fallbacks, plus explicit empty and unavailable states.
+- Kept taxonomy failure isolated from identity, midpoint, open interest, books, latest trades, and historical observations.
+- Added no backend route, related-tag expansion, discovery filtering, ranking, persistence, recommendation, account, order, or execution behavior.
+- Verified 34 dashboard tests, 1,551 backend tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
+## 2026-09-29 — M9.42 Polymarket dashboard global open interest completed
+
+- Loaded the existing parameter-free public platform-wide open-interest observation independently during each dashboard refresh.
+- Displayed the exact aggregate USDC value and local receipt time separately from selected-market open interest.
+- Preserved an isolated unavailable state so aggregate failure does not hide Data API freshness, discovery, or selected-market research.
+- Added no backend route, market expansion, holders, wallet positions, persistence, recommendation, account, order, or execution behavior.
+- Verified 33 dashboard tests, 1,551 backend tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
 ## 2026-09-29 — M9.41 Polymarket dashboard Data API freshness completed
 
 - Loaded the existing parameter-free public Data API freshness snapshot independently during each dashboard refresh.

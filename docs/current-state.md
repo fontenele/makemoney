@@ -4,6 +4,14 @@ Last validated: 2026-09-29
 
 The startup validator accepts strictly positive canonical fractional values such as `0.01` for risk limits, matching the documented defaults and `.env.example`.
 
+M9.45 is complete: selected-market research now surfaces the existing exact midpoint sum, signed deviation from one, and descriptive `balanced`, `below_one`, or `above_one` relationship. The browser adds no provider request and explicitly preserves independent receipt, non-atomic, and non-executable semantics without arbitrage, recommendation, account, order, or execution claims.
+
+M9.44 is complete: an explicit selection of one direct market tag now loads and displays its bounded first-level related taxonomy. Related results are display-only, stale requests are suppressed, selection clears with market or provider state changes, and no recursive traversal, implicit expansion, discovery filtering, ranking, persistence, recommendation, account, order, or execution behavior is added.
+
+M9.43 is complete: selected Polymarket market research now displays the bounded tags directly attached to that market, with provider label, slug, and identity fallbacks plus distinct empty and unavailable states. Taxonomy remains isolated from every other observation and adds no related-tag expansion, filtering, ranking, persistence, recommendation, account, order, or execution behavior.
+
+M9.42 is complete: the dashboard now displays the existing platform-wide Polymarket open-interest aggregate with its exact USDC value and local receipt time, separately from selected-market open interest. Aggregate failure remains isolated from Data API freshness, discovery, and selected-market research, with no market expansion, holder or position access, persistence, recommendation, order, or execution behavior.
+
 M9.41 is complete: the dashboard now displays the public Polymarket Data API freshness snapshot independently from local health and market discovery. Snapshot age, serving lag, worst ingestion cursor, network, and cursor count remain descriptive provider facts without invented thresholds, Gamma/CLOB freshness claims, alerts, recommendations, or execution behavior.
 
 M9.40 is complete: selected Polymarket markets now plot independently loaded YES and NO price histories over the trailing 24-hour UTC window at 30-minute resolution. Each first page is bounded to 100 points, either outcome can render alone, and the fixed zero-to-one scale adds no synchronized-snapshot, probability-guarantee, signal, recommendation, or execution claim.
@@ -466,6 +474,46 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
+The following passed on 2026-09-29 after M9.45:
+
+- `npm run test:dashboard` — 39 tests passed across 7 files
+- `npm test -- --runInBand` — 1,551 backend tests passed across 135 suites
+- `npm run format:check`
+- `npm run lint`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
+The following passed on 2026-09-29 after M9.44:
+
+- `npm run test:dashboard` — 36 tests passed across 6 files
+- `npm test -- --runInBand` — 1,551 backend tests passed across 135 suites
+- `npm run format:check`
+- `npm run lint`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
+The following passed on 2026-09-29 after M9.43:
+
+- `npm run test:dashboard` — 34 tests passed across 6 files
+- `npm test -- --runInBand` — 1,551 backend tests passed across 135 suites
+- `npm run format:check`
+- `npm run lint`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
+The following passed on 2026-09-29 after M9.42:
+
+- `npm run test:dashboard` — 33 tests passed across 6 files
+- `npm test -- --runInBand` — 1,551 backend tests passed across 135 suites
+- `npm run format:check`
+- `npm run lint`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
 The following passed on 2026-09-29 after M9.41:
 
 - `npm run test:dashboard` — 32 tests passed across 6 files
@@ -617,7 +665,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.41. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the dashboard's Data API freshness, selected-market midpoint, open-interest, level-one liquidity, latest reported trades, trailing 24-hour price change and history chart, and process-local availability control are isolated from Spot crypto and every execution path. Live Gamma, Data API, and CLOB dashboard paths passed with the development VPN active; startup and post-restart behavior defaults to disabled.
+M0 through M8.11 are complete, and M9 is implemented through M9.44. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the dashboard's Data API freshness, platform-wide and selected-market open interest, direct and explicitly selected first-level related taxonomy, selected-market midpoint, level-one liquidity, latest reported trades, trailing 24-hour price change and history chart, and process-local availability control are isolated from Spot crypto and every execution path. Live Gamma, Data API, and CLOB dashboard paths passed with the development VPN active; startup and post-restart behavior defaults to disabled.
 
 ## Known issues and cautions
 

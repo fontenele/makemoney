@@ -1,5 +1,29 @@
 # Technical Decisions
 
+## 2026-09-29 — Reuse the midpoint-complement contract in the dashboard
+
+M9.45 presents the exact sum, signed deviation, and descriptive classification already calculated by M9.8 instead of recomputing the relationship in the browser or issuing another provider request. Browser formatting is limited to a secondary percentage representation while the source decimal strings remain visible.
+
+The panel explicitly retains independent-receipt, non-atomic, and non-executable semantics. The three labels describe only whether the sum equals, falls below, or exceeds one and do not imply probability coherence, arbitrage, profit, recommendation, or executable liquidity.
+
+## 2026-09-29 — Require explicit selection for one related-tag level
+
+M9.44 does not load relationships merely because a market was selected. One direct tag must be chosen explicitly before the browser calls the established related-tag route; related results are display-only, so they cannot trigger recursive provider traffic.
+
+The browser clears relationship state when the market changes or provider access is disabled and uses a monotonically increasing request identity to ignore stale responses. The selected relationship refreshes with the existing visible dashboard cadence only after that initial choice and never changes discovery filters or market ordering.
+
+## 2026-09-29 — Display only direct selected-market taxonomy
+
+M9.43 requests the established market-tag resource independently with the other selected-market observations. The dashboard renders only the provider's bounded direct tag set and uses label, slug, then identity as presentation fallbacks; an empty set is not treated as unavailable.
+
+The browser does not request related tags, recursively traverse taxonomy, apply tag filters to discovery, infer categories, or rank markets. Taxonomy failure remains isolated from identity, prices, liquidity, trades, history, and open interest.
+
+## 2026-09-29 — Keep platform and selected-market open interest distinct
+
+M9.42 requests the established parameter-free platform aggregate independently during the general dashboard refresh. The dashboard presents its exact USDC value and receipt time in a dedicated context card rather than combining it with the selected market's condition-level open interest.
+
+Global open-interest failure remains isolated from Data API freshness, discovery, and selected-market resources. The browser performs formatting only and does not expand markets, infer holder or position state, persist observations, recommend action, or connect the value to execution.
+
 ## 2026-09-29 — Keep provider freshness descriptive and feed-specific
 
 M9.41 displays the established Data API freshness observation separately from local application health and from Gamma/CLOB resources. Snapshot age, serving lag, ingestion lag, and cursor coverage are provider facts; the dashboard does not invent green/amber/red thresholds or generalize them to APIs the status endpoint does not measure.

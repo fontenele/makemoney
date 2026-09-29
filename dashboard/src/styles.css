@@ -623,6 +623,51 @@ h1 em {
   margin: 0 0 20px;
 }
 
+.polymarket-global-interest {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.8fr);
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 17px 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.polymarket-global-interest > div {
+  display: grid;
+  gap: 7px;
+}
+
+.polymarket-global-interest span,
+.polymarket-global-interest small,
+.polymarket-global-interest p,
+.polymarket-global-interest-unavailable {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.polymarket-global-interest span {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.polymarket-global-interest strong {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.polymarket-global-interest p {
+  margin: 0;
+}
+
+.polymarket-global-interest-unavailable {
+  margin: 0 0 20px;
+}
+
 .polymarket-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -914,6 +959,127 @@ h1 em {
 .polymarket-stat-grid small {
   align-self: end;
   text-transform: none;
+}
+
+.polymarket-midpoint-complement {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 12px;
+  background: var(--line);
+}
+
+.polymarket-midpoint-complement > div {
+  display: grid;
+  min-height: 88px;
+  gap: 8px;
+  padding: 17px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.polymarket-midpoint-complement span,
+.polymarket-midpoint-complement small,
+.polymarket-midpoint-complement-unavailable {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.polymarket-midpoint-complement span {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.polymarket-midpoint-complement strong {
+  align-self: end;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 15px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.polymarket-tags {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.polymarket-tags > span,
+.polymarket-tags small,
+.polymarket-tags p,
+.polymarket-tags-unavailable {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.polymarket-tags > span {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.polymarket-tags ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.polymarket-tags li,
+.polymarket-tags button {
+  color: var(--ink);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+}
+
+.polymarket-tags button,
+.polymarket-related-tags li {
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+}
+
+.polymarket-tags button {
+  cursor: pointer;
+}
+
+.polymarket-tags button:hover,
+.polymarket-tags button:focus-visible,
+.polymarket-tags button.selected {
+  border-color: var(--green);
+  color: var(--green-bright);
+}
+
+.polymarket-tags p,
+.polymarket-tags-unavailable {
+  margin: 0;
+}
+
+.polymarket-tags-unavailable {
+  margin-top: 12px;
+}
+
+.polymarket-related-tags {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.polymarket-related-tags > span {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .polymarket-note {
@@ -1475,6 +1641,7 @@ footer {
 
   .polymarket-grid,
   .polymarket-stat-grid,
+  .polymarket-midpoint-complement,
   .polymarket-freshness {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1482,6 +1649,10 @@ footer {
   .polymarket-access {
     grid-template-columns: 1fr;
     align-items: start;
+  }
+
+  .polymarket-global-interest {
+    grid-template-columns: 1fr;
   }
 
   .polymarket-access button {
@@ -1608,7 +1779,8 @@ footer {
   }
 
   .polymarket-grid,
-  .polymarket-stat-grid {
+  .polymarket-stat-grid,
+  .polymarket-midpoint-complement {
     grid-template-columns: 1fr;
   }
 

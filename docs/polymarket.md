@@ -289,7 +289,31 @@ The override is held only in the current API process. Restarting restores `POLYM
 
 ## Boundaries
 
-M9.1–M9.41 do not persist or poll markets, events, tags, series, or provider status. M9.3–M9.36 expose bounded public observations and dashboard research without executable quote, fill, recommendation, or probability-guarantee semantics. M9.37 stores only a process-local availability override and adds no market-data retention. M9.38 displays only the existing latest reported trade per indexed outcome, without trade history, identity, quantity, or provider time. M9.39 displays one on-demand trailing 24-hour M9.32 comparison as absolute percentage-point changes, not percentage returns or an atomic historical series. M9.40 independently loads the first bounded 30-minute history page for each outcome and charts available values without joining timestamps into atomic pairs or retaining data. M9.41 surfaces the existing Data API freshness snapshot without extending it to Gamma, CLOB, or local-health claims. The increments do not load user positions or accounts and have no authentication, signing, wallet, order, redemption, strategy, signal, paper execution, or real execution path.
+M9.1–M9.45 do not persist or poll markets, events, tags, series, or provider status. M9.3–M9.36 expose bounded public observations and dashboard research without executable quote, fill, recommendation, or probability-guarantee semantics. M9.37 stores only a process-local availability override and adds no market-data retention. M9.38 displays only the existing latest reported trade per indexed outcome, without trade history, identity, quantity, or provider time. M9.39 displays one on-demand trailing 24-hour M9.32 comparison as absolute percentage-point changes, not percentage returns or an atomic historical series. M9.40 independently loads the first bounded 30-minute history page for each outcome and charts available values without joining timestamps into atomic pairs or retaining data. M9.41 surfaces the existing Data API freshness snapshot without extending it to Gamma, CLOB, or local-health claims. M9.42 surfaces the existing platform-wide open-interest aggregate separately from selected-market open interest and retains its isolated unavailable state. M9.43 displays only the direct bounded tags of the selected market. M9.44 loads one bounded related-tag level only after explicit tag selection, without implicit or recursive expansion or discovery filtering. M9.45 displays the existing midpoint sum, signed deviation, and descriptive relationship without another provider request or an arbitrage claim. The increments do not load user positions or accounts and have no authentication, signing, wallet, order, redemption, strategy, signal, paper execution, or real execution path.
+
+## M9.42 — Dashboard platform-wide open interest
+
+The dashboard independently requests the existing parameter-free `GET /polymarket/open-interest` route during its general refresh. It displays the exact aggregate USDC value and local receipt time in a dedicated platform context card, separate from the selected market's condition-level open interest.
+
+Failure affects only this card and does not suppress Data API freshness, market discovery, or selected-market research. The observation remains public, descriptive, and explicitly non-executable. M9.42 adds no backend route, market expansion, holder or wallet-position data, persistence, account access, recommendation, signal, order, or execution behavior.
+
+## M9.43 — Dashboard selected-market taxonomy
+
+Selected-market research independently requests the existing `GET /polymarket/markets/:id/tags` resource. The dashboard displays the bounded direct tag set using the provider label, then slug, then identity as a presentation fallback. An empty set is distinct from an unavailable resource.
+
+Taxonomy failure does not suppress market identity, prices, books, trades, history, or open interest. The dashboard does not request related tags, recursively traverse taxonomy, apply tag-based discovery filters, infer categories, rank markets, or add persistence, recommendation, account, order, or execution behavior.
+
+## M9.44 — Dashboard explicit related taxonomy
+
+Each direct selected-market tag is an explicit browser control. Choosing one calls the existing `GET /polymarket/tags/:id/related` route and displays its bounded first-level identities using label, slug, then ID fallbacks. Loading, empty, and unavailable states remain distinct, and switching market or disabling provider access clears the browser-local selection.
+
+Related results are deliberately display-only and cannot be selected for another lookup. The client suppresses stale responses when selection changes and adds no recursive traversal, implicit expansion, relationship weight, discovery filtering, ranking, persistence, recommendation, account, order, or execution behavior.
+
+## M9.45 — Dashboard binary midpoint relationship
+
+The selected-market dashboard reuses the established M9.8 response to display the exact midpoint sum, signed deviation from one, and descriptive `balanced`, `below_one`, or `above_one` relationship. It adds no provider request or backend route and keeps unavailability isolated with the existing midpoint resource.
+
+The UI preserves the raw decimal strings and adds percentage formatting only for presentation. It explicitly states that YES and NO were independently received and that the comparison is non-atomic and non-executable; no deviation is interpreted as arbitrage, incoherence, profit, recommendation, or an execution opportunity.
 
 ## M9.35 operational availability
 

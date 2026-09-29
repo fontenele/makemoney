@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, **M6 — Backtesting (M6.1–M6.32)**, **M7 — New Listing Scanner (M7.1–M7.109)**, and **M8 — Dashboard (M8.1–M8.11)**.
-- M9 is in progress through **M9.41 — Polymarket Dashboard Data API Freshness**.
+- M9 is in progress through **M9.45 — Polymarket Dashboard Binary Midpoint Relationship**.
 - M6 is closed. M7.1–M7.109 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -436,6 +436,14 @@ M9.39 extends selected-market dashboard research with the existing binary price-
 M9.40 loads one bounded 30-minute price-history page independently for each indexed outcome over the same trailing 24-hour window and displays the available YES/NO series on a fixed zero-to-one chart. Missing outcomes remain isolated, the pages are neither joined into atomic observations nor retained, and the chart adds no signal, recommendation, or execution semantics.
 
 M9.41 displays the existing public Data API freshness snapshot independently from local health and market discovery. It exposes provider-reported snapshot age, serving lag, worst ingestion lag, and cursor coverage without inventing alert thresholds or claiming freshness for Gamma or CLOB resources.
+
+M9.42 displays the existing public platform-wide open-interest observation independently from selected-market open interest, Data API freshness, and discovery. It preserves the exact USDC aggregate, local receipt time, isolated unavailability, and explicitly non-executable semantics without adding holders, accounts, positions, persistence, recommendations, orders, or execution behavior.
+
+M9.43 displays the existing bounded taxonomy directly attached to a selected Polymarket market. It preserves provider label/slug fallbacks, explicit empty and unavailable states, and does not expand related tags, filter discovery, rank markets, persist observations, or introduce recommendation or execution behavior.
+
+M9.44 lets the user explicitly select one direct market tag and load its existing bounded first-level related-tag set. Related results are display-only and cannot trigger recursive traversal; selection is browser-local, stale responses are suppressed, and no discovery filtering, ranking, persistence, recommendation, or execution behavior is added.
+
+M9.45 displays the selected market's existing exact midpoint sum, signed deviation from one, and descriptive relationship classification alongside its independently observed YES and NO midpoints. The view preserves explicit non-atomic and non-executable semantics and adds no provider request, arbitrage claim, recommendation, persistence, account, order, or execution behavior.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

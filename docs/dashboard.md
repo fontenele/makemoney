@@ -163,3 +163,27 @@ The dashboard independently requests the existing parameter-free `GET /polymarke
 This observation describes the public Data API only. It remains separate from the application's `/health` resource and does not claim freshness for Gamma discovery, CLOB books, midpoints, or latest trades. The dashboard applies no warning threshold or traffic-light classification because the provider contract supplies measurements rather than a locally approved operational policy.
 
 Freshness failure is isolated from provider settings, market discovery, and selected-market resources. M9.41 adds no persistence, alert, automated response, VPN action, recommendation, account, order, or execution behavior.
+
+## M9.42 platform-wide open interest context
+
+The dashboard independently requests the existing parameter-free `GET /polymarket/open-interest` resource during each general refresh. A separate platform context card displays the exact aggregate open interest in USDC and the application's local receipt time without conflating it with the selected market's condition-level measurement.
+
+Unavailable global open interest remains isolated from Data API freshness, discovery, and selected-market research. The value is descriptive and explicitly non-executable. M9.42 adds no backend route, market expansion, holders, wallet positions, persistence, account access, recommendation, signal, order, or execution behavior.
+
+## M9.43 selected-market direct taxonomy
+
+Each selected-market refresh independently requests the existing bounded `GET /polymarket/markets/:id/tags` resource. The research panel presents directly attached tags as compact labels, using the provider label, nullable slug, or tag identity in that order. An empty direct taxonomy and an unavailable taxonomy are explicit separate states.
+
+The dashboard does not follow related-tag relationships, filter market discovery, infer missing categories, or rank markets by taxonomy. Failure remains isolated from every other selected-market observation. M9.43 adds no backend route, persistence, recommendation, signal, account, order, or execution behavior.
+
+## M9.44 explicit first-level related taxonomy
+
+Direct market-tag labels become explicit controls. Selecting one independently requests the existing `GET /polymarket/tags/:id/related` resource and displays the bounded first-level result with separate loading, empty, and unavailable states. Selection is browser-local, resets when the selected market changes or provider access is disabled, and refreshes only after the initial user choice.
+
+Related results are plain display labels rather than controls, preventing recursive traversal. Request sequencing ignores stale responses when a newer tag is selected. M9.44 adds no backend route, implicit expansion, discovery filtering, relationship weight, ranking, persistence, recommendation, signal, account, order, or execution behavior.
+
+## M9.45 selected-market binary midpoint relationship
+
+The selected-market panel now exposes the exact `midpointSum`, signed `deviationFromOne`, and descriptive `balanced`, `below_one`, or `above_one` classification already returned with the YES and NO midpoint observations. The browser adds percentage formatting for readability while retaining the source decimal strings.
+
+This view reuses the existing midpoint-complement request and therefore adds no provider traffic or backend route. It explicitly labels the observations as independent receipts, non-atomic, and non-executable; a deviation is not presented as arbitrage, incoherence, profit, a recommendation, or an execution opportunity.

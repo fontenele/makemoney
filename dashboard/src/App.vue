@@ -4,12 +4,15 @@ import {
   loadDashboard,
   loadListingPerformance,
   loadPolymarketMarketResearch,
+  loadPolymarketRelatedTags,
   updatePolymarketSettings,
   type DashboardSnapshot,
   type DetectedSpotSymbol,
   type ListingPerformance,
   type PolymarketMarketResearch,
   type PolymarketMarketSummary,
+  type PolymarketMarketTag,
+  type PolymarketRelatedTags,
   type Resource,
 } from './api';
 import {
@@ -20,6 +23,7 @@ import { buildSignalChart } from './signal-chart';
 import { buildListingPerformanceChart } from './listing-performance-chart';
 import { buildEquityChart } from './equity-chart';
 import { buildPolymarketPriceChart } from './polymarket-price-chart';
+import { polymarketMidpointComplementStatusLabel } from './polymarket-midpoint-complement';
 import DashboardChart from './DashboardChart.vue';
 
 const snapshot = ref<DashboardSnapshot | null>(null);
@@ -32,11 +36,20 @@ const selectedPolymarketMarket = ref<PolymarketMarketSummary | null>(null);
 const polymarketResearch = ref<PolymarketMarketResearch | null>(null);
 const polymarketResearchLoading = ref(false);
 let polymarketResearchRequest = 0;
+const selectedPolymarketTag = ref<PolymarketMarketTag | null>(null);
+const relatedPolymarketTags = ref<Resource<PolymarketRelatedTags> | null>(null);
+const relatedPolymarketTagsLoading = ref(false);
+let relatedPolymarketTagsRequest = 0;
 const polymarketAccessConfirmed = ref(false);
 const polymarketSettingsUpdating = ref(false);
 const polymarketSettingsMessage = ref<string | null>(null);
 
 const apiOnline = computed(() => snapshot.value?.health.status === 'available');
+const availableRelatedPolymarketTags = computed(() =>
+  relatedPolymarketTags.value?.status === 'available'
+    ? relatedPolymarketTags.value.data
+    : null,
+);
 const signalChart = computed(() =>
   snapshot.value?.strategySignals.status === 'available'
     ? buildSignalChart(snapshot.value.strategySignals.data)
@@ -107,12 +120,49 @@ async function refreshPolymarketResearch(
   if (request !== polymarketResearchRequest) return;
   polymarketResearch.value = result;
   polymarketResearchLoading.value = false;
+  if (selectedPolymarketTag.value) {
+    const tagStillAttached =
+      available(result.tags) &&
+      result.tags.data.tags.some(
+        (tag) => tag.id === selectedPolymarketTag.value?.id,
+      );
+    if (tagStillAttached) {
+      await refreshRelatedPolymarketTags(selectedPolymarketTag.value);
+    } else {
+      clearPolymarketTagSelection();
+    }
+  }
 }
 
 function selectPolymarketMarket(market: PolymarketMarketSummary): void {
   selectedPolymarketMarket.value = market;
   polymarketResearch.value = null;
+  clearPolymarketTagSelection();
   void refreshPolymarketResearch(market);
+}
+
+async function refreshRelatedPolymarketTags(
+  tag: PolymarketMarketTag,
+): Promise<void> {
+  const request = ++relatedPolymarketTagsRequest;
+  relatedPolymarketTagsLoading.value = true;
+  const result = await loadPolymarketRelatedTags(tag.id);
+  if (request !== relatedPolymarketTagsRequest) return;
+  relatedPolymarketTags.value = result;
+  relatedPolymarketTagsLoading.value = false;
+}
+
+function selectPolymarketTag(tag: PolymarketMarketTag): void {
+  selectedPolymarketTag.value = tag;
+  relatedPolymarketTags.value = null;
+  void refreshRelatedPolymarketTags(tag);
+}
+
+function clearPolymarketTagSelection(): void {
+  selectedPolymarketTag.value = null;
+  relatedPolymarketTags.value = null;
+  relatedPolymarketTagsLoading.value = false;
+  relatedPolymarketTagsRequest += 1;
 }
 
 async function changePolymarketAvailability(enabled: boolean): Promise<void> {
@@ -134,6 +184,7 @@ async function changePolymarketAvailability(enabled: boolean): Promise<void> {
       selectedPolymarketMarket.value = null;
       polymarketResearch.value = null;
       polymarketResearchRequest += 1;
+      clearPolymarketTagSelection();
     }
     await refresh();
   } finally {
@@ -224,6 +275,12 @@ function available<T>(resource: Resource<T> | undefined): resource is {
   data: T;
 } {
   return resource?.status === 'available';
+}
+
+function unavailableMessage<T>(resource: Resource<T>): string {
+  return resource.status === 'unavailable'
+    ? resource.message
+    : 'Resource is unavailable';
 }
 
 onMounted(() => autoRefresh.start());
@@ -857,6 +914,40 @@ onUnmounted(() => autoRefresh.stop());
         }}
       </p>
 
+      <div
+        v-if="available(snapshot?.polymarketGlobalOpenInterest)"
+        class="polymarket-global-interest"
+      >
+        <div>
+          <span>Platform open interest</span>
+          <strong>
+            {{
+              decimal(
+                snapshot.polymarketGlobalOpenInterest.data.openInterestUsdc,
+              )
+            }}
+            USDC
+          </strong>
+          <small>
+            Public Data API aggregate · received
+            {{
+              timestamp(snapshot.polymarketGlobalOpenInterest.data.receivedAt)
+            }}
+          </small>
+        </div>
+        <p>
+          Platform-wide measurement, separate from the selected market. It is
+          descriptive and non-executable.
+        </p>
+      </div>
+      <p v-else class="empty-state polymarket-global-interest-unavailable">
+        Platform open interest:
+        {{
+          snapshot?.polymarketGlobalOpenInterest.message ??
+          'Loading platform aggregate…'
+        }}
+      </p>
+
       <template v-if="available(snapshot?.polymarketMarkets)">
         <p
           v-if="snapshot.polymarketMarkets.data.markets.length === 0"
@@ -959,6 +1050,127 @@ onUnmounted(() => autoRefresh.stop());
               <small v-else>{{ polymarketResearch.details.message }}</small>
             </div>
           </div>
+          <div
+            v-if="
+              polymarketResearch &&
+              available(polymarketResearch.midpointComplement)
+            "
+            class="polymarket-midpoint-complement"
+            aria-label="Binary midpoint relationship"
+          >
+            <div>
+              <span>Midpoint sum</span>
+              <strong>
+                {{ polymarketResearch.midpointComplement.data.midpointSum }}
+              </strong>
+              <small>
+                {{
+                  probability(
+                    polymarketResearch.midpointComplement.data.midpointSum,
+                  )
+                }}
+              </small>
+            </div>
+            <div>
+              <span>Deviation from one</span>
+              <strong>
+                {{
+                  polymarketResearch.midpointComplement.data.deviationFromOne
+                }}
+              </strong>
+              <small>
+                {{
+                  probabilityChange(
+                    polymarketResearch.midpointComplement.data.deviationFromOne,
+                  )
+                }}
+              </small>
+            </div>
+            <div>
+              <span>Relationship</span>
+              <strong>
+                {{
+                  polymarketMidpointComplementStatusLabel(
+                    polymarketResearch.midpointComplement.data.status,
+                  )
+                }}
+              </strong>
+              <small>Independent receipts · non-atomic · non-executable</small>
+            </div>
+          </div>
+          <p
+            v-else-if="
+              polymarketResearch &&
+              !available(polymarketResearch.midpointComplement)
+            "
+            class="empty-state polymarket-midpoint-complement-unavailable"
+          >
+            Binary midpoint relationship:
+            {{ polymarketResearch.midpointComplement.message }}
+          </p>
+          <div
+            v-if="polymarketResearch && available(polymarketResearch.tags)"
+            class="polymarket-tags"
+          >
+            <span>Direct market taxonomy</span>
+            <p v-if="polymarketResearch.tags.data.tags.length === 0">
+              No tags attached to this market.
+            </p>
+            <ul v-else aria-label="Tags directly attached to selected market">
+              <li
+                v-for="tag in polymarketResearch.tags.data.tags"
+                :key="tag.id"
+              >
+                <button
+                  type="button"
+                  :class="{ selected: selectedPolymarketTag?.id === tag.id }"
+                  :aria-pressed="selectedPolymarketTag?.id === tag.id"
+                  :title="`Inspect tags related to Polymarket tag ${tag.id}`"
+                  @click="selectPolymarketTag(tag)"
+                >
+                  {{ tag.label ?? tag.slug ?? `Tag ${tag.id}` }}
+                </button>
+              </li>
+            </ul>
+            <small
+              >Choose one direct tag to inspect one relationship level</small
+            >
+            <div v-if="selectedPolymarketTag" class="polymarket-related-tags">
+              <span>
+                Related to
+                {{
+                  selectedPolymarketTag.label ??
+                  selectedPolymarketTag.slug ??
+                  `Tag ${selectedPolymarketTag.id}`
+                }}
+              </span>
+              <p v-if="relatedPolymarketTagsLoading">Loading related tags…</p>
+              <template v-else-if="availableRelatedPolymarketTags">
+                <p v-if="availableRelatedPolymarketTags.tags.length === 0">
+                  No related tags returned.
+                </p>
+                <ul v-else aria-label="Tags related to selected direct tag">
+                  <li
+                    v-for="tag in availableRelatedPolymarketTags.tags"
+                    :key="tag.id"
+                    :title="`Related Polymarket tag ${tag.id}`"
+                  >
+                    {{ tag.label ?? tag.slug ?? `Tag ${tag.id}` }}
+                  </li>
+                </ul>
+                <small>One level only · related tags are not expanded</small>
+              </template>
+              <p v-else-if="relatedPolymarketTags" class="empty-state">
+                {{ unavailableMessage(relatedPolymarketTags) }}
+              </p>
+            </div>
+          </div>
+          <p
+            v-else-if="polymarketResearch"
+            class="empty-state polymarket-tags-unavailable"
+          >
+            Market taxonomy: {{ unavailableMessage(polymarketResearch.tags) }}
+          </p>
           <div v-if="polymarketResearch" class="polymarket-book-grid">
             <article
               v-for="book in [
@@ -1103,13 +1315,14 @@ onUnmounted(() => autoRefresh.stop());
             <small v-else>NO history returned no plottable points</small>
           </div>
           <p class="polymarket-note">
-            Midpoints, level-one books, latest reported trades, and 24-hour
-            historical comparisons are independent observations. The chart uses
-            bounded 30-minute history pages and does not imply synchronized
-            YES/NO snapshots. Trades have no provider timestamp or quantity;
-            changes are absolute percentage points, not returns. None of these
-            values are executable quotes, depth, fill guarantees, signals, or
-            recommendations.
+            Direct taxonomy is provider-attached; related taxonomy requires an
+            explicit selection and is limited to one level. Midpoints, level-one
+            books, latest reported trades, and 24-hour historical comparisons
+            are independent observations. The chart uses bounded 30-minute
+            history pages and does not imply synchronized YES/NO snapshots.
+            Trades have no provider timestamp or quantity; changes are absolute
+            percentage points, not returns. None of these values are executable
+            quotes, depth, fill guarantees, signals, or recommendations.
           </p>
         </article>
       </template>
