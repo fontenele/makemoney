@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-09-29 — Keep historical observation provenance explicit
+
+M9.47 maps the established binary price-change contract into a fixed earlier-YES, earlier-NO, later-YES, later-NO presentation. Keeping boundary and outcome identity in the view prevents a compact aggregate from hiding which provider-selected point produced each change.
+
+Every card retains the exact price, actual observation time, resolution, and exact-requested-time flag. The browser performs no historical selection or additional request, and the observations are not relabeled as trades, quotes, synchronized snapshots, recommendations, or executable prices.
+
+## 2026-09-29 — Preserve both historical alignment dimensions in the dashboard
+
+M9.46 reuses the established binary price-change response and displays its exact combined movement instead of recalculating it in the browser. It also renders timestamp equality and resolution equality independently for both requested boundaries, including every mixed alignment state.
+
+The dashboard does not upgrade matching timestamps or resolutions into an atomic-snapshot claim. The combined value is labeled as an absolute price movement in percentage points, not a percentage return, synchronized probability path, arbitrage measure, recommendation, signal, or executable observation.
+
 ## 2026-09-29 — Reuse the midpoint-complement contract in the dashboard
 
 M9.45 presents the exact sum, signed deviation, and descriptive classification already calculated by M9.8 instead of recomputing the relationship in the browser or issuing another provider request. Browser formatting is limited to a secondary percentage representation while the source decimal strings remain visible.

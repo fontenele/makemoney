@@ -843,6 +843,120 @@ h1 em {
   background: var(--panel);
 }
 
+.polymarket-change-context {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 12px;
+  background: var(--line);
+}
+
+.polymarket-change-context article {
+  display: grid;
+  min-height: 112px;
+  gap: 12px;
+  padding: 17px;
+  background: var(--panel);
+}
+
+.polymarket-change-context span,
+.polymarket-change-context small,
+.polymarket-change-context p {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.polymarket-change-context span {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.polymarket-change-context strong {
+  align-self: end;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.polymarket-change-context strong.up {
+  color: var(--green-bright);
+}
+
+.polymarket-change-context strong.down {
+  color: var(--red);
+}
+
+.polymarket-change-context p {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 10px 17px;
+  background: rgba(4, 12, 10, 0.7);
+}
+
+.polymarket-observation-provenance {
+  margin-top: 12px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  background: rgba(4, 12, 10, 0.5);
+}
+
+.polymarket-observation-provenance-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.polymarket-observation-provenance-heading > div {
+  display: grid;
+  gap: 6px;
+}
+
+.polymarket-observation-provenance-heading span,
+.polymarket-observation-provenance-heading small,
+.polymarket-observation-grid span,
+.polymarket-observation-grid small {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.polymarket-observation-provenance-heading span,
+.polymarket-observation-grid span {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.polymarket-observation-provenance-heading strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.polymarket-observation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 14px;
+  background: var(--line);
+}
+
+.polymarket-observation-grid article {
+  display: grid;
+  gap: 8px;
+  min-height: 126px;
+  padding: 17px;
+  background: var(--panel);
+}
+
+.polymarket-observation-grid strong {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 15px;
+  font-weight: 500;
+}
+
 .polymarket-trade span,
 .polymarket-trade small {
   color: var(--muted);
@@ -1668,6 +1782,19 @@ footer {
   }
 
   .polymarket-change-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .polymarket-change-context {
+    grid-template-columns: 1fr;
+  }
+
+  .polymarket-observation-provenance-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .polymarket-observation-grid {
     grid-template-columns: 1fr;
   }
 

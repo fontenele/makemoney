@@ -441,9 +441,55 @@ describe('loadPolymarketMarketResearch', () => {
             requestedFrom: '2026-09-28T12:34:56.000Z',
             requestedTo: '2026-09-29T12:34:56.000Z',
             outcomes: {
-              yes: { priceChange: '0.04', direction: 'up' },
-              no: { priceChange: '-0.04', direction: 'down' },
+              yes: {
+                priceChange: '0.04',
+                direction: 'up',
+                observations: {
+                  from: {
+                    tokenId: '111',
+                    observedAt: '2026-09-28T12:30:00.000Z',
+                    price: '0.58',
+                    resolutionSeconds: 1800,
+                    exactTimestamp: false,
+                  },
+                  to: {
+                    tokenId: '111',
+                    observedAt: '2026-09-29T12:30:00.000Z',
+                    price: '0.62',
+                    resolutionSeconds: 1800,
+                    exactTimestamp: false,
+                  },
+                },
+              },
+              no: {
+                priceChange: '-0.04',
+                direction: 'down',
+                observations: {
+                  from: {
+                    tokenId: '222',
+                    observedAt: '2026-09-28T12:00:00.000Z',
+                    price: '0.42',
+                    resolutionSeconds: 3600,
+                    exactTimestamp: false,
+                  },
+                  to: {
+                    tokenId: '222',
+                    observedAt: '2026-09-29T12:00:00.000Z',
+                    price: '0.38',
+                    resolutionSeconds: 3600,
+                    exactTimestamp: false,
+                  },
+                },
+              },
             },
+            combinedPriceChange: '0',
+            combinedDirection: 'unchanged',
+            sameFromObservedTimestamp: true,
+            sameToObservedTimestamp: false,
+            sameFromResolution: true,
+            sameToResolution: false,
+            atomicSnapshot: false,
+            executable: false,
           }),
         );
       }
@@ -545,9 +591,55 @@ describe('loadPolymarketMarketResearch', () => {
       status: 'available',
       data: {
         outcomes: {
-          yes: { priceChange: '0.04', direction: 'up' },
-          no: { priceChange: '-0.04', direction: 'down' },
+          yes: {
+            priceChange: '0.04',
+            direction: 'up',
+            observations: {
+              from: {
+                tokenId: '111',
+                observedAt: '2026-09-28T12:30:00.000Z',
+                price: '0.58',
+                resolutionSeconds: 1800,
+                exactTimestamp: false,
+              },
+              to: {
+                tokenId: '111',
+                observedAt: '2026-09-29T12:30:00.000Z',
+                price: '0.62',
+                resolutionSeconds: 1800,
+                exactTimestamp: false,
+              },
+            },
+          },
+          no: {
+            priceChange: '-0.04',
+            direction: 'down',
+            observations: {
+              from: {
+                tokenId: '222',
+                observedAt: '2026-09-28T12:00:00.000Z',
+                price: '0.42',
+                resolutionSeconds: 3600,
+                exactTimestamp: false,
+              },
+              to: {
+                tokenId: '222',
+                observedAt: '2026-09-29T12:00:00.000Z',
+                price: '0.38',
+                resolutionSeconds: 3600,
+                exactTimestamp: false,
+              },
+            },
+          },
         },
+        combinedPriceChange: '0',
+        combinedDirection: 'unchanged',
+        sameFromObservedTimestamp: true,
+        sameToObservedTimestamp: false,
+        sameFromResolution: true,
+        sameToResolution: false,
+        atomicSnapshot: false,
+        executable: false,
       },
     });
     expect(research.yesPriceHistory24h).toMatchObject({

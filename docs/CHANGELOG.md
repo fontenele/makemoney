@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-29 — M9.47 Polymarket dashboard historical observation provenance completed
+
+- Reused the existing selected-market binary price-change response without adding a provider request or backend route.
+- Added a fixed earlier-YES, earlier-NO, later-YES, later-NO provenance view.
+- Displayed each exact source price, actual observed time, resolution, and exact-requested-time status.
+- Kept the points explicitly descriptive and distinct from trades, bid/ask history, synchronized snapshots, executable quotes, recommendations, or fills.
+- Added focused mapping coverage and strengthened the dashboard API contract fixture with all four observations.
+- Verified 44 dashboard tests, 1,551 backend tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
+## 2026-09-29 — M9.46 Polymarket dashboard historical alignment context completed
+
+- Reused the existing selected-market 24-hour price-change response without adding a provider request or backend route.
+- Displayed the exact combined YES/NO movement and its absolute percentage-point presentation.
+- Exposed timestamp and resolution alignment independently at the earlier and later requested boundaries.
+- Kept the comparison explicitly non-atomic, non-executable, and distinct from a percentage return or synchronized price series.
+- Added focused coverage for all four timestamp/resolution alignment combinations and strengthened the dashboard API contract assertion.
+- Verified 43 dashboard tests, 1,551 backend tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
 ## 2026-09-29 — M9.45 Polymarket dashboard binary midpoint relationship completed
 
 - Reused the selected market's existing midpoint-complement response without adding a provider request or backend route.

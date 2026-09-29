@@ -24,6 +24,8 @@ import { buildListingPerformanceChart } from './listing-performance-chart';
 import { buildEquityChart } from './equity-chart';
 import { buildPolymarketPriceChart } from './polymarket-price-chart';
 import { polymarketMidpointComplementStatusLabel } from './polymarket-midpoint-complement';
+import { polymarketHistoricalAlignmentLabel } from './polymarket-price-change-context';
+import { buildPolymarketPriceChangeObservationRows } from './polymarket-price-change-observations';
 import DashboardChart from './DashboardChart.vue';
 
 const snapshot = ref<DashboardSnapshot | null>(null);
@@ -92,6 +94,12 @@ const polymarketPriceChart = computed(() => {
       ? research.noPriceHistory24h.data
       : null,
   );
+});
+const polymarketPriceChangeObservationRows = computed(() => {
+  const research = polymarketResearch.value;
+  return research && available(research.priceChange24h)
+    ? buildPolymarketPriceChangeObservationRows(research.priceChange24h.data)
+    : [];
 });
 
 async function refreshListingPerformance(
@@ -1273,6 +1281,112 @@ onUnmounted(() => autoRefresh.stop());
               {{ polymarketResearch.priceChange24h.message }}
             </p>
           </div>
+          <div
+            v-if="
+              polymarketResearch && available(polymarketResearch.priceChange24h)
+            "
+            class="polymarket-change-context"
+            aria-label="Binary 24-hour price-change context"
+          >
+            <article>
+              <span>Combined 24-hour movement</span>
+              <strong
+                :class="
+                  polymarketResearch.priceChange24h.data.combinedDirection
+                "
+              >
+                {{
+                  probabilityChange(
+                    polymarketResearch.priceChange24h.data.combinedPriceChange,
+                  )
+                }}
+              </strong>
+              <small>
+                Exact sum
+                {{ polymarketResearch.priceChange24h.data.combinedPriceChange }}
+                ·
+                {{ polymarketResearch.priceChange24h.data.combinedDirection }}
+              </small>
+            </article>
+            <article>
+              <span>Earlier boundary alignment</span>
+              <strong>
+                {{
+                  polymarketHistoricalAlignmentLabel(
+                    polymarketResearch.priceChange24h.data
+                      .sameFromObservedTimestamp,
+                    polymarketResearch.priceChange24h.data.sameFromResolution,
+                  )
+                }}
+              </strong>
+              <small>
+                Requested
+                {{
+                  timestamp(
+                    polymarketResearch.priceChange24h.data.requestedFrom,
+                  )
+                }}
+              </small>
+            </article>
+            <article>
+              <span>Later boundary alignment</span>
+              <strong>
+                {{
+                  polymarketHistoricalAlignmentLabel(
+                    polymarketResearch.priceChange24h.data
+                      .sameToObservedTimestamp,
+                    polymarketResearch.priceChange24h.data.sameToResolution,
+                  )
+                }}
+              </strong>
+              <small>
+                Requested
+                {{
+                  timestamp(polymarketResearch.priceChange24h.data.requestedTo)
+                }}
+              </small>
+            </article>
+            <p>
+              Independently selected observations · non-atomic · non-executable
+              · not a percentage return
+            </p>
+          </div>
+          <section
+            v-if="polymarketPriceChangeObservationRows.length > 0"
+            class="polymarket-observation-provenance"
+            aria-labelledby="polymarket-observation-provenance-heading"
+          >
+            <div class="polymarket-observation-provenance-heading">
+              <div>
+                <span>Historical observation provenance</span>
+                <strong id="polymarket-observation-provenance-heading">
+                  Provider-selected points used by the 24-hour comparison
+                </strong>
+              </div>
+              <small>Data API · descriptive · non-executable</small>
+            </div>
+            <div class="polymarket-observation-grid">
+              <article
+                v-for="row in polymarketPriceChangeObservationRows"
+                :key="row.key"
+              >
+                <span>{{ row.boundary }} boundary · {{ row.outcome }}</span>
+                <strong>{{ probability(row.observation.price) }}</strong>
+                <small>Exact price {{ row.observation.price }}</small>
+                <small>
+                  Observed {{ timestamp(row.observation.observedAt) }} ·
+                  {{ row.observation.resolutionSeconds }}s resolution
+                </small>
+                <small>
+                  {{
+                    row.observation.exactTimestamp
+                      ? 'Exact requested instant'
+                      : 'Latest observation at or before request'
+                  }}
+                </small>
+              </article>
+            </div>
+          </section>
           <figure
             v-if="polymarketResearch && polymarketPriceChart"
             class="polymarket-price-chart"

@@ -187,3 +187,15 @@ Related results are plain display labels rather than controls, preventing recurs
 The selected-market panel now exposes the exact `midpointSum`, signed `deviationFromOne`, and descriptive `balanced`, `below_one`, or `above_one` classification already returned with the YES and NO midpoint observations. The browser adds percentage formatting for readability while retaining the source decimal strings.
 
 This view reuses the existing midpoint-complement request and therefore adds no provider traffic or backend route. It explicitly labels the observations as independent receipts, non-atomic, and non-executable; a deviation is not presented as arbitrage, incoherence, profit, a recommendation, or an execution opportunity.
+
+## M9.46 selected-market historical alignment context
+
+The trailing 24-hour comparison now also displays the backend-calculated exact combined YES/NO movement and its direction. The same established response supplies separate timestamp and resolution alignment flags for the earlier and later requested boundaries, which the dashboard renders without collapsing those two dimensions.
+
+No additional request or browser-side financial calculation is introduced. The combined movement is an exact sum of two absolute price changes, not a percentage return, synchronized probability path, arbitrage measure, signal, recommendation, or executable observation. Both boundaries remain independently selected and the aggregate remains explicitly non-atomic and non-executable.
+
+## M9.47 selected-market historical observation provenance
+
+The dashboard now expands the existing binary price-change response into four audit cards: YES and NO at the earlier boundary, followed by YES and NO at the later boundary. Each card preserves the exact decimal price, actual provider-selected observation time, resolution in seconds, and whether that observation exactly matched the requested instant or was the latest point at or before it.
+
+The browser only maps the already validated response into a fixed presentation order and adds no request or price selection. These points remain Data API historical observations rather than trades, bids, asks, executable quotes, synchronized snapshots, signals, recommendations, or evidence of a fill.

@@ -4,6 +4,10 @@ Last validated: 2026-09-29
 
 The startup validator accepts strictly positive canonical fractional values such as `0.01` for risk limits, matching the documented defaults and `.env.example`.
 
+M9.47 is complete: selected-market research now displays the four provider-selected observations underlying its trailing 24-hour comparison, preserving outcome and boundary identity plus exact price, observed time, resolution, and exact-requested-time status. The browser adds no provider request and makes no historical quote, trade, synchronized-snapshot, recommendation, or execution claim.
+
+M9.46 is complete: selected-market research now surfaces the existing exact combined 24-hour movement and separately describes timestamp and resolution alignment at the earlier and later comparison boundaries. The browser adds no provider request and preserves independent-observation, non-atomic, non-executable, and non-percentage-return semantics.
+
 M9.45 is complete: selected-market research now surfaces the existing exact midpoint sum, signed deviation from one, and descriptive `balanced`, `below_one`, or `above_one` relationship. The browser adds no provider request and explicitly preserves independent receipt, non-atomic, and non-executable semantics without arbitrage, recommendation, account, order, or execution claims.
 
 M9.44 is complete: an explicit selection of one direct market tag now loads and displays its bounded first-level related taxonomy. Related results are display-only, stale requests are suppressed, selection clears with market or provider state changes, and no recursive traversal, implicit expansion, discovery filtering, ranking, persistence, recommendation, account, order, or execution behavior is added.
@@ -473,6 +477,26 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 PostgreSQL uses `5433` because another local Docker project already occupies `5432`.
 
 ## Verification evidence
+
+The following passed on 2026-09-29 after M9.47:
+
+- `npm run test:dashboard` — 44 tests passed across 9 files
+- `npm test -- --runInBand` — 1,551 backend tests passed across 135 suites
+- `npm run format:check`
+- `npm run lint`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
+
+The following passed on 2026-09-29 after M9.46:
+
+- `npm run test:dashboard` — 43 tests passed across 8 files
+- `npm test -- --runInBand` — 1,551 backend tests passed across 135 suites
+- `npm run format:check`
+- `npm run lint`
+- `npm run build:all`
+- `docker compose config --quiet` (the local Docker client emitted only its existing inaccessible user-config warning)
+- `git diff --check`
 
 The following passed on 2026-09-29 after M9.45:
 

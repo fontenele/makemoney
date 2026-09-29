@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, **M6 — Backtesting (M6.1–M6.32)**, **M7 — New Listing Scanner (M7.1–M7.109)**, and **M8 — Dashboard (M8.1–M8.11)**.
-- M9 is in progress through **M9.45 — Polymarket Dashboard Binary Midpoint Relationship**.
+- M9 is in progress through **M9.47 — Polymarket Dashboard Historical Observation Provenance**.
 - M6 is closed. M7.1–M7.109 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.
@@ -444,6 +444,10 @@ M9.43 displays the existing bounded taxonomy directly attached to a selected Pol
 M9.44 lets the user explicitly select one direct market tag and load its existing bounded first-level related-tag set. Related results are display-only and cannot trigger recursive traversal; selection is browser-local, stale responses are suppressed, and no discovery filtering, ranking, persistence, recommendation, or execution behavior is added.
 
 M9.45 displays the selected market's existing exact midpoint sum, signed deviation from one, and descriptive relationship classification alongside its independently observed YES and NO midpoints. The view preserves explicit non-atomic and non-executable semantics and adds no provider request, arbitrage claim, recommendation, persistence, account, order, or execution behavior.
+
+M9.46 displays the selected market's existing combined 24-hour price movement and the provider observation-time and resolution alignment at the earlier and later comparison boundaries. It retains exact source values, independent-observation and non-atomic semantics, and adds no provider request, percentage-return claim, persistence, recommendation, account, order, or execution behavior.
+
+M9.47 exposes the four provider-selected observations underlying the selected market's 24-hour comparison: YES and NO at both requested boundaries, with exact price, observed time, resolution, and exact-time status. It adds no provider request, historical quote or trade claim, persistence, recommendation, account, order, or execution behavior.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 
