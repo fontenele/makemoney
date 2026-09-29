@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-29 — Resolve outcome parentage through the CLOB identity contract
+
+M9.33 uses the public CLOB market-by-token endpoint rather than searching Gamma catalogs or inferring parentage from price observations. The adapter accepts only one canonical condition plus distinct primary/YES and secondary/NO token identities and requires the requested token to match exactly one side.
+
+The local model exposes only this reverse identity and its receipt time. It does not merge separate Gamma descriptive metadata, infer a Gamma market ID, or import prices, fee rules, holders, positions, accounts, or execution semantics.
+
 ## 2026-09-28 — Binary historical movement preserves four independent observations
 
 M9.32 loads the selected market once, requires distinct indexed YES and NO tokens, and concurrently composes one M9.31 change per outcome over the same bounded interval. Returned token identities and requested interval endpoints must match the selected market and caller exactly.

@@ -25,6 +25,7 @@ import { PredictionMarketPriceChangeService } from '../application/prediction-ma
 import { PredictionMarketPriceHistoryService } from '../application/prediction-market-price-history.service';
 import { PredictionMarketPriceComplementAtService } from '../application/prediction-market-price-complement-at.service';
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
+import { PredictionMarketTokenParentService } from '../application/prediction-market-token-parent.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
 import { PredictionSeriesService } from '../application/prediction-series.service';
 import { PredictionDataFreshnessObservation } from '../domain/prediction-data-freshness';
@@ -81,6 +82,10 @@ import {
   PredictionMarketPage,
   PredictionMarketTags,
 } from '../domain/prediction-market';
+import {
+  PredictionMarketTokenParent,
+  PredictionMarketTokenParentUnavailableError,
+} from '../domain/prediction-market-token-parent';
 import {
   PredictionMarketHistoricalPriceObservation,
   PredictionMarketHistoricalPriceUnavailableError,
@@ -148,6 +153,7 @@ export class PolymarketController {
     private readonly priceComplementAt: PredictionMarketPriceComplementAtService,
     private readonly priceChange: PredictionMarketPriceChangeService,
     private readonly binaryPriceChange: PredictionMarketBinaryPriceChangeService,
+    private readonly tokenParent: PredictionMarketTokenParentService,
   ) {}
 
   @Get('data-freshness')
@@ -601,6 +607,29 @@ export class PolymarketController {
       }
       throw new ServiceUnavailableException(
         'Polymarket outcome midpoint provider is unavailable',
+      );
+    }
+  }
+
+  @Get('outcomes/:tokenId/market')
+  async getOutcomeMarket(
+    @Param('tokenId') tokenId: string,
+  ): Promise<PredictionMarketTokenParent> {
+    if (!isPredictionMarketTokenId(tokenId)) {
+      throw new BadRequestException(
+        'tokenId must be a canonical Polymarket decimal token identifier',
+      );
+    }
+    try {
+      return await this.tokenParent.getByToken(tokenId);
+    } catch (error) {
+      if (error instanceof PredictionMarketTokenParentUnavailableError) {
+        throw new NotFoundException(
+          'Polymarket outcome parent market is unavailable',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Polymarket outcome parent-market provider is unavailable',
       );
     }
   }

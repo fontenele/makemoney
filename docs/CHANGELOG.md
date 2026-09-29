@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-29 — M9.33 outcome parent-market identity completed
+
+- Added `GET /polymarket/outcomes/:tokenId/market` backed by the public CLOB market-by-token endpoint.
+- Added a provider-neutral reverse-identity contract, application service, and strict adapter for canonical condition and primary/YES plus secondary/NO token identities.
+- Require distinct returned tokens and exact requested-token membership, exposing the requested indexed side while mapping documented absence separately from provider or contract failure.
+- Kept the result stateless, identity-only, and explicitly non-executable without prices, holders, positions, accounts, credentials, orders, or execution.
+
 ## 2026-09-28 — M9.32 binary point-in-time price change completed
 
 - Added `GET /polymarket/markets/:id/price-change` for one selected binary market and a required positive whole-second UTC interval of at most 31 days.

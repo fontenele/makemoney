@@ -22,6 +22,7 @@ import { PredictionMarketPriceChangeService } from '../application/prediction-ma
 import { PredictionMarketPriceHistoryService } from '../application/prediction-market-price-history.service';
 import { PredictionMarketPriceComplementAtService } from '../application/prediction-market-price-complement-at.service';
 import { PredictionMarketResolutionService } from '../application/prediction-market-resolution.service';
+import { PredictionMarketTokenParentService } from '../application/prediction-market-token-parent.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
 import { PredictionSeriesService } from '../application/prediction-series.service';
 import { PredictionDataFreshnessProvider } from '../domain/prediction-data-freshness';
@@ -59,6 +60,10 @@ import {
 } from '../domain/prediction-market-price-history';
 import { PredictionMarketPriceChangeIncoherentError } from '../domain/prediction-market-price-change';
 import { PredictionMarketPriceComplementAtIncoherentError } from '../domain/prediction-market-price-complement-at';
+import {
+  PredictionMarketTokenParentProvider,
+  PredictionMarketTokenParentUnavailableError,
+} from '../domain/prediction-market-token-parent';
 import {
   PredictionMarketNotFoundError,
   PredictionMarketProvider,
@@ -940,6 +945,93 @@ describe('PolymarketController', () => {
       midpoint(),
     );
     expect(calls).toEqual(['111']);
+  });
+
+  it('loads the parent market identity for one outcome token', async () => {
+    const getByToken = jest
+      .fn<PredictionMarketTokenParentProvider['getByToken']>()
+      .mockResolvedValue(tokenParent());
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getByToken },
+    );
+
+    await expect(controller.getOutcomeMarket('111')).resolves.toEqual(
+      tokenParent(),
+    );
+    expect(getByToken).toHaveBeenCalledWith('111', undefined);
+  });
+
+  it.each(['', '01', '-1', '1.5', 'abc', '1'.repeat(79)])(
+    'rejects invalid market-by-token identity %s before provider access',
+    async (tokenId) => {
+      await expect(
+        controllerWith({}).getOutcomeMarket(tokenId),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it('maps unavailable parent identity to not found', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        getByToken: (tokenId) =>
+          Promise.reject(
+            new PredictionMarketTokenParentUnavailableError(tokenId),
+          ),
+      },
+    );
+
+    await expect(controller.getOutcomeMarket('111')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('maps malformed parent identity to service unavailable', async () => {
+    const controller = controllerWith(
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      { getByToken: () => Promise.reject(new Error('identity mismatch')) },
+    );
+
+    await expect(controller.getOutcomeMarket('111')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
   });
 
   it.each(['', '01', '-1', '1.5', 'abc', '1'.repeat(79)])(
@@ -2113,6 +2205,7 @@ function controllerWith(
   eventLiveVolumeProvider: Partial<PredictionEventLiveVolumeProvider> = {},
   globalOpenInterestProvider: Partial<PredictionGlobalOpenInterestProvider> = {},
   priceHistoryProvider: Partial<PredictionMarketPriceHistoryProvider> = {},
+  tokenParentProvider: Partial<PredictionMarketTokenParentProvider> = {},
 ): PolymarketController {
   const pricing = new PredictionMarketPricingService({
     getMidpoint:
@@ -2221,6 +2314,11 @@ function controllerWith(
     discovery,
     priceChange,
   );
+  const tokenParent = new PredictionMarketTokenParentService({
+    getByToken:
+      tokenParentProvider.getByToken ??
+      (() => Promise.reject(new Error('unexpected market-by-token call'))),
+  });
   return new PolymarketController(
     events,
     tags,
@@ -2242,7 +2340,21 @@ function controllerWith(
     priceComplementAt,
     priceChange,
     binaryPriceChange,
+    tokenParent,
   );
+}
+
+function tokenParent() {
+  return {
+    provider: 'polymarket' as const,
+    requestedTokenId: '111',
+    requestedOutcome: 'yes' as const,
+    conditionId: `0x${'a'.repeat(64)}`,
+    outcomes: { yes: { tokenId: '111' }, no: { tokenId: '222' } },
+    source: 'clob-market-by-token' as const,
+    receivedAt: new Date('2026-09-29T12:00:00Z'),
+    executable: false as const,
+  };
 }
 
 function priceHistory() {

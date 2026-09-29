@@ -9,6 +9,7 @@ import { PREDICTION_EVENT_LIVE_VOLUME_PROVIDER } from './domain/prediction-event
 import { PREDICTION_TAG_PROVIDER } from './domain/prediction-tag';
 import { PREDICTION_SERIES_PROVIDER } from './domain/prediction-series';
 import { PREDICTION_MARKET_MIDPOINT_PROVIDER } from './domain/prediction-market-midpoint';
+import { PREDICTION_MARKET_TOKEN_PARENT_PROVIDER } from './domain/prediction-market-token-parent';
 import { PREDICTION_MARKET_ORDER_BOOK_PROVIDER } from './domain/prediction-market-top-of-book';
 import { PREDICTION_MARKET_RESOLUTION_PROVIDER } from './domain/prediction-market-resolution';
 import {
@@ -16,6 +17,7 @@ import {
   PREDICTION_MARKET_OPEN_INTEREST_PROVIDER,
 } from './domain/prediction-market-open-interest';
 import { PolymarketClobMidpointClient } from './infrastructure/polymarket-clob-midpoint.client';
+import { PolymarketClobMarketByTokenClient } from './infrastructure/polymarket-clob-market-by-token.client';
 import { PolymarketClobOrderBookClient } from './infrastructure/polymarket-clob-order-book.client';
 import { PolymarketDataResolutionClient } from './infrastructure/polymarket-data-resolution.client';
 import { PolymarketDataFreshnessClient } from './infrastructure/polymarket-data-freshness.client';
@@ -180,6 +182,35 @@ describe('PolymarketModule', () => {
 
     expect(getOrThrow).toHaveBeenCalledWith('POLYMARKET_CLOB_BASE_URL');
     expect(provider).toBeInstanceOf(PolymarketClobMidpointClient);
+  });
+
+  it('registers the public CLOB market-by-token adapter', () => {
+    const providers = Reflect.getMetadata(
+      MODULE_METADATA.PROVIDERS,
+      PolymarketModule,
+    ) as Provider[];
+    const registration = providers.find(
+      (provider) =>
+        typeof provider === 'object' &&
+        provider !== null &&
+        'provide' in provider &&
+        provider.provide === PREDICTION_MARKET_TOKEN_PARENT_PROVIDER,
+    );
+    if (
+      typeof registration !== 'object' ||
+      registration === null ||
+      !('useFactory' in registration)
+    ) {
+      throw new Error('Polymarket market-by-token provider factory is missing');
+    }
+    const getOrThrow = jest
+      .fn<ConfigService['getOrThrow']>()
+      .mockReturnValue('https://clob.polymarket.test');
+    const config = { getOrThrow } as unknown as ConfigService;
+    const provider = registration.useFactory(config) as unknown;
+
+    expect(getOrThrow).toHaveBeenCalledWith('POLYMARKET_CLOB_BASE_URL');
+    expect(provider).toBeInstanceOf(PolymarketClobMarketByTokenClient);
   });
 
   it('registers the public CLOB order-book adapter', () => {

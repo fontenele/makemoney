@@ -18,6 +18,7 @@ import { PredictionMarketPriceChangeService } from './application/prediction-mar
 import { PredictionMarketPriceHistoryService } from './application/prediction-market-price-history.service';
 import { PredictionMarketPriceComplementAtService } from './application/prediction-market-price-complement-at.service';
 import { PredictionMarketResolutionService } from './application/prediction-market-resolution.service';
+import { PredictionMarketTokenParentService } from './application/prediction-market-token-parent.service';
 import { PredictionTagService } from './application/prediction-tag.service';
 import { PredictionSeriesService } from './application/prediction-series.service';
 import { PREDICTION_MARKET_MIDPOINT_PROVIDER } from './domain/prediction-market-midpoint';
@@ -26,6 +27,7 @@ import { PREDICTION_MARKET_ORDER_BOOK_PROVIDER } from './domain/prediction-marke
 import { PREDICTION_MARKET_RESOLUTION_PROVIDER } from './domain/prediction-market-resolution';
 import { PREDICTION_MARKET_PROVIDER } from './domain/prediction-market';
 import { PREDICTION_MARKET_PRICE_HISTORY_PROVIDER } from './domain/prediction-market-price-history';
+import { PREDICTION_MARKET_TOKEN_PARENT_PROVIDER } from './domain/prediction-market-token-parent';
 import { PREDICTION_EVENT_PROVIDER } from './domain/prediction-event';
 import { PREDICTION_EVENT_LIVE_VOLUME_PROVIDER } from './domain/prediction-event-live-volume';
 import { PREDICTION_TAG_PROVIDER } from './domain/prediction-tag';
@@ -36,6 +38,7 @@ import {
   PREDICTION_MARKET_OPEN_INTEREST_PROVIDER,
 } from './domain/prediction-market-open-interest';
 import { PolymarketClobMidpointClient } from './infrastructure/polymarket-clob-midpoint.client';
+import { PolymarketClobMarketByTokenClient } from './infrastructure/polymarket-clob-market-by-token.client';
 import { PolymarketClobLastTradeClient } from './infrastructure/polymarket-clob-last-trade.client';
 import { PolymarketClobOrderBookClient } from './infrastructure/polymarket-clob-order-book.client';
 import { PolymarketDataResolutionClient } from './infrastructure/polymarket-data-resolution.client';
@@ -89,6 +92,14 @@ import { PolymarketController } from './presentation/polymarket.controller';
       inject: [ConfigService],
       useFactory: (config: ConfigService) =>
         new PolymarketClobMidpointClient(
+          config.getOrThrow<string>('POLYMARKET_CLOB_BASE_URL'),
+        ),
+    },
+    {
+      provide: PREDICTION_MARKET_TOKEN_PARENT_PROVIDER,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new PolymarketClobMarketByTokenClient(
           config.getOrThrow<string>('POLYMARKET_CLOB_BASE_URL'),
         ),
     },
@@ -174,6 +185,7 @@ import { PolymarketController } from './presentation/polymarket.controller';
     PredictionMarketPriceHistoryService,
     PredictionMarketPriceComplementAtService,
     PredictionMarketResolutionService,
+    PredictionMarketTokenParentService,
     PredictionTagService,
     PredictionSeriesService,
   ],
