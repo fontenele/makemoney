@@ -532,6 +532,63 @@ h1 em {
   text-transform: uppercase;
 }
 
+.polymarket-book-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.polymarket-book {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+
+.polymarket-book-heading,
+.polymarket-book > div,
+.polymarket-book > p {
+  padding: 15px;
+  background: var(--panel);
+}
+
+.polymarket-book-heading {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+}
+
+.polymarket-book span,
+.polymarket-book small,
+.polymarket-book p {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.polymarket-book > div:not(.polymarket-book-heading) {
+  display: grid;
+  min-height: 88px;
+  gap: 10px;
+}
+
+.polymarket-book strong {
+  align-self: end;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.polymarket-book > p {
+  grid-column: 1 / -1;
+  margin: 0;
+  text-transform: none;
+}
+
 .polymarket-card strong {
   align-self: center;
   font-size: 13px;
@@ -1145,6 +1202,10 @@ footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .polymarket-book-grid {
+    grid-template-columns: 1fr;
+  }
+
   .backtest-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1194,6 +1255,15 @@ footer {
   .detail-list {
     grid-template-columns: 1fr;
     gap: 19px;
+  }
+
+  .polymarket-book {
+    grid-template-columns: 1fr;
+  }
+
+  .polymarket-book-heading,
+  .polymarket-book > p {
+    grid-column: 1;
   }
 
   .position-quantity {

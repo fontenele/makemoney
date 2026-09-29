@@ -82,8 +82,8 @@ describe('PolymarketClobOrderBookClient', () => {
       ).normalize('111', {
         ...book(),
         bids: [
-          { price: '0.44', size: '100' },
           { price: '0.45', size: '200' },
+          { price: '0.44', size: '100' },
         ],
       }),
     ).toThrow('Invalid Polymarket order-book ordering');
@@ -170,12 +170,12 @@ function book() {
     timestamp: '1758920000123',
     hash: '0xhash',
     bids: [
-      { price: '0.45', size: '100.00' },
       { price: '0.44', size: '200' },
+      { price: '0.45', size: '100.00' },
     ],
     asks: [
-      { price: '0.460', size: '150' },
       { price: '0.47', size: '250' },
+      { price: '0.460', size: '150' },
     ],
   };
 }

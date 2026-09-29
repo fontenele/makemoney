@@ -213,6 +213,20 @@ export interface PolymarketMidpointComplement {
   executable: false;
 }
 
+export interface PolymarketTopOfBook {
+  provider: 'polymarket';
+  tokenId: string;
+  conditionId: string;
+  snapshotHash: string;
+  bid: { price: string; quantity: string } | null;
+  ask: { price: string; quantity: string } | null;
+  spread: string | null;
+  source: 'clob-order-book';
+  executable: false;
+  providerTimestamp: string;
+  receivedAt: string;
+}
+
 export type Resource<T> =
   { status: 'available'; data: T } | { status: 'unavailable'; message: string };
 
@@ -233,6 +247,8 @@ export interface PolymarketMarketResearch {
   details: Resource<PolymarketMarketDetails>;
   openInterest: Resource<PolymarketMarketOpenInterest>;
   midpointComplement: Resource<PolymarketMidpointComplement>;
+  yesTopOfBook: Resource<PolymarketTopOfBook>;
+  noTopOfBook: Resource<PolymarketTopOfBook>;
 }
 
 type FetchLike = typeof fetch;
@@ -326,7 +342,50 @@ export async function loadPolymarketMarketResearch(
       request,
     ),
   ]);
-  return { details, openInterest, midpointComplement };
+
+  const unavailableIdentity: Resource<PolymarketTopOfBook> = {
+    status: 'unavailable',
+    message: 'Outcome identity is unavailable',
+  };
+  if (details.status === 'unavailable') {
+    return {
+      details,
+      openInterest,
+      midpointComplement,
+      yesTopOfBook: unavailableIdentity,
+      noTopOfBook: unavailableIdentity,
+    };
+  }
+
+  const [yesTopOfBook, noTopOfBook] = await Promise.all([
+    loadOutcomeTopOfBook(details.data.outcomes.yes.tokenId, request),
+    loadOutcomeTopOfBook(details.data.outcomes.no.tokenId, request),
+  ]);
+  return {
+    details,
+    openInterest,
+    midpointComplement,
+    yesTopOfBook,
+    noTopOfBook,
+  };
+}
+
+function loadOutcomeTopOfBook(
+  tokenId: string | null,
+  request: FetchLike,
+): Promise<Resource<PolymarketTopOfBook>> {
+  if (tokenId === null) {
+    return Promise.resolve({
+      status: 'unavailable',
+      message: 'Outcome token is unavailable',
+    });
+  }
+  return loadResource<PolymarketTopOfBook>(
+    dashboardApiPath(
+      `/polymarket/outcomes/${encodeURIComponent(tokenId)}/top-of-book`,
+    ),
+    request,
+  );
 }
 
 export function loadListingPerformance(

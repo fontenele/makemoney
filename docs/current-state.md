@@ -6,6 +6,8 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
+M9.36 is complete: selected Polymarket markets now display independently loaded YES and NO level-one books with best bid/ask prices and quantities plus spread. Token identity is loaded before the two concurrent book requests, failures remain isolated per outcome, and the view makes no full-depth, executable-quote, fill, recommendation, or execution claim. The CLOB adapter now follows the live provider ordering (ascending bids and descending asks) and selects the final level of each side.
+
 M9.35 is complete: every local Polymarket route now fails closed behind `POLYMARKET_ENABLED`, whose application and Compose default is `false`. Disabled requests return a sanitized `503` before any provider call; explicit enablement requires a process restart and remains a local operational choice for use only when access is permitted and the required VPN is active.
 
 M9.34 is complete: the local dashboard now lists eight active Polymarket questions and lets the user select one to view its indexed outcome labels, independent YES/NO midpoint percentages, and aggregate open interest. Resource failures remain isolated, sanitized backend diagnostics are displayed for unavailable resources, and the surface has no recommendation, account, mutation, order, or execution controls.
@@ -454,9 +456,10 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 ## Verification evidence
 
-The following passed on 2026-09-29 after M9.35:
+The following passed on 2026-09-29 after M9.36:
 
-- `npm run test:dashboard` — 22 tests passed across 5 files
+- live VPN-enabled dashboard-proxy validation returned coherent two-sided YES and NO books for market `559651`, each with exact `0.001` spread; the final runtime was returned to `POLYMARKET_ENABLED=false`
+- `npm run test:dashboard` — 23 tests passed across 5 files
 - `npm test -- --runInBand` — 1,540 backend tests passed across 133 suites
 - `npm run lint`
 - `npm run format:check`
@@ -554,7 +557,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.35. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the first read-only dashboard research surface are isolated from Spot crypto and every execution path. Live Gamma, Data API, and CLOB dashboard paths passed with the development VPN active; normal runtime now defaults to disabled.
+M0 through M8.11 are complete, and M9 is implemented through M9.36. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the dashboard's selected-market midpoint, open-interest, and level-one liquidity surface are isolated from Spot crypto and every execution path. Live Gamma, Data API, and CLOB dashboard paths passed with the development VPN active; normal runtime defaults to disabled.
 
 ## Known issues and cautions
 

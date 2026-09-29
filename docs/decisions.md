@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## 2026-09-29 — Load dashboard books only after indexed token identity
+
+M9.36 keeps market identity as the source of YES and NO token mapping. The dashboard first loads the selected market's existing detail resource, then concurrently requests one existing top-of-book resource per non-null indexed token. It does not infer sides from prices or introduce a new aggregate backend route.
+
+Each book retains independent availability and reports only best bid/ask levels and spread. Missing bid or ask remains valid empty-side data; provider failure remains unavailable and never becomes a zero price or quantity. All values are descriptive, non-executable, and still covered by the M9.35 availability guard.
+
+Live validation also corrected an earlier assumption in the M9.4 adapter: CLOB `/book` snapshots arrive with bids ascending and asks descending. The adapter validates those full provider sequences and selects the final item as the best level instead of rejecting valid snapshots or inferring an order from unvalidated data.
+
 ## 2026-09-29 — Default Polymarket provider access to disabled
 
 M9.35 uses one controller-wide NestJS guard instead of duplicating checks across every route or adapter. `POLYMARKET_ENABLED` defaults to `false`, and the guard returns a sanitized `503` before route-handler execution, guaranteeing that a disabled request cannot contact Gamma, CLOB, or the Data API.

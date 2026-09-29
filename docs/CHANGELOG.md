@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-29 — M9.36 Polymarket dashboard level-one liquidity completed
+
+- Extended selected-market research with existing public CLOB top-of-book routes for indexed YES and NO outcomes.
+- Load the two outcome books only after selected-market token identity is available, then request them concurrently with isolated failure states.
+- Display best bid/ask price and quantity plus provider spread without presenting level one as full depth, an executable quote, or a fill guarantee.
+- Corrected the CLOB snapshot normalization to validate the provider's ascending bids and descending asks and select the final level of each side, eliminating false `503` responses for valid books.
+- Validated the dashboard proxy against live VPN-accessible data: one selected market returned coherent two-sided YES and NO books with exact `0.001` spreads.
+- Preserved the M9.35 fail-closed default; no provider access occurs while Polymarket research is disabled.
+
 ## 2026-09-29 — M9.35 Polymarket operational availability guard completed
 
 - Added one controller-wide guard covering every `/polymarket` route before any Gamma, CLOB, or Data API call.

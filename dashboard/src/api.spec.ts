@@ -244,7 +244,7 @@ describe('loadDashboard', () => {
 });
 
 describe('loadPolymarketMarketResearch', () => {
-  it('loads identity, open interest, and midpoint statistics independently', async () => {
+  it('loads identity, market statistics, and indexed top of book', async () => {
     const request = vi.fn((input: string | URL | Request) => {
       const path = input.toString();
       if (path.endsWith('/open-interest')) {
@@ -257,17 +257,30 @@ describe('loadPolymarketMarketResearch', () => {
           }),
         );
       }
+      if (path.includes('/outcomes/111/top-of-book')) {
+        return Promise.resolve(
+          Response.json({ bid: { price: '0.61', quantity: '120' } }),
+        );
+      }
+      if (path.includes('/outcomes/222/top-of-book')) {
+        return Promise.resolve(
+          Response.json({ ask: { price: '0.39', quantity: '95' } }),
+        );
+      }
       return Promise.resolve(
         Response.json({
           id: '42',
-          outcomes: { yes: { label: 'Yes' }, no: { label: 'No' } },
+          outcomes: {
+            yes: { label: 'Yes', tokenId: '111' },
+            no: { label: 'No', tokenId: '222' },
+          },
         }),
       );
     });
 
     const research = await loadPolymarketMarketResearch('42', request);
 
-    expect(request).toHaveBeenCalledTimes(3);
+    expect(request).toHaveBeenCalledTimes(5);
     expect(research.details.status).toBe('available');
     expect(research.openInterest).toMatchObject({
       status: 'available',
@@ -276,6 +289,14 @@ describe('loadPolymarketMarketResearch', () => {
     expect(research.midpointComplement).toMatchObject({
       status: 'available',
       data: { outcomes: { yes: { price: '0.62' } } },
+    });
+    expect(research.yesTopOfBook).toMatchObject({
+      status: 'available',
+      data: { bid: { price: '0.61', quantity: '120' } },
+    });
+    expect(research.noTopOfBook).toMatchObject({
+      status: 'available',
+      data: { ask: { price: '0.39', quantity: '95' } },
     });
     expect(request).toHaveBeenCalledWith('/api/polymarket/markets/42', {
       headers: { Accept: 'application/json' },
@@ -286,7 +307,15 @@ describe('loadPolymarketMarketResearch', () => {
     const request = vi.fn((input: string | URL | Request) =>
       input.toString().endsWith('/open-interest')
         ? Promise.resolve(new Response(null, { status: 404 }))
-        : Promise.resolve(Response.json({ id: '42' })),
+        : Promise.resolve(
+            Response.json({
+              id: '42',
+              outcomes: {
+                yes: { label: 'Yes', tokenId: null },
+                no: { label: 'No', tokenId: null },
+              },
+            }),
+          ),
     );
 
     const research = await loadPolymarketMarketResearch('42', request);
@@ -297,6 +326,42 @@ describe('loadPolymarketMarketResearch', () => {
       message: 'Unavailable (404)',
     });
     expect(research.midpointComplement.status).toBe('available');
+    expect(research.yesTopOfBook).toEqual({
+      status: 'unavailable',
+      message: 'Outcome token is unavailable',
+    });
+  });
+
+  it('keeps YES and NO order-book failures isolated', async () => {
+    const request = vi.fn((input: string | URL | Request) => {
+      const path = input.toString();
+      if (path.includes('/outcomes/111/top-of-book')) {
+        return Promise.resolve(new Response(null, { status: 404 }));
+      }
+      if (path.includes('/outcomes/222/top-of-book')) {
+        return Promise.resolve(Response.json({ bid: null, ask: null }));
+      }
+      if (path.endsWith('/polymarket/markets/42')) {
+        return Promise.resolve(
+          Response.json({
+            id: '42',
+            outcomes: {
+              yes: { label: 'Yes', tokenId: '111' },
+              no: { label: 'No', tokenId: '222' },
+            },
+          }),
+        );
+      }
+      return Promise.resolve(Response.json({}));
+    });
+
+    const research = await loadPolymarketMarketResearch('42', request);
+
+    expect(research.yesTopOfBook).toEqual({
+      status: 'unavailable',
+      message: 'Unavailable (404)',
+    });
+    expect(research.noTopOfBook.status).toBe('available');
   });
 });
 

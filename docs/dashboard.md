@@ -120,4 +120,10 @@ Unavailable responses display a bounded, sanitized message returned by the local
 
 M9.35 makes the complete Polymarket API fail closed by default. With `POLYMARKET_ENABLED=false`, the section displays `Polymarket research is disabled by configuration`, and no provider request is attempted. The flag is enabled only through local startup configuration while permitted provider access and the required VPN are already available.
 
+## M9.36 selected-market level-one liquidity
+
+After selected-market details provide indexed non-null outcome tokens, the dashboard concurrently requests the existing top-of-book route for YES and NO. Each outcome displays its best bid and ask price as a percentage, corresponding displayed share quantity, and provider-calculated spread. A missing side remains explicitly `No bid` or `No ask`, while an unavailable book is isolated to that outcome.
+
+These are independent public level-one observations. The view does not expose full depth, aggregate available liquidity, executable quotes, fill guarantees, recommendation logic, account state, orders, or execution controls. M9.35 still prevents every request while Polymarket is disabled.
+
 Selection remains browser-local and refreshes with the established visibility-aware dashboard cadence. Midpoints remain explicitly non-executable, are not atomic quotes, and are not recommendations or probability guarantees. The view does not yet display event-level volume, price history, full order-book depth, last trades, holders, positions, accounts, orders, or execution controls.

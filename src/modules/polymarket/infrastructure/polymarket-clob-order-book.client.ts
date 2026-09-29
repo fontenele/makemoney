@@ -68,10 +68,10 @@ export class PolymarketClobOrderBookClient implements PredictionMarketOrderBookP
       throw new Error('Invalid Polymarket order-book payload');
     }
 
-    const bids = normalizeLevels(payload.bids, 'descending');
-    const asks = normalizeLevels(payload.asks, 'ascending');
-    const bid = bids[0] ?? null;
-    const ask = asks[0] ?? null;
+    const bids = normalizeLevels(payload.bids, 'ascending');
+    const asks = normalizeLevels(payload.asks, 'descending');
+    const bid = bids.at(-1) ?? null;
+    const ask = asks.at(-1) ?? null;
     if (
       bid !== null &&
       ask !== null &&

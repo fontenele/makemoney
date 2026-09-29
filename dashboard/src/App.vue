@@ -783,9 +783,53 @@ onUnmounted(() => autoRefresh.stop());
               <small v-else>{{ polymarketResearch.details.message }}</small>
             </div>
           </div>
+          <div v-if="polymarketResearch" class="polymarket-book-grid">
+            <article
+              v-for="book in [
+                { label: 'YES', resource: polymarketResearch.yesTopOfBook },
+                { label: 'NO', resource: polymarketResearch.noTopOfBook },
+              ]"
+              :key="book.label"
+              class="polymarket-book"
+            >
+              <div class="polymarket-book-heading">
+                <span>{{ book.label }} top of book</span>
+                <small>Public level 1</small>
+              </div>
+              <template v-if="available(book.resource)">
+                <div>
+                  <span>Best bid</span>
+                  <strong v-if="book.resource.data.bid">
+                    {{ probability(book.resource.data.bid.price) }} ·
+                    {{ decimal(book.resource.data.bid.quantity, 4) }} shares
+                  </strong>
+                  <strong v-else>No bid</strong>
+                </div>
+                <div>
+                  <span>Best ask</span>
+                  <strong v-if="book.resource.data.ask">
+                    {{ probability(book.resource.data.ask.price) }} ·
+                    {{ decimal(book.resource.data.ask.quantity, 4) }} shares
+                  </strong>
+                  <strong v-else>No ask</strong>
+                </div>
+                <div>
+                  <span>Spread</span>
+                  <strong>
+                    {{
+                      book.resource.data.spread === null
+                        ? 'Unavailable'
+                        : probability(book.resource.data.spread)
+                    }}
+                  </strong>
+                </div>
+              </template>
+              <p v-else>{{ book.resource.message }}</p>
+            </article>
+          </div>
           <p class="polymarket-note">
-            Midpoints are independent observations, not executable quotes or
-            recommendations.
+            Midpoints and level-one books are independent observations, not
+            executable quotes, depth, fill guarantees, or recommendations.
           </p>
         </article>
       </template>
