@@ -67,6 +67,7 @@ import {
 import {
   PredictionMarketNotFoundError,
   PredictionMarketProvider,
+  PredictionMarketProviderDnsError,
 } from '../domain/prediction-market';
 import {
   PredictionEventNotFoundError,
@@ -711,6 +712,19 @@ describe('PolymarketController', () => {
     await expect(controller.listActiveMarkets()).rejects.toThrow(
       ServiceUnavailableException,
     );
+  });
+
+  it('exposes a sanitized DNS diagnostic for market discovery', async () => {
+    const controller = controllerWith({
+      listActive: () => Promise.reject(new PredictionMarketProviderDnsError()),
+    });
+
+    await expect(controller.listActiveMarkets()).rejects.toMatchObject({
+      response: {
+        message:
+          'Polymarket market discovery is unavailable because provider DNS resolution failed',
+      },
+    });
   });
 
   it('loads one selected event with lifecycle and market references', async () => {

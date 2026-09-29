@@ -12,7 +12,7 @@ describe('PolymarketClobMidpointClient', () => {
       () => receivedAt,
     );
 
-    expect(client.normalize('111', { mid_price: '0.4500' })).toEqual({
+    expect(client.normalize('111', { mid: '0.4500' })).toEqual({
       provider: 'polymarket',
       tokenId: '111',
       price: '0.4500',
@@ -25,12 +25,13 @@ describe('PolymarketClobMidpointClient', () => {
 
   it.each([
     {},
-    { mid_price: 0.45 },
-    { mid_price: '.45' },
-    { mid_price: '01' },
-    { mid_price: '-0.1' },
-    { mid_price: '1.01' },
-    { mid_price: 'NaN' },
+    { mid: 0.45 },
+    { mid: '.45' },
+    { mid: '01' },
+    { mid: '-0.1' },
+    { mid: '1.01' },
+    { mid: 'NaN' },
+    { mid_price: '0.45' },
   ])('rejects malformed midpoint payload %#', (payload) => {
     const client = new PolymarketClobMidpointClient(
       'https://clob.polymarket.com',
@@ -43,7 +44,7 @@ describe('PolymarketClobMidpointClient', () => {
   it('loads a midpoint by canonical token ID without credentials', async () => {
     const http = jest
       .fn<(input: string, init?: RequestInit) => Promise<Response>>()
-      .mockResolvedValue(new Response(JSON.stringify({ mid_price: '0.45' })));
+      .mockResolvedValue(new Response(JSON.stringify({ mid: '0.45' })));
     const client = new PolymarketClobMidpointClient(
       'https://clob.polymarket.com/',
       http,

@@ -195,6 +195,31 @@ describe('loadDashboard', () => {
     expect(snapshot.polymarketMarkets.status).toBe('unavailable');
   });
 
+  it('shows a bounded diagnostic returned by the local API', async () => {
+    const request = vi.fn((input: string | URL | Request) => {
+      if (input.toString().includes('/polymarket/markets')) {
+        return Promise.resolve(
+          Response.json(
+            {
+              message:
+                'Polymarket market discovery is unavailable because provider DNS resolution failed',
+            },
+            { status: 503 },
+          ),
+        );
+      }
+      return Promise.resolve(Response.json({ status: 'ok' }));
+    });
+
+    const snapshot = await loadDashboard(request);
+
+    expect(snapshot.polymarketMarkets).toEqual({
+      status: 'unavailable',
+      message:
+        'Polymarket market discovery is unavailable because provider DNS resolution failed',
+    });
+  });
+
   it('keeps the dashboard available when stored backtests are unavailable', async () => {
     const request = vi.fn((input: string | URL | Request) => {
       if (input.toString().includes('/backtesting/runs')) {

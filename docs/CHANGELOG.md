@@ -5,6 +5,8 @@
 - Added a responsive Polymarket dashboard section backed only by existing local read-only APIs.
 - Display up to eight active market questions and allow explicit browser-local market selection.
 - Concurrently load selected-market YES/NO labels, independent midpoint percentages, and aggregate open interest with isolated unavailable states.
+- Classify provider hostname-resolution failures during market discovery and surface the sanitized local API diagnostic in the dashboard instead of a generic HTTP 503 label.
+- Corrected the public CLOB midpoint response contract from the obsolete `mid_price` field to the provider's live and documented `mid` field, restoring selected-market YES/NO midpoint statistics.
 - Kept event volume, history, full depth, trades, recommendations, positions, accounts, mutations, orders, and execution outside the view.
 
 ## 2026-09-29 — M9.33 outcome parent-market identity completed

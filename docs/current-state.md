@@ -6,7 +6,7 @@ The startup validator accepts strictly positive canonical fractional values such
 
 ## Milestone status
 
-M9.34 is complete: the local dashboard now lists eight active Polymarket questions and lets the user select one to view its indexed outcome labels, independent YES/NO midpoint percentages, and aggregate open interest. Resource failures remain isolated and the surface has no recommendation, account, mutation, order, or execution controls.
+M9.34 is complete: the local dashboard now lists eight active Polymarket questions and lets the user select one to view its indexed outcome labels, independent YES/NO midpoint percentages, and aggregate open interest. Resource failures remain isolated, sanitized backend diagnostics are displayed for unavailable resources, and the surface has no recommendation, account, mutation, order, or execution controls.
 
 M9.33 is complete: one public route resolves a canonical outcome token to its CLOB condition plus distinct indexed YES and NO token identities. It verifies exact requested-token membership, reports the requested outcome side, and remains stateless, identity-only, and non-executable without positions or accounts.
 
@@ -454,8 +454,8 @@ PostgreSQL uses `5433` because another local Docker project already occupies `54
 
 The following passed on 2026-09-29 after M9.34:
 
-- `npm run test:dashboard` — 21 tests passed across 5 files
-- `npm test -- --runInBand` — 1,529 backend tests passed across 132 suites
+- `npm run test:dashboard` — 22 tests passed across 5 files
+- `npm test -- --runInBand` — 1,533 backend tests passed across 132 suites
 - `npm run lint`
 - `npm run format:check`
 - `npm run build:all`
@@ -541,7 +541,7 @@ The complete database-backed integration validation passed after E2E isolation:
 - `npx prisma migrate deploy` — all fifteen migrations applied, including exact checkpoint top-of-book storage
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live production entry point — `GET /dashboard/` returned HTML, its hashed asset returned 200 under `/dashboard/assets/`, production API paths omitted the development proxy prefix, and `GET /health` remained healthy.
-- Public Polymarket Gamma live-contract attempt — blocked by provider DNS resolution in the development environment; no live response was claimed, and the current official documented keyset shape is covered by focused adapter and controller tests.
+- Public Polymarket live-contract check — with the development VPN active, Gamma returned eight real active-market summaries and selected-market identity, the Data API returned real open interest, and CLOB returned the documented `mid` response used by the corrected midpoint adapter.
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live Binance historical-candle smoke test — the public market-data-only kline endpoint returned ordered BTCUSDT one-minute rows with the documented 12 fields and no credentials
 - Live paper wallet initialization — reported BTC `0` and USDT `1000` from the default configuration
@@ -551,10 +551,11 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M8.11 are complete, and M9 is implemented through M9.34. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the first read-only dashboard research surface are isolated from Spot crypto and every execution path. Live provider validation remains environment-dependent; the official documented response contracts, focused adapter tests, and local compilation passed.
+M0 through M8.11 are complete, and M9 is implemented through M9.34. Public Polymarket Data API freshness, selected-market and global open interest, selected-event live volume, bounded and point-in-time outcome prices, binary and same-outcome historical price comparisons and movements, forward and reverse market/outcome identities, event, market, and active-series discovery, exact-tag event and market filtering, exact-recurrence series filtering, selected event, tag, and series details, bounded selected-series event references, selected/global/related tag taxonomy, midpoint, binary midpoint complement, level-one book, coherent aggregate, last-trade, descriptive book-context, condition-resolution lifecycle, indexed binary payout-result observations, and the first read-only dashboard research surface are isolated from Spot crypto and every execution path. Live Gamma, Data API, and CLOB dashboard paths passed with the development VPN active.
 
 ## Known issues and cautions
 
+- Without the development VPN, the configured host DNS resolver at `192.168.100.1` returns `NXDOMAIN` for Polymarket hostnames. Market discovery then fails closed with `503` and an explicit provider-DNS diagnostic; browser-only secure DNS does not fix the Node.js backend.
 - Jest requires Node's `--experimental-vm-modules` flag because NestJS 12 packages are ESM.
 - `npm audit --omit=dev` currently reports four high-severity findings in the Prisma toolchain dependency path (`prisma` through `@prisma/config`, `deepmerge-ts`, and `mysql2`). ECharts is not involved. The suggested fix is a breaking Prisma downgrade, so it was not applied automatically.
 - A transitive Angular DevKit package recommends Node `24.15.0` or newer while the machine has Node `24.14.1`. Current build, lint, and tests pass, but a Node 24 LTS patch update is advisable.

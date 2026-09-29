@@ -421,7 +421,7 @@ M9.32 composes the indexed YES and NO M9.31 changes for one selected binary mark
 
 M9.33 resolves one canonical outcome token to its public CLOB parent identity at `GET /polymarket/outcomes/:tokenId/market`. It validates the canonical condition and distinct primary/YES and secondary/NO tokens, requires the requested token to be one of them, and exposes its indexed side without importing prices, positions, accounts, or execution behavior.
 
-M9.34 adds a read-only Polymarket section to the local dashboard. It displays eight active market questions and lets the user explicitly load one selected market's YES/NO identities, independent midpoints, and open interest with per-resource unavailable states and no mutation or execution controls.
+M9.34 adds a read-only Polymarket section to the local dashboard. It displays eight active market questions and lets the user explicitly load one selected market's YES/NO identities, independent midpoints, and open interest with per-resource unavailable states, sanitized provider diagnostics, and no mutation or execution controls.
 
 M6 satisfies its complete acceptance scope. Bulk run deletion, automatic retention, additional filtering, cache refresh or expiry, overwriting stored candles, parallel gap loading, cursor-paginated signal history, variable position sizing, BRL conversion, order mutation APIs, order-book/depth liquidity, partial fills, persisted circuit state, risk-adjusted or annualized performance statistics, authenticated APIs, and real execution are optional post-milestone enhancements. They require separately planned milestones and approval and are not unfinished M6 work.
 

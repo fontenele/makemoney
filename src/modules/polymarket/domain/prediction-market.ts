@@ -67,3 +67,10 @@ export class PredictionMarketNotFoundError extends Error {
     this.name = PredictionMarketNotFoundError.name;
   }
 }
+
+export class PredictionMarketProviderDnsError extends Error {
+  constructor() {
+    super('Polymarket provider hostname could not be resolved');
+    this.name = PredictionMarketProviderDnsError.name;
+  }
+}

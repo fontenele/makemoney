@@ -4,6 +4,7 @@ import {
   PredictionMarketDetails,
   PredictionMarketNotFoundError,
   PredictionMarketPage,
+  PredictionMarketProviderDnsError,
   PredictionMarketProvider,
   PredictionMarketTag,
   PredictionMarketTags,
@@ -41,13 +42,21 @@ export class PolymarketGammaMarketClient implements PredictionMarketProvider {
     }
 
     const timeout = AbortSignal.timeout(TIMEOUT_MS);
-    const response = await this.http(
-      `${this.baseUrl.replace(/\/$/, '')}/markets/keyset?${parameters.toString()}`,
-      {
-        headers: { accept: 'application/json' },
-        signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
-      },
-    );
+    let response: Response;
+    try {
+      response = await this.http(
+        `${this.baseUrl.replace(/\/$/, '')}/markets/keyset?${parameters.toString()}`,
+        {
+          headers: { accept: 'application/json' },
+          signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+        },
+      );
+    } catch (error) {
+      if (hasDnsResolutionCode(error)) {
+        throw new PredictionMarketProviderDnsError();
+      }
+      throw error;
+    }
     if (!response.ok) {
       throw new Error(
         `Polymarket market discovery request failed: ${response.status}`,
@@ -291,4 +300,15 @@ function validCursor(value: unknown): value is string | null {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function hasDnsResolutionCode(error: unknown): boolean {
+  let current = error;
+  for (let depth = 0; depth < 5 && isRecord(current); depth += 1) {
+    if (current.code === 'ENOTFOUND' || current.code === 'EAI_AGAIN') {
+      return true;
+    }
+    current = current.cause;
+  }
+  return false;
 }

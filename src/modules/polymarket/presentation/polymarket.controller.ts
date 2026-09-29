@@ -80,6 +80,7 @@ import {
   PredictionMarketDetails,
   PredictionMarketNotFoundError,
   PredictionMarketPage,
+  PredictionMarketProviderDnsError,
   PredictionMarketTags,
 } from '../domain/prediction-market';
 import {
@@ -372,7 +373,12 @@ export class PolymarketController {
     };
     try {
       return await this.discovery.listActive(query);
-    } catch {
+    } catch (error) {
+      if (error instanceof PredictionMarketProviderDnsError) {
+        throw new ServiceUnavailableException(
+          'Polymarket market discovery is unavailable because provider DNS resolution failed',
+        );
+      }
       throw new ServiceUnavailableException(
         'Polymarket market discovery is unavailable',
       );

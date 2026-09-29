@@ -357,7 +357,9 @@ async function loadResource<T>(
     if (!response.ok) {
       return {
         status: 'unavailable',
-        message: `Unavailable (${response.status})`,
+        message:
+          (await readProviderErrorMessage(response)) ??
+          `Unavailable (${response.status})`,
       };
     }
     return { status: 'available', data: (await response.json()) as T };
@@ -367,4 +369,25 @@ async function loadResource<T>(
       message: 'Local API is unreachable',
     };
   }
+}
+
+async function readProviderErrorMessage(
+  response: Response,
+): Promise<string | null> {
+  try {
+    const payload = (await response.json()) as unknown;
+    if (
+      typeof payload === 'object' &&
+      payload !== null &&
+      'message' in payload &&
+      typeof payload.message === 'string' &&
+      payload.message.length > 0 &&
+      payload.message.length <= 300
+    ) {
+      return payload.message;
+    }
+  } catch {
+    // A non-JSON error response still has a useful HTTP status fallback.
+  }
+  return null;
 }

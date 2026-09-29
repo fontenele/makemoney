@@ -116,4 +116,6 @@ The dashboard independently requests `GET /polymarket/markets?limit=8` and displ
 
 Selecting one market concurrently loads its existing detail, open-interest, and midpoint-complement resources. The panel shows indexed YES/NO labels, independently observed midpoint percentages, and aggregate open interest in USDC. Each resource retains an isolated unavailable state, so an absent open-interest measurement does not hide valid identity or midpoint data.
 
+Unavailable responses display a bounded, sanitized message returned by the local API when one exists. In particular, active-market discovery distinguishes provider DNS-resolution failure from an otherwise generic `503`; malformed or non-JSON errors retain the HTTP-status fallback.
+
 Selection remains browser-local and refreshes with the established visibility-aware dashboard cadence. Midpoints remain explicitly non-executable, are not atomic quotes, and are not recommendations or probability guarantees. The view does not yet display event-level volume, price history, full order-book depth, last trades, holders, positions, accounts, orders, or execution controls.

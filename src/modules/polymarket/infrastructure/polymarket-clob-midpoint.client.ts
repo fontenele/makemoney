@@ -50,15 +50,15 @@ export class PolymarketClobMidpointClient implements PredictionMarketMidpointPro
   ): PredictionMarketOutcomeMidpoint {
     if (
       !isRecord(payload) ||
-      typeof payload.mid_price !== 'string' ||
-      !MIDPOINT_PRICE.test(payload.mid_price)
+      typeof payload.mid !== 'string' ||
+      !MIDPOINT_PRICE.test(payload.mid)
     ) {
       throw new Error('Invalid Polymarket midpoint payload');
     }
     return {
       provider: 'polymarket',
       tokenId,
-      price: payload.mid_price,
+      price: payload.mid,
       source: 'clob-midpoint',
       executable: false,
       providerTimestamp: null,

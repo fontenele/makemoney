@@ -1,6 +1,9 @@
 import { jest } from '@jest/globals';
 import { PolymarketGammaMarketClient } from './polymarket-gamma-market.client';
-import { PredictionMarketNotFoundError } from '../domain/prediction-market';
+import {
+  PredictionMarketNotFoundError,
+  PredictionMarketProviderDnsError,
+} from '../domain/prediction-market';
 
 describe('PolymarketGammaMarketClient', () => {
   const receivedAt = new Date('2026-09-26T12:00:00.000Z');
@@ -150,6 +153,25 @@ describe('PolymarketGammaMarketClient', () => {
       }),
     ).rejects.toThrow('429');
   });
+
+  it.each(['ENOTFOUND', 'EAI_AGAIN'])(
+    'classifies provider DNS failure %s',
+    async (code) => {
+      const error = new TypeError('fetch failed', {
+        cause: Object.assign(new Error('dns failed'), { code }),
+      });
+      const http = jest
+        .fn<(input: string, init?: RequestInit) => Promise<Response>>()
+        .mockRejectedValue(error);
+
+      await expect(
+        new PolymarketGammaMarketClient(
+          'https://gamma-api.polymarket.com',
+          http,
+        ).listActive({ limit: 8 }),
+      ).rejects.toBeInstanceOf(PredictionMarketProviderDnsError);
+    },
+  );
 
   it('normalizes indexed YES and NO token identities', () => {
     const client = new PolymarketGammaMarketClient(

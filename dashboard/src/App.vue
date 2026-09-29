@@ -672,7 +672,13 @@ onUnmounted(() => autoRefresh.stop());
           <p class="eyebrow">Public prediction-market research</p>
           <h2 id="polymarket-title">Active Polymarket markets</h2>
         </div>
-        <span class="history-limit">8 active · read only</span>
+        <span class="history-limit">
+          <template v-if="available(snapshot?.polymarketMarkets)">
+            {{ snapshot.polymarketMarkets.data.markets.length }} returned
+          </template>
+          <template v-else>Unavailable</template>
+          · read only
+        </span>
       </div>
 
       <template v-if="available(snapshot?.polymarketMarkets)">
