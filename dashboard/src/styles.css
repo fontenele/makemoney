@@ -1965,3 +1965,374 @@ footer {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Routed dashboard shell */
+:root {
+  --ink: #f3f8f5;
+  --muted: #a5b5ae;
+  --line: rgba(219, 242, 231, 0.16);
+  --panel: rgba(17, 34, 29, 0.9);
+  --panel-raised: #142a23;
+  --sidebar: #091713;
+}
+
+body {
+  background:
+    radial-gradient(
+      circle at 86% 4%,
+      rgba(43, 184, 116, 0.12),
+      transparent 32rem
+    ),
+    #08120f;
+}
+
+.dashboard-shell {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 28px 20px 22px;
+  border-right: 1px solid var(--line);
+  background: rgba(9, 23, 19, 0.96);
+  backdrop-filter: blur(22px);
+  z-index: 10;
+}
+
+.sidebar .brand {
+  padding: 2px 8px 30px;
+}
+
+.sidebar .brand strong {
+  font-size: 15px;
+}
+
+.sidebar .brand small {
+  font-size: 12px;
+}
+
+.section-nav {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.section-nav a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
+.section-nav a span {
+  color: #6f857b;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.section-nav a::after {
+  display: none;
+}
+
+.section-nav a:hover,
+.section-nav a:focus-visible,
+.section-nav a.active {
+  border-color: rgba(166, 244, 197, 0.17);
+  color: var(--ink);
+  background: rgba(166, 244, 197, 0.075);
+}
+
+.section-nav a.active span {
+  color: var(--green-bright);
+}
+
+.sidebar-status {
+  display: grid;
+  gap: 13px;
+  margin-top: auto;
+  padding: 20px 8px;
+  border-top: 1px solid var(--line);
+}
+
+.sidebar-status .connection {
+  font-size: 12px;
+}
+
+.sidebar-status button {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(166, 244, 197, 0.22);
+  border-radius: 8px;
+  color: var(--ink);
+  background: rgba(166, 244, 197, 0.08);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.sidebar-status button:hover:not(:disabled) {
+  border-color: rgba(166, 244, 197, 0.5);
+  background: rgba(166, 244, 197, 0.13);
+}
+
+.sidebar-status button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.sidebar-safety {
+  margin: 0;
+  padding: 0 8px;
+  color: #73867e;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.dashboard-content {
+  justify-self: center;
+  min-width: 0;
+  width: min(100%, 1500px);
+  padding: 0 clamp(28px, 4vw, 64px) 32px;
+}
+
+.hero {
+  padding-top: 72px;
+}
+
+.page-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 40px;
+  min-height: 272px;
+  padding: 62px 0 42px;
+  border-bottom: 1px solid var(--line);
+}
+
+.page-heading h1 {
+  font-size: clamp(44px, 6vw, 76px);
+  line-height: 0.98;
+}
+
+.page-heading p:not(.eyebrow) {
+  max-width: 660px;
+  margin: 22px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.page-heading > span {
+  padding-bottom: 5px;
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.panel {
+  min-height: auto;
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.13);
+}
+
+.polymarket-panel,
+.listings-panel {
+  margin-top: 28px;
+}
+
+.eyebrow,
+.metric-label,
+.history-limit,
+.detail-list dt,
+.polymarket-panel small,
+.listings-panel small {
+  line-height: 1.5;
+}
+
+.eyebrow {
+  font-size: 11px;
+}
+
+.history-limit,
+.detail-list dt,
+.polymarket-panel small,
+.listings-panel small {
+  font-size: 10px;
+}
+
+.panel-heading h2 {
+  font-size: clamp(24px, 2.2vw, 34px);
+  line-height: 1.15;
+}
+
+.polymarket-stat-grid > div,
+.polymarket-midpoint-complement > div,
+.polymarket-book,
+.polymarket-trade,
+.polymarket-change-card,
+.polymarket-observation-card,
+.listing-card,
+.checkpoint-card {
+  background: rgba(21, 43, 36, 0.72);
+}
+
+.polymarket-stat-grid strong,
+.polymarket-book strong,
+.polymarket-trade strong,
+.polymarket-change-card strong,
+.polymarket-observation-card strong {
+  color: var(--ink);
+}
+
+footer {
+  margin-top: 56px;
+}
+
+@media (max-width: 980px) {
+  .dashboard-shell {
+    grid-template-columns: 196px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .sidebar .brand {
+    padding-right: 4px;
+    padding-left: 4px;
+  }
+
+  .dashboard-content {
+    padding-right: 28px;
+    padding-left: 28px;
+  }
+}
+
+@media (max-width: 720px) {
+  .dashboard-shell {
+    display: block;
+  }
+
+  .sidebar {
+    position: sticky;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    height: auto;
+    padding: 12px 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .sidebar .brand {
+    padding: 0;
+  }
+
+  .sidebar .brand > span:last-child,
+  .sidebar-safety,
+  .refresh-cadence,
+  .sidebar-status .connection {
+    display: none;
+  }
+
+  .section-nav {
+    display: flex;
+    grid-column: auto;
+    grid-row: auto;
+    justify-content: flex-start;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+  }
+
+  .section-nav a {
+    flex: 0 0 auto;
+    min-height: 40px;
+    padding: 0 10px;
+    font-size: 10px;
+  }
+
+  .section-nav a span {
+    display: none;
+  }
+
+  .sidebar-status {
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .sidebar-status button {
+    width: auto;
+    min-height: 40px;
+    padding: 0 11px;
+    font-size: 0;
+  }
+
+  .sidebar-status button::after {
+    content: 'Refresh';
+    font-size: 10px;
+  }
+
+  .dashboard-content {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 0;
+    padding: 52px 0 34px;
+  }
+
+  .page-heading > span {
+    text-align: left;
+  }
+}
+
+@media (max-width: 440px) {
+  .sidebar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .sidebar .brand {
+    display: none;
+  }
+
+  .section-nav a {
+    padding: 0 8px;
+    letter-spacing: 0.01em;
+  }
+
+  .panel {
+    padding: 21px;
+  }
+}

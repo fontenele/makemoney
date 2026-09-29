@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-29 — M9.48 dashboard routed information architecture completed
+
+- Corrected the ultrawide layout so the side navigation stays flush with the viewport edge while the width-bounded content column remains centered in the available area.
+- Replaced the dense top navigation with a responsive side-navigation shell and explicit active-page states.
+- Split overview, Polymarket, and new-listing research into stable browser-local hash routes compatible with development and compiled static serving.
+- Added dedicated research-page headings and improved panel contrast, supporting text size, spacing, and hierarchy for dense observations.
+- Preserved every existing API request, isolated unavailable state, automatic refresh rule, provider safeguard, and read-only boundary.
+- Added focused route parsing/link coverage and verified 52 dashboard tests plus the production dashboard build.
+
 ## 2026-09-29 — M9.47 Polymarket dashboard historical observation provenance completed
 
 - Reused the existing selected-market binary price-change response without adding a provider request or backend route.

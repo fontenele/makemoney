@@ -199,3 +199,9 @@ No additional request or browser-side financial calculation is introduced. The c
 The dashboard now expands the existing binary price-change response into four audit cards: YES and NO at the earlier boundary, followed by YES and NO at the later boundary. Each card preserves the exact decimal price, actual provider-selected observation time, resolution in seconds, and whether that observation exactly matched the requested instant or was the latest point at or before it.
 
 The browser only maps the already validated response into a fixed presentation order and adds no request or price selection. These points remain Data API historical observations rather than trades, bids, asks, executable quotes, synchronized snapshots, signals, recommendations, or evidence of a fill.
+
+## M9.48 routed information architecture and legibility
+
+The dashboard now uses a persistent side-navigation shell on desktop and compact responsive navigation on narrow screens. Its content is separated into three browser-local hash routes: `#/` for portfolio, execution, strategy, and backtest overview; `#/polymarket` for prediction-market research; and `#/new-listings` for detection and checkpoint research. Hash routing keeps direct links compatible with both the Vite development server and the compiled `/dashboard/` static mount without adding a backend fallback route or router dependency.
+
+Each research page has its own heading and context label. Higher panel contrast, larger supporting text, clearer spacing, and stronger selected-navigation states improve scanning of dense market observations. Existing data loading, isolated unavailable states, selection state, automatic refresh behavior, financial formatting, provider enablement controls, and read-only execution boundary remain unchanged.

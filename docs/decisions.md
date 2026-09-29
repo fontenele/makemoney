@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-29 — Split the dashboard with dependency-free local routes
+
+M9.48 replaces the single long document and anchor menu with a shared responsive side-navigation shell and three hash-addressed pages. Overview keeps portfolio, execution, strategy, and backtest context together; Polymarket and new-listing research each receive a focused route and page heading.
+
+Hash routes remain directly addressable under the existing compiled `/dashboard/` static mount without requiring an Express history fallback or a new router dependency. Navigation changes presentation only: the established visibility-aware refresh, independent resource requests, browser-local selections, provider availability safeguards, and absence of execution controls remain intact.
+
 ## 2026-09-29 — Keep historical observation provenance explicit
 
 M9.47 maps the established binary price-change contract into a fixed earlier-YES, earlier-NO, later-YES, later-NO presentation. Keeping boundary and outcome identity in the view prevents a compact aggregate from hiding which provider-selected point produced each change.

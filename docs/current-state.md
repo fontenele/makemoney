@@ -4,6 +4,8 @@ Last validated: 2026-09-29
 
 The startup validator accepts strictly positive canonical fractional values such as `0.01` for risk limits, matching the documented defaults and `.env.example`.
 
+M9.48 is complete: the dashboard now uses a responsive side-navigation shell with dedicated browser-local routes for overview (`#/`), Polymarket (`#/polymarket`), and new-listing research (`#/new-listings`). The redesign increases contrast, minimum text sizes, spacing, and page hierarchy while preserving the existing independent resource states, visibility-aware refresh, API contracts, and read-only safety boundary.
+
 M9.47 is complete: selected-market research now displays the four provider-selected observations underlying its trailing 24-hour comparison, preserving outcome and boundary identity plus exact price, observed time, resolution, and exact-requested-time status. The browser adds no provider request and makes no historical quote, trade, synchronized-snapshot, recommendation, or execution claim.
 
 M9.46 is complete: selected-market research now surfaces the existing exact combined 24-hour movement and separately describes timestamp and resolution alignment at the earlier and later comparison boundaries. The browser adds no provider request and preserves independent-observation, non-atomic, non-executable, and non-percentage-return semantics.
