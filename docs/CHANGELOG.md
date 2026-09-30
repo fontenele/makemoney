@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-29 — M9.50 Polymarket dashboard selected-event details completed
+
+- Made bounded active-event cards explicit selection controls.
+- Loaded the existing public event-detail resource only after selection and suppressed stale responses.
+- Displayed description, lifecycle, resolution source, local receipt time, and referenced-market count with isolated loading and unavailable states.
+- Cleared event selection and invalidated pending detail work when provider access is disabled.
+- Kept market references unexpanded and added no taxonomy, live volume, price, liquidity, outcome, account, order, or execution request.
+- Added focused event-detail API coverage and verified 55 dashboard tests plus the production dashboard build.
+
+## 2026-09-29 — M9.49 Polymarket dashboard active-event discovery completed
+
+- Reused the existing bounded public event-discovery route with a fixed six-event dashboard page.
+- Added a responsive event grid with identity, title, optional start/end schedule, and restricted status.
+- Preserved explicit empty and unavailable states independently from active-market discovery and selected-market research.
+- Added no event selection, nested-market expansion, live-volume request, pagination, ranking, recommendation, account, order, or execution behavior.
+- Added focused API isolation coverage and verified 53 dashboard tests plus the production dashboard build.
+
 ## 2026-09-29 — M9.48 dashboard routed information architecture completed
 
 - Corrected the ultrawide layout so the side navigation stays flush with the viewport edge while the width-bounded content column remains centered in the available area.

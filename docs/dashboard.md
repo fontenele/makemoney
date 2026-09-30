@@ -205,3 +205,15 @@ The browser only maps the already validated response into a fixed presentation o
 The dashboard now uses a persistent side-navigation shell on desktop and compact responsive navigation on narrow screens. Its content is separated into three browser-local hash routes: `#/` for portfolio, execution, strategy, and backtest overview; `#/polymarket` for prediction-market research; and `#/new-listings` for detection and checkpoint research. Hash routing keeps direct links compatible with both the Vite development server and the compiled `/dashboard/` static mount without adding a backend fallback route or router dependency.
 
 Each research page has its own heading and context label. Higher panel contrast, larger supporting text, clearer spacing, and stronger selected-navigation states improve scanning of dense market observations. Existing data loading, isolated unavailable states, selection state, automatic refresh behavior, financial formatting, provider enablement controls, and read-only execution boundary remain unchanged.
+
+## M9.49 bounded active-event discovery
+
+The Polymarket page independently requests `GET /polymarket/events?limit=6` during the established visibility-aware refresh and displays the first bounded page as a responsive event grid. Each event card shows provider identity, title, nullable start/end schedule, and restricted status without expanding nested markets or requesting event details.
+
+An empty event page is distinct from an unavailable event resource, and event failure does not suppress active-market discovery or selected-market research. The cards are deliberately non-interactive in this increment: no event selection, cursor pagination, taxonomy filter, live volume, ranking, recommendation, persistence, account, order, or execution behavior is added.
+
+## M9.50 selected-event identity and lifecycle
+
+Active-event cards are now explicit selection controls. Selecting one independently requests `GET /polymarket/events/:id` and displays its public description, active/closed lifecycle, nullable resolution source, local receipt time, and count of normalized market references.
+
+Selection is browser-local, stale responses are ignored when a newer event is selected, and disabling Polymarket access clears pending and displayed event detail. Referenced markets are counted but not rendered or queried, and the view adds no tags, live volume, prices, liquidity, outcomes, ranking, recommendation, account, order, or execution behavior.

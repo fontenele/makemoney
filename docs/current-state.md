@@ -4,6 +4,10 @@ Last validated: 2026-09-29
 
 The startup validator accepts strictly positive canonical fractional values such as `0.01` for risk limits, matching the documented defaults and `.env.example`.
 
+M9.50 is complete: an explicit active-event selection now loads the existing public event-detail resource and displays its description, lifecycle, resolution source, local receipt time, and referenced-market count. Stale detail responses are suppressed, selection clears when provider access is disabled, and market references are not expanded into price, liquidity, volume, outcome, account, order, or execution data.
+
+M9.49 is complete: the Polymarket page now independently displays a bounded six-event public discovery page with event identity, optional start/end schedule, and restricted status. Empty and unavailable event discovery remain distinct and isolated from active-market selection, with no nested-market expansion, event detail, volume, ranking, recommendation, account, order, or execution behavior.
+
 M9.48 is complete: the dashboard now uses a responsive side-navigation shell with dedicated browser-local routes for overview (`#/`), Polymarket (`#/polymarket`), and new-listing research (`#/new-listings`). The redesign increases contrast, minimum text sizes, spacing, and page hierarchy while preserving the existing independent resource states, visibility-aware refresh, API contracts, and read-only safety boundary.
 
 M9.47 is complete: selected-market research now displays the four provider-selected observations underlying its trailing 24-hour comparison, preserving outcome and boundary identity plus exact price, observed time, resolution, and exact-requested-time status. The browser adds no provider request and makes no historical quote, trade, synchronized-snapshot, recommendation, or execution claim.

@@ -333,6 +333,18 @@ No additional provider call, point selection, or browser-side financial calculat
 
 Provider failure is exposed locally as `503`. Market discovery additionally classifies `ENOTFOUND` and `EAI_AGAIN` transport causes and returns a sanitized DNS-resolution diagnostic. Live Gamma, Data API, and CLOB requests were validated successfully while the development VPN supplied working provider DNS resolution.
 
+## M9.49 — Dashboard active-event discovery
+
+The dashboard reuses the existing bounded active-event route with `limit=6` and displays event identity, optional schedule, and restricted status in a dedicated non-interactive grid. Event discovery has its own unavailable and empty states, so it cannot hide active markets or selected-market research.
+
+The browser does not request event detail, attached tags, nested markets, or live volume and does not follow the unstable discovery cursor. It adds no provider contract, backend route, implicit expansion, ranking, persistence, recommendation, account, order, or execution behavior.
+
+## M9.50 — Dashboard selected-event details
+
+An explicit event-card selection loads the existing public event-detail route and presents description, lifecycle state, nullable resolution source, local receipt time, and the number of normalized market references. Request identities suppress stale responses, and disabling provider access clears selection and invalidates pending detail loads.
+
+The browser counts but does not expand the returned market references. It requests no event taxonomy, live volume, market prices, liquidity, outcome data, account state, order capability, or execution path.
+
 ## Next safe increment
 
 A later M9 increment may add another narrowly bounded public research view without introducing positions, redemption, trade history, persistence, authentication, accounts, or execution. M10 real-trading design remains separate and requires current official Binance research plus explicit safeguards.

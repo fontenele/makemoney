@@ -179,6 +179,48 @@ export interface PolymarketMarketPage {
   receivedAt: string;
 }
 
+export interface PolymarketEventSummary {
+  provider: 'polymarket';
+  id: string;
+  slug: string | null;
+  title: string;
+  startDate: string | null;
+  endDate: string | null;
+  active: boolean;
+  closed: false;
+  archived: boolean;
+  restricted: boolean;
+}
+
+export interface PolymarketEventPage {
+  events: PolymarketEventSummary[];
+  nextCursor: string | null;
+  receivedAt: string;
+}
+
+export interface PolymarketEventDetails {
+  provider: 'polymarket';
+  id: string;
+  slug: string | null;
+  title: string;
+  description: string | null;
+  resolutionSource: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  active: boolean;
+  closed: boolean;
+  archived: boolean;
+  restricted: boolean;
+  markets: Array<{
+    id: string;
+    slug: string | null;
+    question: string | null;
+    conditionId: string | null;
+    closed: boolean;
+  }>;
+  receivedAt: string;
+}
+
 export interface PolymarketMarketDetails {
   provider: 'polymarket';
   id: string;
@@ -380,6 +422,7 @@ export interface DashboardSnapshot {
   polymarketSettings: Resource<PolymarketSettings>;
   polymarketDataFreshness: Resource<PolymarketDataFreshness>;
   polymarketGlobalOpenInterest: Resource<PolymarketGlobalOpenInterest>;
+  polymarketEvents: Resource<PolymarketEventPage>;
   polymarketMarkets: Resource<PolymarketMarketPage>;
   loadedAt: string;
 }
@@ -422,6 +465,7 @@ export async function loadDashboard(
     polymarketSettings,
     polymarketDataFreshness,
     polymarketGlobalOpenInterest,
+    polymarketEvents,
     polymarketMarkets,
   ] = await Promise.all([
     loadResource<HealthResponse>(dashboardApiPath('/health'), request),
@@ -465,6 +509,10 @@ export async function loadDashboard(
       dashboardApiPath('/polymarket/open-interest'),
       request,
     ),
+    loadResource<PolymarketEventPage>(
+      dashboardApiPath('/polymarket/events?limit=6'),
+      request,
+    ),
     loadResource<PolymarketMarketPage>(
       dashboardApiPath('/polymarket/markets?limit=8'),
       request,
@@ -483,6 +531,7 @@ export async function loadDashboard(
     polymarketSettings,
     polymarketDataFreshness,
     polymarketGlobalOpenInterest,
+    polymarketEvents,
     polymarketMarkets,
     loadedAt: new Date().toISOString(),
   };
@@ -638,6 +687,16 @@ export function loadPolymarketRelatedTags(
 ): Promise<Resource<PolymarketRelatedTags>> {
   return loadResource<PolymarketRelatedTags>(
     dashboardApiPath(`/polymarket/tags/${encodeURIComponent(tagId)}/related`),
+    request,
+  );
+}
+
+export function loadPolymarketEventDetails(
+  eventId: string,
+  request: FetchLike = fetch,
+): Promise<Resource<PolymarketEventDetails>> {
+  return loadResource<PolymarketEventDetails>(
+    dashboardApiPath(`/polymarket/events/${encodeURIComponent(eventId)}`),
     request,
   );
 }

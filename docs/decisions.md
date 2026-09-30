@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-09-29 — Require explicit selection before loading event details
+
+M9.50 keeps the bounded event list lightweight and requests the established event-detail resource only after a browser-local user selection. A monotonically increasing request identity prevents an older response from replacing a newer selection, and provider disablement invalidates pending work.
+
+Although the backend detail contract contains bounded normalized market references, the dashboard exposes only their count. This gives useful event context without creating implicit market expansion, additional price or liquidity traffic, ranking, recommendation, account, order, or execution behavior.
+
+## 2026-09-29 — Keep dashboard event discovery bounded and non-interactive
+
+M9.49 reuses the established event-discovery contract with a fixed six-item limit and gives it an independent dashboard resource state. The browser displays only the normalized summary identity, nullable schedule, and restricted flag; it does not infer event importance or expand event relationships.
+
+Event cards remain non-interactive so selection does not silently trigger event details, nested markets, taxonomy, or live-volume requests. This preserves a narrow observational increment and keeps event failure isolated from the existing active-market research surface.
+
 ## 2026-09-29 — Split the dashboard with dependency-free local routes
 
 M9.48 replaces the single long document and anchor menu with a shared responsive side-navigation shell and three hash-addressed pages. Overview keeps portfolio, execution, strategy, and backtest context together; Polymarket and new-listing research each receive a focused route and page heading.

@@ -3,12 +3,15 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import {
   loadDashboard,
   loadListingPerformance,
+  loadPolymarketEventDetails,
   loadPolymarketMarketResearch,
   loadPolymarketRelatedTags,
   updatePolymarketSettings,
   type DashboardSnapshot,
   type DetectedSpotSymbol,
   type ListingPerformance,
+  type PolymarketEventDetails,
+  type PolymarketEventSummary,
   type PolymarketMarketResearch,
   type PolymarketMarketSummary,
   type PolymarketMarketTag,
@@ -47,6 +50,12 @@ const selectedPolymarketMarket = ref<PolymarketMarketSummary | null>(null);
 const polymarketResearch = ref<PolymarketMarketResearch | null>(null);
 const polymarketResearchLoading = ref(false);
 let polymarketResearchRequest = 0;
+const selectedPolymarketEvent = ref<PolymarketEventSummary | null>(null);
+const polymarketEventDetails = ref<Resource<PolymarketEventDetails> | null>(
+  null,
+);
+const polymarketEventDetailsLoading = ref(false);
+let polymarketEventDetailsRequest = 0;
 const selectedPolymarketTag = ref<PolymarketMarketTag | null>(null);
 const relatedPolymarketTags = ref<Resource<PolymarketRelatedTags> | null>(null);
 const relatedPolymarketTagsLoading = ref(false);
@@ -158,6 +167,30 @@ function selectPolymarketMarket(market: PolymarketMarketSummary): void {
   void refreshPolymarketResearch(market);
 }
 
+async function refreshPolymarketEventDetails(
+  event: PolymarketEventSummary,
+): Promise<void> {
+  const request = ++polymarketEventDetailsRequest;
+  polymarketEventDetailsLoading.value = true;
+  const result = await loadPolymarketEventDetails(event.id);
+  if (request !== polymarketEventDetailsRequest) return;
+  polymarketEventDetails.value = result;
+  polymarketEventDetailsLoading.value = false;
+}
+
+function selectPolymarketEvent(event: PolymarketEventSummary): void {
+  selectedPolymarketEvent.value = event;
+  polymarketEventDetails.value = null;
+  void refreshPolymarketEventDetails(event);
+}
+
+function clearPolymarketEventSelection(): void {
+  selectedPolymarketEvent.value = null;
+  polymarketEventDetails.value = null;
+  polymarketEventDetailsLoading.value = false;
+  polymarketEventDetailsRequest += 1;
+}
+
 async function refreshRelatedPolymarketTags(
   tag: PolymarketMarketTag,
 ): Promise<void> {
@@ -198,6 +231,7 @@ async function changePolymarketAvailability(enabled: boolean): Promise<void> {
     if (snapshot.value) snapshot.value.polymarketSettings = result;
     polymarketAccessConfirmed.value = false;
     if (!enabled) {
+      clearPolymarketEventSelection();
       selectedPolymarketMarket.value = null;
       polymarketResearch.value = null;
       polymarketResearchRequest += 1;
@@ -219,6 +253,9 @@ async function refresh(): Promise<void> {
     }
     if (selectedPolymarketMarket.value) {
       await refreshPolymarketResearch(selectedPolymarketMarket.value);
+    }
+    if (selectedPolymarketEvent.value) {
+      await refreshPolymarketEventDetails(selectedPolymarketEvent.value);
     }
   } finally {
     refreshing.value = false;
@@ -287,7 +324,7 @@ function timestamp(value: string): string {
   }).format(parsed);
 }
 
-function available<T>(resource: Resource<T> | undefined): resource is {
+function available<T>(resource: Resource<T> | null | undefined): resource is {
   status: 'available';
   data: T;
 } {
@@ -862,15 +899,9 @@ onUnmounted(() => {
           <div class="panel-heading execution-heading">
             <div>
               <p class="eyebrow">Public prediction-market research</p>
-              <h2 id="polymarket-title">Active Polymarket markets</h2>
+              <h2 id="polymarket-title">Polymarket research</h2>
             </div>
-            <span class="history-limit">
-              <template v-if="available(snapshot?.polymarketMarkets)">
-                {{ snapshot.polymarketMarkets.data.markets.length }} returned
-              </template>
-              <template v-else>Unavailable</template>
-              · read only
-            </span>
+            <span class="history-limit">Public data · read only</span>
           </div>
 
           <div
@@ -1042,6 +1073,150 @@ onUnmounted(() => {
               'Loading platform aggregate…'
             }}
           </p>
+
+          <div class="polymarket-section-heading">
+            <div>
+              <span>Event discovery</span>
+              <h3>Active events</h3>
+            </div>
+            <small v-if="available(snapshot?.polymarketEvents)">
+              {{ snapshot.polymarketEvents.data.events.length }} returned ·
+              latest bounded page
+            </small>
+            <small v-else>Independent resource unavailable</small>
+          </div>
+
+          <template v-if="available(snapshot?.polymarketEvents)">
+            <p
+              v-if="snapshot.polymarketEvents.data.events.length === 0"
+              class="empty-state polymarket-discovery-empty"
+            >
+              No active public events returned.
+            </p>
+            <div v-else class="polymarket-event-grid">
+              <button
+                v-for="event in snapshot.polymarketEvents.data.events"
+                :key="event.id"
+                type="button"
+                class="polymarket-event-card"
+                :class="{
+                  selected: selectedPolymarketEvent?.id === event.id,
+                }"
+                :aria-pressed="selectedPolymarketEvent?.id === event.id"
+                @click="selectPolymarketEvent(event)"
+              >
+                <div>
+                  <span>Event {{ event.id }}</span>
+                  <span v-if="event.restricted">Restricted</span>
+                </div>
+                <strong>{{ event.title }}</strong>
+                <dl>
+                  <div>
+                    <dt>Starts</dt>
+                    <dd>
+                      {{ event.startDate ? timestamp(event.startDate) : '—' }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Ends</dt>
+                    <dd>
+                      {{ event.endDate ? timestamp(event.endDate) : '—' }}
+                    </dd>
+                  </div>
+                </dl>
+              </button>
+            </div>
+          </template>
+          <p v-else class="empty-state polymarket-discovery-empty">
+            {{
+              snapshot?.polymarketEvents.message ??
+              'Loading active public events…'
+            }}
+          </p>
+
+          <article
+            v-if="selectedPolymarketEvent"
+            class="polymarket-event-detail"
+            aria-live="polite"
+          >
+            <div class="listing-research-heading">
+              <div>
+                <p class="eyebrow">Selected public event</p>
+                <h3>{{ selectedPolymarketEvent.title }}</h3>
+              </div>
+              <span>Identity and lifecycle only</span>
+            </div>
+
+            <p
+              v-if="polymarketEventDetailsLoading"
+              class="empty-state polymarket-state"
+            >
+              Loading public event details…
+            </p>
+            <template v-else-if="available(polymarketEventDetails)">
+              <p class="polymarket-event-description">
+                {{
+                  polymarketEventDetails.data.description ??
+                  'No public description supplied.'
+                }}
+              </p>
+              <dl class="polymarket-event-facts">
+                <div>
+                  <dt>Lifecycle</dt>
+                  <dd>
+                    {{
+                      polymarketEventDetails.data.closed
+                        ? 'Closed'
+                        : polymarketEventDetails.data.active
+                          ? 'Active'
+                          : 'Inactive'
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Referenced markets</dt>
+                  <dd>{{ polymarketEventDetails.data.markets.length }}</dd>
+                </div>
+                <div>
+                  <dt>Resolution source</dt>
+                  <dd>
+                    {{
+                      polymarketEventDetails.data.resolutionSource ??
+                      'Not supplied'
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Received locally</dt>
+                  <dd>
+                    {{ timestamp(polymarketEventDetails.data.receivedAt) }}
+                  </dd>
+                </div>
+              </dl>
+              <p class="polymarket-note">
+                Market references are counted only. This view does not expand
+                their prices, liquidity, volume, or outcome data.
+              </p>
+            </template>
+            <p v-else class="empty-state polymarket-state">
+              {{
+                polymarketEventDetails?.message ??
+                'Select an event to load public details.'
+              }}
+            </p>
+          </article>
+
+          <div class="polymarket-section-heading market-heading">
+            <div>
+              <span>Market discovery</span>
+              <h3>Active markets</h3>
+            </div>
+            <small v-if="available(snapshot?.polymarketMarkets)">
+              {{ snapshot.polymarketMarkets.data.markets.length }} returned ·
+              select one for detail
+            </small>
+            <small v-else>Independent resource unavailable</small>
+          </div>
 
           <template v-if="available(snapshot?.polymarketMarkets)">
             <p
