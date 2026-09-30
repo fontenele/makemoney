@@ -25,6 +25,7 @@ export class PolymarketGammaSearchClient implements PredictionSearchProvider {
       q: query.query,
       events_status: 'active',
       limit_per_type: query.limit.toString(),
+      page: query.page.toString(),
     });
     const timeout = AbortSignal.timeout(TIMEOUT_MS);
     const response = await this.http(
@@ -44,22 +45,26 @@ export class PolymarketGammaSearchClient implements PredictionSearchProvider {
     payload: unknown,
     query: PredictionSearchQuery,
   ): PredictionSearchResult {
+    if (!isRecord(payload)) {
+      throw new Error('Invalid Polymarket search payload');
+    }
+    const rawEvents = payload.events === null ? [] : payload.events;
     if (
-      !isRecord(payload) ||
-      !Array.isArray(payload.events) ||
-      payload.events.length > query.limit ||
+      !Array.isArray(rawEvents) ||
+      rawEvents.length > query.limit ||
       !isRecord(payload.pagination) ||
       typeof payload.pagination.hasMore !== 'boolean' ||
       !isNonNegativeInteger(payload.pagination.totalResults)
     ) {
       throw new Error('Invalid Polymarket search payload');
     }
-    const events = payload.events.map(normalizeEvent);
+    const events = rawEvents.map(normalizeEvent);
     if (new Set(events.map((event) => event.id)).size !== events.length) {
       throw new Error('Invalid Polymarket search payload');
     }
     return {
       query: query.query,
+      page: query.page,
       events,
       hasMore: payload.pagination.hasMore,
       totalResults: payload.pagination.totalResults,

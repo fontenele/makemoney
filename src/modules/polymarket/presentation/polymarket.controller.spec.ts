@@ -96,6 +96,7 @@ describe('PolymarketController', () => {
       .fn<PredictionSearchProvider['searchActiveEvents']>()
       .mockResolvedValue({
         query: 'bitcoin',
+        page: 2,
         events: [],
         hasMore: false,
         totalResults: 0,
@@ -104,10 +105,10 @@ describe('PolymarketController', () => {
     const controller = controllerWithSearch({ searchActiveEvents });
 
     await expect(
-      controller.searchActiveEvents('bitcoin', '8'),
+      controller.searchActiveEvents('bitcoin', '8', '2'),
     ).resolves.toMatchObject({ query: 'bitcoin', events: [] });
     expect(searchActiveEvents).toHaveBeenCalledWith(
-      { query: 'bitcoin', limit: 8 },
+      { query: 'bitcoin', limit: 8, page: 2 },
       undefined,
     );
   });
@@ -121,13 +122,31 @@ describe('PolymarketController', () => {
     },
   );
 
+  it.each(['0', '-1', '1.5', '01', '101'])(
+    'rejects invalid search page %s',
+    async (page) => {
+      await expect(
+        controllerWithSearch({}).searchActiveEvents('bitcoin', '8', page),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it.each(['0', '-1', '1.5', '01', '101'])(
+    'rejects invalid search limit %s',
+    async (limit) => {
+      await expect(
+        controllerWithSearch({}).searchActiveEvents('bitcoin', limit, '1'),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
   it('maps search provider failure to service unavailable', async () => {
     const controller = controllerWithSearch({
       searchActiveEvents: () => Promise.reject(new Error('offline')),
     });
-    await expect(controller.searchActiveEvents('bitcoin', '8')).rejects.toThrow(
-      ServiceUnavailableException,
-    );
+    await expect(
+      controller.searchActiveEvents('bitcoin', '8', '1'),
+    ).rejects.toThrow(ServiceUnavailableException);
   });
 
   it('loads the public Data API freshness observation', async () => {

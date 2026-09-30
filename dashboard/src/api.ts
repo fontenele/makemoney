@@ -200,6 +200,7 @@ export interface PolymarketEventPage {
 
 export interface PolymarketSearchResult {
   query: string;
+  page: number;
   events: PolymarketEventSummary[];
   hasMore: boolean;
   totalResults: number;
@@ -731,9 +732,14 @@ export function loadPolymarketEventDetails(
 
 export function loadPolymarketSearch(
   query: string,
+  page: number,
   request: FetchLike = fetch,
 ): Promise<Resource<PolymarketSearchResult>> {
-  const parameters = new URLSearchParams({ q: query, limit: '8' });
+  const parameters = new URLSearchParams({
+    q: query,
+    limit: '8',
+    page: page.toString(),
+  });
   return loadResource<PolymarketSearchResult>(
     dashboardApiPath(`/polymarket/search?${parameters.toString()}`),
     request,

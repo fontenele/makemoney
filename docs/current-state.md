@@ -1,6 +1,12 @@
 # Current State
 
-Last validated: 2026-09-29
+Last validated: 2026-09-30
+
+M9.57 is complete: open market references in selected-event details can now be explicitly selected into the existing public market-research flow. Closed references remain visible and disabled, no market data is preloaded, and the selected-market panel no longer depends on the initial active-market discovery page being available.
+
+M9.56 is complete: active-event search now accepts an explicit 1-based page from 1 through 100 and passes it directly to Gamma's documented search pagination. The dashboard keeps each request fixed at eight events and provides bounded Previous/Next navigation while preserving provider order, total/continuation context, stale-response suppression, selection reuse, and the existing non-persistent read-only boundary.
+
+Live validation after M9.55 confirmed the bounded event search and all six current dashboard event selections. Gamma sometimes represents optional event text and not-yet-assigned nested market condition identities as empty strings; the selected-event adapter now normalizes those provider forms to `null`, so valid detail and live-volume observations no longer fail closed.
 
 The startup validator accepts strictly positive canonical fractional values such as `0.01` for risk limits, matching the documented defaults and `.env.example`.
 

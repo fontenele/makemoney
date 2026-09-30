@@ -3,10 +3,12 @@ import { PredictionEvent } from './prediction-event';
 export interface PredictionSearchQuery {
   query: string;
   limit: number;
+  page: number;
 }
 
 export interface PredictionSearchResult {
   query: string;
+  page: number;
   events: PredictionEvent[];
   hasMore: boolean;
   totalResults: number;

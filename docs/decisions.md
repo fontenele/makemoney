@@ -1,5 +1,23 @@
 # Technical Decisions
 
+## 2026-09-30 — Reuse market research from explicit event references
+
+M9.57 maps an explicitly selected open event-market reference into the existing browser-side market summary contract and then invokes the established selected-market research loader. It does not introduce another backend route or automatically expand every event reference, keeping provider traffic tied to one deliberate user selection.
+
+Closed references remain descriptive and disabled because the current selected-market surface is scoped to open research. The selected-market panel is rendered independently from the initial active-market discovery page so search-derived navigation does not inherit an unrelated resource failure.
+
+## 2026-09-30 — Follow Gamma's bounded 1-based search pages
+
+M9.56 exposes Gamma's documented integer `page` parameter instead of simulating pagination by increasing the result limit or filtering previously loaded samples. Live contract validation confirmed that page one is the first result page and page two advances to the next provider-ordered set.
+
+The local API accepts only pages 1 through 100, returns the requested page identity, and still bounds each payload independently. The dashboard replaces the visible page instead of accumulating an unbounded catalog, and Previous/Next navigation remains tied to the submitted query and provider `hasMore` result.
+
+## 2026-09-30 — Canonicalize Gamma's empty optional event fields
+
+Gamma's live event payloads use empty strings for some absent optional text and for condition identities that have not yet been assigned. M9.11 already models these fields as nullable, so the provider adapter maps omitted, null, and empty values to the same `null` representation instead of rejecting an otherwise valid event.
+
+Non-empty condition identities must still satisfy the canonical hexadecimal contract, and non-string values still fail closed. This compatibility rule restores valid event detail and dependent live-volume composition without weakening identity validation or inventing a condition identity.
+
 ## 2026-09-29 — Search the provider catalog instead of filtering dashboard samples
 
 M9.55 uses Gamma's public `public-search` contract for explicit active-event search. Filtering the six event cards or eight market cards already in the browser would search only a presentation sample and could misleadingly appear complete.

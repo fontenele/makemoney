@@ -295,6 +295,29 @@ describe('PolymarketGammaEventClient', () => {
     });
   });
 
+  it('normalizes empty or omitted optional descriptive text to null', () => {
+    const client = new PolymarketGammaEventClient('https://example.com');
+
+    expect(
+      client.normalize({
+        ...eventPayload(),
+        description: undefined,
+        resolutionSource: '',
+      }),
+    ).toMatchObject({ description: null, resolutionSource: null });
+  });
+
+  it('normalizes an empty unassigned nested condition identity to null', () => {
+    const client = new PolymarketGammaEventClient('https://example.com');
+
+    expect(
+      client.normalize({
+        ...eventPayload(),
+        markets: [{ ...marketPayload(), conditionId: '' }],
+      }).markets[0]?.conditionId,
+    ).toBeNull();
+  });
+
   it('loads one unauthenticated event by Gamma ID', async () => {
     const http = jest
       .fn<(input: string, init?: RequestInit) => Promise<Response>>()
@@ -320,6 +343,7 @@ describe('PolymarketGammaEventClient', () => {
     { ...eventPayload(), title: '' },
     { ...eventPayload(), active: 'true' },
     { ...eventPayload(), startDate: 'not-a-date' },
+    { ...eventPayload(), resolutionSource: 42 },
     { ...eventPayload(), markets: 'invalid' },
     {
       ...eventPayload(),

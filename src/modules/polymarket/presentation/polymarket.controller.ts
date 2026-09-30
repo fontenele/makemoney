@@ -132,6 +132,7 @@ import { PredictionSearchResult } from '../domain/prediction-search';
 
 const DEFAULT_LIMIT = 20;
 const MAXIMUM_LIMIT = 100;
+const MAXIMUM_SEARCH_PAGE = 100;
 const MAXIMUM_OFFSET = 10_000;
 const CURSOR = /^\S{1,4096}$/u;
 
@@ -167,12 +168,16 @@ export class PolymarketController {
   async searchActiveEvents(
     @Query('q') query?: string,
     @Query('limit') limit?: string,
+    @Query('page') page?: string,
   ): Promise<PredictionSearchResult> {
     const parsedQuery = validSearchQuery(query);
+    const parsedLimit = validLimit(limit);
+    const parsedPage = validSearchPage(page);
     try {
       return await this.search.searchActiveEvents({
         query: parsedQuery,
-        limit: validLimit(limit),
+        limit: parsedLimit,
+        page: parsedPage,
       });
     } catch {
       throw new ServiceUnavailableException('Polymarket search is unavailable');
@@ -956,6 +961,18 @@ function validLimit(value?: string): number {
   const parsed = Number(value);
   if (parsed > MAXIMUM_LIMIT) {
     throw new BadRequestException('limit must be an integer from 1 to 100');
+  }
+  return parsed;
+}
+
+function validSearchPage(value?: string): number {
+  if (value === undefined) return 1;
+  if (!/^[1-9]\d*$/.test(value)) {
+    throw new BadRequestException('page must be an integer from 1 to 100');
+  }
+  const parsed = Number(value);
+  if (parsed > MAXIMUM_SEARCH_PAGE) {
+    throw new BadRequestException('page must be an integer from 1 to 100');
   }
   return parsed;
 }

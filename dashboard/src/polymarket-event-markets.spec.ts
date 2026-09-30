@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { PolymarketEventDetails } from './api';
-import { buildPolymarketEventMarketRows } from './polymarket-event-markets';
+import {
+  buildPolymarketEventMarketRows,
+  eventMarketRowToSummary,
+} from './polymarket-event-markets';
 
 describe('buildPolymarketEventMarketRows', () => {
   it('preserves provider order and bounds the displayed reference sample', () => {
@@ -18,6 +21,9 @@ describe('buildPolymarketEventMarketRows', () => {
       Array.from({ length: 8 }, (_, index) => ({
         id: String(index + 1),
         label: `Question ${index + 1}`,
+        slug: `market-${index + 1}`,
+        question: `Question ${index + 1}`,
+        conditionId: null,
         closed: index === 1,
       })),
     );
@@ -42,9 +48,54 @@ describe('buildPolymarketEventMarketRows', () => {
     ]);
 
     expect(buildPolymarketEventMarketRows(event)).toEqual([
-      { id: '41', label: 'candidate-a', closed: false },
-      { id: '42', label: 'Market 42', closed: true },
+      {
+        id: '41',
+        label: 'candidate-a',
+        slug: 'candidate-a',
+        question: null,
+        conditionId: null,
+        closed: false,
+      },
+      {
+        id: '42',
+        label: 'Market 42',
+        slug: null,
+        question: null,
+        conditionId: null,
+        closed: true,
+      },
     ]);
+  });
+
+  it('maps only open references into the existing market-selection model', () => {
+    const [open, closed] = buildPolymarketEventMarketRows(
+      eventDetails([
+        {
+          id: '41',
+          slug: 'candidate-a',
+          question: 'Candidate A?',
+          conditionId: '0xabc',
+          closed: false,
+        },
+        {
+          id: '42',
+          slug: 'candidate-b',
+          question: 'Candidate B?',
+          conditionId: '0xdef',
+          closed: true,
+        },
+      ]),
+    );
+
+    expect(open && eventMarketRowToSummary(open)).toEqual({
+      provider: 'polymarket',
+      id: '41',
+      slug: 'candidate-a',
+      question: 'Candidate A?',
+      conditionId: '0xabc',
+      closed: false,
+    });
+    expect(closed && eventMarketRowToSummary(closed)).toBeNull();
   });
 });
 

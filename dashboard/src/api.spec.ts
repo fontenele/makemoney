@@ -18,6 +18,7 @@ describe('loadPolymarketSearch', () => {
       Promise.resolve(
         Response.json({
           query: 'bitcoin & fed',
+          page: 2,
           events: [{ id: '84', title: 'Bitcoin and the Fed' }],
           hasMore: true,
           totalResults: 12,
@@ -27,13 +28,13 @@ describe('loadPolymarketSearch', () => {
     );
 
     await expect(
-      loadPolymarketSearch('bitcoin & fed', request),
+      loadPolymarketSearch('bitcoin & fed', 2, request),
     ).resolves.toMatchObject({
       status: 'available',
-      data: { query: 'bitcoin & fed', totalResults: 12 },
+      data: { query: 'bitcoin & fed', page: 2, totalResults: 12 },
     });
     expect(request).toHaveBeenCalledWith(
-      '/api/polymarket/search?q=bitcoin+%26+fed&limit=8',
+      '/api/polymarket/search?q=bitcoin+%26+fed&limit=8&page=2',
       { headers: { Accept: 'application/json' } },
     );
   });
@@ -48,7 +49,7 @@ describe('loadPolymarketSearch', () => {
       ),
     );
 
-    await expect(loadPolymarketSearch('bitcoin', request)).resolves.toEqual({
+    await expect(loadPolymarketSearch('bitcoin', 1, request)).resolves.toEqual({
       status: 'unavailable',
       message: 'Polymarket search is unavailable',
     });

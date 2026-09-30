@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-30 — M9.57 event-to-market research navigation completed
+
+- Turned the bounded selected-event market-reference sample into explicit controls for open references while keeping closed references visible and disabled.
+- Reused the existing selected-market summary and research loader without adding a provider route, background request, duplicate research model, or implicit market expansion.
+- Decoupled the selected-market research panel from the initial active-market discovery resource, so an event-derived selection remains usable when that independent discovery page is unavailable.
+- Preserved provider order, the eight-reference display bound, stale-response suppression, and all non-executable semantics; added no ranking, recommendation, persistence, account, order, wallet, or execution behavior.
+- Verified 66 dashboard tests and the production dashboard build.
+
+## 2026-09-30 — M9.56 bounded Polymarket search pagination completed
+
+- Added optional 1-based `page=1..100` validation to `GET /polymarket/search`, with page identity retained in the normalized response and invalid query, limit, or page input rejected as `400` before provider access.
+- Passed the documented page directly to Gamma while keeping every response bounded by the existing limit, preserving provider order, and normalizing the documented null event collection as an empty page.
+- Added dashboard Previous/Next controls over fixed eight-event pages; a new term returns to page one, continuation follows the submitted term, and pending requests remain stale-safe.
+- Added no unbounded accumulation, client-side ranking, persistence, recommendation, account, order, wallet, or execution behavior.
+- Verified 1,581 backend tests, 65 dashboard tests, formatting, lint, the complete backend/dashboard build, and diff integrity.
+- Live-validated pages one and two for `teste`: each returned eight distinct events from 50 reported matches with no cross-page overlap; page zero returned the expected `400`.
+
+## 2026-09-30 — Polymarket event compatibility correction
+
+- Normalized empty optional Gamma event description and resolution-source values to `null` while continuing to reject non-string provider values.
+- Normalized an empty nested market condition identity to `null`, matching the existing provider-neutral model for markets whose condition has not yet been assigned.
+- Restored selected-event details and the dependent live-volume composition for valid active events that use either provider representation.
+- Restarted the local API to load M9.55's new route and confirmed `GET /polymarket/search?q=teste&limit=8` returns eight bounded events from 50 reported matches.
+- Live-validated detail and live-volume responses for all six current dashboard active events; added focused normalization coverage and verified the Polymarket test suite, lint, and backend build.
+
 ## 2026-09-29 — M9.55 bounded Polymarket event search completed
 
 - Added guarded read-only `GET /polymarket/search` over Gamma's public search contract with a trimmed 2–100 character query and `limit=1..100` (dashboard fixed at eight).

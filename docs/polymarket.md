@@ -97,6 +97,8 @@ The raw vector remains internal, so the condition-lifecycle response introduced 
 
 `GET /polymarket/events/:id` loads one public Gamma event using a validated positive numeric event ID. Events are modeled separately from markets: the normalized result preserves the event ID, nullable slug, title, nullable description and resolution source, nullable start/end timestamps, active/closed/archived/restricted flags, and local receipt time.
 
+Gamma may encode absent optional description, resolution source, or a not-yet-assigned nested market condition identity as either an omitted value, `null`, or an empty string. The adapter canonicalizes all three absent forms to `null` while continuing to reject malformed non-string values and non-empty invalid condition identities.
+
 The nested market collection is bounded to at most 1,000 entries and reduced to references containing only market ID, nullable slug and question, nullable condition ID, and closed state. Every reference is validated as a complete unit; the route does not import nested prices, volume, liquidity, outcome arrays, or trading flags.
 
 Provider `404` becomes local `404`, malformed IDs return `400`, and transport, other HTTP, identity, or normalization failures return `503`. M9.11 adds no event listing, persistence, polling, account, position, wallet, order, strategy, signal, or execution behavior.
@@ -349,7 +351,19 @@ The browser counts but does not expand the returned market references. It reques
 
 `GET /polymarket/search` accepts a required trimmed `q` from 2 through 100 characters and a bounded `limit`, then calls Gamma's unauthenticated `public-search` endpoint with `events_status=active` and `limit_per_type`. The local response retains only unique active, non-closed event identity, dates, lifecycle flags, the provider's `hasMore` and `totalResults` summary, and local receipt time.
 
-Nested markets, tags, series, financial metrics, images, editorial fields, and provider ranking details are discarded. The first page is intentionally bounded and no search-page traversal is exposed yet. The route remains behind the established fail-closed availability guard and adds no persistence, recommendation, account, position, order, wallet, or execution behavior.
+Nested markets, tags, series, financial metrics, images, editorial fields, and provider ranking details are discarded. M9.55 initially exposes only the bounded first page. The route remains behind the established fail-closed availability guard and adds no persistence, recommendation, account, position, order, wallet, or execution behavior.
+
+## M9.56 — Bounded active-event search pagination
+
+The search route accepts an optional 1-based `page` from 1 through 100, defaults it to one, passes it directly to Gamma, and retains the requested page in the normalized response. Query, limit, and page validation all occur before provider access; malformed inputs are `400`, while transport or response-contract failures remain `503`.
+
+The dashboard requests eight events per page and exposes Previous/Next controls without accumulating pages. A new search starts at page one, page changes continue the submitted query even if the input is subsequently edited, and the provider's `hasMore` controls forward navigation. The selected-event detail flow is unchanged, and pagination adds no ranking, persistence, recommendation, account, position, order, wallet, or execution behavior.
+
+## M9.57 — Event-to-market research navigation
+
+The bounded selected-event market-reference sample now allows an explicit open reference to enter the existing selected-market research flow. The browser maps only the already-normalized reference identity, slug, question, and nullable condition into the established market-summary shape, then lets the existing loader request details, taxonomy, midpoint context, open interest, books, latest trades, and bounded history under their independent resource states.
+
+Closed references stay visible but disabled, and no reference is expanded until selected. The selected-market research panel is independent from the initial active-market discovery page, so an event-derived selection remains visible if that separate page is unavailable. This adds no backend route, bulk loading, ranking, recommendation, persistence, account, order, wallet, or execution behavior.
 
 ## Next safe increment
 

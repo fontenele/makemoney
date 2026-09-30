@@ -3,7 +3,7 @@ import { PolymarketGammaSearchClient } from './polymarket-gamma-search.client';
 
 describe('PolymarketGammaSearchClient', () => {
   const receivedAt = new Date('2026-09-29T23:00:00.000Z');
-  const query = { query: 'bitcoin', limit: 8 };
+  const query = { query: 'bitcoin', limit: 8, page: 2 };
 
   it('loads and normalizes bounded active event search results', async () => {
     const http = jest
@@ -22,6 +22,7 @@ describe('PolymarketGammaSearchClient', () => {
 
     await expect(client.searchActiveEvents(query)).resolves.toEqual({
       query: 'bitcoin',
+      page: 2,
       events: [
         {
           provider: 'polymarket',
@@ -41,7 +42,7 @@ describe('PolymarketGammaSearchClient', () => {
       receivedAt,
     });
     expect(http.mock.calls[0]?.[0]).toBe(
-      'https://gamma-api.polymarket.com/public-search?q=bitcoin&events_status=active&limit_per_type=8',
+      'https://gamma-api.polymarket.com/public-search?q=bitcoin&events_status=active&limit_per_type=8&page=2',
     );
     expect(http.mock.calls[0]?.[1]?.signal).toBeInstanceOf(AbortSignal);
   });
@@ -78,6 +79,20 @@ describe('PolymarketGammaSearchClient', () => {
         query,
       ),
     ).toThrow('Invalid Polymarket search payload');
+  });
+
+  it('normalizes the documented null event collection as an empty page', () => {
+    const client = new PolymarketGammaSearchClient('https://example.com');
+
+    expect(
+      client.normalize(
+        {
+          events: null,
+          pagination: { hasMore: false, totalResults: 0 },
+        },
+        query,
+      ),
+    ).toMatchObject({ page: 2, events: [], hasMore: false, totalResults: 0 });
   });
 });
 

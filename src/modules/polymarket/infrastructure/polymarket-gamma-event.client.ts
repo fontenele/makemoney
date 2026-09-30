@@ -113,13 +113,18 @@ export class PolymarketGammaEventClient implements PredictionEventProvider {
   }
 
   normalize(payload: unknown): PredictionEventDetails {
+    if (!isRecord(payload)) {
+      throw new Error('Invalid Polymarket event payload');
+    }
+    const description = normalizeNullableText(payload.description, 20_000);
+    const resolutionSource = normalizeNullableText(
+      payload.resolutionSource,
+      4_096,
+    );
     if (
-      !isRecord(payload) ||
       !validRequiredString(payload.id, 100) ||
       !validOptionalString(payload.slug, 500) ||
       !validRequiredString(payload.title, 2_000) ||
-      !validOptionalString(payload.description, 20_000) ||
-      !validOptionalString(payload.resolutionSource, 4_096) ||
       !validOptionalTimestamp(payload.startDate) ||
       !validOptionalTimestamp(payload.endDate) ||
       typeof payload.active !== 'boolean' ||
@@ -136,8 +141,8 @@ export class PolymarketGammaEventClient implements PredictionEventProvider {
       id: payload.id,
       slug: payload.slug,
       title: payload.title,
-      description: payload.description,
-      resolutionSource: payload.resolutionSource,
+      description,
+      resolutionSource,
       startDate: payload.startDate,
       endDate: payload.endDate,
       active: payload.active,
@@ -210,12 +215,14 @@ function normalizeEvent(
 }
 
 function normalizeMarket(value: unknown): PredictionEventMarketIdentity {
+  if (!isRecord(value)) {
+    throw new Error('Invalid Polymarket event market payload');
+  }
+  const conditionId = normalizeNullableConditionId(value.conditionId);
   if (
-    !isRecord(value) ||
     !validRequiredString(value.id, 100) ||
     !validOptionalString(value.slug, 500) ||
     !validOptionalString(value.question, 2_000) ||
-    !validConditionId(value.conditionId) ||
     typeof value.closed !== 'boolean'
   ) {
     throw new Error('Invalid Polymarket event market payload');
@@ -224,7 +231,7 @@ function normalizeMarket(value: unknown): PredictionEventMarketIdentity {
     id: value.id,
     slug: value.slug,
     question: value.question,
-    conditionId: value.conditionId,
+    conditionId,
     closed: value.closed,
   };
 }
@@ -269,6 +276,12 @@ function validOptionalString(
   return value === null || validRequiredString(value, maximum);
 }
 
+function normalizeNullableText(value: unknown, maximum: number): string | null {
+  if (value === null || value === undefined || value === '') return null;
+  if (validRequiredString(value, maximum)) return value;
+  throw new Error('Invalid Polymarket event payload');
+}
+
 function validOptionalTimestamp(value: unknown): value is string | null {
   return (
     value === null ||
@@ -276,10 +289,10 @@ function validOptionalTimestamp(value: unknown): value is string | null {
   );
 }
 
-function validConditionId(value: unknown): value is string | null {
-  return (
-    value === null || (typeof value === 'string' && CONDITION_ID.test(value))
-  );
+function normalizeNullableConditionId(value: unknown): string | null {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value === 'string' && CONDITION_ID.test(value)) return value;
+  throw new Error('Invalid Polymarket event market payload');
 }
 
 function validOptionalCursor(

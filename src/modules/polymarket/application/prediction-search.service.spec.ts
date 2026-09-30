@@ -6,6 +6,7 @@ describe('PredictionSearchService', () => {
   it('delegates a bounded active-event search', async () => {
     const result = {
       query: 'bitcoin',
+      page: 3,
       events: [],
       hasMore: false,
       totalResults: 0,
@@ -17,10 +18,10 @@ describe('PredictionSearchService', () => {
     const service = new PredictionSearchService({ searchActiveEvents });
 
     await expect(
-      service.searchActiveEvents({ query: 'bitcoin', limit: 8 }),
+      service.searchActiveEvents({ query: 'bitcoin', limit: 8, page: 3 }),
     ).resolves.toBe(result);
     expect(searchActiveEvents).toHaveBeenCalledWith(
-      { query: 'bitcoin', limit: 8 },
+      { query: 'bitcoin', limit: 8, page: 3 },
       undefined,
     );
   });
