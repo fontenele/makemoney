@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-29 — M9.54 Polymarket dashboard selected-event volume breakdown completed
+
+- Correlated provider-ordered live-volume rows to the event's embedded market references by condition identity.
+- Displayed at most eight rows with exact taker-volume shares and question, slug, market identity, or explicit unidentified fallbacks.
+- Reused the existing aggregate response without another provider request or browser-side volume calculation.
+- Did not sort, sum, convert to USDC, infer a measurement window, or expose trades, holders, positions, recommendations, accounts, orders, or execution behavior.
+- Verified 63 dashboard tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
+## 2026-09-29 — M9.53 Polymarket dashboard selected-event market references completed
+
+- Displayed at most eight already-normalized selected-event market references without another provider request.
+- Preserved provider order, identity, open/closed state, and question with slug/identity fallbacks.
+- Kept the displayed sample count explicit beside the complete normalized reference count.
+- Did not join references to live-volume rows or load market prices, liquidity, volume, outcomes, ranking, recommendations, accounts, orders, or execution behavior.
+- Verified 61 dashboard tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
 ## 2026-09-29 — M9.52 Polymarket dashboard selected-event live volume completed
 
 - Loaded the existing public Data API live-volume resource alongside selected-event details and taxonomy.

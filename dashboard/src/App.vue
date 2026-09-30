@@ -33,6 +33,8 @@ import { buildPolymarketPriceChart } from './polymarket-price-chart';
 import { polymarketMidpointComplementStatusLabel } from './polymarket-midpoint-complement';
 import { polymarketHistoricalAlignmentLabel } from './polymarket-price-change-context';
 import { buildPolymarketPriceChangeObservationRows } from './polymarket-price-change-observations';
+import { buildPolymarketEventMarketRows } from './polymarket-event-markets';
+import { buildPolymarketEventVolumeRows } from './polymarket-event-volume';
 import DashboardChart from './DashboardChart.vue';
 import {
   dashboardRouteFromHash,
@@ -126,6 +128,16 @@ const polymarketPriceChangeObservationRows = computed(() => {
     ? buildPolymarketPriceChangeObservationRows(research.priceChange24h.data)
     : [];
 });
+const polymarketEventMarketRows = computed(() =>
+  available(polymarketEventDetails.value)
+    ? buildPolymarketEventMarketRows(polymarketEventDetails.value.data)
+    : [],
+);
+const polymarketEventVolumeRows = computed(() =>
+  available(polymarketEventLiveVolume.value)
+    ? buildPolymarketEventVolumeRows(polymarketEventLiveVolume.value.data)
+    : [],
+);
 
 async function refreshListingPerformance(
   listing: DetectedSpotSymbol,
@@ -1211,9 +1223,35 @@ onUnmounted(() => {
                 </div>
               </dl>
               <p class="polymarket-note">
-                Market references are counted only. This view does not expand
+                Market references remain descriptive. This view does not load
                 their prices, liquidity, volume, or outcome data.
               </p>
+              <div class="polymarket-event-markets">
+                <div>
+                  <span>Referenced market sample</span>
+                  <small>
+                    {{ polymarketEventMarketRows.length }} of
+                    {{ polymarketEventDetails.data.markets.length }} shown
+                  </small>
+                </div>
+                <p v-if="polymarketEventMarketRows.length === 0">
+                  No market references returned for this event.
+                </p>
+                <div v-else class="polymarket-event-market-grid">
+                  <article
+                    v-for="market in polymarketEventMarketRows"
+                    :key="market.id"
+                  >
+                    <div>
+                      <span>Market {{ market.id }}</span>
+                      <span :class="{ closed: market.closed }">
+                        {{ market.closed ? 'Closed' : 'Open' }}
+                      </span>
+                    </div>
+                    <strong>{{ market.label }}</strong>
+                  </article>
+                </div>
+              </div>
             </template>
             <p v-else class="empty-state polymarket-state">
               {{
@@ -1274,6 +1312,36 @@ onUnmounted(() => {
                     </dd>
                   </div>
                 </dl>
+                <div class="polymarket-event-volume-breakdown">
+                  <div>
+                    <span>Leading market rows</span>
+                    <small>
+                      {{ polymarketEventVolumeRows.length }} of
+                      {{ polymarketEventLiveVolume.data.markets.length }} shown
+                    </small>
+                  </div>
+                  <p v-if="polymarketEventVolumeRows.length === 0">
+                    No market volume rows returned.
+                  </p>
+                  <div v-else class="polymarket-event-volume-list">
+                    <article
+                      v-for="(row, index) in polymarketEventVolumeRows"
+                      :key="row.conditionId ?? `unidentified-${index}`"
+                    >
+                      <div>
+                        <span>{{
+                          row.marketId
+                            ? `Market ${row.marketId}`
+                            : 'No market identity'
+                        }}</span>
+                        <strong
+                          >{{ decimal(row.takerVolumeShares) }} shares</strong
+                        >
+                      </div>
+                      <p>{{ row.label }}</p>
+                    </article>
+                  </div>
+                </div>
                 <p>
                   Provider aggregate in shares, not USDC turnover. No trade,
                   holder, position, or executable-price detail is shown.

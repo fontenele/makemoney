@@ -809,6 +809,68 @@ h1 em {
   line-height: 1.7;
 }
 
+.polymarket-event-markets {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.polymarket-event-markets > div:first-child,
+.polymarket-event-market-grid article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.polymarket-event-markets span,
+.polymarket-event-markets small,
+.polymarket-event-markets > p {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.polymarket-event-markets > div:first-child > span {
+  color: #73867e;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.polymarket-event-markets > p {
+  margin: 0;
+}
+
+.polymarket-event-market-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.polymarket-event-market-grid article {
+  display: grid;
+  min-height: 112px;
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.polymarket-event-market-grid article > div span:last-child {
+  color: #a6f4c5;
+}
+
+.polymarket-event-market-grid article > div span.closed {
+  color: #ffca80;
+}
+
+.polymarket-event-market-grid article strong {
+  align-self: end;
+  font-size: 12px;
+  font-weight: 560;
+  line-height: 1.45;
+}
+
 .polymarket-event-taxonomy {
   display: grid;
   gap: 10px;
@@ -866,6 +928,47 @@ h1 em {
 .polymarket-event-volume dd,
 .polymarket-event-volume p {
   margin: 0;
+}
+
+.polymarket-event-volume-breakdown {
+  display: grid;
+  gap: 10px;
+}
+
+.polymarket-event-volume-breakdown > div:first-child,
+.polymarket-event-volume-list article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.polymarket-event-volume-breakdown span,
+.polymarket-event-volume-breakdown small {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.polymarket-event-volume-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.polymarket-event-volume-list article {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.polymarket-event-volume-list article strong {
+  color: var(--ink);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 10px;
+  font-weight: 560;
 }
 
 .polymarket-event-volume dd {
@@ -2005,6 +2108,8 @@ footer {
 
   .polymarket-grid,
   .polymarket-event-grid,
+  .polymarket-event-market-grid,
+  .polymarket-event-volume-list,
   .polymarket-event-facts,
   .polymarket-event-volume dl,
   .polymarket-stat-grid,
@@ -2160,6 +2265,8 @@ footer {
 
   .polymarket-grid,
   .polymarket-event-grid,
+  .polymarket-event-market-grid,
+  .polymarket-event-volume-list,
   .polymarket-event-facts,
   .polymarket-event-volume dl,
   .polymarket-stat-grid,

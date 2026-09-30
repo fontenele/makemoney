@@ -229,3 +229,15 @@ Taxonomy failure does not hide valid event identity and lifecycle details. Selec
 Selecting an active event now independently requests the existing `GET /polymarket/events/:id/live-volume` resource alongside detail and taxonomy. The dashboard displays the provider-validated exact total taker volume as shares, the count of reported market rows, and local receipt time.
 
 The provider contract supplies no measurement window, and shares must not be described as USDC turnover. The dashboard does not expose the per-condition breakdown, individual trades, holders, positions, persistence, recommendations, accounts, orders, or execution behavior. Failure remains isolated from valid event details and taxonomy, while selection cleanup and stale-response suppression cover the added resource.
+
+## M9.53 selected-event market-reference sample
+
+Selected-event details now render at most the first eight already-normalized market references in their provider order. Each display-only card contains the market identity, question with slug/identity fallback, and open/closed state, while the heading retains the displayed and total reference counts.
+
+The browser makes no additional request and does not join these references to the independent live-volume rows. No market price, liquidity, volume, outcome identity, discovery ranking, recommendation, account, order, or execution behavior is added.
+
+## M9.54 selected-event live-volume breakdown
+
+The selected-event live-volume panel now displays at most the first eight rows from the backend-validated descending provider response. Non-null condition identities are correlated to the event references embedded in the same aggregate response and use question, slug, or market identity labels; the single permitted null-condition row stays explicitly unidentified.
+
+The browser preserves provider order and exact share strings. It does not sort, sum, convert to USDC, infer a measurement window, request market details, or expose individual trades, holders, positions, recommendations, accounts, orders, or execution behavior.
