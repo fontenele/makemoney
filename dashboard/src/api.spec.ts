@@ -661,6 +661,41 @@ describe('loadPolymarketMarketResearch', () => {
       if (path.endsWith('/open-interest')) {
         return Promise.resolve(Response.json({ openInterestUsdc: '12500' }));
       }
+      if (path.endsWith('/resolution')) {
+        return Promise.resolve(
+          Response.json({
+            provider: 'polymarket',
+            market: { id: '42' },
+            resolution: {
+              provider: 'polymarket',
+              conditionId: `0x${'a'.repeat(64)}`,
+              status: 'resolved',
+              extendedReview: false,
+              wasDisputed: false,
+              wasArbitrated: false,
+              resolvedAt: '2026-09-29T12:00:00.000Z',
+              source: 'data-api-resolution',
+              receivedAt: '2026-09-29T12:34:57.000Z',
+            },
+            result: 'yes',
+            payouts: {
+              yes: {
+                label: 'Yes',
+                tokenId: '111',
+                payoutRate: '1',
+                status: 'winner',
+              },
+              no: {
+                label: 'No',
+                tokenId: '222',
+                payoutRate: '0',
+                status: 'loser',
+              },
+            },
+            executable: false,
+          }),
+        );
+      }
       if (path.endsWith('/tags')) {
         return Promise.resolve(
           Response.json({
@@ -795,7 +830,7 @@ describe('loadPolymarketMarketResearch', () => {
       new Date('2026-09-29T12:34:56.789Z'),
     );
 
-    expect(request).toHaveBeenCalledTimes(11);
+    expect(request).toHaveBeenCalledTimes(12);
     expect(research.details.status).toBe('available');
     expect(research.tags).toMatchObject({
       status: 'available',
@@ -810,6 +845,18 @@ describe('loadPolymarketMarketResearch', () => {
     expect(research.openInterest).toMatchObject({
       status: 'available',
       data: { openInterestUsdc: '12500' },
+    });
+    expect(research.resolution).toMatchObject({
+      status: 'available',
+      data: {
+        result: 'yes',
+        resolution: { status: 'resolved', wasDisputed: false },
+        payouts: {
+          yes: { payoutRate: '1', status: 'winner' },
+          no: { payoutRate: '0', status: 'loser' },
+        },
+        executable: false,
+      },
     });
     expect(research.midpointComplement).toMatchObject({
       status: 'available',
@@ -915,11 +962,16 @@ describe('loadPolymarketMarketResearch', () => {
     expect(request).toHaveBeenCalledWith('/api/polymarket/markets/42/tags', {
       headers: { Accept: 'application/json' },
     });
+    expect(request).toHaveBeenCalledWith(
+      '/api/polymarket/markets/42/resolution',
+      { headers: { Accept: 'application/json' } },
+    );
   });
 
   it('keeps unavailable market statistics isolated', async () => {
-    const request = vi.fn((input: string | URL | Request) =>
-      input.toString().endsWith('/open-interest')
+    const request = vi.fn((input: string | URL | Request) => {
+      const path = input.toString();
+      return path.endsWith('/open-interest') || path.endsWith('/resolution')
         ? Promise.resolve(new Response(null, { status: 404 }))
         : Promise.resolve(
             Response.json({
@@ -929,13 +981,17 @@ describe('loadPolymarketMarketResearch', () => {
                 no: { label: 'No', tokenId: null },
               },
             }),
-          ),
-    );
+          );
+    });
 
     const research = await loadPolymarketMarketResearch('42', request);
 
     expect(research.details.status).toBe('available');
     expect(research.openInterest).toEqual({
+      status: 'unavailable',
+      message: 'Unavailable (404)',
+    });
+    expect(research.resolution).toEqual({
       status: 'unavailable',
       message: 'Unavailable (404)',
     });

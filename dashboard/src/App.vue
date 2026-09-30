@@ -40,7 +40,11 @@ import {
   eventMarketRowToSummary,
   type PolymarketEventMarketRow,
 } from './polymarket-event-markets';
-import { buildPolymarketEventVolumeRows } from './polymarket-event-volume';
+import {
+  buildPolymarketEventVolumePage,
+  eventVolumeRowToSummary,
+  type PolymarketEventVolumeRow,
+} from './polymarket-event-volume';
 import DashboardChart from './DashboardChart.vue';
 import {
   dashboardRouteFromHash,
@@ -72,6 +76,7 @@ const polymarketEventLiveVolume =
 const polymarketEventDetailsLoading = ref(false);
 let polymarketEventDetailsRequest = 0;
 const polymarketEventMarketPage = ref(1);
+const polymarketEventVolumePage = ref(1);
 const selectedPolymarketTag = ref<PolymarketMarketTag | null>(null);
 const relatedPolymarketTags = ref<Resource<PolymarketRelatedTags> | null>(null);
 const relatedPolymarketTagsLoading = ref(false);
@@ -152,10 +157,16 @@ const polymarketEventMarketPagination = computed(() =>
 const polymarketEventMarketRows = computed(
   () => polymarketEventMarketPagination.value.rows,
 );
-const polymarketEventVolumeRows = computed(() =>
+const polymarketEventVolumePagination = computed(() =>
   available(polymarketEventLiveVolume.value)
-    ? buildPolymarketEventVolumeRows(polymarketEventLiveVolume.value.data)
-    : [],
+    ? buildPolymarketEventVolumePage(
+        polymarketEventLiveVolume.value.data,
+        polymarketEventVolumePage.value,
+      )
+    : { rows: [], page: 1, pageCount: 1, total: 0 },
+);
+const polymarketEventVolumeRows = computed(
+  () => polymarketEventVolumePagination.value.rows,
 );
 
 async function refreshListingPerformance(
@@ -211,6 +222,12 @@ function selectPolymarketEventMarket(market: PolymarketEventMarketRow): void {
   selectPolymarketMarket(summary);
 }
 
+function selectPolymarketEventVolume(row: PolymarketEventVolumeRow): void {
+  const summary = eventVolumeRowToSummary(row);
+  if (!summary) return;
+  selectPolymarketMarket(summary);
+}
+
 async function refreshPolymarketEventDetails(
   event: PolymarketEventSummary,
 ): Promise<void> {
@@ -231,6 +248,7 @@ async function refreshPolymarketEventDetails(
 function selectPolymarketEvent(event: PolymarketEventSummary): void {
   selectedPolymarketEvent.value = event;
   polymarketEventMarketPage.value = 1;
+  polymarketEventVolumePage.value = 1;
   polymarketEventDetails.value = null;
   polymarketEventTags.value = null;
   polymarketEventLiveVolume.value = null;
@@ -240,6 +258,7 @@ function selectPolymarketEvent(event: PolymarketEventSummary): void {
 function clearPolymarketEventSelection(): void {
   selectedPolymarketEvent.value = null;
   polymarketEventMarketPage.value = 1;
+  polymarketEventVolumePage.value = 1;
   polymarketEventDetails.value = null;
   polymarketEventTags.value = null;
   polymarketEventLiveVolume.value = null;
@@ -252,6 +271,13 @@ function changePolymarketEventMarketPage(page: number): void {
     return;
   }
   polymarketEventMarketPage.value = page;
+}
+
+function changePolymarketEventVolumePage(page: number): void {
+  if (page < 1 || page > polymarketEventVolumePagination.value.pageCount) {
+    return;
+  }
+  polymarketEventVolumePage.value = page;
 }
 
 async function loadPolymarketSearchPage(
@@ -1557,19 +1583,31 @@ onUnmounted(() => {
                 </dl>
                 <div class="polymarket-event-volume-breakdown">
                   <div>
-                    <span>Leading market rows</span>
+                    <span>Provider-ordered market rows</span>
                     <small>
-                      {{ polymarketEventVolumeRows.length }} of
-                      {{ polymarketEventLiveVolume.data.markets.length }} shown
+                      Page {{ polymarketEventVolumePagination.page }} of
+                      {{ polymarketEventVolumePagination.pageCount }} ·
+                      {{ polymarketEventVolumePagination.total }} total
                     </small>
                   </div>
                   <p v-if="polymarketEventVolumeRows.length === 0">
                     No market volume rows returned.
                   </p>
                   <div v-else class="polymarket-event-volume-list">
-                    <article
+                    <button
                       v-for="(row, index) in polymarketEventVolumeRows"
                       :key="row.conditionId ?? `unidentified-${index}`"
+                      type="button"
+                      :class="{
+                        selected: selectedPolymarketMarket?.id === row.marketId,
+                      }"
+                      :disabled="row.marketId === null || row.closed !== false"
+                      :aria-pressed="
+                        row.marketId !== null && row.closed === false
+                          ? selectedPolymarketMarket?.id === row.marketId
+                          : undefined
+                      "
+                      @click="selectPolymarketEventVolume(row)"
                     >
                       <div>
                         <span>{{
@@ -1582,7 +1620,45 @@ onUnmounted(() => {
                         >
                       </div>
                       <p>{{ row.label }}</p>
-                    </article>
+                      <small v-if="row.marketId !== null">
+                        {{ row.closed ? 'Closed' : 'Open · select research' }}
+                      </small>
+                    </button>
+                  </div>
+                  <div
+                    v-if="polymarketEventVolumePagination.pageCount > 1"
+                    class="polymarket-event-volume-pagination"
+                  >
+                    <button
+                      type="button"
+                      class="secondary"
+                      :disabled="polymarketEventVolumePagination.page === 1"
+                      @click="
+                        changePolymarketEventVolumePage(
+                          polymarketEventVolumePagination.page - 1,
+                        )
+                      "
+                    >
+                      Previous
+                    </button>
+                    <span>
+                      {{ polymarketEventVolumePagination.page }} /
+                      {{ polymarketEventVolumePagination.pageCount }}
+                    </span>
+                    <button
+                      type="button"
+                      :disabled="
+                        polymarketEventVolumePagination.page ===
+                        polymarketEventVolumePagination.pageCount
+                      "
+                      @click="
+                        changePolymarketEventVolumePage(
+                          polymarketEventVolumePagination.page + 1,
+                        )
+                      "
+                    >
+                      Next
+                    </button>
                   </div>
                 </div>
                 <p>
@@ -1728,6 +1804,56 @@ onUnmounted(() => {
                 <small v-else>{{ polymarketResearch.details.message }}</small>
               </div>
             </div>
+            <div
+              v-if="
+                polymarketResearch && available(polymarketResearch.resolution)
+              "
+              class="polymarket-resolution"
+              aria-label="Public binary resolution"
+            >
+              <div>
+                <span>Resolution result</span>
+                <strong>
+                  {{
+                    polymarketResearch.resolution.data.result === 'fifty_fifty'
+                      ? '50 / 50 split'
+                      : polymarketResearch.resolution.data.result.toUpperCase()
+                  }}
+                </strong>
+                <small>
+                  {{ polymarketResearch.resolution.data.resolution.status }}
+                </small>
+              </div>
+              <div>
+                <span>YES payout</span>
+                <strong>
+                  {{
+                    polymarketResearch.resolution.data.payouts.yes.payoutRate
+                  }}
+                </strong>
+                <small>
+                  {{ polymarketResearch.resolution.data.payouts.yes.status }}
+                </small>
+              </div>
+              <div>
+                <span>NO payout</span>
+                <strong>
+                  {{ polymarketResearch.resolution.data.payouts.no.payoutRate }}
+                </strong>
+                <small>
+                  {{ polymarketResearch.resolution.data.payouts.no.status }} ·
+                  non-executable
+                </small>
+              </div>
+            </div>
+            <p
+              v-else-if="
+                polymarketResearch && !available(polymarketResearch.resolution)
+              "
+              class="empty-state polymarket-resolution-unavailable"
+            >
+              Binary resolution: {{ polymarketResearch.resolution.message }}
+            </p>
             <div
               v-if="
                 polymarketResearch &&

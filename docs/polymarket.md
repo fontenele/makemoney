@@ -371,6 +371,24 @@ The selected-event dashboard paginates the already-normalized bounded market-ref
 
 Page navigation performs no provider request and does not preload market detail or research. Open references still enter the established selected-market flow only after explicit selection; closed references remain visible and disabled. No backend route, ranking, recommendation, persistence, account, order, wallet, or execution behavior is added.
 
+## M9.59 — Dashboard event live-volume pagination
+
+The selected-event live-volume breakdown paginates the already-returned bounded Data API market rows locally, displaying eight entries at a time in provider order. Its page is independent from the Gamma market-reference page, replaces the visible rows without accumulation, and resets when event selection changes.
+
+Existing condition-to-market correlation and explicit unidentified provider rows remain intact. Navigation makes no provider request and introduces no browser-side aggregation, measurement-window inference, USDC conversion, trade detail, persistence, account, position, order, wallet, or execution behavior.
+
+## M9.60 — Event-volume-to-market research navigation
+
+An explicitly selected live-volume row correlated by condition identity to an open event market now enters the established selected-market research flow. The browser retains only the already-normalized market identity, slug, question, condition, and open state needed by that existing loader.
+
+Closed and unidentified provider rows remain visible but disabled, and no row triggers market loading until selected. Provider volume order is descriptive rather than a browser ranking or recommendation. No backend route, automatic expansion, persistence, account, position, order, wallet, or execution behavior is added.
+
+## M9.61 — Dashboard binary resolution result
+
+Selected-market research independently requests the existing `GET /polymarket/markets/:id/resolution` resource. When a recognized terminal payout exists, the dashboard displays the YES, NO, or 50/50 result, the exact indexed YES and NO payout rates and winner/loser/split classifications, and the provider lifecycle status.
+
+Unavailable or unsupported resolution remains isolated from market identity, midpoint, books, latest trades, taxonomy, open interest, and bounded history. The display is explicitly non-executable and makes no claim about user entitlement, wallet holdings, positions, redemption, recommendation, order, or execution behavior.
+
 ## Next safe increment
 
 A later M9 increment may add another narrowly bounded public research view without introducing positions, redemption, trade history, persistence, authentication, accounts, or execution. M10 real-trading design remains separate and requires current official Binance research plus explicit safeguards.

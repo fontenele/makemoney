@@ -1,5 +1,23 @@
 # Technical Decisions
 
+## 2026-09-30 — Keep terminal resolution independent from live research
+
+M9.61 requests the existing indexed binary resolution resource independently alongside the selected market's other read models. A missing or unsupported terminal payout remains an isolated unavailable state, so it cannot suppress identity, midpoint, book, trade, taxonomy, open-interest, or historical observations.
+
+The dashboard displays only the backend's recognized YES, NO, or 50/50 result and exact indexed payout rates. It does not infer entitlement, inspect holdings, present redemption controls, or reinterpret payout data in the browser.
+
+## 2026-09-30 — Reuse market research from correlated volume rows
+
+M9.60 retains the correlated Gamma market identity, descriptive text, condition, and closed state in each live-volume presentation row. Only an explicitly selected row correlated to an open market is mapped into the existing browser-side market summary and research loader.
+
+Closed and unidentified rows remain visible but disabled. This avoids inventing identities or extending open-market research into terminal markets, while ensuring the Data API ordering never becomes an implicit ranking or automatic bulk-expansion trigger.
+
+## 2026-09-30 — Page event volume independently from market references
+
+M9.59 paginates the bounded Data API live-volume rows already present in the selected-event response. The dashboard preserves provider order and existing condition-to-market correlation, displays eight rows at a time, replaces rather than accumulates pages, and resets the independent volume page when event selection changes.
+
+The volume page remains independent because Data API order represents its own volume ordering rather than the Gamma event-reference order. Navigation performs no provider request, aggregation, ranking, measurement-window inference, or USDC conversion.
+
 ## 2026-09-30 — Page event references without more provider traffic
 
 M9.58 paginates the bounded market-reference collection already present in the selected-event detail response. The browser displays eight references at a time, preserves provider order, replaces the visible page instead of accumulating rows, and returns to page one whenever event selection changes.

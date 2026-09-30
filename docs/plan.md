@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is in progress through M9.58 browser-local selected-event market-reference pagination. The existing bounded event-detail payload is paged without additional provider traffic, and explicit open-reference selection reuses the selected-market research flow. Holders, other named Data API feeds, implicit related-tag expansion, recursive traversal, wallet positions, redemption, individual trade history, authentication, accounts, automatic execution controls, and real trading remain separate future work.
+M9 is in progress through M9.61 isolated selected-market binary resolution display. Existing bounded event-detail references and Data API volume rows are paged independently, explicit open-market selections reuse the selected-market research flow, and recognized terminal payout results remain descriptive and non-executable. Holders, entitlement, other named Data API feeds, implicit related-tag expansion, recursive traversal, wallet positions, redemption, individual trade history, authentication, accounts, automatic execution controls, and real trading remain separate future work.
 ```

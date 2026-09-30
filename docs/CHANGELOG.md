@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-09-30 — M9.61 dashboard binary resolution result completed
+
+- Added the existing indexed binary resolution resource to selected-market dashboard research as an independent request.
+- Displayed recognized YES, NO, and 50/50 outcomes with exact indexed payout rates, payout classifications, provider lifecycle status, and explicit non-executable semantics.
+- Kept missing or unsupported terminal resolution isolated from identity, price, book, trade, taxonomy, open-interest, and historical resources.
+- Extended dashboard API coverage for available resolution and isolated `404` behavior.
+- Verified all 12 dashboard test files and 77 tests, the complete backend/dashboard build, lint, formatting, and whitespace checks.
+
+### Scope confirmation
+
+- No payout entitlement, holder or wallet position, redemption, recommendation, persistence, account, order, or execution behavior was introduced.
+
+## 2026-09-30 — M9.60 event-volume-to-market research navigation completed
+
+- Retained correlated market slug, question, condition identity, and closed state in live-volume presentation rows.
+- Turned rows correlated to open markets into explicit controls that reuse the existing selected-market research loader.
+- Kept closed and unidentified provider rows visible and disabled, with no automatic market expansion or preload.
+- Added focused coverage for open-row mapping and closed/unidentified rejection.
+- Verified all 12 dashboard test files and 77 tests, the complete backend/dashboard build, lint, formatting, and whitespace checks.
+
+### Scope confirmation
+
+- No backend route, provider request before selection, browser ranking, recommendation, persistence, account, position, order, wallet, or execution behavior was introduced.
+
+## 2026-09-30 — M9.59 dashboard event live-volume pagination completed
+
+- Added independent browser-local eight-item pagination across the selected event's bounded Data API market-volume rows.
+- Preserved provider order, condition-to-market correlation, exact share values, and explicit unidentified rows while replacing rather than accumulating pages.
+- Reset volume navigation when event selection changes and retained isolated loading and unavailable states.
+- Added focused coverage for middle/final pages, stale-page clamping, and invalid page input.
+- Verified all 12 dashboard test files and 76 tests, the complete backend/dashboard build, lint, formatting, and whitespace checks.
+
+### Scope confirmation
+
+- No provider request, browser-side aggregation, measurement-window or USDC inference, persistence, account, position, order, wallet, or execution behavior was introduced.
+
 ## 2026-09-30 — M9.58 dashboard event-market pagination completed
 
 - Added browser-local eight-item pagination across the bounded selected-event market-reference collection.

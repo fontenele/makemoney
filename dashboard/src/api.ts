@@ -263,6 +263,38 @@ export interface PolymarketMarketDetails {
   receivedAt: string;
 }
 
+export interface PolymarketBinaryResolution {
+  provider: 'polymarket';
+  market: PolymarketMarketDetails;
+  resolution: {
+    provider: 'polymarket';
+    conditionId: string;
+    status: string;
+    extendedReview: boolean;
+    wasDisputed: boolean;
+    wasArbitrated: boolean;
+    resolvedAt: string | null;
+    source: 'data-api-resolution';
+    receivedAt: string;
+  };
+  result: 'yes' | 'no' | 'fifty_fifty';
+  payouts: {
+    yes: {
+      label: string;
+      tokenId: string;
+      payoutRate: '0' | '0.5' | '1';
+      status: 'winner' | 'loser' | 'split';
+    };
+    no: {
+      label: string;
+      tokenId: string;
+      payoutRate: '0' | '0.5' | '1';
+      status: 'winner' | 'loser' | 'split';
+    };
+  };
+  executable: false;
+}
+
 export interface PolymarketMarketTag {
   id: string;
   label: string | null;
@@ -458,6 +490,7 @@ export interface DashboardSnapshot {
 
 export interface PolymarketMarketResearch {
   details: Resource<PolymarketMarketDetails>;
+  resolution: Resource<PolymarketBinaryResolution>;
   tags: Resource<PolymarketMarketTags>;
   openInterest: Resource<PolymarketMarketOpenInterest>;
   midpointComplement: Resource<PolymarketMidpointComplement>;
@@ -616,33 +649,41 @@ export async function loadPolymarketMarketResearch(
     resolution: '30m',
     limit: '100',
   });
-  const [details, tags, openInterest, midpointComplement, priceChange24h] =
-    await Promise.all([
-      loadResource<PolymarketMarketDetails>(
-        dashboardApiPath(`/polymarket/markets/${encodedId}`),
-        request,
+  const [
+    details,
+    resolution,
+    tags,
+    openInterest,
+    midpointComplement,
+    priceChange24h,
+  ] = await Promise.all([
+    loadResource<PolymarketMarketDetails>(
+      dashboardApiPath(`/polymarket/markets/${encodedId}`),
+      request,
+    ),
+    loadResource<PolymarketBinaryResolution>(
+      dashboardApiPath(`/polymarket/markets/${encodedId}/resolution`),
+      request,
+    ),
+    loadResource<PolymarketMarketTags>(
+      dashboardApiPath(`/polymarket/markets/${encodedId}/tags`),
+      request,
+    ),
+    loadResource<PolymarketMarketOpenInterest>(
+      dashboardApiPath(`/polymarket/markets/${encodedId}/open-interest`),
+      request,
+    ),
+    loadResource<PolymarketMidpointComplement>(
+      dashboardApiPath(`/polymarket/markets/${encodedId}/midpoint-complement`),
+      request,
+    ),
+    loadResource<PolymarketBinaryPriceChange>(
+      dashboardApiPath(
+        `/polymarket/markets/${encodedId}/price-change?${priceChangeQuery.toString()}`,
       ),
-      loadResource<PolymarketMarketTags>(
-        dashboardApiPath(`/polymarket/markets/${encodedId}/tags`),
-        request,
-      ),
-      loadResource<PolymarketMarketOpenInterest>(
-        dashboardApiPath(`/polymarket/markets/${encodedId}/open-interest`),
-        request,
-      ),
-      loadResource<PolymarketMidpointComplement>(
-        dashboardApiPath(
-          `/polymarket/markets/${encodedId}/midpoint-complement`,
-        ),
-        request,
-      ),
-      loadResource<PolymarketBinaryPriceChange>(
-        dashboardApiPath(
-          `/polymarket/markets/${encodedId}/price-change?${priceChangeQuery.toString()}`,
-        ),
-        request,
-      ),
-    ]);
+      request,
+    ),
+  ]);
 
   const unavailableIdentity: Resource<PolymarketTopOfBook> = {
     status: 'unavailable',
@@ -659,6 +700,7 @@ export async function loadPolymarketMarketResearch(
     };
     return {
       details,
+      resolution,
       tags,
       openInterest,
       midpointComplement,
@@ -697,6 +739,7 @@ export async function loadPolymarketMarketResearch(
   ]);
   return {
     details,
+    resolution,
     tags,
     openInterest,
     midpointComplement,
