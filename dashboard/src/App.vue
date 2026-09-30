@@ -46,7 +46,9 @@ import {
   type PolymarketEventVolumeRow,
 } from './polymarket-event-volume';
 import { buildPolymarketMarketIdentityRows } from './polymarket-market-identities';
+import { verifyPolymarketReverseIdentities } from './polymarket-reverse-identity';
 import { buildPolymarketResolutionContextRows } from './polymarket-resolution-context';
+import { verifyPolymarketResolutionIdentity } from './polymarket-resolution-identity';
 import DashboardChart from './DashboardChart.vue';
 import {
   dashboardRouteFromHash,
@@ -148,9 +150,20 @@ const polymarketPriceChangeObservationRows = computed(() => {
     ? buildPolymarketPriceChangeObservationRows(research.priceChange24h.data)
     : [];
 });
+const polymarketResolutionIdentityVerification = computed(() => {
+  const research = polymarketResearch.value;
+  return research && available(research.details)
+    ? verifyPolymarketResolutionIdentity(
+        research.details.data,
+        research.resolution,
+      )
+    : null;
+});
 const polymarketResolutionContextRows = computed(() => {
   const research = polymarketResearch.value;
-  return research && available(research.resolution)
+  return research &&
+    polymarketResolutionIdentityVerification.value?.status === 'verified' &&
+    available(research.resolution)
     ? buildPolymarketResolutionContextRows(research.resolution.data.resolution)
     : [];
 });
@@ -159,6 +172,16 @@ const polymarketMarketIdentityRows = computed(() => {
   return research && available(research.details)
     ? buildPolymarketMarketIdentityRows(research.details.data)
     : [];
+});
+const polymarketReverseIdentityVerification = computed(() => {
+  const research = polymarketResearch.value;
+  return research && available(research.details)
+    ? verifyPolymarketReverseIdentities(
+        research.details.data,
+        research.yesParentMarket,
+        research.noParentMarket,
+      )
+    : null;
 });
 const polymarketEventMarketPagination = computed(() =>
   available(polymarketEventDetails.value)
@@ -1830,7 +1853,51 @@ onUnmounted(() => {
             </div>
             <div
               v-if="
-                polymarketResearch && available(polymarketResearch.resolution)
+                polymarketReverseIdentityVerification?.status === 'verified'
+              "
+              class="polymarket-reverse-identity"
+              aria-label="Reverse outcome identity verification"
+            >
+              <div>
+                <span>Reverse verification</span>
+                <strong>Verified</strong>
+                <small>Gamma detail matches both CLOB token parents</small>
+              </div>
+              <div>
+                <span>YES parent received</span>
+                <strong>
+                  {{
+                    timestamp(
+                      polymarketReverseIdentityVerification.yesReceivedAt,
+                    )
+                  }}
+                </strong>
+              </div>
+              <div>
+                <span>NO parent received</span>
+                <strong>
+                  {{
+                    timestamp(
+                      polymarketReverseIdentityVerification.noReceivedAt,
+                    )
+                  }}
+                </strong>
+              </div>
+            </div>
+            <p
+              v-else-if="polymarketReverseIdentityVerification"
+              class="empty-state polymarket-reverse-identity-unavailable"
+            >
+              Reverse identity
+              {{ polymarketReverseIdentityVerification.status }}:
+              {{ polymarketReverseIdentityVerification.message }}
+            </p>
+            <div
+              v-if="
+                polymarketResearch &&
+                polymarketResolutionIdentityVerification?.status ===
+                  'verified' &&
+                available(polymarketResearch.resolution)
               "
               class="polymarket-resolution"
               aria-label="Public binary resolution"
@@ -1845,7 +1912,8 @@ onUnmounted(() => {
                   }}
                 </strong>
                 <small>
-                  {{ polymarketResearch.resolution.data.resolution.status }}
+                  {{ polymarketResearch.resolution.data.resolution.status }} ·
+                  identity verified
                 </small>
               </div>
               <div>
@@ -1914,11 +1982,14 @@ onUnmounted(() => {
             </div>
             <p
               v-else-if="
-                polymarketResearch && !available(polymarketResearch.resolution)
+                polymarketResolutionIdentityVerification &&
+                polymarketResolutionIdentityVerification.status !== 'verified'
               "
               class="empty-state polymarket-resolution-unavailable"
             >
-              Binary resolution: {{ polymarketResearch.resolution.message }}
+              Binary resolution
+              {{ polymarketResolutionIdentityVerification.status }}:
+              {{ polymarketResolutionIdentityVerification.message }}
             </p>
             <div
               v-if="

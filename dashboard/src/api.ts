@@ -263,6 +263,20 @@ export interface PolymarketMarketDetails {
   receivedAt: string;
 }
 
+export interface PolymarketOutcomeParentMarket {
+  provider: 'polymarket';
+  requestedTokenId: string;
+  requestedOutcome: 'yes' | 'no';
+  conditionId: string;
+  outcomes: {
+    yes: { tokenId: string };
+    no: { tokenId: string };
+  };
+  source: 'clob-market-by-token';
+  receivedAt: string;
+  executable: false;
+}
+
 export interface PolymarketBinaryResolution {
   provider: 'polymarket';
   market: PolymarketMarketDetails;
@@ -490,6 +504,8 @@ export interface DashboardSnapshot {
 
 export interface PolymarketMarketResearch {
   details: Resource<PolymarketMarketDetails>;
+  yesParentMarket: Resource<PolymarketOutcomeParentMarket>;
+  noParentMarket: Resource<PolymarketOutcomeParentMarket>;
   resolution: Resource<PolymarketBinaryResolution>;
   tags: Resource<PolymarketMarketTags>;
   openInterest: Resource<PolymarketMarketOpenInterest>;
@@ -698,8 +714,14 @@ export async function loadPolymarketMarketResearch(
       status: 'unavailable',
       message: 'Outcome identity is unavailable',
     };
+    const unavailableParentMarket: Resource<PolymarketOutcomeParentMarket> = {
+      status: 'unavailable',
+      message: 'Outcome identity is unavailable',
+    };
     return {
       details,
+      yesParentMarket: unavailableParentMarket,
+      noParentMarket: unavailableParentMarket,
       resolution,
       tags,
       openInterest,
@@ -715,6 +737,8 @@ export async function loadPolymarketMarketResearch(
   }
 
   const [
+    yesParentMarket,
+    noParentMarket,
     yesTopOfBook,
     noTopOfBook,
     yesLastTrade,
@@ -722,6 +746,8 @@ export async function loadPolymarketMarketResearch(
     yesPriceHistory24h,
     noPriceHistory24h,
   ] = await Promise.all([
+    loadOutcomeParentMarket(details.data.outcomes.yes.tokenId, request),
+    loadOutcomeParentMarket(details.data.outcomes.no.tokenId, request),
     loadOutcomeTopOfBook(details.data.outcomes.yes.tokenId, request),
     loadOutcomeTopOfBook(details.data.outcomes.no.tokenId, request),
     loadOutcomeLastTrade(details.data.outcomes.yes.tokenId, request),
@@ -739,6 +765,8 @@ export async function loadPolymarketMarketResearch(
   ]);
   return {
     details,
+    yesParentMarket,
+    noParentMarket,
     resolution,
     tags,
     openInterest,
@@ -751,6 +779,24 @@ export async function loadPolymarketMarketResearch(
     yesPriceHistory24h,
     noPriceHistory24h,
   };
+}
+
+function loadOutcomeParentMarket(
+  tokenId: string | null,
+  request: FetchLike,
+): Promise<Resource<PolymarketOutcomeParentMarket>> {
+  if (tokenId === null) {
+    return Promise.resolve({
+      status: 'unavailable',
+      message: 'Outcome token is unavailable',
+    });
+  }
+  return loadResource<PolymarketOutcomeParentMarket>(
+    dashboardApiPath(
+      `/polymarket/outcomes/${encodeURIComponent(tokenId)}/market`,
+    ),
+    request,
+  );
 }
 
 export function loadPolymarketRelatedTags(

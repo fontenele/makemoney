@@ -1670,6 +1670,47 @@ h1 em {
   overflow-wrap: anywhere;
 }
 
+.polymarket-reverse-identity {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 1px;
+  background: var(--line);
+}
+
+.polymarket-reverse-identity > div {
+  display: grid;
+  min-height: 78px;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--panel);
+}
+
+.polymarket-reverse-identity span,
+.polymarket-reverse-identity small {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.05em;
+}
+
+.polymarket-reverse-identity span {
+  text-transform: uppercase;
+}
+
+.polymarket-reverse-identity strong {
+  align-self: end;
+  color: #a6f4c5;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 10px;
+  font-weight: 560;
+  overflow-wrap: anywhere;
+}
+
+.polymarket-reverse-identity-unavailable {
+  margin-top: 1px;
+}
+
 .polymarket-resolution > div {
   display: grid;
   min-height: 88px;
@@ -2414,6 +2455,7 @@ footer {
   .polymarket-event-volume dl,
   .polymarket-stat-grid,
   .polymarket-market-identities,
+  .polymarket-reverse-identity,
   .polymarket-resolution,
   .polymarket-resolution-context,
   .polymarket-midpoint-complement,
@@ -2579,6 +2621,7 @@ footer {
   .polymarket-event-volume dl,
   .polymarket-stat-grid,
   .polymarket-market-identities,
+  .polymarket-reverse-identity,
   .polymarket-resolution,
   .polymarket-resolution-context,
   .polymarket-midpoint-complement {
@@ -2862,6 +2905,7 @@ body {
 
 .polymarket-stat-grid > div,
 .polymarket-market-identities > div,
+.polymarket-reverse-identity > div,
 .polymarket-resolution > div,
 .polymarket-midpoint-complement > div,
 .polymarket-book,

@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-30 — M9.65 dashboard resolution identity coherence completed
+
+- Added fail-closed reconciliation between selected-market detail and the already-loaded binary-resolution response.
+- Required exact embedded market ID, market condition, indexed token, resolution-condition, and payout-token agreement before displaying result or lifecycle context.
+- Classified returned divergence as incoherent and suppressed the complete resolution presentation while preserving unrelated market research.
+- Added focused coverage for verified, unavailable, market-divergent, condition-divergent, and payout-token-divergent states.
+- Verified all 16 dashboard test files and 89 tests, the complete backend/dashboard build, lint, formatting, and whitespace checks.
+
+### Scope confirmation
+
+- No additional provider request, payout entitlement, holder or wallet position, redemption, recommendation, account, order, or execution behavior was introduced.
+
+## 2026-09-30 — M9.64 dashboard reverse outcome identity verification completed
+
+- Added independent selected-market reverse parent lookups for available indexed YES and NO tokens through the existing public CLOB-backed routes.
+- Reconciled requested outcome roles, both token memberships, and canonical condition identity against Gamma market detail before declaring verification.
+- Kept missing observations unavailable and classified any returned cross-provider divergence as explicitly incoherent rather than partially verified.
+- Added focused coverage for verified, unavailable, and role-divergent identity sets plus dashboard API request coverage.
+- Verified all 15 dashboard test files and 84 tests, the complete backend/dashboard build, lint, formatting, and whitespace checks.
+
+### Scope confirmation
+
+- No price, probability, account association, ownership, balance, position, wallet, recommendation, order, redemption, or execution behavior was introduced.
+
 ## 2026-09-30 — M9.63 dashboard market identity provenance completed
 
 - Added fixed selected-market provenance rows for the canonical condition identity and indexed YES/NO CLOB token identities.

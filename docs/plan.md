@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is in progress through M9.63 selected-market condition and indexed outcome-token provenance. Existing bounded event-detail references and Data API volume rows are paged independently, explicit open-market selections reuse the selected-market research flow, and public identities plus terminal resolution context remain descriptive and non-executable. Holders, entitlement, other named Data API feeds, implicit related-tag expansion, recursive traversal, wallet positions, redemption, individual trade history, authentication, accounts, automatic execution controls, and real trading remain separate future work.
+M9 is in progress through M9.65 selected-market binary-resolution identity coherence. Existing bounded event-detail references and Data API volume rows are paged independently, Gamma identities are reconciled against both CLOB token parents, and terminal results are displayed only after full selected-market identity agreement while remaining descriptive and non-executable. Holders, entitlement, other named Data API feeds, implicit related-tag expansion, recursive traversal, wallet positions, redemption, individual trade history, authentication, accounts, automatic execution controls, and real trading remain separate future work.
 ```

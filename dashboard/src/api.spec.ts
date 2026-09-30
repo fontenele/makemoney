@@ -788,6 +788,28 @@ describe('loadPolymarketMarketResearch', () => {
           }),
         );
       }
+      if (path.endsWith('/outcomes/111/market')) {
+        return Promise.resolve(
+          Response.json({
+            requestedTokenId: '111',
+            requestedOutcome: 'yes',
+            conditionId: `0x${'a'.repeat(64)}`,
+            outcomes: { yes: { tokenId: '111' }, no: { tokenId: '222' } },
+            receivedAt: '2026-09-29T12:34:57.000Z',
+          }),
+        );
+      }
+      if (path.endsWith('/outcomes/222/market')) {
+        return Promise.resolve(
+          Response.json({
+            requestedTokenId: '222',
+            requestedOutcome: 'no',
+            conditionId: `0x${'a'.repeat(64)}`,
+            outcomes: { yes: { tokenId: '111' }, no: { tokenId: '222' } },
+            receivedAt: '2026-09-29T12:34:58.000Z',
+          }),
+        );
+      }
       if (path.includes('/outcomes/222/price-history?')) {
         return Promise.resolve(
           Response.json({
@@ -830,7 +852,7 @@ describe('loadPolymarketMarketResearch', () => {
       new Date('2026-09-29T12:34:56.789Z'),
     );
 
-    expect(request).toHaveBeenCalledTimes(12);
+    expect(request).toHaveBeenCalledTimes(14);
     expect(research.details.status).toBe('available');
     expect(research.tags).toMatchObject({
       status: 'available',
@@ -884,6 +906,14 @@ describe('loadPolymarketMarketResearch', () => {
     expect(research.noLastTrade).toMatchObject({
       status: 'available',
       data: { price: '0.38', side: 'sell' },
+    });
+    expect(research.yesParentMarket).toMatchObject({
+      status: 'available',
+      data: { requestedTokenId: '111', requestedOutcome: 'yes' },
+    });
+    expect(research.noParentMarket).toMatchObject({
+      status: 'available',
+      data: { requestedTokenId: '222', requestedOutcome: 'no' },
     });
     expect(research.priceChange24h).toMatchObject({
       status: 'available',
@@ -964,6 +994,14 @@ describe('loadPolymarketMarketResearch', () => {
     });
     expect(request).toHaveBeenCalledWith(
       '/api/polymarket/markets/42/resolution',
+      { headers: { Accept: 'application/json' } },
+    );
+    expect(request).toHaveBeenCalledWith(
+      '/api/polymarket/outcomes/111/market',
+      { headers: { Accept: 'application/json' } },
+    );
+    expect(request).toHaveBeenCalledWith(
+      '/api/polymarket/outcomes/222/market',
       { headers: { Accept: 'application/json' } },
     );
   });

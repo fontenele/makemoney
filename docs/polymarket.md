@@ -401,6 +401,18 @@ Selected-market research maps the existing market-detail response into three fix
 
 No provider request, reverse lookup, token metadata expansion, or identifier calculation is introduced. Public condition and token identities do not imply ownership, balance, position, wallet association, approval, order capability, payout entitlement, redemption, recommendation, or execution behavior.
 
+## M9.64 — Dashboard reverse outcome identity verification
+
+For each available indexed outcome token, selected-market research independently calls the existing `GET /polymarket/outcomes/:tokenId/market` route. The browser declares verification only when both CLOB responses preserve the expected YES/NO requested roles, reproduce both indexed tokens, and return the exact Gamma condition identity.
+
+A missing token or reverse observation remains unavailable; any returned role, membership, or condition divergence becomes explicitly incoherent rather than partially verified. The cross-provider identity check adds no price, probability, ownership, balance, position, account, wallet, recommendation, order, or execution semantics.
+
+## M9.65 — Dashboard resolution identity coherence
+
+Before displaying an available binary-resolution result or its lifecycle context, the dashboard reconciles that response with the independently loaded selected-market detail. The embedded market ID, embedded market condition and indexed tokens, resolution condition, and both payout token identities must all match exactly.
+
+Unavailable resolution remains unavailable, while any returned identity divergence becomes explicitly incoherent and suppresses the complete resolution presentation. Other market research remains independent. The check uses already-loaded resources and adds no provider request, payout entitlement, redemption, recommendation, account, position, wallet, order, or execution behavior.
+
 ## Next safe increment
 
 A later M9 increment may add another narrowly bounded public research view without introducing positions, redemption, trade history, persistence, authentication, accounts, or execution. M10 real-trading design remains separate and requires current official Binance research plus explicit safeguards.

@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-09-30 — Fail closed before displaying binary resolution
+
+M9.65 compares the already-loaded binary-resolution response with the independently loaded selected-market detail. The embedded market ID, market condition, indexed outcome tokens, resolution condition, and both payout token identities must all match before the result or lifecycle context is displayed.
+
+An unavailable resolution remains unavailable, while any returned divergence becomes explicitly incoherent and suppresses the complete resolution presentation. Other research stays independent, and this reconciliation makes no additional provider request or entitlement judgment.
+
+## 2026-09-30 — Reconcile both reverse token identities before verification
+
+M9.64 independently calls the existing CLOB parent-market route for the selected market's YES and NO tokens. Verification succeeds only when both responses preserve their expected requested role, reproduce both indexed token identities, and return the exact Gamma condition identity.
+
+One unavailable response keeps the verification unavailable, while any returned divergence makes the combined result explicitly incoherent. The browser never treats one matching side as sufficient and does not use provider agreement to infer ownership, probability, recommendation, or executability.
+
 ## 2026-09-30 — Show exact market identities without account semantics
 
 M9.63 projects the selected market detail into three fixed provenance rows: canonical condition identity, indexed YES token, and indexed NO token. It preserves the provider's outcome labels and complete identifier strings rather than abbreviating or recomputing them.
