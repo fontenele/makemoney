@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-30 — Page event references without more provider traffic
+
+M9.58 paginates the bounded market-reference collection already present in the selected-event detail response. The browser displays eight references at a time, preserves provider order, replaces the visible page instead of accumulating rows, and returns to page one whenever event selection changes.
+
+Because navigation is purely local, it introduces no extra Gamma request and does not preload market details or research. Open references still require deliberate selection before the existing market-research loader runs, while closed references remain descriptive and disabled.
+
 ## 2026-09-30 — Reuse market research from explicit event references
 
 M9.57 maps an explicitly selected open event-market reference into the existing browser-side market summary contract and then invokes the established selected-market research loader. It does not introduce another backend route or automatically expand every event reference, keeping provider traffic tied to one deliberate user selection.

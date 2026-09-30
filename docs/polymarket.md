@@ -365,6 +365,12 @@ The bounded selected-event market-reference sample now allows an explicit open r
 
 Closed references stay visible but disabled, and no reference is expanded until selected. The selected-market research panel is independent from the initial active-market discovery page, so an event-derived selection remains visible if that separate page is unavailable. This adds no backend route, bulk loading, ranking, recommendation, persistence, account, order, wallet, or execution behavior.
 
+## M9.58 — Dashboard event-market pagination
+
+The selected-event dashboard paginates the already-normalized bounded market-reference collection locally, displaying eight provider-ordered entries at a time. Previous and Next replace the visible page without accumulating rows, and selecting or clearing an event returns the browser to page one.
+
+Page navigation performs no provider request and does not preload market detail or research. Open references still enter the established selected-market flow only after explicit selection; closed references remain visible and disabled. No backend route, ranking, recommendation, persistence, account, order, wallet, or execution behavior is added.
+
 ## Next safe increment
 
 A later M9 increment may add another narrowly bounded public research view without introducing positions, redemption, trade history, persistence, authentication, accounts, or execution. M10 real-trading design remains separate and requires current official Binance research plus explicit safeguards.

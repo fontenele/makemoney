@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is in progress through M9.55 bounded public active-event search and the dashboard research surfaces built through that increment. Search pagination, holders, other named Data API feeds, implicit related-tag expansion, recursive traversal, wallet positions, redemption, individual trade history, authentication, accounts, automatic execution controls, and real trading remain separate future work.
+M9 is in progress through M9.58 browser-local selected-event market-reference pagination. The existing bounded event-detail payload is paged without additional provider traffic, and explicit open-reference selection reuses the selected-market research flow. Holders, other named Data API feeds, implicit related-tag expansion, recursive traversal, wallet positions, redemption, individual trade history, authentication, accounts, automatic execution controls, and real trading remain separate future work.
 ```

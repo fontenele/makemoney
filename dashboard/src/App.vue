@@ -36,7 +36,7 @@ import { polymarketMidpointComplementStatusLabel } from './polymarket-midpoint-c
 import { polymarketHistoricalAlignmentLabel } from './polymarket-price-change-context';
 import { buildPolymarketPriceChangeObservationRows } from './polymarket-price-change-observations';
 import {
-  buildPolymarketEventMarketRows,
+  buildPolymarketEventMarketPage,
   eventMarketRowToSummary,
   type PolymarketEventMarketRow,
 } from './polymarket-event-markets';
@@ -71,6 +71,7 @@ const polymarketEventLiveVolume =
   ref<Resource<PolymarketEventLiveVolume> | null>(null);
 const polymarketEventDetailsLoading = ref(false);
 let polymarketEventDetailsRequest = 0;
+const polymarketEventMarketPage = ref(1);
 const selectedPolymarketTag = ref<PolymarketMarketTag | null>(null);
 const relatedPolymarketTags = ref<Resource<PolymarketRelatedTags> | null>(null);
 const relatedPolymarketTagsLoading = ref(false);
@@ -140,10 +141,16 @@ const polymarketPriceChangeObservationRows = computed(() => {
     ? buildPolymarketPriceChangeObservationRows(research.priceChange24h.data)
     : [];
 });
-const polymarketEventMarketRows = computed(() =>
+const polymarketEventMarketPagination = computed(() =>
   available(polymarketEventDetails.value)
-    ? buildPolymarketEventMarketRows(polymarketEventDetails.value.data)
-    : [],
+    ? buildPolymarketEventMarketPage(
+        polymarketEventDetails.value.data,
+        polymarketEventMarketPage.value,
+      )
+    : { rows: [], page: 1, pageCount: 1, total: 0 },
+);
+const polymarketEventMarketRows = computed(
+  () => polymarketEventMarketPagination.value.rows,
 );
 const polymarketEventVolumeRows = computed(() =>
   available(polymarketEventLiveVolume.value)
@@ -223,6 +230,7 @@ async function refreshPolymarketEventDetails(
 
 function selectPolymarketEvent(event: PolymarketEventSummary): void {
   selectedPolymarketEvent.value = event;
+  polymarketEventMarketPage.value = 1;
   polymarketEventDetails.value = null;
   polymarketEventTags.value = null;
   polymarketEventLiveVolume.value = null;
@@ -231,11 +239,19 @@ function selectPolymarketEvent(event: PolymarketEventSummary): void {
 
 function clearPolymarketEventSelection(): void {
   selectedPolymarketEvent.value = null;
+  polymarketEventMarketPage.value = 1;
   polymarketEventDetails.value = null;
   polymarketEventTags.value = null;
   polymarketEventLiveVolume.value = null;
   polymarketEventDetailsLoading.value = false;
   polymarketEventDetailsRequest += 1;
+}
+
+function changePolymarketEventMarketPage(page: number): void {
+  if (page < 1 || page > polymarketEventMarketPagination.value.pageCount) {
+    return;
+  }
+  polymarketEventMarketPage.value = page;
 }
 
 async function loadPolymarketSearchPage(
@@ -1407,10 +1423,11 @@ onUnmounted(() => {
               </p>
               <div class="polymarket-event-markets">
                 <div>
-                  <span>Referenced market sample</span>
+                  <span>Referenced markets</span>
                   <small>
-                    {{ polymarketEventMarketRows.length }} of
-                    {{ polymarketEventDetails.data.markets.length }} shown
+                    Page {{ polymarketEventMarketPagination.page }} of
+                    {{ polymarketEventMarketPagination.pageCount }} ·
+                    {{ polymarketEventMarketPagination.total }} total
                   </small>
                 </div>
                 <p v-if="polymarketEventMarketRows.length === 0">
@@ -1440,6 +1457,41 @@ onUnmounted(() => {
                       </span>
                     </div>
                     <strong>{{ market.label }}</strong>
+                  </button>
+                </div>
+                <div
+                  v-if="polymarketEventMarketPagination.pageCount > 1"
+                  class="polymarket-event-market-pagination"
+                >
+                  <button
+                    type="button"
+                    class="secondary"
+                    :disabled="polymarketEventMarketPagination.page === 1"
+                    @click="
+                      changePolymarketEventMarketPage(
+                        polymarketEventMarketPagination.page - 1,
+                      )
+                    "
+                  >
+                    Previous
+                  </button>
+                  <span>
+                    {{ polymarketEventMarketPagination.page }} /
+                    {{ polymarketEventMarketPagination.pageCount }}
+                  </span>
+                  <button
+                    type="button"
+                    :disabled="
+                      polymarketEventMarketPagination.page ===
+                      polymarketEventMarketPagination.pageCount
+                    "
+                    @click="
+                      changePolymarketEventMarketPage(
+                        polymarketEventMarketPagination.page + 1,
+                      )
+                    "
+                  >
+                    Next
                   </button>
                 </div>
               </div>

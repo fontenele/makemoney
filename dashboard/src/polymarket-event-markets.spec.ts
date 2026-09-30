@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { PolymarketEventDetails } from './api';
 import {
+  buildPolymarketEventMarketPage,
   buildPolymarketEventMarketRows,
   eventMarketRowToSummary,
 } from './polymarket-event-markets';
@@ -96,6 +97,50 @@ describe('buildPolymarketEventMarketRows', () => {
       closed: false,
     });
     expect(closed && eventMarketRowToSummary(closed)).toBeNull();
+  });
+
+  it('pages the complete bounded reference collection without accumulating rows', () => {
+    const event = eventDetails(
+      Array.from({ length: 18 }, (_, index) => ({
+        id: String(index + 1),
+        slug: `market-${index + 1}`,
+        question: `Question ${index + 1}`,
+        conditionId: null,
+        closed: false,
+      })),
+    );
+
+    expect(buildPolymarketEventMarketPage(event, 2)).toMatchObject({
+      page: 2,
+      pageCount: 3,
+      total: 18,
+      rows: [
+        { id: '9', label: 'Question 9' },
+        { id: '10', label: 'Question 10' },
+        { id: '11', label: 'Question 11' },
+        { id: '12', label: 'Question 12' },
+        { id: '13', label: 'Question 13' },
+        { id: '14', label: 'Question 14' },
+        { id: '15', label: 'Question 15' },
+        { id: '16', label: 'Question 16' },
+      ],
+    });
+    expect(buildPolymarketEventMarketPage(event, 3).rows).toHaveLength(2);
+  });
+
+  it('clamps a stale page after the selected event changes', () => {
+    expect(buildPolymarketEventMarketPage(eventDetails([]), 4)).toEqual({
+      rows: [],
+      page: 1,
+      pageCount: 1,
+      total: 0,
+    });
+  });
+
+  it.each([0, -1, 1.5])('rejects invalid page %s', (page) => {
+    expect(() =>
+      buildPolymarketEventMarketPage(eventDetails([]), page),
+    ).toThrow('page must be a positive integer');
   });
 });
 

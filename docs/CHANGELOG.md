@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-30 — M9.58 dashboard event-market pagination completed
+
+- Added browser-local eight-item pagination across the bounded selected-event market-reference collection.
+- Preserved provider order, replaced the visible page without accumulating rows, and reset navigation when event selection changes.
+- Kept closed references visible and disabled while open references retain the explicit M9.57 market-research navigation.
+- Added focused coverage for middle/final pages, stale-page clamping, and invalid page input.
+- Verified all 12 dashboard test files and 71 tests, the complete backend/dashboard build, lint, and formatting.
+
+### Scope confirmation
+
+- No provider request, backend route, market preload, ranking, recommendation, persistence, account, position, order, wallet, or execution behavior was introduced.
+
 ## 2026-09-30 — M9.57 event-to-market research navigation completed
 
 - Turned the bounded selected-event market-reference sample into explicit controls for open references while keeping closed references visible and disabled.

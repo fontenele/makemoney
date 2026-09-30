@@ -964,6 +964,39 @@ h1 em {
   gap: 8px;
 }
 
+.polymarket-event-market-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.polymarket-event-market-pagination span {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 10px;
+}
+
+.polymarket-event-market-pagination button {
+  padding: 8px 12px;
+  border: 1px solid rgba(166, 244, 197, 0.45);
+  border-radius: 5px;
+  background: rgba(166, 244, 197, 0.1);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.polymarket-event-market-pagination button.secondary {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--muted);
+}
+
+.polymarket-event-market-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .polymarket-event-market-card {
   display: grid;
   min-height: 112px;
