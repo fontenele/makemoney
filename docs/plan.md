@@ -1711,7 +1711,7 @@ M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.11)
 M9 — Polymarket                   DONE (M9.1–M9.65)
-M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1)
+M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.2)
 ```
 
 ---
@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.65. M10.1 documents the current official Agentic Wallet as a distinct on-chain MPC/CLI provider, the incompatibility with centralized Spot assumptions, the required independent safeguards, and a read-only-first delivery sequence. No wallet package, authentication, balance access, quote, funding, or real executor has been added. Agentic Wallet remains disconnected with zero balance and real trading remains disabled.
+M9 is closed through M9.65. M10.2 adds inert provider-neutral capability, market-swap intent, non-executable quote/cost, and provider-result contracts with pure validation and no gateway or submission method. No wallet package, authentication, provider process, balance access, quote request, funding, Risk Engine bridge, or real executor has been added. Agentic Wallet remains disconnected with zero balance and real trading remains disabled.
 ```

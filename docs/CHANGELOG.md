@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-30 — M10.2 provider-neutral real-execution contracts completed
+
+- Added inert domain contracts for real-execution capability snapshots, exact-address market-swap intents, non-executable quotes, bounded cost facts, and correlated provider results.
+- Added pure validation for canonical identities, exact decimal quantities and slippage, distinct assets, temporal quote validity, bounded costs, unique capabilities, result-state coherence, and the permanent automatic-retry prohibition.
+- Kept token symbols presentational while requiring exact opaque token addresses and explicit chains for every intent.
+- Added 25 focused tests without registering a NestJS module or adding any provider, process, credential, configuration, route, Risk Engine bridge, wallet read, quote request, or submission path.
+- Verified all 1,606 backend tests, 89 dashboard tests, lint, formatting, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
+### Scope confirmation
+
+- Agentic Wallet remains disconnected and unfunded; every new object is an inert validated fact and real trading remains disabled.
+
 ## 2026-09-30 — M10.1 real-trading architecture and safety baseline completed
 
 - Closed M9 after confirming that its public, bounded, unauthenticated research goal and acceptance criteria are satisfied through M9.65.

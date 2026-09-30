@@ -43,7 +43,7 @@ Futures, margin, leverage, transfers, withdrawals, prediction-market orders, DeF
 
 The next increments must remain independently reviewable:
 
-1. Define provider-neutral real-execution intent, quote, result, and capability contracts with no provider process or credentials.
+1. **Complete in M10.2:** define provider-neutral real-execution intent, quote, result, and capability contracts with no provider process or credentials.
 2. Add fail-closed configuration and pure preflight evaluation with tests; defaults remain disabled.
 3. Add a read-only Agentic Wallet capability adapter for version, connection, chains, settings, quota, address, balances, and gas. It must not expose a mutating command.
 4. Add quote-only support for one explicitly approved chain and exact token pair after instrument compatibility is documented.
@@ -53,6 +53,21 @@ The next increments must remain independently reviewable:
 ### Acceptance criteria
 
 M10.1 is complete when the official product distinction, non-goals, independent safeguards, architecture boundary, and staged delivery sequence are documented and the project still has no authenticated or mutating wallet integration.
+
+## M10.2 — Provider-neutral real-execution contracts
+
+The first code increment defines inert domain facts under `src/modules/real-trading/domain`. It is not registered as a NestJS module and exposes no provider, process, command, route, configuration, authentication, quote loader, Risk Engine bridge, or executor.
+
+The contracts model:
+
+- one market-swap intent with a canonical local identity and idempotency key, explicit chain, exact source and target token addresses, exact source quantity, maximum slippage rate, and creation time;
+- a non-executable quote carrying the complete validated intent, provider identity, nullable provider quote identity, expected and minimum target quantities, bounded network/provider costs, explicit complete or partial cost coverage, and a strict validity interval;
+- a provider result with local intent/quote correlation, provider order identity, nullable transaction hash, pending/finished/failed state, exact actual target quantity only when finished, observation times, and an invariant that forbids automatic retry;
+- a bounded capability snapshot with connection state, unique chains, explicit quote/submission operations, read capabilities, and an observation time. Submission capability is invalid unless quote capability is also present.
+
+Token symbols are optional presentation labels and never replace exact token addresses. Chain and address formats remain provider-neutral opaque identities; a later provider adapter must perform chain-specific canonicalization before these facts can pass a preflight gate. All quantities and rates remain canonical decimal strings and comparisons use an isolated exact-decimal context.
+
+M10.2 deliberately defines no submission interface. It cannot call `baw`, cannot construct a shell command, and cannot mutate provider or local financial state.
 
 ### Official sources reviewed
 

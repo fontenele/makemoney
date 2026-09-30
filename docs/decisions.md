@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## 2026-09-30 — Make real-execution facts exact, correlated, and inert first
+
+M10.2 introduces data contracts and pure validators before any provider interface or module wiring. A market-swap intent requires an explicit chain plus exact source and target token addresses; optional symbols are display labels only. This prevents an ambiguous ticker from becoming executable identity and leaves chain-specific address canonicalization to a future adapter and preflight.
+
+A quote embeds the complete validated intent, is always marked non-executable, has a strict validity interval, bounded exact-decimal costs, and explicit complete or partial cost coverage. A result correlates local intent and quote identities with the provider order, only a finished result may claim actual output, and every accepted result permanently forbids automatic retry. Capability snapshots cannot advertise submission without quote support.
+
+The contracts deliberately expose no gateway or submission method. They establish facts that later read-only preflight and quote increments can consume without making provider access or a mutating operation reachable.
+
 ## 2026-09-30 — Treat Agentic Wallet as a separate on-chain provider
 
 Official Binance documentation describes Agentic Wallet as an MPC on-chain wallet operated through the `binance-agentic-wallet` skill and versioned `baw` CLI. Its market order is a chain-specific token swap with contract addresses, gas, route liquidity, slippage, MEV exposure, Web3 Wallet fees, and asynchronous finality. It is not the centralized Binance Spot REST trading API used by an exchange API key.
