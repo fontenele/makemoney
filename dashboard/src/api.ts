@@ -198,6 +198,14 @@ export interface PolymarketEventPage {
   receivedAt: string;
 }
 
+export interface PolymarketSearchResult {
+  query: string;
+  events: PolymarketEventSummary[];
+  hasMore: boolean;
+  totalResults: number;
+  receivedAt: string;
+}
+
 export interface PolymarketEventDetails {
   provider: 'polymarket';
   id: string;
@@ -717,6 +725,17 @@ export function loadPolymarketEventDetails(
 ): Promise<Resource<PolymarketEventDetails>> {
   return loadResource<PolymarketEventDetails>(
     dashboardApiPath(`/polymarket/events/${encodeURIComponent(eventId)}`),
+    request,
+  );
+}
+
+export function loadPolymarketSearch(
+  query: string,
+  request: FetchLike = fetch,
+): Promise<Resource<PolymarketSearchResult>> {
+  const parameters = new URLSearchParams({ q: query, limit: '8' });
+  return loadResource<PolymarketSearchResult>(
+    dashboardApiPath(`/polymarket/search?${parameters.toString()}`),
     request,
   );
 }

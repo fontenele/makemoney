@@ -29,6 +29,7 @@ import { PredictionMarketResolutionService } from '../application/prediction-mar
 import { PredictionMarketTokenParentService } from '../application/prediction-market-token-parent.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
 import { PredictionSeriesService } from '../application/prediction-series.service';
+import { PredictionSearchService } from '../application/prediction-search.service';
 import { PolymarketEnabledGuard } from './polymarket-enabled.guard';
 import { PredictionDataFreshnessObservation } from '../domain/prediction-data-freshness';
 import {
@@ -127,6 +128,7 @@ import {
   PredictionSeriesNotFoundError,
   PredictionSeriesPage,
 } from '../domain/prediction-series';
+import { PredictionSearchResult } from '../domain/prediction-search';
 
 const DEFAULT_LIMIT = 20;
 const MAXIMUM_LIMIT = 100;
@@ -158,7 +160,24 @@ export class PolymarketController {
     private readonly priceChange: PredictionMarketPriceChangeService,
     private readonly binaryPriceChange: PredictionMarketBinaryPriceChangeService,
     private readonly tokenParent: PredictionMarketTokenParentService,
+    private readonly search: PredictionSearchService,
   ) {}
+
+  @Get('search')
+  async searchActiveEvents(
+    @Query('q') query?: string,
+    @Query('limit') limit?: string,
+  ): Promise<PredictionSearchResult> {
+    const parsedQuery = validSearchQuery(query);
+    try {
+      return await this.search.searchActiveEvents({
+        query: parsedQuery,
+        limit: validLimit(limit),
+      });
+    } catch {
+      throw new ServiceUnavailableException('Polymarket search is unavailable');
+    }
+  }
 
   @Get('data-freshness')
   async getDataFreshness(): Promise<PredictionDataFreshnessObservation> {
@@ -902,6 +921,21 @@ function validRecurrence(value: string): string {
   ) {
     throw new BadRequestException(
       'recurrence must be a non-empty Polymarket series recurrence up to 100 characters',
+    );
+  }
+  return value;
+}
+
+function validSearchQuery(value: string | undefined): string {
+  if (
+    value === undefined ||
+    value.length < 2 ||
+    value.length > 100 ||
+    value !== value.trim() ||
+    containsControlCharacter(value)
+  ) {
+    throw new BadRequestException(
+      'q must be a trimmed Polymarket search term from 2 to 100 characters',
     );
   }
   return value;

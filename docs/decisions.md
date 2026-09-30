@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-09-29 — Search the provider catalog instead of filtering dashboard samples
+
+M9.55 uses Gamma's public `public-search` contract for explicit active-event search. Filtering the six event cards or eight market cards already in the browser would search only a presentation sample and could misleadingly appear complete.
+
+The local adapter fixes active-event status, bounds result count, validates unique normalized lifecycle summaries, and discards nested markets and unrelated search result types. The dashboard does not auto-run the query on each keystroke or refresh, and a selected result enters the existing event research flow rather than introducing another detail model.
+
 ## 2026-09-29 — Require explicit selection before loading event details
 
 M9.50 keeps the bounded event list lightweight and requests the established event-detail resource only after a browser-local user selection. A monotonically increasing request identity prevents an older response from replacing a newer selection, and provider disablement invalidates pending work.

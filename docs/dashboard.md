@@ -241,3 +241,9 @@ The browser makes no additional request and does not join these references to th
 The selected-event live-volume panel now displays at most the first eight rows from the backend-validated descending provider response. Non-null condition identities are correlated to the event references embedded in the same aggregate response and use question, slug, or market identity labels; the single permitted null-condition row stays explicitly unidentified.
 
 The browser preserves provider order and exact share strings. It does not sort, sum, convert to USDC, infer a measurement window, request market details, or expose individual trades, holders, positions, recommendations, accounts, orders, or execution behavior.
+
+## M9.55 bounded Polymarket catalog search
+
+The Polymarket page provides an explicit search form backed by `GET /polymarket/search?q=...&limit=8`. Unlike filtering the six initial event cards or eight initial market cards in the browser, each submission queries Gamma's public active-event catalog and displays the bounded normalized results, provider total-match count, and whether more results exist.
+
+Selecting a search result reuses the established event-detail, direct-tag, live-volume, market-reference, and volume-breakdown flow. Search is user-triggered rather than repeated by automatic refresh, failures remain isolated, and disabling provider access clears results and invalidates pending work. No pagination, ranking, recommendation, persistence, account, order, wallet, or execution behavior is added.

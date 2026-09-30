@@ -678,6 +678,90 @@ h1 em {
   border-top: 1px solid var(--line);
 }
 
+.polymarket-search {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(320px, 1.5fr);
+  align-items: end;
+  gap: 18px;
+  margin-top: 26px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  background: rgba(4, 12, 10, 0.42);
+}
+
+.polymarket-search > div:first-child {
+  display: grid;
+  gap: 6px;
+}
+
+.polymarket-search label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.polymarket-search small,
+.polymarket-search-results small {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.polymarket-search-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.polymarket-search input {
+  min-width: 0;
+  flex: 1;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--ink);
+  font: inherit;
+}
+
+.polymarket-search input:focus-visible {
+  border-color: rgba(166, 244, 197, 0.7);
+  outline: 2px solid rgba(166, 244, 197, 0.16);
+}
+
+.polymarket-search button {
+  padding: 10px 14px;
+  border: 1px solid rgba(166, 244, 197, 0.45);
+  border-radius: 5px;
+  background: rgba(166, 244, 197, 0.1);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.polymarket-search button.secondary {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--muted);
+}
+
+.polymarket-search button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.polymarket-search-results {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 20px;
+  border: 1px solid rgba(166, 244, 197, 0.24);
+}
+
+.polymarket-search-results > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .polymarket-section-heading.market-heading {
   margin-top: 36px;
 }
@@ -2125,6 +2209,11 @@ footer {
 
   .polymarket-global-interest {
     grid-template-columns: 1fr;
+  }
+
+  .polymarket-search {
+    grid-template-columns: 1fr;
+    align-items: stretch;
   }
 
   .polymarket-access button {

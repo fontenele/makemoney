@@ -30,8 +30,39 @@ import { PolymarketGammaEventClient } from './infrastructure/polymarket-gamma-ev
 import { PolymarketGammaTagClient } from './infrastructure/polymarket-gamma-tag.client';
 import { PolymarketGammaSeriesClient } from './infrastructure/polymarket-gamma-series.client';
 import { PolymarketModule } from './polymarket.module';
+import { PREDICTION_SEARCH_PROVIDER } from './domain/prediction-search';
+import { PolymarketGammaSearchClient } from './infrastructure/polymarket-gamma-search.client';
 
 describe('PolymarketModule', () => {
+  it('registers the public Gamma search adapter', () => {
+    const providers = Reflect.getMetadata(
+      MODULE_METADATA.PROVIDERS,
+      PolymarketModule,
+    ) as Provider[];
+    const registration = providers.find(
+      (provider) =>
+        typeof provider === 'object' &&
+        provider !== null &&
+        'provide' in provider &&
+        provider.provide === PREDICTION_SEARCH_PROVIDER,
+    );
+    if (
+      typeof registration !== 'object' ||
+      registration === null ||
+      !('useFactory' in registration)
+    ) {
+      throw new Error('Polymarket search provider factory is missing');
+    }
+    const getOrThrow = jest
+      .fn<ConfigService['getOrThrow']>()
+      .mockReturnValue('https://gamma-api.polymarket.test');
+    const config = { getOrThrow } as unknown as ConfigService;
+    const provider = registration.useFactory(config) as unknown;
+
+    expect(getOrThrow).toHaveBeenCalledWith('POLYMARKET_GAMMA_BASE_URL');
+    expect(provider).toBeInstanceOf(PolymarketGammaSearchClient);
+  });
+
   it('registers the public Gamma event adapter', () => {
     const providers = Reflect.getMetadata(
       MODULE_METADATA.PROVIDERS,

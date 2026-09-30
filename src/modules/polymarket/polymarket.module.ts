@@ -22,6 +22,7 @@ import { PredictionMarketResolutionService } from './application/prediction-mark
 import { PredictionMarketTokenParentService } from './application/prediction-market-token-parent.service';
 import { PredictionTagService } from './application/prediction-tag.service';
 import { PredictionSeriesService } from './application/prediction-series.service';
+import { PredictionSearchService } from './application/prediction-search.service';
 import { PREDICTION_MARKET_MIDPOINT_PROVIDER } from './domain/prediction-market-midpoint';
 import { PREDICTION_MARKET_LAST_TRADE_PROVIDER } from './domain/prediction-market-last-trade';
 import { PREDICTION_MARKET_ORDER_BOOK_PROVIDER } from './domain/prediction-market-top-of-book';
@@ -34,6 +35,7 @@ import { PREDICTION_EVENT_LIVE_VOLUME_PROVIDER } from './domain/prediction-event
 import { PREDICTION_TAG_PROVIDER } from './domain/prediction-tag';
 import { PREDICTION_SERIES_PROVIDER } from './domain/prediction-series';
 import { PREDICTION_DATA_FRESHNESS_PROVIDER } from './domain/prediction-data-freshness';
+import { PREDICTION_SEARCH_PROVIDER } from './domain/prediction-search';
 import {
   PREDICTION_GLOBAL_OPEN_INTEREST_PROVIDER,
   PREDICTION_MARKET_OPEN_INTEREST_PROVIDER,
@@ -51,6 +53,7 @@ import { PolymarketGammaMarketClient } from './infrastructure/polymarket-gamma-m
 import { PolymarketGammaEventClient } from './infrastructure/polymarket-gamma-event.client';
 import { PolymarketGammaTagClient } from './infrastructure/polymarket-gamma-tag.client';
 import { PolymarketGammaSeriesClient } from './infrastructure/polymarket-gamma-series.client';
+import { PolymarketGammaSearchClient } from './infrastructure/polymarket-gamma-search.client';
 import { PolymarketController } from './presentation/polymarket.controller';
 import { PolymarketEnabledGuard } from './presentation/polymarket-enabled.guard';
 import { PolymarketSettingsController } from './presentation/polymarket-settings.controller';
@@ -63,6 +66,14 @@ import { PolymarketSettingsController } from './presentation/polymarket-settings
       inject: [ConfigService],
       useFactory: (config: ConfigService) =>
         new PolymarketGammaEventClient(
+          config.getOrThrow<string>('POLYMARKET_GAMMA_BASE_URL'),
+        ),
+    },
+    {
+      provide: PREDICTION_SEARCH_PROVIDER,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new PolymarketGammaSearchClient(
           config.getOrThrow<string>('POLYMARKET_GAMMA_BASE_URL'),
         ),
     },
@@ -192,6 +203,7 @@ import { PolymarketSettingsController } from './presentation/polymarket-settings
     PredictionMarketTokenParentService,
     PredictionTagService,
     PredictionSeriesService,
+    PredictionSearchService,
     PolymarketEnabledGuard,
   ],
 })

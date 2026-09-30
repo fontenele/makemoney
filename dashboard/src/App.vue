@@ -7,6 +7,7 @@ import {
   loadPolymarketEventLiveVolume,
   loadPolymarketEventTags,
   loadPolymarketMarketResearch,
+  loadPolymarketSearch,
   loadPolymarketRelatedTags,
   updatePolymarketSettings,
   type DashboardSnapshot,
@@ -20,6 +21,7 @@ import {
   type PolymarketMarketSummary,
   type PolymarketMarketTag,
   type PolymarketRelatedTags,
+  type PolymarketSearchResult,
   type Resource,
 } from './api';
 import {
@@ -72,6 +74,12 @@ let relatedPolymarketTagsRequest = 0;
 const polymarketAccessConfirmed = ref(false);
 const polymarketSettingsUpdating = ref(false);
 const polymarketSettingsMessage = ref<string | null>(null);
+const polymarketSearchQuery = ref('');
+const polymarketSearchResult = ref<Resource<PolymarketSearchResult> | null>(
+  null,
+);
+const polymarketSearchLoading = ref(false);
+let polymarketSearchRequest = 0;
 
 const apiOnline = computed(() => snapshot.value?.health.status === 'available');
 const availableRelatedPolymarketTags = computed(() =>
@@ -220,6 +228,24 @@ function clearPolymarketEventSelection(): void {
   polymarketEventDetailsRequest += 1;
 }
 
+async function searchPolymarket(): Promise<void> {
+  const query = polymarketSearchQuery.value.trim();
+  if (query.length < 2 || polymarketSearchLoading.value) return;
+  const request = ++polymarketSearchRequest;
+  polymarketSearchLoading.value = true;
+  const result = await loadPolymarketSearch(query);
+  if (request !== polymarketSearchRequest) return;
+  polymarketSearchResult.value = result;
+  polymarketSearchLoading.value = false;
+}
+
+function clearPolymarketSearch(): void {
+  polymarketSearchQuery.value = '';
+  polymarketSearchResult.value = null;
+  polymarketSearchLoading.value = false;
+  polymarketSearchRequest += 1;
+}
+
 async function refreshRelatedPolymarketTags(
   tag: PolymarketMarketTag,
 ): Promise<void> {
@@ -261,6 +287,7 @@ async function changePolymarketAvailability(enabled: boolean): Promise<void> {
     polymarketAccessConfirmed.value = false;
     if (!enabled) {
       clearPolymarketEventSelection();
+      clearPolymarketSearch();
       selectedPolymarketMarket.value = null;
       polymarketResearch.value = null;
       polymarketResearchRequest += 1;
@@ -1102,6 +1129,101 @@ onUnmounted(() => {
               'Loading platform aggregate…'
             }}
           </p>
+
+          <form class="polymarket-search" @submit.prevent="searchPolymarket">
+            <div>
+              <label for="polymarket-search-query">Search active events</label>
+              <small>
+                Searches the public Gamma catalog, not only the items shown
+                below.
+              </small>
+            </div>
+            <div class="polymarket-search-controls">
+              <input
+                id="polymarket-search-query"
+                v-model="polymarketSearchQuery"
+                type="search"
+                minlength="2"
+                maxlength="100"
+                placeholder="e.g. Bitcoin, elections, Fed"
+                autocomplete="off"
+              />
+              <button
+                type="submit"
+                :disabled="
+                  polymarketSearchLoading ||
+                  polymarketSearchQuery.trim().length < 2
+                "
+              >
+                {{ polymarketSearchLoading ? 'Searchingâ€¦' : 'Search' }}
+              </button>
+              <button
+                v-if="polymarketSearchResult"
+                type="button"
+                class="secondary"
+                @click="clearPolymarketSearch"
+              >
+                Clear
+              </button>
+            </div>
+          </form>
+
+          <section
+            v-if="polymarketSearchResult"
+            class="polymarket-search-results"
+            aria-live="polite"
+          >
+            <template v-if="available(polymarketSearchResult)">
+              <div>
+                <strong>
+                  Results for â€œ{{ polymarketSearchResult.data.query }}â€
+                </strong>
+                <small>
+                  {{ polymarketSearchResult.data.events.length }} shown Â·
+                  {{ polymarketSearchResult.data.totalResults }} provider
+                  matches
+                  <template v-if="polymarketSearchResult.data.hasMore">
+                    Â· more available
+                  </template>
+                </small>
+              </div>
+              <p
+                v-if="polymarketSearchResult.data.events.length === 0"
+                class="empty-state polymarket-discovery-empty"
+              >
+                No active public events matched this term.
+              </p>
+              <div v-else class="polymarket-event-grid">
+                <button
+                  v-for="event in polymarketSearchResult.data.events"
+                  :key="`search-${event.id}`"
+                  type="button"
+                  class="polymarket-event-card"
+                  :class="{
+                    selected: selectedPolymarketEvent?.id === event.id,
+                  }"
+                  :aria-pressed="selectedPolymarketEvent?.id === event.id"
+                  @click="selectPolymarketEvent(event)"
+                >
+                  <div>
+                    <span>Event {{ event.id }}</span>
+                    <span v-if="event.restricted">Restricted</span>
+                  </div>
+                  <strong>{{ event.title }}</strong>
+                  <small>
+                    {{
+                      event.endDate
+                        ? `Ends ${timestamp(event.endDate)}`
+                        : 'No end date supplied'
+                    }}
+                  </small>
+                </button>
+              </div>
+            </template>
+            <p v-else class="empty-state polymarket-discovery-empty">
+              {{ polymarketSearchResult.message }}
+            </p>
+          </section>
 
           <div class="polymarket-section-heading">
             <div>

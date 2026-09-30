@@ -345,6 +345,12 @@ An explicit event-card selection loads the existing public event-detail route an
 
 The browser counts but does not expand the returned market references. It requests no event taxonomy, live volume, market prices, liquidity, outcome data, account state, order capability, or execution path.
 
+## M9.55 — Bounded public active-event search
+
+`GET /polymarket/search` accepts a required trimmed `q` from 2 through 100 characters and a bounded `limit`, then calls Gamma's unauthenticated `public-search` endpoint with `events_status=active` and `limit_per_type`. The local response retains only unique active, non-closed event identity, dates, lifecycle flags, the provider's `hasMore` and `totalResults` summary, and local receipt time.
+
+Nested markets, tags, series, financial metrics, images, editorial fields, and provider ranking details are discarded. The first page is intentionally bounded and no search-page traversal is exposed yet. The route remains behind the established fail-closed availability guard and adds no persistence, recommendation, account, position, order, wallet, or execution behavior.
+
 ## Next safe increment
 
 A later M9 increment may add another narrowly bounded public research view without introducing positions, redemption, trade history, persistence, authentication, accounts, or execution. M10 real-trading design remains separate and requires current official Binance research plus explicit safeguards.

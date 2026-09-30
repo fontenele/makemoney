@@ -25,6 +25,7 @@ import { PredictionMarketResolutionService } from '../application/prediction-mar
 import { PredictionMarketTokenParentService } from '../application/prediction-market-token-parent.service';
 import { PredictionTagService } from '../application/prediction-tag.service';
 import { PredictionSeriesService } from '../application/prediction-series.service';
+import { PredictionSearchService } from '../application/prediction-search.service';
 import { PredictionDataFreshnessProvider } from '../domain/prediction-data-freshness';
 import { PredictionMarketBinaryPriceChangeIncoherentError } from '../domain/prediction-market-binary-price-change';
 import {
@@ -86,9 +87,49 @@ import {
   PredictionSeriesNotFoundError,
   PredictionSeriesProvider,
 } from '../domain/prediction-series';
+import { PredictionSearchProvider } from '../domain/prediction-search';
 import { PolymarketController } from './polymarket.controller';
 
 describe('PolymarketController', () => {
+  it('exposes bounded active-event search', async () => {
+    const searchActiveEvents = jest
+      .fn<PredictionSearchProvider['searchActiveEvents']>()
+      .mockResolvedValue({
+        query: 'bitcoin',
+        events: [],
+        hasMore: false,
+        totalResults: 0,
+        receivedAt: new Date('2026-09-29T23:00:00.000Z'),
+      });
+    const controller = controllerWithSearch({ searchActiveEvents });
+
+    await expect(
+      controller.searchActiveEvents('bitcoin', '8'),
+    ).resolves.toMatchObject({ query: 'bitcoin', events: [] });
+    expect(searchActiveEvents).toHaveBeenCalledWith(
+      { query: 'bitcoin', limit: 8 },
+      undefined,
+    );
+  });
+
+  it.each([undefined, '', 'a', ' bitcoin', 'bitcoin ', 'x'.repeat(101)])(
+    'rejects invalid search query %s',
+    async (query) => {
+      await expect(
+        controllerWithSearch({}).searchActiveEvents(query, '8'),
+      ).rejects.toThrow(BadRequestException);
+    },
+  );
+
+  it('maps search provider failure to service unavailable', async () => {
+    const controller = controllerWithSearch({
+      searchActiveEvents: () => Promise.reject(new Error('offline')),
+    });
+    await expect(controller.searchActiveEvents('bitcoin', '8')).rejects.toThrow(
+      ServiceUnavailableException,
+    );
+  });
+
   it('loads the public Data API freshness observation', async () => {
     const getFreshness = jest
       .fn<PredictionDataFreshnessProvider['getFreshness']>()
@@ -2220,6 +2261,7 @@ function controllerWith(
   globalOpenInterestProvider: Partial<PredictionGlobalOpenInterestProvider> = {},
   priceHistoryProvider: Partial<PredictionMarketPriceHistoryProvider> = {},
   tokenParentProvider: Partial<PredictionMarketTokenParentProvider> = {},
+  searchProvider: Partial<PredictionSearchProvider> = {},
 ): PolymarketController {
   const pricing = new PredictionMarketPricingService({
     getMidpoint:
@@ -2333,6 +2375,11 @@ function controllerWith(
       tokenParentProvider.getByToken ??
       (() => Promise.reject(new Error('unexpected market-by-token call'))),
   });
+  const search = new PredictionSearchService({
+    searchActiveEvents:
+      searchProvider.searchActiveEvents ??
+      (() => Promise.reject(new Error('unexpected search call'))),
+  });
   return new PolymarketController(
     events,
     tags,
@@ -2355,6 +2402,29 @@ function controllerWith(
     priceChange,
     binaryPriceChange,
     tokenParent,
+    search,
+  );
+}
+
+function controllerWithSearch(
+  searchProvider: Partial<PredictionSearchProvider>,
+): PolymarketController {
+  return controllerWith(
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    searchProvider,
   );
 }
 

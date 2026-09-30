@@ -4,6 +4,8 @@ Last validated: 2026-09-29
 
 The startup validator accepts strictly positive canonical fractional values such as `0.01` for risk limits, matching the documented defaults and `.env.example`.
 
+M9.55 is complete: `GET /polymarket/search` validates a trimmed 2–100 character term and loads at most eight active public Gamma event matches by default. The dashboard search queries the provider catalog rather than filtering the initial six events or eight markets, displays bounded result and total-match context, and reuses the established selected-event research flow without persistence, ranking, recommendation, accounts, orders, or execution behavior.
+
 M9.54 is complete: selected-event research now displays at most eight provider-ordered live-volume rows correlated to the already-normalized event market references by condition identity. Each row preserves exact taker-volume shares and an explicit unidentified fallback, with no new provider request, browser-side aggregation, measurement-window inference, USDC conversion, trade detail, recommendation, account, order, or execution behavior.
 
 M9.53 is complete: selected-event research now displays at most eight already-normalized market references in provider order, preserving only identity, question/slug fallback, and open/closed state. It makes no additional provider request and does not load market prices, liquidity, volume, outcomes, ranking, recommendations, accounts, orders, or execution behavior.

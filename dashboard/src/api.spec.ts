@@ -8,8 +8,52 @@ import {
   loadPolymarketEventTags,
   loadPolymarketMarketResearch,
   loadPolymarketRelatedTags,
+  loadPolymarketSearch,
   updatePolymarketSettings,
 } from './api';
+
+describe('loadPolymarketSearch', () => {
+  it('searches the provider catalog with a bounded encoded query', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json({
+          query: 'bitcoin & fed',
+          events: [{ id: '84', title: 'Bitcoin and the Fed' }],
+          hasMore: true,
+          totalResults: 12,
+          receivedAt: '2026-09-29T23:00:00.000Z',
+        }),
+      ),
+    );
+
+    await expect(
+      loadPolymarketSearch('bitcoin & fed', request),
+    ).resolves.toMatchObject({
+      status: 'available',
+      data: { query: 'bitcoin & fed', totalResults: 12 },
+    });
+    expect(request).toHaveBeenCalledWith(
+      '/api/polymarket/search?q=bitcoin+%26+fed&limit=8',
+      { headers: { Accept: 'application/json' } },
+    );
+  });
+
+  it('keeps a search provider failure isolated', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json(
+          { message: 'Polymarket search is unavailable' },
+          { status: 503 },
+        ),
+      ),
+    );
+
+    await expect(loadPolymarketSearch('bitcoin', request)).resolves.toEqual({
+      status: 'unavailable',
+      message: 'Polymarket search is unavailable',
+    });
+  });
+});
 
 describe('dashboardApiPath', () => {
   it('uses the Vite proxy only during development', () => {

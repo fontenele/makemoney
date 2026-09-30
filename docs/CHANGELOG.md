@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-29 — M9.55 bounded Polymarket event search completed
+
+- Added guarded read-only `GET /polymarket/search` over Gamma's public search contract with a trimmed 2–100 character query and `limit=1..100` (dashboard fixed at eight).
+- Restricted provider results to active, non-closed events and strictly validated bounded unique identity, lifecycle, pagination summary, and timestamps while discarding nested markets, tags, series, metrics, and editorial fields.
+- Added a dashboard search form that queries the provider catalog rather than filtering the initial bounded cards, shows total-match and additional-result context, and routes explicit result selection through the existing event-detail research flow.
+- Kept search failure isolated and cleared pending search state when provider access is disabled; added no persistence, ranking, recommendation, account, order, wallet, or execution behavior.
+- Verified 1,567 backend tests, 65 dashboard tests, lint, formatting, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
 ## 2026-09-29 — M9.54 Polymarket dashboard selected-event volume breakdown completed
 
 - Correlated provider-ordered live-volume rows to the event's embedded market references by condition identity.
