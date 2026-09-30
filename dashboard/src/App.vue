@@ -45,6 +45,8 @@ import {
   eventVolumeRowToSummary,
   type PolymarketEventVolumeRow,
 } from './polymarket-event-volume';
+import { buildPolymarketMarketIdentityRows } from './polymarket-market-identities';
+import { buildPolymarketResolutionContextRows } from './polymarket-resolution-context';
 import DashboardChart from './DashboardChart.vue';
 import {
   dashboardRouteFromHash,
@@ -144,6 +146,18 @@ const polymarketPriceChangeObservationRows = computed(() => {
   const research = polymarketResearch.value;
   return research && available(research.priceChange24h)
     ? buildPolymarketPriceChangeObservationRows(research.priceChange24h.data)
+    : [];
+});
+const polymarketResolutionContextRows = computed(() => {
+  const research = polymarketResearch.value;
+  return research && available(research.resolution)
+    ? buildPolymarketResolutionContextRows(research.resolution.data.resolution)
+    : [];
+});
+const polymarketMarketIdentityRows = computed(() => {
+  const research = polymarketResearch.value;
+  return research && available(research.details)
+    ? buildPolymarketMarketIdentityRows(research.details.data)
     : [];
 });
 const polymarketEventMarketPagination = computed(() =>
@@ -1805,6 +1819,16 @@ onUnmounted(() => {
               </div>
             </div>
             <div
+              v-if="polymarketMarketIdentityRows.length > 0"
+              class="polymarket-market-identities"
+              aria-label="Selected market identity provenance"
+            >
+              <div v-for="row in polymarketMarketIdentityRows" :key="row.key">
+                <span>{{ row.label }}</span>
+                <strong>{{ row.value ?? 'Unavailable' }}</strong>
+              </div>
+            </div>
+            <div
               v-if="
                 polymarketResearch && available(polymarketResearch.resolution)
               "
@@ -1844,6 +1868,48 @@ onUnmounted(() => {
                   {{ polymarketResearch.resolution.data.payouts.no.status }} ·
                   non-executable
                 </small>
+              </div>
+            </div>
+            <div
+              v-if="polymarketResolutionContextRows.length > 0"
+              class="polymarket-resolution-context"
+              aria-label="Resolution lifecycle context"
+            >
+              <div
+                v-for="row in polymarketResolutionContextRows"
+                :key="row.key"
+              >
+                <span>{{ row.label }}</span>
+                <strong :class="{ active: row.active }">{{ row.value }}</strong>
+              </div>
+              <div>
+                <span>Resolved at</span>
+                <strong>
+                  {{
+                    polymarketResearch &&
+                    available(polymarketResearch.resolution) &&
+                    polymarketResearch.resolution.data.resolution.resolvedAt
+                      ? timestamp(
+                          polymarketResearch.resolution.data.resolution
+                            .resolvedAt,
+                        )
+                      : 'Not supplied'
+                  }}
+                </strong>
+              </div>
+              <div>
+                <span>Received locally</span>
+                <strong>
+                  {{
+                    polymarketResearch &&
+                    available(polymarketResearch.resolution)
+                      ? timestamp(
+                          polymarketResearch.resolution.data.resolution
+                            .receivedAt,
+                        )
+                      : 'Unavailable'
+                  }}
+                </strong>
               </div>
             </div>
             <p

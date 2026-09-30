@@ -389,6 +389,18 @@ Selected-market research independently requests the existing `GET /polymarket/ma
 
 Unavailable or unsupported resolution remains isolated from market identity, midpoint, books, latest trades, taxonomy, open interest, and bounded history. The display is explicitly non-executable and makes no claim about user entitlement, wallet holdings, positions, redemption, recommendation, order, or execution behavior.
 
+## M9.62 — Dashboard resolution lifecycle context
+
+The dashboard reuses the available M9.61 response to display the provider's nullable resolution time, local receipt time, and independent extended-review, dispute, and arbitration flags. Standard/inactive values remain explicit rather than disappearing, so the view does not imply that an omitted badge means unknown provider state.
+
+No additional provider request or browser-side lifecycle calculation is introduced. The three flags are not collapsed into severity, confidence, validity, recommendation, payout entitlement, or redemption-readiness claims, and the display remains isolated from accounts, positions, wallets, orders, and execution.
+
+## M9.63 — Dashboard market identity provenance
+
+Selected-market research maps the existing market-detail response into three fixed provenance entries: the canonical condition identity and the indexed YES and NO CLOB token identities. Provider outcome labels and complete identifier strings are preserved, while nullable identities are shown explicitly as unavailable rather than inferred.
+
+No provider request, reverse lookup, token metadata expansion, or identifier calculation is introduced. Public condition and token identities do not imply ownership, balance, position, wallet association, approval, order capability, payout entitlement, redemption, recommendation, or execution behavior.
+
 ## Next safe increment
 
 A later M9 increment may add another narrowly bounded public research view without introducing positions, redemption, trade history, persistence, authentication, accounts, or execution. M10 real-trading design remains separate and requires current official Binance research plus explicit safeguards.

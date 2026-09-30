@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-09-30 — Show exact market identities without account semantics
+
+M9.63 projects the selected market detail into three fixed provenance rows: canonical condition identity, indexed YES token, and indexed NO token. It preserves the provider's outcome labels and complete identifier strings rather than abbreviating or recomputing them.
+
+Absent condition or token identities remain explicitly unavailable. Displaying a public token identifier does not imply ownership, balance, position, wallet association, approval, order capability, or redemption entitlement, and the projection requires no additional provider request or reverse lookup.
+
+## 2026-09-30 — Keep resolution lifecycle dimensions independent
+
+M9.62 presents extended review, dispute, and arbitration as three separate facts from the existing binary-resolution response. The browser does not collapse them into a severity, confidence, validity, or recommendation score, because the provider contract exposes independent booleans rather than an ordered local interpretation.
+
+Resolution time remains explicitly nullable and is shown separately from local receipt time. The dashboard performs no new request or date inference and does not use lifecycle context to imply payout entitlement or redemption readiness.
+
 ## 2026-09-30 — Keep terminal resolution independent from live research
 
 M9.61 requests the existing indexed binary resolution resource independently alongside the selected market's other read models. A missing or unsupported terminal payout remains an isolated unavailable state, so it cannot suppress identity, midpoint, book, trade, taxonomy, open-interest, or historical observations.

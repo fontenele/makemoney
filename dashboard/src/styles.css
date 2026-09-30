@@ -1637,6 +1637,39 @@ h1 em {
   background: var(--line);
 }
 
+.polymarket-market-identities {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 12px;
+  background: var(--line);
+}
+
+.polymarket-market-identities > div {
+  display: grid;
+  min-height: 88px;
+  gap: 8px;
+  padding: 14px;
+  background: var(--panel);
+}
+
+.polymarket-market-identities span {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.polymarket-market-identities strong {
+  align-self: end;
+  color: var(--ink);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+  font-weight: 520;
+  overflow-wrap: anywhere;
+}
+
 .polymarket-resolution > div {
   display: grid;
   min-height: 88px;
@@ -1664,6 +1697,43 @@ h1 em {
 
 .polymarket-resolution-unavailable {
   margin-top: 12px;
+}
+
+.polymarket-resolution-context {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 1px;
+  background: var(--line);
+}
+
+.polymarket-resolution-context > div {
+  display: grid;
+  min-height: 72px;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--panel);
+}
+
+.polymarket-resolution-context span {
+  color: var(--muted);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.polymarket-resolution-context strong {
+  align-self: end;
+  color: var(--ink);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 10px;
+  font-weight: 520;
+  overflow-wrap: anywhere;
+}
+
+.polymarket-resolution-context strong.active {
+  color: #ffd6a5;
 }
 
 .polymarket-midpoint-complement > div {
@@ -2343,7 +2413,9 @@ footer {
   .polymarket-event-facts,
   .polymarket-event-volume dl,
   .polymarket-stat-grid,
+  .polymarket-market-identities,
   .polymarket-resolution,
+  .polymarket-resolution-context,
   .polymarket-midpoint-complement,
   .polymarket-freshness {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2506,7 +2578,9 @@ footer {
   .polymarket-event-facts,
   .polymarket-event-volume dl,
   .polymarket-stat-grid,
+  .polymarket-market-identities,
   .polymarket-resolution,
+  .polymarket-resolution-context,
   .polymarket-midpoint-complement {
     grid-template-columns: 1fr;
   }
@@ -2787,6 +2861,7 @@ body {
 }
 
 .polymarket-stat-grid > div,
+.polymarket-market-identities > div,
 .polymarket-resolution > div,
 .polymarket-midpoint-complement > div,
 .polymarket-book,

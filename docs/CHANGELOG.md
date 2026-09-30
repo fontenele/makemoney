@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-30 — M9.63 dashboard market identity provenance completed
+
+- Added fixed selected-market provenance rows for the canonical condition identity and indexed YES/NO CLOB token identities.
+- Preserved complete provider identifier strings and outcome labels without browser-side calculation or abbreviation.
+- Kept nullable identities explicitly unavailable and separated public identifiers from account, wallet, balance, position, and order semantics.
+- Added focused coverage for complete and absent identity sets.
+- Verified all 14 dashboard test files and 81 tests, the complete backend/dashboard build, lint, formatting, and whitespace checks.
+
+### Scope confirmation
+
+- No provider request, reverse lookup, token metadata expansion, account association, balance, position, wallet, order, redemption, recommendation, or execution behavior was introduced.
+
+## 2026-09-30 — M9.62 dashboard resolution lifecycle context completed
+
+- Displayed nullable provider resolution time and separate local receipt time from the existing binary-resolution response.
+- Added independent standard/extended review, disputed/not-disputed, and arbitrated/not-arbitrated presentation states.
+- Kept inactive states explicit and avoided inventing a combined severity, confidence, validity, or recommendation score.
+- Added focused coverage for inactive and simultaneously active lifecycle dimensions.
+- Verified all 13 dashboard test files and 79 tests, the complete backend/dashboard build, lint, formatting, and whitespace checks.
+
+### Scope confirmation
+
+- No additional provider request, payout entitlement, holder or wallet position, redemption, recommendation, persistence, account, order, or execution behavior was introduced.
+
 ## 2026-09-30 — M9.61 dashboard binary resolution result completed
 
 - Added the existing indexed binary resolution resource to selected-market dashboard research as an independent request.
