@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## 2026-09-30 — Treat Agentic Wallet as a separate on-chain provider
+
+Official Binance documentation describes Agentic Wallet as an MPC on-chain wallet operated through the `binance-agentic-wallet` skill and versioned `baw` CLI. Its market order is a chain-specific token swap with contract addresses, gas, route liquidity, slippage, MEV exposure, Web3 Wallet fees, and asynchronous finality. It is not the centralized Binance Spot REST trading API used by an exchange API key.
+
+M10 therefore cannot attach the existing BTC/USDT Spot strategy to Agentic Wallet by swapping the paper executor for a real one. A later increment must explicitly approve a supported chain and exact token contracts and prove instrument compatibility. Until then the wallet remains disconnected and unfunded and no real executor exists.
+
+Any future provider adapter must remain downstream of the Risk Engine, invoke only allowlisted CLI commands without shell interpolation, separate quote from submission, avoid automatic retries of mutations, reconcile ambiguous results, and audit the complete approved intent without secrets. Multiple independent configuration, durable-arm, provider-setting, quota/balance/gas, exact-token, risk, fresh-quote, emergency-stop, and immediate-confirmation gates are required before submission.
+
 ## 2026-09-30 — Fail closed before displaying binary resolution
 
 M9.65 compares the already-loaded binary-resolution response with the independently loaded selected-market detail. The embedded market ID, market condition, indexed outcome tokens, resolution condition, and both payout token identities must all match before the result or lifecycle context is displayed.

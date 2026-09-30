@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-30 — M10.1 real-trading architecture and safety baseline completed
+
+- Closed M9 after confirming that its public, bounded, unauthenticated research goal and acceptance criteria are satisfied through M9.65.
+- Reviewed current official Binance Agentic Wallet, Spot security, and official Skills Hub documentation before designing M10.
+- Recorded that Agentic Wallet is an MPC on-chain wallet driven by the `baw` CLI, not a centralized Binance Spot API-key executor, so the existing BTC/USDT model cannot be connected by substitution.
+- Defined the future provider adapter boundary, independent activation and preflight safeguards, quote/submission separation, non-retry rule for mutations, audit requirements, forbidden capabilities, and read-only-first delivery sequence.
+- Added no dependency, configuration, credential, provider process, route, wallet connection, quote, balance read, or execution path.
+- Verified 1,581 backend tests, 89 dashboard tests, lint, formatting, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
+### Scope confirmation
+
+- Agentic Wallet remains disconnected and at zero balance; real trading, transfers, withdrawals, futures, margin, leverage, prediction orders, DeFi, external signing, and automatic execution remain disabled.
+
 ## 2026-09-30 — M9.65 dashboard resolution identity coherence completed
 
 - Added fail-closed reconciliation between selected-market detail and the already-loaded binary-resolution response.

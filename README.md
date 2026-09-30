@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M8 are complete, and M9 is in progress through Polymarket dashboard research, including Data API freshness, platform-wide and selected-market open interest, descriptive binary midpoint relationships, direct and explicitly selected first-level related taxonomy, plus bounded 24-hour price comparison, historical alignment and observation provenance, and history charts. Market feeds and bounded historical observations are public and unauthenticated; capital, fills, equity, statistics, and balances are fictional or research-only, with no exchange-account or real-fund access.
+Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, and M10 has begun with a documentation-only Agentic Wallet architecture and safety baseline. Market feeds and bounded historical observations are public and unauthenticated; capital, fills, equity, statistics, and balances remain fictional or research-only, with no exchange-account, connected-wallet, or real-fund access.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -9,7 +9,7 @@ Project context, current state, roadmap, and change history are indexed in [`doc
 
 - No futures, margin, leverage, or automated withdrawals.
 - No secrets or wallet credentials belong in this repository.
-- Real trading is out of scope until M10 and will require explicit confirmation plus independent safeguards.
+- Real execution is not implemented. M10 requires explicit immediate confirmation plus independent configuration, durable-arm, provider, Risk Engine, quote, audit, and emergency-stop safeguards before any first order.
 
 ## Requirements
 

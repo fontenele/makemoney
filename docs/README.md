@@ -20,5 +20,6 @@ Read `../AGENTS.md`, `../PROJECT_CONTEXT.md`, and `maps.md` before starting a ta
 - `strategies.md`: M5.1 strategy contract and moving-average crossover semantics.
 - `dashboard.md`: M8 read-only Vue/Vite dashboard architecture and local operation.
 - `polymarket.md`: M9 public prediction-market discovery, boundaries, and operating notes.
+- `real-trading.md`: M10 Agentic Wallet architecture, safety gates, non-goals, and staged delivery plan.
 
 Documentation describes the real working tree. Planned behavior must be clearly distinguished from implemented behavior.

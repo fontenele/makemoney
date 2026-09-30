@@ -236,7 +236,7 @@ Vue 3/Vite interface and market/portfolio visualizations.
 - **M8.11 — complete:** every existing dashboard plot uses Apache ECharts through one responsive accessible Vue lifecycle component; manual chart SVG paths are removed and Vite splits the application, ECharts, and ZRender into bounded chunks.
 - Live price/portfolio-equity history and additional research views remain optional post-M8 enhancements.
 
-## M9 — Polymarket — in progress
+## M9 — Polymarket — complete
 
 **Goal:** establish trustworthy, public prediction-market research while modeling markets, outcomes, probabilities, resolution, and liquidity separately from Spot crypto.
 
@@ -316,6 +316,18 @@ Vue 3/Vite interface and market/portfolio visualizations.
 - **M9.64 — complete:** selected-market research independently reverse-loads each available YES/NO token through the existing CLOB parent-market route and verifies both roles, token membership, and condition identity against Gamma market detail. Missing observations remain unavailable and any divergence is explicitly incoherent; no account, balance, position, recommendation, order, or execution semantics are added.
 - **M9.65 — complete:** the already-loaded binary resolution is displayed only when its embedded market ID, condition, indexed tokens, resolution condition, and payout token identities all match the independently selected market detail. Unavailable or divergent identity suppresses resolution/result context without affecting other research and adds no provider request, entitlement, redemption, order, or execution behavior.
 
-## M10 — Agentic Wallet / Real Trading — planned
+## M10 — Agentic Wallet / Real Trading — in progress
 
-Research current official Binance documentation before design. Real trading requires multiple independent safeguards and explicit user confirmation immediately before the first real order.
+**Goal:** introduce real execution only after proving that an explicitly selected on-chain instrument can preserve the project's risk, audit, and research semantics.
+
+**Scope:** design and verify the Agentic Wallet boundary incrementally, starting with provider-neutral contracts and read-only preflight capabilities before quote-only or mutating behavior.
+
+**Non-goals:** installing or authenticating the wallet during design, funding it, transfers, withdrawals, futures, margin, leverage, prediction orders, DeFi, external signing, automatic execution, or adapting the existing BTC/USDT strategy by assumption.
+
+**Architecture impact:** Binance Agentic Wallet is an MPC on-chain wallet driven by the `baw` CLI, not the centralized Binance Spot REST trading API. Any future adapter remains behind the shared executor boundary, downstream of the Risk Engine, and separate from paper trading.
+
+**Tests and acceptance:** every increment defaults disabled and fails closed; pure contracts and safeguards receive focused tests; provider state is read before use; quotes and submissions remain separate; mutable calls are not automatically retried; the first real order requires a separate explicit confirmation immediately before submission.
+
+**Known limitations:** no Agentic Wallet package is installed, no session is connected, no chain or token pair is approved, no wallet balance or quote is read, and no real-execution code exists. The wallet remains at zero balance.
+
+- **M10.1 — complete:** current official Binance documentation establishes the Agentic Wallet as a distinct on-chain MPC/CLI provider, records the incompatibility with centralized Spot assumptions, fixes independent safety gates and forbidden capabilities, and defines a staged delivery sequence without installing, authenticating, funding, quoting, or executing anything.

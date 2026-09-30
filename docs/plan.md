@@ -1710,8 +1710,8 @@ M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.11)
-M9 — Polymarket                   IN PROGRESS (M9.1–M9.27)
-M10 — Agentic Wallet / Real Trading PLANNED
+M9 — Polymarket                   DONE (M9.1–M9.65)
+M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1)
 ```
 
 ---
@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is in progress through M9.65 selected-market binary-resolution identity coherence. Existing bounded event-detail references and Data API volume rows are paged independently, Gamma identities are reconciled against both CLOB token parents, and terminal results are displayed only after full selected-market identity agreement while remaining descriptive and non-executable. Holders, entitlement, other named Data API feeds, implicit related-tag expansion, recursive traversal, wallet positions, redemption, individual trade history, authentication, accounts, automatic execution controls, and real trading remain separate future work.
+M9 is closed through M9.65. M10.1 documents the current official Agentic Wallet as a distinct on-chain MPC/CLI provider, the incompatibility with centralized Spot assumptions, the required independent safeguards, and a read-only-first delivery sequence. No wallet package, authentication, balance access, quote, funding, or real executor has been added. Agentic Wallet remains disconnected with zero balance and real trading remains disabled.
 ```
