@@ -809,6 +809,79 @@ h1 em {
   line-height: 1.7;
 }
 
+.polymarket-event-taxonomy {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.polymarket-event-taxonomy > span {
+  color: #73867e;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.polymarket-event-taxonomy > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.polymarket-event-volume {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.polymarket-event-volume > span,
+.polymarket-event-volume dt {
+  color: #73867e;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.polymarket-event-volume dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  background: var(--line);
+}
+
+.polymarket-event-volume dl > div {
+  display: grid;
+  gap: 10px;
+  min-height: 86px;
+  padding: 14px;
+  background: var(--panel);
+}
+
+.polymarket-event-volume dt,
+.polymarket-event-volume dd,
+.polymarket-event-volume p {
+  margin: 0;
+}
+
+.polymarket-event-volume dd {
+  align-self: end;
+  color: var(--ink);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.polymarket-event-volume p {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
 .polymarket-event-facts {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1933,6 +2006,7 @@ footer {
   .polymarket-grid,
   .polymarket-event-grid,
   .polymarket-event-facts,
+  .polymarket-event-volume dl,
   .polymarket-stat-grid,
   .polymarket-midpoint-complement,
   .polymarket-freshness {
@@ -2087,6 +2161,7 @@ footer {
   .polymarket-grid,
   .polymarket-event-grid,
   .polymarket-event-facts,
+  .polymarket-event-volume dl,
   .polymarket-stat-grid,
   .polymarket-midpoint-complement {
     grid-template-columns: 1fr;

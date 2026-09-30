@@ -4,6 +4,8 @@ import {
   loadDashboard,
   loadListingPerformance,
   loadPolymarketEventDetails,
+  loadPolymarketEventLiveVolume,
+  loadPolymarketEventTags,
   loadPolymarketMarketResearch,
   loadPolymarketRelatedTags,
   updatePolymarketSettings,
@@ -11,7 +13,9 @@ import {
   type DetectedSpotSymbol,
   type ListingPerformance,
   type PolymarketEventDetails,
+  type PolymarketEventLiveVolume,
   type PolymarketEventSummary,
+  type PolymarketEventTags,
   type PolymarketMarketResearch,
   type PolymarketMarketSummary,
   type PolymarketMarketTag,
@@ -54,6 +58,9 @@ const selectedPolymarketEvent = ref<PolymarketEventSummary | null>(null);
 const polymarketEventDetails = ref<Resource<PolymarketEventDetails> | null>(
   null,
 );
+const polymarketEventTags = ref<Resource<PolymarketEventTags> | null>(null);
+const polymarketEventLiveVolume =
+  ref<Resource<PolymarketEventLiveVolume> | null>(null);
 const polymarketEventDetailsLoading = ref(false);
 let polymarketEventDetailsRequest = 0;
 const selectedPolymarketTag = ref<PolymarketMarketTag | null>(null);
@@ -172,21 +179,31 @@ async function refreshPolymarketEventDetails(
 ): Promise<void> {
   const request = ++polymarketEventDetailsRequest;
   polymarketEventDetailsLoading.value = true;
-  const result = await loadPolymarketEventDetails(event.id);
+  const [details, tags, liveVolume] = await Promise.all([
+    loadPolymarketEventDetails(event.id),
+    loadPolymarketEventTags(event.id),
+    loadPolymarketEventLiveVolume(event.id),
+  ]);
   if (request !== polymarketEventDetailsRequest) return;
-  polymarketEventDetails.value = result;
+  polymarketEventDetails.value = details;
+  polymarketEventTags.value = tags;
+  polymarketEventLiveVolume.value = liveVolume;
   polymarketEventDetailsLoading.value = false;
 }
 
 function selectPolymarketEvent(event: PolymarketEventSummary): void {
   selectedPolymarketEvent.value = event;
   polymarketEventDetails.value = null;
+  polymarketEventTags.value = null;
+  polymarketEventLiveVolume.value = null;
   void refreshPolymarketEventDetails(event);
 }
 
 function clearPolymarketEventSelection(): void {
   selectedPolymarketEvent.value = null;
   polymarketEventDetails.value = null;
+  polymarketEventTags.value = null;
+  polymarketEventLiveVolume.value = null;
   polymarketEventDetailsLoading.value = false;
   polymarketEventDetailsRequest += 1;
 }
@@ -1204,6 +1221,73 @@ onUnmounted(() => {
                 'Select an event to load public details.'
               }}
             </p>
+
+            <div class="polymarket-event-taxonomy">
+              <span>Direct event taxonomy</span>
+              <template v-if="available(polymarketEventTags)">
+                <p v-if="polymarketEventTags.data.tags.length === 0">
+                  No direct tags returned for this event.
+                </p>
+                <div v-else class="polymarket-tag-list">
+                  <span
+                    v-for="tag in polymarketEventTags.data.tags"
+                    :key="tag.id"
+                    class="polymarket-related-tag"
+                  >
+                    {{ tag.label ?? tag.slug ?? `Tag ${tag.id}` }}
+                  </span>
+                </div>
+              </template>
+              <p v-else>
+                {{
+                  polymarketEventDetailsLoading
+                    ? 'Loading direct event tagsâ€¦'
+                    : (polymarketEventTags?.message ??
+                      'Direct event taxonomy is unavailable.')
+                }}
+              </p>
+            </div>
+
+            <div class="polymarket-event-volume">
+              <span>Public live-volume observation</span>
+              <template v-if="available(polymarketEventLiveVolume)">
+                <dl>
+                  <div>
+                    <dt>Total taker volume</dt>
+                    <dd>
+                      {{
+                        decimal(
+                          polymarketEventLiveVolume.data.takerVolumeTotalShares,
+                        )
+                      }}
+                      shares
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Reported market rows</dt>
+                    <dd>{{ polymarketEventLiveVolume.data.markets.length }}</dd>
+                  </div>
+                  <div>
+                    <dt>Received locally</dt>
+                    <dd>
+                      {{ timestamp(polymarketEventLiveVolume.data.receivedAt) }}
+                    </dd>
+                  </div>
+                </dl>
+                <p>
+                  Provider aggregate in shares, not USDC turnover. No trade,
+                  holder, position, or executable-price detail is shown.
+                </p>
+              </template>
+              <p v-else>
+                {{
+                  polymarketEventDetailsLoading
+                    ? 'Loading public event volumeâ€¦'
+                    : (polymarketEventLiveVolume?.message ??
+                      'Public event volume is unavailable.')
+                }}
+              </p>
+            </div>
           </article>
 
           <div class="polymarket-section-heading market-heading">

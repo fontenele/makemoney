@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-29 — M9.52 Polymarket dashboard selected-event live volume completed
+
+- Loaded the existing public Data API live-volume resource alongside selected-event details and taxonomy.
+- Displayed the exact aggregate taker volume in shares, reported market-row count, and local receipt time.
+- Kept live-volume failure isolated from valid event identity, lifecycle, and taxonomy resources.
+- Preserved stale-response suppression and provider-disable cleanup across all selected-event resources.
+- Did not expose condition-level breakdowns, infer a measurement window or USDC turnover, or add trades, holders, positions, persistence, recommendations, accounts, orders, or execution behavior.
+- Verified 59 dashboard tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
+## 2026-09-29 — M9.51 Polymarket dashboard selected-event taxonomy completed
+
+- Loaded the existing bounded direct event-tag resource alongside explicitly selected event details.
+- Displayed provider label, slug, or identity fallbacks with distinct empty and unavailable taxonomy states.
+- Kept taxonomy failure isolated from valid event identity and lifecycle details.
+- Applied existing stale-response suppression and provider-disable cleanup to both selected-event resources.
+- Added no related-tag traversal, discovery filtering, nested-market expansion, ranking, persistence, recommendation, account, order, or execution behavior.
+- Verified 57 dashboard tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and diff integrity.
+
 ## 2026-09-29 — M9.50 Polymarket dashboard selected-event details completed
 
 - Made bounded active-event cards explicit selection controls.

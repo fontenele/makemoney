@@ -4,6 +4,8 @@ import {
   loadDashboard,
   loadListingPerformance,
   loadPolymarketEventDetails,
+  loadPolymarketEventLiveVolume,
+  loadPolymarketEventTags,
   loadPolymarketMarketResearch,
   loadPolymarketRelatedTags,
   updatePolymarketSettings,
@@ -450,6 +452,112 @@ describe('loadPolymarketEventDetails', () => {
     expect(request).toHaveBeenCalledWith('/api/polymarket/events/84%2Fpath', {
       headers: { Accept: 'application/json' },
     });
+  });
+});
+
+describe('loadPolymarketEventTags', () => {
+  it('loads direct taxonomy for one explicitly selected event', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json({
+          provider: 'polymarket',
+          eventId: '84',
+          tags: [{ id: '2', label: 'Politics', slug: 'politics' }],
+          receivedAt: '2026-09-29T18:00:01.000Z',
+        }),
+      ),
+    );
+
+    await expect(loadPolymarketEventTags('84', request)).resolves.toMatchObject(
+      {
+        status: 'available',
+        data: { eventId: '84', tags: [{ id: '2', label: 'Politics' }] },
+      },
+    );
+    expect(request).toHaveBeenCalledWith('/api/polymarket/events/84/tags', {
+      headers: { Accept: 'application/json' },
+    });
+  });
+
+  it('encodes event identity and isolates taxonomy failure', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json(
+          { message: 'Polymarket event tags are unavailable' },
+          { status: 503 },
+        ),
+      ),
+    );
+
+    await expect(loadPolymarketEventTags('84/path', request)).resolves.toEqual({
+      status: 'unavailable',
+      message: 'Polymarket event tags are unavailable',
+    });
+    expect(request).toHaveBeenCalledWith(
+      '/api/polymarket/events/84%2Fpath/tags',
+      { headers: { Accept: 'application/json' } },
+    );
+  });
+});
+
+describe('loadPolymarketEventLiveVolume', () => {
+  it('loads the public aggregate for one explicitly selected event', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json({
+          provider: 'polymarket',
+          event: { id: '84', title: '2028 Democratic nominee' },
+          takerVolumeTotalShares: '1250.5',
+          markets: [
+            { conditionId: '0xabc', takerVolumeShares: '1000.5' },
+            { conditionId: '0xdef', takerVolumeShares: '250' },
+          ],
+          source: 'data-api-live-volume',
+          receivedAt: '2026-09-29T18:00:01.000Z',
+          executable: false,
+        }),
+      ),
+    );
+
+    await expect(
+      loadPolymarketEventLiveVolume('84', request),
+    ).resolves.toMatchObject({
+      status: 'available',
+      data: {
+        takerVolumeTotalShares: '1250.5',
+        markets: [
+          { takerVolumeShares: '1000.5' },
+          { takerVolumeShares: '250' },
+        ],
+        executable: false,
+      },
+    });
+    expect(request).toHaveBeenCalledWith(
+      '/api/polymarket/events/84/live-volume',
+      { headers: { Accept: 'application/json' } },
+    );
+  });
+
+  it('encodes event identity and isolates live-volume failure', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json(
+          { message: 'Polymarket event live volume is unavailable' },
+          { status: 404 },
+        ),
+      ),
+    );
+
+    await expect(
+      loadPolymarketEventLiveVolume('84/path', request),
+    ).resolves.toEqual({
+      status: 'unavailable',
+      message: 'Polymarket event live volume is unavailable',
+    });
+    expect(request).toHaveBeenCalledWith(
+      '/api/polymarket/events/84%2Fpath/live-volume',
+      { headers: { Accept: 'application/json' } },
+    );
   });
 });
 

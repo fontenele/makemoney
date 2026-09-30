@@ -221,6 +221,26 @@ export interface PolymarketEventDetails {
   receivedAt: string;
 }
 
+export interface PolymarketEventTags {
+  provider: 'polymarket';
+  eventId: string;
+  tags: PolymarketMarketTag[];
+  receivedAt: string;
+}
+
+export interface PolymarketEventLiveVolume {
+  provider: 'polymarket';
+  event: PolymarketEventDetails;
+  takerVolumeTotalShares: string;
+  markets: Array<{
+    conditionId: string | null;
+    takerVolumeShares: string;
+  }>;
+  source: 'data-api-live-volume';
+  receivedAt: string;
+  executable: false;
+}
+
 export interface PolymarketMarketDetails {
   provider: 'polymarket';
   id: string;
@@ -697,6 +717,28 @@ export function loadPolymarketEventDetails(
 ): Promise<Resource<PolymarketEventDetails>> {
   return loadResource<PolymarketEventDetails>(
     dashboardApiPath(`/polymarket/events/${encodeURIComponent(eventId)}`),
+    request,
+  );
+}
+
+export function loadPolymarketEventTags(
+  eventId: string,
+  request: FetchLike = fetch,
+): Promise<Resource<PolymarketEventTags>> {
+  return loadResource<PolymarketEventTags>(
+    dashboardApiPath(`/polymarket/events/${encodeURIComponent(eventId)}/tags`),
+    request,
+  );
+}
+
+export function loadPolymarketEventLiveVolume(
+  eventId: string,
+  request: FetchLike = fetch,
+): Promise<Resource<PolymarketEventLiveVolume>> {
+  return loadResource<PolymarketEventLiveVolume>(
+    dashboardApiPath(
+      `/polymarket/events/${encodeURIComponent(eventId)}/live-volume`,
+    ),
     request,
   );
 }

@@ -217,3 +217,15 @@ An empty event page is distinct from an unavailable event resource, and event fa
 Active-event cards are now explicit selection controls. Selecting one independently requests `GET /polymarket/events/:id` and displays its public description, active/closed lifecycle, nullable resolution source, local receipt time, and count of normalized market references.
 
 Selection is browser-local, stale responses are ignored when a newer event is selected, and disabling Polymarket access clears pending and displayed event detail. Referenced markets are counted but not rendered or queried, and the view adds no tags, live volume, prices, liquidity, outcomes, ranking, recommendation, account, order, or execution behavior.
+
+## M9.51 selected-event direct taxonomy
+
+Selecting an active event now independently requests the existing bounded `GET /polymarket/events/:id/tags` resource alongside its detail. Direct tags are displayed using provider label, nullable slug, or tag identity fallbacks, with explicit empty and unavailable states.
+
+Taxonomy failure does not hide valid event identity and lifecycle details. Selection cleanup and stale-response suppression cover both resources, and the view adds no related-tag traversal, implicit discovery filtering, nested-market expansion, ranking, persistence, recommendation, account, order, or execution behavior.
+
+## M9.52 selected-event aggregate live volume
+
+Selecting an active event now independently requests the existing `GET /polymarket/events/:id/live-volume` resource alongside detail and taxonomy. The dashboard displays the provider-validated exact total taker volume as shares, the count of reported market rows, and local receipt time.
+
+The provider contract supplies no measurement window, and shares must not be described as USDC turnover. The dashboard does not expose the per-condition breakdown, individual trades, holders, positions, persistence, recommendations, accounts, orders, or execution behavior. Failure remains isolated from valid event details and taxonomy, while selection cleanup and stale-response suppression cover the added resource.
