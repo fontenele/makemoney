@@ -310,6 +310,24 @@ A blocked M10.15 assessment yields no plan. The narrow `reservation_plan_ready` 
 - No durable reservation or atomic enforcement is claimed.
 - No result grants Risk Engine approval, funding, quote, or submission authorization, and the planner remains unwired.
 
+## M10.17 — Pure non-authorizing aggregate reservation capacity
+
+M10.17 adds the concurrency-safety prerequisite that must exist before durable reservation can be correct. A caller-supplied snapshot binds the approved provider, chain, and current UTC day to at most 100 unique reservation records with exact intent and quote identities, USDT budget charge, source-token address and quantity, BNB requirement, provider-quota USD requirement, expiry, coverage, and observation time.
+
+The policy first requires the complete M10.16 plan. It excludes records expired at the evaluation boundary, rejects reuse of an active intent or quote, and requires the summed active USDT budget reservations to equal the reserved-spend fact already consumed by M10.13. It then adds the proposed plan and independently compares the same-source token total, total BNB requirement, and total provider-quota USD requirement with their complete resource and quota snapshots. Different denominations are never combined.
+
+Malformed or duplicate records, more than 100 records, partial coverage, another provider, chain, or UTC day, future or stale observation, an already-active intent or quote, budget non-reconciliation, or aggregate source, gas, or quota insufficiency fail closed. Expired records do not consume capacity. Exact arithmetic uses the isolated precision-40 decimal context.
+
+`reservation_capacity_available` is still only a pure assessment. It does not serialize concurrent callers, create or expire a database row, lock a wallet balance, consume provider quota, grant Risk Engine approval, or authorize funding, quoting, or submission. M10.17 adds no schema, migration, repository, module wiring, route, provider call, wallet mutation, arm, confirmation, audit record, reconciliation, submission command, or executor.
+
+### M10.17 acceptance criteria
+
+- Active reservation facts are bounded, unique, complete, fresh, current-day, and provider/chain correlated.
+- Active budget reservations reconcile exactly with the budget snapshot before a new plan is considered.
+- Same-source token, BNB gas, and provider-quota USD capacity are checked independently after adding the plan.
+- Expired records release capacity, while an active duplicate intent or quote fails closed.
+- No durable reservation or atomic enforcement is claimed, and no result grants Risk Engine approval or financial authorization.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — Add pure aggregate reservation-capacity assessment
+
+- Added a bounded active-reservation snapshot with exact identity, denomination, expiry, coverage, and freshness facts.
+- Reconciled active USDT reservation totals with the budget snapshot before considering a new M10.16 plan.
+- Added independent aggregate source-token, native-BNB, and provider-quota USD capacity checks with exact decimals.
+- Excluded expired records and failed closed on duplicates, divergence, partial coverage, stale facts, and the 100-active-reservation bound.
+- Kept durable reservation, atomic enforcement, Risk Engine approval, and every funding, quote, and submission authorization false.
+- Verified all 1,737 backend tests across 154 suites, all 92 dashboard tests across 16 files, the 8 focused reservation-capacity tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add pure non-authorizing real-execution reservation plan
 
 - Added an inert reservation planner that runs only after the complete M10.15 risk chain passes.
