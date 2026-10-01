@@ -9,6 +9,10 @@ import {
   AgenticWalletSecurityAssessment,
   assessAgenticWalletSecurity,
 } from './agentic-wallet-security-policy';
+import {
+  assessRealExecutionLocalRiskLimits,
+  RealExecutionLocalRiskLimitAssessment,
+} from './real-execution-local-risk-limits';
 
 export interface RealTradingLocalStatus {
   readonly scope: 'real_trading_local_status';
@@ -17,6 +21,7 @@ export interface RealTradingLocalStatus {
   readonly runtimeExecutionAvailable: false;
   readonly instrument: typeof APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT;
   readonly walletObservationMode: 'manual_read_only';
+  readonly localRiskLimits: RealExecutionLocalRiskLimitAssessment;
   readonly quoteAuthorized: false;
   readonly submissionAuthorized: false;
 }
@@ -24,6 +29,12 @@ export interface RealTradingLocalStatus {
 interface RealTradingEnvironment {
   readonly TRADING_MODE: 'paper' | 'real';
   readonly REAL_EXECUTION_ENABLED: boolean;
+  readonly REAL_RISK_MAX_ORDER_NOTIONAL_USDT: string | null;
+  readonly REAL_RISK_MAX_DAILY_SPEND_USDT: string | null;
+  readonly REAL_RISK_MAX_BANKROLL_USDT: string | null;
+  readonly REAL_RISK_MAX_PROVIDER_FEE_RATE: string | null;
+  readonly REAL_RISK_MAX_NETWORK_FEE_USDT: string | null;
+  readonly REAL_RISK_MAX_SLIPPAGE_RATE: string | null;
 }
 
 export interface RealTradingWalletObservation {
@@ -77,6 +88,30 @@ export class RealTradingStatusService {
       runtimeExecutionAvailable: false,
       instrument: APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT,
       walletObservationMode: 'manual_read_only',
+      localRiskLimits: assessRealExecutionLocalRiskLimits({
+        maximumOrderNotionalUsdt: this.config.get(
+          'REAL_RISK_MAX_ORDER_NOTIONAL_USDT',
+          { infer: true },
+        ),
+        maximumDailySpendUsdt: this.config.get(
+          'REAL_RISK_MAX_DAILY_SPEND_USDT',
+          { infer: true },
+        ),
+        maximumBankrollUsdt: this.config.get('REAL_RISK_MAX_BANKROLL_USDT', {
+          infer: true,
+        }),
+        maximumProviderFeeRate: this.config.get(
+          'REAL_RISK_MAX_PROVIDER_FEE_RATE',
+          { infer: true },
+        ),
+        maximumNetworkFeeUsdt: this.config.get(
+          'REAL_RISK_MAX_NETWORK_FEE_USDT',
+          { infer: true },
+        ),
+        maximumSlippageRate: this.config.get('REAL_RISK_MAX_SLIPPAGE_RATE', {
+          infer: true,
+        }),
+      }),
       quoteAuthorized: false,
       submissionAuthorized: false,
     };

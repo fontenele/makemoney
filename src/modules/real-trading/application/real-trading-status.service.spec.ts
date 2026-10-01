@@ -26,6 +26,22 @@ describe('RealTradingStatusService', () => {
         usdt: { symbol: 'USDT' },
       },
       walletObservationMode: 'manual_read_only',
+      localRiskLimits: {
+        scope: 'real_execution_local_risk_limits',
+        status: 'blocked',
+        blockers: [
+          'maximum_order_notional_unconfigured',
+          'maximum_daily_spend_unconfigured',
+          'maximum_bankroll_unconfigured',
+          'maximum_provider_fee_rate_unconfigured',
+          'maximum_network_fee_unconfigured',
+          'maximum_slippage_rate_unconfigured',
+        ],
+        providerDailyLimitUsed: false,
+        fundingAuthorized: false,
+        quoteAuthorized: false,
+        submissionAuthorized: false,
+      },
       quoteAuthorized: false,
       submissionAuthorized: false,
     });
@@ -91,13 +107,19 @@ describe('RealTradingStatusService', () => {
 function config(values: {
   TRADING_MODE: 'paper' | 'real';
   REAL_EXECUTION_ENABLED: boolean;
-}): ConfigService<
-  { TRADING_MODE: 'paper' | 'real'; REAL_EXECUTION_ENABLED: boolean },
-  true
-> {
+}): ConfigService<Record<string, unknown>, true> {
+  const completeValues = {
+    REAL_RISK_MAX_ORDER_NOTIONAL_USDT: null,
+    REAL_RISK_MAX_DAILY_SPEND_USDT: null,
+    REAL_RISK_MAX_BANKROLL_USDT: null,
+    REAL_RISK_MAX_PROVIDER_FEE_RATE: null,
+    REAL_RISK_MAX_NETWORK_FEE_USDT: null,
+    REAL_RISK_MAX_SLIPPAGE_RATE: null,
+    ...values,
+  };
   return {
-    get: jest.fn((key: keyof typeof values) => values[key]),
-  } as unknown as ConfigService<typeof values, true>;
+    get: jest.fn((key: keyof typeof completeValues) => completeValues[key]),
+  } as unknown as ConfigService<Record<string, unknown>, true>;
 }
 
 function connectedObservation(): AgenticWalletCapabilityObservation {

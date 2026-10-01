@@ -188,6 +188,22 @@ The assessment is included in the existing explicit manual wallet response and d
 - Dashboard visibility reuses the manual observation and does not add provider access to automatic refresh.
 - Funding, quote, and submission authorization remain false in every result.
 
+## M10.10 — Explicit local real-risk limits
+
+M10.10 models the independent project controls that M10.9 left mandatory: maximum order notional, UTC-daily spend, bankroll, provider-fee rate, network fee, and slippage. Each value is an explicit canonical decimal environment setting and defaults to absent. The project owner has not yet selected financial values, so `.env.example` deliberately leaves the complete envelope blank rather than inventing a risk appetite.
+
+A pure exact-decimal assessment reports each absent limit independently, rejects malformed or out-of-range values, and requires maximum order notional ≤ maximum daily spend ≤ maximum bankroll. `GET /real-trading/status` exposes the provider-free assessment and configured values for local audit. It never substitutes the provider daily limit and always reports funding, quote, and submission authorization as false.
+
+This increment does not yet evaluate an intent or quote against the limits, persist daily usage, value non-USDT gas, invoke `market-order quote`, enable App trading access, fund the wallet, bridge the operational Risk Engine, arm execution, or add an executor.
+
+### M10.10 acceptance criteria
+
+- All six local limits default to absent and are visible as independent blockers.
+- Configured values preserve canonical exact decimals; fee and slippage rates are bounded from zero through one.
+- Order, daily-spend, and bankroll containment is evaluated with exact decimal arithmetic.
+- The provider daily limit is never consumed as a project limit.
+- Funding, quote, and submission authorization remain false in every result.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

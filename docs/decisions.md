@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-01 — Keep local real-risk values explicit and non-authorizing
+
+M10.10 introduces separate maximum order-notional, UTC-daily-spend, bankroll, provider-fee-rate, network-fee, and slippage settings. They default to absent because choosing financial values is a project-owner decision; neither the provider's broad daily quota nor paper-trading limits are silently reused for real on-chain activity.
+
+The provider-free status reports missing or incoherent values, and the pure policy requires order notional not to exceed daily spend and daily spend not to exceed bankroll. Even a fully defined envelope grants no funding, quote, or submission authority. Intent/quote enforcement, durable daily usage, gas valuation, quote support, and the operational Risk Engine bridge remain later independent increments.
+
 ## 2026-10-01 — Treat restrictive wallet settings as observation, not authorization
 
 The Agentic Wallet exposes useful provider safeguards, but its available daily limits are materially broader than the intended first experiment and cannot replace project-owned controls. M10.9 therefore evaluates session validity, abnormal-transaction handling, token scope, prediction trading, developer mode, and quota reconciliation independently while always rejecting the provider daily limit as a project Risk Engine limit.

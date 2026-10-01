@@ -39,6 +39,12 @@ interface Environment {
   REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: string | null;
   REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS: string | null;
   REAL_EXECUTION_CAPABILITY_MAX_AGE_MS: number;
+  REAL_RISK_MAX_ORDER_NOTIONAL_USDT: string | null;
+  REAL_RISK_MAX_DAILY_SPEND_USDT: string | null;
+  REAL_RISK_MAX_BANKROLL_USDT: string | null;
+  REAL_RISK_MAX_PROVIDER_FEE_RATE: string | null;
+  REAL_RISK_MAX_NETWORK_FEE_USDT: string | null;
+  REAL_RISK_MAX_SLIPPAGE_RATE: string | null;
 }
 
 const positiveDecimalPattern =
@@ -149,6 +155,30 @@ const environmentSchema = Joi.object<Environment>({
     .min(1000)
     .max(60000)
     .default(10000),
+  REAL_RISK_MAX_ORDER_NOTIONAL_USDT: Joi.string()
+    .pattern(positiveDecimalPattern)
+    .empty('')
+    .default(null),
+  REAL_RISK_MAX_DAILY_SPEND_USDT: Joi.string()
+    .pattern(positiveDecimalPattern)
+    .empty('')
+    .default(null),
+  REAL_RISK_MAX_BANKROLL_USDT: Joi.string()
+    .pattern(positiveDecimalPattern)
+    .empty('')
+    .default(null),
+  REAL_RISK_MAX_PROVIDER_FEE_RATE: Joi.string()
+    .pattern(/^(?:0|0\.\d*[1-9]\d*|1(?:\.0+)?)$/)
+    .empty('')
+    .default(null),
+  REAL_RISK_MAX_NETWORK_FEE_USDT: Joi.string()
+    .pattern(positiveDecimalPattern)
+    .empty('')
+    .default(null),
+  REAL_RISK_MAX_SLIPPAGE_RATE: Joi.string()
+    .pattern(/^(?:0|0\.\d*[1-9]\d*|1(?:\.0+)?)$/)
+    .empty('')
+    .default(null),
 })
   .custom((value: Environment, helpers) => {
     if (value.STRATEGY_MA_SHORT_PERIOD >= value.STRATEGY_MA_LONG_PERIOD) {

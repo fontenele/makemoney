@@ -506,6 +506,33 @@ export interface RealTradingStatus {
     decision: 'approved_candidate';
   };
   walletObservationMode: 'manual_read_only';
+  localRiskLimits: {
+    scope: 'real_execution_local_risk_limits';
+    status: 'defined' | 'blocked';
+    blockers: Array<
+      | 'maximum_order_notional_unconfigured'
+      | 'maximum_daily_spend_unconfigured'
+      | 'maximum_bankroll_unconfigured'
+      | 'maximum_provider_fee_rate_unconfigured'
+      | 'maximum_network_fee_unconfigured'
+      | 'maximum_slippage_rate_unconfigured'
+      | 'invalid_limit'
+      | 'order_notional_exceeds_daily_spend'
+      | 'daily_spend_exceeds_bankroll'
+    >;
+    limits: {
+      maximumOrderNotionalUsdt: string | null;
+      maximumDailySpendUsdt: string | null;
+      maximumBankrollUsdt: string | null;
+      maximumProviderFeeRate: string | null;
+      maximumNetworkFeeUsdt: string | null;
+      maximumSlippageRate: string | null;
+    };
+    providerDailyLimitUsed: false;
+    fundingAuthorized: false;
+    quoteAuthorized: false;
+    submissionAuthorized: false;
+  };
   quoteAuthorized: false;
   submissionAuthorized: false;
 }

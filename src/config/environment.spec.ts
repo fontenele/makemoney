@@ -63,7 +63,37 @@ describe('validateEnvironment real execution', () => {
       REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: null,
       REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS: null,
       REAL_EXECUTION_CAPABILITY_MAX_AGE_MS: 10000,
+      REAL_RISK_MAX_ORDER_NOTIONAL_USDT: null,
+      REAL_RISK_MAX_DAILY_SPEND_USDT: null,
+      REAL_RISK_MAX_BANKROLL_USDT: null,
+      REAL_RISK_MAX_PROVIDER_FEE_RATE: null,
+      REAL_RISK_MAX_NETWORK_FEE_USDT: null,
+      REAL_RISK_MAX_SLIPPAGE_RATE: null,
     });
+  });
+
+  it('accepts only canonical explicit local real-risk limits', () => {
+    expect(
+      validateEnvironment({
+        ...required,
+        REAL_RISK_MAX_ORDER_NOTIONAL_USDT: '5',
+        REAL_RISK_MAX_DAILY_SPEND_USDT: '10',
+        REAL_RISK_MAX_BANKROLL_USDT: '25',
+        REAL_RISK_MAX_PROVIDER_FEE_RATE: '0.01',
+        REAL_RISK_MAX_NETWORK_FEE_USDT: '1',
+        REAL_RISK_MAX_SLIPPAGE_RATE: '0.005',
+      }),
+    ).toMatchObject({
+      REAL_RISK_MAX_ORDER_NOTIONAL_USDT: '5',
+      REAL_RISK_MAX_SLIPPAGE_RATE: '0.005',
+    });
+
+    expect(() =>
+      validateEnvironment({
+        ...required,
+        REAL_RISK_MAX_SLIPPAGE_RATE: '1.01',
+      }),
+    ).toThrow('Invalid environment configuration');
   });
 
   it('accepts explicit independent gates and a complete exact allowlist', () => {

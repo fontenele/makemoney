@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — Add explicit local real-risk limit envelope
+
+- Added fail-closed configuration for maximum real order notional, UTC-daily spend, bankroll, provider-fee rate, network fee, and slippage; every value defaults to absent.
+- Added a pure exact-decimal assessment that reports each missing limit and requires order notional ≤ daily spend ≤ bankroll.
+- Exposed the assessment through the existing provider-free local status and synchronized its README route contract.
+- Kept the provider daily limit excluded and funding, quote, and submission authorization false; no financial value was selected automatically.
+- Added no quote command, wallet access, provider mutation, persistence, Risk Engine bridge, or executor.
+- Verified all 1,672 backend tests across 146 suites, all 92 dashboard tests across 16 files, focused tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add non-authorizing Agentic Wallet security posture
 
 - Added a pure exact-decimal assessment for session validity, abnormal-transaction rejection, limited-token scope, prediction trading, developer mode, and provider quota reconciliation.
