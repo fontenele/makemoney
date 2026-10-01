@@ -204,8 +204,27 @@ This increment does not yet evaluate an intent or quote against the limits, pers
 - The provider daily limit is never consumed as a project limit.
 - Funding, quote, and submission authorization remain false in every result.
 
+## M10.11 — Unwired non-executable quote adapter
+
+M10.11 adds a dedicated Agentic Wallet quote boundary for the official `market-order quote` command. The runner checks the pinned CLI version, invokes an argument array with `shell: false`, and shares the existing bounded timeout, cancellation, output ceiling, discarded stderr, sanitized failure, and Windows package-entry behavior. Its command union and argument builder cannot represent `market-order swap` or another mutation.
+
+The adapter accepts only the exact approved BSC chain and BTCB/USDT token directions. It validates the complete provider envelope, exact source quantity, expected source/target symbols, and reported slippage no greater than the intent maximum. Intent slippage is converted from a fractional rate to the provider's percentage argument with exact decimal arithmetic.
+
+Because the published provider response has no quote ID, expiry, complete provider fee, or network fee, normalization is deliberately conservative: `providerQuoteId` is null, `costCoverage` is `partial`, no costs are fabricated, the quote is always `executable: false`, and a one-to-ten-second local validity policy is mandatory. Minimum target quantity is derived from expected output and the intent's maximum slippage rather than from an unreported provider field.
+
+The adapter and runner are not registered in the NestJS module and have not been called live. M10.11 adds no configuration gate, endpoint, dashboard action, automatic task, persistence, funding, Risk Engine bridge, durable arm, confirmation, swap command, reconciliation, or executor.
+
+### M10.11 acceptance criteria
+
+- The quote command is structurally separate from read commands and cannot represent submission.
+- CLI version, process bounds, cancellation, no-shell invocation, and sanitized failures remain mandatory.
+- Only exact approved chain/token directions and correlated provider output normalize successfully.
+- Missing provider fee, gas, quote identity, and expiry remain explicit rather than inferred as complete.
+- No runtime or live provider path can invoke the adapter.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
 - [Binance's official `binance-skills-hub`](https://github.com/binance/binance-skills-hub), including the Agentic Wallet skill plus preflight, wallet-view, wallet-setting, gas, security, and market-order references (reviewed 2026-09-30).
+- [Binance Agentic Wallet market-order reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/market-order.md), including the distinct quote and swap commands and published quote response (reviewed 2026-10-01).
 - [Binance Spot REST security documentation](https://developers.binance.com/en/docs/products/spot/rest-api) was reviewed only to confirm that centralized Spot API keys and permissions are a separate integration model; it is not the selected M10 provider boundary.

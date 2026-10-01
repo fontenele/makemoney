@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-01 — Keep the first quote adapter unwired and incomplete by construction
+
+The official Agentic Wallet market-order quote is a non-mutating CLI command, but its published response contains source amount, expected target amount, symbols, and slippage without a provider quote identity, expiry, complete provider fee, or network fee. M10.11 therefore normalizes it as `executable: false`, `providerQuoteId: null`, and `costCoverage: partial`, with a short local validity window and a conservative minimum output derived from the intent's maximum slippage.
+
+The dedicated runner checks the pinned CLI version before use and can build only `market-order quote`; it has no `swap` representation. The adapter is not registered in NestJS and is not reachable from HTTP or automatic work. Local limits, security posture, current capability, intent approval, fee/gas valuation, and later Risk Engine approval must be composed before runtime quote access can be considered.
+
 ## 2026-10-01 — Keep local real-risk values explicit and non-authorizing
 
 M10.10 introduces separate maximum order-notional, UTC-daily-spend, bankroll, provider-fee-rate, network-fee, and slippage settings. They default to absent because choosing financial values is a project-owner decision; neither the provider's broad daily quota nor paper-trading limits are silently reused for real on-chain activity.

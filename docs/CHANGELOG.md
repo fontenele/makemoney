@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — Add unwired non-executable Agentic Wallet quote adapter
+
+- Added a dedicated pinned-version CLI runner whose closed command surface contains only `market-order quote` and no swap/submission operation.
+- Added exact BSC BTCB/USDT direction, amount, symbol, and slippage correlation before normalizing provider output.
+- Represented the result as a short-lived, non-executable quote with null provider quote identity and explicitly partial fee/gas coverage.
+- Reused the shell-free, bounded, cancelable, output-limited, sanitized JSON process boundary for reads and quotes.
+- Kept the adapter outside NestJS runtime wiring; no route, live quote, funding, persistence, Risk Engine bridge, arm, confirmation, submission, or executor was added.
+- Verified all 1,689 backend tests across 148 suites, all 92 dashboard tests across 16 files, focused quote tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add explicit local real-risk limit envelope
 
 - Added fail-closed configuration for maximum real order notional, UTC-daily spend, bankroll, provider-fee rate, network fee, and slippage; every value defaults to absent.
