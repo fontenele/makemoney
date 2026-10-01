@@ -3,6 +3,7 @@ import Joi from 'joi';
 interface Environment {
   NODE_ENV: 'development' | 'test' | 'production';
   PORT: number;
+  API_BIND_HOST: '127.0.0.1' | '0.0.0.0';
   DATABASE_URL: string;
   REDIS_URL: string;
   BINANCE_WS_BASE_URL: string;
@@ -48,6 +49,9 @@ const environmentSchema = Joi.object<Environment>({
     .valid('development', 'test', 'production')
     .default('development'),
   PORT: Joi.number().port().default(3000),
+  API_BIND_HOST: Joi.string()
+    .valid('127.0.0.1', '0.0.0.0')
+    .default('127.0.0.1'),
   DATABASE_URL: Joi.string().uri().required(),
   REDIS_URL: Joi.string().uri().required(),
   BINANCE_WS_BASE_URL: Joi.string()

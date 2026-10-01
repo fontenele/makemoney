@@ -11,6 +11,7 @@ import { StrategiesModule } from './modules/strategies/strategies.module';
 import { BacktestingModule } from './modules/backtesting/backtesting.module';
 import { NewListingsModule } from './modules/new-listings/new-listings.module';
 import { PolymarketModule } from './modules/polymarket/polymarket.module';
+import { RealTradingModule } from './modules/real-trading/real-trading.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PolymarketModule } from './modules/polymarket/polymarket.module';
     BacktestingModule,
     NewListingsModule,
     PolymarketModule,
+    RealTradingModule,
   ],
 })
 export class AppModule {}

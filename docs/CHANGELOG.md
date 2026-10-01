@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-10-01 — Host Agentic Wallet runtime and loopback binding corrected
+
+- Diagnosed the dashboard `Cannot GET` response as a stale 37-hour-old API container and rebuilt the API with the M10.8 routes.
+- Confirmed that a containerized API cannot use the Binance Agentic Wallet CLI session stored on the Windows host; the manual route correctly failed closed with `503` in that runtime.
+- Validated the same API on the Windows host: local status, wallet connection, BSC availability, empty balance, limited-token mode, disabled prediction and Developer Mode, `AutoReject`, gas read, and false quote/submission authority all normalized successfully.
+- Added validated `API_BIND_HOST` configuration. Host execution defaults to `127.0.0.1`; Compose opts into `0.0.0.0` only inside the container and continues publishing on host loopback.
+
+### Scope confirmation
+
+- PostgreSQL and Redis remain in Docker with their existing volumes. No wallet setting, balance, quote, signature, transfer, approval, or order was changed.
+
+## 2026-09-30 — M10.8 manual Agentic Wallet dashboard visibility completed
+
+- Added provider-free `GET /real-trading/status` for local mode, independent execution gate, exact BSC BTCB/USDT candidate, and explicit false quote/submission authority.
+- Added explicit `POST /real-trading/wallet-observation` over the existing closed read-only CLI surface, with concurrent-call coalescing, sanitized failures, no returned wallet address, and no session material.
+- Extended strict settings normalization with prediction-trading and Developer Mode flags.
+- Separated the dashboard's fictional 1,000 USDT paper portfolio from a dedicated Agentic Wallet / Real trading panel.
+- Kept wallet access outside the automatic refresh; only **Check wallet (read only)** invokes the provider.
+- Added focused backend and dashboard tests for provider-free status, manual POST behavior, failure isolation, coalescing, output sanitization, and disabled quote/submission authority.
+- Verified 1,660 backend tests across 144 suites, 92 dashboard tests across 16 files, lint, formatting, backend/dashboard builds, Compose configuration, and whitespace checks.
+
+### Scope confirmation
+
+- No funding, quote, provider-setting mutation, token approval, signing, transaction submission, transfer, order, persistence, Risk Engine bridge, or real executor was added. Real execution remains disabled.
+
 ## 2026-09-30 — Read-only wallet access verified with App trading disabled
 
 - Re-read the connected Agentic Wallet after the operator disabled App-level trading access.

@@ -485,6 +485,61 @@ export interface PolymarketDataFreshness {
 export type Resource<T> =
   { status: 'available'; data: T } | { status: 'unavailable'; message: string };
 
+export interface RealTradingStatus {
+  scope: 'real_trading_local_status';
+  tradingMode: 'paper' | 'real';
+  realExecutionEnabled: boolean;
+  runtimeExecutionAvailable: false;
+  instrument: {
+    providerId: 'agentic_wallet';
+    chainId: '56';
+    btc: {
+      symbol: 'BTCB';
+      tokenAddress: string;
+      representation: 'binance_peg_btc';
+    };
+    usdt: {
+      symbol: 'USDT';
+      tokenAddress: string;
+      representation: 'bsc_usdt';
+    };
+    decision: 'approved_candidate';
+  };
+  walletObservationMode: 'manual_read_only';
+  quoteAuthorized: false;
+  submissionAuthorized: false;
+}
+
+export interface AgenticWalletObservation {
+  providerId: 'agentic_wallet';
+  connection: 'connected' | 'disconnected';
+  observedAt: string;
+  cliVersion: string;
+  requiredCliVersion: string;
+  approvedChain: {
+    chainId: '56';
+    available: boolean;
+    addressAvailable: boolean;
+  };
+  security: {
+    dailyLimitUsd: string;
+    abnormalTransactionHandling: 'AutoReject' | 'NeedConfirmation';
+    tradeAllTokens: boolean;
+    predictionTradingEnabled: boolean;
+    developerModeEnabled: boolean;
+    sessionExpiresAt: string;
+  } | null;
+  quota: {
+    usedUsd: string;
+    remainingUsd: string;
+    date: string;
+  } | null;
+  balance: { available: boolean; assetCount: number; empty: boolean };
+  gasAvailable: boolean;
+  quoteAuthorized: false;
+  submissionAuthorized: false;
+}
+
 export interface DashboardSnapshot {
   health: Resource<HealthResponse>;
   valuation: Resource<PortfolioValuation>;
@@ -494,6 +549,7 @@ export interface DashboardSnapshot {
   newListings: Resource<DetectedSpotSymbol[]>;
   strategySignals: Resource<StrategySignal[]>;
   backtestRuns: Resource<StoredBacktestRun[]>;
+  realTradingStatus: Resource<RealTradingStatus>;
   polymarketSettings: Resource<PolymarketSettings>;
   polymarketDataFreshness: Resource<PolymarketDataFreshness>;
   polymarketGlobalOpenInterest: Resource<PolymarketGlobalOpenInterest>;
@@ -544,6 +600,7 @@ export async function loadDashboard(
     newListings,
     strategySignals,
     backtestRuns,
+    realTradingStatus,
   ] = await Promise.all([
     loadResource<HealthResponse>(dashboardApiPath('/health'), request),
     loadResource<PortfolioValuation>(
@@ -574,6 +631,10 @@ export async function loadDashboard(
       dashboardApiPath('/backtesting/runs?limit=1'),
       request,
     ),
+    loadResource<RealTradingStatus>(
+      dashboardApiPath('/real-trading/status'),
+      request,
+    ),
   ]);
   const polymarketSettings = await polymarketSettingsPromise;
   const polymarketResources =
@@ -595,10 +656,36 @@ export async function loadDashboard(
     newListings,
     strategySignals,
     backtestRuns,
+    realTradingStatus,
     polymarketSettings,
     ...polymarketResources,
     loadedAt: new Date().toISOString(),
   };
+}
+
+export async function observeAgenticWallet(
+  request: FetchLike = fetch,
+): Promise<Resource<AgenticWalletObservation>> {
+  try {
+    const response = await request(
+      dashboardApiPath('/real-trading/wallet-observation'),
+      { method: 'POST', headers: { Accept: 'application/json' } },
+    );
+    if (!response.ok) {
+      return {
+        status: 'unavailable',
+        message:
+          (await readProviderErrorMessage(response)) ??
+          `Unavailable (${response.status})`,
+      };
+    }
+    return {
+      status: 'available',
+      data: (await response.json()) as AgenticWalletObservation,
+    };
+  } catch {
+    return { status: 'unavailable', message: 'Local API is unreachable' };
+  }
 }
 
 async function loadPolymarketDashboardResources(

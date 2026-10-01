@@ -1,0 +1,142 @@
+import { ConfigService } from '@nestjs/config';
+import { jest } from '@jest/globals';
+import { RealTradingStatusService } from './real-trading-status.service';
+import {
+  AgenticWalletCapabilityAdapter,
+  AgenticWalletCapabilityObservation,
+} from '../infrastructure/agentic-wallet-capability.adapter';
+
+describe('RealTradingStatusService', () => {
+  it('reports local fail-closed gates without reading the provider', () => {
+    const wallet = { load: jest.fn() };
+    const service = new RealTradingStatusService(
+      config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
+      wallet as unknown as AgenticWalletCapabilityAdapter,
+    );
+
+    expect(service.getLocalStatus()).toMatchObject({
+      scope: 'real_trading_local_status',
+      tradingMode: 'paper',
+      realExecutionEnabled: false,
+      runtimeExecutionAvailable: false,
+      instrument: {
+        providerId: 'agentic_wallet',
+        chainId: '56',
+        btc: { symbol: 'BTCB' },
+        usdt: { symbol: 'USDT' },
+      },
+      walletObservationMode: 'manual_read_only',
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    });
+    expect(wallet.load).not.toHaveBeenCalled();
+  });
+
+  it('sanitizes the wallet read and coalesces concurrent observations', async () => {
+    let resolveObservation!: (
+      value: AgenticWalletCapabilityObservation,
+    ) => void;
+    const providerResult = new Promise<AgenticWalletCapabilityObservation>(
+      (resolve) => {
+        resolveObservation = resolve;
+      },
+    );
+    const wallet = { load: jest.fn(() => providerResult) };
+    const service = new RealTradingStatusService(
+      config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
+      wallet as unknown as AgenticWalletCapabilityAdapter,
+    );
+
+    const first = service.observeWallet();
+    const second = service.observeWallet();
+    expect(wallet.load).toHaveBeenCalledTimes(1);
+
+    resolveObservation(connectedObservation());
+    const [firstResult, secondResult] = await Promise.all([first, second]);
+
+    expect(firstResult).toBe(secondResult);
+    expect(firstResult).toMatchObject({
+      providerId: 'agentic_wallet',
+      connection: 'connected',
+      approvedChain: {
+        chainId: '56',
+        available: true,
+        addressAvailable: true,
+      },
+      security: {
+        tradeAllTokens: false,
+        predictionTradingEnabled: false,
+        developerModeEnabled: false,
+      },
+      balance: { available: true, assetCount: 0, empty: true },
+      gasAvailable: true,
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    });
+    expect(firstResult).not.toHaveProperty('addresses');
+    expect(JSON.stringify(firstResult)).not.toContain('0xprivate-address');
+  });
+});
+
+function config(values: {
+  TRADING_MODE: 'paper' | 'real';
+  REAL_EXECUTION_ENABLED: boolean;
+}): ConfigService<
+  { TRADING_MODE: 'paper' | 'real'; REAL_EXECUTION_ENABLED: boolean },
+  true
+> {
+  return {
+    get: jest.fn((key: keyof typeof values) => values[key]),
+  } as unknown as ConfigService<typeof values, true>;
+}
+
+function connectedObservation(): AgenticWalletCapabilityObservation {
+  return {
+    cliVersion: '1.10.0',
+    requiredCliVersion: '1.10.0',
+    capabilities: {
+      providerId: 'agentic_wallet',
+      connected: true,
+      chains: [{ chainId: '56', operations: [] }],
+      reads: {
+        securitySettings: true,
+        quota: true,
+        balances: true,
+        gas: true,
+      },
+      observedAt: new Date('2026-09-30T23:48:42.000Z'),
+    },
+    settings: {
+      dailyLimitUsd: '1000',
+      abnormalTransactionHandling: 'AutoReject',
+      tradeAllTokens: false,
+      predictionTradingEnabled: false,
+      developerModeEnabled: false,
+      sessionExpiresAt: new Date('2026-10-02T23:48:42.000Z'),
+    },
+    quota: {
+      usedUsd: '0',
+      remainingUsd: '1000',
+      date: '2026-09-30',
+    },
+    addresses: [{ chainId: '56', address: '0xprivate-address' }],
+    balances: [],
+    gas: {
+      chainId: '56',
+      baseFeePerGas: '0',
+      low: gasLevel(),
+      medium: gasLevel(),
+      high: gasLevel(),
+    },
+  };
+}
+
+function gasLevel() {
+  return {
+    gasPrice: '0.05',
+    maxFeePerGas: '0.05',
+    maxPriorityFeePerGas: '0.05',
+    tipAmount: null,
+    waitTimeEstimateMs: 1000,
+  };
+}

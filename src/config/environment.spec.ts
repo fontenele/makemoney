@@ -36,6 +36,23 @@ describe('validateEnvironment positive risk decimals', () => {
   );
 });
 
+describe('validateEnvironment API binding', () => {
+  it('binds to host loopback by default', () => {
+    expect(validateEnvironment(required)).toMatchObject({
+      API_BIND_HOST: '127.0.0.1',
+    });
+  });
+
+  it('allows all interfaces only when explicitly configured for a container', () => {
+    expect(
+      validateEnvironment({ ...required, API_BIND_HOST: '0.0.0.0' }),
+    ).toMatchObject({ API_BIND_HOST: '0.0.0.0' });
+    expect(() =>
+      validateEnvironment({ ...required, API_BIND_HOST: 'localhost' }),
+    ).toThrow('Invalid environment configuration');
+  });
+});
+
 describe('validateEnvironment real execution', () => {
   it('defaults both activation gates off with no approved instrument', () => {
     expect(validateEnvironment(required)).toMatchObject({

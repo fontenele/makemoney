@@ -236,6 +236,12 @@ Each automatic refresh reads the always-local Polymarket setting before loading 
 
 Core health, paper portfolio, execution, listing, strategy, and backtesting requests remain independent. A transport-level proxy error on one of those non-Polymarket routes indicates that the local API was unavailable or restarting, not that the disabled Polymarket provider was contacted.
 
+## M10.8 Agentic Wallet visibility
+
+The overview labels the existing 1,000 USDT portfolio as fictional paper capital and renders Agentic Wallet state in a separate real-environment panel. Automatic dashboard refreshes load only provider-free `GET /real-trading/status`, which reports the application gates, exact approved BSC BTCB/USDT candidate, and the absence of any runtime quote or submission capability.
+
+The wallet CLI is contacted only after the user selects **Check wallet (read only)**. That explicit action calls `POST /real-trading/wallet-observation` and displays a sanitized snapshot of connection, BSC availability, empty/non-empty asset count, security flags, provider quota, and gas-read availability. Wallet addresses and authentication material are omitted. The observation is browser-memory-only, is not replaced by automatic refreshes, and cannot request a quote, sign, submit, or move funds.
+
 ## M9.53 selected-event market-reference sample
 
 Selected-event details now render at most the first eight already-normalized market references in their provider order. Each display-only card contains the market identity, question with slug/identity fallback, and open/closed state, while the heading retains the displayed and total reference counts.

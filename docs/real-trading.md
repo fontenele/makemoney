@@ -152,6 +152,26 @@ The first live project-adapter attempt exposed Windows `spawn EINVAL` because No
 - Windows invocation preserves `shell: false` and a closed argument array.
 - No quote, provider-setting mutation, funding, transfer, order, or runtime execution path is introduced.
 
+## M10.8 — Manual runtime wallet visibility
+
+M10.8 registers the first runtime Agentic Wallet module, but its surface remains read-only. `GET /real-trading/status` is an always-local provider-free route that reports the application trading mode, independent execution gate, exact approved BSC BTCB/USDT candidate, manual observation policy, and the permanent absence of quote and submission authorization.
+
+`POST /real-trading/wallet-observation` is an explicit operator-triggered read. It uses the existing pinned, shell-free, closed CLI command runner to observe connection, chains, security settings and quota, approved-chain address availability, BSC balances, and gas. Concurrent requests share one in-flight read. The public result deliberately omits wallet addresses and session material and exposes only a balance asset count rather than token holdings.
+
+The dashboard never calls this provider route during automatic refresh. It keeps the result only in browser memory and visually separates the fictional paper portfolio from the real wallet. Provider failure returns a sanitized isolated `503` and does not affect the paper, research, or local-gate panels.
+
+The authenticated CLI session is host-local. A Docker API cannot inherit it and therefore fails the manual observation closed. During Agentic Wallet development the API runs on the Windows host against Docker-hosted PostgreSQL and Redis, with `API_BIND_HOST=127.0.0.1`; the container remains suitable for provider-free features but not authenticated wallet reads. Compose's internal `0.0.0.0` binding is separately explicit and its published API port remains host-loopback-only.
+
+This increment adds no quote command, trade-access mutation, token approval, signing, submission, transfer, funding, persistence, Risk Engine bridge, or real executor. `quoteAuthorized` and `submissionAuthorized` remain false in every public response.
+
+### M10.8 acceptance criteria
+
+- Automatic dashboard refreshes never invoke the Agentic Wallet CLI.
+- Wallet reads require one explicit manual request and concurrent reads coalesce.
+- Public responses omit addresses, authentication/session data, and executable operations.
+- Fictional paper capital and the empty real wallet are visibly separate.
+- Quote and submission authorization remain false and no mutating CLI command exists.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

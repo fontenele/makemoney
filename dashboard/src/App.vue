@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import {
   loadDashboard,
+  observeAgenticWallet,
   loadListingPerformance,
   loadPolymarketEventDetails,
   loadPolymarketEventLiveVolume,
@@ -11,6 +12,7 @@ import {
   loadPolymarketRelatedTags,
   updatePolymarketSettings,
   type DashboardSnapshot,
+  type AgenticWalletObservation,
   type DetectedSpotSymbol,
   type ListingPerformance,
   type PolymarketEventDetails,
@@ -62,6 +64,10 @@ const currentRoute = ref<DashboardRoute>(
 
 const snapshot = ref<DashboardSnapshot | null>(null);
 const refreshing = ref(false);
+const agenticWalletObservation = ref<Resource<AgenticWalletObservation> | null>(
+  null,
+);
+const agenticWalletObservationLoading = ref(false);
 let dashboardRequest = 0;
 const selectedListing = ref<DetectedSpotSymbol | null>(null);
 const listingPerformance = ref<Resource<ListingPerformance> | null>(null);
@@ -445,6 +451,16 @@ function refreshNow(): void {
   void autoRefresh.refreshNow();
 }
 
+async function refreshAgenticWalletObservation(): Promise<void> {
+  if (agenticWalletObservationLoading.value) return;
+  agenticWalletObservationLoading.value = true;
+  try {
+    agenticWalletObservation.value = await observeAgenticWallet();
+  } finally {
+    agenticWalletObservationLoading.value = false;
+  }
+}
+
 function decimal(value: string | null | undefined, digits = 2): string {
   if (value === null || value === undefined) return '—';
   const parsed = Number(value);
@@ -605,7 +621,7 @@ onUnmounted(() => {
 
         <section class="metric-grid" aria-label="Portfolio overview">
           <article class="metric-card featured">
-            <span class="metric-label">Paper portfolio</span>
+            <span class="metric-label">Fictional paper portfolio</span>
             <template v-if="available(snapshot?.valuation)">
               <strong class="metric-value">
                 {{ decimal(snapshot.valuation.data.totalValue) }}
@@ -656,6 +672,178 @@ onUnmounted(() => {
               {{ snapshot?.performance.message ?? 'Loading performance…' }}
             </p>
           </article>
+        </section>
+
+        <section class="wallet-panel" aria-label="Agentic Wallet status">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Separate real environment</p>
+              <h2>Agentic Wallet / Real trading</h2>
+            </div>
+            <span class="paper-badge wallet-disabled">Execution disabled</span>
+          </div>
+
+          <template v-if="available(snapshot?.realTradingStatus)">
+            <p class="wallet-summary">
+              Approved candidate only: BSC (chain 56) BTCB / USDT. This screen
+              cannot request a quote, submit a transaction, or move funds.
+            </p>
+            <dl class="wallet-status-grid">
+              <div>
+                <dt>Application mode</dt>
+                <dd>{{ snapshot.realTradingStatus.data.tradingMode }}</dd>
+              </div>
+              <div>
+                <dt>Real execution gate</dt>
+                <dd>
+                  {{
+                    snapshot.realTradingStatus.data.realExecutionEnabled
+                      ? 'Enabled'
+                      : 'Disabled'
+                  }}
+                </dd>
+              </div>
+              <div>
+                <dt>Runtime executor</dt>
+                <dd>Not implemented</dd>
+              </div>
+              <div>
+                <dt>Quote / submission</dt>
+                <dd>Unavailable / unavailable</dd>
+              </div>
+            </dl>
+
+            <div class="wallet-observation">
+              <div>
+                <strong>Manual read-only wallet check</strong>
+                <p>
+                  Not included in the 15-second dashboard refresh, so the
+                  provider is contacted only when you request it.
+                </p>
+              </div>
+              <button
+                type="button"
+                :disabled="agenticWalletObservationLoading"
+                @click="refreshAgenticWalletObservation"
+              >
+                {{
+                  agenticWalletObservationLoading
+                    ? 'Checking wallet…'
+                    : 'Check wallet (read only)'
+                }}
+              </button>
+            </div>
+
+            <template v-if="agenticWalletObservation?.status === 'available'">
+              <dl class="wallet-status-grid observation-result">
+                <div>
+                  <dt>Connection</dt>
+                  <dd>{{ agenticWalletObservation.data.connection }}</dd>
+                </div>
+                <div>
+                  <dt>BSC balance</dt>
+                  <dd>
+                    {{
+                      !agenticWalletObservation.data.balance.available
+                        ? 'Unavailable'
+                        : agenticWalletObservation.data.balance.empty
+                          ? 'Empty (0 assets)'
+                          : `${agenticWalletObservation.data.balance.assetCount} assets`
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Token scope</dt>
+                  <dd>
+                    {{
+                      agenticWalletObservation.data.security === null
+                        ? 'Unavailable'
+                        : agenticWalletObservation.data.security.tradeAllTokens
+                          ? 'All tokens'
+                          : 'Limited tokens'
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Provider daily limit</dt>
+                  <dd>
+                    <template
+                      v-if="agenticWalletObservation.data.security !== null"
+                    >
+                      {{
+                        decimal(
+                          agenticWalletObservation.data.security.dailyLimitUsd,
+                        )
+                      }}
+                      USD
+                    </template>
+                    <template v-else>Unavailable</template>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Prediction trading</dt>
+                  <dd>
+                    {{
+                      agenticWalletObservation.data.security === null
+                        ? 'Unavailable'
+                        : agenticWalletObservation.data.security
+                              .predictionTradingEnabled
+                          ? 'Enabled'
+                          : 'Disabled'
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Developer mode</dt>
+                  <dd>
+                    {{
+                      agenticWalletObservation.data.security === null
+                        ? 'Unavailable'
+                        : agenticWalletObservation.data.security
+                              .developerModeEnabled
+                          ? 'Enabled'
+                          : 'Disabled'
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Abnormal transactions</dt>
+                  <dd>
+                    {{
+                      agenticWalletObservation.data.security
+                        ?.abnormalTransactionHandling ?? 'Unavailable'
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Gas read</dt>
+                  <dd>
+                    {{
+                      agenticWalletObservation.data.gasAvailable
+                        ? 'Available'
+                        : 'Unavailable'
+                    }}
+                  </dd>
+                </div>
+              </dl>
+              <p class="wallet-observed-at">
+                Observed
+                {{ timestamp(agenticWalletObservation.data.observedAt) }}
+              </p>
+            </template>
+            <p
+              v-else-if="agenticWalletObservation?.status === 'unavailable'"
+              class="empty-state wallet-error"
+            >
+              {{ agenticWalletObservation.message }}
+            </p>
+          </template>
+          <p v-else class="empty-state">
+            {{
+              snapshot?.realTradingStatus.message ??
+              'Loading local real-trading safeguards…'
+            }}
+          </p>
         </section>
 
         <section class="detail-grid">

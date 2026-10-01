@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   dashboardApiPath,
   loadDashboard,
+  observeAgenticWallet,
   loadListingPerformance,
   loadPolymarketEventDetails,
   loadPolymarketEventLiveVolume,
@@ -99,88 +100,97 @@ describe('loadDashboard', () => {
                           createdAt: '2026-09-26T12:00:00.000Z',
                         },
                       ]
-                    : path.endsWith('/polymarket/settings')
+                    : path.endsWith('/real-trading/status')
                       ? {
-                          enabled: true,
-                          startupDefault: false,
-                          source: 'startup',
-                          changedAt: null,
+                          scope: 'real_trading_local_status',
+                          tradingMode: 'paper',
+                          realExecutionEnabled: false,
+                          runtimeExecutionAvailable: false,
+                          quoteAuthorized: false,
+                          submissionAuthorized: false,
                         }
-                      : path.endsWith('/polymarket/open-interest')
+                      : path.endsWith('/polymarket/settings')
                         ? {
-                            provider: 'polymarket',
-                            openInterestUsdc: '1234567.89',
-                            source: 'data-api-open-interest',
-                            receivedAt: '2026-09-29T18:00:01.000Z',
-                            executable: false,
+                            enabled: true,
+                            startupDefault: false,
+                            source: 'startup',
+                            changedAt: null,
                           }
-                        : path.includes('/polymarket/events')
+                        : path.endsWith('/polymarket/open-interest')
                           ? {
-                              events: [
-                                {
-                                  provider: 'polymarket',
-                                  id: '84',
-                                  title: '2028 Democratic nominee',
-                                  active: true,
-                                  closed: false,
-                                  archived: false,
-                                  restricted: false,
-                                },
-                              ],
-                              nextCursor: null,
+                              provider: 'polymarket',
+                              openInterestUsdc: '1234567.89',
+                              source: 'data-api-open-interest',
                               receivedAt: '2026-09-29T18:00:01.000Z',
+                              executable: false,
                             }
-                          : path.includes('/polymarket/markets')
+                          : path.includes('/polymarket/events')
                             ? {
-                                markets: [
+                                events: [
                                   {
                                     provider: 'polymarket',
-                                    id: '42',
-                                    question: 'Will this market resolve YES?',
+                                    id: '84',
+                                    title: '2028 Democratic nominee',
+                                    active: true,
                                     closed: false,
+                                    archived: false,
+                                    restricted: false,
                                   },
                                 ],
                                 nextCursor: null,
+                                receivedAt: '2026-09-29T18:00:01.000Z',
                               }
-                            : path.endsWith('/polymarket/data-freshness')
+                            : path.includes('/polymarket/markets')
                               ? {
-                                  provider: 'polymarket',
-                                  snapshotAgeSeconds: 3,
-                                  computedAt: '2026-09-29T18:00:00.000Z',
-                                  ingestion: {
-                                    chainId: 137,
-                                    cursorCount: 4,
-                                    lagging: [],
-                                    maxSyncedBlock: 100,
-                                    minSyncedBlock: 98,
-                                    mostLagged: {
-                                      behindMax: 2,
-                                      block: 98,
-                                      source: 'positions',
+                                  markets: [
+                                    {
+                                      provider: 'polymarket',
+                                      id: '42',
+                                      question: 'Will this market resolve YES?',
+                                      closed: false,
                                     },
-                                    network: 'polygon',
-                                  },
-                                  serving: {
-                                    mechanisms: [],
-                                    lagSeconds: 5,
-                                    worst: 'trades',
-                                  },
-                                  source: 'data-api-status',
-                                  receivedAt: '2026-09-29T18:00:01.000Z',
+                                  ],
+                                  nextCursor: null,
                                 }
-                              : [
-                                  {
-                                    strategy: 'moving_average_crossover',
-                                    symbol: 'BTC/USDT',
-                                    action: 'hold',
-                                  },
-                                ];
+                              : path.endsWith('/polymarket/data-freshness')
+                                ? {
+                                    provider: 'polymarket',
+                                    snapshotAgeSeconds: 3,
+                                    computedAt: '2026-09-29T18:00:00.000Z',
+                                    ingestion: {
+                                      chainId: 137,
+                                      cursorCount: 4,
+                                      lagging: [],
+                                      maxSyncedBlock: 100,
+                                      minSyncedBlock: 98,
+                                      mostLagged: {
+                                        behindMax: 2,
+                                        block: 98,
+                                        source: 'positions',
+                                      },
+                                      network: 'polygon',
+                                    },
+                                    serving: {
+                                      mechanisms: [],
+                                      lagSeconds: 5,
+                                      worst: 'trades',
+                                    },
+                                    source: 'data-api-status',
+                                    receivedAt: '2026-09-29T18:00:01.000Z',
+                                  }
+                                : [
+                                    {
+                                      strategy: 'moving_average_crossover',
+                                      symbol: 'BTC/USDT',
+                                      action: 'hold',
+                                    },
+                                  ];
       return Promise.resolve(Response.json(body));
     });
 
     const snapshot = await loadDashboard(request);
 
-    expect(request).toHaveBeenCalledTimes(13);
+    expect(request).toHaveBeenCalledTimes(14);
     expect(snapshot.health.status).toBe('available');
     expect(snapshot.valuation).toMatchObject({
       status: 'available',
@@ -203,6 +213,14 @@ describe('loadDashboard', () => {
     expect(snapshot.backtestRuns).toMatchObject({
       status: 'available',
       data: [{ id: 'run-1' }],
+    });
+    expect(snapshot.realTradingStatus).toMatchObject({
+      status: 'available',
+      data: {
+        tradingMode: 'paper',
+        realExecutionEnabled: false,
+        runtimeExecutionAvailable: false,
+      },
     });
     expect(snapshot.polymarketSettings).toMatchObject({
       status: 'available',
@@ -259,7 +277,7 @@ describe('loadDashboard', () => {
 
     const snapshot = await loadDashboard(request);
 
-    expect(request).toHaveBeenCalledTimes(9);
+    expect(request).toHaveBeenCalledTimes(10);
     expect(
       request.mock.calls.some(([input]) =>
         input.toString().includes('/polymarket/open-interest'),
@@ -382,6 +400,7 @@ describe('loadDashboard', () => {
     expect(snapshot.newListings.status).toBe('unavailable');
     expect(snapshot.strategySignals.status).toBe('unavailable');
     expect(snapshot.backtestRuns.status).toBe('unavailable');
+    expect(snapshot.realTradingStatus.status).toBe('unavailable');
     expect(snapshot.polymarketSettings.status).toBe('unavailable');
     expect(snapshot.polymarketDataFreshness.status).toBe('unavailable');
     expect(snapshot.polymarketGlobalOpenInterest.status).toBe('unavailable');
@@ -524,6 +543,53 @@ describe('loadDashboard', () => {
     expect(snapshot.newListings.status).toBe('available');
     expect(snapshot.strategySignals.status).toBe('available');
     expect(snapshot.polymarketMarkets.status).toBe('available');
+  });
+});
+
+describe('observeAgenticWallet', () => {
+  it('requests one explicit read-only observation with POST', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json({
+          providerId: 'agentic_wallet',
+          connection: 'connected',
+          observedAt: '2026-09-30T23:48:42.000Z',
+          balance: { available: true, assetCount: 0, empty: true },
+          quoteAuthorized: false,
+          submissionAuthorized: false,
+        }),
+      ),
+    );
+
+    await expect(observeAgenticWallet(request)).resolves.toMatchObject({
+      status: 'available',
+      data: {
+        connection: 'connected',
+        balance: { available: true, empty: true },
+        quoteAuthorized: false,
+        submissionAuthorized: false,
+      },
+    });
+    expect(request).toHaveBeenCalledWith(
+      '/api/real-trading/wallet-observation',
+      { method: 'POST', headers: { Accept: 'application/json' } },
+    );
+  });
+
+  it('keeps wallet provider failures isolated', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json(
+          { message: 'Agentic Wallet read-only observation is unavailable' },
+          { status: 503 },
+        ),
+      ),
+    );
+
+    await expect(observeAgenticWallet(request)).resolves.toEqual({
+      status: 'unavailable',
+      message: 'Agentic Wallet read-only observation is unavailable',
+    });
   });
 });
 

@@ -13,6 +13,8 @@ export interface AgenticWalletSecuritySettings {
   readonly dailyLimitUsd: string;
   readonly abnormalTransactionHandling: 'AutoReject' | 'NeedConfirmation';
   readonly tradeAllTokens: boolean;
+  readonly predictionTradingEnabled: boolean;
+  readonly developerModeEnabled: boolean;
   readonly sessionExpiresAt: Date;
 }
 
@@ -211,6 +213,13 @@ function parseSettings(value: unknown): {
   if (typeof data.tradeAllTokens !== 'boolean') {
     throw new Error('Agentic Wallet token-scope setting is invalid');
   }
+  if (typeof data.predictionEnabled !== 'boolean') {
+    throw new Error('Agentic Wallet prediction setting is invalid');
+  }
+  const developerMode = record(data.devMode);
+  if (typeof developerMode.enabled !== 'boolean') {
+    throw new Error('Agentic Wallet developer-mode setting is invalid');
+  }
   const sessionExpiresAt = new Date(
     requiredString(data.sessionExpireTime, 'session expiry'),
   );
@@ -220,6 +229,8 @@ function parseSettings(value: unknown): {
       dailyLimitUsd: decimal(data.dailyLimit, 'daily limit'),
       abnormalTransactionHandling: handling,
       tradeAllTokens: data.tradeAllTokens,
+      predictionTradingEnabled: data.predictionEnabled,
+      developerModeEnabled: developerMode.enabled,
       sessionExpiresAt,
     },
     quota: {

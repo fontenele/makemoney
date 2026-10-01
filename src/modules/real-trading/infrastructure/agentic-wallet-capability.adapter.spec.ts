@@ -33,6 +33,8 @@ describe('AgenticWalletCapabilityAdapter', () => {
         dailyLimitUsd: '50000',
         abnormalTransactionHandling: 'AutoReject',
         tradeAllTokens: false,
+        predictionTradingEnabled: false,
+        developerModeEnabled: false,
         sessionExpiresAt: new Date('2026-10-01T12:00:00.000Z'),
       },
       quota: {
@@ -294,6 +296,8 @@ function settingsData(): Record<string, unknown> {
     dailyLimit: 50000,
     abnormalTxnHandling: 'AutoReject',
     tradeAllTokens: false,
+    predictionEnabled: false,
+    devMode: { enabled: false },
     quotaUsed: 0,
     quotaLeft: 50000,
     quotaDate: '2026-09-30',

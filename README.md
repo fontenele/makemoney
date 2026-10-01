@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, and M10 is in progress through zero-balance, read-only onboarding of a dedicated Agentic Wallet for the exact BSC BTCB/USDT candidate. Market feeds and bounded historical observations are public and unauthenticated; real execution remains disabled, with no provider quote, order, or real-fund access by the application.
+Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, and M10 is in progress through manual read-only runtime visibility of a dedicated, zero-balance Agentic Wallet for the exact BSC BTCB/USDT candidate. Market feeds and bounded historical observations are public and unauthenticated; real execution remains disabled, with no provider quote, order, or real-fund access by the application.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -20,6 +20,15 @@ Project context, current state, roadmap, and change history are indexed in [`doc
 On Windows PowerShell installations that block `npm.ps1`, use `npm.cmd` without changing the machine execution policy.
 
 ## Local development
+
+For Agentic Wallet reads on Windows, keep PostgreSQL and Redis in Docker but run the API on the host where the authenticated CLI session exists:
+
+```bash
+docker compose up -d postgres redis
+npm run start:dev
+```
+
+Do not start the Compose `api` service at the same time because both use port 3000. The host API defaults to `127.0.0.1` and the manual wallet route remains read-only.
 
 ```bash
 cp .env.example .env
@@ -58,6 +67,8 @@ docker compose up --build
 
 Verify the complete stack at `http://localhost:3000/health`. A healthy response reports the API, PostgreSQL, and Redis as `up`.
 
+The containerized API supports provider-free application behavior but cannot inherit the authenticated Agentic Wallet CLI session stored on the Windows host. In that runtime, manual wallet observation fails closed with `503`; use the host-development arrangement above when wallet visibility is required.
+
 The API connects to public Binance BTC/USDT trade, mini ticker, one-minute candle, and top-of-book streams, loads public pair metadata, and writes normalized events to its logs:
 
 ```bash
@@ -68,12 +79,16 @@ docker compose logs -f api
 
 Local base URL: `http://localhost:3000`. Docker Compose publishes it on host loopback only.
 
+The application defaults `API_BIND_HOST` to `127.0.0.1` for a host-run API. Compose explicitly uses `0.0.0.0` only inside the isolated container while its published host port remains restricted to `127.0.0.1`.
+
 Every provider-backed `/polymarket` route requires effective Polymarket availability. The fail-closed `POLYMARKET_ENABLED` startup default is `false`; while disabled, provider routes return `503` before any external call. The always-local settings routes can apply a process-only override after explicit access/VPN confirmation; restart restores the startup value.
 
 | Method   | Route                                                             | Purpose                                                                                                     | Access and parameters                                                                                                                                                                                                                                                                               |
 | -------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `GET`    | `/dashboard/`                                                      | Compiled read-only local dashboard                                                                          | Local static assets on the existing loopback-bound application; run `npm run build:all` before `npm run start:prod`                                                                                                                                                                               |
 | `GET`    | `/health`                                                         | API, PostgreSQL, and Redis health                                                                           | Local, read-only                                                                                                                                                                                                                                                                                    |
+| `GET`    | `/real-trading/status`                                             | Local real-trading gates and approved Agentic Wallet candidate                                              | Local, read-only, and provider-free; reports paper/real mode, independent execution gate, exact BSC BTCB/USDT candidate, manual observation mode, and permanently false quote/submission authorization; never invokes the wallet CLI                                                                 |
+| `POST`   | `/real-trading/wallet-observation`                                 | Explicit read-only Agentic Wallet capability observation                                                    | Local manual read; invokes only the pinned closed CLI read surface for status, chains, settings/quota, address availability, BSC balances, and gas; returns no wallet address or session material, coalesces concurrent requests, and cannot quote, sign, submit, or move funds                            |
 | `GET`    | `/polymarket/settings`                                            | Current local Polymarket provider availability                                                              | Local and always available; returns the effective state, startup default, startup/runtime source, and nullable runtime-change time; performs no provider request                                                                                                                                      |
 | `PUT`    | `/polymarket/settings`                                            | Change Polymarket provider availability for the current API process                                          | Local process-only mutation; strict body `{ "enabled": boolean, "accessConfirmed": boolean }`; enabling requires explicit access/VPN confirmation, disabling is immediate, and restart restores the startup setting; no VPN automation, credentials, account, order, or execution access                     |
 | `GET`    | `/polymarket/events`                                              | One public active Polymarket event-discovery page                                                           | Local, read-only; optional `limit=1..100` (default `20`), opaque keyset `cursor`, and positive numeric `tagId`; a tag-filtered response verifies exact provider membership before returning normalized event identity and lifecycle summaries; provider failures or incoherent membership return `503`; no implicit related-tag expansion, nested markets, prices, persistence, positions, orders, or wallet access |
