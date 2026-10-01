@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — Add pure emergency-stop composition for durable arms
+
+- Added a pure assessment that binds a valid unexpired M10.20 arm to a fresh, complete emergency-stop snapshot.
+- Required a persisted inactive stop event observed after arm creation; configuration fallback and active state fail closed.
+- Invalidated the arm after any later persisted stop change, including a subsequent clear, so re-entry requires a fresh quote-backed reservation and arm.
+- Kept the result point-in-time and non-atomic with Risk Engine approval, final confirmation, and submission authorization always false.
+- Added no schema, repository, adapter bridge, runtime wiring, route, provider call, wallet mutation, funding behavior, submission command, or executor.
+- Verified all 1,770 backend tests across 158 suites, all 92 dashboard tests across 16 files, the focused 10-test emergency-stop assessment suite, formatting, lint, the complete backend/dashboard build, Prisma schema validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add durable reservation-bound real-execution arms
 
 - Added an immutable Prisma arm record with a restrictive reservation foreign key and unique reservation, intent, and quote identities.

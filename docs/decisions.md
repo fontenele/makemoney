@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-01 — Invalidate an arm across every emergency-stop change
+
+M10.21 requires a fresh, complete, persisted inactive emergency-stop observation made after the durable arm exists. Configuration fallback is insufficient for the real-execution boundary, and an active state always blocks.
+
+Any persisted stop change after arm creation invalidates that arm even if the latest change clears the stop. This prevents a pre-stop arm from becoming eligible again after an operator clears an incident. Continued investigation requires a fresh quote-backed reservation and arm. The assessment remains point-in-time and non-atomic, so a clear result grants no Risk Engine approval, final confirmation, or submission authorization.
+
 ## 2026-10-01 — Make an expired arm require a fresh reservation and quote
 
 M10.20 enforces one immutable arm per reservation, intent, and quote rather than allowing an expired arm to be replaced in place. The reservation's foreign key and unique identities preserve a simple audit chain, while exact replay remains available without changing expiry. Re-arming therefore requires a new quote-backed reservation and another explicit review acknowledgment.

@@ -379,6 +379,22 @@ Exact replay is returned before expiry evaluation and never changes the stored e
 - PostgreSQL E2E coverage proves exact persistence, post-expiry replay, and concurrent single-arm enforcement.
 - The store remains unwired and does not inspect emergency stop, approve risk, capture final confirmation, or authorize submission.
 
+## M10.21 — Pure emergency-stop composition
+
+M10.21 adds a pure, unwired assessment that composes one exact durable M10.20 arm with an explicit emergency-stop snapshot. The arm must still be active and retain the approved Agentic Wallet/BSC identities. The stop snapshot must be complete, fresh under a caller-supplied one-to-sixty-second bound, sourced from a persisted event, inactive, and observed only after the durable arm exists. A configuration-only fallback is intentionally insufficient for this real-execution boundary.
+
+Any persisted stop change after arm creation invalidates that arm, even when the newest state is inactive. This prevents an arm created before or during a stop cycle from becoming usable merely because the stop was later cleared; continued investigation requires a fresh quote-backed reservation, review, and arm. Future, stale, partial, malformed, pre-arm, or active facts fail closed.
+
+`emergency_stop_clear_for_arm` is only a point-in-time observation. M10.21 does not read the runtime service, persist a result, lock emergency-stop state, or enforce the check atomically with a provider mutation. It grants no Risk Engine approval, records no final immediate confirmation, and authorizes no quote or submission.
+
+### M10.21 acceptance criteria
+
+- Only a valid unexpired M10.20 arm and a fresh, complete, persisted inactive stop snapshot can produce a clear assessment.
+- The stop must be observed after arm creation, and any later persisted stop change permanently invalidates that arm.
+- Configuration fallback, active state, and malformed, partial, future, or stale facts fail closed.
+- A clear assessment explicitly remains non-atomic and grants no Risk Engine approval, final confirmation, or submission authorization.
+- The assessment remains unwired and adds no schema, provider access, route, wallet mutation, command, or executor.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

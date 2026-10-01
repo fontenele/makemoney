@@ -1711,7 +1711,7 @@ M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.11)
 M9 — Polymarket                   DONE (M9.1–M9.66)
-M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.20)
+M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.21)
 ```
 
 ---
@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.66. M10.20 atomically persists at most one immutable, short-lived arm per exact M10.18 reservation after reapplying M10.19. Fingerprinted replay is idempotent, foreign-key and unique identities fail closed, concurrent duplicates are prevented, and expiry is never extended. The store remains unwired and is not yet an operational gate. The current Agentic Wallet quote remains blocked by partial fee and gas coverage; the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, emergency-stop composition, Risk Engine approval, final confirmation, submission command, or real executor has been added. Real trading remains disabled.
+M9 is closed through M9.66. M10.21 purely composes one active durable arm with a fresh, complete, persisted inactive emergency-stop observation made after the arm. Configuration fallback, active state, stale or partial facts, and every later persisted stop change fail closed; the result remains non-atomic and unwired. The current Agentic Wallet quote remains blocked by partial fee and gas coverage; the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, Risk Engine approval, final confirmation, submission command, or real executor has been added. Real trading remains disabled.
 ```
