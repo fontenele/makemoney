@@ -258,6 +258,24 @@ Snapshots from another provider, chain, or UTC day, observations from the future
 - Durable enforcement, exact source balance, and native gas remain explicitly unevaluated.
 - No result grants Risk Engine approval, funding, quote, or submission authorization, and the policy remains unwired.
 
+## M10.14 — Pure non-authorizing resource sufficiency assessment
+
+M10.14 introduces a pure resource snapshot and policy without connecting it to the existing wallet observation. The snapshot binds the approved provider and BSC chain to exact intent and quote IDs, the exact source-token address and symbol, its available quantity and coverage, the BSC native-gas symbol BNB, an available BNB quantity, an explicit positive required BNB quantity, gas coverage, and a bounded observation time. It contains no wallet address, credential, or session material.
+
+The policy first requires M10.13 to be within its narrow budget limits. Required source quantity is then the intent's exact source quantity plus every source-denominated provider fee already validated by M10.12. Available source balance must meet that amount at an inclusive boundary. Native gas is evaluated separately: BNB availability must meet the explicitly supplied positive BNB requirement. This deliberately does not treat the adapter's gas-price observation or the quote's USDT-valued network fee as proof of native-token balance.
+
+Snapshots from another provider or chain, snapshots tied to another intent or quote, divergent source identity, a native asset other than BNB, observations from the future or older than the bounded one-to-sixty-second policy, partial coverage, malformed decimals, insufficient source balance, or insufficient gas fail closed. Buy and sell directions use the same source-denominated fee rule with precision-40 exact arithmetic.
+
+`resources_sufficient` remains non-authorizing. The snapshot is caller-supplied and unwired; no adapter maps live balances or gas into it, no amount is reserved atomically, and provider quota remains explicitly unevaluated because the provider reports USD while the local budget is denominated in USDT and no conversion policy has been approved. M10.14 adds no configuration, repository, schema, route, live wallet read, quote request, funding, arm, confirmation, audit record, reconciliation, submission command, or executor.
+
+### M10.14 acceptance criteria
+
+- Resource facts must be exact, complete, fresh, and bound to the approved provider, chain, intent, and quote.
+- Required source quantity includes every validated source-denominated provider fee.
+- Exact source-token and BNB gas sufficiency are evaluated independently at inclusive boundaries.
+- Provider quota and durable resource reservation remain explicitly unevaluated.
+- No result grants Risk Engine approval, funding, quote, or submission authorization, and the policy remains unwired.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

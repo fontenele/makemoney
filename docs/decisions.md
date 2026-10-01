@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-01 — Keep balance sufficiency distinct from gas pricing and quota
+
+M10.14 requires explicit source-token and native BNB quantities rather than inferring sufficiency from aggregate bankroll or gas-price observations. Required source quantity includes the intent amount plus every source-denominated provider fee. The BNB requirement is a separate positive fact tied to the exact intent and quote; an observed gas price and a USDT-valued network fee do not prove that native gas is available.
+
+Provider quota remains unevaluated because its unit is provider-reported USD while project limits are in USDT and no conversion policy has been approved. The resource snapshot is caller-supplied and has no durable reservation or live adapter bridge, so even exact balance sufficiency cannot grant Risk Engine approval or any financial authorization.
+
 ## 2026-10-01 — Model budget facts before adding durable enforcement
 
 M10.13 defines a caller-supplied budget snapshot before any repository or runtime integration. Settled and reserved UTC-day spend are separate exact facts, while spend completeness and USDT bankroll-valuation completeness remain explicit. The policy accepts only the approved provider and chain, the current UTC day, and a caller-selected freshness limit bounded from one through sixty seconds.

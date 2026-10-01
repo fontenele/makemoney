@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — Add pure non-authorizing resource sufficiency assessment
+
+- Added a bounded resource snapshot tied to the approved provider/chain and exact intent/quote identities.
+- Added exact source-token requirements including source-denominated provider fees and independent inclusive balance checks.
+- Added explicit positive BNB gas requirements and availability checks without conflating gas prices, USDT-valued network fees, and native-token balance.
+- Kept provider quota and durable resource reservation unevaluated and every Risk Engine, funding, quote, and submission authorization false.
+- Added no adapter bridge, runtime wiring, route, persistence, live provider call, funding, wallet mutation, arm, confirmation, submission command, or executor.
+- Verified all 1,715 backend tests across 151 suites, all 92 dashboard tests across 16 files, the 9 focused resource-risk tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add pure non-authorizing real-budget assessment
 
 - Added a bounded budget snapshot for approved provider/chain identity, UTC-day settled and reserved spend, coverage, valued bankroll, and observation time.
