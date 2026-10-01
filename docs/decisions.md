@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-01 — Bind every operator arm to one expiring reservation
+
+A broad process-wide real-trading arm could unintentionally cover a different intent or a refreshed quote. M10.19 therefore makes the first arm artifact specific to one durable reservation plus its exact provider, chain, intent, and quote identities. The requested arm cannot predate the reservation or outlive its quote-backed expiry, and both request age and total lifetime are limited by explicit one-to-sixty-second policies.
+
+The required review acknowledgment is deliberately not called confirmation: final operator confirmation must be captured separately and immediately before a future initial submission. The M10.19 output is only an inert plan and remains independent from durable storage, emergency-stop state, Risk Engine approval, provider access, and every financial authorization.
+
 ## 2026-10-01 — Keep balance sufficiency distinct from gas pricing and quota
 
 M10.14 requires explicit source-token and native BNB quantities rather than inferring sufficiency from aggregate bankroll or gas-price observations. Required source quantity includes the intent amount plus every source-denominated provider fee. The BNB requirement is a separate positive fact tied to the exact intent and quote; an observed gas price and a USDT-valued network fee do not prove that native gas is available.

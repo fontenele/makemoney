@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — Add pure reservation-bound real-execution arm plan
+
+- Added an inert operator-arm request and plan bound to one exact durable reservation, provider, chain, intent, and quote.
+- Required the explicit `reservation_and_quote_reviewed` acknowledgment while keeping it distinct from final pre-submission confirmation.
+- Bounded request freshness and maximum arm lifetime from one through sixty seconds and prevented the plan from predating or outliving its quote-backed reservation.
+- Failed closed on malformed, divergent, stale, future, expired, overlong, or invalid-clock facts.
+- Kept durable arm creation, emergency-stop composition, Risk Engine approval, confirmation, and every financial authorization false.
+- Verified all 1,755 backend tests across 156 suites, all 71 PostgreSQL-backed E2E tests across 5 suites, all 92 dashboard tests across 16 files, the focused 12-test arm-plan suite, formatting, lint, the complete backend/dashboard build, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add durable atomic real-execution reservations
 
 - Added an immutable Prisma reservation record with unique intent, quote, and idempotency identities plus a canonical request fingerprint.

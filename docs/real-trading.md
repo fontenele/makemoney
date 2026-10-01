@@ -347,6 +347,22 @@ The reservation is local accounting only. It does not lock wallet balances, cons
 - PostgreSQL E2E coverage proves exact persistence, replay, and prevention of concurrent over-reservation.
 - The store remains unwired and grants no Risk Engine approval or financial authorization.
 
+## M10.19 — Pure reservation-bound arm plan
+
+M10.19 adds a pure planner for the next durable operator-control boundary. An arm request has its own UUID and must identify one exact M10.18 reservation, approved Agentic Wallet provider and BSC chain, intent, and quote. It also carries the explicit literal acknowledgment `reservation_and_quote_reviewed`, request time, and requested expiry. This acknowledgment records only the facts supplied to the planner; it is not the immediate final confirmation required before a future first submission.
+
+The caller supplies independent request-age and maximum-lifetime limits, each restricted to one through sixty seconds. The request must be current, cannot predate the durable reservation, must still be active at evaluation, and cannot expire after the quote-backed reservation. Invalid clocks, malformed reservation or request facts, missing acknowledgment, identity divergence, stale/future timing, expiry, and excessive lifetime all fail closed.
+
+`arm_plan_ready` means only that an inert plan can be reviewed by a later persistence design. The planner creates no durable arm, does not inspect emergency-stop state, does not reclassify the reservation as Risk Engine approval, records no final confirmation, and authorizes no quote or submission. It is unwired and adds no schema, repository, route, provider call, wallet mutation, funding, submission command, or executor.
+
+### M10.19 acceptance criteria
+
+- The arm request is bound to one exact durable reservation, provider, chain, intent, and quote.
+- An exact operator-review acknowledgment is mandatory but remains distinct from final pre-submission confirmation.
+- Request age and total arm lifetime are explicit, bounded, and cannot exceed the reservation's quote expiry.
+- Malformed, divergent, future, stale, predating, expired, or overlong facts fail closed.
+- A ready plan remains non-durable and grants no Risk Engine approval or financial authorization.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

@@ -1711,7 +1711,7 @@ M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.11)
 M9 — Polymarket                   DONE (M9.1–M9.66)
-M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.18)
+M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.19)
 ```
 
 ---
@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.66. M10.18 durably persists an immutable, quote-expiring reservation only after reloading active same-day rows and reapplying M10.17 inside a serializable, advisory-locked PostgreSQL transaction. Exact idempotent replay is safe, conflicting key/intent/quote reuse fails closed, and concurrent over-reservation is prevented. The store remains unwired and caller-supplied snapshots remain prerequisites. The current Agentic Wallet quote remains blocked by partial fee and gas coverage; the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, Risk Engine approval, durable arm, submission command, or real executor has been added. Real trading remains disabled.
+M9 is closed through M9.66. M10.19 purely plans a short-lived arm request bound to one exact M10.18 reservation and requires an explicit reservation/quote-review acknowledgment. It rejects malformed, divergent, stale, future, predating, expired, overlong, or quote-outliving facts, while creating no durable arm and granting no authorization. The current Agentic Wallet quote remains blocked by partial fee and gas coverage; the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, emergency-stop composition, Risk Engine approval, final confirmation, submission command, or real executor has been added. Real trading remains disabled.
 ```
