@@ -531,6 +531,10 @@ export function dashboardApiPath(
 export async function loadDashboard(
   request: FetchLike = fetch,
 ): Promise<DashboardSnapshot> {
+  const polymarketSettingsPromise = loadResource<PolymarketSettings>(
+    dashboardApiPath('/polymarket/settings'),
+    request,
+  );
   const [
     health,
     valuation,
@@ -540,11 +544,6 @@ export async function loadDashboard(
     newListings,
     strategySignals,
     backtestRuns,
-    polymarketSettings,
-    polymarketDataFreshness,
-    polymarketGlobalOpenInterest,
-    polymarketEvents,
-    polymarketMarkets,
   ] = await Promise.all([
     loadResource<HealthResponse>(dashboardApiPath('/health'), request),
     loadResource<PortfolioValuation>(
@@ -575,10 +574,50 @@ export async function loadDashboard(
       dashboardApiPath('/backtesting/runs?limit=1'),
       request,
     ),
-    loadResource<PolymarketSettings>(
-      dashboardApiPath('/polymarket/settings'),
-      request,
-    ),
+  ]);
+  const polymarketSettings = await polymarketSettingsPromise;
+  const polymarketResources =
+    polymarketSettings.status === 'available' &&
+    polymarketSettings.data.enabled === true
+      ? await loadPolymarketDashboardResources(request)
+      : unavailablePolymarketDashboardResources(
+          polymarketSettings.status === 'available'
+            ? 'Polymarket provider access is disabled'
+            : 'Polymarket access state is unavailable',
+        );
+
+  return {
+    health,
+    valuation,
+    position,
+    performance,
+    executions,
+    newListings,
+    strategySignals,
+    backtestRuns,
+    polymarketSettings,
+    ...polymarketResources,
+    loadedAt: new Date().toISOString(),
+  };
+}
+
+async function loadPolymarketDashboardResources(
+  request: FetchLike,
+): Promise<
+  Pick<
+    DashboardSnapshot,
+    | 'polymarketDataFreshness'
+    | 'polymarketGlobalOpenInterest'
+    | 'polymarketEvents'
+    | 'polymarketMarkets'
+  >
+> {
+  const [
+    polymarketDataFreshness,
+    polymarketGlobalOpenInterest,
+    polymarketEvents,
+    polymarketMarkets,
+  ] = await Promise.all([
     loadResource<PolymarketDataFreshness>(
       dashboardApiPath('/polymarket/data-freshness'),
       request,
@@ -596,22 +635,28 @@ export async function loadDashboard(
       request,
     ),
   ]);
-
   return {
-    health,
-    valuation,
-    position,
-    performance,
-    executions,
-    newListings,
-    strategySignals,
-    backtestRuns,
-    polymarketSettings,
     polymarketDataFreshness,
     polymarketGlobalOpenInterest,
     polymarketEvents,
     polymarketMarkets,
-    loadedAt: new Date().toISOString(),
+  };
+}
+
+function unavailablePolymarketDashboardResources(
+  message: string,
+): Pick<
+  DashboardSnapshot,
+  | 'polymarketDataFreshness'
+  | 'polymarketGlobalOpenInterest'
+  | 'polymarketEvents'
+  | 'polymarketMarkets'
+> {
+  return {
+    polymarketDataFreshness: { status: 'unavailable', message },
+    polymarketGlobalOpenInterest: { status: 'unavailable', message },
+    polymarketEvents: { status: 'unavailable', message },
+    polymarketMarkets: { status: 'unavailable', message },
   };
 }
 

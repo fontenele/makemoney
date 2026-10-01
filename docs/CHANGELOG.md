@@ -1,5 +1,105 @@
 # Changelog
 
+## 2026-09-30 — Read-only wallet access verified with App trading disabled
+
+- Re-read the connected Agentic Wallet after the operator disabled App-level trading access.
+- Confirmed status, supported chains, addresses, empty BSC balances, and gas remain available to bounded reads.
+- Confirmed provider settings returned to `tradeAllTokens=false` and `predictionEnabled=false`, while Developer Mode remains disabled.
+- Recorded that the application's closed Agentic Wallet command surface exposes no DeFi, prediction, quote, or mutation operation despite provider minimum quota fields.
+
+### Scope confirmation
+
+- No re-pairing, funding, quote, provider mutation, transfer, approval, or order was performed. Trading access remains disabled.
+
+## 2026-09-30 — Agentic Wallet post-pairing settings re-observed
+
+- Confirmed the operator's 365-day maximum sign-in setting is active through 2027-09-30; the current 2026-10-02 session expiry is the separate fixed 48-hour inactivity deadline, so immediate re-pairing is unnecessary.
+- Observed that all-token trading and prediction trading are now enabled and that provider minimum quotas remain much larger than the planned R$50 experiment.
+- Kept Developer Mode disabled and classified the broad token/scenario permissions as blockers for funding, quotes, and execution pending least-privilege correction or independent project-side denial.
+
+### Scope confirmation
+
+- This was a read-only provider-state observation. No setting, session, balance, quote, transfer, or order was changed by the application.
+
+## 2026-09-30 — M10.7 zero-balance Agentic Wallet read-only onboarding completed
+
+- Installed the official pinned `@binance/agentic-wallet@1.10.0` CLI globally with explicit operator authorization; no project dependency or credential was added.
+- Completed the official provider-generated link and matching-code confirmation in the Binance App, then independently confirmed the dedicated session as `CONNECTED`.
+- Read BSC support, security settings/quota, chain address, empty BSC balances, and gas levels while invoking no quote or mutation.
+- Confirmed `tradeAllTokens=false` and abnormal-transaction `AutoReject`; observed the provider's broad default daily limit without treating it as approved for project funding or execution.
+- Fixed Windows `spawn EINVAL` without enabling a shell: the runner now discovers the installed package JavaScript entry under `PATH` and launches it with the current Node executable.
+- Added three focused Windows/POSIX invocation tests and passed live normalization through the existing read-only adapter with an empty operation list.
+- Verified all 1,658 backend tests across 143 suites, all 90 dashboard tests across 16 files, lint, formatting, the complete backend/dashboard build, Compose validation, and diff integrity.
+
+### Scope confirmation
+
+- The Agentic Wallet remains at zero balance. No quote, provider-setting mutation, transfer, token approval, order, route, persistence, application runtime wiring, Risk Engine bridge, or executor was added; real trading remains disabled.
+
+## 2026-09-30 — M10.6 exact BSC BTCB/USDT candidate approval completed
+
+- Recorded the project owner's explicit selection of BSC chain `56`, BTCB `0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c`, and USDT `0x55d398326f99059ff775485246999027b3197955` as the sole Agentic Wallet candidate.
+- Added a pure approval gate that re-runs M10.5 evidence review and accepts only exact USDT-to-BTCB buys or BTCB-to-USDT sells.
+- Canonicalized EVM address casing while rejecting any different hexadecimal identity, chain, token, economic direction, malformed approval, incomplete evidence, or future decision.
+- Kept quote and submission authorization permanently false even when the candidate is approved.
+- Corrected project state to record that the user has only the regular Binance Wallet; the dedicated Agentic Wallet CLI session is not created, connected, or funded.
+- Added seven focused tests and verified all 1,655 backend tests across 143 suites, all 90 dashboard tests across 16 files, lint, formatting, the complete backend/dashboard build, Compose validation, and diff integrity.
+
+### Scope confirmation
+
+- No package installation, authentication, wallet creation, funding, live provider call, quote, route, persistence, runtime wiring, Risk Engine bridge, or executor was added. Real trading remains disabled.
+
+## 2026-09-30 — M10.5 non-authorizing instrument compatibility review completed
+
+- Added a pure review model specific to Binance Spot BTC/USDT research versus one exact Agentic Wallet on-chain swap candidate.
+- Required exact intent, chain, and token-address correlation plus directionally correct BTC/USDT economic mapping for buy and sell candidates.
+- Kept token identity, representation, cross-venue price basis, on-chain liquidity, provider fee, network fee, route slippage, and asynchronous-finality evidence as independent blockers.
+- Made complete evidence only `review_ready`; instrument approval, quote authorization, and submission authorization remain permanently false.
+- Added eight focused tests for complete evidence, exact-identity divergence, economic direction, every missing evidence class, future review time, and malformed facts.
+- Verified all 1,648 backend tests across 142 suites, all 90 dashboard tests across 16 files, lint, formatting, the complete backend/dashboard build, Compose validation, and diff integrity.
+
+### Scope confirmation
+
+- No production chain or token pair was selected; no wallet package, authentication, provider process, route, persistence, live read, quote, mutation, Risk Engine bridge, or executor was added.
+
+## 2026-09-30 — M9.66 disabled Polymarket dashboard requests suppressed
+
+- Changed dashboard refresh into an availability-gated flow: the always-local settings route resolves before any provider-backed Polymarket dashboard request is scheduled.
+- Suppressed Data API freshness, global open-interest, active-event, active-market, and selected-research requests whenever Polymarket is disabled or its local availability state cannot be read.
+- Preserved the independent settings control so provider access can still be enabled or disabled while external Polymarket services are unavailable.
+- Cleared provider-backed browser state on disabled refreshes and invalidated stale refresh generations so an older enabled response cannot undo a manual disable.
+- Added focused coverage proving disabled access produces nine local/core requests and zero provider-backed Polymarket requests.
+- Verified all 90 dashboard tests across 16 files, lint, formatting, and the complete backend/dashboard build; direct and Vite-proxied local health/backtesting checks returned `200`.
+
+### Scope confirmation
+
+- The backend guard remains fail-closed with expected `503` responses for direct provider-backed routes while disabled; no route, provider contract, persistence, account, order, wallet, or execution behavior changed.
+
+## 2026-09-30 — M10.4 read-only Agentic Wallet capability adapter completed
+
+- Added a closed read-command contract for the pinned CLI check plus wallet status, chains, settings/quota, address, chain-filtered balances, and gas levels.
+- Added a process runner that uses argument arrays with no shell, bounded timeout and stdout, cancellation, discarded stderr, and sanitized failures.
+- Added strict response normalization for version, connection, chain, security settings, quota, address, exact balance decimals, and chain-specific gas snapshots.
+- Made disconnected and still-creating states stop before detail reads and kept every observed chain's quote/submission operations empty, so the existing preflight remains blocked.
+- Added 25 focused infrastructure tests using doubles only; no Agentic Wallet package, authentication, live wallet command, route, persistence, quote, mutation, Risk Engine bridge, or executor was introduced.
+- Verified all 1,640 backend tests across 141 suites, all 89 dashboard tests across 16 files, lint, formatting, the complete backend/dashboard build, Compose validation, and diff integrity.
+
+### Scope confirmation
+
+- Agentic Wallet remains disconnected and unfunded, real trading remains disabled, and the new adapter is absent from the runtime dependency graph.
+
+## 2026-09-30 — M10.3 fail-closed configuration and capability preflight completed
+
+- Added independent `TRADING_MODE` and `REAL_EXECUTION_ENABLED` startup gates with safe paper/disabled defaults in validation, examples, and Compose.
+- Required a complete exact provider, chain, source-token, and distinct target-token allowlist whenever both gates are active.
+- Added a pure capability preflight that rejects invalid facts, disabled gates, identity divergence, disconnected state, stale or future snapshots, missing quote support, and unavailable security-settings, quota, balance, or gas reads.
+- Made every assessment explicitly non-authorizing for both quotes and submissions, including a fully ready capability assessment.
+- Added focused configuration and preflight coverage without creating a NestJS module, provider adapter, route, persistence, wallet read, quote request, Risk Engine bridge, or executor.
+- Verified all 1,615 backend tests across 139 suites, all 89 dashboard tests across 16 files, lint, formatting, the complete backend/dashboard build, Compose validation, and diff integrity.
+
+### Scope confirmation
+
+- Agentic Wallet remains disconnected and unfunded; configuration alone cannot create a provider or execution path, and real trading remains disabled.
+
 ## 2026-09-30 — M10.2 provider-neutral real-execution contracts completed
 
 - Added inert domain contracts for real-execution capability snapshots, exact-address market-swap intents, non-executable quotes, bounded cost facts, and correlated provider results.

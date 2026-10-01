@@ -31,6 +31,13 @@ interface Environment {
   RISK_EXECUTION_WINDOW_MS: number;
   STRATEGY_MA_SHORT_PERIOD: number;
   STRATEGY_MA_LONG_PERIOD: number;
+  TRADING_MODE: 'paper' | 'real';
+  REAL_EXECUTION_ENABLED: boolean;
+  REAL_EXECUTION_APPROVED_PROVIDER_ID: string | null;
+  REAL_EXECUTION_APPROVED_CHAIN_ID: string | null;
+  REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: string | null;
+  REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS: string | null;
+  REAL_EXECUTION_CAPABILITY_MAX_AGE_MS: number;
 }
 
 const positiveDecimalPattern =
@@ -117,6 +124,29 @@ const environmentSchema = Joi.object<Environment>({
   RISK_EXECUTION_WINDOW_MS: Joi.number().integer().positive().default(60000),
   STRATEGY_MA_SHORT_PERIOD: Joi.number().integer().min(1).max(1000).default(3),
   STRATEGY_MA_LONG_PERIOD: Joi.number().integer().min(1).max(1000).default(5),
+  TRADING_MODE: Joi.string().valid('paper', 'real').default('paper'),
+  REAL_EXECUTION_ENABLED: Joi.boolean().default(false),
+  REAL_EXECUTION_APPROVED_PROVIDER_ID: Joi.string()
+    .pattern(/^[a-z][a-z0-9_-]{0,31}$/)
+    .empty('')
+    .default(null),
+  REAL_EXECUTION_APPROVED_CHAIN_ID: Joi.string()
+    .pattern(/^[A-Za-z0-9_-]{1,32}$/)
+    .empty('')
+    .default(null),
+  REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: Joi.string()
+    .pattern(/^\S{1,256}$/)
+    .empty('')
+    .default(null),
+  REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS: Joi.string()
+    .pattern(/^\S{1,256}$/)
+    .empty('')
+    .default(null),
+  REAL_EXECUTION_CAPABILITY_MAX_AGE_MS: Joi.number()
+    .integer()
+    .min(1000)
+    .max(60000)
+    .default(10000),
 })
   .custom((value: Environment, helpers) => {
     if (value.STRATEGY_MA_SHORT_PERIOD >= value.STRATEGY_MA_LONG_PERIOD) {
@@ -124,6 +154,28 @@ const environmentSchema = Joi.object<Environment>({
         custom:
           'STRATEGY_MA_SHORT_PERIOD must be less than STRATEGY_MA_LONG_PERIOD',
       });
+    }
+    if (value.TRADING_MODE === 'real' && value.REAL_EXECUTION_ENABLED) {
+      const approvals = [
+        value.REAL_EXECUTION_APPROVED_PROVIDER_ID,
+        value.REAL_EXECUTION_APPROVED_CHAIN_ID,
+        value.REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS,
+        value.REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS,
+      ];
+      if (approvals.some((approval) => approval === null)) {
+        return helpers.message({
+          custom:
+            'real execution requires explicit provider, chain, source-token, and target-token approvals',
+        });
+      }
+      if (
+        value.REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS ===
+        value.REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS
+      ) {
+        return helpers.message({
+          custom: 'real execution approved token addresses must be distinct',
+        });
+      }
     }
     return value;
   }, 'moving-average period relationship')

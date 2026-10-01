@@ -62,6 +62,7 @@ const currentRoute = ref<DashboardRoute>(
 
 const snapshot = ref<DashboardSnapshot | null>(null);
 const refreshing = ref(false);
+let dashboardRequest = 0;
 const selectedListing = ref<DetectedSpotSymbol | null>(null);
 const listingPerformance = ref<Resource<ListingPerformance> | null>(null);
 const listingPerformanceLoading = ref(false);
@@ -372,6 +373,16 @@ function clearPolymarketTagSelection(): void {
   relatedPolymarketTagsRequest += 1;
 }
 
+function clearPolymarketProviderState(): void {
+  clearPolymarketEventSelection();
+  clearPolymarketSearch();
+  selectedPolymarketMarket.value = null;
+  polymarketResearch.value = null;
+  polymarketResearchLoading.value = false;
+  polymarketResearchRequest += 1;
+  clearPolymarketTagSelection();
+}
+
 async function changePolymarketAvailability(enabled: boolean): Promise<void> {
   if (polymarketSettingsUpdating.value) return;
   polymarketSettingsUpdating.value = true;
@@ -385,15 +396,11 @@ async function changePolymarketAvailability(enabled: boolean): Promise<void> {
       polymarketSettingsMessage.value = result.message;
       return;
     }
+    dashboardRequest += 1;
     if (snapshot.value) snapshot.value.polymarketSettings = result;
     polymarketAccessConfirmed.value = false;
     if (!enabled) {
-      clearPolymarketEventSelection();
-      clearPolymarketSearch();
-      selectedPolymarketMarket.value = null;
-      polymarketResearch.value = null;
-      polymarketResearchRequest += 1;
-      clearPolymarketTagSelection();
+      clearPolymarketProviderState();
     }
     await refresh();
   } finally {
@@ -403,16 +410,25 @@ async function changePolymarketAvailability(enabled: boolean): Promise<void> {
 
 async function refresh(): Promise<void> {
   if (refreshing.value) return;
+  const request = ++dashboardRequest;
   refreshing.value = true;
   try {
-    snapshot.value = await loadDashboard();
+    const result = await loadDashboard();
+    if (request !== dashboardRequest) return;
+    snapshot.value = result;
+    const polymarketEnabled =
+      available(snapshot.value.polymarketSettings) &&
+      snapshot.value.polymarketSettings.data.enabled;
+    if (!polymarketEnabled) {
+      clearPolymarketProviderState();
+    }
     if (selectedListing.value) {
       await refreshListingPerformance(selectedListing.value);
     }
-    if (selectedPolymarketMarket.value) {
+    if (polymarketEnabled && selectedPolymarketMarket.value) {
       await refreshPolymarketResearch(selectedPolymarketMarket.value);
     }
-    if (selectedPolymarketEvent.value) {
+    if (polymarketEnabled && selectedPolymarketEvent.value) {
       await refreshPolymarketEventDetails(selectedPolymarketEvent.value);
     }
   } finally {

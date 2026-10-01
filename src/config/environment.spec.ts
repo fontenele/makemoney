@@ -36,6 +36,67 @@ describe('validateEnvironment positive risk decimals', () => {
   );
 });
 
+describe('validateEnvironment real execution', () => {
+  it('defaults both activation gates off with no approved instrument', () => {
+    expect(validateEnvironment(required)).toMatchObject({
+      TRADING_MODE: 'paper',
+      REAL_EXECUTION_ENABLED: false,
+      REAL_EXECUTION_APPROVED_PROVIDER_ID: null,
+      REAL_EXECUTION_APPROVED_CHAIN_ID: null,
+      REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: null,
+      REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS: null,
+      REAL_EXECUTION_CAPABILITY_MAX_AGE_MS: 10000,
+    });
+  });
+
+  it('accepts explicit independent gates and a complete exact allowlist', () => {
+    expect(
+      validateEnvironment({
+        ...required,
+        TRADING_MODE: 'real',
+        REAL_EXECUTION_ENABLED: 'true',
+        REAL_EXECUTION_APPROVED_PROVIDER_ID: 'agentic_wallet',
+        REAL_EXECUTION_APPROVED_CHAIN_ID: '56',
+        REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: '0xsource',
+        REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS: '0xtarget',
+        REAL_EXECUTION_CAPABILITY_MAX_AGE_MS: '5000',
+      }),
+    ).toMatchObject({
+      TRADING_MODE: 'real',
+      REAL_EXECUTION_ENABLED: true,
+      REAL_EXECUTION_APPROVED_CHAIN_ID: '56',
+      REAL_EXECUTION_CAPABILITY_MAX_AGE_MS: 5000,
+    });
+  });
+
+  it('rejects simultaneous activation without a complete allowlist', () => {
+    expect(() =>
+      validateEnvironment({
+        ...required,
+        TRADING_MODE: 'real',
+        REAL_EXECUTION_ENABLED: 'true',
+      }),
+    ).toThrow('real execution requires explicit provider');
+  });
+
+  it('rejects equal approved token identities and ambiguous gates', () => {
+    expect(() =>
+      validateEnvironment({
+        ...required,
+        TRADING_MODE: 'real',
+        REAL_EXECUTION_ENABLED: true,
+        REAL_EXECUTION_APPROVED_PROVIDER_ID: 'agentic_wallet',
+        REAL_EXECUTION_APPROVED_CHAIN_ID: '56',
+        REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: '0xsame',
+        REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS: '0xsame',
+      }),
+    ).toThrow('approved token addresses must be distinct');
+    expect(() =>
+      validateEnvironment({ ...required, REAL_EXECUTION_ENABLED: 'yes' }),
+    ).toThrow('Invalid environment configuration');
+  });
+});
+
 describe('validateEnvironment Polymarket public API', () => {
   it('uses the official Gamma API default', () => {
     expect(validateEnvironment(required)).toMatchObject({

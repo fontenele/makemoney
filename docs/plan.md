@@ -256,7 +256,7 @@ O patrimônio pessoal deve permanecer completamente separado do experimento.
 
 # 6. Binance Agentic Wallet
 
-Foi criada pelo aplicativo oficial Binance uma carteira específica para o projeto:
+The user has the regular Binance Wallet plus a dedicated Agentic Wallet created through the official Binance App pairing flow:
 
 ```text
 Binance Agentic Wallet
@@ -267,11 +267,11 @@ Estado atual:
 ```text
 Created:             YES
 Balance:             R$0
-Connected to bot:    NO
+Connected to bot:    READ-ONLY CLI SESSION
 Real trading:        NO
 ```
 
-Ela foi criada especificamente para o Crypto Trader.
+The dedicated wallet was paired with explicit user confirmation in the Binance Wallet App and remains restricted to bounded CLI reads at zero balance.
 
 O aplicativo oferece posteriormente:
 
@@ -279,7 +279,7 @@ O aplicativo oferece posteriormente:
 "Usar Meu Próprio AI Agent"
 ```
 
-Essa integração ainda NÃO foi realizada.
+Application runtime integration has not been performed. No quote or mutation is reachable from the application.
 
 A Agentic Wallet deve permanecer com:
 
@@ -1710,8 +1710,8 @@ M5 — Strategies                   DONE
 M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.11)
-M9 — Polymarket                   DONE (M9.1–M9.65)
-M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.2)
+M9 — Polymarket                   DONE (M9.1–M9.66)
+M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.7)
 ```
 
 ---
@@ -2426,12 +2426,12 @@ M9.27 Global Open Interest: DONE
 Binance Account:      EXISTS
 Personal assets:      OFF LIMITS
 
-Agentic Wallet:       CREATED
+Agentic Wallet:       CONNECTED FOR BOUNDED READS
 Agentic Balance:      R$0
 Agent Connected:      NO
 
 Paper Capital:        1000 USDT configurable; BTC 0
-Real Capital:         R$10 planned
+Real Capital:         R$50 planned; not funded
 
 Real Trading:         DISABLED
 Futures:              DISABLED
@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.65. M10.2 adds inert provider-neutral capability, market-swap intent, non-executable quote/cost, and provider-result contracts with pure validation and no gateway or submission method. No wallet package, authentication, provider process, balance access, quote request, funding, Risk Engine bridge, or real executor has been added. Agentic Wallet remains disconnected with zero balance and real trading remains disabled.
+M9 is closed through M9.66. M10.7 installs the pinned official CLI with operator approval, completes official Binance App pairing, validates the connected BSC session through bounded live reads, and fixes the Windows no-shell process launch. The Agentic Wallet remains at zero balance; no quote, funding, provider-setting mutation, runtime module, Risk Engine bridge, or real executor has been added, and real trading remains disabled.
 ```

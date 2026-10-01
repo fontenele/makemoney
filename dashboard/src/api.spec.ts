@@ -101,7 +101,7 @@ describe('loadDashboard', () => {
                       ]
                     : path.endsWith('/polymarket/settings')
                       ? {
-                          enabled: false,
+                          enabled: true,
                           startupDefault: false,
                           source: 'startup',
                           changedAt: null,
@@ -206,7 +206,7 @@ describe('loadDashboard', () => {
     });
     expect(snapshot.polymarketSettings).toMatchObject({
       status: 'available',
-      data: { enabled: false, source: 'startup' },
+      data: { enabled: true, source: 'startup' },
     });
     expect(snapshot.polymarketDataFreshness).toMatchObject({
       status: 'available',
@@ -233,9 +233,61 @@ describe('loadDashboard', () => {
     });
   });
 
+  it('does not request provider-backed Polymarket resources while access is disabled', async () => {
+    const request = vi.fn((input: string | URL | Request) => {
+      const path = input.toString();
+      if (path.endsWith('/polymarket/settings')) {
+        return Promise.resolve(
+          Response.json({
+            enabled: false,
+            startupDefault: false,
+            source: 'startup',
+            changedAt: null,
+          }),
+        );
+      }
+      if (
+        path.includes('/polymarket/') &&
+        !path.endsWith('/polymarket/settings')
+      ) {
+        return Promise.reject(
+          new Error('Disabled Polymarket provider route was requested'),
+        );
+      }
+      return Promise.resolve(Response.json({ status: 'ok' }));
+    });
+
+    const snapshot = await loadDashboard(request);
+
+    expect(request).toHaveBeenCalledTimes(9);
+    expect(
+      request.mock.calls.some(([input]) =>
+        input.toString().includes('/polymarket/open-interest'),
+      ),
+    ).toBe(false);
+    expect(snapshot.polymarketSettings).toMatchObject({
+      status: 'available',
+      data: { enabled: false },
+    });
+    expect(snapshot.polymarketMarkets).toEqual({
+      status: 'unavailable',
+      message: 'Polymarket provider access is disabled',
+    });
+    expect(snapshot.polymarketEvents).toEqual(snapshot.polymarketMarkets);
+    expect(snapshot.polymarketDataFreshness).toEqual(
+      snapshot.polymarketMarkets,
+    );
+    expect(snapshot.polymarketGlobalOpenInterest).toEqual(
+      snapshot.polymarketMarkets,
+    );
+  });
+
   it('keeps healthy resources visible when another endpoint is unavailable', async () => {
     const request = vi.fn((input: string | URL | Request) => {
       const path = input.toString();
+      if (path.endsWith('/polymarket/settings')) {
+        return enabledPolymarketSettingsResponse();
+      }
       if (path.endsWith('/valuation')) {
         return Promise.resolve(new Response(null, { status: 503 }));
       }
@@ -260,7 +312,11 @@ describe('loadDashboard', () => {
 
   it('keeps the overview available when execution history is unavailable', async () => {
     const request = vi.fn((input: string | URL | Request) => {
-      if (input.toString().includes('/executions')) {
+      const path = input.toString();
+      if (path.endsWith('/polymarket/settings')) {
+        return enabledPolymarketSettingsResponse();
+      }
+      if (path.includes('/executions')) {
         return Promise.resolve(new Response(null, { status: 503 }));
       }
       return Promise.resolve(Response.json({ status: 'ok' }));
@@ -284,7 +340,11 @@ describe('loadDashboard', () => {
 
   it('keeps portfolio resources available when new listings are unavailable', async () => {
     const request = vi.fn((input: string | URL | Request) => {
-      if (input.toString().includes('/new-listings')) {
+      const path = input.toString();
+      if (path.endsWith('/polymarket/settings')) {
+        return enabledPolymarketSettingsResponse();
+      }
+      if (path.includes('/new-listings')) {
         return Promise.resolve(new Response(null, { status: 503 }));
       }
       return Promise.resolve(Response.json([]));
@@ -331,7 +391,11 @@ describe('loadDashboard', () => {
 
   it('shows a bounded diagnostic returned by the local API', async () => {
     const request = vi.fn((input: string | URL | Request) => {
-      if (input.toString().includes('/polymarket/markets')) {
+      const path = input.toString();
+      if (path.endsWith('/polymarket/settings')) {
+        return enabledPolymarketSettingsResponse();
+      }
+      if (path.includes('/polymarket/markets')) {
         return Promise.resolve(
           Response.json(
             {
@@ -356,7 +420,11 @@ describe('loadDashboard', () => {
 
   it('keeps Data API freshness failure isolated from market discovery', async () => {
     const request = vi.fn((input: string | URL | Request) => {
-      if (input.toString().endsWith('/polymarket/data-freshness')) {
+      const path = input.toString();
+      if (path.endsWith('/polymarket/settings')) {
+        return enabledPolymarketSettingsResponse();
+      }
+      if (path.endsWith('/polymarket/data-freshness')) {
         return Promise.resolve(
           Response.json(
             { message: 'Polymarket Data API freshness is unavailable' },
@@ -379,7 +447,11 @@ describe('loadDashboard', () => {
 
   it('keeps global open-interest failure isolated from provider freshness and discovery', async () => {
     const request = vi.fn((input: string | URL | Request) => {
-      if (input.toString().endsWith('/polymarket/open-interest')) {
+      const path = input.toString();
+      if (path.endsWith('/polymarket/settings')) {
+        return enabledPolymarketSettingsResponse();
+      }
+      if (path.endsWith('/polymarket/open-interest')) {
         return Promise.resolve(
           Response.json(
             { message: 'Polymarket global open interest is unavailable' },
@@ -403,7 +475,11 @@ describe('loadDashboard', () => {
 
   it('keeps event discovery failure isolated from active markets', async () => {
     const request = vi.fn((input: string | URL | Request) => {
-      if (input.toString().includes('/polymarket/events')) {
+      const path = input.toString();
+      if (path.endsWith('/polymarket/settings')) {
+        return enabledPolymarketSettingsResponse();
+      }
+      if (path.includes('/polymarket/events')) {
         return Promise.resolve(
           Response.json(
             { message: 'Polymarket event discovery is unavailable' },
@@ -426,7 +502,11 @@ describe('loadDashboard', () => {
 
   it('keeps the dashboard available when stored backtests are unavailable', async () => {
     const request = vi.fn((input: string | URL | Request) => {
-      if (input.toString().includes('/backtesting/runs')) {
+      const path = input.toString();
+      if (path.endsWith('/polymarket/settings')) {
+        return enabledPolymarketSettingsResponse();
+      }
+      if (path.includes('/backtesting/runs')) {
         return Promise.resolve(new Response(null, { status: 503 }));
       }
       return Promise.resolve(Response.json([]));
@@ -446,6 +526,17 @@ describe('loadDashboard', () => {
     expect(snapshot.polymarketMarkets.status).toBe('available');
   });
 });
+
+function enabledPolymarketSettingsResponse(): Promise<Response> {
+  return Promise.resolve(
+    Response.json({
+      enabled: true,
+      startupDefault: false,
+      source: 'runtime',
+      changedAt: '2026-09-30T23:00:00.000Z',
+    }),
+  );
+}
 
 describe('loadPolymarketEventDetails', () => {
   it('loads one explicitly selected public event', async () => {

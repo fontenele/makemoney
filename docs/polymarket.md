@@ -413,6 +413,12 @@ Before displaying an available binary-resolution result or its lifecycle context
 
 Unavailable resolution remains unavailable, while any returned identity divergence becomes explicitly incoherent and suppresses the complete resolution presentation. Other market research remains independent. The check uses already-loaded resources and adds no provider request, payout entitlement, redemption, recommendation, account, position, wallet, order, or execution behavior.
 
+## M9.66 — Disabled-provider dashboard request suppression
+
+The visibility-aware dashboard refresh loads `GET /polymarket/settings` as an always-local control-plane resource before scheduling any provider-backed Polymarket observation. When the setting is disabled, or the local availability state cannot be read, the refresh does not request Data API freshness, global open interest, active events, active markets, or selected event/market research. Those resources expose an explicit disabled or unavailable state rather than generating repeated guarded `503` responses through the Vite proxy.
+
+Disabling access clears selected provider-backed browser state and invalidates its pending response generations. Dashboard refresh generations also prevent a request that began under an older enabled state from overwriting a successful manual disable. The existing settings endpoint and control remain independent, so access can be enabled or disabled even when Gamma, CLOB, or Data API is unavailable. This changes no backend route, startup default, provider guard, persistence, account, order, wallet, or execution behavior.
+
 ## Next safe increment
 
 A later M9 increment may add another narrowly bounded public research view without introducing positions, redemption, trade history, persistence, authentication, accounts, or execution. M10 real-trading design remains separate and requires current official Binance research plus explicit safeguards.

@@ -230,6 +230,12 @@ Selecting an active event now independently requests the existing `GET /polymark
 
 The provider contract supplies no measurement window, and shares must not be described as USDC turnover. The dashboard does not expose the per-condition breakdown, individual trades, holders, positions, persistence, recommendations, accounts, orders, or execution behavior. Failure remains isolated from valid event details and taxonomy, while selection cleanup and stale-response suppression cover the added resource.
 
+## M9.66 disabled Polymarket request suppression
+
+Each automatic refresh reads the always-local Polymarket setting before loading any provider-backed Polymarket panel. Disabled or unavailable access state suppresses those requests entirely, clears selected provider state, and displays explicit unavailable resources while preserving the independent enable/disable control. A refresh generation prevents stale work started before a manual toggle from restoring the old state.
+
+Core health, paper portfolio, execution, listing, strategy, and backtesting requests remain independent. A transport-level proxy error on one of those non-Polymarket routes indicates that the local API was unavailable or restarting, not that the disabled Polymarket provider was contacted.
+
 ## M9.53 selected-event market-reference sample
 
 Selected-event details now render at most the first eight already-normalized market references in their provider order. Each display-only card contains the market identity, question with slug/identity fallback, and open/closed state, while the heading retains the displayed and total reference counts.

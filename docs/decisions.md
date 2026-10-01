@@ -1,5 +1,35 @@
 # Technical Decisions
 
+## 2026-09-30 — Keep live Agentic Wallet onboarding read-only and at zero balance
+
+After exact candidate approval, the operator authorized installation of the official pinned `@binance/agentic-wallet@1.10.0` CLI and completed the provider's Binance App pairing flow. Live reads confirmed the dedicated session, BSC support, restricted token scope, automatic rejection of abnormal transactions, an empty BSC balance, and gas availability. No secret or session material is stored in the repository, and no quote or mutation was invoked.
+
+On Windows, Node 24 cannot safely spawn the npm `baw.cmd` wrapper with `shell: false`; the live adapter initially failed with `spawn EINVAL`. The process runner must not enable a shell. It instead discovers the installed package's fixed `dist/index.js` entry alongside a `PATH` directory and executes that file with `process.execPath`, preserving the existing closed argument array, timeout, output bound, cancellation, and sanitized-error controls. Absence of that package entry fails closed.
+
+## 2026-09-30 — Approve only BSC BTCB/USDT as the first candidate
+
+The project owner explicitly selected Agentic Wallet on BSC chain `56`, BTCB `0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c`, and USDT `0x55d398326f99059ff775485246999027b3197955` for continued investigation. BTCB is recorded as Binance-Peg BTC rather than native BTC, so representation and cross-venue risks remain part of every compatibility review.
+
+M10.6 encodes that decision in a pure gate and supports only exact USDT-to-BTCB buys and BTCB-to-USDT sells after M10.5 is `review_ready`. The gate grants instrument approval only; quote and submission authorization remain false. A regular Binance Wallet does not establish an Agentic Wallet CLI session, and installation, authentication, funding, live reads, quotes, and mutations remain separate later actions.
+
+## 2026-09-30 — Require explicit instrument evidence before quote support
+
+M10.5 does not assume that a token symbol, wrapped representation, or on-chain route is economically equivalent to Binance Spot BTC/USDT. A candidate review must bind the exact intent, chain, and source/target contract identities; preserve buy/sell direction in the BTC/USDT economic mapping; and independently document token identity, representation risk, cross-venue price-basis risk, on-chain liquidity, provider fees, network fees, route slippage, and asynchronous finality.
+
+The pure result deliberately distinguishes evidence completeness from approval. `review_ready` means only that every required question has a documented answer for human assessment. It never approves the instrument or authorizes a provider quote or submission. No production candidate is selected in M10.5, so quote support remains blocked and the existing Spot strategy remains disconnected from real execution.
+
+## 2026-09-30 — Keep the first Agentic Wallet adapter read-only and unwired
+
+M10.4 introduces an infrastructure adapter before any runtime module or authenticated provider access. Its command type is a closed union containing only the pinned CLI check plus wallet status, chains, settings, address, balances, and gas reads. The process boundary passes an argument array with `shell: false`, bounds time and captured output, propagates cancellation, discards provider stderr, and exposes only sanitized local failures.
+
+The adapter checks CLI version and connection before protected reads, stops on disconnected or still-creating state, validates every response envelope and bounded collection, and preserves monetary and gas values as canonical decimal strings. Supported chains deliberately expose no quote or submission operation: observing a wallet does not prove an instrument can be quoted, and therefore the M10.3 capability preflight remains blocked. Installation, authentication, runtime wiring, quote support, and all mutations remain later decisions.
+
+## 2026-09-30 — Keep capability preflight pure and non-authorizing
+
+M10.3 introduces two independent configuration gates: selecting `real` mode does not enable real execution, and enabling real execution does not leave `paper` mode. When both are active, startup validation requires an exact provider, chain, source-token address, and distinct target-token address; defaults remain `paper` and disabled.
+
+The first preflight is a pure evaluation of an inert intent and capability snapshot. It checks exact allowlist identity, connection, freshness, quote support, and availability of security-settings, quota, balance, and gas reads. Its scope is capability readiness only, and its result always states that quote and submission are unauthorized. Durable arming, emergency-stop state, wallet settings and balances, Risk Engine approval, quote binding, confirmation, audit, and reconciliation remain future independent gates.
+
 ## 2026-09-30 — Make real-execution facts exact, correlated, and inert first
 
 M10.2 introduces data contracts and pure validators before any provider interface or module wiring. A market-swap intent requires an explicit chain plus exact source and target token addresses; optional symbols are display labels only. This prevents an ambiguous ticker from becoming executable identity and leaves chain-specific address canonicalization to a future adapter and preflight.

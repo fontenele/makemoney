@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, and M10 has begun with an Agentic Wallet architecture baseline and inert provider-neutral real-execution contracts. Market feeds and bounded historical observations are public and unauthenticated; capital, fills, equity, statistics, and balances remain fictional or research-only, with no exchange-account, connected-wallet, or real-fund access.
+Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, and M10 is in progress through zero-balance, read-only onboarding of a dedicated Agentic Wallet for the exact BSC BTCB/USDT candidate. Market feeds and bounded historical observations are public and unauthenticated; real execution remains disabled, with no provider quote, order, or real-fund access by the application.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
