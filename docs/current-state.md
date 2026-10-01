@@ -1,10 +1,12 @@
 # Current State
 
-Last validated: 2026-09-30
+Last validated: 2026-10-01
 
 M10.8 is complete: the application now registers a strictly read-only real-trading module. Provider-free `GET /real-trading/status` reports local gates and the exact approved BSC BTCB/USDT candidate, while explicit `POST /real-trading/wallet-observation` performs one sanitized manual Agentic Wallet read. Concurrent manual reads coalesce; wallet addresses and session material are omitted; and every response keeps quote and submission authorization false.
 
-The Agentic Wallet CLI and authenticated session live on the Windows host, so the local API must also run on the host for manual wallet observation; PostgreSQL and Redis remain in Docker. The API now defaults to loopback-only `127.0.0.1`. Compose retains explicit internal `0.0.0.0` binding while continuing to publish port 3000 only on host loopback. This prevents the host-run wallet read surface from becoming reachable on the LAN.
+The NestJS API now has one supported local runtime: the Windows host where the authenticated Agentic Wallet CLI session exists. The API service and Dockerfile were removed; Docker Compose runs only PostgreSQL and Redis, both published on host loopback. `API_BIND_HOST` accepts only `127.0.0.1`, preventing the wallet read surface from becoming reachable on the LAN.
+
+The running environment was reconciled with that decision: the obsolete API container was removed, PostgreSQL and Redis are healthy with their existing data volumes, and the host API is listening on `127.0.0.1:3000`. The local startup setting now keeps Polymarket disabled; after an API restart both the direct guard and Vite proxy returned the intentional sanitized `503` without provider access. Manual Agentic Wallet observation still succeeds from the host and remains read-only, empty, and non-authorizing.
 
 The dashboard now labels its 1,000 USDT balance as a fictional paper portfolio and displays Agentic Wallet / Real trading in a separate panel. Its automatic 15-second refresh never contacts the wallet. The user must select **Check wallet (read only)** to observe connection, empty BSC asset count, limited-token mode, prediction/developer flags, provider daily limit, abnormal-transaction handling, and gas-read availability. No funds, quote, setting mutation, signing, transfer, approval, order, Risk Engine bridge, or executor was added.
 
@@ -124,7 +126,7 @@ M9.37 is complete: the local dashboard exposes current Polymarket provider avail
 
 M9.36 is complete: selected Polymarket markets now display independently loaded YES and NO level-one books with best bid/ask prices and quantities plus spread. Token identity is loaded before the two concurrent book requests, failures remain isolated per outcome, and the view makes no full-depth, executable-quote, fill, recommendation, or execution claim. The CLOB adapter now follows the live provider ordering (ascending bids and descending asks) and selects the final level of each side.
 
-M9.35 is complete: every provider-backed Polymarket route fails closed behind an availability guard whose application and Compose startup default is `false`. Disabled requests return a sanitized `503` before any provider call; M9.37 later added an always-local process override without weakening that provider boundary.
+M9.35 is complete: every provider-backed Polymarket route fails closed behind an availability guard whose application and `.env.example` startup default is `false`. Disabled requests return a sanitized `503` before any provider call; M9.37 later added an always-local process override without weakening that provider boundary.
 
 M9.34 is complete: the local dashboard now lists eight active Polymarket questions and lets the user select one to view its indexed outcome labels, independent YES/NO midpoint percentages, and aggregate open interest. Resource failures remain isolated, sanitized backend diagnostics are displayed for unavailable resources, and the surface has no recommendation, account, mutation, order, or execution controls.
 
@@ -392,8 +394,8 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - PostgreSQL access through Prisma 7.10 and the PostgreSQL driver adapter.
 - Redis client with explicit shutdown lifecycle handling.
 - `GET /health` checks the API, PostgreSQL, and Redis.
-- Docker Compose services for the API, PostgreSQL 17, and Redis 8.
-- The Compose API applies pending Prisma migrations before starting.
+- Docker Compose services for PostgreSQL 17 and Redis 8 only.
+- The NestJS API runs on the Windows host and applies committed Prisma migrations through the documented host command before startup.
 - ESLint, Prettier, Jest unit tests, Jest E2E tests, and TypeScript build scripts.
 - Safe `.env.example`; local `.env` files and generated/build artifacts are ignored by Git.
 - Public Binance Spot `btcusdt@trade` WebSocket consumption through the `ws` transport.
@@ -445,7 +447,7 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - Local `GET /risk/emergency-stop` and `PUT /risk/emergency-stop` expose status and idempotent paper-only control, including HTTP 409 for conflicting key reuse.
 - Every quote carries its best-side available quantity; `RISK_MAX_TOP_OF_BOOK_PARTICIPATION_RATE` defaults to `0.10` and rejects larger buy or sell participation before persistence.
 - Emergency-stop writes require a Bearer token matching optional `RISK_CONTROL_TOKEN_SHA256`; absent configuration disables writes, and the raw token is never stored or logged.
-- Compose publishes API port 3000 only on host loopback.
+- The host API binds port 3000 only on `127.0.0.1`; configuration rejects broader bindings.
 - `RISK_MAX_UNREALIZED_LOSS_USDT` defaults to `25`; a new buy is rejected when the existing open position's net unrealized PnL reaches that negative boundary, while sells and replays remain available.
 - Unrealized-loss assessment reuses the fresh best-bid position valuation, including estimated exit fees; missing or stale market data for an open position fails before execution mutation.
 - Distinct approved paper execution keys share an atomic Redis fixed-window limit of 10 per 60 seconds by default; duplicates share a slot, persisted replays bypass it, and Redis failure blocks new mutation.
@@ -502,7 +504,7 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 
 ## Local endpoints and ports
 
-- API: `http://localhost:3000` (Compose host-loopback only)
+- API: `http://127.0.0.1:3000` (Windows host process, loopback only)
 - Compiled dashboard: `http://localhost:3000/dashboard/`
 - Health: `http://localhost:3000/health`
 - Paper balances: `http://localhost:3000/paper-wallet/balances`
@@ -773,7 +775,7 @@ The complete database-backed integration validation passed after E2E isolation:
 - Live `GET /health` — API, PostgreSQL, and Redis reported `up`
 - Live production entry point — `GET /dashboard/` returned HTML, its hashed asset returned 200 under `/dashboard/assets/`, production API paths omitted the development proxy prefix, and `GET /health` remained healthy.
 - Public Polymarket live-contract check — with the development VPN active, Gamma returned eight real active-market summaries and selected-market identity, the Data API returned real open interest, and CLOB returned the documented `mid` response used by the corrected midpoint adapter.
-- Polymarket operational guard live check — an explicitly enabled VPN-backed Compose API returned `200` from real market discovery; the API was then recreated with the default disabled state, where both the direct route and Vite proxy returned sanitized `503` before provider access while `/health` remained `ok`.
+- Historical Polymarket operational guard live check — the then-supported VPN-backed container runtime returned `200` from real market discovery; it was then restored to the default disabled state, where both the direct route and Vite proxy returned sanitized `503` before provider access while `/health` remained `ok`. The API container has since been removed by the 2026-10-01 host-only runtime decision.
 - Live Binance integrations — received normalized BTC/USDT public trades, mini tickers, one-minute candles, top-of-book updates, calculated spreads, and pair metadata without credentials
 - Live Binance historical-candle smoke test — the public market-data-only kline endpoint returned ordered BTCUSDT one-minute rows with the documented 12 fields and no credentials
 - Live paper wallet initialization — reported BTC `0` and USDT `1000` from the default configuration

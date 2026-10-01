@@ -57,7 +57,7 @@ M4.7 persists idempotent, append-only emergency-stop changes and exposes local s
 
 M4.8 limits each new paper order to a configurable share of the best bid or ask quantity used by its quote, defaulting to ten percent and rejecting before financial mutation.
 
-M4.9 restricts the Compose API port to host loopback and protects emergency-stop writes with a fail-closed Bearer-token guard configured only by a SHA-256 digest. The raw token is never stored or logged.
+M4.9 restricts the local API to host loopback and protects emergency-stop writes with a fail-closed Bearer-token guard configured only by a SHA-256 digest. The raw token is never stored or logged. The current runtime decision is stricter: NestJS runs only on the Windows host, while Docker Compose runs PostgreSQL and Redis only.
 
 M4.10 rejects new paper buys when the existing open BTC position's net unrealized PnL reaches the configured loss limit. It reuses fresh best-bid valuation including the estimated exit fee; sells and idempotent replays remain available.
 

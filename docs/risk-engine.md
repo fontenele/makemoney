@@ -76,7 +76,7 @@ This rule uses only level-one displayed liquidity. Multi-level depth, market imp
 
 ## M4.9 authenticated local risk control
 
-The Compose API port is bound to `127.0.0.1:3000`, preventing Docker from publishing it on every host interface. `GET /risk/emergency-stop` remains read-only, while `PUT /risk/emergency-stop` additionally requires `Authorization: Bearer <token>`.
+The host API is bound to `127.0.0.1:3000`, and startup rejects broader interface bindings. `GET /risk/emergency-stop` remains read-only, while `PUT /risk/emergency-stop` additionally requires `Authorization: Bearer <token>`.
 
 The application configuration accepts only `RISK_CONTROL_TOKEN_SHA256`, a 64-character hexadecimal SHA-256 digest. The raw token is supplied only by the caller, hashed in memory, compared with `timingSafeEqual`, and never stored, returned, or logged. `.env.example` contains no credential or usable digest.
 

@@ -55,11 +55,11 @@ If the buyer is maker (`m=true`), the seller is the taker and `takerSide` is `se
 
 ## Operation
 
-Start the stack and follow the API logs:
+Start local infrastructure, then run the host API and follow that terminal:
 
 ```bash
-docker compose up -d --build
-docker compose logs -f api
+docker compose up -d
+npm run start:dev
 ```
 
-Normalized entries use the event name `market.trade.received`. The health endpoint remains available at `http://localhost:3000/health`.
+Normalized entries use the event name `market.trade.received`. The health endpoint remains available at `http://127.0.0.1:3000/health`.

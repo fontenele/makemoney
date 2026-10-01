@@ -43,10 +43,10 @@ describe('validateEnvironment API binding', () => {
     });
   });
 
-  it('allows all interfaces only when explicitly configured for a container', () => {
-    expect(
+  it('rejects non-loopback bindings', () => {
+    expect(() =>
       validateEnvironment({ ...required, API_BIND_HOST: '0.0.0.0' }),
-    ).toMatchObject({ API_BIND_HOST: '0.0.0.0' });
+    ).toThrow('Invalid environment configuration');
     expect(() =>
       validateEnvironment({ ...required, API_BIND_HOST: 'localhost' }),
     ).toThrow('Invalid environment configuration');

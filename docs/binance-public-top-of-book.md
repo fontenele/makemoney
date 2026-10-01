@@ -58,11 +58,11 @@ Scheduled retries use `market.top_of_book.reconnect_scheduled` with `attempt` an
 
 ## Operation
 
-Start the stack and follow the API logs:
+Start local infrastructure, then run the host API and follow that terminal:
 
 ```bash
-docker compose up -d --build
-docker compose logs -f api
+docker compose up -d
+npm run start:dev
 ```
 
-Normalized entries use `market.top_of_book.received`; derived spread entries use `market.spread.calculated`. The health endpoint remains available at `http://localhost:3000/health`.
+Normalized entries use `market.top_of_book.received`; derived spread entries use `market.spread.calculated`. The health endpoint remains available at `http://127.0.0.1:3000/health`.

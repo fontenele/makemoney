@@ -1,36 +1,4 @@
 services:
-  api:
-    build:
-      context: .
-      target: development
-    environment:
-      NODE_ENV: development
-      PORT: 3000
-      API_BIND_HOST: 0.0.0.0
-      DATABASE_URL: postgresql://crypto_trader:crypto_trader@postgres:5432/crypto_trader?schema=public
-      REDIS_URL: redis://redis:6379
-      BINANCE_WS_BASE_URL: wss://stream.binance.com:9443
-      BINANCE_REST_BASE_URL: https://data-api.binance.vision
-      POLYMARKET_ENABLED: "${POLYMARKET_ENABLED:-false}"
-      TRADING_MODE: paper
-      REAL_EXECUTION_ENABLED: "false"
-      PAPER_INITIAL_USDT_BALANCE: "1000"
-      PAPER_VALUATION_MAX_PRICE_AGE_MS: 10000
-      PAPER_QUOTE_MAX_MARKET_DATA_AGE_MS: 10000
-      PAPER_TAKER_FEE_RATE: "0.001"
-    command: ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
-    ports:
-      - "127.0.0.1:3000:3000"
-    volumes:
-      - .:/app
-      - api_node_modules:/app/node_modules
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-
   postgres:
     image: postgres:17-alpine
     environment:
@@ -51,7 +19,7 @@ services:
   redis:
     image: redis:8-alpine
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -62,6 +30,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  api_node_modules:
   postgres_data:
   redis_data:

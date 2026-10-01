@@ -30,11 +30,11 @@ All financial values remain decimal strings. Required identity fields, filters, 
 
 ## Operation
 
-Start the stack and inspect the API logs:
+Start local infrastructure, then run the host API and inspect that terminal:
 
 ```bash
-docker compose up -d --build
-docker compose logs api
+docker compose up -d
+npm run start:dev
 ```
 
-Normalized metadata uses the event name `market.pair_metadata.received`. The health endpoint remains available at `http://localhost:3000/health`.
+Normalized metadata uses the event name `market.pair_metadata.received`. The health endpoint remains available at `http://127.0.0.1:3000/health`.

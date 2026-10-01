@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-01 — Standardize on a host-only NestJS runtime
+
+- Removed the NestJS `api` service and its dependency-cache volume from Docker Compose; Compose now owns only PostgreSQL and Redis.
+- Removed the obsolete API Dockerfile so the unsupported container runtime cannot be started accidentally.
+- Restricted both infrastructure port publications to host loopback and changed `API_BIND_HOST` validation to reject every value except `127.0.0.1`.
+- Updated the root runbook and project documentation to make the Windows host API the sole supported runtime required by the authenticated Agentic Wallet CLI session.
+- Reconciled the running stack by removing the obsolete API container and recreating Redis with loopback-only publication while preserving the existing PostgreSQL and Redis data volumes.
+- Restored the ignored local startup setting to `POLYMARKET_ENABLED=false`; after a host API restart, direct and Vite-proxied provider routes failed closed with the expected sanitized `503`, while health and manual wallet observation remained operational.
+- Verified Compose configuration, whitespace, formatting, lint, the complete backend/dashboard build, and all 42 environment-configuration tests.
+- Preserved all financial safeguards: the wallet remains empty, the observation is read-only, and quote and submission authorization remain false.
+
 ## 2026-10-01 — Host Agentic Wallet runtime and loopback binding corrected
 
 - Diagnosed the dashboard `Cannot GET` response as a stale 37-hour-old API container and rebuilt the API with the M10.8 routes.

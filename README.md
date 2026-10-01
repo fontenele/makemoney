@@ -21,19 +21,13 @@ On Windows PowerShell installations that block `npm.ps1`, use `npm.cmd` without 
 
 ## Local development
 
-For Agentic Wallet reads on Windows, keep PostgreSQL and Redis in Docker but run the API on the host where the authenticated CLI session exists:
-
-```bash
-docker compose up -d postgres redis
-npm run start:dev
-```
-
-Do not start the Compose `api` service at the same time because both use port 3000. The host API defaults to `127.0.0.1` and the manual wallet route remains read-only.
+The NestJS API always runs on the Windows host, where the authenticated Agentic Wallet CLI session exists. Docker Compose runs only PostgreSQL and Redis; there is no API container or Dockerfile. The API is restricted to `127.0.0.1`, and the manual wallet route remains read-only.
 
 ```bash
 cp .env.example .env
 npm install
 npm run prisma:generate
+docker compose up -d
 npx prisma migrate deploy
 npm run start:dev
 ```
@@ -57,29 +51,22 @@ npm run start:prod
 
 Open `http://127.0.0.1:3000/dashboard/`. The generated assets and existing API share the same loopback-bound NestJS listener; no separate dashboard server or API alias is used.
 
-## Docker Compose
+## Local infrastructure with Docker Compose
 
-Start Docker Desktop (or another Docker daemon), then run. The API container applies pending Prisma migrations before starting:
-
-```bash
-docker compose up --build
-```
-
-Verify the complete stack at `http://localhost:3000/health`. A healthy response reports the API, PostgreSQL, and Redis as `up`.
-
-The containerized API supports provider-free application behavior but cannot inherit the authenticated Agentic Wallet CLI session stored on the Windows host. In that runtime, manual wallet observation fails closed with `503`; use the host-development arrangement above when wallet visibility is required.
-
-The API connects to public Binance BTC/USDT trade, mini ticker, one-minute candle, and top-of-book streams, loads public pair metadata, and writes normalized events to its logs:
+Start Docker Desktop (or another Docker daemon), then start the two local infrastructure services:
 
 ```bash
-docker compose logs -f api
+docker compose up -d
+docker compose ps
 ```
+
+Compose exposes PostgreSQL at `127.0.0.1:5433` and Redis at `127.0.0.1:6379`. Apply migrations and start NestJS from the host terminal as shown above, then verify `http://127.0.0.1:3000/health`. API and market-data logs remain in that host terminal.
 
 ## API routes
 
-Local base URL: `http://localhost:3000`. Docker Compose publishes it on host loopback only.
+Local base URL: `http://127.0.0.1:3000`. The host-run NestJS process publishes it on loopback only.
 
-The application defaults `API_BIND_HOST` to `127.0.0.1` for a host-run API. Compose explicitly uses `0.0.0.0` only inside the isolated container while its published host port remains restricted to `127.0.0.1`.
+`API_BIND_HOST` accepts only `127.0.0.1`; startup rejects broader bindings such as `0.0.0.0`.
 
 Every provider-backed `/polymarket` route requires effective Polymarket availability. The fail-closed `POLYMARKET_ENABLED` startup default is `false`; while disabled, provider routes return `503` before any external call. The always-local settings routes can apply a process-only override after explicit access/VPN confirmation; restart restores the startup value.
 

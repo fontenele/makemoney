@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-01 — Run NestJS only on the Windows host
+
+The authenticated Binance Agentic Wallet CLI session is owned by the Windows user environment and is not available inside a Linux container. Maintaining both host and container API runtimes created divergent behavior: provider-free routes could appear healthy in Docker while the explicit wallet observation necessarily failed.
+
+The project therefore has one supported API runtime. NestJS runs directly on the Windows host and binds only to `127.0.0.1`; startup rejects `0.0.0.0`. Docker Compose owns only PostgreSQL and Redis, also published on host loopback. The Compose API service, its dependency-cache volume declaration, and the Dockerfile were removed. This is an operational boundary only: it does not enable wallet mutations, quotes, orders, or real execution.
+
 ## 2026-09-30 — Keep live Agentic Wallet onboarding read-only and at zero balance
 
 After exact candidate approval, the operator authorized installation of the official pinned `@binance/agentic-wallet@1.10.0` CLI and completed the provider's Binance App pairing flow. Live reads confirmed the dedicated session, BSC support, restricted token scope, automatic rejection of abnormal transactions, an empty BSC balance, and gas availability. No secret or session material is stored in the repository, and no quote or mutation was invoked.

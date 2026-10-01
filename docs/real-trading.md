@@ -74,7 +74,7 @@ M10.2 deliberately defines no submission interface. It cannot call `baw`, cannot
 
 ## M10.3 — Fail-closed configuration and pure capability preflight
 
-M10.3 adds two independent startup gates, `TRADING_MODE` and `REAL_EXECUTION_ENABLED`. They default to `paper` and `false` in application validation, `.env.example`, and Compose. Simultaneously selecting real mode and enabling real execution is rejected at startup unless an exact provider, chain, source-token address, and distinct target-token address are all configured. No credential or wallet authentication material is accepted.
+M10.3 adds two independent startup gates, `TRADING_MODE` and `REAL_EXECUTION_ENABLED`. They default to `paper` and `false` in application validation and `.env.example`. Simultaneously selecting real mode and enabling real execution is rejected at startup unless an exact provider, chain, source-token address, and distinct target-token address are all configured. No credential or wallet authentication material is accepted.
 
 The pure capability preflight evaluates one M10.2 intent and capability snapshot against that exact allowlist. It fails closed for malformed facts, either disabled gate, missing or divergent identities, a disconnected wallet, future or stale observations, absent chain or quote capability, and unavailable security-settings, quota, balance, or gas reads.
 
@@ -160,7 +160,7 @@ M10.8 registers the first runtime Agentic Wallet module, but its surface remains
 
 The dashboard never calls this provider route during automatic refresh. It keeps the result only in browser memory and visually separates the fictional paper portfolio from the real wallet. Provider failure returns a sanitized isolated `503` and does not affect the paper, research, or local-gate panels.
 
-The authenticated CLI session is host-local. A Docker API cannot inherit it and therefore fails the manual observation closed. During Agentic Wallet development the API runs on the Windows host against Docker-hosted PostgreSQL and Redis, with `API_BIND_HOST=127.0.0.1`; the container remains suitable for provider-free features but not authenticated wallet reads. Compose's internal `0.0.0.0` binding is separately explicit and its published API port remains host-loopback-only.
+The authenticated CLI session is host-local, so the NestJS API has one supported runtime: the Windows host against Docker-hosted PostgreSQL and Redis. The API container and Dockerfile were removed. `API_BIND_HOST` accepts only `127.0.0.1`, so even a configuration change cannot expose the wallet read surface on all interfaces.
 
 This increment adds no quote command, trade-access mutation, token approval, signing, submission, transfer, funding, persistence, Risk Engine bridge, or real executor. `quoteAuthorized` and `submissionAuthorized` remain false in every public response.
 

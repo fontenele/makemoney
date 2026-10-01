@@ -54,11 +54,11 @@ Scheduled retries use `market.candle.reconnect_scheduled` with `attempt` and `de
 
 ## Operation
 
-Start the stack and follow the API logs:
+Start local infrastructure, then run the host API and follow that terminal:
 
 ```bash
-docker compose up -d --build
-docker compose logs -f api
+docker compose up -d
+npm run start:dev
 ```
 
-Normalized entries use the event name `market.candle.received`. The health endpoint remains available at `http://localhost:3000/health`.
+Normalized entries use the event name `market.candle.received`. The health endpoint remains available at `http://127.0.0.1:3000/health`.
