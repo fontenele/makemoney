@@ -222,6 +222,24 @@ The adapter and runner are not registered in the NestJS module and have not been
 - Missing provider fee, gas, quote identity, and expiry remain explicit rather than inferred as complete.
 - No runtime or live provider path can invoke the adapter.
 
+## M10.12 — Pure non-authorizing quote risk assessment
+
+M10.12 adds a pure policy that correlates a separately supplied intent with a normalized quote and evaluates only facts that can be compared without another provider call or invented conversion. It requires the approved Agentic Wallet provider and exact BSC BTCB/USDT direction, a currently valid quote, a fully defined M10.10 envelope, complete cost coverage, and explicit provider-fee and network-fee records.
+
+Buy notional is the exact USDT source quantity; sell notional is the quote's exact expected USDT output. Provider fees are comparable only when denominated in the source asset, which permits an exact fee-rate calculation. Network fees are comparable only when already valued in approved BSC USDT. Multiple same-kind records are summed with the isolated precision-40 decimal context before the relevant limit is applied. Partial costs, a native-gas fee without a trusted USDT valuation, missing fee facts, stale quotes, identity divergence, and every exceeded bound fail closed.
+
+The narrow successful status is `within_quote_limits`, not Risk Engine approval. Durable UTC-daily usage and current bankroll exposure are explicitly marked unevaluated, and `riskApproved`, `fundingAuthorized`, `quoteAuthorized`, and `submissionAuthorized` always remain false. Because the M10.11 adapter truthfully emits partial coverage with no provider or network cost, its current quote cannot pass this assessment.
+
+The policy is not registered in NestJS and no endpoint or provider call can reach it. M10.12 adds no local-risk values, persistence, balance/gas conversion, wallet mutation, durable arm, confirmation, audit record, reconciliation, submission command, or executor.
+
+### M10.12 acceptance criteria
+
+- Intent, quote, approved provider, chain, token direction, and validity interval must correlate exactly.
+- Order notional, slippage, provider-fee rate, and USDT-valued network fee use exact decimal comparisons.
+- Incomplete, missing, or non-comparable cost facts fail closed rather than being estimated.
+- Daily spend and bankroll remain explicitly unevaluated, and no result grants Risk Engine approval or authorization.
+- The policy remains unwired and cannot invoke the Agentic Wallet adapter.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

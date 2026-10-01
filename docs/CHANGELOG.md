@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — Add pure non-authorizing quote risk assessment
+
+- Added exact intent/quote correlation plus approved Agentic Wallet and BSC BTCB/USDT direction checks.
+- Added pure order-notional, slippage, provider-fee-rate, and USDT-valued network-fee comparisons against the explicit local envelope.
+- Failed closed on stale quotes, partial or missing costs, and costs whose asset cannot be compared without an unimplemented conversion.
+- Kept UTC-daily spend and bankroll exposure explicitly unevaluated and every Risk Engine, funding, quote, and submission authorization false.
+- Kept the policy outside runtime wiring; no route, live quote, persistence, wallet mutation, arm, confirmation, submission command, or executor was added.
+- Verified all 1,697 backend tests across 149 suites, all 92 dashboard tests across 16 files, the 8 focused quote-risk tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add unwired non-executable Agentic Wallet quote adapter
 
 - Added a dedicated pinned-version CLI runner whose closed command surface contains only `market-order quote` and no swap/submission operation.

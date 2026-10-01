@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-01 — Separate comparable quote checks from complete real-risk approval
+
+M10.12 evaluates only quote facts that can be compared exactly without new provider access or an implicit market conversion. Buy notional uses the USDT source quantity, sell notional uses expected USDT output, provider fees must be denominated in the source asset to derive a rate, and network fees must already be valued in the approved BSC USDT token. Incomplete, missing, or differently denominated costs remain blockers.
+
+A result may be `within_quote_limits`, but it is deliberately not a Risk Engine approval. Durable UTC-daily spend and current bankroll exposure remain unevaluated, every authorization flag remains false, and the current partial-cost Agentic Wallet quote cannot pass. This preserves a reviewable boundary before persistence, gas conversion, runtime quote wiring, funding, arming, confirmation, audit, reconciliation, or submission is considered.
+
 ## 2026-10-01 — Keep the first quote adapter unwired and incomplete by construction
 
 The official Agentic Wallet market-order quote is a non-mutating CLI command, but its published response contains source amount, expected target amount, symbols, and slippage without a provider quote identity, expiry, complete provider fee, or network fee. M10.11 therefore normalizes it as `executable: false`, `providerQuoteId: null`, and `costCoverage: partial`, with a short local validity window and a conservative minimum output derived from the intent's maximum slippage.
