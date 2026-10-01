@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — Add pure non-authorizing real-execution reservation plan
+
+- Added an inert reservation planner that runs only after the complete M10.15 risk chain passes.
+- Preserved exact provider, chain, intent, quote, idempotency, UTC-day, and quote-expiry identity in the plan.
+- Kept USDT budget charge, source-token quantity, native BNB gas, and explicit provider-quota USD as separate denominations.
+- Kept durable reservation, atomic enforcement, Risk Engine approval, and every funding, quote, and submission authorization false.
+- Added no schema, repository, adapter bridge, runtime wiring, route, persistence, live provider call, funding, wallet mutation, arm, confirmation, submission command, or executor.
+- Verified all 1,729 backend tests across 153 suites, all 92 dashboard tests across 16 files, the 4 focused reservation-plan tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add pure non-authorizing provider-quota sufficiency assessment
 
 - Added bounded provider-quota and explicit external USD-requirement facts tied to the approved provider/chain, current UTC day, and exact intent/quote identities.

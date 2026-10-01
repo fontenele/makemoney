@@ -294,6 +294,22 @@ Snapshots from another provider, chain, intent, quote, or UTC day, observations 
 - Durable quota and resource reservation remain explicitly absent.
 - No result grants Risk Engine approval, funding, quote, or submission authorization, and the policy remains unwired.
 
+## M10.16 — Pure non-authorizing reservation plan
+
+M10.16 adds a pure planner for the future atomic reservation boundary. It first requires the complete M10.15 provider-quota assessment to pass, then materializes the exact facts that a later durable transaction would need: provider, chain, intent, quote, and idempotency identities; current UTC day; conservative USDT budget charge; exact source-token address, symbol, and required quantity; positive BNB gas requirement; independently valued provider-quota USD requirement; and the quote expiry.
+
+The planner derives those quantities from the already validated M10.13 budget and M10.14 resource assessments rather than merging their denominations. Buy and sell directions therefore preserve different source assets while keeping local USDT budget and provider USD quota explicit and separate. Token addresses are canonicalized only after the approved BSC instrument and complete upstream facts pass.
+
+A blocked M10.15 assessment yields no plan. The narrow `reservation_plan_ready` status means only that complete inert inputs exist for a future persistence design. It does not create a row, lock funds, consume provider quota, extend quote validity, grant a Risk Engine approval, or authorize funding, quoting, or submission. M10.16 adds no schema, migration, repository, module wiring, route, provider call, wallet mutation, arm, confirmation, audit record, reconciliation, submission command, or executor.
+
+### M10.16 acceptance criteria
+
+- A plan exists only after quote, budget, resource, and provider-quota sufficiency all pass.
+- Budget USDT, source-token quantity, native BNB gas, and provider-quota USD remain separately denominated exact facts.
+- Plan identity is bound to the same provider, chain, intent, quote, idempotency key, UTC day, and quote expiry.
+- No durable reservation or atomic enforcement is claimed.
+- No result grants Risk Engine approval, funding, quote, or submission authorization, and the planner remains unwired.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
