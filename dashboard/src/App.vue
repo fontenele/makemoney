@@ -825,7 +825,42 @@ onUnmounted(() => {
                     }}
                   </dd>
                 </div>
+                <div>
+                  <dt>Security posture</dt>
+                  <dd>
+                    {{
+                      agenticWalletObservation.data.securityAssessment
+                        .status === 'restrictive'
+                        ? 'Restrictive'
+                        : 'Blocked'
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Provider limit as risk control</dt>
+                  <dd>Rejected</dd>
+                </div>
               </dl>
+              <p
+                v-if="
+                  agenticWalletObservation.data.securityAssessment.blockers
+                    .length > 0
+                "
+                class="wallet-policy-warning"
+              >
+                Security blockers:
+                {{
+                  agenticWalletObservation.data.securityAssessment.blockers.join(
+                    ', ',
+                  )
+                }}
+              </p>
+              <p v-else class="wallet-policy-note">
+                Provider settings are restrictive for continued read-only
+                investigation. The broad provider daily limit is not a project
+                risk limit; independent local limits are still required before
+                funding or quotes.
+              </p>
               <p class="wallet-observed-at">
                 Observed
                 {{ timestamp(agenticWalletObservation.data.observedAt) }}

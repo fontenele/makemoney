@@ -529,6 +529,17 @@ export interface AgenticWalletObservation {
     developerModeEnabled: boolean;
     sessionExpiresAt: string;
   } | null;
+  securityAssessment: {
+    scope: 'agentic_wallet_security_posture';
+    status: 'restrictive' | 'blocked';
+    blockers: string[];
+    providerDailyLimitAcceptedAsProjectRiskLimit: false;
+    independentProjectLimitsRequired: true;
+    fundingAuthorized: false;
+    quoteAuthorized: false;
+    submissionAuthorized: false;
+    evaluatedAt: string;
+  };
   quota: {
     usedUsd: string;
     remainingUsd: string;

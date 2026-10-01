@@ -5,6 +5,10 @@ import {
   AgenticWalletCapabilityAdapter,
   AgenticWalletCapabilityObservation,
 } from '../infrastructure/agentic-wallet-capability.adapter';
+import {
+  AgenticWalletSecurityAssessment,
+  assessAgenticWalletSecurity,
+} from './agentic-wallet-security-policy';
 
 export interface RealTradingLocalStatus {
   readonly scope: 'real_trading_local_status';
@@ -41,6 +45,7 @@ export interface RealTradingWalletObservation {
     readonly developerModeEnabled: boolean;
     readonly sessionExpiresAt: Date;
   } | null;
+  readonly securityAssessment: AgenticWalletSecurityAssessment;
   readonly quota: AgenticWalletCapabilityObservation['quota'];
   readonly balance: {
     readonly available: boolean;
@@ -112,6 +117,11 @@ export class RealTradingStatusService {
         ),
       },
       security: observation.settings,
+      securityAssessment: assessAgenticWalletSecurity(
+        observation.settings,
+        observation.quota,
+        observedAt,
+      ),
       quota: observation.quota,
       balance: {
         available: observation.capabilities.reads.balances,

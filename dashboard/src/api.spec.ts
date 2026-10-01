@@ -555,6 +555,17 @@ describe('observeAgenticWallet', () => {
           connection: 'connected',
           observedAt: '2026-09-30T23:48:42.000Z',
           balance: { available: true, assetCount: 0, empty: true },
+          securityAssessment: {
+            scope: 'agentic_wallet_security_posture',
+            status: 'restrictive',
+            blockers: [],
+            providerDailyLimitAcceptedAsProjectRiskLimit: false,
+            independentProjectLimitsRequired: true,
+            fundingAuthorized: false,
+            quoteAuthorized: false,
+            submissionAuthorized: false,
+            evaluatedAt: '2026-09-30T23:48:42.000Z',
+          },
           quoteAuthorized: false,
           submissionAuthorized: false,
         }),
@@ -566,6 +577,10 @@ describe('observeAgenticWallet', () => {
       data: {
         connection: 'connected',
         balance: { available: true, empty: true },
+        securityAssessment: {
+          status: 'restrictive',
+          fundingAuthorized: false,
+        },
         quoteAuthorized: false,
         submissionAuthorized: false,
       },

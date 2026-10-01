@@ -407,6 +407,21 @@ h1 em {
   font-size: 11px;
 }
 
+.wallet-policy-note,
+.wallet-policy-warning {
+  margin: 14px 0 0;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.wallet-policy-note {
+  color: var(--muted);
+}
+
+.wallet-policy-warning {
+  color: var(--red);
+}
+
 .wallet-observation button {
   flex: 0 0 auto;
   padding: 10px 14px;

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-01 — Add non-authorizing Agentic Wallet security posture
+
+- Added a pure exact-decimal assessment for session validity, abnormal-transaction rejection, limited-token scope, prediction trading, developer mode, and provider quota reconciliation.
+- Explicitly rejected the provider daily limit as a project risk limit and preserved mandatory independent local safeguards.
+- Included the assessment and its blockers in the existing manual wallet response and dashboard without adding a provider call to automatic refresh.
+- Kept funding, quote, and submission authorization permanently false and added no wallet command, mutation, or executor.
+- Added focused coverage and passed all 1,667 backend tests across 145 suites, all 92 dashboard tests across 16 files, lint, formatting, the complete backend/dashboard build, and a live manual wallet assessment.
+
 ## 2026-10-01 — Standardize on a host-only NestJS runtime
 
 - Removed the NestJS `api` service and its dependency-cache volume from Docker Compose; Compose now owns only PostgreSQL and Redis.

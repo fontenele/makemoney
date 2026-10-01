@@ -172,6 +172,22 @@ This increment adds no quote command, trade-access mutation, token approval, sig
 - Fictional paper capital and the empty real wallet are visibly separate.
 - Quote and submission authorization remain false and no mutating CLI command exists.
 
+## M10.9 — Non-authorizing wallet security posture
+
+M10.9 converts the already observed Agentic Wallet settings into a pure, deterministic safety assessment. It independently blocks an expired session, non-automatic rejection of abnormal transactions, unrestricted token scope, enabled prediction trading, enabled developer mode, malformed settings or quota, and quota values that do not reconcile exactly with the reported provider daily limit.
+
+A result with no blockers is named `restrictive`, not execution-ready. The provider daily limit is always marked as unacceptable as a project Risk Engine limit because the provider's available minimums are materially broader than the intended first experiment. Independent local order, daily-spend, bankroll, fee, gas, and slippage limits remain mandatory later safeguards.
+
+The assessment is included in the existing explicit manual wallet response and displayed by the dashboard without another CLI invocation. It always reports `fundingAuthorized: false`, `quoteAuthorized: false`, and `submissionAuthorized: false`. M10.9 adds no command, quote request, wallet setting mutation, token approval, funding, Risk Engine bridge, durable arm, signing, submission, or executor.
+
+### M10.9 acceptance criteria
+
+- Every restrictive provider setting and quota invariant is evaluated independently with exact decimal arithmetic.
+- Missing, malformed, expired, broad, or incoherent observations fail closed with explicit blockers.
+- The provider daily limit is never represented as a project risk limit.
+- Dashboard visibility reuses the manual observation and does not add provider access to automatic refresh.
+- Funding, quote, and submission authorization remain false in every result.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

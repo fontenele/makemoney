@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-01 — Treat restrictive wallet settings as observation, not authorization
+
+The Agentic Wallet exposes useful provider safeguards, but its available daily limits are materially broader than the intended first experiment and cannot replace project-owned controls. M10.9 therefore evaluates session validity, abnormal-transaction handling, token scope, prediction trading, developer mode, and quota reconciliation independently while always rejecting the provider daily limit as a project Risk Engine limit.
+
+The strongest successful result is named `restrictive`, not ready or safe for execution. It permits only continued read-only investigation and always leaves funding, quote, and submission unauthorized. Independent project order, daily-spend, bankroll, fee, gas, and slippage limits remain required before later quote-only work can be considered.
+
 ## 2026-10-01 — Run NestJS only on the Windows host
 
 The authenticated Binance Agentic Wallet CLI session is owned by the Windows user environment and is not available inside a Linux container. Maintaining both host and container API runtimes created divergent behavior: provider-free routes could appear healthy in Docker while the explicit wallet observation necessarily failed.

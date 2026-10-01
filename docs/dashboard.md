@@ -242,6 +242,12 @@ The overview labels the existing 1,000 USDT portfolio as fictional paper capital
 
 The wallet CLI is contacted only after the user selects **Check wallet (read only)**. That explicit action calls `POST /real-trading/wallet-observation` and displays a sanitized snapshot of connection, BSC availability, empty/non-empty asset count, security flags, provider quota, and gas-read availability. Wallet addresses and authentication material are omitted. The observation is browser-memory-only, is not replaced by automatic refreshes, and cannot request a quote, sign, submit, or move funds.
 
+## M10.9 Agentic Wallet security posture
+
+The same manual observation now displays a pure provider-settings assessment. A restrictive posture requires an unexpired session, automatic rejection of abnormal transactions, limited-token scope, disabled prediction trading, disabled developer mode, and exactly reconciled quota values. Any failed condition is shown as an explicit blocker.
+
+The provider daily limit is always labeled as rejected for project risk control, even when the other settings are restrictive. The assessment requires independent local limits and keeps funding, quotes, and submissions unauthorized. It reuses the existing manual request and adds nothing to automatic refresh.
+
 ## M9.53 selected-event market-reference sample
 
 Selected-event details now render at most the first eight already-normalized market references in their provider order. Each display-only card contains the market identity, question with slug/identity fallback, and open/closed state, while the heading retains the displayed and total reference counts.

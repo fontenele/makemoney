@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.66. M10.7 installs the pinned official CLI with operator approval, completes official Binance App pairing, validates the connected BSC session through bounded live reads, and fixes the Windows no-shell process launch. The Agentic Wallet remains at zero balance; no quote, funding, provider-setting mutation, runtime module, Risk Engine bridge, or real executor has been added, and real trading remains disabled.
+M9 is closed through M9.66. M10.9 evaluates the already observed Agentic Wallet security posture without adding a provider command. Restrictive settings remain suitable only for read-only investigation because the provider daily limit is not accepted as a project risk limit. The Agentic Wallet remains at zero balance; no quote, funding, provider-setting mutation, Risk Engine bridge, durable arm, or real executor has been added, and real trading remains disabled.
 ```
