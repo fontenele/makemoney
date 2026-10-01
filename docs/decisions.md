@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-01 — Model budget facts before adding durable enforcement
+
+M10.13 defines a caller-supplied budget snapshot before any repository or runtime integration. Settled and reserved UTC-day spend are separate exact facts, while spend completeness and USDT bankroll-valuation completeness remain explicit. The policy accepts only the approved provider and chain, the current UTC day, and a caller-selected freshness limit bounded from one through sixty seconds.
+
+For conservative daily accounting, both buy and sell quotes consume gross USDT notional plus provider-fee notional and USDT-valued network fee. The policy checks projected daily spend, the configured bankroll cap, and whether aggregate valued bankroll covers that charge. This is still not sufficient for execution: no durable reservation, atomic concurrency control, source-token balance, or native-gas sufficiency is represented, so every approval and authorization flag remains false.
+
 ## 2026-10-01 — Separate comparable quote checks from complete real-risk approval
 
 M10.12 evaluates only quote facts that can be compared exactly without new provider access or an implicit market conversion. Buy notional uses the USDT source quantity, sell notional uses expected USDT output, provider fees must be denominated in the source asset to derive a rate, and network fees must already be valued in the approved BSC USDT token. Incomplete, missing, or differently denominated costs remain blockers.

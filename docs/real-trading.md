@@ -240,6 +240,24 @@ The policy is not registered in NestJS and no endpoint or provider call can reac
 - Daily spend and bankroll remain explicitly unevaluated, and no result grants Risk Engine approval or authorization.
 - The policy remains unwired and cannot invoke the Agentic Wallet adapter.
 
+## M10.13 — Pure non-authorizing budget risk assessment
+
+M10.13 introduces a pure budget snapshot and policy without creating its data source. The snapshot binds one approved provider and chain to a canonical UTC day, exact settled and reserved USDT spend, explicit complete or partial spend coverage, an exact USDT-valued bankroll with its own coverage state, and a bounded observation time. It contains no address, balance list, credential, or session material.
+
+The policy first requires the M10.12 quote assessment to be within its narrow limits. It then treats gross USDT order notional plus the quote-implied provider-fee notional and explicit USDT network fee as a conservative budget charge for both buy and sell directions. That charge is added to settled and already reserved spend before comparison with the UTC-daily limit. The completely valued bankroll must not exceed the configured bankroll cap, and the aggregate bankroll value must cover the new quote charge. All arithmetic uses the isolated precision-40 decimal context.
+
+Snapshots from another provider, chain, or UTC day, observations from the future or older than the caller's bounded one-to-sixty-second freshness policy, partial spend history, partial bankroll valuation, malformed decimals, projected daily excess, bankroll excess, or insufficient aggregate value fail closed. The current M10.11 quote still stops at M10.12 because it lacks complete costs.
+
+`within_budget_limits` remains non-authorizing. The snapshot is caller-supplied and unwired; there is no durable spend reservation, atomic enforcement, source-token balance check, native-gas balance check, provider quota composition, or operational Risk Engine decision. M10.13 adds no configuration value, repository, schema, route, live wallet read, quote request, funding, arm, confirmation, audit record, reconciliation, submission command, or executor.
+
+### M10.13 acceptance criteria
+
+- Budget facts must be exact, complete, fresh, current-day, and bound to the approved provider and chain.
+- Daily usage includes settled spend, reserved spend, gross quote notional, provider-fee notional, and USDT-valued network fee.
+- Projected daily spend, maximum bankroll, and aggregate quote capacity are enforced with exact decimals.
+- Durable enforcement, exact source balance, and native gas remain explicitly unevaluated.
+- No result grants Risk Engine approval, funding, quote, or submission authorization, and the policy remains unwired.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

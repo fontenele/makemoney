@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — Add pure non-authorizing real-budget assessment
+
+- Added a bounded budget snapshot for approved provider/chain identity, UTC-day settled and reserved spend, coverage, valued bankroll, and observation time.
+- Composed the M10.12 quote checks with conservative exact quote-budget charge and projected daily-spend calculations.
+- Added fail-closed checks for freshness, UTC day, coverage, daily-spend cap, bankroll cap, and aggregate quote capacity.
+- Kept durable spend enforcement, source-token balance, native-gas balance, Risk Engine approval, and every financial authorization explicitly false.
+- Added no runtime wiring, route, persistence, live provider call, funding, wallet mutation, arm, confirmation, submission command, or executor.
+- Verified all 1,706 backend tests across 150 suites, all 92 dashboard tests across 16 files, the 9 focused budget-risk tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add pure non-authorizing quote risk assessment
 
 - Added exact intent/quote correlation plus approved Agentic Wallet and BSC BTCB/USDT direction checks.
