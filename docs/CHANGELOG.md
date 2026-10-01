@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — Add pure non-authorizing provider-quota sufficiency assessment
+
+- Added bounded provider-quota and explicit external USD-requirement facts tied to the approved provider/chain, current UTC day, and exact intent/quote identities.
+- Composed M10.14 resource sufficiency with independent quota and valuation freshness, coverage, identity, day, reconciliation, and remaining-capacity checks.
+- Avoided USDT/USD parity assumptions and kept the provider daily limit separate from project-owned risk limits.
+- Kept durable quota/resource reservation and every Risk Engine, funding, quote, and submission authorization false.
+- Added no adapter bridge, runtime wiring, route, persistence, live provider call, funding, wallet mutation, arm, confirmation, submission command, or executor.
+- Verified all 1,725 backend tests across 152 suites, all 92 dashboard tests across 16 files, the 10 focused provider-quota tests, formatting, lint, the complete backend/dashboard build, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add pure non-authorizing resource sufficiency assessment
 
 - Added a bounded resource snapshot tied to the approved provider/chain and exact intent/quote identities.

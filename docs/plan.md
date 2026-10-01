@@ -1711,7 +1711,7 @@ M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.11)
 M9 — Polymarket                   DONE (M9.1–M9.66)
-M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.14)
+M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.15)
 ```
 
 ---
@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.66. M10.14 purely composes budget checks with caller-supplied exact source-token and native-BNB sufficiency facts, without an adapter bridge, runtime wiring, or persistence. The current Agentic Wallet quote remains blocked by partial fee and gas coverage; provider quota and durable reservation remain unevaluated, the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, Risk Engine approval, durable arm, submission command, or real executor has been added. Real trading remains disabled.
+M9 is closed through M9.66. M10.15 purely composes resource checks with caller-supplied provider quota and independently valued USD-requirement facts, without assuming USDT/USD parity, adding an adapter bridge, runtime wiring, or persistence. The current Agentic Wallet quote remains blocked by partial fee and gas coverage; durable quota/resource reservation remains absent, the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, Risk Engine approval, durable arm, submission command, or real executor has been added. Real trading remains disabled.
 ```

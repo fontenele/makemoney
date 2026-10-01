@@ -276,6 +276,24 @@ Snapshots from another provider or chain, snapshots tied to another intent or qu
 - Provider quota and durable resource reservation remain explicitly unevaluated.
 - No result grants Risk Engine approval, funding, quote, or submission authorization, and the policy remains unwired.
 
+## M10.15 — Pure non-authorizing provider-quota sufficiency assessment
+
+M10.15 introduces a pure provider-quota snapshot and policy without connecting it to the existing wallet observation. The snapshot binds the approved provider and BSC chain to exact intent and quote IDs, a canonical UTC day, positive provider daily limit, used and remaining USD quota, quota coverage, an independently supplied positive USD requirement, explicit external-valuation basis and coverage, and separate bounded observation times. It contains no wallet address, credential, session material, or conversion rule.
+
+The policy first requires M10.14 to report sufficient exact source and BNB resources. It then requires the quota observation to belong to its declared current UTC day, reconciles used plus remaining quota exactly to the reported daily limit, rejects usage above that limit, and checks remaining quota against the externally valued USD requirement at an inclusive boundary. This does not assume that one USDT equals one USD: the caller must supply a complete, fresh USD valuation bound to the same intent and quote.
+
+Snapshots from another provider, chain, intent, quote, or UTC day, observations or valuations from the future or older than their independent one-to-sixty-second policies, partial quota or valuation coverage, malformed decimals, inconsistent totals, excessive usage, or insufficient remaining quota fail closed. All arithmetic uses the isolated precision-40 decimal context.
+
+`provider_quota_sufficient` remains non-authorizing. The provider daily limit is not accepted as a project Risk Engine limit, the snapshot is caller-supplied and unwired, and neither quota nor resources are durably reserved. M10.15 adds no configuration, conversion adapter, repository, schema, route, live wallet read, quote request, funding, arm, confirmation, audit record, reconciliation, submission command, or executor.
+
+### M10.15 acceptance criteria
+
+- Quota and valuation facts must be exact, complete, independently fresh, and bound to the approved provider, chain, current UTC day, intent, and quote.
+- Used plus remaining provider quota must exactly equal the reported daily limit, and remaining quota must cover the explicit USD requirement.
+- USDT/USD parity is never assumed and the provider daily limit is never accepted as a project risk limit.
+- Durable quota and resource reservation remain explicitly absent.
+- No result grants Risk Engine approval, funding, quote, or submission authorization, and the policy remains unwired.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
