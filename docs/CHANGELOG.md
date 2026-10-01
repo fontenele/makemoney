@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — Add durable atomic real-execution reservations
+
+- Added an immutable Prisma reservation record with unique intent, quote, and idempotency identities plus a canonical request fingerprint.
+- Serialized reservation attempts with a PostgreSQL advisory transaction lock and serializable isolation, then rebuilt durable active capacity and reapplied M10.17 before insertion.
+- Preserved USDT budget, source-token, native-BNB, and provider-quota USD facts as separate exact strings and retained expired rows without counting them as active capacity.
+- Added exact replay and fail-closed conflict behavior without registering the store in NestJS or creating a quote, wallet, Risk Engine, or submission path.
+- Added focused unit coverage and PostgreSQL E2E proof for exact persistence, post-expiry replay, and concurrent over-reservation prevention.
+- Verified all 1,743 backend tests across 155 suites, all 71 PostgreSQL-backed E2E tests across 5 suites, all 92 dashboard tests across 16 files, the focused 6-test reservation-store unit suite and 2-test persistence/concurrency E2E suite, formatting, lint, the complete backend/dashboard build, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add pure aggregate reservation-capacity assessment
 
 - Added a bounded active-reservation snapshot with exact identity, denomination, expiry, coverage, and freshness facts.

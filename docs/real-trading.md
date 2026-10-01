@@ -328,6 +328,25 @@ Malformed or duplicate records, more than 100 records, partial coverage, another
 - Expired records release capacity, while an active duplicate intent or quote fails closed.
 - No durable reservation or atomic enforcement is claimed, and no result grants Risk Engine approval or financial authorization.
 
+## M10.18 — Durable atomic real-execution reservation
+
+M10.18 adds the first local durable reservation boundary, still without registering it in NestJS or exposing a route. The Prisma store accepts the complete M10.17 input, derives a canonical SHA-256 fingerprint from every request fact, and runs the reservation attempt in one serializable PostgreSQL transaction protected by a transaction-scoped advisory lock.
+
+Inside that transaction, exact idempotent replay is returned before quote-expiry evaluation, while changed reuse of an idempotency key and reuse of an intent or quote fail closed. A new attempt reads the current transaction time, loads up to 101 unexpired records for the same provider, chain, and UTC day, rebuilds the complete reservation snapshot, and reapplies M10.17. Loading one beyond the policy's 100-record limit preserves the fail-closed bound rather than silently truncating capacity facts.
+
+Only an available assessment produces one immutable row. It stores exact provider, chain, intent, quote, idempotency, fingerprint, UTC day, expiry, USDT budget charge, source-token identity and quantity, native-BNB requirement, and provider-quota USD requirement. Unique database constraints protect intent, quote, and idempotency identities. Expired rows remain an audit fact but stop consuming capacity in later transactions; replay does not extend their quote validity.
+
+The reservation is local accounting only. It does not lock wallet balances, consume provider quota, approve risk, arm execution, authorize a quote or submission, or invoke the Agentic Wallet. The store is deliberately unwired and continues to consume caller-supplied budget, resource, quota, and freshness facts. No adapter bridge, route, live provider call, funding, wallet mutation, confirmation, submission command, or executor is added.
+
+### M10.18 acceptance criteria
+
+- A new reservation is inserted only after M10.17 is reevaluated against durable active rows in the same serialized transaction.
+- Exact idempotent replay returns the original immutable row; changed key reuse and reused intent or quote identities fail closed.
+- USDT budget, source-token, BNB gas, and provider-quota USD remain separately denominated exact strings.
+- Quote expiry releases capacity without deleting or extending the audit row.
+- PostgreSQL E2E coverage proves exact persistence, replay, and prevention of concurrent over-reservation.
+- The store remains unwired and grants no Risk Engine approval or financial authorization.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

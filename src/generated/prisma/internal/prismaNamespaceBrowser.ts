@@ -57,6 +57,7 @@ export const ModelName = {
   StrategySignal: 'StrategySignal',
   HistoricalCandleRecord: 'HistoricalCandleRecord',
   BacktestRun: 'BacktestRun',
+  RealExecutionReservation: 'RealExecutionReservation',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -167,6 +168,29 @@ export const BacktestRunScalarFieldEnum = {
 } as const
 
 export type BacktestRunScalarFieldEnum = (typeof BacktestRunScalarFieldEnum)[keyof typeof BacktestRunScalarFieldEnum]
+
+
+export const RealExecutionReservationScalarFieldEnum = {
+  id: 'id',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  intentId: 'intentId',
+  quoteId: 'quoteId',
+  idempotencyKey: 'idempotencyKey',
+  requestFingerprint: 'requestFingerprint',
+  utcDay: 'utcDay',
+  budgetChargeUsdt: 'budgetChargeUsdt',
+  sourceTokenAddress: 'sourceTokenAddress',
+  sourceSymbol: 'sourceSymbol',
+  sourceQuantity: 'sourceQuantity',
+  nativeGasSymbol: 'nativeGasSymbol',
+  nativeGasQuantity: 'nativeGasQuantity',
+  providerQuotaUsd: 'providerQuotaUsd',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RealExecutionReservationScalarFieldEnum = (typeof RealExecutionReservationScalarFieldEnum)[keyof typeof RealExecutionReservationScalarFieldEnum]
 
 
 export const ObservedSpotSymbolScalarFieldEnum = {

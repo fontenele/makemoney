@@ -403,6 +403,7 @@ export const ModelName = {
   StrategySignal: 'StrategySignal',
   HistoricalCandleRecord: 'HistoricalCandleRecord',
   BacktestRun: 'BacktestRun',
+  RealExecutionReservation: 'RealExecutionReservation',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -421,7 +422,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -869,6 +870,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RealExecutionReservation: {
+      payload: Prisma.$RealExecutionReservationPayload<ExtArgs>
+      fields: Prisma.RealExecutionReservationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionReservationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionReservationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionReservationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionReservationPayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionReservationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionReservationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionReservationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionReservationPayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionReservationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionReservationPayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionReservationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionReservationPayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionReservationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionReservationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionReservationPayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionReservationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionReservationPayload>
+        }
+        update: {
+          args: Prisma.RealExecutionReservationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionReservationPayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionReservationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionReservationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionReservationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionReservationPayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionReservationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionReservationPayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionReservationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionReservation>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionReservationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionReservationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionReservationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionReservationCountAggregateOutputType> | number
+        }
+      }
+    }
     ObservedSpotSymbol: {
       payload: Prisma.$ObservedSpotSymbolPayload<ExtArgs>
       fields: Prisma.ObservedSpotSymbolFieldRefs
@@ -1219,6 +1294,29 @@ export const BacktestRunScalarFieldEnum = {
 } as const
 
 export type BacktestRunScalarFieldEnum = (typeof BacktestRunScalarFieldEnum)[keyof typeof BacktestRunScalarFieldEnum]
+
+
+export const RealExecutionReservationScalarFieldEnum = {
+  id: 'id',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  intentId: 'intentId',
+  quoteId: 'quoteId',
+  idempotencyKey: 'idempotencyKey',
+  requestFingerprint: 'requestFingerprint',
+  utcDay: 'utcDay',
+  budgetChargeUsdt: 'budgetChargeUsdt',
+  sourceTokenAddress: 'sourceTokenAddress',
+  sourceSymbol: 'sourceSymbol',
+  sourceQuantity: 'sourceQuantity',
+  nativeGasSymbol: 'nativeGasSymbol',
+  nativeGasQuantity: 'nativeGasQuantity',
+  providerQuotaUsd: 'providerQuotaUsd',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RealExecutionReservationScalarFieldEnum = (typeof RealExecutionReservationScalarFieldEnum)[keyof typeof RealExecutionReservationScalarFieldEnum]
 
 
 export const ObservedSpotSymbolScalarFieldEnum = {
@@ -1582,6 +1680,7 @@ export type GlobalOmitConfig = {
   strategySignal?: Prisma.StrategySignalOmit
   historicalCandleRecord?: Prisma.HistoricalCandleRecordOmit
   backtestRun?: Prisma.BacktestRunOmit
+  realExecutionReservation?: Prisma.RealExecutionReservationOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
   listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit
   listingCheckpointTopOfBook?: Prisma.ListingCheckpointTopOfBookOmit

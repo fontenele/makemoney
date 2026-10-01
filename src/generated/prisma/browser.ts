@@ -48,6 +48,11 @@ export type HistoricalCandleRecord = Prisma.HistoricalCandleRecordModel
  */
 export type BacktestRun = Prisma.BacktestRunModel
 /**
+ * Model RealExecutionReservation
+ * 
+ */
+export type RealExecutionReservation = Prisma.RealExecutionReservationModel
+/**
  * Model ObservedSpotSymbol
  * 
  */
