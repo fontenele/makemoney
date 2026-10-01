@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — Add durable reservation-bound real-execution arms
+
+- Added an immutable Prisma arm record with a restrictive reservation foreign key and unique reservation, intent, and quote identities.
+- Serialized arm attempts under a PostgreSQL advisory transaction lock, reloaded the durable reservation, and reapplied M10.19 before insertion.
+- Added canonical request fingerprinting for exact post-expiry replay without extending the original arm.
+- Failed closed on missing reservations, changed UUID reuse, identity reuse, expired plans, and concurrent attempts for the same reservation.
+- Kept the store unwired and every emergency-stop, Risk Engine, final-confirmation, provider-access, and financial authorization false.
+- Verified all 1,760 backend tests across 157 suites, all 73 PostgreSQL-backed E2E tests across 6 suites, all 92 dashboard tests across 16 files, the focused 5-test arm-store unit suite and 2-test persistence/concurrency E2E suite, Prisma schema/migrations, formatting, lint, the complete backend/dashboard build, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add pure reservation-bound real-execution arm plan
 
 - Added an inert operator-arm request and plan bound to one exact durable reservation, provider, chain, intent, and quote.

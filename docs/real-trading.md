@@ -363,6 +363,22 @@ The caller supplies independent request-age and maximum-lifetime limits, each re
 - Malformed, divergent, future, stale, predating, expired, or overlong facts fail closed.
 - A ready plan remains non-durable and grants no Risk Engine approval or financial authorization.
 
+## M10.20 — Durable reservation-bound arm
+
+M10.20 adds an unwired Prisma store for the M10.19 plan. One serializable PostgreSQL transaction protected by a dedicated advisory lock first checks the caller-supplied arm UUID for exact fingerprinted replay, then reloads the referenced M10.18 reservation and checks whether its reservation, intent, or quote is already armed. A missing reservation or conflicting identity fails closed before insertion.
+
+The transaction evaluates M10.19 again using its current clock. Only a still-valid plan creates one immutable row containing the exact arm, reservation, provider, chain, intent, quote, acknowledgment, request time, expiry, fingerprint, and database creation time. The schema has a restrictive foreign key to the durable reservation and unique reservation, intent, and quote identities. Consequently, an expired arm cannot be replaced for the same quote-backed reservation; a later attempt requires a fresh reservation and quote.
+
+Exact replay is returned before expiry evaluation and never changes the stored expiry. This preserves idempotent observation of the original control record without treating it as currently active. The store remains unregistered and does not compose emergency-stop state, create Risk Engine approval, capture final pre-submission confirmation, authorize provider access, or expose any execution path.
+
+### M10.20 acceptance criteria
+
+- A durable arm can reference only an existing exact reservation and M10.19 is reevaluated inside the serialized transaction.
+- One reservation, intent, and quote can produce at most one immutable arm.
+- Exact replay returns the original row without extending expiry; changed UUID reuse fails closed.
+- PostgreSQL E2E coverage proves exact persistence, post-expiry replay, and concurrent single-arm enforcement.
+- The store remains unwired and does not inspect emergency stop, approve risk, capture final confirmation, or authorize submission.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

@@ -278,6 +278,7 @@ export type RealExecutionReservationWhereInput = {
   providerQuotaUsd?: Prisma.StringFilter<"RealExecutionReservation"> | string
   expiresAt?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
+  arm?: Prisma.XOR<Prisma.RealExecutionArmNullableScalarRelationFilter, Prisma.RealExecutionArmWhereInput> | null
 }
 
 export type RealExecutionReservationOrderByWithRelationInput = {
@@ -298,6 +299,7 @@ export type RealExecutionReservationOrderByWithRelationInput = {
   providerQuotaUsd?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  arm?: Prisma.RealExecutionArmOrderByWithRelationInput
 }
 
 export type RealExecutionReservationWhereUniqueInput = Prisma.AtLeast<{
@@ -321,6 +323,7 @@ export type RealExecutionReservationWhereUniqueInput = Prisma.AtLeast<{
   providerQuotaUsd?: Prisma.StringFilter<"RealExecutionReservation"> | string
   expiresAt?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
+  arm?: Prisma.XOR<Prisma.RealExecutionArmNullableScalarRelationFilter, Prisma.RealExecutionArmWhereInput> | null
 }, "id" | "intentId" | "quoteId" | "idempotencyKey">
 
 export type RealExecutionReservationOrderByWithAggregationInput = {
@@ -387,6 +390,7 @@ export type RealExecutionReservationCreateInput = {
   providerQuotaUsd: string
   expiresAt: Date | string
   createdAt?: Date | string
+  arm?: Prisma.RealExecutionArmCreateNestedOneWithoutReservationInput
 }
 
 export type RealExecutionReservationUncheckedCreateInput = {
@@ -407,6 +411,7 @@ export type RealExecutionReservationUncheckedCreateInput = {
   providerQuotaUsd: string
   expiresAt: Date | string
   createdAt?: Date | string
+  arm?: Prisma.RealExecutionArmUncheckedCreateNestedOneWithoutReservationInput
 }
 
 export type RealExecutionReservationUpdateInput = {
@@ -427,6 +432,7 @@ export type RealExecutionReservationUpdateInput = {
   providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  arm?: Prisma.RealExecutionArmUpdateOneWithoutReservationNestedInput
 }
 
 export type RealExecutionReservationUncheckedUpdateInput = {
@@ -447,6 +453,7 @@ export type RealExecutionReservationUncheckedUpdateInput = {
   providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  arm?: Prisma.RealExecutionArmUncheckedUpdateOneWithoutReservationNestedInput
 }
 
 export type RealExecutionReservationCreateManyInput = {
@@ -569,6 +576,121 @@ export type RealExecutionReservationMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
 }
 
+export type RealExecutionReservationScalarRelationFilter = {
+  is?: Prisma.RealExecutionReservationWhereInput
+  isNot?: Prisma.RealExecutionReservationWhereInput
+}
+
+export type RealExecutionReservationCreateNestedOneWithoutArmInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionReservationCreateWithoutArmInput, Prisma.RealExecutionReservationUncheckedCreateWithoutArmInput>
+  connectOrCreate?: Prisma.RealExecutionReservationCreateOrConnectWithoutArmInput
+  connect?: Prisma.RealExecutionReservationWhereUniqueInput
+}
+
+export type RealExecutionReservationUpdateOneRequiredWithoutArmNestedInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionReservationCreateWithoutArmInput, Prisma.RealExecutionReservationUncheckedCreateWithoutArmInput>
+  connectOrCreate?: Prisma.RealExecutionReservationCreateOrConnectWithoutArmInput
+  upsert?: Prisma.RealExecutionReservationUpsertWithoutArmInput
+  connect?: Prisma.RealExecutionReservationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionReservationUpdateToOneWithWhereWithoutArmInput, Prisma.RealExecutionReservationUpdateWithoutArmInput>, Prisma.RealExecutionReservationUncheckedUpdateWithoutArmInput>
+}
+
+export type RealExecutionReservationCreateWithoutArmInput = {
+  id?: string
+  providerId: string
+  chainId: string
+  intentId: string
+  quoteId: string
+  idempotencyKey: string
+  requestFingerprint: string
+  utcDay: Date | string
+  budgetChargeUsdt: string
+  sourceTokenAddress: string
+  sourceSymbol: string
+  sourceQuantity: string
+  nativeGasSymbol: string
+  nativeGasQuantity: string
+  providerQuotaUsd: string
+  expiresAt: Date | string
+  createdAt?: Date | string
+}
+
+export type RealExecutionReservationUncheckedCreateWithoutArmInput = {
+  id?: string
+  providerId: string
+  chainId: string
+  intentId: string
+  quoteId: string
+  idempotencyKey: string
+  requestFingerprint: string
+  utcDay: Date | string
+  budgetChargeUsdt: string
+  sourceTokenAddress: string
+  sourceSymbol: string
+  sourceQuantity: string
+  nativeGasSymbol: string
+  nativeGasQuantity: string
+  providerQuotaUsd: string
+  expiresAt: Date | string
+  createdAt?: Date | string
+}
+
+export type RealExecutionReservationCreateOrConnectWithoutArmInput = {
+  where: Prisma.RealExecutionReservationWhereUniqueInput
+  create: Prisma.XOR<Prisma.RealExecutionReservationCreateWithoutArmInput, Prisma.RealExecutionReservationUncheckedCreateWithoutArmInput>
+}
+
+export type RealExecutionReservationUpsertWithoutArmInput = {
+  update: Prisma.XOR<Prisma.RealExecutionReservationUpdateWithoutArmInput, Prisma.RealExecutionReservationUncheckedUpdateWithoutArmInput>
+  create: Prisma.XOR<Prisma.RealExecutionReservationCreateWithoutArmInput, Prisma.RealExecutionReservationUncheckedCreateWithoutArmInput>
+  where?: Prisma.RealExecutionReservationWhereInput
+}
+
+export type RealExecutionReservationUpdateToOneWithWhereWithoutArmInput = {
+  where?: Prisma.RealExecutionReservationWhereInput
+  data: Prisma.XOR<Prisma.RealExecutionReservationUpdateWithoutArmInput, Prisma.RealExecutionReservationUncheckedUpdateWithoutArmInput>
+}
+
+export type RealExecutionReservationUpdateWithoutArmInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  intentId?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  utcDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  budgetChargeUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSymbol?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  nativeGasSymbol?: Prisma.StringFieldUpdateOperationsInput | string
+  nativeGasQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type RealExecutionReservationUncheckedUpdateWithoutArmInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  intentId?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  utcDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  budgetChargeUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSymbol?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  nativeGasSymbol?: Prisma.StringFieldUpdateOperationsInput | string
+  nativeGasQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type RealExecutionReservationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -589,6 +711,7 @@ export type RealExecutionReservationSelect<ExtArgs extends runtime.Types.Extensi
   providerQuotaUsd?: boolean
   expiresAt?: boolean
   createdAt?: boolean
+  arm?: boolean | Prisma.RealExecutionReservation$armArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionReservation"]>
 
 export type RealExecutionReservationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -652,10 +775,17 @@ export type RealExecutionReservationSelectScalar = {
 }
 
 export type RealExecutionReservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "providerId" | "chainId" | "intentId" | "quoteId" | "idempotencyKey" | "requestFingerprint" | "utcDay" | "budgetChargeUsdt" | "sourceTokenAddress" | "sourceSymbol" | "sourceQuantity" | "nativeGasSymbol" | "nativeGasQuantity" | "providerQuotaUsd" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionReservation"]>
+export type RealExecutionReservationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  arm?: boolean | Prisma.RealExecutionReservation$armArgs<ExtArgs>
+}
+export type RealExecutionReservationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type RealExecutionReservationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $RealExecutionReservationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "RealExecutionReservation"
-  objects: {}
+  objects: {
+    arm: Prisma.$RealExecutionArmPayload<ExtArgs> | null
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     providerId: string
@@ -1068,6 +1198,7 @@ readonly fields: RealExecutionReservationFieldRefs;
  */
 export interface Prisma__RealExecutionReservationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  arm<T extends Prisma.RealExecutionReservation$armArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionReservation$armArgs<ExtArgs>>): Prisma.Prisma__RealExecutionArmClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionArmPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1131,6 +1262,10 @@ export type RealExecutionReservationFindUniqueArgs<ExtArgs extends runtime.Types
    */
   omit?: Prisma.RealExecutionReservationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionReservationInclude<ExtArgs> | null
+  /**
    * Filter, which RealExecutionReservation to fetch.
    */
   where: Prisma.RealExecutionReservationWhereUniqueInput
@@ -1149,6 +1284,10 @@ export type RealExecutionReservationFindUniqueOrThrowArgs<ExtArgs extends runtim
    */
   omit?: Prisma.RealExecutionReservationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionReservationInclude<ExtArgs> | null
+  /**
    * Filter, which RealExecutionReservation to fetch.
    */
   where: Prisma.RealExecutionReservationWhereUniqueInput
@@ -1166,6 +1305,10 @@ export type RealExecutionReservationFindFirstArgs<ExtArgs extends runtime.Types.
    * Omit specific fields from the RealExecutionReservation
    */
   omit?: Prisma.RealExecutionReservationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionReservationInclude<ExtArgs> | null
   /**
    * Filter, which RealExecutionReservation to fetch.
    */
@@ -1215,6 +1358,10 @@ export type RealExecutionReservationFindFirstOrThrowArgs<ExtArgs extends runtime
    */
   omit?: Prisma.RealExecutionReservationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionReservationInclude<ExtArgs> | null
+  /**
    * Filter, which RealExecutionReservation to fetch.
    */
   where?: Prisma.RealExecutionReservationWhereInput
@@ -1262,6 +1409,10 @@ export type RealExecutionReservationFindManyArgs<ExtArgs extends runtime.Types.E
    * Omit specific fields from the RealExecutionReservation
    */
   omit?: Prisma.RealExecutionReservationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionReservationInclude<ExtArgs> | null
   /**
    * Filter, which RealExecutionReservations to fetch.
    */
@@ -1311,6 +1462,10 @@ export type RealExecutionReservationCreateArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.RealExecutionReservationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionReservationInclude<ExtArgs> | null
+  /**
    * The data needed to create a RealExecutionReservation.
    */
   data: Prisma.XOR<Prisma.RealExecutionReservationCreateInput, Prisma.RealExecutionReservationUncheckedCreateInput>
@@ -1358,6 +1513,10 @@ export type RealExecutionReservationUpdateArgs<ExtArgs extends runtime.Types.Ext
    * Omit specific fields from the RealExecutionReservation
    */
   omit?: Prisma.RealExecutionReservationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionReservationInclude<ExtArgs> | null
   /**
    * The data needed to update a RealExecutionReservation.
    */
@@ -1425,6 +1584,10 @@ export type RealExecutionReservationUpsertArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.RealExecutionReservationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionReservationInclude<ExtArgs> | null
+  /**
    * The filter to search for the RealExecutionReservation to update in case it exists.
    */
   where: Prisma.RealExecutionReservationWhereUniqueInput
@@ -1451,6 +1614,10 @@ export type RealExecutionReservationDeleteArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.RealExecutionReservationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionReservationInclude<ExtArgs> | null
+  /**
    * Filter which RealExecutionReservation to delete.
    */
   where: Prisma.RealExecutionReservationWhereUniqueInput
@@ -1471,6 +1638,25 @@ export type RealExecutionReservationDeleteManyArgs<ExtArgs extends runtime.Types
 }
 
 /**
+ * RealExecutionReservation.arm
+ */
+export type RealExecutionReservation$armArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RealExecutionArm
+   */
+  select?: Prisma.RealExecutionArmSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RealExecutionArm
+   */
+  omit?: Prisma.RealExecutionArmOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionArmInclude<ExtArgs> | null
+  where?: Prisma.RealExecutionArmWhereInput
+}
+
+/**
  * RealExecutionReservation without action
  */
 export type RealExecutionReservationDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1482,4 +1668,8 @@ export type RealExecutionReservationDefaultArgs<ExtArgs extends runtime.Types.Ex
    * Omit specific fields from the RealExecutionReservation
    */
   omit?: Prisma.RealExecutionReservationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionReservationInclude<ExtArgs> | null
 }

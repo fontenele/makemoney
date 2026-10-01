@@ -58,6 +58,7 @@ export const ModelName = {
   HistoricalCandleRecord: 'HistoricalCandleRecord',
   BacktestRun: 'BacktestRun',
   RealExecutionReservation: 'RealExecutionReservation',
+  RealExecutionArm: 'RealExecutionArm',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -191,6 +192,23 @@ export const RealExecutionReservationScalarFieldEnum = {
 } as const
 
 export type RealExecutionReservationScalarFieldEnum = (typeof RealExecutionReservationScalarFieldEnum)[keyof typeof RealExecutionReservationScalarFieldEnum]
+
+
+export const RealExecutionArmScalarFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  intentId: 'intentId',
+  quoteId: 'quoteId',
+  acknowledgment: 'acknowledgment',
+  requestFingerprint: 'requestFingerprint',
+  requestedAt: 'requestedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RealExecutionArmScalarFieldEnum = (typeof RealExecutionArmScalarFieldEnum)[keyof typeof RealExecutionArmScalarFieldEnum]
 
 
 export const ObservedSpotSymbolScalarFieldEnum = {

@@ -75,6 +75,11 @@ export type BacktestRun = Prisma.BacktestRunModel
  */
 export type RealExecutionReservation = Prisma.RealExecutionReservationModel
 /**
+ * Model RealExecutionArm
+ * 
+ */
+export type RealExecutionArm = Prisma.RealExecutionArmModel
+/**
  * Model ObservedSpotSymbol
  * 
  */

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-01 — Make an expired arm require a fresh reservation and quote
+
+M10.20 enforces one immutable arm per reservation, intent, and quote rather than allowing an expired arm to be replaced in place. The reservation's foreign key and unique identities preserve a simple audit chain, while exact replay remains available without changing expiry. Re-arming therefore requires a new quote-backed reservation and another explicit review acknowledgment.
+
+The durable arm is intentionally not treated as an operational execution gate. Emergency-stop state, current risk approval, and final immediate operator confirmation remain separate mandatory compositions before any future submission can be considered.
+
 ## 2026-10-01 — Bind every operator arm to one expiring reservation
 
 A broad process-wide real-trading arm could unintentionally cover a different intent or a refreshed quote. M10.19 therefore makes the first arm artifact specific to one durable reservation plus its exact provider, chain, intent, and quote identities. The requested arm cannot predate the reservation or outlive its quote-backed expiry, and both request age and total lifetime are limited by explicit one-to-sixty-second policies.

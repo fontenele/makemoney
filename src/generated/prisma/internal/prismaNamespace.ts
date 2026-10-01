@@ -404,6 +404,7 @@ export const ModelName = {
   HistoricalCandleRecord: 'HistoricalCandleRecord',
   BacktestRun: 'BacktestRun',
   RealExecutionReservation: 'RealExecutionReservation',
+  RealExecutionArm: 'RealExecutionArm',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -422,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -944,6 +945,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RealExecutionArm: {
+      payload: Prisma.$RealExecutionArmPayload<ExtArgs>
+      fields: Prisma.RealExecutionArmFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionArmFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionArmPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionArmFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionArmPayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionArmFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionArmPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionArmFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionArmPayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionArmFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionArmPayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionArmCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionArmPayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionArmCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionArmCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionArmPayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionArmDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionArmPayload>
+        }
+        update: {
+          args: Prisma.RealExecutionArmUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionArmPayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionArmDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionArmUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionArmUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionArmPayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionArmUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionArmPayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionArmAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionArm>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionArmGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionArmGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionArmCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionArmCountAggregateOutputType> | number
+        }
+      }
+    }
     ObservedSpotSymbol: {
       payload: Prisma.$ObservedSpotSymbolPayload<ExtArgs>
       fields: Prisma.ObservedSpotSymbolFieldRefs
@@ -1319,6 +1394,23 @@ export const RealExecutionReservationScalarFieldEnum = {
 export type RealExecutionReservationScalarFieldEnum = (typeof RealExecutionReservationScalarFieldEnum)[keyof typeof RealExecutionReservationScalarFieldEnum]
 
 
+export const RealExecutionArmScalarFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  intentId: 'intentId',
+  quoteId: 'quoteId',
+  acknowledgment: 'acknowledgment',
+  requestFingerprint: 'requestFingerprint',
+  requestedAt: 'requestedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RealExecutionArmScalarFieldEnum = (typeof RealExecutionArmScalarFieldEnum)[keyof typeof RealExecutionArmScalarFieldEnum]
+
+
 export const ObservedSpotSymbolScalarFieldEnum = {
   provider: 'provider',
   symbol: 'symbol',
@@ -1681,6 +1773,7 @@ export type GlobalOmitConfig = {
   historicalCandleRecord?: Prisma.HistoricalCandleRecordOmit
   backtestRun?: Prisma.BacktestRunOmit
   realExecutionReservation?: Prisma.RealExecutionReservationOmit
+  realExecutionArm?: Prisma.RealExecutionArmOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
   listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit
   listingCheckpointTopOfBook?: Prisma.ListingCheckpointTopOfBookOmit
