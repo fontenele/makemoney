@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, and M10 is in progress through a pure, unwired, non-authorizing emergency-stop assessment bound to one durable arm for the dedicated, zero-balance Agentic Wallet's exact BSC BTCB/USDT candidate. Market feeds and bounded historical observations are public and unauthenticated; real execution remains disabled, with no provider quote, order, or real-fund access by the application.
+Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, and M10 is in progress through pure, unwired, non-authorizing pre-approval risk revalidation for one durable reservation and arm for the dedicated, zero-balance Agentic Wallet's exact BSC BTCB/USDT candidate. Market feeds and bounded historical observations are public and unauthenticated; real execution remains disabled, with no provider quote, order, or real-fund access by the application.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 

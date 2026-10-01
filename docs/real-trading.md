@@ -395,6 +395,22 @@ Any persisted stop change after arm creation invalidates that arm, even when the
 - A clear assessment explicitly remains non-atomic and grants no Risk Engine approval, final confirmation, or submission authorization.
 - The assessment remains unwired and adds no schema, provider access, route, wallet mutation, command, or executor.
 
+## M10.22 — Pure pre-approval risk revalidation
+
+M10.22 adds a pure, unwired composition for the point immediately before a future durable Risk Engine approval. It requires the exact active M10.18 reservation to remain present in a complete reservation snapshot and the exact M10.20 arm to remain correlated. To avoid counting the same order twice, it subtracts only the current reservation's USDT charge and removes only its exact aggregate-capacity record before proposing that same reservation again.
+
+The policy then reruns the complete M10.12–M10.17 chain using current quote, local-limit, UTC-day budget, bankroll, source-token, native-BNB, provider-quota, external USD-valuation, and aggregate-reservation facts. The newly derived reservation plan must match every durable economic and identity field exactly. Missing durable membership, changed facts, under-accounted reserved spend, insufficient current capacity, expired artifacts, or divergent identities fail closed. M10.21 is recomposed from the exact arm and current persisted emergency-stop snapshot rather than trusting a caller-supplied assessment result.
+
+`risk_revalidation_ready` creates only an inert plan bound to the reservation, arm, and persisted stop-change identity, expiring no later than either durable artifact. The function does not persist an approval, lock the emergency stop, make external reads, or enforce anything atomically with a provider mutation. `riskApproved`, final confirmation, and submission authorization remain false.
+
+### M10.22 acceptance criteria
+
+- The exact active durable reservation must be present and unchanged in the complete current reservation snapshot.
+- Revalidation excludes only that reservation, preventing self-double-counting while preserving every other active reservation.
+- Fresh current financial and provider facts must pass the complete M10.12–M10.17 chain and reproduce the durable reservation exactly.
+- The exact arm and M10.21 emergency-stop composition must also remain clear.
+- A ready plan remains non-atomic, unwired, and explicitly grants no Risk Engine approval, final confirmation, or submission authorization.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

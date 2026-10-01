@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-01 — Revalidate a reservation without double-counting itself
+
+M10.22 treats the durable reservation as the identity and accounting record to prove again, not as an additional proposed order. The exact current reservation must appear in the complete active snapshot; the policy subtracts its USDT charge and removes only its matching capacity record before rerunning M10.12–M10.17. Every other active reservation remains in the aggregate calculation.
+
+The rederived plan must match every durable economic field and identity exactly, while the exact arm and M10.21 emergency-stop state must remain valid. A successful revalidation is deliberately only a plan for a later durable approval. It neither approves risk nor captures final confirmation or authorizes submission, because its facts are caller-supplied and its checks are not atomic with any provider mutation.
+
 ## 2026-10-01 — Invalidate an arm across every emergency-stop change
 
 M10.21 requires a fresh, complete, persisted inactive emergency-stop observation made after the durable arm exists. Configuration fallback is insufficient for the real-execution boundary, and an active state always blocks.

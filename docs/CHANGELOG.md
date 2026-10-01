@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-01 — Add pure pre-approval real-risk revalidation
+
+- Added a pure composition that correlates one exact durable reservation and arm with current financial, provider-capacity, and emergency-stop facts.
+- Removed only the current reservation from reserved-spend and aggregate-capacity inputs before reproposing it, preventing self-double-counting without hiding other reservations.
+- Reran the complete quote, budget, resource, provider-quota, reservation-capacity, and M10.21 emergency-stop policies.
+- Required every rederived reservation identity and economic amount to match the durable row exactly.
+- Produced only an expiring future-approval plan while keeping atomic enforcement, Risk Engine approval, final confirmation, and submission authorization false.
+- Added no schema, repository, adapter bridge, runtime wiring, route, provider call, wallet mutation, funding behavior, command, or executor.
+- Verified all 1,779 backend tests across 159 suites, all 92 dashboard tests across 16 files, the focused 9-test risk-revalidation suite, formatting, lint, the complete backend/dashboard build, Prisma schema validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-01 — Add pure emergency-stop composition for durable arms
 
 - Added a pure assessment that binds a valid unexpired M10.20 arm to a fresh, complete emergency-stop snapshot.
