@@ -10,6 +10,7 @@ import {
   RealExecutionReservationCapacityFreshnessPolicy,
 } from './real-execution-reservation-capacity';
 import { RealExecutionResourceSnapshot } from './real-execution-resource-risk';
+import { RealExecutionPayloadCommitmentBlocker } from './real-execution-payload-commitment';
 
 export interface RealExecutionReservationCommand {
   readonly intent: RealExecutionIntent;
@@ -28,6 +29,8 @@ export interface StoredRealExecutionReservation {
   readonly intentId: string;
   readonly quoteId: string;
   readonly idempotencyKey: string;
+  readonly payloadCommitmentVersion: 'real_execution_intent_quote_v1';
+  readonly payloadCommitmentDigest: string;
   readonly utcDay: string;
   readonly budgetChargeUsdt: string;
   readonly sourceTokenAddress: string;
@@ -67,5 +70,14 @@ export class RealExecutionReservationCapacityError extends Error {
   ) {
     super('Real execution reservation capacity is blocked');
     this.name = RealExecutionReservationCapacityError.name;
+  }
+}
+
+export class RealExecutionReservationPayloadCommitmentError extends Error {
+  constructor(
+    readonly blockers: readonly RealExecutionPayloadCommitmentBlocker[],
+  ) {
+    super('Real execution reservation payload commitment is blocked');
+    this.name = RealExecutionReservationPayloadCommitmentError.name;
   }
 }

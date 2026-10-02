@@ -32,6 +32,8 @@ export type RealExecutionReservationMinAggregateOutputType = {
   quoteId: string | null
   idempotencyKey: string | null
   requestFingerprint: string | null
+  payloadCommitmentVersion: string | null
+  payloadCommitmentDigest: string | null
   utcDay: Date | null
   budgetChargeUsdt: string | null
   sourceTokenAddress: string | null
@@ -52,6 +54,8 @@ export type RealExecutionReservationMaxAggregateOutputType = {
   quoteId: string | null
   idempotencyKey: string | null
   requestFingerprint: string | null
+  payloadCommitmentVersion: string | null
+  payloadCommitmentDigest: string | null
   utcDay: Date | null
   budgetChargeUsdt: string | null
   sourceTokenAddress: string | null
@@ -72,6 +76,8 @@ export type RealExecutionReservationCountAggregateOutputType = {
   quoteId: number
   idempotencyKey: number
   requestFingerprint: number
+  payloadCommitmentVersion: number
+  payloadCommitmentDigest: number
   utcDay: number
   budgetChargeUsdt: number
   sourceTokenAddress: number
@@ -94,6 +100,8 @@ export type RealExecutionReservationMinAggregateInputType = {
   quoteId?: true
   idempotencyKey?: true
   requestFingerprint?: true
+  payloadCommitmentVersion?: true
+  payloadCommitmentDigest?: true
   utcDay?: true
   budgetChargeUsdt?: true
   sourceTokenAddress?: true
@@ -114,6 +122,8 @@ export type RealExecutionReservationMaxAggregateInputType = {
   quoteId?: true
   idempotencyKey?: true
   requestFingerprint?: true
+  payloadCommitmentVersion?: true
+  payloadCommitmentDigest?: true
   utcDay?: true
   budgetChargeUsdt?: true
   sourceTokenAddress?: true
@@ -134,6 +144,8 @@ export type RealExecutionReservationCountAggregateInputType = {
   quoteId?: true
   idempotencyKey?: true
   requestFingerprint?: true
+  payloadCommitmentVersion?: true
+  payloadCommitmentDigest?: true
   utcDay?: true
   budgetChargeUsdt?: true
   sourceTokenAddress?: true
@@ -227,6 +239,8 @@ export type RealExecutionReservationGroupByOutputType = {
   quoteId: string
   idempotencyKey: string
   requestFingerprint: string
+  payloadCommitmentVersion: string | null
+  payloadCommitmentDigest: string | null
   utcDay: Date
   budgetChargeUsdt: string
   sourceTokenAddress: string
@@ -268,6 +282,8 @@ export type RealExecutionReservationWhereInput = {
   quoteId?: Prisma.UuidFilter<"RealExecutionReservation"> | string
   idempotencyKey?: Prisma.StringFilter<"RealExecutionReservation"> | string
   requestFingerprint?: Prisma.StringFilter<"RealExecutionReservation"> | string
+  payloadCommitmentVersion?: Prisma.StringNullableFilter<"RealExecutionReservation"> | string | null
+  payloadCommitmentDigest?: Prisma.StringNullableFilter<"RealExecutionReservation"> | string | null
   utcDay?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
   budgetChargeUsdt?: Prisma.StringFilter<"RealExecutionReservation"> | string
   sourceTokenAddress?: Prisma.StringFilter<"RealExecutionReservation"> | string
@@ -290,6 +306,8 @@ export type RealExecutionReservationOrderByWithRelationInput = {
   quoteId?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrderInput | Prisma.SortOrder
   utcDay?: Prisma.SortOrder
   budgetChargeUsdt?: Prisma.SortOrder
   sourceTokenAddress?: Prisma.SortOrder
@@ -315,6 +333,8 @@ export type RealExecutionReservationWhereUniqueInput = Prisma.AtLeast<{
   providerId?: Prisma.StringFilter<"RealExecutionReservation"> | string
   chainId?: Prisma.StringFilter<"RealExecutionReservation"> | string
   requestFingerprint?: Prisma.StringFilter<"RealExecutionReservation"> | string
+  payloadCommitmentVersion?: Prisma.StringNullableFilter<"RealExecutionReservation"> | string | null
+  payloadCommitmentDigest?: Prisma.StringNullableFilter<"RealExecutionReservation"> | string | null
   utcDay?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
   budgetChargeUsdt?: Prisma.StringFilter<"RealExecutionReservation"> | string
   sourceTokenAddress?: Prisma.StringFilter<"RealExecutionReservation"> | string
@@ -337,6 +357,8 @@ export type RealExecutionReservationOrderByWithAggregationInput = {
   quoteId?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrderInput | Prisma.SortOrder
   utcDay?: Prisma.SortOrder
   budgetChargeUsdt?: Prisma.SortOrder
   sourceTokenAddress?: Prisma.SortOrder
@@ -363,6 +385,8 @@ export type RealExecutionReservationScalarWhereWithAggregatesInput = {
   quoteId?: Prisma.UuidWithAggregatesFilter<"RealExecutionReservation"> | string
   idempotencyKey?: Prisma.StringWithAggregatesFilter<"RealExecutionReservation"> | string
   requestFingerprint?: Prisma.StringWithAggregatesFilter<"RealExecutionReservation"> | string
+  payloadCommitmentVersion?: Prisma.StringNullableWithAggregatesFilter<"RealExecutionReservation"> | string | null
+  payloadCommitmentDigest?: Prisma.StringNullableWithAggregatesFilter<"RealExecutionReservation"> | string | null
   utcDay?: Prisma.DateTimeWithAggregatesFilter<"RealExecutionReservation"> | Date | string
   budgetChargeUsdt?: Prisma.StringWithAggregatesFilter<"RealExecutionReservation"> | string
   sourceTokenAddress?: Prisma.StringWithAggregatesFilter<"RealExecutionReservation"> | string
@@ -383,6 +407,8 @@ export type RealExecutionReservationCreateInput = {
   quoteId: string
   idempotencyKey: string
   requestFingerprint: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   utcDay: Date | string
   budgetChargeUsdt: string
   sourceTokenAddress: string
@@ -405,6 +431,8 @@ export type RealExecutionReservationUncheckedCreateInput = {
   quoteId: string
   idempotencyKey: string
   requestFingerprint: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   utcDay: Date | string
   budgetChargeUsdt: string
   sourceTokenAddress: string
@@ -427,6 +455,8 @@ export type RealExecutionReservationUpdateInput = {
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utcDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   budgetChargeUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -449,6 +479,8 @@ export type RealExecutionReservationUncheckedUpdateInput = {
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utcDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   budgetChargeUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -471,6 +503,8 @@ export type RealExecutionReservationCreateManyInput = {
   quoteId: string
   idempotencyKey: string
   requestFingerprint: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   utcDay: Date | string
   budgetChargeUsdt: string
   sourceTokenAddress: string
@@ -491,6 +525,8 @@ export type RealExecutionReservationUpdateManyMutationInput = {
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utcDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   budgetChargeUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -511,6 +547,8 @@ export type RealExecutionReservationUncheckedUpdateManyInput = {
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utcDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   budgetChargeUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -531,6 +569,8 @@ export type RealExecutionReservationCountOrderByAggregateInput = {
   quoteId?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrder
   utcDay?: Prisma.SortOrder
   budgetChargeUsdt?: Prisma.SortOrder
   sourceTokenAddress?: Prisma.SortOrder
@@ -551,6 +591,8 @@ export type RealExecutionReservationMaxOrderByAggregateInput = {
   quoteId?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrder
   utcDay?: Prisma.SortOrder
   budgetChargeUsdt?: Prisma.SortOrder
   sourceTokenAddress?: Prisma.SortOrder
@@ -571,6 +613,8 @@ export type RealExecutionReservationMinOrderByAggregateInput = {
   quoteId?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrder
   utcDay?: Prisma.SortOrder
   budgetChargeUsdt?: Prisma.SortOrder
   sourceTokenAddress?: Prisma.SortOrder
@@ -586,6 +630,10 @@ export type RealExecutionReservationMinOrderByAggregateInput = {
 export type RealExecutionReservationScalarRelationFilter = {
   is?: Prisma.RealExecutionReservationWhereInput
   isNot?: Prisma.RealExecutionReservationWhereInput
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type RealExecutionReservationCreateNestedOneWithoutArmInput = {
@@ -624,6 +672,8 @@ export type RealExecutionReservationCreateWithoutArmInput = {
   quoteId: string
   idempotencyKey: string
   requestFingerprint: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   utcDay: Date | string
   budgetChargeUsdt: string
   sourceTokenAddress: string
@@ -645,6 +695,8 @@ export type RealExecutionReservationUncheckedCreateWithoutArmInput = {
   quoteId: string
   idempotencyKey: string
   requestFingerprint: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   utcDay: Date | string
   budgetChargeUsdt: string
   sourceTokenAddress: string
@@ -682,6 +734,8 @@ export type RealExecutionReservationUpdateWithoutArmInput = {
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utcDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   budgetChargeUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -703,6 +757,8 @@ export type RealExecutionReservationUncheckedUpdateWithoutArmInput = {
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utcDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   budgetChargeUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -724,6 +780,8 @@ export type RealExecutionReservationCreateWithoutRiskApprovalInput = {
   quoteId: string
   idempotencyKey: string
   requestFingerprint: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   utcDay: Date | string
   budgetChargeUsdt: string
   sourceTokenAddress: string
@@ -745,6 +803,8 @@ export type RealExecutionReservationUncheckedCreateWithoutRiskApprovalInput = {
   quoteId: string
   idempotencyKey: string
   requestFingerprint: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   utcDay: Date | string
   budgetChargeUsdt: string
   sourceTokenAddress: string
@@ -782,6 +842,8 @@ export type RealExecutionReservationUpdateWithoutRiskApprovalInput = {
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utcDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   budgetChargeUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -803,6 +865,8 @@ export type RealExecutionReservationUncheckedUpdateWithoutRiskApprovalInput = {
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utcDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   budgetChargeUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -826,6 +890,8 @@ export type RealExecutionReservationSelect<ExtArgs extends runtime.Types.Extensi
   quoteId?: boolean
   idempotencyKey?: boolean
   requestFingerprint?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   utcDay?: boolean
   budgetChargeUsdt?: boolean
   sourceTokenAddress?: boolean
@@ -848,6 +914,8 @@ export type RealExecutionReservationSelectCreateManyAndReturn<ExtArgs extends ru
   quoteId?: boolean
   idempotencyKey?: boolean
   requestFingerprint?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   utcDay?: boolean
   budgetChargeUsdt?: boolean
   sourceTokenAddress?: boolean
@@ -868,6 +936,8 @@ export type RealExecutionReservationSelectUpdateManyAndReturn<ExtArgs extends ru
   quoteId?: boolean
   idempotencyKey?: boolean
   requestFingerprint?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   utcDay?: boolean
   budgetChargeUsdt?: boolean
   sourceTokenAddress?: boolean
@@ -888,6 +958,8 @@ export type RealExecutionReservationSelectScalar = {
   quoteId?: boolean
   idempotencyKey?: boolean
   requestFingerprint?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   utcDay?: boolean
   budgetChargeUsdt?: boolean
   sourceTokenAddress?: boolean
@@ -900,7 +972,7 @@ export type RealExecutionReservationSelectScalar = {
   createdAt?: boolean
 }
 
-export type RealExecutionReservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "providerId" | "chainId" | "intentId" | "quoteId" | "idempotencyKey" | "requestFingerprint" | "utcDay" | "budgetChargeUsdt" | "sourceTokenAddress" | "sourceSymbol" | "sourceQuantity" | "nativeGasSymbol" | "nativeGasQuantity" | "providerQuotaUsd" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionReservation"]>
+export type RealExecutionReservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "providerId" | "chainId" | "intentId" | "quoteId" | "idempotencyKey" | "requestFingerprint" | "payloadCommitmentVersion" | "payloadCommitmentDigest" | "utcDay" | "budgetChargeUsdt" | "sourceTokenAddress" | "sourceSymbol" | "sourceQuantity" | "nativeGasSymbol" | "nativeGasQuantity" | "providerQuotaUsd" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionReservation"]>
 export type RealExecutionReservationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   arm?: boolean | Prisma.RealExecutionReservation$armArgs<ExtArgs>
   riskApproval?: boolean | Prisma.RealExecutionReservation$riskApprovalArgs<ExtArgs>
@@ -922,6 +994,8 @@ export type $RealExecutionReservationPayload<ExtArgs extends runtime.Types.Exten
     quoteId: string
     idempotencyKey: string
     requestFingerprint: string
+    payloadCommitmentVersion: string | null
+    payloadCommitmentDigest: string | null
     utcDay: Date
     budgetChargeUsdt: string
     sourceTokenAddress: string
@@ -1364,6 +1438,8 @@ export interface RealExecutionReservationFieldRefs {
   readonly quoteId: Prisma.FieldRef<"RealExecutionReservation", 'String'>
   readonly idempotencyKey: Prisma.FieldRef<"RealExecutionReservation", 'String'>
   readonly requestFingerprint: Prisma.FieldRef<"RealExecutionReservation", 'String'>
+  readonly payloadCommitmentVersion: Prisma.FieldRef<"RealExecutionReservation", 'String'>
+  readonly payloadCommitmentDigest: Prisma.FieldRef<"RealExecutionReservation", 'String'>
   readonly utcDay: Prisma.FieldRef<"RealExecutionReservation", 'DateTime'>
   readonly budgetChargeUsdt: Prisma.FieldRef<"RealExecutionReservation", 'String'>
   readonly sourceTokenAddress: Prisma.FieldRef<"RealExecutionReservation", 'String'>

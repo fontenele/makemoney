@@ -74,6 +74,8 @@ describe('Real execution arm persistence (e2e)', () => {
         quoteId: '22222222-2222-4222-8222-222222222222',
         idempotencyKey: 'durable-reservation-1',
         requestFingerprint: 'a'.repeat(64),
+        payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+        payloadCommitmentDigest: 'c'.repeat(64),
         utcDay: new Date('2026-10-01T00:00:00.000Z'),
         budgetChargeUsdt: '5.105',
         sourceTokenAddress: '0x55d398326f99059ff775485246999027b3197955',

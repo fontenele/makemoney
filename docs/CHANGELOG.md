@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-10-02 — Persist payload commitment with real-execution reservations
+
+- Added nullable, pair-constrained commitment version and SHA-256 digest columns to durable reservations without fabricating legacy payload facts.
+- Reevaluated M10.28 inside the existing serializable reservation transaction and persisted the exact commitment on every new row.
+- Exposed the commitment through the stored reservation contract and made reservation, arm-store, approval-store, arm-plan, and pre-approval mappers/validators fail closed on missing or malformed values.
+- Added unit coverage for persisted commitments and legacy-row rejection plus PostgreSQL E2E coverage for migration, persistence, and replay.
+- Kept later-artifact commitment propagation, the atomic gate, confirmation consumption, provider mutation, and `submissionAuthorized` absent.
+- Verified all 1,833 backend tests across 165 suites, all 77 PostgreSQL E2E tests across 8 suites with 20 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
+## 2026-10-02 — Add canonical intent/quote payload commitment
+
+- Identified that audit IDs and selected durable totals alone cannot prove equality of a future provider-bound payload.
+- Added a pure versioned SHA-256 commitment over every execution-critical intent and quote fact.
+- Canonicalized exact decimals, token-address case, and cost ordering while retaining all routing, amount, slippage, output, fee, provider, and time facts.
+- Required the exact approved Agentic Wallet BSC BTCB/USDT intent, semantic quote-intent equality, complete costs, and an active quote.
+- Kept commitment persistence, atomic enforcement, confirmation consumption, and `submissionAuthorized` absent; added no route, provider call, command, or executor.
+- Verified all 1,832 backend tests across 165 suites, including the 9 focused commitment tests, plus formatting, lint, and the backend build.
+
 ## 2026-10-02 — Add pure initial-submission plan
 
 - Added a pure planner over one exact active M10.25 confirmation, its successful fresh M10.26 stop assessment, and one short-lived submission request.

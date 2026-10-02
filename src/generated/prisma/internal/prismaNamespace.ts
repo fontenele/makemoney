@@ -1529,6 +1529,8 @@ export const RealExecutionReservationScalarFieldEnum = {
   quoteId: 'quoteId',
   idempotencyKey: 'idempotencyKey',
   requestFingerprint: 'requestFingerprint',
+  payloadCommitmentVersion: 'payloadCommitmentVersion',
+  payloadCommitmentDigest: 'payloadCommitmentDigest',
   utcDay: 'utcDay',
   budgetChargeUsdt: 'budgetChargeUsdt',
   sourceTokenAddress: 'sourceTokenAddress',

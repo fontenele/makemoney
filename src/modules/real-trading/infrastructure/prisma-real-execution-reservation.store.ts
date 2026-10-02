@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { Prisma } from '../../../generated/prisma/client';
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
 import { planRealExecutionReservation } from '../application/real-execution-reservation-plan';
+import { assessRealExecutionPayloadCommitment } from '../application/real-execution-payload-commitment';
 import {
   assessRealExecutionReservationCapacity,
   RealExecutionReservationCapacitySnapshot,
@@ -12,6 +13,7 @@ import {
   RealExecutionReservationCommand,
   RealExecutionReservationIdempotencyConflictError,
   RealExecutionReservationIdentityConflictError,
+  RealExecutionReservationPayloadCommitmentError,
   RealExecutionReservationStore,
   StoredRealExecutionReservation,
 } from '../application/real-execution-reservation-store';
@@ -115,6 +117,17 @@ export class PrismaRealExecutionReservationStore implements RealExecutionReserva
             'reservation_plan_blocked',
           ]);
         }
+        const payloadAssessment = assessRealExecutionPayloadCommitment(
+          command.intent,
+          command.quote,
+          evaluatedAt,
+        );
+        const payloadCommitment = payloadAssessment.commitment;
+        if (payloadCommitment === null) {
+          throw new RealExecutionReservationPayloadCommitmentError(
+            payloadAssessment.blockers,
+          );
+        }
 
         const created = await tx.realExecutionReservation.create({
           data: {
@@ -124,6 +137,8 @@ export class PrismaRealExecutionReservationStore implements RealExecutionReserva
             quoteId: planned.quoteId,
             idempotencyKey: planned.idempotencyKey,
             requestFingerprint,
+            payloadCommitmentVersion: payloadCommitment.version,
+            payloadCommitmentDigest: payloadCommitment.digest,
             utcDay: new Date(`${planned.utcDay}T00:00:00.000Z`),
             budgetChargeUsdt: planned.budgetChargeUsdt,
             sourceTokenAddress: planned.sourceTokenAddress,
@@ -172,6 +187,8 @@ function mapReservation(row: {
   intentId: string;
   quoteId: string;
   idempotencyKey: string;
+  payloadCommitmentVersion: string | null;
+  payloadCommitmentDigest: string | null;
   utcDay: Date;
   budgetChargeUsdt: string;
   sourceTokenAddress: string;
@@ -186,6 +203,15 @@ function mapReservation(row: {
   if (row.nativeGasSymbol !== 'BNB') {
     throw new Error('Persisted real execution reservation has invalid gas');
   }
+  if (
+    row.payloadCommitmentVersion !== 'real_execution_intent_quote_v1' ||
+    row.payloadCommitmentDigest === null ||
+    !/^[a-f0-9]{64}$/.test(row.payloadCommitmentDigest)
+  ) {
+    throw new Error(
+      'Persisted real execution reservation has invalid payload commitment',
+    );
+  }
   return {
     id: row.id,
     providerId: row.providerId,
@@ -193,6 +219,8 @@ function mapReservation(row: {
     intentId: row.intentId,
     quoteId: row.quoteId,
     idempotencyKey: row.idempotencyKey,
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: row.payloadCommitmentDigest,
     utcDay: row.utcDay.toISOString().slice(0, 10),
     budgetChargeUsdt: row.budgetChargeUsdt,
     sourceTokenAddress: row.sourceTokenAddress,

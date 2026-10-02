@@ -707,10 +707,6 @@ export type ListingObservationCheckpointUncheckedUpdateManyWithoutDetectionNeste
   deleteMany?: Prisma.ListingObservationCheckpointScalarWhereInput | Prisma.ListingObservationCheckpointScalarWhereInput[]
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type NullableBigIntFieldUpdateOperationsInput = {
   set?: bigint | number | null
   increment?: bigint | number

@@ -346,6 +346,8 @@ function isValidStoredReservation(
     UUID_PATTERN.test(reservation.intentId) &&
     UUID_PATTERN.test(reservation.quoteId) &&
     IDEMPOTENCY_KEY_PATTERN.test(reservation.idempotencyKey) &&
+    reservation.payloadCommitmentVersion === 'real_execution_intent_quote_v1' &&
+    /^[a-f0-9]{64}$/.test(reservation.payloadCommitmentDigest) &&
     UTC_DAY_PATTERN.test(reservation.utcDay) &&
     sourceIdentityValid &&
     reservation.nativeGasSymbol === 'BNB' &&

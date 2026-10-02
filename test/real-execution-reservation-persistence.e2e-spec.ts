@@ -41,11 +41,14 @@ describe('Real execution reservation persistence (e2e)', () => {
         where: { id: first.reservation.id },
       }),
     ).resolves.toMatchObject({
+      payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+      payloadCommitmentDigest: first.reservation.payloadCommitmentDigest,
       budgetChargeUsdt: '5.105',
       sourceQuantity: '5.005',
       nativeGasQuantity: '0.0002',
       providerQuotaUsd: '5.2',
     });
+    expect(first.reservation.payloadCommitmentDigest).toMatch(/^[a-f0-9]{64}$/);
   });
 
   it('allows at most one concurrent request to consume the same zero-reservation snapshot', async () => {

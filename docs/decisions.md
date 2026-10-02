@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-10-02 — Persist payload integrity at reservation creation without inventing legacy facts
+
+M10.29 computes the M10.28 commitment inside the existing serialized reservation transaction, after risk/capacity planning and before insertion. The reservation is the earliest durable artifact for the exact approved intent and quote, so it is the correct origin for propagating payload integrity through later controls.
+
+The new columns are intentionally nullable for migration compatibility. Existing rows cannot be truthfully backfilled because their complete original intent and quote payload is not stored. A check constraint permits only a both-null legacy pair or the exact supported version with a canonical digest, while application mappers reject the null legacy state. This preserves database upgradeability without allowing uncertain rows into arm or approval decisions. Copying the commitment into later durable artifacts remains a separate milestone.
+
+## 2026-10-02 — Bind complete intent/quote content before creating a permit
+
+The pre-permit review found that durable M10 artifacts preserve audit identities and selected economic totals but do not yet provide a dedicated commitment to the complete provider-bound intent and quote payload. IDs alone are insufficient because a future caller could present changed content under the same local identities unless the content itself is compared with a previously trusted value.
+
+M10.28 therefore defines a versioned SHA-256 commitment over the validated complete-cost quote and its exact approved intent. Canonical decimals, lowercase token addresses, and deterministic cost ordering avoid representational mismatches while all routing, quantity, slippage, output, fee, provider, and time facts remain bound. Persistence and propagation of this digest must precede a durable atomic permit; the pure commitment itself authorizes nothing.
+
 ## 2026-10-02 — Separate an inert initial-submission plan from the atomic gate
 
 M10.27 defines the complete identity and time boundary for a possible first submission attempt without treating the non-atomic M10.26 observation as permission. The plan composes the exact durable confirmation with its successful stop assessment, repeats every upstream audit identity, and expires no later than the confirmation.

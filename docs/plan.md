@@ -1711,7 +1711,7 @@ M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.11)
 M9 — Polymarket                   DONE (M9.1–M9.66)
-M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.27)
+M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.29)
 ```
 
 ---
@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.66. M10.27 purely plans one initial submission attempt from the exact active M10.25 confirmation and successful fresh M10.26 stop assessment. It preserves every audit identity, cannot outlive confirmation, forbids automatic retry, and still requires a future atomic stop gate and durable confirmation consumption. The result is unwired and submission authorization remains false. The current Agentic Wallet quote remains blocked by partial fee and gas coverage; the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, submission command, or real executor has been added. Real trading remains disabled.
+M9 is closed through M9.66. M10.29 evaluates M10.28 inside reservation persistence and durably binds its versioned canonical SHA-256 commitment to every new reservation. Legacy rows remain nullable at the schema level but fail closed in all reservation mappers and validators. The digest is not yet copied into every later durable artifact, so the M10.27 plan still requires a future atomic stop gate and durable confirmation consumption and submission authorization remains false. The current Agentic Wallet quote remains blocked by partial fee and gas coverage; the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, submission command, or real executor has been added. Real trading remains disabled.
 ```

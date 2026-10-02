@@ -105,6 +105,8 @@ model RealExecutionReservation {
   quoteId            String            @unique @map("quote_id") @db.Uuid
   idempotencyKey     String            @unique @map("idempotency_key") @db.VarChar(128)
   requestFingerprint String            @map("request_fingerprint") @db.Char(64)
+  payloadCommitmentVersion String?     @map("payload_commitment_version") @db.VarChar(64)
+  payloadCommitmentDigest  String?     @map("payload_commitment_digest") @db.Char(64)
   utcDay             DateTime          @map("utc_day") @db.Date
   budgetChargeUsdt   String            @map("budget_charge_usdt") @db.Text
   sourceTokenAddress String            @map("source_token_address") @db.VarChar(256)

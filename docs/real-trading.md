@@ -496,6 +496,42 @@ The stop assessment must be fresh, cannot predate confirmation, and the request 
 - A ready result remains unwired and grants no submission authorization.
 - No schema, repository, route, provider call, wallet mutation, command, or executor is added.
 
+## M10.28 — Canonical intent/quote payload commitment
+
+M10.28 addresses a payload-integrity gap identified before designing the durable atomic gate. Reservation, arm, approval, confirmation, and submission-plan artifacts preserve exact audit IDs and selected economic totals, but IDs alone cannot prove that a future provider command was reconstructed from the same complete intent and quote content reviewed by the Risk Engine.
+
+The pure assessment validates the intent and quote, requires their semantic identity, the approved Agentic Wallet provider and BSC BTCB/USDT direction, complete cost coverage, and an active non-future quote. It then hashes a versioned canonical representation with SHA-256. The representation includes every intent field; provider and local quote identities; expected and minimum output; all costs; coverage; timestamps; and the non-executable marker. Decimal spellings, token-address case, and cost order are canonicalized so equivalent facts produce one stable digest.
+
+`payload_commitment_ready` remains non-authorizing. M10.28 does not persist or propagate the digest into reservations and later records, compare a future provider payload, consume confirmation, enforce emergency stop atomically, or call the provider. A later migration/store increment must make the commitment durable across the complete approval chain before an atomic permit can be safely designed.
+
+### M10.28 acceptance criteria
+
+- Only a valid active complete-cost quote over the exact approved intent can produce a commitment.
+- The embedded quote intent must semantically match the separately assessed intent.
+- Every execution-critical intent and quote fact is included in a versioned SHA-256 digest.
+- Equivalent decimal spellings, token-address case, and cost ordering produce the same digest.
+- Changed economic or routing facts produce a different digest.
+- The commitment remains non-durable, unwired, and grants no submission authorization.
+- No schema, repository, route, provider call, wallet mutation, command, or executor is added.
+
+## M10.29 — Durable reservation-bound payload commitment
+
+M10.29 makes the M10.28 commitment durable at the origin of the existing approval chain. Inside the same serializable transaction and advisory lock used for capacity enforcement, the reservation store reevaluates the exact intent and quote at the transaction clock and writes the commitment version and SHA-256 digest beside the new reservation.
+
+The migration uses a nullable version/digest pair so an upgrade never fabricates a commitment for an existing row whose original complete payload cannot be reconstructed. A database check constraint permits only both-null legacy state or the supported version with a lowercase 64-character hexadecimal digest. New store writes always provide both fields. Public reservation mapping, arm-store and approval-store reservation mapping, arm planning, and pre-approval revalidation all fail closed on a missing, unsupported, or malformed commitment.
+
+This increment binds the payload to the reservation but does not duplicate the digest into arm, approval, or confirmation rows. Those later durable artifacts still require explicit propagation before a standalone atomic permit can trust the complete chain. The store remains unregistered, and commitment persistence creates no provider payload, submission authorization, command, or executor.
+
+### M10.29 acceptance criteria
+
+- Reservation persistence reevaluates M10.28 inside the existing serialized transaction.
+- Every new reservation stores the supported version and canonical digest.
+- The migration preserves legacy uncertainty instead of backfilling a false commitment.
+- Database constraints and all reservation mappers fail closed on invalid commitment pairs.
+- Arm planning and pre-approval revalidation require a structurally valid reservation commitment.
+- PostgreSQL E2E coverage proves migration, persistence, and exact replay with the commitment.
+- No runtime wiring, route, provider call, wallet mutation, command, executor, atomic permit, or submission authorization is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

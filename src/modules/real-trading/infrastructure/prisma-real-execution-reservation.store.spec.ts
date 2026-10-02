@@ -44,12 +44,14 @@ describe('PrismaRealExecutionReservationStore', () => {
       intentId: '11111111-1111-4111-8111-111111111111',
       quoteId: '22222222-2222-4222-8222-222222222222',
       idempotencyKey: 'durable-reservation-1',
+      payloadCommitmentVersion: 'real_execution_intent_quote_v1',
       budgetChargeUsdt: '5.105',
       sourceQuantity: '5.005',
       nativeGasQuantity: '0.0002',
       providerQuotaUsd: '5.2',
     });
     expect(createdData.requestFingerprint).toMatch(/^[0-9a-f]{64}$/);
+    expect(createdData.payloadCommitmentDigest).toMatch(/^[0-9a-f]{64}$/);
     expect(harness.prismaTransaction).toHaveBeenCalledWith(
       expect.any(Function),
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
@@ -118,6 +120,27 @@ describe('PrismaRealExecutionReservationStore', () => {
     await expect(harness.store.reserve(reordered)).resolves.toMatchObject({
       replayed: true,
     });
+  });
+
+  it('fails closed when replay encounters a legacy reservation without a commitment', async () => {
+    const harness = repositoryHarness();
+    harness.tx.realExecutionReservation.create.mockImplementation(
+      ({ data }: { data: Record<string, unknown> }) =>
+        Promise.resolve(row(data)),
+    );
+    await harness.store.reserve(command());
+    const stored = harness.create.mock.calls[0][0].data;
+    harness.tx.realExecutionReservation.findUnique.mockResolvedValue(
+      row({
+        ...stored,
+        payloadCommitmentVersion: null,
+        payloadCommitmentDigest: null,
+      }),
+    );
+
+    await expect(harness.store.reserve(command())).rejects.toThrow(
+      'invalid payload commitment',
+    );
   });
 
   it('rejects conflicting idempotency and intent or quote reuse', async () => {
@@ -316,6 +339,9 @@ function row(overrides: Record<string, unknown> = {}) {
     quoteId: '22222222-2222-4222-8222-222222222222',
     idempotencyKey: 'durable-reservation-1',
     requestFingerprint: 'a'.repeat(64),
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest:
+      'c13e8124d7ce1d3463b6eac3238bdc60e19aa50449dd433047f22456a11d92f6',
     utcDay: new Date('2026-10-01T00:00:00.000Z'),
     budgetChargeUsdt: '5.105',
     sourceTokenAddress: USDT_ADDRESS,
@@ -340,6 +366,9 @@ function publicReservation() {
     intentId: '11111111-1111-4111-8111-111111111111',
     quoteId: '22222222-2222-4222-8222-222222222222',
     idempotencyKey: 'durable-reservation-1',
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest:
+      'c13e8124d7ce1d3463b6eac3238bdc60e19aa50449dd433047f22456a11d92f6',
     utcDay: '2026-10-01',
     budgetChargeUsdt: '5.105',
     sourceTokenAddress: USDT_ADDRESS,

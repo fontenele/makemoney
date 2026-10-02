@@ -116,6 +116,8 @@ function mapReservation(row: {
   intentId: string;
   quoteId: string;
   idempotencyKey: string;
+  payloadCommitmentVersion: string | null;
+  payloadCommitmentDigest: string | null;
   utcDay: Date;
   budgetChargeUsdt: string;
   sourceTokenAddress: string;
@@ -130,10 +132,21 @@ function mapReservation(row: {
   if (row.nativeGasSymbol !== 'BNB') {
     throw new Error('Persisted real execution reservation has invalid gas');
   }
+  if (
+    row.payloadCommitmentVersion !== 'real_execution_intent_quote_v1' ||
+    row.payloadCommitmentDigest === null ||
+    !/^[a-f0-9]{64}$/.test(row.payloadCommitmentDigest)
+  ) {
+    throw new Error(
+      'Persisted real execution reservation has invalid payload commitment',
+    );
+  }
   return {
     ...row,
     utcDay: row.utcDay.toISOString().slice(0, 10),
     nativeGasSymbol: 'BNB',
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: row.payloadCommitmentDigest,
     expiresAt: new Date(row.expiresAt),
     createdAt: new Date(row.createdAt),
   };

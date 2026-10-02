@@ -315,6 +315,8 @@ function reservation(
     intentId: intent().id,
     quoteId: quote().id,
     idempotencyKey: intent().idempotencyKey,
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'a'.repeat(64),
     utcDay: '2026-10-01',
     budgetChargeUsdt: '5.105',
     sourceTokenAddress: USDT.tokenAddress,
