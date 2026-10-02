@@ -253,6 +253,8 @@ function mapArm(row: {
   chainId: string;
   intentId: string;
   quoteId: string;
+  payloadCommitmentVersion: string | null;
+  payloadCommitmentDigest: string | null;
   acknowledgment: string;
   requestedAt: Date;
   expiresAt: Date;
@@ -261,9 +263,20 @@ function mapArm(row: {
   if (row.acknowledgment !== 'reservation_and_quote_reviewed') {
     throw new Error('Persisted real execution arm has invalid acknowledgment');
   }
+  if (
+    row.payloadCommitmentVersion !== 'real_execution_intent_quote_v1' ||
+    row.payloadCommitmentDigest === null ||
+    !/^[a-f0-9]{64}$/.test(row.payloadCommitmentDigest)
+  ) {
+    throw new Error(
+      'Persisted real execution arm has invalid payload commitment',
+    );
+  }
   return {
     ...row,
     acknowledgment: 'reservation_and_quote_reviewed',
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: row.payloadCommitmentDigest,
     requestedAt: new Date(row.requestedAt),
     expiresAt: new Date(row.expiresAt),
     createdAt: new Date(row.createdAt),

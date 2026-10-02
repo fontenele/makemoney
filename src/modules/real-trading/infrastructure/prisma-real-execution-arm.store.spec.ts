@@ -34,6 +34,8 @@ describe('PrismaRealExecutionArmStore', () => {
       reservationId: command().request.reservationId,
       providerId: 'agentic_wallet',
       chainId: '56',
+      payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+      payloadCommitmentDigest: 'a'.repeat(64),
       acknowledgment: 'reservation_and_quote_reviewed',
     });
     expect(harness.create.mock.calls[0][0].data.requestFingerprint).toMatch(
@@ -64,6 +66,27 @@ describe('PrismaRealExecutionArmStore', () => {
       replayed: true,
     });
     expect(harness.tx.realExecutionArm.create).toHaveBeenCalledTimes(1);
+  });
+
+  it('fails closed when replaying a legacy arm without a payload commitment', async () => {
+    const harness = repositoryHarness();
+    harness.tx.realExecutionArm.create.mockImplementation(
+      ({ data }: { data: Record<string, unknown> }) =>
+        Promise.resolve(armRow(data)),
+    );
+    await harness.store.arm(command());
+    const stored = harness.create.mock.calls[0][0].data;
+    harness.tx.realExecutionArm.findUnique.mockResolvedValue(
+      armRow({
+        ...stored,
+        payloadCommitmentVersion: null,
+        payloadCommitmentDigest: null,
+      }),
+    );
+
+    await expect(harness.store.arm(command())).rejects.toThrow(
+      'Persisted real execution arm has invalid payload commitment',
+    );
   });
 
   it('rejects conflicting arm ids and reservation identity reuse', async () => {
@@ -195,6 +218,8 @@ function armRow(overrides: Record<string, unknown> = {}) {
     chainId: '56',
     intentId: '11111111-1111-4111-8111-111111111111',
     quoteId: '22222222-2222-4222-8222-222222222222',
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'a'.repeat(64),
     acknowledgment: 'reservation_and_quote_reviewed',
     requestFingerprint: 'a'.repeat(64),
     requestedAt: new Date('2026-10-01T14:00:02.000Z'),
@@ -209,5 +234,10 @@ type ArmRow = ReturnType<typeof armRow>;
 
 function publicArm() {
   const { request } = command();
-  return { ...request, createdAt: CREATED_AT };
+  return {
+    ...request,
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'a'.repeat(64),
+    createdAt: CREATED_AT,
+  };
 }

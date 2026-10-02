@@ -109,6 +109,21 @@ describe('PrismaRealExecutionRiskApprovalStore', () => {
     ).not.toHaveBeenCalled();
   });
 
+  it('fails closed when the durable arm has no payload commitment', async () => {
+    const harness = repositoryHarness();
+    harness.tx.realExecutionArm.findUnique.mockResolvedValue(
+      armRow({
+        payloadCommitmentVersion: null,
+        payloadCommitmentDigest: null,
+      }),
+    );
+
+    await expect(harness.store.approve(command())).rejects.toThrow(
+      'Persisted real execution arm has invalid payload commitment',
+    );
+    expect(harness.create).not.toHaveBeenCalled();
+  });
+
   it('fails closed without a persisted inactive emergency-stop event', async () => {
     const missing = repositoryHarness();
     missing.tx.riskControlEvent.findFirst.mockResolvedValue(null);
@@ -332,6 +347,8 @@ function armRow(overrides: Record<string, unknown> = {}) {
     chainId: '56',
     intentId: '11111111-1111-4111-8111-111111111111',
     quoteId: '22222222-2222-4222-8222-222222222222',
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'c'.repeat(64),
     acknowledgment: 'reservation_and_quote_reviewed',
     requestFingerprint: 'b'.repeat(64),
     requestedAt: new Date('2026-10-02T14:00:03.000Z'),

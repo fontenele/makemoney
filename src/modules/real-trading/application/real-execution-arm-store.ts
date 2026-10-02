@@ -16,6 +16,8 @@ export interface StoredRealExecutionArm {
   readonly chainId: string;
   readonly intentId: string;
   readonly quoteId: string;
+  readonly payloadCommitmentVersion: 'real_execution_intent_quote_v1';
+  readonly payloadCommitmentDigest: string;
   readonly acknowledgment: 'reservation_and_quote_reviewed';
   readonly requestedAt: Date;
   readonly expiresAt: Date;

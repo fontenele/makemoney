@@ -44,6 +44,8 @@ describe('Real execution arm persistence (e2e)', () => {
       prisma.realExecutionArm.findUnique({ where: { id: first.arm.id } }),
     ).resolves.toMatchObject({
       reservationId: first.arm.reservationId,
+      payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+      payloadCommitmentDigest: first.arm.payloadCommitmentDigest,
       acknowledgment: 'reservation_and_quote_reviewed',
       expiresAt: new Date('2026-10-01T14:00:06.000Z'),
     });

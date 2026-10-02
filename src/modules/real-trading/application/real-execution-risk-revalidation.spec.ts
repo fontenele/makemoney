@@ -139,6 +139,11 @@ describe('revalidateRealExecutionRisk', () => {
         arm: arm({ reservationId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' }),
       }).blockers,
     ).toContain('arm_identity_mismatch');
+    expect(
+      run({
+        arm: arm({ payloadCommitmentDigest: 'b'.repeat(64) }),
+      }).blockers,
+    ).toContain('arm_identity_mismatch');
   });
 
   it('recomposes M10.21 and blocks an active emergency stop', () => {
@@ -387,6 +392,8 @@ function arm(
     chainId: '56',
     intentId: intent().id,
     quoteId: quote().id,
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'a'.repeat(64),
     acknowledgment: 'reservation_and_quote_reviewed',
     requestedAt: new Date('2026-10-01T14:00:03.000Z'),
     createdAt: new Date('2026-10-01T14:00:04.000Z'),

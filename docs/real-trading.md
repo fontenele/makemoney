@@ -532,6 +532,24 @@ This increment binds the payload to the reservation but does not duplicate the d
 - PostgreSQL E2E coverage proves migration, persistence, and exact replay with the commitment.
 - No runtime wiring, route, provider call, wallet mutation, command, executor, atomic permit, or submission authorization is added.
 
+## M10.30 — Durable arm-bound payload commitment
+
+M10.30 extends the commitment across the next durable decision boundary. The arm plan copies the exact supported commitment version and digest from its validated reservation, and the existing serializable arm transaction persists both values with the immutable arm.
+
+The migration again uses a nullable pair so historical arms are not assigned payload facts that cannot be proven. Its database constraint permits only both-null legacy state or the supported version with a lowercase 64-character hexadecimal digest. Every arm mapper rejects legacy, unsupported, or malformed values before replay or risk approval. The arm-bound emergency-stop assessment also requires a structurally valid commitment, and pre-approval revalidation requires the arm commitment to equal its reservation commitment exactly.
+
+This increment does not yet duplicate the commitment into approval or confirmation rows. It creates no provider payload, atomic permit, confirmation consumption, submission authorization, command, or executor, and the store remains outside runtime wiring.
+
+### M10.30 acceptance criteria
+
+- Every new durable arm stores the commitment version and digest copied from its validated reservation.
+- The migration preserves legacy uncertainty and constrains valid database pairs.
+- Arm replay and approval-store arm mapping fail closed on absent, unsupported, or malformed commitments.
+- Arm-bound emergency-stop assessment requires a structurally valid commitment.
+- Pre-approval revalidation requires exact arm/reservation commitment equality.
+- PostgreSQL E2E coverage proves migration and arm persistence with the commitment.
+- No runtime wiring, route, provider call, wallet mutation, command, executor, atomic permit, or submission authorization is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

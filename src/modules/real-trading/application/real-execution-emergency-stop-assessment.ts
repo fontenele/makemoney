@@ -167,6 +167,8 @@ function isValidArm(arm: StoredRealExecutionArm): boolean {
     arm.chainId === BSC_CHAIN_ID &&
     UUID_PATTERN.test(arm.intentId) &&
     UUID_PATTERN.test(arm.quoteId) &&
+    arm.payloadCommitmentVersion === 'real_execution_intent_quote_v1' &&
+    /^[a-f0-9]{64}$/.test(arm.payloadCommitmentDigest) &&
     arm.acknowledgment === 'reservation_and_quote_reviewed' &&
     isValidDate(arm.requestedAt) &&
     isValidDate(arm.createdAt) &&

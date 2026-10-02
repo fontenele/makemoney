@@ -1553,6 +1553,8 @@ export const RealExecutionArmScalarFieldEnum = {
   chainId: 'chainId',
   intentId: 'intentId',
   quoteId: 'quoteId',
+  payloadCommitmentVersion: 'payloadCommitmentVersion',
+  payloadCommitmentDigest: 'payloadCommitmentDigest',
   acknowledgment: 'acknowledgment',
   requestFingerprint: 'requestFingerprint',
   requestedAt: 'requestedAt',

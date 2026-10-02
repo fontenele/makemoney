@@ -77,6 +77,8 @@ export class PrismaRealExecutionArmStore implements RealExecutionArmStore {
             chainId: assessment.plan.chainId,
             intentId: assessment.plan.intentId,
             quoteId: assessment.plan.quoteId,
+            payloadCommitmentVersion: assessment.plan.payloadCommitmentVersion,
+            payloadCommitmentDigest: assessment.plan.payloadCommitmentDigest,
             acknowledgment: assessment.plan.acknowledgment,
             requestFingerprint,
             requestedAt: assessment.plan.requestedAt,
@@ -159,6 +161,8 @@ function mapArm(row: {
   chainId: string;
   intentId: string;
   quoteId: string;
+  payloadCommitmentVersion: string | null;
+  payloadCommitmentDigest: string | null;
   acknowledgment: string;
   requestedAt: Date;
   expiresAt: Date;
@@ -167,6 +171,15 @@ function mapArm(row: {
   if (row.acknowledgment !== 'reservation_and_quote_reviewed') {
     throw new Error('Persisted real execution arm has invalid acknowledgment');
   }
+  if (
+    row.payloadCommitmentVersion !== 'real_execution_intent_quote_v1' ||
+    row.payloadCommitmentDigest === null ||
+    !/^[a-f0-9]{64}$/.test(row.payloadCommitmentDigest)
+  ) {
+    throw new Error(
+      'Persisted real execution arm has invalid payload commitment',
+    );
+  }
   return {
     id: row.id,
     reservationId: row.reservationId,
@@ -174,6 +187,8 @@ function mapArm(row: {
     chainId: row.chainId,
     intentId: row.intentId,
     quoteId: row.quoteId,
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: row.payloadCommitmentDigest,
     acknowledgment: 'reservation_and_quote_reviewed',
     requestedAt: new Date(row.requestedAt),
     expiresAt: new Date(row.expiresAt),

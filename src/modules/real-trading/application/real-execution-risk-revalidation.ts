@@ -325,6 +325,8 @@ function armMatchesReservation(
     arm.chainId === reservation.chainId &&
     arm.intentId === reservation.intentId &&
     arm.quoteId === reservation.quoteId &&
+    arm.payloadCommitmentVersion === reservation.payloadCommitmentVersion &&
+    arm.payloadCommitmentDigest === reservation.payloadCommitmentDigest &&
     arm.createdAt.getTime() >= reservation.createdAt.getTime() &&
     arm.expiresAt.getTime() <= reservation.expiresAt.getTime()
   );

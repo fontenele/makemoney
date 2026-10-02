@@ -38,6 +38,8 @@ export interface RealExecutionArmPlan {
   readonly chainId: string;
   readonly intentId: string;
   readonly quoteId: string;
+  readonly payloadCommitmentVersion: 'real_execution_intent_quote_v1';
+  readonly payloadCommitmentDigest: string;
   readonly acknowledgment: 'reservation_and_quote_reviewed';
   readonly requestedAt: Date;
   readonly expiresAt: Date;
@@ -160,6 +162,8 @@ export function planRealExecutionArm(
           chainId: request.chainId,
           intentId: request.intentId,
           quoteId: request.quoteId,
+          payloadCommitmentVersion: reservation.payloadCommitmentVersion,
+          payloadCommitmentDigest: reservation.payloadCommitmentDigest,
           acknowledgment: request.acknowledgment,
           requestedAt: new Date(request.requestedAt),
           expiresAt: new Date(request.expiresAt),

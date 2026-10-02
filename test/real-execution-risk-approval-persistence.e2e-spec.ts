@@ -109,6 +109,8 @@ describe('Real execution risk approval persistence (e2e)', () => {
         chainId: '56',
         intentId: '11111111-1111-4111-8111-111111111111',
         quoteId: '22222222-2222-4222-8222-222222222222',
+        payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+        payloadCommitmentDigest: 'c'.repeat(64),
         acknowledgment: 'reservation_and_quote_reviewed',
         requestFingerprint: 'b'.repeat(64),
         requestedAt: new Date('2026-10-02T14:00:03.000Z'),

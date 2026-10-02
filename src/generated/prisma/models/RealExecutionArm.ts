@@ -31,6 +31,8 @@ export type RealExecutionArmMinAggregateOutputType = {
   chainId: string | null
   intentId: string | null
   quoteId: string | null
+  payloadCommitmentVersion: string | null
+  payloadCommitmentDigest: string | null
   acknowledgment: string | null
   requestFingerprint: string | null
   requestedAt: Date | null
@@ -45,6 +47,8 @@ export type RealExecutionArmMaxAggregateOutputType = {
   chainId: string | null
   intentId: string | null
   quoteId: string | null
+  payloadCommitmentVersion: string | null
+  payloadCommitmentDigest: string | null
   acknowledgment: string | null
   requestFingerprint: string | null
   requestedAt: Date | null
@@ -59,6 +63,8 @@ export type RealExecutionArmCountAggregateOutputType = {
   chainId: number
   intentId: number
   quoteId: number
+  payloadCommitmentVersion: number
+  payloadCommitmentDigest: number
   acknowledgment: number
   requestFingerprint: number
   requestedAt: number
@@ -75,6 +81,8 @@ export type RealExecutionArmMinAggregateInputType = {
   chainId?: true
   intentId?: true
   quoteId?: true
+  payloadCommitmentVersion?: true
+  payloadCommitmentDigest?: true
   acknowledgment?: true
   requestFingerprint?: true
   requestedAt?: true
@@ -89,6 +97,8 @@ export type RealExecutionArmMaxAggregateInputType = {
   chainId?: true
   intentId?: true
   quoteId?: true
+  payloadCommitmentVersion?: true
+  payloadCommitmentDigest?: true
   acknowledgment?: true
   requestFingerprint?: true
   requestedAt?: true
@@ -103,6 +113,8 @@ export type RealExecutionArmCountAggregateInputType = {
   chainId?: true
   intentId?: true
   quoteId?: true
+  payloadCommitmentVersion?: true
+  payloadCommitmentDigest?: true
   acknowledgment?: true
   requestFingerprint?: true
   requestedAt?: true
@@ -190,6 +202,8 @@ export type RealExecutionArmGroupByOutputType = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion: string | null
+  payloadCommitmentDigest: string | null
   acknowledgment: string
   requestFingerprint: string
   requestedAt: Date
@@ -225,6 +239,8 @@ export type RealExecutionArmWhereInput = {
   chainId?: Prisma.StringFilter<"RealExecutionArm"> | string
   intentId?: Prisma.UuidFilter<"RealExecutionArm"> | string
   quoteId?: Prisma.UuidFilter<"RealExecutionArm"> | string
+  payloadCommitmentVersion?: Prisma.StringNullableFilter<"RealExecutionArm"> | string | null
+  payloadCommitmentDigest?: Prisma.StringNullableFilter<"RealExecutionArm"> | string | null
   acknowledgment?: Prisma.StringFilter<"RealExecutionArm"> | string
   requestFingerprint?: Prisma.StringFilter<"RealExecutionArm"> | string
   requestedAt?: Prisma.DateTimeFilter<"RealExecutionArm"> | Date | string
@@ -241,6 +257,8 @@ export type RealExecutionArmOrderByWithRelationInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrderInput | Prisma.SortOrder
   acknowledgment?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
   requestedAt?: Prisma.SortOrder
@@ -260,6 +278,8 @@ export type RealExecutionArmWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.RealExecutionArmWhereInput | Prisma.RealExecutionArmWhereInput[]
   providerId?: Prisma.StringFilter<"RealExecutionArm"> | string
   chainId?: Prisma.StringFilter<"RealExecutionArm"> | string
+  payloadCommitmentVersion?: Prisma.StringNullableFilter<"RealExecutionArm"> | string | null
+  payloadCommitmentDigest?: Prisma.StringNullableFilter<"RealExecutionArm"> | string | null
   acknowledgment?: Prisma.StringFilter<"RealExecutionArm"> | string
   requestFingerprint?: Prisma.StringFilter<"RealExecutionArm"> | string
   requestedAt?: Prisma.DateTimeFilter<"RealExecutionArm"> | Date | string
@@ -276,6 +296,8 @@ export type RealExecutionArmOrderByWithAggregationInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrderInput | Prisma.SortOrder
   acknowledgment?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
   requestedAt?: Prisma.SortOrder
@@ -296,6 +318,8 @@ export type RealExecutionArmScalarWhereWithAggregatesInput = {
   chainId?: Prisma.StringWithAggregatesFilter<"RealExecutionArm"> | string
   intentId?: Prisma.UuidWithAggregatesFilter<"RealExecutionArm"> | string
   quoteId?: Prisma.UuidWithAggregatesFilter<"RealExecutionArm"> | string
+  payloadCommitmentVersion?: Prisma.StringNullableWithAggregatesFilter<"RealExecutionArm"> | string | null
+  payloadCommitmentDigest?: Prisma.StringNullableWithAggregatesFilter<"RealExecutionArm"> | string | null
   acknowledgment?: Prisma.StringWithAggregatesFilter<"RealExecutionArm"> | string
   requestFingerprint?: Prisma.StringWithAggregatesFilter<"RealExecutionArm"> | string
   requestedAt?: Prisma.DateTimeWithAggregatesFilter<"RealExecutionArm"> | Date | string
@@ -309,6 +333,8 @@ export type RealExecutionArmCreateInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   acknowledgment: string
   requestFingerprint: string
   requestedAt: Date | string
@@ -325,6 +351,8 @@ export type RealExecutionArmUncheckedCreateInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   acknowledgment: string
   requestFingerprint: string
   requestedAt: Date | string
@@ -339,6 +367,8 @@ export type RealExecutionArmUpdateInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   requestedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -355,6 +385,8 @@ export type RealExecutionArmUncheckedUpdateInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   requestedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -370,6 +402,8 @@ export type RealExecutionArmCreateManyInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   acknowledgment: string
   requestFingerprint: string
   requestedAt: Date | string
@@ -383,6 +417,8 @@ export type RealExecutionArmUpdateManyMutationInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   requestedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -397,6 +433,8 @@ export type RealExecutionArmUncheckedUpdateManyInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   requestedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -416,6 +454,8 @@ export type RealExecutionArmCountOrderByAggregateInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrder
   acknowledgment?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
   requestedAt?: Prisma.SortOrder
@@ -430,6 +470,8 @@ export type RealExecutionArmMaxOrderByAggregateInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrder
   acknowledgment?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
   requestedAt?: Prisma.SortOrder
@@ -444,6 +486,8 @@ export type RealExecutionArmMinOrderByAggregateInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrder
   acknowledgment?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
   requestedAt?: Prisma.SortOrder
@@ -508,6 +552,8 @@ export type RealExecutionArmCreateWithoutReservationInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   acknowledgment: string
   requestFingerprint: string
   requestedAt: Date | string
@@ -522,6 +568,8 @@ export type RealExecutionArmUncheckedCreateWithoutReservationInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   acknowledgment: string
   requestFingerprint: string
   requestedAt: Date | string
@@ -552,6 +600,8 @@ export type RealExecutionArmUpdateWithoutReservationInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   requestedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -566,6 +616,8 @@ export type RealExecutionArmUncheckedUpdateWithoutReservationInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   requestedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -580,6 +632,8 @@ export type RealExecutionArmCreateWithoutRiskApprovalInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   acknowledgment: string
   requestFingerprint: string
   requestedAt: Date | string
@@ -595,6 +649,8 @@ export type RealExecutionArmUncheckedCreateWithoutRiskApprovalInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   acknowledgment: string
   requestFingerprint: string
   requestedAt: Date | string
@@ -624,6 +680,8 @@ export type RealExecutionArmUpdateWithoutRiskApprovalInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   requestedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -639,6 +697,8 @@ export type RealExecutionArmUncheckedUpdateWithoutRiskApprovalInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   requestedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -655,6 +715,8 @@ export type RealExecutionArmSelect<ExtArgs extends runtime.Types.Extensions.Inte
   chainId?: boolean
   intentId?: boolean
   quoteId?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   acknowledgment?: boolean
   requestFingerprint?: boolean
   requestedAt?: boolean
@@ -671,6 +733,8 @@ export type RealExecutionArmSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   chainId?: boolean
   intentId?: boolean
   quoteId?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   acknowledgment?: boolean
   requestFingerprint?: boolean
   requestedAt?: boolean
@@ -686,6 +750,8 @@ export type RealExecutionArmSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   chainId?: boolean
   intentId?: boolean
   quoteId?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   acknowledgment?: boolean
   requestFingerprint?: boolean
   requestedAt?: boolean
@@ -701,6 +767,8 @@ export type RealExecutionArmSelectScalar = {
   chainId?: boolean
   intentId?: boolean
   quoteId?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   acknowledgment?: boolean
   requestFingerprint?: boolean
   requestedAt?: boolean
@@ -708,7 +776,7 @@ export type RealExecutionArmSelectScalar = {
   createdAt?: boolean
 }
 
-export type RealExecutionArmOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reservationId" | "providerId" | "chainId" | "intentId" | "quoteId" | "acknowledgment" | "requestFingerprint" | "requestedAt" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionArm"]>
+export type RealExecutionArmOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reservationId" | "providerId" | "chainId" | "intentId" | "quoteId" | "payloadCommitmentVersion" | "payloadCommitmentDigest" | "acknowledgment" | "requestFingerprint" | "requestedAt" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionArm"]>
 export type RealExecutionArmInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reservation?: boolean | Prisma.RealExecutionReservationDefaultArgs<ExtArgs>
   riskApproval?: boolean | Prisma.RealExecutionArm$riskApprovalArgs<ExtArgs>
@@ -733,6 +801,8 @@ export type $RealExecutionArmPayload<ExtArgs extends runtime.Types.Extensions.In
     chainId: string
     intentId: string
     quoteId: string
+    payloadCommitmentVersion: string | null
+    payloadCommitmentDigest: string | null
     acknowledgment: string
     requestFingerprint: string
     requestedAt: Date
@@ -1169,6 +1239,8 @@ export interface RealExecutionArmFieldRefs {
   readonly chainId: Prisma.FieldRef<"RealExecutionArm", 'String'>
   readonly intentId: Prisma.FieldRef<"RealExecutionArm", 'String'>
   readonly quoteId: Prisma.FieldRef<"RealExecutionArm", 'String'>
+  readonly payloadCommitmentVersion: Prisma.FieldRef<"RealExecutionArm", 'String'>
+  readonly payloadCommitmentDigest: Prisma.FieldRef<"RealExecutionArm", 'String'>
   readonly acknowledgment: Prisma.FieldRef<"RealExecutionArm", 'String'>
   readonly requestFingerprint: Prisma.FieldRef<"RealExecutionArm", 'String'>
   readonly requestedAt: Prisma.FieldRef<"RealExecutionArm", 'DateTime'>

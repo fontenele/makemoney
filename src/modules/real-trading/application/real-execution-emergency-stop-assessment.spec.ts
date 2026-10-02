@@ -156,6 +156,14 @@ describe('assessRealExecutionEmergencyStop', () => {
       blockers: ['invalid_arm'],
       armId: null,
     });
+    expect(
+      assessRealExecutionEmergencyStop(
+        arm({ payloadCommitmentDigest: 'invalid' }),
+        snapshot(),
+        POLICY,
+        NOW,
+      ).blockers,
+    ).toContain('invalid_arm');
   });
 
   it('fails closed on malformed stop facts and evaluation time', () => {
@@ -203,6 +211,8 @@ function arm(
     chainId: '56',
     intentId: '11111111-1111-4111-8111-111111111111',
     quoteId: '22222222-2222-4222-8222-222222222222',
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'a'.repeat(64),
     acknowledgment: 'reservation_and_quote_reviewed',
     requestedAt: new Date('2026-10-01T14:00:03.000Z'),
     createdAt: new Date('2026-10-01T14:00:04.000Z'),

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-02 — Propagate payload commitment into durable arms
+
+- Added nullable, pair-constrained commitment version and SHA-256 digest columns to durable arms without fabricating legacy payload facts.
+- Copied the exact validated reservation commitment through arm planning and persistence in the existing serializable transaction.
+- Made arm replay, emergency-stop assessment, approval-store mapping, and pre-approval revalidation fail closed on missing, malformed, or reservation-divergent commitments.
+- Added focused unit coverage for propagation, legacy-row rejection, malformed commitments, and cross-artifact mismatch plus PostgreSQL E2E coverage for migration and persistence.
+- Kept approval/confirmation commitment propagation, the atomic gate, confirmation consumption, provider mutation, and `submissionAuthorized` absent.
+- Verified all 1,835 backend tests across 165 suites, all 77 PostgreSQL E2E tests across 8 suites with 21 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-02 — Persist payload commitment with real-execution reservations
 
 - Added nullable, pair-constrained commitment version and SHA-256 digest columns to durable reservations without fabricating legacy payload facts.

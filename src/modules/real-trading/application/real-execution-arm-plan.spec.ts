@@ -33,7 +33,11 @@ describe('planRealExecutionArm', () => {
       confirmationRecorded: false,
       submissionAuthorized: false,
     });
-    expect(assessment.plan).toEqual(request());
+    expect(assessment.plan).toEqual({
+      ...request(),
+      payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+      payloadCommitmentDigest: 'a'.repeat(64),
+    });
   });
 
   it.each([
