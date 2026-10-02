@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-10-02 — Add pure initial-submission plan
+
+- Added a pure planner over one exact active M10.25 confirmation, its successful fresh M10.26 stop assessment, and one short-lived submission request.
+- Bound the request to every confirmation, approval, reservation, arm, provider, chain, intent, quote, and stop-event identity and required strict temporal ordering.
+- Bounded request age, stop-assessment age, plan lifetime, and confirmation expiry from one through sixty seconds.
+- Marked a ready plan initial-only with automatic retry forbidden while retaining mandatory future atomic stop enforcement and confirmation consumption.
+- Kept `submissionAuthorized: false`; added no schema, repository, runtime wiring, route, provider call, wallet mutation, command, or executor.
+- Verified all 1,823 backend tests across 164 suites, including the 9 focused planner tests, plus formatting, lint, and the backend build.
+
+## 2026-10-02 — Add pure submission-bound emergency-stop recheck
+
+- Added a pure assessment over one exact active M10.25 confirmation and a fresh complete persisted emergency-stop observation.
+- Required the observation after durable confirmation while preserving the exact stop-event identity bound through M10.23–M10.25.
+- Invalidated the chain after every later stop change, including a later clear, and rejected configuration fallback, partial coverage, active state, invalid clocks, expiry, future facts, and staleness.
+- Kept the result non-atomic and `submissionAuthorized: false`; added no schema, repository, runtime wiring, route, provider call, wallet mutation, command, or executor.
+- Verified all 1,814 backend tests across 163 suites, including the 9 focused tests, plus formatting, lint, and the backend build.
+
 ## 2026-10-02 — Add durable approval-bound final confirmation
 
 - Audited M10.23 against its implementation, migration, generated Prisma client, unit coverage, and PostgreSQL persistence/concurrency acceptance criteria; no incomplete M10.23 behavior remained.

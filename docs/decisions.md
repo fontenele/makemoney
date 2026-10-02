@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-10-02 — Separate an inert initial-submission plan from the atomic gate
+
+M10.27 defines the complete identity and time boundary for a possible first submission attempt without treating the non-atomic M10.26 observation as permission. The plan composes the exact durable confirmation with its successful stop assessment, repeats every upstream audit identity, and expires no later than the confirmation.
+
+The output is initial-only and forbids automatic retry. It explicitly requires a later atomic stop re-read and durable confirmation consumption. Those controls, provider mutation, and ambiguous-result reconciliation remain separate future boundaries, so a ready plan still has `submissionAuthorized: false`.
+
+## 2026-10-02 — Recheck the unchanged stop event after final confirmation
+
+M10.26 does not treat an earlier inactive emergency-stop decision as permanently valid. A future submission review must observe persisted state again after durable confirmation and must see the exact same stop-event identity already used by risk approval. Consequently, activating and then clearing the stop cannot revive an existing confirmation; a new quote-backed chain is required.
+
+The pure assessment remains deliberately non-atomic. It cannot prevent a stop event after evaluation and therefore cannot be called a submission permit. Atomic stop enforcement, confirmation consumption, provider mutation, and ambiguous-result reconciliation remain separate future boundaries.
+
 ## 2026-10-02 — Persist final confirmation without authorizing submission
 
 M10.25 makes the explicit M10.24 acknowledgment immutable and single-use for one complete approval chain. The store reloads the durable approval and reevaluates freshness and identity inside a serialized transaction; unique approval, reservation, arm, intent, and quote fields prevent another confirmation from covering the same financial decision. Exact replay remains available after expiry but cannot extend it.

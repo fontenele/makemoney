@@ -462,6 +462,40 @@ The emergency-stop change identity uses the same bounded opaque `[A-Za-z0-9_-]` 
 - PostgreSQL E2E coverage proves migration, persistence, replay, and concurrent single-confirmation enforcement.
 - The store remains unwired, performs no submission-bound emergency-stop recheck, and grants no submission authorization.
 
+## M10.26 — Pure submission-bound emergency-stop recheck
+
+M10.26 adds a pure, unwired policy for the last emergency-stop observation before a future submission design. It requires one structurally valid, active M10.25 confirmation and a complete persisted emergency-stop snapshot observed after that durable confirmation. Configuration fallback, partial coverage, active state, malformed clocks, future or stale observation, and expired confirmation all fail closed.
+
+The newest persisted stop event must have the exact same bounded opaque change identity already carried from M10.23 through the durable confirmation. A later stop activation followed by another clear therefore still changes the identity and invalidates the entire approval/confirmation chain. The stop change itself must predate confirmation, while its current observation must be strictly later.
+
+`emergency_stop_clear_for_submission_review` remains non-atomic because the assessment consumes caller-supplied state and cannot prevent a stop change immediately afterward. It records no permit, consumes no confirmation, contacts no provider, and permanently reports `submissionAuthorized: false`. A future provider-mutation boundary must re-read and enforce stop state atomically with any submission attempt.
+
+### M10.26 acceptance criteria
+
+- Only a valid unexpired M10.25 confirmation and fresh complete persisted inactive stop observation can pass.
+- The observation must occur after confirmation and preserve the exact M10.23 stop-event identity.
+- Any later stop change, including a later clear, invalidates the chain.
+- Configuration fallback, partial, active, malformed, future, or stale facts fail closed.
+- A clear result remains non-atomic, unwired, and grants no submission authorization.
+- No schema, repository, route, provider call, wallet mutation, command, or executor is added.
+
+## M10.27 — Pure initial-submission plan
+
+M10.27 adds a pure, unwired planner for the exact initial submission attempt that a later atomic gate may consider. It accepts only one structurally valid and active M10.25 confirmation, the successful M10.26 assessment for that same confirmation and persisted stop-event identity, and a short-lived request repeating the confirmation, approval, reservation, arm, provider, chain, intent, quote, and stop-change identities.
+
+The stop assessment must be fresh, cannot predate confirmation, and the request must be fresh and occur no earlier than that assessment. The plan must remain active, cannot outlive confirmation, and has an independently bounded lifetime. All three policy windows are restricted to one through sixty seconds.
+
+`submission_plan_ready_for_atomic_gate` is not submission permission. The inert plan is explicitly limited to an initial attempt and permanently forbids automatic retry. It also records that a future mutating boundary must atomically re-read emergency-stop state and durably consume the confirmation before provider submission can be considered. M10.27 creates neither boundary and leaves `submissionAuthorized: false`.
+
+### M10.27 acceptance criteria
+
+- Confirmation, stop assessment, and request must carry the exact complete audit chain.
+- The stop assessment and request are independently fresh, ordered, and bounded by confirmation expiry.
+- A ready plan is initial-only and sets `automaticRetryAllowed: false`.
+- Atomic stop enforcement and durable confirmation consumption remain mandatory future boundaries.
+- A ready result remains unwired and grants no submission authorization.
+- No schema, repository, route, provider call, wallet mutation, command, or executor is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
