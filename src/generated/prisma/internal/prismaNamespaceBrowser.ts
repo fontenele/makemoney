@@ -60,6 +60,7 @@ export const ModelName = {
   RealExecutionReservation: 'RealExecutionReservation',
   RealExecutionArm: 'RealExecutionArm',
   RealExecutionRiskApproval: 'RealExecutionRiskApproval',
+  RealExecutionFinalConfirmation: 'RealExecutionFinalConfirmation',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -228,6 +229,26 @@ export const RealExecutionRiskApprovalScalarFieldEnum = {
 } as const
 
 export type RealExecutionRiskApprovalScalarFieldEnum = (typeof RealExecutionRiskApprovalScalarFieldEnum)[keyof typeof RealExecutionRiskApprovalScalarFieldEnum]
+
+
+export const RealExecutionFinalConfirmationScalarFieldEnum = {
+  id: 'id',
+  approvalId: 'approvalId',
+  reservationId: 'reservationId',
+  armId: 'armId',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  intentId: 'intentId',
+  quoteId: 'quoteId',
+  emergencyStopChangeId: 'emergencyStopChangeId',
+  acknowledgment: 'acknowledgment',
+  requestFingerprint: 'requestFingerprint',
+  requestedAt: 'requestedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RealExecutionFinalConfirmationScalarFieldEnum = (typeof RealExecutionFinalConfirmationScalarFieldEnum)[keyof typeof RealExecutionFinalConfirmationScalarFieldEnum]
 
 
 export const ObservedSpotSymbolScalarFieldEnum = {

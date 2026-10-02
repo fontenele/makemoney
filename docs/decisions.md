@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-02 — Persist final confirmation without authorizing submission
+
+M10.25 makes the explicit M10.24 acknowledgment immutable and single-use for one complete approval chain. The store reloads the durable approval and reevaluates freshness and identity inside a serialized transaction; unique approval, reservation, arm, intent, and quote fields prevent another confirmation from covering the same financial decision. Exact replay remains available after expiry but cannot extend it.
+
+The confirmation deliberately preserves the persisted emergency-stop change as an opaque bounded risk-control identity, not a UUID assumption. Persistence marks only that confirmation was recorded. It does not recheck emergency stop at the future provider-mutation boundary and therefore cannot authorize submission or be consumed by an executor.
+
 ## 2026-10-02 — Keep final confirmation exact, ephemeral, and non-authorizing
 
 M10.24 models final confirmation as a separate request after durable Risk Engine approval, never as a side effect of arming or approval persistence. The operator acknowledgment repeats every relevant audit identity, including the exact persisted emergency-stop change used by M10.23, and explicitly states that the risk approval and final quote were reviewed for immediate submission.

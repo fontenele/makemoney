@@ -406,6 +406,7 @@ export const ModelName = {
   RealExecutionReservation: 'RealExecutionReservation',
   RealExecutionArm: 'RealExecutionArm',
   RealExecutionRiskApproval: 'RealExecutionRiskApproval',
+  RealExecutionFinalConfirmation: 'RealExecutionFinalConfirmation',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1094,6 +1095,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RealExecutionFinalConfirmation: {
+      payload: Prisma.$RealExecutionFinalConfirmationPayload<ExtArgs>
+      fields: Prisma.RealExecutionFinalConfirmationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionFinalConfirmationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionFinalConfirmationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionFinalConfirmationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionFinalConfirmationPayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionFinalConfirmationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionFinalConfirmationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionFinalConfirmationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionFinalConfirmationPayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionFinalConfirmationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionFinalConfirmationPayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionFinalConfirmationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionFinalConfirmationPayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionFinalConfirmationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionFinalConfirmationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionFinalConfirmationPayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionFinalConfirmationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionFinalConfirmationPayload>
+        }
+        update: {
+          args: Prisma.RealExecutionFinalConfirmationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionFinalConfirmationPayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionFinalConfirmationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionFinalConfirmationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionFinalConfirmationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionFinalConfirmationPayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionFinalConfirmationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionFinalConfirmationPayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionFinalConfirmationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionFinalConfirmation>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionFinalConfirmationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionFinalConfirmationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionFinalConfirmationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionFinalConfirmationCountAggregateOutputType> | number
+        }
+      }
+    }
     ObservedSpotSymbol: {
       payload: Prisma.$ObservedSpotSymbolPayload<ExtArgs>
       fields: Prisma.ObservedSpotSymbolFieldRefs
@@ -1504,6 +1579,26 @@ export const RealExecutionRiskApprovalScalarFieldEnum = {
 export type RealExecutionRiskApprovalScalarFieldEnum = (typeof RealExecutionRiskApprovalScalarFieldEnum)[keyof typeof RealExecutionRiskApprovalScalarFieldEnum]
 
 
+export const RealExecutionFinalConfirmationScalarFieldEnum = {
+  id: 'id',
+  approvalId: 'approvalId',
+  reservationId: 'reservationId',
+  armId: 'armId',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  intentId: 'intentId',
+  quoteId: 'quoteId',
+  emergencyStopChangeId: 'emergencyStopChangeId',
+  acknowledgment: 'acknowledgment',
+  requestFingerprint: 'requestFingerprint',
+  requestedAt: 'requestedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RealExecutionFinalConfirmationScalarFieldEnum = (typeof RealExecutionFinalConfirmationScalarFieldEnum)[keyof typeof RealExecutionFinalConfirmationScalarFieldEnum]
+
+
 export const ObservedSpotSymbolScalarFieldEnum = {
   provider: 'provider',
   symbol: 'symbol',
@@ -1868,6 +1963,7 @@ export type GlobalOmitConfig = {
   realExecutionReservation?: Prisma.RealExecutionReservationOmit
   realExecutionArm?: Prisma.RealExecutionArmOmit
   realExecutionRiskApproval?: Prisma.RealExecutionRiskApprovalOmit
+  realExecutionFinalConfirmation?: Prisma.RealExecutionFinalConfirmationOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
   listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit
   listingCheckpointTopOfBook?: Prisma.ListingCheckpointTopOfBookOmit

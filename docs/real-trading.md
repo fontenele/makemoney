@@ -445,6 +445,23 @@ The durable approval must be structurally valid, active, and still carry `riskAp
 - A ready plan records no durable confirmation, performs no final stop recheck, and grants no submission authorization.
 - The planner remains unwired and adds no schema, repository, route, provider call, wallet mutation, command, or executor.
 
+## M10.25 — Durable approval-bound final confirmation
+
+M10.25 adds an unwired Prisma store for the M10.24 plan. Each attempt runs in a serializable transaction under a dedicated advisory lock, checks exact fingerprinted replay first, reloads the referenced M10.23 approval, rejects protected identity reuse, and reapplies M10.24 using the transaction-time clock before insertion.
+
+The immutable row preserves the exact approval, reservation, arm, provider, chain, intent, quote, persisted emergency-stop change, acknowledgment, request time, and expiry. A restrictive foreign key binds it to the durable approval, while unique approval, reservation, arm, intent, and quote identities permit at most one confirmation for the complete audit chain. Exact replay remains observable after expiry without extending it.
+
+The emergency-stop change identity uses the same bounded opaque `[A-Za-z0-9_-]` format as the persisted risk-control event rather than assuming UUID identity. The public mapper excludes the internal request fingerprint. A stored confirmation reports `confirmationRecorded: true`, but the emergency stop has not been rechecked at a submission boundary and `submissionAuthorized` remains false.
+
+### M10.25 acceptance criteria
+
+- Persistence reloads the exact durable approval and reapplies M10.24 inside a serializable transaction.
+- One approval, reservation, arm, intent, and quote can produce at most one immutable confirmation.
+- Exact fingerprinted replay returns the original record without extending expiry; changed ID reuse and protected identity reuse fail closed.
+- The persisted emergency-stop change identity remains compatible with the actual risk-control event format, and internal fingerprints are not exposed.
+- PostgreSQL E2E coverage proves migration, persistence, replay, and concurrent single-confirmation enforcement.
+- The store remains unwired, performs no submission-bound emergency-stop recheck, and grants no submission authorization.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

@@ -4,6 +4,7 @@ const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const PROVIDER_ID_PATTERN = /^[a-z][a-z0-9_-]{0,31}$/;
 const CHAIN_ID_PATTERN = /^[A-Za-z0-9_-]{1,32}$/;
+const EMERGENCY_STOP_CHANGE_ID_PATTERN = /^[A-Za-z0-9_-]{1,100}$/;
 const AGENTIC_WALLET_PROVIDER_ID = 'agentic_wallet';
 const BSC_CHAIN_ID = '56';
 const MINIMUM_POLICY_MS = 1_000;
@@ -217,7 +218,7 @@ function isValidApproval(approval: StoredRealExecutionRiskApproval): boolean {
     approval.chainId === BSC_CHAIN_ID &&
     UUID_PATTERN.test(approval.intentId) &&
     UUID_PATTERN.test(approval.quoteId) &&
-    UUID_PATTERN.test(approval.emergencyStopChangeId) &&
+    EMERGENCY_STOP_CHANGE_ID_PATTERN.test(approval.emergencyStopChangeId) &&
     isValidDate(approval.revalidatedAt) &&
     isValidDate(approval.createdAt) &&
     isValidDate(approval.expiresAt) &&
@@ -243,7 +244,7 @@ function isValidRequest(
     CHAIN_ID_PATTERN.test(request.chainId) &&
     UUID_PATTERN.test(request.intentId) &&
     UUID_PATTERN.test(request.quoteId) &&
-    UUID_PATTERN.test(request.emergencyStopChangeId) &&
+    EMERGENCY_STOP_CHANGE_ID_PATTERN.test(request.emergencyStopChangeId) &&
     isValidDate(request.requestedAt) &&
     isValidDate(request.expiresAt) &&
     request.expiresAt.getTime() > request.requestedAt.getTime()

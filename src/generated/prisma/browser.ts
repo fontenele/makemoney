@@ -63,6 +63,11 @@ export type RealExecutionArm = Prisma.RealExecutionArmModel
  */
 export type RealExecutionRiskApproval = Prisma.RealExecutionRiskApprovalModel
 /**
+ * Model RealExecutionFinalConfirmation
+ * 
+ */
+export type RealExecutionFinalConfirmation = Prisma.RealExecutionFinalConfirmationModel
+/**
  * Model ObservedSpotSymbol
  * 
  */

@@ -240,6 +240,7 @@ export type RealExecutionRiskApprovalWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"RealExecutionRiskApproval"> | Date | string
   reservation?: Prisma.XOR<Prisma.RealExecutionReservationScalarRelationFilter, Prisma.RealExecutionReservationWhereInput>
   arm?: Prisma.XOR<Prisma.RealExecutionArmScalarRelationFilter, Prisma.RealExecutionArmWhereInput>
+  finalConfirmation?: Prisma.XOR<Prisma.RealExecutionFinalConfirmationNullableScalarRelationFilter, Prisma.RealExecutionFinalConfirmationWhereInput> | null
 }
 
 export type RealExecutionRiskApprovalOrderByWithRelationInput = {
@@ -257,6 +258,7 @@ export type RealExecutionRiskApprovalOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   reservation?: Prisma.RealExecutionReservationOrderByWithRelationInput
   arm?: Prisma.RealExecutionArmOrderByWithRelationInput
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationOrderByWithRelationInput
 }
 
 export type RealExecutionRiskApprovalWhereUniqueInput = Prisma.AtLeast<{
@@ -277,6 +279,7 @@ export type RealExecutionRiskApprovalWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"RealExecutionRiskApproval"> | Date | string
   reservation?: Prisma.XOR<Prisma.RealExecutionReservationScalarRelationFilter, Prisma.RealExecutionReservationWhereInput>
   arm?: Prisma.XOR<Prisma.RealExecutionArmScalarRelationFilter, Prisma.RealExecutionArmWhereInput>
+  finalConfirmation?: Prisma.XOR<Prisma.RealExecutionFinalConfirmationNullableScalarRelationFilter, Prisma.RealExecutionFinalConfirmationWhereInput> | null
 }, "id" | "reservationId" | "armId" | "intentId" | "quoteId">
 
 export type RealExecutionRiskApprovalOrderByWithAggregationInput = {
@@ -328,6 +331,7 @@ export type RealExecutionRiskApprovalCreateInput = {
   createdAt?: Date | string
   reservation: Prisma.RealExecutionReservationCreateNestedOneWithoutRiskApprovalInput
   arm: Prisma.RealExecutionArmCreateNestedOneWithoutRiskApprovalInput
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationCreateNestedOneWithoutApprovalInput
 }
 
 export type RealExecutionRiskApprovalUncheckedCreateInput = {
@@ -343,6 +347,7 @@ export type RealExecutionRiskApprovalUncheckedCreateInput = {
   revalidatedAt: Date | string
   expiresAt: Date | string
   createdAt?: Date | string
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationUncheckedCreateNestedOneWithoutApprovalInput
 }
 
 export type RealExecutionRiskApprovalUpdateInput = {
@@ -358,6 +363,7 @@ export type RealExecutionRiskApprovalUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservation?: Prisma.RealExecutionReservationUpdateOneRequiredWithoutRiskApprovalNestedInput
   arm?: Prisma.RealExecutionArmUpdateOneRequiredWithoutRiskApprovalNestedInput
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationUpdateOneWithoutApprovalNestedInput
 }
 
 export type RealExecutionRiskApprovalUncheckedUpdateInput = {
@@ -373,6 +379,7 @@ export type RealExecutionRiskApprovalUncheckedUpdateInput = {
   revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationUncheckedUpdateOneWithoutApprovalNestedInput
 }
 
 export type RealExecutionRiskApprovalCreateManyInput = {
@@ -468,6 +475,11 @@ export type RealExecutionRiskApprovalMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
 }
 
+export type RealExecutionRiskApprovalScalarRelationFilter = {
+  is?: Prisma.RealExecutionRiskApprovalWhereInput
+  isNot?: Prisma.RealExecutionRiskApprovalWhereInput
+}
+
 export type RealExecutionRiskApprovalCreateNestedOneWithoutReservationInput = {
   create?: Prisma.XOR<Prisma.RealExecutionRiskApprovalCreateWithoutReservationInput, Prisma.RealExecutionRiskApprovalUncheckedCreateWithoutReservationInput>
   connectOrCreate?: Prisma.RealExecutionRiskApprovalCreateOrConnectWithoutReservationInput
@@ -532,6 +544,20 @@ export type RealExecutionRiskApprovalUncheckedUpdateOneWithoutArmNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionRiskApprovalUpdateToOneWithWhereWithoutArmInput, Prisma.RealExecutionRiskApprovalUpdateWithoutArmInput>, Prisma.RealExecutionRiskApprovalUncheckedUpdateWithoutArmInput>
 }
 
+export type RealExecutionRiskApprovalCreateNestedOneWithoutFinalConfirmationInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionRiskApprovalCreateWithoutFinalConfirmationInput, Prisma.RealExecutionRiskApprovalUncheckedCreateWithoutFinalConfirmationInput>
+  connectOrCreate?: Prisma.RealExecutionRiskApprovalCreateOrConnectWithoutFinalConfirmationInput
+  connect?: Prisma.RealExecutionRiskApprovalWhereUniqueInput
+}
+
+export type RealExecutionRiskApprovalUpdateOneRequiredWithoutFinalConfirmationNestedInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionRiskApprovalCreateWithoutFinalConfirmationInput, Prisma.RealExecutionRiskApprovalUncheckedCreateWithoutFinalConfirmationInput>
+  connectOrCreate?: Prisma.RealExecutionRiskApprovalCreateOrConnectWithoutFinalConfirmationInput
+  upsert?: Prisma.RealExecutionRiskApprovalUpsertWithoutFinalConfirmationInput
+  connect?: Prisma.RealExecutionRiskApprovalWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionRiskApprovalUpdateToOneWithWhereWithoutFinalConfirmationInput, Prisma.RealExecutionRiskApprovalUpdateWithoutFinalConfirmationInput>, Prisma.RealExecutionRiskApprovalUncheckedUpdateWithoutFinalConfirmationInput>
+}
+
 export type RealExecutionRiskApprovalCreateWithoutReservationInput = {
   id: string
   providerId: string
@@ -544,6 +570,7 @@ export type RealExecutionRiskApprovalCreateWithoutReservationInput = {
   expiresAt: Date | string
   createdAt?: Date | string
   arm: Prisma.RealExecutionArmCreateNestedOneWithoutRiskApprovalInput
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationCreateNestedOneWithoutApprovalInput
 }
 
 export type RealExecutionRiskApprovalUncheckedCreateWithoutReservationInput = {
@@ -558,6 +585,7 @@ export type RealExecutionRiskApprovalUncheckedCreateWithoutReservationInput = {
   revalidatedAt: Date | string
   expiresAt: Date | string
   createdAt?: Date | string
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationUncheckedCreateNestedOneWithoutApprovalInput
 }
 
 export type RealExecutionRiskApprovalCreateOrConnectWithoutReservationInput = {
@@ -588,6 +616,7 @@ export type RealExecutionRiskApprovalUpdateWithoutReservationInput = {
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   arm?: Prisma.RealExecutionArmUpdateOneRequiredWithoutRiskApprovalNestedInput
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationUpdateOneWithoutApprovalNestedInput
 }
 
 export type RealExecutionRiskApprovalUncheckedUpdateWithoutReservationInput = {
@@ -602,6 +631,7 @@ export type RealExecutionRiskApprovalUncheckedUpdateWithoutReservationInput = {
   revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationUncheckedUpdateOneWithoutApprovalNestedInput
 }
 
 export type RealExecutionRiskApprovalCreateWithoutArmInput = {
@@ -616,6 +646,7 @@ export type RealExecutionRiskApprovalCreateWithoutArmInput = {
   expiresAt: Date | string
   createdAt?: Date | string
   reservation: Prisma.RealExecutionReservationCreateNestedOneWithoutRiskApprovalInput
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationCreateNestedOneWithoutApprovalInput
 }
 
 export type RealExecutionRiskApprovalUncheckedCreateWithoutArmInput = {
@@ -630,6 +661,7 @@ export type RealExecutionRiskApprovalUncheckedCreateWithoutArmInput = {
   revalidatedAt: Date | string
   expiresAt: Date | string
   createdAt?: Date | string
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationUncheckedCreateNestedOneWithoutApprovalInput
 }
 
 export type RealExecutionRiskApprovalCreateOrConnectWithoutArmInput = {
@@ -660,11 +692,89 @@ export type RealExecutionRiskApprovalUpdateWithoutArmInput = {
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservation?: Prisma.RealExecutionReservationUpdateOneRequiredWithoutRiskApprovalNestedInput
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationUpdateOneWithoutApprovalNestedInput
 }
 
 export type RealExecutionRiskApprovalUncheckedUpdateWithoutArmInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reservationId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  intentId?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  finalConfirmation?: Prisma.RealExecutionFinalConfirmationUncheckedUpdateOneWithoutApprovalNestedInput
+}
+
+export type RealExecutionRiskApprovalCreateWithoutFinalConfirmationInput = {
+  id: string
+  providerId: string
+  chainId: string
+  intentId: string
+  quoteId: string
+  emergencyStopChangeId: string
+  requestFingerprint: string
+  revalidatedAt: Date | string
+  expiresAt: Date | string
+  createdAt?: Date | string
+  reservation: Prisma.RealExecutionReservationCreateNestedOneWithoutRiskApprovalInput
+  arm: Prisma.RealExecutionArmCreateNestedOneWithoutRiskApprovalInput
+}
+
+export type RealExecutionRiskApprovalUncheckedCreateWithoutFinalConfirmationInput = {
+  id: string
+  reservationId: string
+  armId: string
+  providerId: string
+  chainId: string
+  intentId: string
+  quoteId: string
+  emergencyStopChangeId: string
+  requestFingerprint: string
+  revalidatedAt: Date | string
+  expiresAt: Date | string
+  createdAt?: Date | string
+}
+
+export type RealExecutionRiskApprovalCreateOrConnectWithoutFinalConfirmationInput = {
+  where: Prisma.RealExecutionRiskApprovalWhereUniqueInput
+  create: Prisma.XOR<Prisma.RealExecutionRiskApprovalCreateWithoutFinalConfirmationInput, Prisma.RealExecutionRiskApprovalUncheckedCreateWithoutFinalConfirmationInput>
+}
+
+export type RealExecutionRiskApprovalUpsertWithoutFinalConfirmationInput = {
+  update: Prisma.XOR<Prisma.RealExecutionRiskApprovalUpdateWithoutFinalConfirmationInput, Prisma.RealExecutionRiskApprovalUncheckedUpdateWithoutFinalConfirmationInput>
+  create: Prisma.XOR<Prisma.RealExecutionRiskApprovalCreateWithoutFinalConfirmationInput, Prisma.RealExecutionRiskApprovalUncheckedCreateWithoutFinalConfirmationInput>
+  where?: Prisma.RealExecutionRiskApprovalWhereInput
+}
+
+export type RealExecutionRiskApprovalUpdateToOneWithWhereWithoutFinalConfirmationInput = {
+  where?: Prisma.RealExecutionRiskApprovalWhereInput
+  data: Prisma.XOR<Prisma.RealExecutionRiskApprovalUpdateWithoutFinalConfirmationInput, Prisma.RealExecutionRiskApprovalUncheckedUpdateWithoutFinalConfirmationInput>
+}
+
+export type RealExecutionRiskApprovalUpdateWithoutFinalConfirmationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  intentId?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reservation?: Prisma.RealExecutionReservationUpdateOneRequiredWithoutRiskApprovalNestedInput
+  arm?: Prisma.RealExecutionArmUpdateOneRequiredWithoutRiskApprovalNestedInput
+}
+
+export type RealExecutionRiskApprovalUncheckedUpdateWithoutFinalConfirmationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reservationId?: Prisma.StringFieldUpdateOperationsInput | string
+  armId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -693,6 +803,7 @@ export type RealExecutionRiskApprovalSelect<ExtArgs extends runtime.Types.Extens
   createdAt?: boolean
   reservation?: boolean | Prisma.RealExecutionReservationDefaultArgs<ExtArgs>
   arm?: boolean | Prisma.RealExecutionArmDefaultArgs<ExtArgs>
+  finalConfirmation?: boolean | Prisma.RealExecutionRiskApproval$finalConfirmationArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionRiskApproval"]>
 
 export type RealExecutionRiskApprovalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -748,6 +859,7 @@ export type RealExecutionRiskApprovalOmit<ExtArgs extends runtime.Types.Extensio
 export type RealExecutionRiskApprovalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reservation?: boolean | Prisma.RealExecutionReservationDefaultArgs<ExtArgs>
   arm?: boolean | Prisma.RealExecutionArmDefaultArgs<ExtArgs>
+  finalConfirmation?: boolean | Prisma.RealExecutionRiskApproval$finalConfirmationArgs<ExtArgs>
 }
 export type RealExecutionRiskApprovalIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reservation?: boolean | Prisma.RealExecutionReservationDefaultArgs<ExtArgs>
@@ -763,6 +875,7 @@ export type $RealExecutionRiskApprovalPayload<ExtArgs extends runtime.Types.Exte
   objects: {
     reservation: Prisma.$RealExecutionReservationPayload<ExtArgs>
     arm: Prisma.$RealExecutionArmPayload<ExtArgs>
+    finalConfirmation: Prisma.$RealExecutionFinalConfirmationPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1173,6 +1286,7 @@ export interface Prisma__RealExecutionRiskApprovalClient<T, Null = never, ExtArg
   readonly [Symbol.toStringTag]: "PrismaPromise"
   reservation<T extends Prisma.RealExecutionReservationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionReservationDefaultArgs<ExtArgs>>): Prisma.Prisma__RealExecutionReservationClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionReservationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   arm<T extends Prisma.RealExecutionArmDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionArmDefaultArgs<ExtArgs>>): Prisma.Prisma__RealExecutionArmClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionArmPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  finalConfirmation<T extends Prisma.RealExecutionRiskApproval$finalConfirmationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionRiskApproval$finalConfirmationArgs<ExtArgs>>): Prisma.Prisma__RealExecutionFinalConfirmationClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionFinalConfirmationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1612,6 +1726,25 @@ export type RealExecutionRiskApprovalDeleteManyArgs<ExtArgs extends runtime.Type
    * Limit how many RealExecutionRiskApprovals to delete.
    */
   limit?: number
+}
+
+/**
+ * RealExecutionRiskApproval.finalConfirmation
+ */
+export type RealExecutionRiskApproval$finalConfirmationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RealExecutionFinalConfirmation
+   */
+  select?: Prisma.RealExecutionFinalConfirmationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RealExecutionFinalConfirmation
+   */
+  omit?: Prisma.RealExecutionFinalConfirmationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionFinalConfirmationInclude<ExtArgs> | null
+  where?: Prisma.RealExecutionFinalConfirmationWhereInput
 }
 
 /**

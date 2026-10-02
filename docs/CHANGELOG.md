@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-02 — Add durable approval-bound final confirmation
+
+- Audited M10.23 against its implementation, migration, generated Prisma client, unit coverage, and PostgreSQL persistence/concurrency acceptance criteria; no incomplete M10.23 behavior remained.
+- Corrected M10.24 to accept the real bounded opaque risk-control event ID format instead of incorrectly requiring a UUID.
+- Added an unwired serializable Prisma store that reloads the exact M10.23 approval and reapplies M10.24 before persisting one immutable short-lived confirmation.
+- Added restrictive approval persistence plus unique approval/reservation/arm/intent/quote identities, canonical request fingerprinting, and exact replay without expiry extension.
+- Prevented the internal request fingerprint from leaking through the public confirmation mapper.
+- Added focused unit and PostgreSQL E2E coverage for persistence, replay, missing or changed approval facts, expiry, conflicts, and concurrent single-confirmation enforcement.
+- Kept the submission-bound emergency-stop recheck and submission authorization false; added no runtime wiring, route, provider call, wallet mutation, command, or executor.
+- Verified all 1,805 backend tests across 162 suites, all 77 E2E tests across 8 suites with 19 migrations applied from scratch, all 92 dashboard tests across 16 files, formatting, lint, builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-02 — Add pure approval-bound final-confirmation plan
 
 - Added a pure planner that requires one active exact M10.23 approval and an explicit final-quote/immediate-submission acknowledgment.

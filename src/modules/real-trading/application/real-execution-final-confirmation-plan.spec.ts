@@ -62,7 +62,7 @@ describe('planRealExecutionFinalConfirmation', () => {
     ],
     [
       'emergencyStopChangeId',
-      'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      'different-stop-change',
       'confirmation_emergency_stop_change_mismatch',
     ],
   ] as const)(
@@ -213,7 +213,7 @@ function approval(
     chainId: '56',
     intentId: '11111111-1111-4111-8111-111111111111',
     quoteId: '22222222-2222-4222-8222-222222222222',
-    emergencyStopChangeId: '66666666-6666-4666-8666-666666666666',
+    emergencyStopChangeId: 'real-trading-stop-clear-1',
     revalidatedAt: new Date('2026-10-02T15:00:03.000Z'),
     createdAt: new Date('2026-10-02T15:00:04.000Z'),
     expiresAt: new Date('2026-10-02T15:00:15.000Z'),
@@ -236,7 +236,7 @@ function request(
     chainId: '56',
     intentId: '11111111-1111-4111-8111-111111111111',
     quoteId: '22222222-2222-4222-8222-222222222222',
-    emergencyStopChangeId: '66666666-6666-4666-8666-666666666666',
+    emergencyStopChangeId: 'real-trading-stop-clear-1',
     acknowledgment:
       'risk_approval_and_final_quote_reviewed_for_immediate_submission',
     requestedAt: new Date('2026-10-02T15:00:04.000Z'),
