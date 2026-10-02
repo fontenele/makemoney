@@ -146,21 +146,23 @@ model RealExecutionArm {
 }
 
 model RealExecutionRiskApproval {
-  id                    String                          @id @db.Uuid
-  reservationId         String                          @unique @map("reservation_id") @db.Uuid
-  armId                 String                          @unique @map("arm_id") @db.Uuid
-  providerId            String                          @map("provider_id") @db.VarChar(32)
-  chainId               String                          @map("chain_id") @db.VarChar(32)
-  intentId              String                          @unique @map("intent_id") @db.Uuid
-  quoteId               String                          @unique @map("quote_id") @db.Uuid
-  emergencyStopChangeId String                          @map("emergency_stop_change_id") @db.VarChar(100)
-  requestFingerprint    String                          @map("request_fingerprint") @db.Char(64)
-  revalidatedAt         DateTime                        @map("revalidated_at")
-  expiresAt             DateTime                        @map("expires_at")
-  createdAt             DateTime                        @default(now()) @map("created_at")
-  reservation           RealExecutionReservation        @relation(fields: [reservationId], references: [id], onDelete: Restrict)
-  arm                   RealExecutionArm                @relation(fields: [armId], references: [id], onDelete: Restrict)
-  finalConfirmation     RealExecutionFinalConfirmation?
+  id                       String                          @id @db.Uuid
+  reservationId            String                          @unique @map("reservation_id") @db.Uuid
+  armId                    String                          @unique @map("arm_id") @db.Uuid
+  providerId               String                          @map("provider_id") @db.VarChar(32)
+  chainId                  String                          @map("chain_id") @db.VarChar(32)
+  intentId                 String                          @unique @map("intent_id") @db.Uuid
+  quoteId                  String                          @unique @map("quote_id") @db.Uuid
+  payloadCommitmentVersion String?                         @map("payload_commitment_version") @db.VarChar(64)
+  payloadCommitmentDigest  String?                         @map("payload_commitment_digest") @db.Char(64)
+  emergencyStopChangeId    String                          @map("emergency_stop_change_id") @db.VarChar(100)
+  requestFingerprint       String                          @map("request_fingerprint") @db.Char(64)
+  revalidatedAt            DateTime                        @map("revalidated_at")
+  expiresAt                DateTime                        @map("expires_at")
+  createdAt                DateTime                        @default(now()) @map("created_at")
+  reservation              RealExecutionReservation        @relation(fields: [reservationId], references: [id], onDelete: Restrict)
+  arm                      RealExecutionArm                @relation(fields: [armId], references: [id], onDelete: Restrict)
+  finalConfirmation        RealExecutionFinalConfirmation?
 
   @@index([providerId, chainId, expiresAt])
   @@map("real_execution_risk_approvals")

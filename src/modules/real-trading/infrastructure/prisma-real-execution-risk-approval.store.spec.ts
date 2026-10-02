@@ -78,6 +78,26 @@ describe('PrismaRealExecutionRiskApprovalStore', () => {
     expect(harness.create).toHaveBeenCalledTimes(1);
   });
 
+  it('fails closed when replaying a legacy approval without a payload commitment', async () => {
+    const harness = repositoryHarness();
+    harness.create.mockImplementation(({ data }) =>
+      Promise.resolve(approvalRow(data)),
+    );
+    await harness.store.approve(command());
+    const stored = harness.create.mock.calls[0][0].data;
+    harness.tx.realExecutionRiskApproval.findUnique.mockResolvedValue(
+      approvalRow({
+        ...stored,
+        payloadCommitmentVersion: null,
+        payloadCommitmentDigest: null,
+      }),
+    );
+
+    await expect(harness.store.approve(command())).rejects.toThrow(
+      'Persisted real execution risk approval has invalid payload commitment',
+    );
+  });
+
   it('rejects conflicting approval ids and protected identity reuse', async () => {
     const idHarness = repositoryHarness();
     idHarness.tx.realExecutionRiskApproval.findUnique.mockResolvedValue(
@@ -378,6 +398,8 @@ function approvalRow(overrides: Record<string, unknown> = {}) {
     chainId: '56',
     intentId: '11111111-1111-4111-8111-111111111111',
     quoteId: '22222222-2222-4222-8222-222222222222',
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'c'.repeat(64),
     emergencyStopChangeId: 'real-trading-stop-clear-1',
     requestFingerprint: fingerprintPlaceholder(),
     revalidatedAt: NOW,
@@ -406,6 +428,8 @@ function publicApproval() {
     chainId: '56',
     intentId: '11111111-1111-4111-8111-111111111111',
     quoteId: '22222222-2222-4222-8222-222222222222',
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'c'.repeat(64),
     emergencyStopChangeId: 'real-trading-stop-clear-1',
     revalidatedAt: NOW,
     expiresAt: new Date('2026-10-02T14:00:07.000Z'),

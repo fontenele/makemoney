@@ -171,6 +171,14 @@ describe('planRealExecutionFinalConfirmation', () => {
         NOW,
       ).blockers,
     ).toContain('invalid_risk_approval');
+    expect(
+      planRealExecutionFinalConfirmation(
+        approval({ payloadCommitmentDigest: 'invalid' }),
+        request(),
+        POLICY,
+        NOW,
+      ).blockers,
+    ).toContain('invalid_risk_approval');
     expect(() =>
       planRealExecutionFinalConfirmation(
         approval(),
@@ -213,6 +221,8 @@ function approval(
     chainId: '56',
     intentId: '11111111-1111-4111-8111-111111111111',
     quoteId: '22222222-2222-4222-8222-222222222222',
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'a'.repeat(64),
     emergencyStopChangeId: 'real-trading-stop-clear-1',
     revalidatedAt: new Date('2026-10-02T15:00:03.000Z'),
     createdAt: new Date('2026-10-02T15:00:04.000Z'),

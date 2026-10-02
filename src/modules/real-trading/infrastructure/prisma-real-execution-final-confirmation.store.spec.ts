@@ -93,6 +93,21 @@ describe('PrismaRealExecutionFinalConfirmationStore', () => {
     ).not.toHaveBeenCalled();
   });
 
+  it('fails closed when the durable approval has no payload commitment', async () => {
+    const harness = repositoryHarness();
+    harness.tx.realExecutionRiskApproval.findUnique.mockResolvedValue(
+      approvalRow({
+        payloadCommitmentVersion: null,
+        payloadCommitmentDigest: null,
+      }),
+    );
+
+    await expect(harness.store.confirm(command())).rejects.toThrow(
+      'Persisted real execution risk approval has invalid payload commitment',
+    );
+    expect(harness.create).not.toHaveBeenCalled();
+  });
+
   it('rechecks approval identity and expiry inside the transaction', async () => {
     const changed = repositoryHarness();
     changed.tx.realExecutionRiskApproval.findUnique.mockResolvedValue(
@@ -197,6 +212,8 @@ function approvalRow(overrides: Record<string, unknown> = {}) {
     chainId: '56',
     intentId: '11111111-1111-4111-8111-111111111111',
     quoteId: '22222222-2222-4222-8222-222222222222',
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'c'.repeat(64),
     emergencyStopChangeId: 'real-trading-stop-clear-1',
     requestFingerprint: 'a'.repeat(64),
     revalidatedAt: new Date('2026-10-02T15:00:02.000Z'),

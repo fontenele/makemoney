@@ -36,6 +36,8 @@ export interface StoredRealExecutionRiskApproval {
   readonly chainId: string;
   readonly intentId: string;
   readonly quoteId: string;
+  readonly payloadCommitmentVersion: 'real_execution_intent_quote_v1';
+  readonly payloadCommitmentDigest: string;
   readonly emergencyStopChangeId: string;
   readonly revalidatedAt: Date;
   readonly expiresAt: Date;

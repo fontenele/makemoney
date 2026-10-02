@@ -218,6 +218,8 @@ function isValidApproval(approval: StoredRealExecutionRiskApproval): boolean {
     approval.chainId === BSC_CHAIN_ID &&
     UUID_PATTERN.test(approval.intentId) &&
     UUID_PATTERN.test(approval.quoteId) &&
+    approval.payloadCommitmentVersion === 'real_execution_intent_quote_v1' &&
+    /^[a-f0-9]{64}$/.test(approval.payloadCommitmentDigest) &&
     EMERGENCY_STOP_CHANGE_ID_PATTERN.test(approval.emergencyStopChangeId) &&
     isValidDate(approval.revalidatedAt) &&
     isValidDate(approval.createdAt) &&

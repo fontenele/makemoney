@@ -118,13 +118,26 @@ function mapApproval(row: {
   chainId: string;
   intentId: string;
   quoteId: string;
+  payloadCommitmentVersion: string | null;
+  payloadCommitmentDigest: string | null;
   emergencyStopChangeId: string;
   revalidatedAt: Date;
   expiresAt: Date;
   createdAt: Date;
 }): StoredRealExecutionRiskApproval {
+  if (
+    row.payloadCommitmentVersion !== 'real_execution_intent_quote_v1' ||
+    row.payloadCommitmentDigest === null ||
+    !/^[a-f0-9]{64}$/.test(row.payloadCommitmentDigest)
+  ) {
+    throw new Error(
+      'Persisted real execution risk approval has invalid payload commitment',
+    );
+  }
   return {
     ...row,
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: row.payloadCommitmentDigest,
     revalidatedAt: new Date(row.revalidatedAt),
     expiresAt: new Date(row.expiresAt),
     createdAt: new Date(row.createdAt),

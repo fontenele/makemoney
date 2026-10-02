@@ -32,6 +32,8 @@ export type RealExecutionRiskApprovalMinAggregateOutputType = {
   chainId: string | null
   intentId: string | null
   quoteId: string | null
+  payloadCommitmentVersion: string | null
+  payloadCommitmentDigest: string | null
   emergencyStopChangeId: string | null
   requestFingerprint: string | null
   revalidatedAt: Date | null
@@ -47,6 +49,8 @@ export type RealExecutionRiskApprovalMaxAggregateOutputType = {
   chainId: string | null
   intentId: string | null
   quoteId: string | null
+  payloadCommitmentVersion: string | null
+  payloadCommitmentDigest: string | null
   emergencyStopChangeId: string | null
   requestFingerprint: string | null
   revalidatedAt: Date | null
@@ -62,6 +66,8 @@ export type RealExecutionRiskApprovalCountAggregateOutputType = {
   chainId: number
   intentId: number
   quoteId: number
+  payloadCommitmentVersion: number
+  payloadCommitmentDigest: number
   emergencyStopChangeId: number
   requestFingerprint: number
   revalidatedAt: number
@@ -79,6 +85,8 @@ export type RealExecutionRiskApprovalMinAggregateInputType = {
   chainId?: true
   intentId?: true
   quoteId?: true
+  payloadCommitmentVersion?: true
+  payloadCommitmentDigest?: true
   emergencyStopChangeId?: true
   requestFingerprint?: true
   revalidatedAt?: true
@@ -94,6 +102,8 @@ export type RealExecutionRiskApprovalMaxAggregateInputType = {
   chainId?: true
   intentId?: true
   quoteId?: true
+  payloadCommitmentVersion?: true
+  payloadCommitmentDigest?: true
   emergencyStopChangeId?: true
   requestFingerprint?: true
   revalidatedAt?: true
@@ -109,6 +119,8 @@ export type RealExecutionRiskApprovalCountAggregateInputType = {
   chainId?: true
   intentId?: true
   quoteId?: true
+  payloadCommitmentVersion?: true
+  payloadCommitmentDigest?: true
   emergencyStopChangeId?: true
   requestFingerprint?: true
   revalidatedAt?: true
@@ -197,6 +209,8 @@ export type RealExecutionRiskApprovalGroupByOutputType = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion: string | null
+  payloadCommitmentDigest: string | null
   emergencyStopChangeId: string
   requestFingerprint: string
   revalidatedAt: Date
@@ -233,6 +247,8 @@ export type RealExecutionRiskApprovalWhereInput = {
   chainId?: Prisma.StringFilter<"RealExecutionRiskApproval"> | string
   intentId?: Prisma.UuidFilter<"RealExecutionRiskApproval"> | string
   quoteId?: Prisma.UuidFilter<"RealExecutionRiskApproval"> | string
+  payloadCommitmentVersion?: Prisma.StringNullableFilter<"RealExecutionRiskApproval"> | string | null
+  payloadCommitmentDigest?: Prisma.StringNullableFilter<"RealExecutionRiskApproval"> | string | null
   emergencyStopChangeId?: Prisma.StringFilter<"RealExecutionRiskApproval"> | string
   requestFingerprint?: Prisma.StringFilter<"RealExecutionRiskApproval"> | string
   revalidatedAt?: Prisma.DateTimeFilter<"RealExecutionRiskApproval"> | Date | string
@@ -251,6 +267,8 @@ export type RealExecutionRiskApprovalOrderByWithRelationInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrderInput | Prisma.SortOrder
   emergencyStopChangeId?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
   revalidatedAt?: Prisma.SortOrder
@@ -272,6 +290,8 @@ export type RealExecutionRiskApprovalWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.RealExecutionRiskApprovalWhereInput | Prisma.RealExecutionRiskApprovalWhereInput[]
   providerId?: Prisma.StringFilter<"RealExecutionRiskApproval"> | string
   chainId?: Prisma.StringFilter<"RealExecutionRiskApproval"> | string
+  payloadCommitmentVersion?: Prisma.StringNullableFilter<"RealExecutionRiskApproval"> | string | null
+  payloadCommitmentDigest?: Prisma.StringNullableFilter<"RealExecutionRiskApproval"> | string | null
   emergencyStopChangeId?: Prisma.StringFilter<"RealExecutionRiskApproval"> | string
   requestFingerprint?: Prisma.StringFilter<"RealExecutionRiskApproval"> | string
   revalidatedAt?: Prisma.DateTimeFilter<"RealExecutionRiskApproval"> | Date | string
@@ -290,6 +310,8 @@ export type RealExecutionRiskApprovalOrderByWithAggregationInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrderInput | Prisma.SortOrder
   emergencyStopChangeId?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
   revalidatedAt?: Prisma.SortOrder
@@ -311,6 +333,8 @@ export type RealExecutionRiskApprovalScalarWhereWithAggregatesInput = {
   chainId?: Prisma.StringWithAggregatesFilter<"RealExecutionRiskApproval"> | string
   intentId?: Prisma.UuidWithAggregatesFilter<"RealExecutionRiskApproval"> | string
   quoteId?: Prisma.UuidWithAggregatesFilter<"RealExecutionRiskApproval"> | string
+  payloadCommitmentVersion?: Prisma.StringNullableWithAggregatesFilter<"RealExecutionRiskApproval"> | string | null
+  payloadCommitmentDigest?: Prisma.StringNullableWithAggregatesFilter<"RealExecutionRiskApproval"> | string | null
   emergencyStopChangeId?: Prisma.StringWithAggregatesFilter<"RealExecutionRiskApproval"> | string
   requestFingerprint?: Prisma.StringWithAggregatesFilter<"RealExecutionRiskApproval"> | string
   revalidatedAt?: Prisma.DateTimeWithAggregatesFilter<"RealExecutionRiskApproval"> | Date | string
@@ -324,6 +348,8 @@ export type RealExecutionRiskApprovalCreateInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   requestFingerprint: string
   revalidatedAt: Date | string
@@ -342,6 +368,8 @@ export type RealExecutionRiskApprovalUncheckedCreateInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   requestFingerprint: string
   revalidatedAt: Date | string
@@ -356,6 +384,8 @@ export type RealExecutionRiskApprovalUpdateInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -374,6 +404,8 @@ export type RealExecutionRiskApprovalUncheckedUpdateInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -390,6 +422,8 @@ export type RealExecutionRiskApprovalCreateManyInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   requestFingerprint: string
   revalidatedAt: Date | string
@@ -403,6 +437,8 @@ export type RealExecutionRiskApprovalUpdateManyMutationInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -418,6 +454,8 @@ export type RealExecutionRiskApprovalUncheckedUpdateManyInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -438,6 +476,8 @@ export type RealExecutionRiskApprovalCountOrderByAggregateInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrder
   emergencyStopChangeId?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
   revalidatedAt?: Prisma.SortOrder
@@ -453,6 +493,8 @@ export type RealExecutionRiskApprovalMaxOrderByAggregateInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrder
   emergencyStopChangeId?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
   revalidatedAt?: Prisma.SortOrder
@@ -468,6 +510,8 @@ export type RealExecutionRiskApprovalMinOrderByAggregateInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrder
   emergencyStopChangeId?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
   revalidatedAt?: Prisma.SortOrder
@@ -564,6 +608,8 @@ export type RealExecutionRiskApprovalCreateWithoutReservationInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   requestFingerprint: string
   revalidatedAt: Date | string
@@ -580,6 +626,8 @@ export type RealExecutionRiskApprovalUncheckedCreateWithoutReservationInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   requestFingerprint: string
   revalidatedAt: Date | string
@@ -610,6 +658,8 @@ export type RealExecutionRiskApprovalUpdateWithoutReservationInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -626,6 +676,8 @@ export type RealExecutionRiskApprovalUncheckedUpdateWithoutReservationInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -640,6 +692,8 @@ export type RealExecutionRiskApprovalCreateWithoutArmInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   requestFingerprint: string
   revalidatedAt: Date | string
@@ -656,6 +710,8 @@ export type RealExecutionRiskApprovalUncheckedCreateWithoutArmInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   requestFingerprint: string
   revalidatedAt: Date | string
@@ -686,6 +742,8 @@ export type RealExecutionRiskApprovalUpdateWithoutArmInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -702,6 +760,8 @@ export type RealExecutionRiskApprovalUncheckedUpdateWithoutArmInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -716,6 +776,8 @@ export type RealExecutionRiskApprovalCreateWithoutFinalConfirmationInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   requestFingerprint: string
   revalidatedAt: Date | string
@@ -733,6 +795,8 @@ export type RealExecutionRiskApprovalUncheckedCreateWithoutFinalConfirmationInpu
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   requestFingerprint: string
   revalidatedAt: Date | string
@@ -762,6 +826,8 @@ export type RealExecutionRiskApprovalUpdateWithoutFinalConfirmationInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -779,6 +845,8 @@ export type RealExecutionRiskApprovalUncheckedUpdateWithoutFinalConfirmationInpu
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   revalidatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -796,6 +864,8 @@ export type RealExecutionRiskApprovalSelect<ExtArgs extends runtime.Types.Extens
   chainId?: boolean
   intentId?: boolean
   quoteId?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   emergencyStopChangeId?: boolean
   requestFingerprint?: boolean
   revalidatedAt?: boolean
@@ -814,6 +884,8 @@ export type RealExecutionRiskApprovalSelectCreateManyAndReturn<ExtArgs extends r
   chainId?: boolean
   intentId?: boolean
   quoteId?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   emergencyStopChangeId?: boolean
   requestFingerprint?: boolean
   revalidatedAt?: boolean
@@ -831,6 +903,8 @@ export type RealExecutionRiskApprovalSelectUpdateManyAndReturn<ExtArgs extends r
   chainId?: boolean
   intentId?: boolean
   quoteId?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   emergencyStopChangeId?: boolean
   requestFingerprint?: boolean
   revalidatedAt?: boolean
@@ -848,6 +922,8 @@ export type RealExecutionRiskApprovalSelectScalar = {
   chainId?: boolean
   intentId?: boolean
   quoteId?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   emergencyStopChangeId?: boolean
   requestFingerprint?: boolean
   revalidatedAt?: boolean
@@ -855,7 +931,7 @@ export type RealExecutionRiskApprovalSelectScalar = {
   createdAt?: boolean
 }
 
-export type RealExecutionRiskApprovalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reservationId" | "armId" | "providerId" | "chainId" | "intentId" | "quoteId" | "emergencyStopChangeId" | "requestFingerprint" | "revalidatedAt" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionRiskApproval"]>
+export type RealExecutionRiskApprovalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reservationId" | "armId" | "providerId" | "chainId" | "intentId" | "quoteId" | "payloadCommitmentVersion" | "payloadCommitmentDigest" | "emergencyStopChangeId" | "requestFingerprint" | "revalidatedAt" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionRiskApproval"]>
 export type RealExecutionRiskApprovalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reservation?: boolean | Prisma.RealExecutionReservationDefaultArgs<ExtArgs>
   arm?: boolean | Prisma.RealExecutionArmDefaultArgs<ExtArgs>
@@ -885,6 +961,8 @@ export type $RealExecutionRiskApprovalPayload<ExtArgs extends runtime.Types.Exte
     chainId: string
     intentId: string
     quoteId: string
+    payloadCommitmentVersion: string | null
+    payloadCommitmentDigest: string | null
     emergencyStopChangeId: string
     requestFingerprint: string
     revalidatedAt: Date
@@ -1323,6 +1401,8 @@ export interface RealExecutionRiskApprovalFieldRefs {
   readonly chainId: Prisma.FieldRef<"RealExecutionRiskApproval", 'String'>
   readonly intentId: Prisma.FieldRef<"RealExecutionRiskApproval", 'String'>
   readonly quoteId: Prisma.FieldRef<"RealExecutionRiskApproval", 'String'>
+  readonly payloadCommitmentVersion: Prisma.FieldRef<"RealExecutionRiskApproval", 'String'>
+  readonly payloadCommitmentDigest: Prisma.FieldRef<"RealExecutionRiskApproval", 'String'>
   readonly emergencyStopChangeId: Prisma.FieldRef<"RealExecutionRiskApproval", 'String'>
   readonly requestFingerprint: Prisma.FieldRef<"RealExecutionRiskApproval", 'String'>
   readonly revalidatedAt: Prisma.FieldRef<"RealExecutionRiskApproval", 'DateTime'>

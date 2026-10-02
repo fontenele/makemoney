@@ -550,6 +550,24 @@ This increment does not yet duplicate the commitment into approval or confirmati
 - PostgreSQL E2E coverage proves migration and arm persistence with the commitment.
 - No runtime wiring, route, provider call, wallet mutation, command, executor, atomic permit, or submission authorization is added.
 
+## M10.31 — Durable approval-bound payload commitment
+
+M10.31 propagates the commitment through the durable Risk Engine decision. The pre-approval plan carries the exact supported commitment already proven equal between reservation and arm, and the existing serializable approval transaction writes that version/digest pair beside the immutable approval.
+
+The migration preserves historical uncertainty with nullable columns and a pair constraint. New approvals always store both values. Approval replay, final-confirmation-store approval mapping, and final-confirmation planning reject absent, unsupported, or malformed commitments before a confirmation can be considered.
+
+This increment does not yet copy the commitment into the final-confirmation row. It creates no provider payload, atomic permit, confirmation consumption, submission authorization, command, or executor, and all affected stores remain outside runtime wiring.
+
+### M10.31 acceptance criteria
+
+- Pre-approval revalidation carries the exact validated reservation/arm commitment into its approval plan.
+- Every new durable approval stores the supported commitment version and digest.
+- The migration preserves legacy uncertainty and constrains valid database pairs.
+- Approval replay and final-confirmation persistence fail closed on invalid commitments.
+- Final-confirmation planning requires a structurally valid approval commitment.
+- PostgreSQL E2E coverage proves migration, approval persistence, and exact replay with the commitment.
+- No runtime wiring, route, provider call, wallet mutation, command, executor, atomic permit, or submission authorization is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

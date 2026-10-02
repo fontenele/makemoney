@@ -225,6 +225,8 @@ export const RealExecutionRiskApprovalScalarFieldEnum = {
   chainId: 'chainId',
   intentId: 'intentId',
   quoteId: 'quoteId',
+  payloadCommitmentVersion: 'payloadCommitmentVersion',
+  payloadCommitmentDigest: 'payloadCommitmentDigest',
   emergencyStopChangeId: 'emergencyStopChangeId',
   requestFingerprint: 'requestFingerprint',
   revalidatedAt: 'revalidatedAt',

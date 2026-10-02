@@ -147,6 +147,8 @@ export class PrismaRealExecutionRiskApprovalStore implements RealExecutionRiskAp
             chainId: assessment.plan.chainId,
             intentId: assessment.plan.intentId,
             quoteId: assessment.plan.quoteId,
+            payloadCommitmentVersion: assessment.plan.payloadCommitmentVersion,
+            payloadCommitmentDigest: assessment.plan.payloadCommitmentDigest,
             emergencyStopChangeId: assessment.plan.emergencyStopChangeId,
             requestFingerprint,
             revalidatedAt: assessment.plan.revalidatedAt,
@@ -291,11 +293,22 @@ function mapApproval(row: {
   chainId: string;
   intentId: string;
   quoteId: string;
+  payloadCommitmentVersion: string | null;
+  payloadCommitmentDigest: string | null;
   emergencyStopChangeId: string;
   revalidatedAt: Date;
   expiresAt: Date;
   createdAt: Date;
 }): StoredRealExecutionRiskApproval {
+  if (
+    row.payloadCommitmentVersion !== 'real_execution_intent_quote_v1' ||
+    row.payloadCommitmentDigest === null ||
+    !/^[a-f0-9]{64}$/.test(row.payloadCommitmentDigest)
+  ) {
+    throw new Error(
+      'Persisted real execution risk approval has invalid payload commitment',
+    );
+  }
   return {
     id: row.id,
     reservationId: row.reservationId,
@@ -304,6 +317,8 @@ function mapApproval(row: {
     chainId: row.chainId,
     intentId: row.intentId,
     quoteId: row.quoteId,
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: row.payloadCommitmentDigest,
     emergencyStopChangeId: row.emergencyStopChangeId,
     revalidatedAt: new Date(row.revalidatedAt),
     expiresAt: new Date(row.expiresAt),

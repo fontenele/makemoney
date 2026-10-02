@@ -51,6 +51,8 @@ export interface RealExecutionRiskApprovalPlan {
   readonly chainId: string;
   readonly intentId: string;
   readonly quoteId: string;
+  readonly payloadCommitmentVersion: 'real_execution_intent_quote_v1';
+  readonly payloadCommitmentDigest: string;
   readonly emergencyStopChangeId: string;
   readonly revalidatedAt: Date;
   readonly expiresAt: Date;
@@ -209,6 +211,8 @@ export function revalidateRealExecutionRisk(
           chainId: reservation.chainId,
           intentId: reservation.intentId,
           quoteId: reservation.quoteId,
+          payloadCommitmentVersion: reservation.payloadCommitmentVersion,
+          payloadCommitmentDigest: reservation.payloadCommitmentDigest,
           emergencyStopChangeId: emergencyStop.emergencyStopChangeId,
           revalidatedAt: new Date(evaluatedAt),
           expiresAt: new Date(

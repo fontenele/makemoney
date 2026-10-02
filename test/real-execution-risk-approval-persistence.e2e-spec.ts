@@ -55,6 +55,8 @@ describe('Real execution risk approval persistence (e2e)', () => {
       riskApproved: true,
       confirmationRecorded: false,
       submissionAuthorized: false,
+      payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+      payloadCommitmentDigest: 'c'.repeat(64),
       emergencyStopChangeId: 'real-trading-stop-clear-1',
       expiresAt: new Date('2026-10-02T14:00:07.000Z'),
     });
