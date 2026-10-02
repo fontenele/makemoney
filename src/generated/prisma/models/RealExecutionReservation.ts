@@ -279,6 +279,7 @@ export type RealExecutionReservationWhereInput = {
   expiresAt?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
   arm?: Prisma.XOR<Prisma.RealExecutionArmNullableScalarRelationFilter, Prisma.RealExecutionArmWhereInput> | null
+  riskApproval?: Prisma.XOR<Prisma.RealExecutionRiskApprovalNullableScalarRelationFilter, Prisma.RealExecutionRiskApprovalWhereInput> | null
 }
 
 export type RealExecutionReservationOrderByWithRelationInput = {
@@ -300,6 +301,7 @@ export type RealExecutionReservationOrderByWithRelationInput = {
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   arm?: Prisma.RealExecutionArmOrderByWithRelationInput
+  riskApproval?: Prisma.RealExecutionRiskApprovalOrderByWithRelationInput
 }
 
 export type RealExecutionReservationWhereUniqueInput = Prisma.AtLeast<{
@@ -324,6 +326,7 @@ export type RealExecutionReservationWhereUniqueInput = Prisma.AtLeast<{
   expiresAt?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
   arm?: Prisma.XOR<Prisma.RealExecutionArmNullableScalarRelationFilter, Prisma.RealExecutionArmWhereInput> | null
+  riskApproval?: Prisma.XOR<Prisma.RealExecutionRiskApprovalNullableScalarRelationFilter, Prisma.RealExecutionRiskApprovalWhereInput> | null
 }, "id" | "intentId" | "quoteId" | "idempotencyKey">
 
 export type RealExecutionReservationOrderByWithAggregationInput = {
@@ -391,6 +394,7 @@ export type RealExecutionReservationCreateInput = {
   expiresAt: Date | string
   createdAt?: Date | string
   arm?: Prisma.RealExecutionArmCreateNestedOneWithoutReservationInput
+  riskApproval?: Prisma.RealExecutionRiskApprovalCreateNestedOneWithoutReservationInput
 }
 
 export type RealExecutionReservationUncheckedCreateInput = {
@@ -412,6 +416,7 @@ export type RealExecutionReservationUncheckedCreateInput = {
   expiresAt: Date | string
   createdAt?: Date | string
   arm?: Prisma.RealExecutionArmUncheckedCreateNestedOneWithoutReservationInput
+  riskApproval?: Prisma.RealExecutionRiskApprovalUncheckedCreateNestedOneWithoutReservationInput
 }
 
 export type RealExecutionReservationUpdateInput = {
@@ -433,6 +438,7 @@ export type RealExecutionReservationUpdateInput = {
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   arm?: Prisma.RealExecutionArmUpdateOneWithoutReservationNestedInput
+  riskApproval?: Prisma.RealExecutionRiskApprovalUpdateOneWithoutReservationNestedInput
 }
 
 export type RealExecutionReservationUncheckedUpdateInput = {
@@ -454,6 +460,7 @@ export type RealExecutionReservationUncheckedUpdateInput = {
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   arm?: Prisma.RealExecutionArmUncheckedUpdateOneWithoutReservationNestedInput
+  riskApproval?: Prisma.RealExecutionRiskApprovalUncheckedUpdateOneWithoutReservationNestedInput
 }
 
 export type RealExecutionReservationCreateManyInput = {
@@ -595,6 +602,20 @@ export type RealExecutionReservationUpdateOneRequiredWithoutArmNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionReservationUpdateToOneWithWhereWithoutArmInput, Prisma.RealExecutionReservationUpdateWithoutArmInput>, Prisma.RealExecutionReservationUncheckedUpdateWithoutArmInput>
 }
 
+export type RealExecutionReservationCreateNestedOneWithoutRiskApprovalInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionReservationCreateWithoutRiskApprovalInput, Prisma.RealExecutionReservationUncheckedCreateWithoutRiskApprovalInput>
+  connectOrCreate?: Prisma.RealExecutionReservationCreateOrConnectWithoutRiskApprovalInput
+  connect?: Prisma.RealExecutionReservationWhereUniqueInput
+}
+
+export type RealExecutionReservationUpdateOneRequiredWithoutRiskApprovalNestedInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionReservationCreateWithoutRiskApprovalInput, Prisma.RealExecutionReservationUncheckedCreateWithoutRiskApprovalInput>
+  connectOrCreate?: Prisma.RealExecutionReservationCreateOrConnectWithoutRiskApprovalInput
+  upsert?: Prisma.RealExecutionReservationUpsertWithoutRiskApprovalInput
+  connect?: Prisma.RealExecutionReservationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionReservationUpdateToOneWithWhereWithoutRiskApprovalInput, Prisma.RealExecutionReservationUpdateWithoutRiskApprovalInput>, Prisma.RealExecutionReservationUncheckedUpdateWithoutRiskApprovalInput>
+}
+
 export type RealExecutionReservationCreateWithoutArmInput = {
   id?: string
   providerId: string
@@ -613,6 +634,7 @@ export type RealExecutionReservationCreateWithoutArmInput = {
   providerQuotaUsd: string
   expiresAt: Date | string
   createdAt?: Date | string
+  riskApproval?: Prisma.RealExecutionRiskApprovalCreateNestedOneWithoutReservationInput
 }
 
 export type RealExecutionReservationUncheckedCreateWithoutArmInput = {
@@ -633,6 +655,7 @@ export type RealExecutionReservationUncheckedCreateWithoutArmInput = {
   providerQuotaUsd: string
   expiresAt: Date | string
   createdAt?: Date | string
+  riskApproval?: Prisma.RealExecutionRiskApprovalUncheckedCreateNestedOneWithoutReservationInput
 }
 
 export type RealExecutionReservationCreateOrConnectWithoutArmInput = {
@@ -669,6 +692,7 @@ export type RealExecutionReservationUpdateWithoutArmInput = {
   providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  riskApproval?: Prisma.RealExecutionRiskApprovalUpdateOneWithoutReservationNestedInput
 }
 
 export type RealExecutionReservationUncheckedUpdateWithoutArmInput = {
@@ -689,6 +713,107 @@ export type RealExecutionReservationUncheckedUpdateWithoutArmInput = {
   providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  riskApproval?: Prisma.RealExecutionRiskApprovalUncheckedUpdateOneWithoutReservationNestedInput
+}
+
+export type RealExecutionReservationCreateWithoutRiskApprovalInput = {
+  id?: string
+  providerId: string
+  chainId: string
+  intentId: string
+  quoteId: string
+  idempotencyKey: string
+  requestFingerprint: string
+  utcDay: Date | string
+  budgetChargeUsdt: string
+  sourceTokenAddress: string
+  sourceSymbol: string
+  sourceQuantity: string
+  nativeGasSymbol: string
+  nativeGasQuantity: string
+  providerQuotaUsd: string
+  expiresAt: Date | string
+  createdAt?: Date | string
+  arm?: Prisma.RealExecutionArmCreateNestedOneWithoutReservationInput
+}
+
+export type RealExecutionReservationUncheckedCreateWithoutRiskApprovalInput = {
+  id?: string
+  providerId: string
+  chainId: string
+  intentId: string
+  quoteId: string
+  idempotencyKey: string
+  requestFingerprint: string
+  utcDay: Date | string
+  budgetChargeUsdt: string
+  sourceTokenAddress: string
+  sourceSymbol: string
+  sourceQuantity: string
+  nativeGasSymbol: string
+  nativeGasQuantity: string
+  providerQuotaUsd: string
+  expiresAt: Date | string
+  createdAt?: Date | string
+  arm?: Prisma.RealExecutionArmUncheckedCreateNestedOneWithoutReservationInput
+}
+
+export type RealExecutionReservationCreateOrConnectWithoutRiskApprovalInput = {
+  where: Prisma.RealExecutionReservationWhereUniqueInput
+  create: Prisma.XOR<Prisma.RealExecutionReservationCreateWithoutRiskApprovalInput, Prisma.RealExecutionReservationUncheckedCreateWithoutRiskApprovalInput>
+}
+
+export type RealExecutionReservationUpsertWithoutRiskApprovalInput = {
+  update: Prisma.XOR<Prisma.RealExecutionReservationUpdateWithoutRiskApprovalInput, Prisma.RealExecutionReservationUncheckedUpdateWithoutRiskApprovalInput>
+  create: Prisma.XOR<Prisma.RealExecutionReservationCreateWithoutRiskApprovalInput, Prisma.RealExecutionReservationUncheckedCreateWithoutRiskApprovalInput>
+  where?: Prisma.RealExecutionReservationWhereInput
+}
+
+export type RealExecutionReservationUpdateToOneWithWhereWithoutRiskApprovalInput = {
+  where?: Prisma.RealExecutionReservationWhereInput
+  data: Prisma.XOR<Prisma.RealExecutionReservationUpdateWithoutRiskApprovalInput, Prisma.RealExecutionReservationUncheckedUpdateWithoutRiskApprovalInput>
+}
+
+export type RealExecutionReservationUpdateWithoutRiskApprovalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  intentId?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  utcDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  budgetChargeUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSymbol?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  nativeGasSymbol?: Prisma.StringFieldUpdateOperationsInput | string
+  nativeGasQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  arm?: Prisma.RealExecutionArmUpdateOneWithoutReservationNestedInput
+}
+
+export type RealExecutionReservationUncheckedUpdateWithoutRiskApprovalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  intentId?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  utcDay?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  budgetChargeUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSymbol?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  nativeGasSymbol?: Prisma.StringFieldUpdateOperationsInput | string
+  nativeGasQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  arm?: Prisma.RealExecutionArmUncheckedUpdateOneWithoutReservationNestedInput
 }
 
 
@@ -712,6 +837,7 @@ export type RealExecutionReservationSelect<ExtArgs extends runtime.Types.Extensi
   expiresAt?: boolean
   createdAt?: boolean
   arm?: boolean | Prisma.RealExecutionReservation$armArgs<ExtArgs>
+  riskApproval?: boolean | Prisma.RealExecutionReservation$riskApprovalArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionReservation"]>
 
 export type RealExecutionReservationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -777,6 +903,7 @@ export type RealExecutionReservationSelectScalar = {
 export type RealExecutionReservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "providerId" | "chainId" | "intentId" | "quoteId" | "idempotencyKey" | "requestFingerprint" | "utcDay" | "budgetChargeUsdt" | "sourceTokenAddress" | "sourceSymbol" | "sourceQuantity" | "nativeGasSymbol" | "nativeGasQuantity" | "providerQuotaUsd" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionReservation"]>
 export type RealExecutionReservationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   arm?: boolean | Prisma.RealExecutionReservation$armArgs<ExtArgs>
+  riskApproval?: boolean | Prisma.RealExecutionReservation$riskApprovalArgs<ExtArgs>
 }
 export type RealExecutionReservationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 export type RealExecutionReservationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -785,6 +912,7 @@ export type $RealExecutionReservationPayload<ExtArgs extends runtime.Types.Exten
   name: "RealExecutionReservation"
   objects: {
     arm: Prisma.$RealExecutionArmPayload<ExtArgs> | null
+    riskApproval: Prisma.$RealExecutionRiskApprovalPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1199,6 +1327,7 @@ readonly fields: RealExecutionReservationFieldRefs;
 export interface Prisma__RealExecutionReservationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   arm<T extends Prisma.RealExecutionReservation$armArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionReservation$armArgs<ExtArgs>>): Prisma.Prisma__RealExecutionArmClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionArmPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  riskApproval<T extends Prisma.RealExecutionReservation$riskApprovalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionReservation$riskApprovalArgs<ExtArgs>>): Prisma.Prisma__RealExecutionRiskApprovalClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionRiskApprovalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1654,6 +1783,25 @@ export type RealExecutionReservation$armArgs<ExtArgs extends runtime.Types.Exten
    */
   include?: Prisma.RealExecutionArmInclude<ExtArgs> | null
   where?: Prisma.RealExecutionArmWhereInput
+}
+
+/**
+ * RealExecutionReservation.riskApproval
+ */
+export type RealExecutionReservation$riskApprovalArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RealExecutionRiskApproval
+   */
+  select?: Prisma.RealExecutionRiskApprovalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RealExecutionRiskApproval
+   */
+  omit?: Prisma.RealExecutionRiskApprovalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionRiskApprovalInclude<ExtArgs> | null
+  where?: Prisma.RealExecutionRiskApprovalWhereInput
 }
 
 /**

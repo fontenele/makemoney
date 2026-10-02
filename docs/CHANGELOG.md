@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-10-02 — Add pure approval-bound final-confirmation plan
+
+- Added a pure planner that requires one active exact M10.23 approval and an explicit final-quote/immediate-submission acknowledgment.
+- Bound the request to the approval, reservation, arm, provider, chain, intent, quote, and persisted emergency-stop change identities.
+- Bounded request age and confirmation lifetime from one through sixty seconds and prevented confirmation from predating or outliving approval.
+- Added focused coverage for readiness, every identity divergence, missing acknowledgment, invalid clocks, expiry, lifetime, and policy bounds.
+- Kept durable confirmation, final emergency-stop recheck, and submission authorization absent; added no schema, repository, runtime wiring, route, provider call, wallet mutation, command, or executor.
+- Verified all 1,800 backend tests across 161 suites, including the 15 focused tests, plus formatting, lint, backend/dashboard builds, Compose configuration, and whitespace checks. Compose emitted only the existing inaccessible user Docker-config warning.
+
+## 2026-10-02 — Add durable real-execution risk approval
+
+- Added an unwired serializable Prisma store that reloads the exact reservation and arm, reconstructs the complete active-reservation snapshot, reads the latest persisted emergency-stop event, and reapplies M10.22 before approval persistence.
+- Added immutable approval storage with restrictive reservation/arm foreign keys, unique reservation/arm/intent/quote identities, canonical request fingerprinting, and exact replay without expiry extension.
+- Shared the reservation advisory lock so capacity cannot change between revalidation and approval insertion.
+- Added focused unit and PostgreSQL E2E coverage for persistence, replay, conflicts, missing or unsafe prerequisites, changed economics, and concurrent single-approval enforcement.
+- Kept the store outside runtime wiring; final confirmation and submission authorization remain false, with no route, live quote, provider mutation, funding, command, or executor.
+
 ## 2026-10-01 — Add pure pre-approval real-risk revalidation
 
 - Added a pure composition that correlates one exact durable reservation and arm with current financial, provider-capacity, and emergency-stop facts.

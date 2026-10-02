@@ -405,6 +405,7 @@ export const ModelName = {
   BacktestRun: 'BacktestRun',
   RealExecutionReservation: 'RealExecutionReservation',
   RealExecutionArm: 'RealExecutionArm',
+  RealExecutionRiskApproval: 'RealExecutionRiskApproval',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -423,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1019,6 +1020,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RealExecutionRiskApproval: {
+      payload: Prisma.$RealExecutionRiskApprovalPayload<ExtArgs>
+      fields: Prisma.RealExecutionRiskApprovalFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionRiskApprovalFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionRiskApprovalPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionRiskApprovalFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionRiskApprovalPayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionRiskApprovalFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionRiskApprovalPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionRiskApprovalFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionRiskApprovalPayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionRiskApprovalFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionRiskApprovalPayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionRiskApprovalCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionRiskApprovalPayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionRiskApprovalCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionRiskApprovalCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionRiskApprovalPayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionRiskApprovalDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionRiskApprovalPayload>
+        }
+        update: {
+          args: Prisma.RealExecutionRiskApprovalUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionRiskApprovalPayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionRiskApprovalDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionRiskApprovalUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionRiskApprovalUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionRiskApprovalPayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionRiskApprovalUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionRiskApprovalPayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionRiskApprovalAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionRiskApproval>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionRiskApprovalGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionRiskApprovalGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionRiskApprovalCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionRiskApprovalCountAggregateOutputType> | number
+        }
+      }
+    }
     ObservedSpotSymbol: {
       payload: Prisma.$ObservedSpotSymbolPayload<ExtArgs>
       fields: Prisma.ObservedSpotSymbolFieldRefs
@@ -1411,6 +1486,24 @@ export const RealExecutionArmScalarFieldEnum = {
 export type RealExecutionArmScalarFieldEnum = (typeof RealExecutionArmScalarFieldEnum)[keyof typeof RealExecutionArmScalarFieldEnum]
 
 
+export const RealExecutionRiskApprovalScalarFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  armId: 'armId',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  intentId: 'intentId',
+  quoteId: 'quoteId',
+  emergencyStopChangeId: 'emergencyStopChangeId',
+  requestFingerprint: 'requestFingerprint',
+  revalidatedAt: 'revalidatedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RealExecutionRiskApprovalScalarFieldEnum = (typeof RealExecutionRiskApprovalScalarFieldEnum)[keyof typeof RealExecutionRiskApprovalScalarFieldEnum]
+
+
 export const ObservedSpotSymbolScalarFieldEnum = {
   provider: 'provider',
   symbol: 'symbol',
@@ -1774,6 +1867,7 @@ export type GlobalOmitConfig = {
   backtestRun?: Prisma.BacktestRunOmit
   realExecutionReservation?: Prisma.RealExecutionReservationOmit
   realExecutionArm?: Prisma.RealExecutionArmOmit
+  realExecutionRiskApproval?: Prisma.RealExecutionRiskApprovalOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
   listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit
   listingCheckpointTopOfBook?: Prisma.ListingCheckpointTopOfBookOmit

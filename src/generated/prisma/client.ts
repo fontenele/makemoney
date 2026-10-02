@@ -80,6 +80,11 @@ export type RealExecutionReservation = Prisma.RealExecutionReservationModel
  */
 export type RealExecutionArm = Prisma.RealExecutionArmModel
 /**
+ * Model RealExecutionRiskApproval
+ * 
+ */
+export type RealExecutionRiskApproval = Prisma.RealExecutionRiskApprovalModel
+/**
  * Model ObservedSpotSymbol
  * 
  */

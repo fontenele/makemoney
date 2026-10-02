@@ -411,6 +411,40 @@ The policy then reruns the complete M10.12–M10.17 chain using current quote, l
 - The exact arm and M10.21 emergency-stop composition must also remain clear.
 - A ready plan remains non-atomic, unwired, and explicitly grants no Risk Engine approval, final confirmation, or submission authorization.
 
+## M10.23 — Durable real-execution risk approval
+
+M10.23 adds an unwired Prisma store for the M10.22 plan. A serializable transaction shares the M10.18 reservation advisory lock, so the active reservation set cannot change between its database read, complete-snapshot reconstruction, revalidation, and approval insertion. It reloads the exact durable reservation and arm, reads the newest persisted emergency-stop event directly, and fails closed when any prerequisite is missing.
+
+The transaction reapplies M10.22 using the freshly reconstructed reservation and emergency-stop facts plus caller-supplied current quote, local-limit, budget, bankroll, resource, provider-quota, and external USD-valuation facts. Only an exact still-valid result creates one immutable approval tied by restrictive foreign keys to its reservation and arm. Unique reservation, arm, intent, and quote identities allow at most one approval, while an explicit approval UUID and canonical request fingerprint provide exact replay without extending expiry.
+
+The stored record is a durable Risk Engine decision, but it is not financial authorization. It expires no later than its arm and reservation, records the exact persisted emergency-stop change used by the decision, and permanently reports final confirmation and submission authorization as false. The store is not registered in NestJS and adds no route, provider call, live quote, wallet mutation, funding behavior, final-confirmation record, submission command, or executor.
+
+### M10.23 acceptance criteria
+
+- Approval persistence reloads the exact reservation, arm, active reservation set, and latest persisted emergency-stop event inside one serializable transaction.
+- The M10.22 chain is reapplied at transaction time and an absent, active, changed, expired, divergent, or under-capacity prerequisite fails closed.
+- Restrictive foreign keys and unique reservation, arm, intent, and quote identities permit at most one immutable approval.
+- Exact fingerprinted replay returns the original approval without extending expiry; conflicting reuse fails closed.
+- PostgreSQL E2E coverage proves persistence, replay, and concurrent single-approval enforcement.
+- The store remains unwired and records neither final confirmation nor submission authorization.
+
+## M10.24 — Pure approval-bound final-confirmation plan
+
+M10.24 adds a pure, unwired planner for the explicit operator confirmation required immediately before a future initial submission. The request has its own UUID and must repeat the exact M10.23 approval, reservation, arm, approved provider and chain, intent, quote, and persisted emergency-stop change identities. It also requires the literal acknowledgment `risk_approval_and_final_quote_reviewed_for_immediate_submission`, which is deliberately distinct from the earlier arm acknowledgment.
+
+The durable approval must be structurally valid, active, and still carry `riskApproved: true` with confirmation and submission authorization false. The request cannot predate the approval, be stale or future-dated, expire at evaluation, or outlive the approval. Independent request-age and total confirmation-lifetime policies are each restricted to one through sixty seconds.
+
+`final_confirmation_plan_ready` is an inert plan only. It does not persist the confirmation, consume the approval, recheck emergency stop at a submission boundary, contact the provider, or authorize a transaction. A later increment must design durable single-use confirmation and a later atomic submission gate; no executor or mutating command is introduced here.
+
+### M10.24 acceptance criteria
+
+- The request is bound to the exact durable approval and every upstream audit identity, including the persisted emergency-stop change.
+- The explicit final-quote/immediate-submission acknowledgment is mandatory and remains distinct from arming.
+- Request freshness and total lifetime are independently bounded and cannot exceed approval expiry.
+- Malformed, divergent, future, stale, predating, expired, or overlong facts fail closed.
+- A ready plan records no durable confirmation, performs no final stop recheck, and grants no submission authorization.
+- The planner remains unwired and adds no schema, repository, route, provider call, wallet mutation, command, or executor.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

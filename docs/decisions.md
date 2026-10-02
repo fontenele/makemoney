@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-10-02 — Keep final confirmation exact, ephemeral, and non-authorizing
+
+M10.24 models final confirmation as a separate request after durable Risk Engine approval, never as a side effect of arming or approval persistence. The operator acknowledgment repeats every relevant audit identity, including the exact persisted emergency-stop change used by M10.23, and explicitly states that the risk approval and final quote were reviewed for immediate submission.
+
+The pure plan cannot predate or outlive its approval and is bounded by independent one-to-sixty-second request-age and lifetime policies. It intentionally creates no durable record and does not authorize submission: a later persistence boundary must enforce single use, and a future submission boundary must recheck emergency stop atomically before any provider mutation can be considered.
+
+## 2026-10-02 — Persist risk approval only after transactional revalidation
+
+M10.23 treats Risk Engine approval as a short-lived immutable audit record, not as permission to submit. The store shares M10.18's advisory lock and reconstructs the active-reservation snapshot from PostgreSQL so another reservation cannot appear between capacity revalidation and approval persistence. It also reloads the exact reservation and arm and reads the newest persisted emergency-stop event instead of trusting caller-supplied durable state.
+
+Current financial, balance, gas, quota, and valuation facts remain explicit command inputs because no live provider bridge exists. M10.22 validates their freshness and identity inside the transaction. A stored approval expires with its arm/reservation, binds the exact stop-change identity, and still requires a distinct future final confirmation plus another fail-closed stop check before any possible submission. The store remains unregistered and no provider or executor command can consume it.
+
 ## 2026-10-01 — Revalidate a reservation without double-counting itself
 
 M10.22 treats the durable reservation as the identity and accounting record to prove again, not as an additional proposed order. The exact current reservation must appear in the complete active snapshot; the policy subtracts its USDT charge and removes only its matching capacity record before rerunning M10.12–M10.17. Every other active reservation remains in the aggregate calculation.

@@ -59,6 +59,7 @@ export const ModelName = {
   BacktestRun: 'BacktestRun',
   RealExecutionReservation: 'RealExecutionReservation',
   RealExecutionArm: 'RealExecutionArm',
+  RealExecutionRiskApproval: 'RealExecutionRiskApproval',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -209,6 +210,24 @@ export const RealExecutionArmScalarFieldEnum = {
 } as const
 
 export type RealExecutionArmScalarFieldEnum = (typeof RealExecutionArmScalarFieldEnum)[keyof typeof RealExecutionArmScalarFieldEnum]
+
+
+export const RealExecutionRiskApprovalScalarFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  armId: 'armId',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  intentId: 'intentId',
+  quoteId: 'quoteId',
+  emergencyStopChangeId: 'emergencyStopChangeId',
+  requestFingerprint: 'requestFingerprint',
+  revalidatedAt: 'revalidatedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RealExecutionRiskApprovalScalarFieldEnum = (typeof RealExecutionRiskApprovalScalarFieldEnum)[keyof typeof RealExecutionRiskApprovalScalarFieldEnum]
 
 
 export const ObservedSpotSymbolScalarFieldEnum = {
