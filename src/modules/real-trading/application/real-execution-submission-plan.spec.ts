@@ -58,6 +58,15 @@ describe('planRealExecutionSubmission', () => {
         'invalid_submission_request',
       ]),
     );
+    expect(
+      planRealExecutionSubmission(
+        confirmation({ payloadCommitmentDigest: 'invalid' }),
+        stopAssessment(),
+        request(),
+        POLICY,
+        NOW,
+      ).blockers,
+    ).toContain('invalid_final_confirmation');
   });
 
   it('requires the exact confirmation and complete upstream identities', () => {
@@ -252,6 +261,8 @@ function confirmation(
     chainId: '56',
     intentId: '11111111-1111-4111-8111-111111111111',
     quoteId: '22222222-2222-4222-8222-222222222222',
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'c'.repeat(64),
     emergencyStopChangeId: 'real-trading-stop-clear-1',
     acknowledgment:
       'risk_approval_and_final_quote_reviewed_for_immediate_submission',

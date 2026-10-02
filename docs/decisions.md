@@ -4,7 +4,7 @@
 
 M10.30 and M10.31 copy the exact reservation commitment into the arm and Risk Engine approval respectively, only after each preceding artifact has been structurally validated and correlated. This makes later decisions independently auditable without recomputing or silently changing the approved intent/quote content.
 
-Each migration keeps its version/digest pair nullable because legacy rows cannot be truthfully reconstructed, while application mappers reject that uncertain state. Final-confirmation propagation remains a separate milestone; no current commitment-bearing artifact is an execution permit.
+Each migration keeps its version/digest pair nullable because legacy rows cannot be truthfully reconstructed, while application mappers reject that uncertain state. M10.32 extends the same rule to final confirmation, completing the durable review chain without making any commitment-bearing artifact an execution permit. Provider-command comparison, atomic stop enforcement, and confirmation consumption remain separate requirements.
 
 ## 2026-10-02 — Persist payload integrity at reservation creation without inventing legacy facts
 

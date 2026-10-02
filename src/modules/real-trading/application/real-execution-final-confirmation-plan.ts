@@ -30,8 +30,10 @@ export interface RealExecutionFinalConfirmationPolicy {
   readonly maximumConfirmationLifetimeMs: number;
 }
 
-export type RealExecutionFinalConfirmationPlan =
-  RealExecutionFinalConfirmationRequest;
+export interface RealExecutionFinalConfirmationPlan extends RealExecutionFinalConfirmationRequest {
+  readonly payloadCommitmentVersion: 'real_execution_intent_quote_v1';
+  readonly payloadCommitmentDigest: string;
+}
 
 export type RealExecutionFinalConfirmationBlocker =
   | 'invalid_risk_approval'
@@ -173,6 +175,8 @@ export function planRealExecutionFinalConfirmation(
     blockers.length === 0
       ? {
           ...request,
+          payloadCommitmentVersion: approval.payloadCommitmentVersion,
+          payloadCommitmentDigest: approval.payloadCommitmentDigest,
           requestedAt: new Date(request.requestedAt),
           expiresAt: new Date(request.expiresAt),
         }

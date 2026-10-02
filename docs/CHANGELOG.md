@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-02 — Propagate payload commitment into durable final confirmations
+
+- Added nullable, pair-constrained commitment version and SHA-256 digest columns to durable final confirmations without fabricating legacy payload facts.
+- Copied the exact validated approval commitment through final-confirmation planning and persistence in the existing serializable transaction.
+- Made confirmation replay, submission-bound emergency-stop assessment, and initial-submission planning fail closed on missing or malformed commitments.
+- Added focused unit coverage for propagation, malformed values, and legacy-row rejection plus PostgreSQL E2E coverage for migration, persistence, and replay.
+- Kept provider-command comparison, the atomic gate, confirmation consumption, provider mutation, and `submissionAuthorized` absent.
+- Verified all 1,838 backend tests across 165 suites, all 77 PostgreSQL E2E tests across 8 suites with 23 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-02 — Propagate payload commitment into durable risk approvals
 
 - Added nullable, pair-constrained commitment version and SHA-256 digest columns to durable Risk Engine approvals without fabricating legacy payload facts.

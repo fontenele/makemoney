@@ -169,6 +169,9 @@ function isValidConfirmation(
     confirmation.chainId === BSC_CHAIN_ID &&
     UUID_PATTERN.test(confirmation.intentId) &&
     UUID_PATTERN.test(confirmation.quoteId) &&
+    confirmation.payloadCommitmentVersion ===
+      'real_execution_intent_quote_v1' &&
+    /^[a-f0-9]{64}$/.test(confirmation.payloadCommitmentDigest) &&
     CHANGE_ID_PATTERN.test(confirmation.emergencyStopChangeId) &&
     confirmation.acknowledgment === ACKNOWLEDGMENT &&
     isValidDate(confirmation.requestedAt) &&

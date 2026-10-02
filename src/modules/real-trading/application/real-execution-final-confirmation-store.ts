@@ -18,6 +18,8 @@ export interface StoredRealExecutionFinalConfirmation {
   readonly chainId: string;
   readonly intentId: string;
   readonly quoteId: string;
+  readonly payloadCommitmentVersion: 'real_execution_intent_quote_v1';
+  readonly payloadCommitmentDigest: string;
   readonly emergencyStopChangeId: string;
   readonly acknowledgment: 'risk_approval_and_final_quote_reviewed_for_immediate_submission';
   readonly requestedAt: Date;

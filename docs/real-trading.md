@@ -568,6 +568,24 @@ This increment does not yet copy the commitment into the final-confirmation row.
 - PostgreSQL E2E coverage proves migration, approval persistence, and exact replay with the commitment.
 - No runtime wiring, route, provider call, wallet mutation, command, executor, atomic permit, or submission authorization is added.
 
+## M10.32 — Durable confirmation-bound payload commitment
+
+M10.32 completes commitment propagation across the existing durable review chain. The final-confirmation plan copies the exact supported version and digest from its validated Risk Engine approval, and the existing serializable confirmation transaction persists the pair with the immutable confirmation.
+
+The migration keeps historical confirmations nullable rather than inventing unprovable payload facts and constrains the stored pair to the supported version and canonical digest. Confirmation replay rejects legacy or malformed rows. Both the submission-bound emergency-stop assessment and the initial-submission planner now require a structurally valid confirmation commitment before producing non-authorizing review state.
+
+Although reservation, arm, approval, and confirmation now carry the same commitment through validated transitions, no implementation yet reconstructs and compares a provider-bound command at an atomic gate. This increment consumes no confirmation, authorizes no submission, calls no provider, and leaves all affected components outside runtime wiring.
+
+### M10.32 acceptance criteria
+
+- Final-confirmation planning copies the exact validated approval commitment into its plan.
+- Every new durable final confirmation stores the supported commitment version and digest.
+- The migration preserves legacy uncertainty and constrains valid database pairs.
+- Confirmation replay fails closed on absent, unsupported, or malformed commitments.
+- Submission-bound emergency-stop assessment and initial-submission planning require a valid confirmation commitment.
+- PostgreSQL E2E coverage proves migration, confirmation persistence, and exact replay with the commitment.
+- No runtime wiring, route, provider call, wallet mutation, command, executor, atomic permit, confirmation consumption, or submission authorization is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

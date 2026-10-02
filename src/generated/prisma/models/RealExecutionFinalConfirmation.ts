@@ -33,6 +33,8 @@ export type RealExecutionFinalConfirmationMinAggregateOutputType = {
   chainId: string | null
   intentId: string | null
   quoteId: string | null
+  payloadCommitmentVersion: string | null
+  payloadCommitmentDigest: string | null
   emergencyStopChangeId: string | null
   acknowledgment: string | null
   requestFingerprint: string | null
@@ -50,6 +52,8 @@ export type RealExecutionFinalConfirmationMaxAggregateOutputType = {
   chainId: string | null
   intentId: string | null
   quoteId: string | null
+  payloadCommitmentVersion: string | null
+  payloadCommitmentDigest: string | null
   emergencyStopChangeId: string | null
   acknowledgment: string | null
   requestFingerprint: string | null
@@ -67,6 +71,8 @@ export type RealExecutionFinalConfirmationCountAggregateOutputType = {
   chainId: number
   intentId: number
   quoteId: number
+  payloadCommitmentVersion: number
+  payloadCommitmentDigest: number
   emergencyStopChangeId: number
   acknowledgment: number
   requestFingerprint: number
@@ -86,6 +92,8 @@ export type RealExecutionFinalConfirmationMinAggregateInputType = {
   chainId?: true
   intentId?: true
   quoteId?: true
+  payloadCommitmentVersion?: true
+  payloadCommitmentDigest?: true
   emergencyStopChangeId?: true
   acknowledgment?: true
   requestFingerprint?: true
@@ -103,6 +111,8 @@ export type RealExecutionFinalConfirmationMaxAggregateInputType = {
   chainId?: true
   intentId?: true
   quoteId?: true
+  payloadCommitmentVersion?: true
+  payloadCommitmentDigest?: true
   emergencyStopChangeId?: true
   acknowledgment?: true
   requestFingerprint?: true
@@ -120,6 +130,8 @@ export type RealExecutionFinalConfirmationCountAggregateInputType = {
   chainId?: true
   intentId?: true
   quoteId?: true
+  payloadCommitmentVersion?: true
+  payloadCommitmentDigest?: true
   emergencyStopChangeId?: true
   acknowledgment?: true
   requestFingerprint?: true
@@ -210,6 +222,8 @@ export type RealExecutionFinalConfirmationGroupByOutputType = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion: string | null
+  payloadCommitmentDigest: string | null
   emergencyStopChangeId: string
   acknowledgment: string
   requestFingerprint: string
@@ -248,6 +262,8 @@ export type RealExecutionFinalConfirmationWhereInput = {
   chainId?: Prisma.StringFilter<"RealExecutionFinalConfirmation"> | string
   intentId?: Prisma.UuidFilter<"RealExecutionFinalConfirmation"> | string
   quoteId?: Prisma.UuidFilter<"RealExecutionFinalConfirmation"> | string
+  payloadCommitmentVersion?: Prisma.StringNullableFilter<"RealExecutionFinalConfirmation"> | string | null
+  payloadCommitmentDigest?: Prisma.StringNullableFilter<"RealExecutionFinalConfirmation"> | string | null
   emergencyStopChangeId?: Prisma.StringFilter<"RealExecutionFinalConfirmation"> | string
   acknowledgment?: Prisma.StringFilter<"RealExecutionFinalConfirmation"> | string
   requestFingerprint?: Prisma.StringFilter<"RealExecutionFinalConfirmation"> | string
@@ -266,6 +282,8 @@ export type RealExecutionFinalConfirmationOrderByWithRelationInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrderInput | Prisma.SortOrder
   emergencyStopChangeId?: Prisma.SortOrder
   acknowledgment?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
@@ -287,6 +305,8 @@ export type RealExecutionFinalConfirmationWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.RealExecutionFinalConfirmationWhereInput | Prisma.RealExecutionFinalConfirmationWhereInput[]
   providerId?: Prisma.StringFilter<"RealExecutionFinalConfirmation"> | string
   chainId?: Prisma.StringFilter<"RealExecutionFinalConfirmation"> | string
+  payloadCommitmentVersion?: Prisma.StringNullableFilter<"RealExecutionFinalConfirmation"> | string | null
+  payloadCommitmentDigest?: Prisma.StringNullableFilter<"RealExecutionFinalConfirmation"> | string | null
   emergencyStopChangeId?: Prisma.StringFilter<"RealExecutionFinalConfirmation"> | string
   acknowledgment?: Prisma.StringFilter<"RealExecutionFinalConfirmation"> | string
   requestFingerprint?: Prisma.StringFilter<"RealExecutionFinalConfirmation"> | string
@@ -305,6 +325,8 @@ export type RealExecutionFinalConfirmationOrderByWithAggregationInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrderInput | Prisma.SortOrder
   emergencyStopChangeId?: Prisma.SortOrder
   acknowledgment?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
@@ -328,6 +350,8 @@ export type RealExecutionFinalConfirmationScalarWhereWithAggregatesInput = {
   chainId?: Prisma.StringWithAggregatesFilter<"RealExecutionFinalConfirmation"> | string
   intentId?: Prisma.UuidWithAggregatesFilter<"RealExecutionFinalConfirmation"> | string
   quoteId?: Prisma.UuidWithAggregatesFilter<"RealExecutionFinalConfirmation"> | string
+  payloadCommitmentVersion?: Prisma.StringNullableWithAggregatesFilter<"RealExecutionFinalConfirmation"> | string | null
+  payloadCommitmentDigest?: Prisma.StringNullableWithAggregatesFilter<"RealExecutionFinalConfirmation"> | string | null
   emergencyStopChangeId?: Prisma.StringWithAggregatesFilter<"RealExecutionFinalConfirmation"> | string
   acknowledgment?: Prisma.StringWithAggregatesFilter<"RealExecutionFinalConfirmation"> | string
   requestFingerprint?: Prisma.StringWithAggregatesFilter<"RealExecutionFinalConfirmation"> | string
@@ -344,6 +368,8 @@ export type RealExecutionFinalConfirmationCreateInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   acknowledgment: string
   requestFingerprint: string
@@ -362,6 +388,8 @@ export type RealExecutionFinalConfirmationUncheckedCreateInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   acknowledgment: string
   requestFingerprint: string
@@ -378,6 +406,8 @@ export type RealExecutionFinalConfirmationUpdateInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
@@ -396,6 +426,8 @@ export type RealExecutionFinalConfirmationUncheckedUpdateInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
@@ -413,6 +445,8 @@ export type RealExecutionFinalConfirmationCreateManyInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   acknowledgment: string
   requestFingerprint: string
@@ -429,6 +463,8 @@ export type RealExecutionFinalConfirmationUpdateManyMutationInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
@@ -446,6 +482,8 @@ export type RealExecutionFinalConfirmationUncheckedUpdateManyInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
@@ -468,6 +506,8 @@ export type RealExecutionFinalConfirmationCountOrderByAggregateInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrder
   emergencyStopChangeId?: Prisma.SortOrder
   acknowledgment?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
@@ -485,6 +525,8 @@ export type RealExecutionFinalConfirmationMaxOrderByAggregateInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrder
   emergencyStopChangeId?: Prisma.SortOrder
   acknowledgment?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
@@ -502,6 +544,8 @@ export type RealExecutionFinalConfirmationMinOrderByAggregateInput = {
   chainId?: Prisma.SortOrder
   intentId?: Prisma.SortOrder
   quoteId?: Prisma.SortOrder
+  payloadCommitmentVersion?: Prisma.SortOrder
+  payloadCommitmentDigest?: Prisma.SortOrder
   emergencyStopChangeId?: Prisma.SortOrder
   acknowledgment?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
@@ -550,6 +594,8 @@ export type RealExecutionFinalConfirmationCreateWithoutApprovalInput = {
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   acknowledgment: string
   requestFingerprint: string
@@ -566,6 +612,8 @@ export type RealExecutionFinalConfirmationUncheckedCreateWithoutApprovalInput = 
   chainId: string
   intentId: string
   quoteId: string
+  payloadCommitmentVersion?: string | null
+  payloadCommitmentDigest?: string | null
   emergencyStopChangeId: string
   acknowledgment: string
   requestFingerprint: string
@@ -598,6 +646,8 @@ export type RealExecutionFinalConfirmationUpdateWithoutApprovalInput = {
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
@@ -614,6 +664,8 @@ export type RealExecutionFinalConfirmationUncheckedUpdateWithoutApprovalInput = 
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
   intentId?: Prisma.StringFieldUpdateOperationsInput | string
   quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payloadCommitmentDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
   acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
@@ -633,6 +685,8 @@ export type RealExecutionFinalConfirmationSelect<ExtArgs extends runtime.Types.E
   chainId?: boolean
   intentId?: boolean
   quoteId?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   emergencyStopChangeId?: boolean
   acknowledgment?: boolean
   requestFingerprint?: boolean
@@ -651,6 +705,8 @@ export type RealExecutionFinalConfirmationSelectCreateManyAndReturn<ExtArgs exte
   chainId?: boolean
   intentId?: boolean
   quoteId?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   emergencyStopChangeId?: boolean
   acknowledgment?: boolean
   requestFingerprint?: boolean
@@ -669,6 +725,8 @@ export type RealExecutionFinalConfirmationSelectUpdateManyAndReturn<ExtArgs exte
   chainId?: boolean
   intentId?: boolean
   quoteId?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   emergencyStopChangeId?: boolean
   acknowledgment?: boolean
   requestFingerprint?: boolean
@@ -687,6 +745,8 @@ export type RealExecutionFinalConfirmationSelectScalar = {
   chainId?: boolean
   intentId?: boolean
   quoteId?: boolean
+  payloadCommitmentVersion?: boolean
+  payloadCommitmentDigest?: boolean
   emergencyStopChangeId?: boolean
   acknowledgment?: boolean
   requestFingerprint?: boolean
@@ -695,7 +755,7 @@ export type RealExecutionFinalConfirmationSelectScalar = {
   createdAt?: boolean
 }
 
-export type RealExecutionFinalConfirmationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "approvalId" | "reservationId" | "armId" | "providerId" | "chainId" | "intentId" | "quoteId" | "emergencyStopChangeId" | "acknowledgment" | "requestFingerprint" | "requestedAt" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionFinalConfirmation"]>
+export type RealExecutionFinalConfirmationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "approvalId" | "reservationId" | "armId" | "providerId" | "chainId" | "intentId" | "quoteId" | "payloadCommitmentVersion" | "payloadCommitmentDigest" | "emergencyStopChangeId" | "acknowledgment" | "requestFingerprint" | "requestedAt" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionFinalConfirmation"]>
 export type RealExecutionFinalConfirmationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   approval?: boolean | Prisma.RealExecutionRiskApprovalDefaultArgs<ExtArgs>
 }
@@ -720,6 +780,8 @@ export type $RealExecutionFinalConfirmationPayload<ExtArgs extends runtime.Types
     chainId: string
     intentId: string
     quoteId: string
+    payloadCommitmentVersion: string | null
+    payloadCommitmentDigest: string | null
     emergencyStopChangeId: string
     acknowledgment: string
     requestFingerprint: string
@@ -1158,6 +1220,8 @@ export interface RealExecutionFinalConfirmationFieldRefs {
   readonly chainId: Prisma.FieldRef<"RealExecutionFinalConfirmation", 'String'>
   readonly intentId: Prisma.FieldRef<"RealExecutionFinalConfirmation", 'String'>
   readonly quoteId: Prisma.FieldRef<"RealExecutionFinalConfirmation", 'String'>
+  readonly payloadCommitmentVersion: Prisma.FieldRef<"RealExecutionFinalConfirmation", 'String'>
+  readonly payloadCommitmentDigest: Prisma.FieldRef<"RealExecutionFinalConfirmation", 'String'>
   readonly emergencyStopChangeId: Prisma.FieldRef<"RealExecutionFinalConfirmation", 'String'>
   readonly acknowledgment: Prisma.FieldRef<"RealExecutionFinalConfirmation", 'String'>
   readonly requestFingerprint: Prisma.FieldRef<"RealExecutionFinalConfirmation", 'String'>

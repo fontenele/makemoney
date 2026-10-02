@@ -156,6 +156,8 @@ function mapConfirmation(row: {
   chainId: string;
   intentId: string;
   quoteId: string;
+  payloadCommitmentVersion: string | null;
+  payloadCommitmentDigest: string | null;
   emergencyStopChangeId: string;
   acknowledgment: string;
   requestedAt: Date;
@@ -164,6 +166,15 @@ function mapConfirmation(row: {
 }): StoredRealExecutionFinalConfirmation {
   if (row.acknowledgment !== ACKNOWLEDGMENT) {
     throw new Error('Persisted final confirmation has invalid acknowledgment');
+  }
+  if (
+    row.payloadCommitmentVersion !== 'real_execution_intent_quote_v1' ||
+    row.payloadCommitmentDigest === null ||
+    !/^[a-f0-9]{64}$/.test(row.payloadCommitmentDigest)
+  ) {
+    throw new Error(
+      'Persisted final confirmation has invalid payload commitment',
+    );
   }
   return {
     id: row.id,
@@ -174,6 +185,8 @@ function mapConfirmation(row: {
     chainId: row.chainId,
     intentId: row.intentId,
     quoteId: row.quoteId,
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: row.payloadCommitmentDigest,
     emergencyStopChangeId: row.emergencyStopChangeId,
     acknowledgment: ACKNOWLEDGMENT,
     requestedAt: new Date(row.requestedAt),

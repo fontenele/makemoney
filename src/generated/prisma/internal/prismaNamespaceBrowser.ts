@@ -246,6 +246,8 @@ export const RealExecutionFinalConfirmationScalarFieldEnum = {
   chainId: 'chainId',
   intentId: 'intentId',
   quoteId: 'quoteId',
+  payloadCommitmentVersion: 'payloadCommitmentVersion',
+  payloadCommitmentDigest: 'payloadCommitmentDigest',
   emergencyStopChangeId: 'emergencyStopChangeId',
   acknowledgment: 'acknowledgment',
   requestFingerprint: 'requestFingerprint',

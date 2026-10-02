@@ -45,6 +45,8 @@ describe('Real execution final confirmation persistence (e2e)', () => {
       confirmationRecorded: true,
       emergencyStopRecheckedForSubmission: false,
       submissionAuthorized: false,
+      payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+      payloadCommitmentDigest: 'c'.repeat(64),
       emergencyStopChangeId: 'real-trading-stop-clear-1',
       expiresAt: new Date('2026-10-02T15:00:09.000Z'),
     });

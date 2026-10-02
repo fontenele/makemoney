@@ -60,6 +60,26 @@ describe('PrismaRealExecutionFinalConfirmationStore', () => {
     expect(harness.create).toHaveBeenCalledTimes(1);
   });
 
+  it('fails closed when replaying a legacy confirmation without a payload commitment', async () => {
+    const harness = repositoryHarness();
+    harness.create.mockImplementation(({ data }) =>
+      Promise.resolve(confirmationRow(data)),
+    );
+    await harness.store.confirm(command());
+    const stored = harness.create.mock.calls[0][0].data;
+    harness.tx.realExecutionFinalConfirmation.findUnique.mockResolvedValue(
+      confirmationRow({
+        ...stored,
+        payloadCommitmentVersion: null,
+        payloadCommitmentDigest: null,
+      }),
+    );
+
+    await expect(harness.store.confirm(command())).rejects.toThrow(
+      'Persisted final confirmation has invalid payload commitment',
+    );
+  });
+
   it('rejects conflicting confirmation ids and protected identity reuse', async () => {
     const idHarness = repositoryHarness();
     idHarness.tx.realExecutionFinalConfirmation.findUnique.mockResolvedValue(
@@ -226,6 +246,8 @@ function approvalRow(overrides: Record<string, unknown> = {}) {
 function confirmationRow(overrides: Record<string, unknown> = {}) {
   return {
     ...command().request,
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'c'.repeat(64),
     requestFingerprint: 'b'.repeat(64),
     createdAt: CREATED_AT,
     ...overrides,
@@ -238,6 +260,8 @@ type ConfirmationRow = ReturnType<typeof confirmationRow>;
 function publicConfirmation() {
   return {
     ...command().request,
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'c'.repeat(64),
     createdAt: CREATED_AT,
     riskApproved: true,
     confirmationRecorded: true,
