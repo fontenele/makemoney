@@ -7,6 +7,14 @@ import {
 } from '../infrastructure/agentic-wallet-capability.adapter';
 
 describe('RealTradingStatusService', () => {
+  beforeEach(() => {
+    jest.useFakeTimers({ now: new Date('2026-10-01T12:00:00.000Z') });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('reports local fail-closed gates without reading the provider', () => {
     const wallet = { load: jest.fn() };
     const service = new RealTradingStatusService(

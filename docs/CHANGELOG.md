@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-03 — Verify the provider-bound payload against durable confirmation
+
+- Added a pure unwired assessment that correlates the active final confirmation, initial-submission plan, intent, and quote.
+- Recalculated the complete canonical payload commitment and required exact equality with the digest carried by the durable confirmation.
+- Constructed only an inert approved BSC market-swap representation with canonical provider inputs, MEV protection enabled, `MEDIUM` gas, and automatic retry forbidden.
+- Added focused coverage for the ready path, tampering, identity divergence, malformed inputs, expiry, incomplete costs, and canonical variants.
+- Stabilized the existing wallet-status test with a fixed test clock so session-expiry behavior remains deterministic without weakening production policy.
+- Kept runtime wiring, routes, provider mutation, a mutating command runner, the atomic gate, confirmation consumption, executor, and submission authorization absent.
+- Verified all 1,844 backend tests across 166 suites, all 77 PostgreSQL E2E tests across 8 suites with 23 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-02 — Propagate payload commitment into durable final confirmations
 
 - Added nullable, pair-constrained commitment version and SHA-256 digest columns to durable final confirmations without fabricating legacy payload facts.

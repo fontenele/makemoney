@@ -586,9 +586,27 @@ Although reservation, arm, approval, and confirmation now carry the same commitm
 - PostgreSQL E2E coverage proves migration, confirmation persistence, and exact replay with the commitment.
 - No runtime wiring, route, provider call, wallet mutation, command, executor, atomic permit, confirmation consumption, or submission authorization is added.
 
+## M10.33 — Provider-command payload verification
+
+M10.33 adds the first representation of the future provider-bound market-swap payload without adding a command runner or executable capability. The pure assessment requires the exact active M10.32 final confirmation, the correlated active M10.27 initial-submission plan, and the complete intent and quote. It reruns M10.28 at the current evaluation time and requires the resulting version and digest to equal the durable confirmation commitment.
+
+Only after every identity, time, quote, and commitment check passes does the assessment construct an inert Agentic Wallet BSC `market-order swap` payload. Token addresses and decimals are canonicalized, the intent's rate is converted exactly to the provider's percentage unit, and the optional provider controls are made explicit as MEV protection enabled and `MEDIUM` gas rather than relying on implicit defaults. The payload remains marked non-executable and forbids automatic retry.
+
+This comparison closes the non-atomic provider-payload integrity gap but is not a submission permit. A later serializable gate must still re-read emergency-stop state, consume the durable confirmation exactly once, bind the verified payload, and create an auditable submission attempt before any provider mutation can be considered. The existing quote adapter still reports partial costs, so it cannot produce the complete quote required by this assessment.
+
+### M10.33 acceptance criteria
+
+- The exact active confirmation and initial-submission plan must carry one correlated audit identity chain.
+- The complete intent and quote are revalidated and their canonical commitment must equal the durable confirmation digest.
+- The inert payload fixes the approved provider, BSC chain, exact token addresses, quantity, slippage percentage, MEV protection, and gas level.
+- Any malformed input, identity divergence, expiry, incomplete quote, changed committed fact, or digest mismatch fails closed.
+- The payload remains non-executable, forbids automatic retry, and explicitly requires a future atomic gate and confirmation consumption.
+- Focused tests cover the ready path, canonicalization, tampering, identity mismatch, expiry, and malformed facts.
+- No schema, persistence, runtime wiring, route, provider call, wallet mutation, funding, mutating command runner, atomic permit, executor, or submission authorization is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
 - [Binance's official `binance-skills-hub`](https://github.com/binance/binance-skills-hub), including the Agentic Wallet skill plus preflight, wallet-view, wallet-setting, gas, security, and market-order references (reviewed 2026-09-30).
-- [Binance Agentic Wallet market-order reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/market-order.md), including the distinct quote and swap commands and published quote response (reviewed 2026-10-01).
+- [Binance Agentic Wallet market-order reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/market-order.md), including the distinct quote and swap commands, explicit MEV/gas controls, and published quote response (reviewed again 2026-10-03).
 - [Binance Spot REST security documentation](https://developers.binance.com/en/docs/products/spot/rest-api) was reviewed only to confirm that centralized Spot API keys and permissions are a separate integration model; it is not the selected M10 provider boundary.

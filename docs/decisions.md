@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Verify a closed provider payload before designing the atomic permit
+
+M10.33 recomputes the complete M10.28 intent/quote commitment and requires exact equality with the digest carried by the durable final confirmation before it can describe a provider-bound payload. The initial-submission plan and every durable audit identity must also match and remain active. This prevents a caller from changing an economic or routing fact under an approved local identity.
+
+The provider representation is deliberately inert and closed to the approved BSC market swap. Required values are canonicalized, while optional provider behavior is explicit: MEV protection is enabled and gas level is `MEDIUM`. It is not a CLI command type and no mutating runner accepts it. Atomic emergency-stop enforcement, single-use confirmation consumption, durable attempt creation, provider submission, and reconciliation remain later independent boundaries.
+
 ## 2026-10-02 — Carry payload integrity through each durable decision boundary
 
 M10.30 and M10.31 copy the exact reservation commitment into the arm and Risk Engine approval respectively, only after each preceding artifact has been structurally validated and correlated. This makes later decisions independently auditable without recomputing or silently changing the approved intent/quote content.
