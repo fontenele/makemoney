@@ -1,5 +1,11 @@
 # Current State
 
+M10.35 is complete: every new durable submission gate now retains the exact initial-submission expiry, while migrated legacy rows remain nullable and fail closed in application mapping instead of receiving an invented lifetime. A pure unwired translator accepts only an active, structurally exact inert gate and produces the closed official Agentic Wallet BSC `market-order swap` argument preview with approved token addresses, canonical exact quantity and slippage, MEV protection enabled, `MEDIUM` gas, and JSON output.
+
+The preview is explicitly non-executable, forbids automatic retry, reports provider submission unstarted, and grants no submission authorization. The current M10.11 partial-cost quote still cannot create the complete upstream chain. No runtime wiring, route, process invocation, provider call, wallet mutation, funding, mutating command runner, executor, retry, reconciliation, or real order was added.
+
+Post-M10.35 validation passed all 1,871 backend tests across 169 suites, all 80 PostgreSQL E2E tests across 9 suites with all 25 migrations applied from scratch, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks. Compose emitted only the existing inaccessible user Docker-config warning.
+
 M10.34 is complete: an unwired serializable Prisma store now reloads the exact durable final confirmation, acquires the same advisory transaction lock used by every persisted emergency-stop change, reads the newest stop event, reapplies the submission-bound stop assessment and M10.33 provider-payload verification, and inserts one immutable `prepared_not_submitted` gate. A unique confirmation foreign key is the durable single-consumption invariant, while unique approval/reservation/arm/plan/intent/quote identities and a canonical request fingerprint protect concurrency and replay.
 
 The stored gate preserves the exact commitment and canonical provider payload, records equal stop-recheck and confirmation-consumption times, and reports `atomicGateSatisfied: true` but `providerSubmissionStarted: false` and `submissionAuthorized: false`. The store remains outside runtime wiring; the current M10.11 partial-cost quote cannot reach it, and no route, live provider call, wallet mutation, funding, mutating command runner, executor, or real order exists.
@@ -22,7 +28,7 @@ M10.30 is complete: every new unwired durable arm now copies the exact supported
 
 Post-M10.30 validation passed all 1,835 backend tests across 165 suites, all 77 PostgreSQL E2E tests across 8 suites with all 21 migrations applied from scratch, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma schema validation, Compose configuration, and whitespace checks. Compose emitted only the existing inaccessible user Docker-config warning. M10.30 adds no runtime wiring, route, provider call, wallet mutation, funding, atomic permit, confirmation consumption, submission command, executor, or submission authorization. Approval and confirmation rows do not yet carry the commitment.
 
-Last validated: 2026-10-02
+Last validated: 2026-10-03
 
 M10.29 is complete: the unwired serializable reservation store now reevaluates M10.28 at transaction time and persists the supported commitment version and canonical SHA-256 digest on every new reservation. The migration preserves unknown legacy rows as a nullable pair rather than inventing payload facts, constrains valid database combinations, and makes every reservation mapper and validator fail closed on absent, unsupported, or malformed commitments. Arm planning and pre-approval revalidation now require a valid reservation commitment.
 
@@ -887,7 +893,7 @@ The complete database-backed integration validation passed after E2E isolation:
 
 ## Repository state
 
-M0 through M9.66 are complete, and M10 is in progress through M10.34 durable atomic submission gating. Public Polymarket research and dashboard capabilities remain isolated from Spot crypto and every execution path. Disabled dashboard refreshes issue no provider-backed Polymarket requests; enabled live Gamma, Data API, and CLOB paths remain environment-dependent, and startup/post-restart behavior defaults to disabled. The connected Agentic Wallet remains empty and is application-wired only for provider-free local status, explicit bounded read-only observation, pure security-posture assessment, and non-authorizing local-limit visibility. The quote adapter and all real-execution planning/persistence components through the atomic submission gate are compiled but unwired and have never been called live; the runtime has no quote or execution access, the gate remains `prepared_not_submitted`, no mutating command runner or executor exists, and submission authorization remains false.
+M0 through M9.66 are complete, and M10 is in progress through M10.35 closed Agentic Wallet swap command preview. Public Polymarket research and dashboard capabilities remain isolated from Spot crypto and every execution path. Disabled dashboard refreshes issue no provider-backed Polymarket requests; enabled live Gamma, Data API, and CLOB paths remain environment-dependent, and startup/post-restart behavior defaults to disabled. The connected Agentic Wallet remains empty and is application-wired only for provider-free local status, explicit bounded read-only observation, pure security-posture assessment, and non-authorizing local-limit visibility. The quote adapter and all real-execution planning/persistence components through the atomic submission gate and inert command preview are compiled but unwired and have never been called live; the runtime has no quote or execution access, the gate remains `prepared_not_submitted`, no mutating command runner or executor exists, and submission authorization remains false.
 
 ## Known issues and cautions
 

@@ -144,6 +144,7 @@ export class PrismaRealExecutionSubmissionGateStore implements RealExecutionSubm
             requestFingerprint,
             emergencyStopRecheckedAt: evaluatedAt,
             confirmationConsumedAt: evaluatedAt,
+            expiresAt: command.submissionPlan.expiresAt,
           },
         });
         return { gate: mapGate(created), replayed: false };
@@ -243,6 +244,7 @@ function mapGate(row: {
   status: string;
   emergencyStopRecheckedAt: Date;
   confirmationConsumedAt: Date;
+  expiresAt: Date | null;
   createdAt: Date;
 }): StoredRealExecutionSubmissionGate {
   if (
@@ -253,8 +255,10 @@ function mapGate(row: {
     row.mevProtection !== true ||
     row.gasLevel !== 'MEDIUM' ||
     row.status !== 'prepared_not_submitted' ||
+    row.expiresAt === null ||
     row.emergencyStopRecheckedAt.getTime() !==
-      row.confirmationConsumedAt.getTime()
+      row.confirmationConsumedAt.getTime() ||
+    row.expiresAt.getTime() <= row.confirmationConsumedAt.getTime()
   ) {
     throw new Error('Persisted real execution submission gate is invalid');
   }
@@ -281,6 +285,7 @@ function mapGate(row: {
     status: 'prepared_not_submitted',
     emergencyStopRecheckedAt: new Date(row.emergencyStopRecheckedAt),
     confirmationConsumedAt: new Date(row.confirmationConsumedAt),
+    expiresAt: new Date(row.expiresAt),
     createdAt: new Date(row.createdAt),
     atomicGateSatisfied: true,
     confirmationConsumed: true,

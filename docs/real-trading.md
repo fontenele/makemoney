@@ -623,6 +623,25 @@ Canonical request fingerprinting permits exact replay even after later expiry or
 - Unit and PostgreSQL E2E tests prove replay, concurrent single consumption, and active-stop rejection.
 - No runtime wiring, route, provider call, wallet mutation, funding, mutating command runner, executor, real order, or submission authorization is added.
 
+## M10.35 — Closed Agentic Wallet swap command preview
+
+M10.35 preserves the M10.27 submission-plan expiry on every new M10.34 gate. The schema column is nullable only so migration does not invent an expiry for preexisting records; the Prisma mapper rejects that uncertain legacy state, and a database constraint requires any stored expiry to be later than confirmation consumption.
+
+A pure, unwired provider translator accepts only one active, structurally exact durable gate. It revalidates every protected UUID, the commitment format, emergency-stop identity, approved Agentic Wallet provider and BSC chain, either exact BTCB/USDT direction, canonical positive source quantity, canonical zero-to-100 slippage percentage, MEV protection enabled, `MEDIUM` gas, `prepared_not_submitted` status, coherent atomic timestamps, and all inert authorization flags. Future, expired, malformed, changed, noncanonical, started, or authorized facts fail closed.
+
+The successful result is an immutable preview of the documented `market-order swap` argument sequence, including explicit `--fromTokenQty`, `--fromToken`, `--toToken`, `--binanceChainId`, `--slippage`, `--mev true`, `--gasLevel MEDIUM`, and `--json`. It deliberately omits an executable path and still reports automatic retry forbidden, provider submission unstarted, and submission authorization false. No process is launched and no provider is contacted.
+
+### M10.35 acceptance criteria
+
+- Every new durable gate stores its exact submission-plan expiry.
+- Legacy gates without provable expiry fail closed in application mapping.
+- Only an active exact M10.34 gate can produce the closed official argument preview.
+- Provider, chain, token direction, quantity, slippage, MEV, gas, status, commitment, identity, timestamps, and inert flags are revalidated.
+- The preview remains non-executable, forbids automatic retry, and authorizes no submission.
+- Focused tests cover both approved directions, exact arguments, malformed facts, future gates, expiry, and invalid evaluation time.
+- PostgreSQL E2E coverage proves expiry migration and persistence.
+- No runtime wiring, route, process invocation, provider call, wallet mutation, funding, mutating command runner, executor, retry, reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

@@ -216,6 +216,7 @@ model RealExecutionSubmissionGate {
   requestFingerprint       String                         @map("request_fingerprint") @db.Char(64)
   emergencyStopRecheckedAt DateTime                       @map("emergency_stop_rechecked_at")
   confirmationConsumedAt   DateTime                       @map("confirmation_consumed_at")
+  expiresAt                DateTime?                      @map("expires_at")
   createdAt                DateTime                       @default(now()) @map("created_at")
   confirmation             RealExecutionFinalConfirmation @relation(fields: [confirmationId], references: [id], onDelete: Restrict)
 

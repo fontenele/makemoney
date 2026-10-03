@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-03 — Add an expiring closed swap-command preview without execution
+
+- Persisted the exact initial-submission expiry on every new durable gate and constrained it to follow confirmation consumption.
+- Preserved unknown legacy expiry as nullable during migration while making application mapping reject such rows fail closed.
+- Added a pure unwired translator from one exact active gate to the documented Agentic Wallet BSC `market-order swap` argument preview.
+- Revalidated the approved provider, chain, token direction, canonical exact decimals, MEV and gas policy, commitment, audit identities, timestamps, inert status, and authorization flags.
+- Added focused unit and PostgreSQL E2E coverage for exact arguments, both approved directions, unsafe facts, future/expired gates, migration, persistence, and legacy rejection.
+- Kept runtime wiring, routes, process invocation, provider calls, wallet mutation, funding, a mutating command runner, executor, retry, reconciliation, real orders, and submission authorization absent.
+- Verified all 1,871 backend tests across 169 suites, all 80 PostgreSQL E2E tests across 9 suites with 25 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Add a durable atomic submission gate without provider execution
 
 - Added an unwired serializable Prisma store that reloads the exact final confirmation and latest persisted emergency-stop event before creating a gate.

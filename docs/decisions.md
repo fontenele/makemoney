@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Preserve gate expiry and translate it only into an inert closed command
+
+M10.35 persists the initial-submission plan expiry on every new durable gate so later consumers cannot mistake an idempotently replayed but stale gate for current authority. The migration leaves the column nullable because an upgrade cannot truthfully reconstruct expiry for an existing gate; application mapping rejects that legacy uncertainty. A database constraint requires every known expiry to follow confirmation consumption.
+
+The provider-specific translator is a pure closed mapping rather than a process runner. It accepts only the exact approved provider, BSC chain, BTCB/USDT direction, canonical positive quantity, bounded canonical slippage percentage, explicit MEV protection, `MEDIUM` gas, intact commitment and audit identities, inert gate flags, coherent timestamps, and an unexpired evaluation time. Its result is only an argument preview for the documented `market-order swap` command and explicitly remains non-executable, non-retriable, unstarted, and unauthorized.
+
 ## 2026-10-03 — Serialize the final stop decision with confirmation consumption
 
 A transactional read alone cannot guarantee that a concurrent emergency-stop insert does not cross the final submission boundary. M10.34 therefore makes emergency-stop writes and submission-gate creation take the same PostgreSQL advisory transaction lock. The gate reads the newest persisted event only after acquiring that lock, requires the exact inactive event already bound to the confirmation, and inserts its audit record before releasing the lock.

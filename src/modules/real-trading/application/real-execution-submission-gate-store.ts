@@ -40,6 +40,7 @@ export interface StoredRealExecutionSubmissionGate {
   readonly status: 'prepared_not_submitted';
   readonly emergencyStopRecheckedAt: Date;
   readonly confirmationConsumedAt: Date;
+  readonly expiresAt: Date;
   readonly createdAt: Date;
   readonly atomicGateSatisfied: true;
   readonly confirmationConsumed: true;

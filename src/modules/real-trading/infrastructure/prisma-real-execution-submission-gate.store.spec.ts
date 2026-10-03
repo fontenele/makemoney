@@ -46,6 +46,7 @@ describe('PrismaRealExecutionSubmissionGateStore', () => {
       gasLevel: 'MEDIUM',
       emergencyStopRecheckedAt: NOW,
       confirmationConsumedAt: NOW,
+      expiresAt: command().submissionPlan.expiresAt,
     });
     expect(harness.prismaTransaction).toHaveBeenCalledWith(
       expect.any(Function),
@@ -156,6 +157,14 @@ describe('PrismaRealExecutionSubmissionGateStore', () => {
       gateRow({ status: 'submitted' }),
     );
     await expect(malformed.store.create(command())).rejects.toThrow(
+      'Persisted real execution submission gate is invalid',
+    );
+
+    const legacyWithoutExpiry = repositoryHarness();
+    legacyWithoutExpiry.tx.realExecutionSubmissionGate.findUnique.mockResolvedValue(
+      gateRow({ expiresAt: null }),
+    );
+    await expect(legacyWithoutExpiry.store.create(command())).rejects.toThrow(
       'Persisted real execution submission gate is invalid',
     );
   });
@@ -384,6 +393,7 @@ function gateRow(overrides: Record<string, unknown> = {}) {
     requestFingerprint: fingerprintPlaceholder(),
     emergencyStopRecheckedAt: NOW,
     confirmationConsumedAt: NOW,
+    expiresAt: value.submissionPlan.expiresAt,
     createdAt: CREATED_AT,
     ...overrides,
   };

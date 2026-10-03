@@ -1706,6 +1706,7 @@ export const RealExecutionSubmissionGateScalarFieldEnum = {
   requestFingerprint: 'requestFingerprint',
   emergencyStopRecheckedAt: 'emergencyStopRecheckedAt',
   confirmationConsumedAt: 'confirmationConsumedAt',
+  expiresAt: 'expiresAt',
   createdAt: 'createdAt'
 } as const
 

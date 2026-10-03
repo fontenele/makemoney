@@ -49,6 +49,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
         payloadCommitmentDigest: commitmentDigest(),
         emergencyStopRecheckedAt: NOW,
         confirmationConsumedAt: NOW,
+        expiresAt: new Date('2026-10-03T12:00:07.000Z'),
         atomicGateSatisfied: true,
         confirmationConsumed: true,
         providerSubmissionStarted: false,

@@ -48,6 +48,7 @@ export type RealExecutionSubmissionGateMinAggregateOutputType = {
   requestFingerprint: string | null
   emergencyStopRecheckedAt: Date | null
   confirmationConsumedAt: Date | null
+  expiresAt: Date | null
   createdAt: Date | null
 }
 
@@ -75,6 +76,7 @@ export type RealExecutionSubmissionGateMaxAggregateOutputType = {
   requestFingerprint: string | null
   emergencyStopRecheckedAt: Date | null
   confirmationConsumedAt: Date | null
+  expiresAt: Date | null
   createdAt: Date | null
 }
 
@@ -102,6 +104,7 @@ export type RealExecutionSubmissionGateCountAggregateOutputType = {
   requestFingerprint: number
   emergencyStopRecheckedAt: number
   confirmationConsumedAt: number
+  expiresAt: number
   createdAt: number
   _all: number
 }
@@ -131,6 +134,7 @@ export type RealExecutionSubmissionGateMinAggregateInputType = {
   requestFingerprint?: true
   emergencyStopRecheckedAt?: true
   confirmationConsumedAt?: true
+  expiresAt?: true
   createdAt?: true
 }
 
@@ -158,6 +162,7 @@ export type RealExecutionSubmissionGateMaxAggregateInputType = {
   requestFingerprint?: true
   emergencyStopRecheckedAt?: true
   confirmationConsumedAt?: true
+  expiresAt?: true
   createdAt?: true
 }
 
@@ -185,6 +190,7 @@ export type RealExecutionSubmissionGateCountAggregateInputType = {
   requestFingerprint?: true
   emergencyStopRecheckedAt?: true
   confirmationConsumedAt?: true
+  expiresAt?: true
   createdAt?: true
   _all?: true
 }
@@ -285,6 +291,7 @@ export type RealExecutionSubmissionGateGroupByOutputType = {
   requestFingerprint: string
   emergencyStopRecheckedAt: Date
   confirmationConsumedAt: Date
+  expiresAt: Date | null
   createdAt: Date
   _count: RealExecutionSubmissionGateCountAggregateOutputType | null
   _min: RealExecutionSubmissionGateMinAggregateOutputType | null
@@ -333,6 +340,7 @@ export type RealExecutionSubmissionGateWhereInput = {
   requestFingerprint?: Prisma.StringFilter<"RealExecutionSubmissionGate"> | string
   emergencyStopRecheckedAt?: Prisma.DateTimeFilter<"RealExecutionSubmissionGate"> | Date | string
   confirmationConsumedAt?: Prisma.DateTimeFilter<"RealExecutionSubmissionGate"> | Date | string
+  expiresAt?: Prisma.DateTimeNullableFilter<"RealExecutionSubmissionGate"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"RealExecutionSubmissionGate"> | Date | string
   confirmation?: Prisma.XOR<Prisma.RealExecutionFinalConfirmationScalarRelationFilter, Prisma.RealExecutionFinalConfirmationWhereInput>
 }
@@ -361,6 +369,7 @@ export type RealExecutionSubmissionGateOrderByWithRelationInput = {
   requestFingerprint?: Prisma.SortOrder
   emergencyStopRecheckedAt?: Prisma.SortOrder
   confirmationConsumedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   confirmation?: Prisma.RealExecutionFinalConfirmationOrderByWithRelationInput
 }
@@ -392,6 +401,7 @@ export type RealExecutionSubmissionGateWhereUniqueInput = Prisma.AtLeast<{
   requestFingerprint?: Prisma.StringFilter<"RealExecutionSubmissionGate"> | string
   emergencyStopRecheckedAt?: Prisma.DateTimeFilter<"RealExecutionSubmissionGate"> | Date | string
   confirmationConsumedAt?: Prisma.DateTimeFilter<"RealExecutionSubmissionGate"> | Date | string
+  expiresAt?: Prisma.DateTimeNullableFilter<"RealExecutionSubmissionGate"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"RealExecutionSubmissionGate"> | Date | string
   confirmation?: Prisma.XOR<Prisma.RealExecutionFinalConfirmationScalarRelationFilter, Prisma.RealExecutionFinalConfirmationWhereInput>
 }, "id" | "confirmationId" | "approvalId" | "reservationId" | "armId" | "submissionPlanId" | "intentId" | "quoteId">
@@ -420,6 +430,7 @@ export type RealExecutionSubmissionGateOrderByWithAggregationInput = {
   requestFingerprint?: Prisma.SortOrder
   emergencyStopRecheckedAt?: Prisma.SortOrder
   confirmationConsumedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.RealExecutionSubmissionGateCountOrderByAggregateInput
   _max?: Prisma.RealExecutionSubmissionGateMaxOrderByAggregateInput
@@ -453,6 +464,7 @@ export type RealExecutionSubmissionGateScalarWhereWithAggregatesInput = {
   requestFingerprint?: Prisma.StringWithAggregatesFilter<"RealExecutionSubmissionGate"> | string
   emergencyStopRecheckedAt?: Prisma.DateTimeWithAggregatesFilter<"RealExecutionSubmissionGate"> | Date | string
   confirmationConsumedAt?: Prisma.DateTimeWithAggregatesFilter<"RealExecutionSubmissionGate"> | Date | string
+  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"RealExecutionSubmissionGate"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"RealExecutionSubmissionGate"> | Date | string
 }
 
@@ -479,6 +491,7 @@ export type RealExecutionSubmissionGateCreateInput = {
   requestFingerprint: string
   emergencyStopRecheckedAt: Date | string
   confirmationConsumedAt: Date | string
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   confirmation: Prisma.RealExecutionFinalConfirmationCreateNestedOneWithoutSubmissionGateInput
 }
@@ -507,6 +520,7 @@ export type RealExecutionSubmissionGateUncheckedCreateInput = {
   requestFingerprint: string
   emergencyStopRecheckedAt: Date | string
   confirmationConsumedAt: Date | string
+  expiresAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -533,6 +547,7 @@ export type RealExecutionSubmissionGateUpdateInput = {
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyStopRecheckedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmationConsumedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmation?: Prisma.RealExecutionFinalConfirmationUpdateOneRequiredWithoutSubmissionGateNestedInput
 }
@@ -561,6 +576,7 @@ export type RealExecutionSubmissionGateUncheckedUpdateInput = {
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyStopRecheckedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmationConsumedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -588,6 +604,7 @@ export type RealExecutionSubmissionGateCreateManyInput = {
   requestFingerprint: string
   emergencyStopRecheckedAt: Date | string
   confirmationConsumedAt: Date | string
+  expiresAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -614,6 +631,7 @@ export type RealExecutionSubmissionGateUpdateManyMutationInput = {
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyStopRecheckedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmationConsumedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -641,6 +659,7 @@ export type RealExecutionSubmissionGateUncheckedUpdateManyInput = {
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyStopRecheckedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmationConsumedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -673,6 +692,7 @@ export type RealExecutionSubmissionGateCountOrderByAggregateInput = {
   requestFingerprint?: Prisma.SortOrder
   emergencyStopRecheckedAt?: Prisma.SortOrder
   confirmationConsumedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -700,6 +720,7 @@ export type RealExecutionSubmissionGateMaxOrderByAggregateInput = {
   requestFingerprint?: Prisma.SortOrder
   emergencyStopRecheckedAt?: Prisma.SortOrder
   confirmationConsumedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -727,6 +748,7 @@ export type RealExecutionSubmissionGateMinOrderByAggregateInput = {
   requestFingerprint?: Prisma.SortOrder
   emergencyStopRecheckedAt?: Prisma.SortOrder
   confirmationConsumedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -785,6 +807,7 @@ export type RealExecutionSubmissionGateCreateWithoutConfirmationInput = {
   requestFingerprint: string
   emergencyStopRecheckedAt: Date | string
   confirmationConsumedAt: Date | string
+  expiresAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -811,6 +834,7 @@ export type RealExecutionSubmissionGateUncheckedCreateWithoutConfirmationInput =
   requestFingerprint: string
   emergencyStopRecheckedAt: Date | string
   confirmationConsumedAt: Date | string
+  expiresAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -853,6 +877,7 @@ export type RealExecutionSubmissionGateUpdateWithoutConfirmationInput = {
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyStopRecheckedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmationConsumedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -879,6 +904,7 @@ export type RealExecutionSubmissionGateUncheckedUpdateWithoutConfirmationInput =
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   emergencyStopRecheckedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmationConsumedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -908,6 +934,7 @@ export type RealExecutionSubmissionGateSelect<ExtArgs extends runtime.Types.Exte
   requestFingerprint?: boolean
   emergencyStopRecheckedAt?: boolean
   confirmationConsumedAt?: boolean
+  expiresAt?: boolean
   createdAt?: boolean
   confirmation?: boolean | Prisma.RealExecutionFinalConfirmationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionSubmissionGate"]>
@@ -936,6 +963,7 @@ export type RealExecutionSubmissionGateSelectCreateManyAndReturn<ExtArgs extends
   requestFingerprint?: boolean
   emergencyStopRecheckedAt?: boolean
   confirmationConsumedAt?: boolean
+  expiresAt?: boolean
   createdAt?: boolean
   confirmation?: boolean | Prisma.RealExecutionFinalConfirmationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionSubmissionGate"]>
@@ -964,6 +992,7 @@ export type RealExecutionSubmissionGateSelectUpdateManyAndReturn<ExtArgs extends
   requestFingerprint?: boolean
   emergencyStopRecheckedAt?: boolean
   confirmationConsumedAt?: boolean
+  expiresAt?: boolean
   createdAt?: boolean
   confirmation?: boolean | Prisma.RealExecutionFinalConfirmationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionSubmissionGate"]>
@@ -992,10 +1021,11 @@ export type RealExecutionSubmissionGateSelectScalar = {
   requestFingerprint?: boolean
   emergencyStopRecheckedAt?: boolean
   confirmationConsumedAt?: boolean
+  expiresAt?: boolean
   createdAt?: boolean
 }
 
-export type RealExecutionSubmissionGateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "confirmationId" | "approvalId" | "reservationId" | "armId" | "submissionPlanId" | "providerId" | "chainId" | "intentId" | "quoteId" | "payloadCommitmentVersion" | "payloadCommitmentDigest" | "emergencyStopChangeId" | "sourceTokenAddress" | "targetTokenAddress" | "sourceQuantity" | "maximumSlippagePercent" | "mevProtection" | "gasLevel" | "status" | "requestFingerprint" | "emergencyStopRecheckedAt" | "confirmationConsumedAt" | "createdAt", ExtArgs["result"]["realExecutionSubmissionGate"]>
+export type RealExecutionSubmissionGateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "confirmationId" | "approvalId" | "reservationId" | "armId" | "submissionPlanId" | "providerId" | "chainId" | "intentId" | "quoteId" | "payloadCommitmentVersion" | "payloadCommitmentDigest" | "emergencyStopChangeId" | "sourceTokenAddress" | "targetTokenAddress" | "sourceQuantity" | "maximumSlippagePercent" | "mevProtection" | "gasLevel" | "status" | "requestFingerprint" | "emergencyStopRecheckedAt" | "confirmationConsumedAt" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionSubmissionGate"]>
 export type RealExecutionSubmissionGateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   confirmation?: boolean | Prisma.RealExecutionFinalConfirmationDefaultArgs<ExtArgs>
 }
@@ -1035,6 +1065,7 @@ export type $RealExecutionSubmissionGatePayload<ExtArgs extends runtime.Types.Ex
     requestFingerprint: string
     emergencyStopRecheckedAt: Date
     confirmationConsumedAt: Date
+    expiresAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["realExecutionSubmissionGate"]>
   composites: {}
@@ -1483,6 +1514,7 @@ export interface RealExecutionSubmissionGateFieldRefs {
   readonly requestFingerprint: Prisma.FieldRef<"RealExecutionSubmissionGate", 'String'>
   readonly emergencyStopRecheckedAt: Prisma.FieldRef<"RealExecutionSubmissionGate", 'DateTime'>
   readonly confirmationConsumedAt: Prisma.FieldRef<"RealExecutionSubmissionGate", 'DateTime'>
+  readonly expiresAt: Prisma.FieldRef<"RealExecutionSubmissionGate", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"RealExecutionSubmissionGate", 'DateTime'>
 }
     
