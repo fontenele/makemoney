@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-03 — Add a durable atomic submission gate without provider execution
+
+- Added an unwired serializable Prisma store that reloads the exact final confirmation and latest persisted emergency-stop event before creating a gate.
+- Serialized every emergency-stop change and gate creation under the same PostgreSQL advisory transaction lock, preventing a stop update from crossing the final decision boundary.
+- Reapplied the submission stop assessment and provider-payload commitment comparison inside the transaction.
+- Added an immutable `prepared_not_submitted` record with restrictive identity uniqueness, exact payload facts, and equal stop-recheck/confirmation-consumption timestamps.
+- Preserved exact idempotent replay while preventing concurrent or alternate reuse of a consumed confirmation and its protected identities.
+- Added focused unit and PostgreSQL E2E coverage for persistence, replay, concurrency, active/missing/changed stop state, payload tampering, and malformed durable facts.
+- Kept runtime wiring, routes, provider calls, wallet mutation, a mutating command runner, executor, real orders, and submission authorization absent.
+- Verified all 1,854 backend tests across 168 suites, all 80 PostgreSQL E2E tests across 9 suites with 24 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Verify the provider-bound payload against durable confirmation
 
 - Added a pure unwired assessment that correlates the active final confirmation, initial-submission plan, intent, and quote.

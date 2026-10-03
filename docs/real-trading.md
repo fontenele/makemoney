@@ -604,6 +604,25 @@ This comparison closes the non-atomic provider-payload integrity gap but is not 
 - Focused tests cover the ready path, canonicalization, tampering, identity mismatch, expiry, and malformed facts.
 - No schema, persistence, runtime wiring, route, provider call, wallet mutation, funding, mutating command runner, atomic permit, executor, or submission authorization is added.
 
+## M10.34 — Durable atomic submission gate
+
+M10.34 adds an unwired Prisma store for the final local decision boundary while deliberately stopping before provider execution. Gate creation runs in a serializable PostgreSQL transaction and acquires an advisory transaction lock shared with every persisted emergency-stop change. After taking the lock, it reloads the exact durable final confirmation and newest persisted stop event, then reapplies M10.26 and M10.33 using the transaction clock.
+
+Only an unchanged inactive stop event and an exact active committed provider payload can create a row. The immutable record preserves every protected audit identity, the commitment, canonical source/target/quantity/slippage payload, explicit MEV and gas settings, and one equal timestamp for the atomic stop recheck and confirmation consumption. A unique foreign key from the gate to the confirmation represents single consumption without mutating the append-only confirmation; additional unique identities prevent the same approval chain or plan from being reused.
+
+Canonical request fingerprinting permits exact replay even after later expiry or stop changes, but altered reuse fails closed. Database constraints restrict every new row to the approved provider/chain/commitment version, MEV enabled, `MEDIUM` gas, `prepared_not_submitted` status, and equal atomic timestamps. The public stored artifact reports that the local atomic gate succeeded and the confirmation was consumed, while provider submission remains unstarted and `submissionAuthorized` remains false.
+
+### M10.34 acceptance criteria
+
+- Gate creation and every persisted emergency-stop change share one PostgreSQL advisory transaction lock.
+- The store reloads the exact confirmation and latest stop event after acquiring the lock.
+- M10.26 stop assessment and M10.33 payload verification are reapplied with the transaction clock.
+- One immutable gate consumes a confirmation through a restrictive unique foreign key without rewriting it.
+- Exact replay is idempotent; changed IDs, reused protected identities, malformed facts, payload drift, and inactive-stop divergence fail closed.
+- PostgreSQL constraints preserve the exact inert status, provider payload policy, commitment shape, and atomic timestamps.
+- Unit and PostgreSQL E2E tests prove replay, concurrent single consumption, and active-stop rejection.
+- No runtime wiring, route, provider call, wallet mutation, funding, mutating command runner, executor, real order, or submission authorization is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

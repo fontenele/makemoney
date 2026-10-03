@@ -61,6 +61,7 @@ export const ModelName = {
   RealExecutionArm: 'RealExecutionArm',
   RealExecutionRiskApproval: 'RealExecutionRiskApproval',
   RealExecutionFinalConfirmation: 'RealExecutionFinalConfirmation',
+  RealExecutionSubmissionGate: 'RealExecutionSubmissionGate',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -257,6 +258,36 @@ export const RealExecutionFinalConfirmationScalarFieldEnum = {
 } as const
 
 export type RealExecutionFinalConfirmationScalarFieldEnum = (typeof RealExecutionFinalConfirmationScalarFieldEnum)[keyof typeof RealExecutionFinalConfirmationScalarFieldEnum]
+
+
+export const RealExecutionSubmissionGateScalarFieldEnum = {
+  id: 'id',
+  confirmationId: 'confirmationId',
+  approvalId: 'approvalId',
+  reservationId: 'reservationId',
+  armId: 'armId',
+  submissionPlanId: 'submissionPlanId',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  intentId: 'intentId',
+  quoteId: 'quoteId',
+  payloadCommitmentVersion: 'payloadCommitmentVersion',
+  payloadCommitmentDigest: 'payloadCommitmentDigest',
+  emergencyStopChangeId: 'emergencyStopChangeId',
+  sourceTokenAddress: 'sourceTokenAddress',
+  targetTokenAddress: 'targetTokenAddress',
+  sourceQuantity: 'sourceQuantity',
+  maximumSlippagePercent: 'maximumSlippagePercent',
+  mevProtection: 'mevProtection',
+  gasLevel: 'gasLevel',
+  status: 'status',
+  requestFingerprint: 'requestFingerprint',
+  emergencyStopRecheckedAt: 'emergencyStopRecheckedAt',
+  confirmationConsumedAt: 'confirmationConsumedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RealExecutionSubmissionGateScalarFieldEnum = (typeof RealExecutionSubmissionGateScalarFieldEnum)[keyof typeof RealExecutionSubmissionGateScalarFieldEnum]
 
 
 export const ObservedSpotSymbolScalarFieldEnum = {

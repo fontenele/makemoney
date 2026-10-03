@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Serialize the final stop decision with confirmation consumption
+
+A transactional read alone cannot guarantee that a concurrent emergency-stop insert does not cross the final submission boundary. M10.34 therefore makes emergency-stop writes and submission-gate creation take the same PostgreSQL advisory transaction lock. The gate reads the newest persisted event only after acquiring that lock, requires the exact inactive event already bound to the confirmation, and inserts its audit record before releasing the lock.
+
+Confirmation consumption is represented by a unique foreign key from one immutable submission-gate row rather than by rewriting the confirmation. This keeps the confirmation append-only, makes concurrent double consumption impossible at the database level, and permits exact fingerprinted replay. The row remains `prepared_not_submitted`: it records atomic enforcement and the exact verified provider payload, but no command runner accepts it and it grants no submission authorization.
+
 ## 2026-10-03 — Verify a closed provider payload before designing the atomic permit
 
 M10.33 recomputes the complete M10.28 intent/quote commitment and requires exact equality with the digest carried by the durable final confirmation before it can describe a provider-bound payload. The initial-submission plan and every durable audit identity must also match and remain active. This prevents a caller from changing an economic or routing fact under an approved local identity.

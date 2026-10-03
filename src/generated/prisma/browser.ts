@@ -68,6 +68,11 @@ export type RealExecutionRiskApproval = Prisma.RealExecutionRiskApprovalModel
  */
 export type RealExecutionFinalConfirmation = Prisma.RealExecutionFinalConfirmationModel
 /**
+ * Model RealExecutionSubmissionGate
+ * 
+ */
+export type RealExecutionSubmissionGate = Prisma.RealExecutionSubmissionGateModel
+/**
  * Model ObservedSpotSymbol
  * 
  */
