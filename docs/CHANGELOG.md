@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-03 — Add a closed read-only swap-status lookup preview
+
+- Added a pure unwired translator from the exact nonterminal submission receipt to the documented Agentic Wallet order lookup arguments.
+- Generated only `market-order list --orderId <orderId> --json`, marked read-only, non-executable, and provider-call-unstarted.
+- Restricted provider order IDs at both response and command boundaries to a bounded option-safe ASCII grammar.
+- Rejected altered provider, kind, gate, order ID, lifecycle, acknowledgment, terminal, execution-success, lookup, and retry facts.
+- Kept submission retry forbidden and separated it from future repeatable read-only status observation.
+- Kept schema, persistence, runtime wiring, routes, process invocation, provider calls, wallet mutation, funding, a mutating command runner, executor, polling, status parsing, reconciliation, real orders, and submission authorization absent.
+- Verified all 1,903 backend tests across 171 suites, all 80 PostgreSQL E2E tests across 9 suites with 25 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Interpret swap submission acknowledgments without claiming execution
 
 - Added a pure unwired interpreter for the documented Agentic Wallet market-swap submission envelope.

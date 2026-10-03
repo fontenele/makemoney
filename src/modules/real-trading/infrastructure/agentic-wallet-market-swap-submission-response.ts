@@ -1,5 +1,6 @@
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+const PROVIDER_ORDER_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,255}$/;
 
 export type AgenticWalletMarketSwapSubmissionResponseBlocker =
   | 'invalid_gate_id'
@@ -58,7 +59,7 @@ export function assessAgenticWalletMarketSwapSubmissionResponse(
     envelope.success === true &&
     (data === null ||
       typeof data.orderId !== 'string' ||
-      !isSafeProviderOrderId(data.orderId))
+      !isSafeAgenticWalletProviderOrderId(data.orderId))
   ) {
     blockers.push('invalid_provider_order_id');
   }
@@ -100,12 +101,8 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>;
 }
 
-function isSafeProviderOrderId(value: string): boolean {
-  if (value.length === 0 || value.length > 256 || /\s/u.test(value)) {
-    return false;
-  }
-  return [...value].every((character) => {
-    const codePoint = character.codePointAt(0);
-    return codePoint !== undefined && codePoint > 31 && codePoint !== 127;
-  });
+export function isSafeAgenticWalletProviderOrderId(
+  value: unknown,
+): value is string {
+  return typeof value === 'string' && PROVIDER_ORDER_ID_PATTERN.test(value);
 }

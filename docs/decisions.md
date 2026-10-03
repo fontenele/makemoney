@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Keep status lookup read-only, closed, and separate from submission retry
+
+M10.37 represents the mandatory post-submission lookup as a distinct pure command preview: `market-order list --orderId <orderId> --json`. It accepts only the exact nonterminal M10.36 receipt and retains the durable gate correlation, so a forged terminal/success claim or altered receipt policy cannot enter the reconciliation path.
+
+Provider order IDs now share a bounded ASCII grammar that starts with an alphanumeric character and permits only alphanumerics plus `.`, `_`, `:`, and `-` afterward. This prevents leading-option and path-like values from becoming CLI arguments while covering the documented numeric identity. The lookup is explicitly read-only and non-executable; repeat status observation is conceptually separate from the permanently forbidden automatic retry of the swap submission.
+
 ## 2026-10-03 — Treat swap acknowledgment as nonterminal and never retry ambiguity
 
 The official Agentic Wallet contract states that `success: true` with an `orderId` acknowledges submission only; it does not prove execution. M10.36 therefore normalizes that response exclusively as `submitted_pending_confirmation`, keeps `executionSucceeded: false`, and requires a later `market-order list --orderId` reconciliation to `FINISHED` or `FAILED`. Additive response metadata, including a claimed status, cannot change that interpretation.

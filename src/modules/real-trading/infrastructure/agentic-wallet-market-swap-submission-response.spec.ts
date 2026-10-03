@@ -93,6 +93,8 @@ describe('assessAgenticWalletMarketSwapSubmissionResponse', () => {
     '',
     ' order',
     'order id',
+    '--status',
+    'order/id',
     `order${String.fromCharCode(10)}id`,
     'x'.repeat(257),
   ])('rejects an unsafe provider order id %#', (orderId: unknown) => {

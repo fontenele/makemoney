@@ -644,7 +644,7 @@ The successful result is an immutable preview of the documented `market-order sw
 
 ## M10.36 — Safe swap submission response interpretation
 
-M10.36 adds a pure, unwired interpretation boundary for the documented result of a future Agentic Wallet `market-order swap` invocation. It requires a canonical durable gate UUID and accepts an acknowledgment only when the envelope reports literal success with a nonempty, bounded, control-free string `orderId`.
+M10.36 adds a pure, unwired interpretation boundary for the documented result of a future Agentic Wallet `market-order swap` invocation. It requires a canonical durable gate UUID and accepts an acknowledgment only when the envelope reports literal success with a nonempty, bounded, option-safe ASCII `orderId`.
 
 An accepted order ID means only `submitted_pending_confirmation`. The resulting receipt records the gate correlation and provider order identity while keeping `terminal: false`, `executionSucceeded: false`, `statusLookupRequired: true`, and `automaticRetryAllowed: false`. Provider-added metadata is ignored for lifecycle purposes, so even a status-like field cannot bypass the mandatory separate order lookup.
 
@@ -659,6 +659,25 @@ An invalid envelope, explicit provider failure, unsafe order ID, or invalid gate
 - Every path requires reconciliation and forbids automatic retry.
 - Focused tests cover the documented response, additive metadata, malformed envelopes, negative responses, unsafe IDs, and invalid correlation.
 - No schema, persistence, runtime wiring, route, process invocation, provider call, wallet mutation, funding, mutating command runner, executor, polling, retry, reconciliation implementation, or real order is added.
+
+## M10.37 — Closed swap status lookup preview
+
+M10.37 adds the next pure, unwired reconciliation artifact without performing a provider read. It accepts only the exact M10.36 receipt: Agentic Wallet provider, canonical gate UUID, safe provider order ID, pending-confirmation lifecycle, acknowledged submission, nonterminal and unsuccessful execution state, mandatory lookup, and forbidden automatic retry.
+
+The successful result is the documented `market-order list --orderId <orderId> --json` argument sequence. It preserves the gate and provider order identities and is marked read-only, non-executable, and provider-call-unstarted. The shared order-ID grammar requires an alphanumeric first character followed only by bounded ASCII alphanumerics, `.`, `_`, `:`, or `-`, preventing leading options and path-like values from reaching a future CLI boundary.
+
+This preview cannot retry the original submission and does not yet execute one lookup, schedule polling, parse a status response, persist reconciliation, or report a terminal outcome.
+
+### M10.37 acceptance criteria
+
+- Only an exact nonterminal M10.36 receipt can produce a lookup preview.
+- The arguments exactly match `market-order list --orderId <orderId> --json`.
+- The gate and provider order identities remain correlated.
+- Order IDs use the same bounded option-safe ASCII grammar at response and command boundaries.
+- Changed lifecycle, success, terminal, lookup, acknowledgment, provider, kind, identity, or retry facts fail closed.
+- The preview is read-only and non-executable and starts no provider call.
+- Focused tests cover the exact command and every protected receipt invariant.
+- No schema, persistence, runtime wiring, route, process invocation, provider call, wallet mutation, funding, mutating command runner, executor, polling, retry, reconciliation, or real order is added.
 
 ### Official sources reviewed
 
