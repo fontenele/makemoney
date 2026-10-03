@@ -697,6 +697,26 @@ Provider execution status is deliberately distinct from financial reconciliation
 - Focused tests cover all states, exact correlation, equivalent decimals and address case, invalid envelopes, pagination, timestamps, statuses, hashes, and altered gate or receipt evidence.
 - No schema, persistence, runtime wiring, route, process invocation, provider call, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
 
+## M10.39 — Monotonic swap status progression
+
+M10.39 adds a pure, unwired transition policy over structurally complete M10.38 observations. It accepts one initial observation, recognizes an exact repeat without requiring another future write, and permits a pending observation to refresh or progress to either `FINISHED` or `FAILED`. A normalized observation validator rechecks canonical gate and order identities, provider status and transaction hash, valid chronological dates, every derived lifecycle flag, incomplete financial reconciliation, and forbidden submission retry.
+
+Observations for different gates or provider orders cannot be combined. Provider booking time is immutable and update time cannot move backward. A transaction hash may first appear while pending or failed, but once established it cannot change or disappear. A terminal status cannot return to pending or switch between finished and failed; a same-terminal refresh is admissible only with non-regressing time and the same established hash.
+
+When a candidate is blocked, it is not accepted for future persistence and the result preserves only whether the preceding valid state still requires another lookup. Every accepted or blocked transition continues to require financial reconciliation because no actual received quantity exists, and none permits resubmitting the swap.
+
+### M10.39 acceptance criteria
+
+- Complete normalized observation structure and all derived lifecycle invariants are revalidated.
+- Initial observations are accepted and exact replay is explicitly idempotent.
+- Pending observations may refresh or progress to `FINISHED` or `FAILED`.
+- Gate/order identity, booking time, and an established transaction hash are immutable; update time cannot regress.
+- Terminal status cannot regress or switch, while a consistent same-terminal refresh may advance provider update time.
+- A blocked candidate never replaces prior evidence and preserves only the prior state's lookup requirement.
+- Financial reconciliation remains incomplete and submission retry remains forbidden on every path.
+- Focused tests cover initial states, replay, valid progression, refreshes, identity drift, time regression, hash mutation, terminal mutation, and malformed evidence.
+- No schema, persistence, runtime wiring, route, process invocation, provider call, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

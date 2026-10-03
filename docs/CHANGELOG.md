@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-03 — Enforce monotonic swap-status progression
+
+- Added a pure unwired transition policy for complete Agentic Wallet status observations.
+- Accepted initial observations, idempotent exact replay, pending refreshes, and pending progression to `FINISHED` or `FAILED`.
+- Rejected gate/order identity drift, changed booking time, regressed update time, changed or removed established transaction hashes, and every terminal-state change.
+- Added structural validation for all normalized observation fields and their derived lifecycle invariants.
+- Preserved the prior lookup requirement when a candidate transition is blocked.
+- Kept financial reconciliation incomplete and submission retry forbidden on every path.
+- Kept schema, persistence, runtime wiring, routes, process invocation, provider calls, polling, wallet mutation, funding, a mutating command runner, executor, automatic retry, completed financial reconciliation, real orders, and submission authorization absent.
+- Verified all 1,970 backend tests across 173 suites, all 80 PostgreSQL E2E tests across 9 suites with 25 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Interpret swap status without overstating reconciliation
 
 - Added a pure unwired interpreter for the documented Agentic Wallet `market-order list` response shape.

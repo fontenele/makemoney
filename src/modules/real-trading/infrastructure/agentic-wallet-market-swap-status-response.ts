@@ -5,6 +5,7 @@ import { APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT } from '../application
 import { isStructurallyValidAgenticWalletMarketSwapGate } from './agentic-wallet-market-swap-command';
 import {
   AgenticWalletMarketSwapSubmissionReceipt,
+  isSafeAgenticWalletProviderOrderId,
   isValidAgenticWalletMarketSwapSubmissionReceipt,
 } from './agentic-wallet-market-swap-submission-response';
 
@@ -18,6 +19,9 @@ const DECIMAL_PATTERN = /^(?:0|[1-9]\d*)(?:\.\d+)?$/;
 const ISO_TIMESTAMP_PATTERN =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(?:Z|[+-]\d{2}:\d{2})$/;
 const EVM_TRANSACTION_HASH_PATTERN = /^0x[a-fA-F0-9]{64}$/;
+const CANONICAL_EVM_TRANSACTION_HASH_PATTERN = /^0x[a-f0-9]{64}$/;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 export type AgenticWalletMarketSwapProviderStatus =
   'PENDING' | 'FINISHED' | 'FAILED';
@@ -181,6 +185,45 @@ export function assessAgenticWalletMarketSwapStatusResponse(
     financialReconciliationRequired: true,
     submissionRetryAllowed: false,
   };
+}
+
+export function isValidAgenticWalletMarketSwapStatusObservation(
+  value: unknown,
+): value is AgenticWalletMarketSwapStatusObservation {
+  const observation = asRecord(value);
+  if (observation === null) return false;
+
+  const providerStatus = parseProviderStatus(observation.providerStatus);
+  const bookedAt = observation.bookedAt;
+  const updatedAt = observation.updatedAt;
+  const transactionHash = observation.transactionHash;
+  const transactionHashValid =
+    transactionHash === null ||
+    (typeof transactionHash === 'string' &&
+      CANONICAL_EVM_TRANSACTION_HASH_PATTERN.test(transactionHash));
+
+  return (
+    observation.kind === 'agentic_wallet_market_swap_status_observation' &&
+    observation.providerId === 'agentic_wallet' &&
+    typeof observation.gateId === 'string' &&
+    UUID_PATTERN.test(observation.gateId) &&
+    isSafeAgenticWalletProviderOrderId(observation.providerOrderId) &&
+    providerStatus !== null &&
+    transactionHashValid &&
+    (providerStatus !== 'FINISHED' || transactionHash !== null) &&
+    bookedAt instanceof Date &&
+    Number.isFinite(bookedAt.getTime()) &&
+    updatedAt instanceof Date &&
+    Number.isFinite(updatedAt.getTime()) &&
+    updatedAt.getTime() >= bookedAt.getTime() &&
+    observation.terminal === (providerStatus !== 'PENDING') &&
+    observation.executionSucceeded === (providerStatus === 'FINISHED') &&
+    observation.statusLookupRequired === (providerStatus === 'PENDING') &&
+    observation.financialReconciliationRequired === true &&
+    observation.financialReconciliationComplete === false &&
+    observation.actualReceivedQuantity === null &&
+    observation.submissionRetryAllowed === false
+  );
 }
 
 function matchesGatePayload(

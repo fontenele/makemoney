@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Admit only monotonic provider-status evidence
+
+M10.39 places a pure transition policy between M10.38 response interpretation and any future persistence. The first structurally complete observation is admissible, an exact repeat is idempotent, and a pending observation may refresh or progress to `FINISHED` or `FAILED`. The durable gate and provider order identities plus provider booking time remain invariant; provider update time cannot regress; once present, a transaction hash cannot change or disappear.
+
+A terminal state is immutable: neither a return to `PENDING` nor a switch between `FINISHED` and `FAILED` is accepted. Same-terminal refreshes may carry a later provider update time while retaining the established hash. A blocked candidate does not replace prior evidence and inherits only the prior state's need for another read-only lookup. The policy grants no persistence, polling, financial reconciliation, submission retry, or execution capability.
+
 ## 2026-10-03 — Separate provider terminal status from financial reconciliation
 
 M10.38 interprets a future `market-order list` response only after exact correlation with both the durable submission gate and its nonterminal receipt. One unambiguous market-order row must preserve the provider order ID, BSC chain, approved token direction and symbols, exact source quantity and slippage, coherent timestamps, documented status, and a valid EVM transaction hash when status is `FINISHED`.
