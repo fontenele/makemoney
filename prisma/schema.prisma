@@ -219,9 +219,27 @@ model RealExecutionSubmissionGate {
   expiresAt                DateTime?                      @map("expires_at")
   createdAt                DateTime                       @default(now()) @map("created_at")
   confirmation             RealExecutionFinalConfirmation @relation(fields: [confirmationId], references: [id], onDelete: Restrict)
+  submissionReceipt        RealExecutionSubmissionReceipt?
 
   @@index([providerId, chainId, createdAt])
   @@map("real_execution_submission_gates")
+}
+
+model RealExecutionSubmissionReceipt {
+  gateId                         String                      @id @map("gate_id") @db.Uuid
+  providerId                     String                      @map("provider_id") @db.VarChar(32)
+  providerOrderId                String                      @unique @map("provider_order_id") @db.VarChar(256)
+  lifecycleStatus                String                      @map("lifecycle_status") @db.VarChar(32)
+  providerSubmissionAcknowledged Boolean                     @map("provider_submission_acknowledged")
+  terminal                       Boolean
+  executionSucceeded             Boolean                     @map("execution_succeeded")
+  statusLookupRequired           Boolean                     @map("status_lookup_required")
+  automaticRetryAllowed          Boolean                     @map("automatic_retry_allowed")
+  recordedAt                     DateTime                    @default(now()) @map("recorded_at")
+  gate                           RealExecutionSubmissionGate @relation(fields: [gateId], references: [id], onDelete: Restrict)
+
+  @@index([providerId, lifecycleStatus, recordedAt])
+  @@map("real_execution_submission_receipts")
 }
 
 model ObservedSpotSymbol {

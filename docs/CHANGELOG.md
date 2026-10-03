@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-03 — Persist the closed swap submission receipt
+
+- Added an unwired serializable Prisma store for the exact M10.36 Agentic Wallet submission receipt.
+- Bound one immutable receipt to an existing structurally valid durable gate through a restrictive foreign key.
+- Made provider order IDs globally unique and preserved the original recording time on exact replay.
+- Rejected changed gate reuse, reused provider order identity, malformed receipt evidence, missing or malformed gates, and invalid or pre-gate recording clocks.
+- Added PostgreSQL checks for the provider, safe order-ID grammar, pending lifecycle, acknowledgment, nonterminal/success state, required lookup, and forbidden retry.
+- Aligned durable gate `createdAt` with its existing transaction clock to remove application/database clock drift from downstream validation.
+- Kept runtime wiring, routes, process invocation, provider calls, polling, wallet mutation, funding, a mutating command runner, executor, automatic retry, status-observation persistence, completed financial reconciliation, real orders, and submission authorization absent.
+- Verified all 1,977 backend tests across 174 suites, all 83 PostgreSQL E2E tests across 9 suites with 26 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Enforce monotonic swap-status progression
 
 - Added a pure unwired transition policy for complete Agentic Wallet status observations.

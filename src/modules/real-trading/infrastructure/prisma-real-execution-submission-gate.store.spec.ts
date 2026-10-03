@@ -20,7 +20,7 @@ import {
 import { PrismaRealExecutionSubmissionGateStore } from './prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
-const CREATED_AT = new Date('2026-10-03T12:00:04.100Z');
+const CREATED_AT = NOW;
 
 describe('PrismaRealExecutionSubmissionGateStore', () => {
   it('atomically rechecks stop state, consumes confirmation, and persists an inert gate', async () => {
@@ -47,6 +47,7 @@ describe('PrismaRealExecutionSubmissionGateStore', () => {
       emergencyStopRecheckedAt: NOW,
       confirmationConsumedAt: NOW,
       expiresAt: command().submissionPlan.expiresAt,
+      createdAt: NOW,
     });
     expect(harness.prismaTransaction).toHaveBeenCalledWith(
       expect.any(Function),

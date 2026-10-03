@@ -10,6 +10,9 @@ import {
   RealExecutionSubmissionGateBlockedError,
   RealExecutionSubmissionGateCommand,
 } from '../src/modules/real-trading/application/real-execution-submission-gate-store';
+import { AgenticWalletMarketSwapSubmissionReceiptConflictError } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-submission-receipt.store';
+import { AgenticWalletMarketSwapSubmissionReceipt } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-submission-response';
+import { PrismaAgenticWalletMarketSwapSubmissionReceiptStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-submission-receipt.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -17,11 +20,16 @@ const NOW = new Date('2026-10-03T12:00:04.000Z');
 describe('Real execution submission gate persistence (e2e)', () => {
   let prisma: PrismaService;
   let store: PrismaRealExecutionSubmissionGateStore;
+  let receiptStore: PrismaAgenticWalletMarketSwapSubmissionReceiptStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
     await prisma.onModuleInit();
     store = new PrismaRealExecutionSubmissionGateStore(prisma, () => NOW);
+    receiptStore = new PrismaAgenticWalletMarketSwapSubmissionReceiptStore(
+      prisma,
+      () => new Date('2026-10-03T12:00:05.000Z'),
+    );
   });
 
   beforeEach(async () => {
@@ -92,7 +100,67 @@ describe('Real execution submission gate persistence (e2e)', () => {
     await expect(prisma.realExecutionSubmissionGate.count()).resolves.toBe(0);
   });
 
+  it('persists and exactly replays one gate-bound submission receipt', async () => {
+    await store.create(command(10));
+
+    const first = await receiptStore.record(submissionReceipt(10));
+    const replay = await receiptStore.record(submissionReceipt(10));
+
+    expect(first).toEqual({
+      stored: {
+        receipt: submissionReceipt(10),
+        recordedAt: new Date('2026-10-03T12:00:05.000Z'),
+      },
+      replayed: false,
+    });
+    expect(replay).toEqual({ stored: first.stored, replayed: true });
+    await expect(prisma.realExecutionSubmissionReceipt.count()).resolves.toBe(
+      1,
+    );
+  });
+
+  it('rejects changed order identity reuse for the same durable gate', async () => {
+    await store.create(command(10));
+    await receiptStore.record(submissionReceipt(10));
+
+    await expect(
+      receiptStore.record(
+        submissionReceipt(10, { providerOrderId: 'different-order' }),
+      ),
+    ).rejects.toBeInstanceOf(
+      AgenticWalletMarketSwapSubmissionReceiptConflictError,
+    );
+    await expect(prisma.realExecutionSubmissionReceipt.count()).resolves.toBe(
+      1,
+    );
+  });
+
+  it('enforces the closed receipt state in PostgreSQL', async () => {
+    await store.create(command(10));
+
+    await expect(
+      prisma.realExecutionSubmissionReceipt.create({
+        data: {
+          gateId: uuid(10),
+          providerId: 'agentic_wallet',
+          providerOrderId: '1234567890',
+          lifecycleStatus: 'pending_confirmation',
+          providerSubmissionAcknowledged: true,
+          terminal: true,
+          executionSucceeded: false,
+          statusLookupRequired: true,
+          automaticRetryAllowed: false,
+          recordedAt: new Date('2026-10-03T12:00:05.000Z'),
+        },
+      }),
+    ).rejects.toThrow();
+    await expect(prisma.realExecutionSubmissionReceipt.count()).resolves.toBe(
+      0,
+    );
+  });
+
   async function cleanup(): Promise<void> {
+    await prisma.realExecutionSubmissionReceipt.deleteMany();
     await prisma.realExecutionSubmissionGate.deleteMany();
     await prisma.realExecutionFinalConfirmation.deleteMany();
     await prisma.realExecutionRiskApproval.deleteMany();
@@ -195,6 +263,25 @@ describe('Real execution submission gate persistence (e2e)', () => {
     });
   }
 });
+
+function submissionReceipt(
+  gateSeed: number,
+  overrides: Partial<AgenticWalletMarketSwapSubmissionReceipt> = {},
+): AgenticWalletMarketSwapSubmissionReceipt {
+  return {
+    kind: 'agentic_wallet_market_swap_submission_receipt',
+    providerId: 'agentic_wallet',
+    gateId: uuid(gateSeed),
+    providerOrderId: '1234567890',
+    lifecycleStatus: 'pending_confirmation',
+    providerSubmissionAcknowledged: true,
+    terminal: false,
+    executionSucceeded: false,
+    statusLookupRequired: true,
+    automaticRetryAllowed: false,
+    ...overrides,
+  };
+}
 
 function command(seed: number): RealExecutionSubmissionGateCommand {
   return {

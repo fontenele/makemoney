@@ -62,6 +62,7 @@ export const ModelName = {
   RealExecutionRiskApproval: 'RealExecutionRiskApproval',
   RealExecutionFinalConfirmation: 'RealExecutionFinalConfirmation',
   RealExecutionSubmissionGate: 'RealExecutionSubmissionGate',
+  RealExecutionSubmissionReceipt: 'RealExecutionSubmissionReceipt',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -289,6 +290,22 @@ export const RealExecutionSubmissionGateScalarFieldEnum = {
 } as const
 
 export type RealExecutionSubmissionGateScalarFieldEnum = (typeof RealExecutionSubmissionGateScalarFieldEnum)[keyof typeof RealExecutionSubmissionGateScalarFieldEnum]
+
+
+export const RealExecutionSubmissionReceiptScalarFieldEnum = {
+  gateId: 'gateId',
+  providerId: 'providerId',
+  providerOrderId: 'providerOrderId',
+  lifecycleStatus: 'lifecycleStatus',
+  providerSubmissionAcknowledged: 'providerSubmissionAcknowledged',
+  terminal: 'terminal',
+  executionSucceeded: 'executionSucceeded',
+  statusLookupRequired: 'statusLookupRequired',
+  automaticRetryAllowed: 'automaticRetryAllowed',
+  recordedAt: 'recordedAt'
+} as const
+
+export type RealExecutionSubmissionReceiptScalarFieldEnum = (typeof RealExecutionSubmissionReceiptScalarFieldEnum)[keyof typeof RealExecutionSubmissionReceiptScalarFieldEnum]
 
 
 export const ObservedSpotSymbolScalarFieldEnum = {

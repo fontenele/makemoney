@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Persist acknowledgment before status observations
+
+M10.40 closes the durable audit gap between the inert submission gate and future status evidence. One append-only row records the exact M10.36 pending-confirmation receipt only after its referenced gate is found and structurally revalidated inside a serializable transaction. The gate is the receipt identity, while the provider order ID is independently unique; exact replay preserves the original row, and any changed reuse fails closed.
+
+PostgreSQL constraints repeat the closed provider, safe order-ID, acknowledgment, pending lifecycle, nonterminal, unsuccessful, lookup-required, and no-retry invariants. The gate store now writes `createdAt` from the same transaction clock used for final stop recheck and confirmation consumption instead of mixing the injected application clock with the database default. The receipt store remains unwired and cannot establish that a command actually ran by itself; it adds no submitter, lookup, polling, or status persistence.
+
 ## 2026-10-03 — Admit only monotonic provider-status evidence
 
 M10.39 places a pure transition policy between M10.38 response interpretation and any future persistence. The first structurally complete observation is admissible, an exact repeat is idempotent, and a pending observation may refresh or progress to `FINISHED` or `FAILED`. The durable gate and provider order identities plus provider booking time remain invariant; provider update time cannot regress; once present, a transaction hash cannot change or disappear.

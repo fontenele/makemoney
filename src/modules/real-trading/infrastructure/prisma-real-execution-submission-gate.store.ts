@@ -145,6 +145,7 @@ export class PrismaRealExecutionSubmissionGateStore implements RealExecutionSubm
             emergencyStopRecheckedAt: evaluatedAt,
             confirmationConsumedAt: evaluatedAt,
             expiresAt: command.submissionPlan.expiresAt,
+            createdAt: evaluatedAt,
           },
         });
         return { gate: mapGate(created), replayed: false };

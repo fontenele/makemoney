@@ -717,6 +717,25 @@ When a candidate is blocked, it is not accepted for future persistence and the r
 - Focused tests cover initial states, replay, valid progression, refreshes, identity drift, time regression, hash mutation, terminal mutation, and malformed evidence.
 - No schema, persistence, runtime wiring, route, process invocation, provider call, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
 
+## M10.40 — Durable swap submission receipt
+
+M10.40 adds an unwired serializable Prisma store for the exact M10.36 pending-confirmation receipt. Before insertion, the store validates the complete receipt, takes a dedicated PostgreSQL advisory transaction lock, reloads its durable M10.34 gate, and reapplies the structural gate policy. Receipt recording time must be valid and cannot predate gate creation.
+
+The gate ID is the receipt's primary identity and foreign key, so at most one submission acknowledgment can follow a gate. Provider order ID is independently unique across all receipts. Exact gate/order replay returns the original immutable row and recording time; a changed order for the same gate, an order already bound elsewhere, a missing or malformed gate, malformed receipt facts, or an invalid clock fails closed.
+
+PostgreSQL constraints preserve the exact Agentic Wallet provider, bounded option-safe order-ID grammar, `pending_confirmation` lifecycle, acknowledged submission, nonterminal and unsuccessful state, required status lookup, and forbidden automatic retry. The existing gate store now explicitly records `createdAt` from its transaction clock, matching the final stop recheck and confirmation consumption clock rather than relying on an independent database default.
+
+### M10.40 acceptance criteria
+
+- Only an exact M10.36 receipt for an existing structurally valid durable gate can be recorded.
+- Each gate has at most one receipt and each provider order ID can belong to at most one gate.
+- Exact replay is idempotent and preserves the original recording time; changed identity reuse fails closed.
+- Receipt recording cannot predate gate creation.
+- Database constraints preserve every closed receipt lifecycle and safety invariant.
+- Gate creation uses one explicit transaction clock for creation, final stop recheck, and confirmation consumption.
+- Unit and PostgreSQL E2E tests prove persistence, replay, conflict handling, gate validation, temporal validation, and database enforcement.
+- No runtime wiring, route, process invocation, provider call, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, status-observation persistence, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

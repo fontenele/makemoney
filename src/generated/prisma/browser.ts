@@ -73,6 +73,11 @@ export type RealExecutionFinalConfirmation = Prisma.RealExecutionFinalConfirmati
  */
 export type RealExecutionSubmissionGate = Prisma.RealExecutionSubmissionGateModel
 /**
+ * Model RealExecutionSubmissionReceipt
+ * 
+ */
+export type RealExecutionSubmissionReceipt = Prisma.RealExecutionSubmissionReceiptModel
+/**
  * Model ObservedSpotSymbol
  * 
  */

@@ -408,6 +408,7 @@ export const ModelName = {
   RealExecutionRiskApproval: 'RealExecutionRiskApproval',
   RealExecutionFinalConfirmation: 'RealExecutionFinalConfirmation',
   RealExecutionSubmissionGate: 'RealExecutionSubmissionGate',
+  RealExecutionSubmissionReceipt: 'RealExecutionSubmissionReceipt',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -426,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1244,6 +1245,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RealExecutionSubmissionReceipt: {
+      payload: Prisma.$RealExecutionSubmissionReceiptPayload<ExtArgs>
+      fields: Prisma.RealExecutionSubmissionReceiptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionSubmissionReceiptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionReceiptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionSubmissionReceiptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionReceiptPayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionSubmissionReceiptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionReceiptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionSubmissionReceiptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionReceiptPayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionSubmissionReceiptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionReceiptPayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionSubmissionReceiptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionReceiptPayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionSubmissionReceiptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionSubmissionReceiptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionReceiptPayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionSubmissionReceiptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionReceiptPayload>
+        }
+        update: {
+          args: Prisma.RealExecutionSubmissionReceiptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionReceiptPayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionSubmissionReceiptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionSubmissionReceiptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionSubmissionReceiptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionReceiptPayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionSubmissionReceiptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionReceiptPayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionSubmissionReceiptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionSubmissionReceipt>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionSubmissionReceiptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionSubmissionReceiptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionSubmissionReceiptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionSubmissionReceiptCountAggregateOutputType> | number
+        }
+      }
+    }
     ObservedSpotSymbol: {
       payload: Prisma.$ObservedSpotSymbolPayload<ExtArgs>
       fields: Prisma.ObservedSpotSymbolFieldRefs
@@ -1713,6 +1788,22 @@ export const RealExecutionSubmissionGateScalarFieldEnum = {
 export type RealExecutionSubmissionGateScalarFieldEnum = (typeof RealExecutionSubmissionGateScalarFieldEnum)[keyof typeof RealExecutionSubmissionGateScalarFieldEnum]
 
 
+export const RealExecutionSubmissionReceiptScalarFieldEnum = {
+  gateId: 'gateId',
+  providerId: 'providerId',
+  providerOrderId: 'providerOrderId',
+  lifecycleStatus: 'lifecycleStatus',
+  providerSubmissionAcknowledged: 'providerSubmissionAcknowledged',
+  terminal: 'terminal',
+  executionSucceeded: 'executionSucceeded',
+  statusLookupRequired: 'statusLookupRequired',
+  automaticRetryAllowed: 'automaticRetryAllowed',
+  recordedAt: 'recordedAt'
+} as const
+
+export type RealExecutionSubmissionReceiptScalarFieldEnum = (typeof RealExecutionSubmissionReceiptScalarFieldEnum)[keyof typeof RealExecutionSubmissionReceiptScalarFieldEnum]
+
+
 export const ObservedSpotSymbolScalarFieldEnum = {
   provider: 'provider',
   symbol: 'symbol',
@@ -2079,6 +2170,7 @@ export type GlobalOmitConfig = {
   realExecutionRiskApproval?: Prisma.RealExecutionRiskApprovalOmit
   realExecutionFinalConfirmation?: Prisma.RealExecutionFinalConfirmationOmit
   realExecutionSubmissionGate?: Prisma.RealExecutionSubmissionGateOmit
+  realExecutionSubmissionReceipt?: Prisma.RealExecutionSubmissionReceiptOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
   listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit
   listingCheckpointTopOfBook?: Prisma.ListingCheckpointTopOfBookOmit
