@@ -63,6 +63,7 @@ export const ModelName = {
   RealExecutionFinalConfirmation: 'RealExecutionFinalConfirmation',
   RealExecutionSubmissionGate: 'RealExecutionSubmissionGate',
   RealExecutionSubmissionReceipt: 'RealExecutionSubmissionReceipt',
+  RealExecutionStatusObservation: 'RealExecutionStatusObservation',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -306,6 +307,22 @@ export const RealExecutionSubmissionReceiptScalarFieldEnum = {
 } as const
 
 export type RealExecutionSubmissionReceiptScalarFieldEnum = (typeof RealExecutionSubmissionReceiptScalarFieldEnum)[keyof typeof RealExecutionSubmissionReceiptScalarFieldEnum]
+
+
+export const RealExecutionStatusObservationScalarFieldEnum = {
+  id: 'id',
+  sequence: 'sequence',
+  gateId: 'gateId',
+  providerId: 'providerId',
+  providerOrderId: 'providerOrderId',
+  providerStatus: 'providerStatus',
+  transactionHash: 'transactionHash',
+  bookedAt: 'bookedAt',
+  providerUpdatedAt: 'providerUpdatedAt',
+  recordedAt: 'recordedAt'
+} as const
+
+export type RealExecutionStatusObservationScalarFieldEnum = (typeof RealExecutionStatusObservationScalarFieldEnum)[keyof typeof RealExecutionStatusObservationScalarFieldEnum]
 
 
 export const ObservedSpotSymbolScalarFieldEnum = {

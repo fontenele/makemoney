@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Persist only monotonic receipt-bound status history
+
+M10.41 places an unwired serializable store behind the M10.39 transition policy. Each candidate must match the exact durable receipt's gate, provider, and provider order identity before the latest observation is loaded and assessed. Exact latest replay preserves its original row; every accepted changed fact is appended rather than overwriting evidence.
+
+A database-generated sequence, rather than provider or recording timestamps, establishes unambiguous history order when timestamps tie. PostgreSQL repeats the composite receipt identity, closed status vocabulary, canonical hash requirements, and timestamp coherence. The store re-derives lifecycle flags from persisted facts and keeps financial reconciliation incomplete and submission retry forbidden. It adds no lookup runner, poller, submitter, runtime wiring, or execution authority.
+
 ## 2026-10-03 — Persist acknowledgment before status observations
 
 M10.40 closes the durable audit gap between the inert submission gate and future status evidence. One append-only row records the exact M10.36 pending-confirmation receipt only after its referenced gate is found and structurally revalidated inside a serializable transaction. The gate is the receipt identity, while the provider order ID is independently unique; exact replay preserves the original row, and any changed reuse fails closed.

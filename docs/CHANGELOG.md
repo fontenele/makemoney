@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-03 — Persist monotonic swap status history
+
+- Added an unwired serializable Prisma store for receipt-bound Agentic Wallet status observations.
+- Applied the M10.39 monotonic policy against the latest durable fact before every append.
+- Made exact latest replay idempotent and introduced a database sequence for unambiguous append order when timestamps tie.
+- Bound every row to the exact receipt gate, provider, and provider order identity through a composite foreign key.
+- Added PostgreSQL checks for provider, safe order ID, closed status vocabulary, canonical transaction hashes, mandatory finished hashes, and provider timestamp coherence.
+- Kept actual received quantity unknown, financial reconciliation incomplete, and submission retry forbidden.
+- Kept runtime wiring, routes, process invocation, provider calls, lookup, polling, wallet mutation, funding, a mutating command runner, executor, automatic retry, completed financial reconciliation, real orders, and submission authorization absent.
+- Verified all 1,984 backend tests across 175 suites, all 86 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Persist the closed swap submission receipt
 
 - Added an unwired serializable Prisma store for the exact M10.36 Agentic Wallet submission receipt.

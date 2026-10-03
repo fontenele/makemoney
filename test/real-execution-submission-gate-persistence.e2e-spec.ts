@@ -12,7 +12,10 @@ import {
 } from '../src/modules/real-trading/application/real-execution-submission-gate-store';
 import { AgenticWalletMarketSwapSubmissionReceiptConflictError } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-submission-receipt.store';
 import { AgenticWalletMarketSwapSubmissionReceipt } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-submission-response';
+import { AgenticWalletMarketSwapStatusObservationBlockedError } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-observation.store';
+import { AgenticWalletMarketSwapStatusObservation } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-response';
 import { PrismaAgenticWalletMarketSwapSubmissionReceiptStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-submission-receipt.store';
+import { PrismaAgenticWalletMarketSwapStatusObservationStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-observation.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -21,6 +24,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let prisma: PrismaService;
   let store: PrismaRealExecutionSubmissionGateStore;
   let receiptStore: PrismaAgenticWalletMarketSwapSubmissionReceiptStore;
+  let statusStore: PrismaAgenticWalletMarketSwapStatusObservationStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -29,6 +33,10 @@ describe('Real execution submission gate persistence (e2e)', () => {
     receiptStore = new PrismaAgenticWalletMarketSwapSubmissionReceiptStore(
       prisma,
       () => new Date('2026-10-03T12:00:05.000Z'),
+    );
+    statusStore = new PrismaAgenticWalletMarketSwapStatusObservationStore(
+      prisma,
+      () => new Date('2026-10-03T12:00:06.000Z'),
     );
   });
 
@@ -159,7 +167,95 @@ describe('Real execution submission gate persistence (e2e)', () => {
     );
   });
 
+  it('appends monotonic status history and exactly replays its latest fact', async () => {
+    await store.create(command(10));
+    await receiptStore.record(submissionReceipt(10));
+
+    const first = await statusStore.record(statusObservation(10));
+    const replay = await statusStore.record(statusObservation(10));
+    const finished = statusObservation(10, {
+      providerStatus: 'FINISHED',
+      transactionHash: `0x${'a'.repeat(64)}`,
+      updatedAt: new Date('2026-10-03T12:00:07.000Z'),
+      terminal: true,
+      executionSucceeded: true,
+      statusLookupRequired: false,
+    });
+    const terminal = await statusStore.record(finished);
+
+    expect(replay).toEqual({ stored: first.stored, replayed: true });
+    expect(terminal).toMatchObject({
+      stored: { observation: finished },
+      replayed: false,
+    });
+    await expect(prisma.realExecutionStatusObservation.count()).resolves.toBe(
+      2,
+    );
+  });
+
+  it('rejects status regression without changing durable history', async () => {
+    await store.create(command(10));
+    await receiptStore.record(submissionReceipt(10));
+    await statusStore.record(
+      statusObservation(10, {
+        providerStatus: 'FAILED',
+        updatedAt: new Date('2026-10-03T12:00:07.000Z'),
+        terminal: true,
+        statusLookupRequired: false,
+      }),
+    );
+
+    await expect(
+      statusStore.record(statusObservation(10)),
+    ).rejects.toBeInstanceOf(
+      AgenticWalletMarketSwapStatusObservationBlockedError,
+    );
+    await expect(prisma.realExecutionStatusObservation.count()).resolves.toBe(
+      1,
+    );
+  });
+
+  it('enforces closed status facts and exact receipt identity in PostgreSQL', async () => {
+    await store.create(command(10));
+    await receiptStore.record(submissionReceipt(10));
+
+    await expect(
+      prisma.realExecutionStatusObservation.create({
+        data: {
+          id: uuid(20),
+          gateId: uuid(10),
+          providerId: 'agentic_wallet',
+          providerOrderId: 'different-order',
+          providerStatus: 'PENDING',
+          transactionHash: null,
+          bookedAt: new Date('2026-10-03T12:00:05.000Z'),
+          providerUpdatedAt: new Date('2026-10-03T12:00:06.000Z'),
+          recordedAt: new Date('2026-10-03T12:00:06.000Z'),
+        },
+      }),
+    ).rejects.toThrow();
+    await expect(
+      prisma.realExecutionStatusObservation.create({
+        data: {
+          id: uuid(21),
+          gateId: uuid(10),
+          providerId: 'agentic_wallet',
+          providerOrderId: '1234567890',
+          providerStatus: 'FINISHED',
+          transactionHash: null,
+          bookedAt: new Date('2026-10-03T12:00:05.000Z'),
+          providerUpdatedAt: new Date('2026-10-03T12:00:06.000Z'),
+          recordedAt: new Date('2026-10-03T12:00:06.000Z'),
+        },
+      }),
+    ).rejects.toThrow();
+    await expect(prisma.realExecutionStatusObservation.count()).resolves.toBe(
+      0,
+    );
+  });
+
   async function cleanup(): Promise<void> {
+    await prisma.realExecutionStatusObservation.deleteMany();
     await prisma.realExecutionSubmissionReceipt.deleteMany();
     await prisma.realExecutionSubmissionGate.deleteMany();
     await prisma.realExecutionFinalConfirmation.deleteMany();
@@ -279,6 +375,30 @@ function submissionReceipt(
     executionSucceeded: false,
     statusLookupRequired: true,
     automaticRetryAllowed: false,
+    ...overrides,
+  };
+}
+
+function statusObservation(
+  gateSeed: number,
+  overrides: Partial<AgenticWalletMarketSwapStatusObservation> = {},
+): AgenticWalletMarketSwapStatusObservation {
+  return {
+    kind: 'agentic_wallet_market_swap_status_observation',
+    providerId: 'agentic_wallet',
+    gateId: uuid(gateSeed),
+    providerOrderId: '1234567890',
+    providerStatus: 'PENDING',
+    transactionHash: null,
+    bookedAt: new Date('2026-10-03T12:00:05.000Z'),
+    updatedAt: new Date('2026-10-03T12:00:05.500Z'),
+    terminal: false,
+    executionSucceeded: false,
+    statusLookupRequired: true,
+    financialReconciliationRequired: true,
+    financialReconciliationComplete: false,
+    actualReceivedQuantity: null,
+    submissionRetryAllowed: false,
     ...overrides,
   };
 }

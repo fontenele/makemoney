@@ -237,9 +237,29 @@ model RealExecutionSubmissionReceipt {
   automaticRetryAllowed          Boolean                     @map("automatic_retry_allowed")
   recordedAt                     DateTime                    @default(now()) @map("recorded_at")
   gate                           RealExecutionSubmissionGate @relation(fields: [gateId], references: [id], onDelete: Restrict)
+  statusObservations             RealExecutionStatusObservation[]
 
+  @@unique([gateId, providerId, providerOrderId])
   @@index([providerId, lifecycleStatus, recordedAt])
   @@map("real_execution_submission_receipts")
+}
+
+model RealExecutionStatusObservation {
+  id                  String                         @id @db.Uuid
+  sequence            BigInt                         @unique @default(autoincrement())
+  gateId              String                         @map("gate_id") @db.Uuid
+  providerId          String                         @map("provider_id") @db.VarChar(32)
+  providerOrderId     String                         @map("provider_order_id") @db.VarChar(256)
+  providerStatus      String                         @map("provider_status") @db.VarChar(16)
+  transactionHash     String?                        @map("transaction_hash") @db.VarChar(66)
+  bookedAt            DateTime                       @map("booked_at")
+  providerUpdatedAt   DateTime                       @map("provider_updated_at")
+  recordedAt          DateTime                       @default(now()) @map("recorded_at")
+  submissionReceipt   RealExecutionSubmissionReceipt @relation(fields: [gateId, providerId, providerOrderId], references: [gateId, providerId, providerOrderId], onDelete: Restrict)
+
+  @@index([gateId, sequence])
+  @@index([providerId, providerStatus, recordedAt])
+  @@map("real_execution_status_observations")
 }
 
 model ObservedSpotSymbol {

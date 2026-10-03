@@ -100,6 +100,11 @@ export type RealExecutionSubmissionGate = Prisma.RealExecutionSubmissionGateMode
  */
 export type RealExecutionSubmissionReceipt = Prisma.RealExecutionSubmissionReceiptModel
 /**
+ * Model RealExecutionStatusObservation
+ * 
+ */
+export type RealExecutionStatusObservation = Prisma.RealExecutionStatusObservationModel
+/**
  * Model ObservedSpotSymbol
  * 
  */

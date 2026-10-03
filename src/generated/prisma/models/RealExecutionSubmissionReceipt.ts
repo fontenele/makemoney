@@ -223,6 +223,7 @@ export type RealExecutionSubmissionReceiptWhereInput = {
   automaticRetryAllowed?: Prisma.BoolFilter<"RealExecutionSubmissionReceipt"> | boolean
   recordedAt?: Prisma.DateTimeFilter<"RealExecutionSubmissionReceipt"> | Date | string
   gate?: Prisma.XOR<Prisma.RealExecutionSubmissionGateScalarRelationFilter, Prisma.RealExecutionSubmissionGateWhereInput>
+  statusObservations?: Prisma.RealExecutionStatusObservationListRelationFilter
 }
 
 export type RealExecutionSubmissionReceiptOrderByWithRelationInput = {
@@ -237,11 +238,13 @@ export type RealExecutionSubmissionReceiptOrderByWithRelationInput = {
   automaticRetryAllowed?: Prisma.SortOrder
   recordedAt?: Prisma.SortOrder
   gate?: Prisma.RealExecutionSubmissionGateOrderByWithRelationInput
+  statusObservations?: Prisma.RealExecutionStatusObservationOrderByRelationAggregateInput
 }
 
 export type RealExecutionSubmissionReceiptWhereUniqueInput = Prisma.AtLeast<{
   gateId?: string
   providerOrderId?: string
+  gateId_providerId_providerOrderId?: Prisma.RealExecutionSubmissionReceiptGateIdProviderIdProviderOrderIdCompoundUniqueInput
   AND?: Prisma.RealExecutionSubmissionReceiptWhereInput | Prisma.RealExecutionSubmissionReceiptWhereInput[]
   OR?: Prisma.RealExecutionSubmissionReceiptWhereInput[]
   NOT?: Prisma.RealExecutionSubmissionReceiptWhereInput | Prisma.RealExecutionSubmissionReceiptWhereInput[]
@@ -254,7 +257,8 @@ export type RealExecutionSubmissionReceiptWhereUniqueInput = Prisma.AtLeast<{
   automaticRetryAllowed?: Prisma.BoolFilter<"RealExecutionSubmissionReceipt"> | boolean
   recordedAt?: Prisma.DateTimeFilter<"RealExecutionSubmissionReceipt"> | Date | string
   gate?: Prisma.XOR<Prisma.RealExecutionSubmissionGateScalarRelationFilter, Prisma.RealExecutionSubmissionGateWhereInput>
-}, "gateId" | "providerOrderId">
+  statusObservations?: Prisma.RealExecutionStatusObservationListRelationFilter
+}, "gateId" | "providerOrderId" | "gateId_providerId_providerOrderId">
 
 export type RealExecutionSubmissionReceiptOrderByWithAggregationInput = {
   gateId?: Prisma.SortOrder
@@ -299,6 +303,7 @@ export type RealExecutionSubmissionReceiptCreateInput = {
   automaticRetryAllowed: boolean
   recordedAt?: Date | string
   gate: Prisma.RealExecutionSubmissionGateCreateNestedOneWithoutSubmissionReceiptInput
+  statusObservations?: Prisma.RealExecutionStatusObservationCreateNestedManyWithoutSubmissionReceiptInput
 }
 
 export type RealExecutionSubmissionReceiptUncheckedCreateInput = {
@@ -312,6 +317,7 @@ export type RealExecutionSubmissionReceiptUncheckedCreateInput = {
   statusLookupRequired: boolean
   automaticRetryAllowed: boolean
   recordedAt?: Date | string
+  statusObservations?: Prisma.RealExecutionStatusObservationUncheckedCreateNestedManyWithoutSubmissionReceiptInput
 }
 
 export type RealExecutionSubmissionReceiptUpdateInput = {
@@ -325,6 +331,7 @@ export type RealExecutionSubmissionReceiptUpdateInput = {
   automaticRetryAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gate?: Prisma.RealExecutionSubmissionGateUpdateOneRequiredWithoutSubmissionReceiptNestedInput
+  statusObservations?: Prisma.RealExecutionStatusObservationUpdateManyWithoutSubmissionReceiptNestedInput
 }
 
 export type RealExecutionSubmissionReceiptUncheckedUpdateInput = {
@@ -338,6 +345,7 @@ export type RealExecutionSubmissionReceiptUncheckedUpdateInput = {
   statusLookupRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   automaticRetryAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusObservations?: Prisma.RealExecutionStatusObservationUncheckedUpdateManyWithoutSubmissionReceiptNestedInput
 }
 
 export type RealExecutionSubmissionReceiptCreateManyInput = {
@@ -383,6 +391,12 @@ export type RealExecutionSubmissionReceiptNullableScalarRelationFilter = {
   isNot?: Prisma.RealExecutionSubmissionReceiptWhereInput | null
 }
 
+export type RealExecutionSubmissionReceiptGateIdProviderIdProviderOrderIdCompoundUniqueInput = {
+  gateId: string
+  providerId: string
+  providerOrderId: string
+}
+
 export type RealExecutionSubmissionReceiptCountOrderByAggregateInput = {
   gateId?: Prisma.SortOrder
   providerId?: Prisma.SortOrder
@@ -422,6 +436,11 @@ export type RealExecutionSubmissionReceiptMinOrderByAggregateInput = {
   recordedAt?: Prisma.SortOrder
 }
 
+export type RealExecutionSubmissionReceiptScalarRelationFilter = {
+  is?: Prisma.RealExecutionSubmissionReceiptWhereInput
+  isNot?: Prisma.RealExecutionSubmissionReceiptWhereInput
+}
+
 export type RealExecutionSubmissionReceiptCreateNestedOneWithoutGateInput = {
   create?: Prisma.XOR<Prisma.RealExecutionSubmissionReceiptCreateWithoutGateInput, Prisma.RealExecutionSubmissionReceiptUncheckedCreateWithoutGateInput>
   connectOrCreate?: Prisma.RealExecutionSubmissionReceiptCreateOrConnectWithoutGateInput
@@ -454,6 +473,20 @@ export type RealExecutionSubmissionReceiptUncheckedUpdateOneWithoutGateNestedInp
   update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionSubmissionReceiptUpdateToOneWithWhereWithoutGateInput, Prisma.RealExecutionSubmissionReceiptUpdateWithoutGateInput>, Prisma.RealExecutionSubmissionReceiptUncheckedUpdateWithoutGateInput>
 }
 
+export type RealExecutionSubmissionReceiptCreateNestedOneWithoutStatusObservationsInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionSubmissionReceiptCreateWithoutStatusObservationsInput, Prisma.RealExecutionSubmissionReceiptUncheckedCreateWithoutStatusObservationsInput>
+  connectOrCreate?: Prisma.RealExecutionSubmissionReceiptCreateOrConnectWithoutStatusObservationsInput
+  connect?: Prisma.RealExecutionSubmissionReceiptWhereUniqueInput
+}
+
+export type RealExecutionSubmissionReceiptUpdateOneRequiredWithoutStatusObservationsNestedInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionSubmissionReceiptCreateWithoutStatusObservationsInput, Prisma.RealExecutionSubmissionReceiptUncheckedCreateWithoutStatusObservationsInput>
+  connectOrCreate?: Prisma.RealExecutionSubmissionReceiptCreateOrConnectWithoutStatusObservationsInput
+  upsert?: Prisma.RealExecutionSubmissionReceiptUpsertWithoutStatusObservationsInput
+  connect?: Prisma.RealExecutionSubmissionReceiptWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionSubmissionReceiptUpdateToOneWithWhereWithoutStatusObservationsInput, Prisma.RealExecutionSubmissionReceiptUpdateWithoutStatusObservationsInput>, Prisma.RealExecutionSubmissionReceiptUncheckedUpdateWithoutStatusObservationsInput>
+}
+
 export type RealExecutionSubmissionReceiptCreateWithoutGateInput = {
   providerId: string
   providerOrderId: string
@@ -464,6 +497,7 @@ export type RealExecutionSubmissionReceiptCreateWithoutGateInput = {
   statusLookupRequired: boolean
   automaticRetryAllowed: boolean
   recordedAt?: Date | string
+  statusObservations?: Prisma.RealExecutionStatusObservationCreateNestedManyWithoutSubmissionReceiptInput
 }
 
 export type RealExecutionSubmissionReceiptUncheckedCreateWithoutGateInput = {
@@ -476,6 +510,7 @@ export type RealExecutionSubmissionReceiptUncheckedCreateWithoutGateInput = {
   statusLookupRequired: boolean
   automaticRetryAllowed: boolean
   recordedAt?: Date | string
+  statusObservations?: Prisma.RealExecutionStatusObservationUncheckedCreateNestedManyWithoutSubmissionReceiptInput
 }
 
 export type RealExecutionSubmissionReceiptCreateOrConnectWithoutGateInput = {
@@ -504,6 +539,7 @@ export type RealExecutionSubmissionReceiptUpdateWithoutGateInput = {
   statusLookupRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   automaticRetryAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusObservations?: Prisma.RealExecutionStatusObservationUpdateManyWithoutSubmissionReceiptNestedInput
 }
 
 export type RealExecutionSubmissionReceiptUncheckedUpdateWithoutGateInput = {
@@ -516,8 +552,106 @@ export type RealExecutionSubmissionReceiptUncheckedUpdateWithoutGateInput = {
   statusLookupRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   automaticRetryAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusObservations?: Prisma.RealExecutionStatusObservationUncheckedUpdateManyWithoutSubmissionReceiptNestedInput
 }
 
+export type RealExecutionSubmissionReceiptCreateWithoutStatusObservationsInput = {
+  providerId: string
+  providerOrderId: string
+  lifecycleStatus: string
+  providerSubmissionAcknowledged: boolean
+  terminal: boolean
+  executionSucceeded: boolean
+  statusLookupRequired: boolean
+  automaticRetryAllowed: boolean
+  recordedAt?: Date | string
+  gate: Prisma.RealExecutionSubmissionGateCreateNestedOneWithoutSubmissionReceiptInput
+}
+
+export type RealExecutionSubmissionReceiptUncheckedCreateWithoutStatusObservationsInput = {
+  gateId: string
+  providerId: string
+  providerOrderId: string
+  lifecycleStatus: string
+  providerSubmissionAcknowledged: boolean
+  terminal: boolean
+  executionSucceeded: boolean
+  statusLookupRequired: boolean
+  automaticRetryAllowed: boolean
+  recordedAt?: Date | string
+}
+
+export type RealExecutionSubmissionReceiptCreateOrConnectWithoutStatusObservationsInput = {
+  where: Prisma.RealExecutionSubmissionReceiptWhereUniqueInput
+  create: Prisma.XOR<Prisma.RealExecutionSubmissionReceiptCreateWithoutStatusObservationsInput, Prisma.RealExecutionSubmissionReceiptUncheckedCreateWithoutStatusObservationsInput>
+}
+
+export type RealExecutionSubmissionReceiptUpsertWithoutStatusObservationsInput = {
+  update: Prisma.XOR<Prisma.RealExecutionSubmissionReceiptUpdateWithoutStatusObservationsInput, Prisma.RealExecutionSubmissionReceiptUncheckedUpdateWithoutStatusObservationsInput>
+  create: Prisma.XOR<Prisma.RealExecutionSubmissionReceiptCreateWithoutStatusObservationsInput, Prisma.RealExecutionSubmissionReceiptUncheckedCreateWithoutStatusObservationsInput>
+  where?: Prisma.RealExecutionSubmissionReceiptWhereInput
+}
+
+export type RealExecutionSubmissionReceiptUpdateToOneWithWhereWithoutStatusObservationsInput = {
+  where?: Prisma.RealExecutionSubmissionReceiptWhereInput
+  data: Prisma.XOR<Prisma.RealExecutionSubmissionReceiptUpdateWithoutStatusObservationsInput, Prisma.RealExecutionSubmissionReceiptUncheckedUpdateWithoutStatusObservationsInput>
+}
+
+export type RealExecutionSubmissionReceiptUpdateWithoutStatusObservationsInput = {
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerOrderId?: Prisma.StringFieldUpdateOperationsInput | string
+  lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  providerSubmissionAcknowledged?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  terminal?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionSucceeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  statusLookupRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  automaticRetryAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gate?: Prisma.RealExecutionSubmissionGateUpdateOneRequiredWithoutSubmissionReceiptNestedInput
+}
+
+export type RealExecutionSubmissionReceiptUncheckedUpdateWithoutStatusObservationsInput = {
+  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerOrderId?: Prisma.StringFieldUpdateOperationsInput | string
+  lifecycleStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  providerSubmissionAcknowledged?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  terminal?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  executionSucceeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  statusLookupRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  automaticRetryAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type RealExecutionSubmissionReceiptCountOutputType
+ */
+
+export type RealExecutionSubmissionReceiptCountOutputType = {
+  statusObservations: number
+}
+
+export type RealExecutionSubmissionReceiptCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  statusObservations?: boolean | RealExecutionSubmissionReceiptCountOutputTypeCountStatusObservationsArgs
+}
+
+/**
+ * RealExecutionSubmissionReceiptCountOutputType without action
+ */
+export type RealExecutionSubmissionReceiptCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RealExecutionSubmissionReceiptCountOutputType
+   */
+  select?: Prisma.RealExecutionSubmissionReceiptCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * RealExecutionSubmissionReceiptCountOutputType without action
+ */
+export type RealExecutionSubmissionReceiptCountOutputTypeCountStatusObservationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RealExecutionStatusObservationWhereInput
+}
 
 
 export type RealExecutionSubmissionReceiptSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -532,6 +666,8 @@ export type RealExecutionSubmissionReceiptSelect<ExtArgs extends runtime.Types.E
   automaticRetryAllowed?: boolean
   recordedAt?: boolean
   gate?: boolean | Prisma.RealExecutionSubmissionGateDefaultArgs<ExtArgs>
+  statusObservations?: boolean | Prisma.RealExecutionSubmissionReceipt$statusObservationsArgs<ExtArgs>
+  _count?: boolean | Prisma.RealExecutionSubmissionReceiptCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionSubmissionReceipt"]>
 
 export type RealExecutionSubmissionReceiptSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -578,6 +714,8 @@ export type RealExecutionSubmissionReceiptSelectScalar = {
 export type RealExecutionSubmissionReceiptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"gateId" | "providerId" | "providerOrderId" | "lifecycleStatus" | "providerSubmissionAcknowledged" | "terminal" | "executionSucceeded" | "statusLookupRequired" | "automaticRetryAllowed" | "recordedAt", ExtArgs["result"]["realExecutionSubmissionReceipt"]>
 export type RealExecutionSubmissionReceiptInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gate?: boolean | Prisma.RealExecutionSubmissionGateDefaultArgs<ExtArgs>
+  statusObservations?: boolean | Prisma.RealExecutionSubmissionReceipt$statusObservationsArgs<ExtArgs>
+  _count?: boolean | Prisma.RealExecutionSubmissionReceiptCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RealExecutionSubmissionReceiptIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gate?: boolean | Prisma.RealExecutionSubmissionGateDefaultArgs<ExtArgs>
@@ -590,6 +728,7 @@ export type $RealExecutionSubmissionReceiptPayload<ExtArgs extends runtime.Types
   name: "RealExecutionSubmissionReceipt"
   objects: {
     gate: Prisma.$RealExecutionSubmissionGatePayload<ExtArgs>
+    statusObservations: Prisma.$RealExecutionStatusObservationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     gateId: string
@@ -997,6 +1136,7 @@ readonly fields: RealExecutionSubmissionReceiptFieldRefs;
 export interface Prisma__RealExecutionSubmissionReceiptClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   gate<T extends Prisma.RealExecutionSubmissionGateDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionSubmissionGateDefaultArgs<ExtArgs>>): Prisma.Prisma__RealExecutionSubmissionGateClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionSubmissionGatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  statusObservations<T extends Prisma.RealExecutionSubmissionReceipt$statusObservationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionSubmissionReceipt$statusObservationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RealExecutionStatusObservationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1434,6 +1574,30 @@ export type RealExecutionSubmissionReceiptDeleteManyArgs<ExtArgs extends runtime
    * Limit how many RealExecutionSubmissionReceipts to delete.
    */
   limit?: number
+}
+
+/**
+ * RealExecutionSubmissionReceipt.statusObservations
+ */
+export type RealExecutionSubmissionReceipt$statusObservationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RealExecutionStatusObservation
+   */
+  select?: Prisma.RealExecutionStatusObservationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RealExecutionStatusObservation
+   */
+  omit?: Prisma.RealExecutionStatusObservationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionStatusObservationInclude<ExtArgs> | null
+  where?: Prisma.RealExecutionStatusObservationWhereInput
+  orderBy?: Prisma.RealExecutionStatusObservationOrderByWithRelationInput | Prisma.RealExecutionStatusObservationOrderByWithRelationInput[]
+  cursor?: Prisma.RealExecutionStatusObservationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RealExecutionStatusObservationScalarFieldEnum | Prisma.RealExecutionStatusObservationScalarFieldEnum[]
 }
 
 /**

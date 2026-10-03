@@ -736,6 +736,25 @@ PostgreSQL constraints preserve the exact Agentic Wallet provider, bounded optio
 - Unit and PostgreSQL E2E tests prove persistence, replay, conflict handling, gate validation, temporal validation, and database enforcement.
 - No runtime wiring, route, process invocation, provider call, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, status-observation persistence, completed financial reconciliation, or real order is added.
 
+## M10.41 — Durable swap status history
+
+M10.41 adds an unwired serializable Prisma store for accepted M10.38 status observations. The store validates each candidate, takes a dedicated advisory transaction lock, reloads the exact M10.40 receipt, loads the latest durable observation by an immutable database sequence, and delegates every progression decision to the M10.39 monotonic transition policy.
+
+An exact repeat of the latest observation returns its original row and recording time without appending history. An accepted refresh or status progression creates a new immutable row. Missing or malformed receipts, gate/provider/order identity divergence, malformed observations, regressed provider time, changed booking time or transaction hash, terminal mutation, invalid generated identity, and invalid recording clocks fail closed.
+
+PostgreSQL uses a composite foreign key to bind every observation to the exact receipt gate, provider, and provider order ID. Database checks preserve the Agentic Wallet provider, option-safe order identity, the closed `PENDING`/`FINISHED`/`FAILED` vocabulary, canonical lowercase EVM hashes, the mandatory hash for `FINISHED`, and provider timestamp ordering. Persisted rows re-derive all lifecycle flags, keep actual received quantity unknown, forbid submission retry, and leave financial reconciliation incomplete.
+
+### M10.41 acceptance criteria
+
+- Only a structurally complete status observation for an exact durable receipt can enter history.
+- Durable sequence order selects the latest fact unambiguously even when timestamps tie.
+- Exact latest replay is idempotent; each accepted changed fact is append-only.
+- The M10.39 policy blocks identity drift, temporal regression, hash mutation, and terminal-state changes before insertion.
+- PostgreSQL repeats identity, status, hash, and timestamp invariants independently of application validation.
+- Unit and PostgreSQL E2E tests prove initial persistence, replay, terminal progression, regression rejection, receipt correlation, malformed evidence rejection, and database enforcement.
+- Financial reconciliation remains incomplete, actual received quantity remains unknown, and submission retry remains forbidden.
+- No runtime wiring, route, process invocation, provider call, lookup, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
