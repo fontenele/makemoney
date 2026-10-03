@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-03 — Interpret swap submission acknowledgments without claiming execution
+
+- Added a pure unwired interpreter for the documented Agentic Wallet market-swap submission envelope.
+- Bound an accepted provider order identity to one canonical durable gate ID.
+- Classified `success: true` plus `orderId` only as submitted and pending confirmation, never as terminal execution success.
+- Ignored additive provider status metadata and required a future separate terminal-status reconciliation.
+- Classified malformed envelopes, provider failure, unsafe order IDs, and invalid gate correlation as unknown outcomes.
+- Required reconciliation and forbade automatic retry on every response path.
+- Kept schema, persistence, runtime wiring, routes, process invocation, provider calls, wallet mutation, funding, a mutating command runner, executor, polling, retry, reconciliation implementation, real orders, and submission authorization absent.
+- Verified all 1,889 backend tests across 170 suites, all 80 PostgreSQL E2E tests across 9 suites with 25 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Add an expiring closed swap-command preview without execution
 
 - Persisted the exact initial-submission expiry on every new durable gate and constrained it to follow confirmation consumption.

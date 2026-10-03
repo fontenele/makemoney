@@ -642,6 +642,24 @@ The successful result is an immutable preview of the documented `market-order sw
 - PostgreSQL E2E coverage proves expiry migration and persistence.
 - No runtime wiring, route, process invocation, provider call, wallet mutation, funding, mutating command runner, executor, retry, reconciliation, or real order is added.
 
+## M10.36 — Safe swap submission response interpretation
+
+M10.36 adds a pure, unwired interpretation boundary for the documented result of a future Agentic Wallet `market-order swap` invocation. It requires a canonical durable gate UUID and accepts an acknowledgment only when the envelope reports literal success with a nonempty, bounded, control-free string `orderId`.
+
+An accepted order ID means only `submitted_pending_confirmation`. The resulting receipt records the gate correlation and provider order identity while keeping `terminal: false`, `executionSucceeded: false`, `statusLookupRequired: true`, and `automaticRetryAllowed: false`. Provider-added metadata is ignored for lifecycle purposes, so even a status-like field cannot bypass the mandatory separate order lookup.
+
+An invalid envelope, explicit provider failure, unsafe order ID, or invalid gate correlation produces `submission_outcome_unknown`, no receipt, reconciliation required, execution success false, and automatic retry forbidden. This is deliberately conservative because a failed or malformed local response does not prove that the provider saw no request. No command is invoked by this component.
+
+### M10.36 acceptance criteria
+
+- A documented successful envelope yields only a gate-bound pending-confirmation receipt.
+- An order ID never proves terminal execution success.
+- Additive provider metadata cannot promote the acknowledgment to `FINISHED` or `FAILED`.
+- Invalid envelopes, provider-reported failure, unsafe order IDs, and invalid gate IDs remain unknown outcomes.
+- Every path requires reconciliation and forbids automatic retry.
+- Focused tests cover the documented response, additive metadata, malformed envelopes, negative responses, unsafe IDs, and invalid correlation.
+- No schema, persistence, runtime wiring, route, process invocation, provider call, wallet mutation, funding, mutating command runner, executor, polling, retry, reconciliation implementation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

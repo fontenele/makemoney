@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Treat swap acknowledgment as nonterminal and never retry ambiguity
+
+The official Agentic Wallet contract states that `success: true` with an `orderId` acknowledges submission only; it does not prove execution. M10.36 therefore normalizes that response exclusively as `submitted_pending_confirmation`, keeps `executionSucceeded: false`, and requires a later `market-order list --orderId` reconciliation to `FINISHED` or `FAILED`. Additive response metadata, including a claimed status, cannot change that interpretation.
+
+Malformed envelopes, explicit provider failure, unsafe order identities, and lost durable-gate correlation are classified conservatively as `submission_outcome_unknown`. Because the provider may have observed a request, every interpreted response forbids automatic retry. The interpreter is pure and unwired: it does not establish that any command ran and adds neither a submitter nor a poller.
+
 ## 2026-10-03 — Preserve gate expiry and translate it only into an inert closed command
 
 M10.35 persists the initial-submission plan expiry on every new durable gate so later consumers cannot mistake an idempotently replayed but stale gate for current authority. The migration leaves the column nullable because an upgrade cannot truthfully reconstruct expiry for an existing gate; application mapping rejects that legacy uncertainty. A database constraint requires every known expiry to follow confirmation consumption.
