@@ -679,9 +679,27 @@ This preview cannot retry the original submission and does not yet execute one l
 - Focused tests cover the exact command and every protected receipt invariant.
 - No schema, persistence, runtime wiring, route, process invocation, provider call, wallet mutation, funding, mutating command runner, executor, polling, retry, reconciliation, or real order is added.
 
+## M10.38 — Conservative swap status response interpretation
+
+M10.38 adds a pure, unwired interpreter for the documented response shape of a future `market-order list --orderId ... --json` call. It accepts a row only when the durable M10.34 gate and exact M10.36 receipt are both structurally valid and mutually correlated. The response must contain exactly one market order on page one and preserve the provider order ID, BSC chain, approved token addresses and symbols, exact source quantity, and exact slippage. Address case and numerically equivalent decimal representations are normalized without native floating-point arithmetic.
+
+The only accepted provider states are `PENDING`, `FINISHED`, and `FAILED`. `PENDING` remains nonterminal and requires another status lookup. `FINISHED` is accepted only with a valid EVM transaction hash and reports provider execution success. `FAILED` is terminal without execution success. Provider timestamps must be explicit ISO timestamps in chronological order; ambiguous pages, mismatched payloads, unknown states, and invalid hashes fail closed.
+
+Provider execution status is deliberately distinct from financial reconciliation. The published status-row example does not contain actual received quantity, so every valid observation retains `financialReconciliationRequired: true`, `financialReconciliationComplete: false`, and `actualReceivedQuantity: null`. Submission retry is forbidden for every outcome, including provider failure and malformed responses. Additive fields cannot manufacture missing financial evidence.
+
+### M10.38 acceptance criteria
+
+- The exact gate, receipt, provider order ID, market type, chain, token direction, symbols, source quantity, and slippage remain correlated.
+- Exactly one documented row is required; malformed envelopes, explicit provider failures, and ambiguous pagination fail closed.
+- Only `PENDING`, `FINISHED`, and `FAILED` are accepted, with coherent explicit timestamps.
+- `FINISHED` requires a valid EVM transaction hash but does not claim actual received quantity or completed financial reconciliation.
+- `PENDING` alone remains nonterminal and requires another lookup; both terminal states stop lookup without permitting submission retry.
+- Focused tests cover all states, exact correlation, equivalent decimals and address case, invalid envelopes, pagination, timestamps, statuses, hashes, and altered gate or receipt evidence.
+- No schema, persistence, runtime wiring, route, process invocation, provider call, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
 - [Binance's official `binance-skills-hub`](https://github.com/binance/binance-skills-hub), including the Agentic Wallet skill plus preflight, wallet-view, wallet-setting, gas, security, and market-order references (reviewed 2026-09-30).
-- [Binance Agentic Wallet market-order reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/market-order.md), including the distinct quote and swap commands, explicit MEV/gas controls, and published quote response (reviewed again 2026-10-03).
+- [Binance Agentic Wallet market-order reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/market-order.md), including the distinct quote, swap, and order-list commands, explicit MEV/gas controls, and published quote, submission, and status response shapes (reviewed again 2026-10-03).
 - [Binance Spot REST security documentation](https://developers.binance.com/en/docs/products/spot/rest-api) was reviewed only to confirm that centralized Spot API keys and permissions are a separate integration model; it is not the selected M10 provider boundary.

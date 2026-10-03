@@ -1,10 +1,7 @@
 import {
   AgenticWalletMarketSwapSubmissionReceipt,
-  isSafeAgenticWalletProviderOrderId,
+  isValidAgenticWalletMarketSwapSubmissionReceipt,
 } from './agentic-wallet-market-swap-submission-response';
-
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 export interface AgenticWalletMarketSwapStatusCommandPreview {
   readonly kind: 'agentic_wallet_market_swap_status_command_preview';
@@ -27,7 +24,7 @@ export interface AgenticWalletMarketSwapStatusCommandAssessment {
 export function prepareAgenticWalletMarketSwapStatusCommand(
   receipt: AgenticWalletMarketSwapSubmissionReceipt,
 ): AgenticWalletMarketSwapStatusCommandAssessment {
-  if (!isValidReceipt(receipt)) {
+  if (!isValidAgenticWalletMarketSwapSubmissionReceipt(receipt)) {
     return {
       scope: 'agentic_wallet_market_swap_status_command',
       status: 'blocked',
@@ -57,23 +54,4 @@ export function prepareAgenticWalletMarketSwapStatusCommand(
       submissionRetryAllowed: false,
     },
   };
-}
-
-function isValidReceipt(
-  receipt: AgenticWalletMarketSwapSubmissionReceipt,
-): boolean {
-  return (
-    typeof receipt === 'object' &&
-    receipt !== null &&
-    receipt.kind === 'agentic_wallet_market_swap_submission_receipt' &&
-    receipt.providerId === 'agentic_wallet' &&
-    UUID_PATTERN.test(receipt.gateId) &&
-    isSafeAgenticWalletProviderOrderId(receipt.providerOrderId) &&
-    receipt.lifecycleStatus === 'pending_confirmation' &&
-    receipt.providerSubmissionAcknowledged === true &&
-    receipt.terminal === false &&
-    receipt.executionSucceeded === false &&
-    receipt.statusLookupRequired === true &&
-    receipt.automaticRetryAllowed === false
-  );
 }

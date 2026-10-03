@@ -44,7 +44,7 @@ export function prepareAgenticWalletMarketSwapCommand(
   evaluatedAt: Date,
 ): AgenticWalletMarketSwapCommandAssessment {
   const blockers: AgenticWalletMarketSwapCommandBlocker[] = [];
-  const gateValid = isValidGate(gate);
+  const gateValid = isStructurallyValidAgenticWalletMarketSwapGate(gate);
   const evaluationTimeValid = isValidDate(evaluatedAt);
   addIf(blockers, !gateValid, 'invalid_submission_gate');
   addIf(blockers, !evaluationTimeValid, 'invalid_evaluation_time');
@@ -102,7 +102,9 @@ export function prepareAgenticWalletMarketSwapCommand(
   };
 }
 
-function isValidGate(gate: StoredRealExecutionSubmissionGate): boolean {
+export function isStructurallyValidAgenticWalletMarketSwapGate(
+  gate: StoredRealExecutionSubmissionGate,
+): boolean {
   if (typeof gate !== 'object' || gate === null) return false;
   const approved = APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT;
   const source = gate.sourceTokenAddress;

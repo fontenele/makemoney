@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Separate provider terminal status from financial reconciliation
+
+M10.38 interprets a future `market-order list` response only after exact correlation with both the durable submission gate and its nonterminal receipt. One unambiguous market-order row must preserve the provider order ID, BSC chain, approved token direction and symbols, exact source quantity and slippage, coherent timestamps, documented status, and a valid EVM transaction hash when status is `FINISHED`.
+
+`PENDING` requires another read-only lookup; `FINISHED` proves only that the provider reports execution success; `FAILED` proves only a terminal provider failure. The published response example does not expose actual received quantity, so none of these states completes financial reconciliation. Submission retry remains forbidden even for failure or malformed lookup data because replaying the original mutation is a separate unsafe decision. The interpreter is pure and unwired and performs no provider read or polling.
+
 ## 2026-10-03 — Keep status lookup read-only, closed, and separate from submission retry
 
 M10.37 represents the mandatory post-submission lookup as a distinct pure command preview: `market-order list --orderId <orderId> --json`. It accepts only the exact nonterminal M10.36 receipt and retains the durable gate correlation, so a forged terminal/success claim or altered receipt policy cannot enter the reconciliation path.

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-03 — Interpret swap status without overstating reconciliation
+
+- Added a pure unwired interpreter for the documented Agentic Wallet `market-order list` response shape.
+- Required exact durable-gate, submission-receipt, order-identity, BSC instrument, source-quantity, and slippage correlation.
+- Classified only `PENDING`, `FINISHED`, and `FAILED`, with strict timestamps and a required valid EVM transaction hash for finished orders.
+- Kept pending orders lookup-required and terminal provider states separate from financial reconciliation.
+- Left actual received quantity unknown and financial reconciliation incomplete because the published response row omits that fact.
+- Forbade submission retry on every valid and invalid response path.
+- Kept schema, persistence, runtime wiring, routes, process invocation, provider calls, polling, wallet mutation, funding, a mutating command runner, executor, automatic retry, completed financial reconciliation, real orders, and submission authorization absent.
+- Verified all 1,944 backend tests across 172 suites, all 80 PostgreSQL E2E tests across 9 suites with 25 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Add a closed read-only swap-status lookup preview
 
 - Added a pure unwired translator from the exact nonterminal submission receipt to the documented Agentic Wallet order lookup arguments.

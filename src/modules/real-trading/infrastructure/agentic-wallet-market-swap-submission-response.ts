@@ -106,3 +106,22 @@ export function isSafeAgenticWalletProviderOrderId(
 ): value is string {
   return typeof value === 'string' && PROVIDER_ORDER_ID_PATTERN.test(value);
 }
+
+export function isValidAgenticWalletMarketSwapSubmissionReceipt(
+  receipt: AgenticWalletMarketSwapSubmissionReceipt,
+): boolean {
+  return (
+    typeof receipt === 'object' &&
+    receipt !== null &&
+    receipt.kind === 'agentic_wallet_market_swap_submission_receipt' &&
+    receipt.providerId === 'agentic_wallet' &&
+    UUID_PATTERN.test(receipt.gateId) &&
+    isSafeAgenticWalletProviderOrderId(receipt.providerOrderId) &&
+    receipt.lifecycleStatus === 'pending_confirmation' &&
+    receipt.providerSubmissionAcknowledged === true &&
+    receipt.terminal === false &&
+    receipt.executionSucceeded === false &&
+    receipt.statusLookupRequired === true &&
+    receipt.automaticRetryAllowed === false
+  );
+}
