@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Derive reconciliation state without mutating lifecycle evidence
+
+M10.42 reads the immutable M10.40 receipt and highest M10.41 sequence instead of updating receipt status or maintaining a second mutable lifecycle row. This makes the append-only history authoritative and prevents a projection write from drifting away from provider evidence. Missing receipt, awaiting first observation, pending, finished, and failed remain distinct states.
+
+The projection deliberately names provider completion as `provider_finished_financial_reconciliation_required`. It preserves the documented transaction hash but cannot infer actual received quantity from it, so financial reconciliation remains incomplete. Failed provider status is terminal but does not make resubmission safe. The store is unwired and read-only and adds no provider lookup, poller, command runner, route, wallet mutation, or execution authority.
+
 ## 2026-10-03 — Persist only monotonic receipt-bound status history
 
 M10.41 places an unwired serializable store behind the M10.39 transition policy. Each candidate must match the exact durable receipt's gate, provider, and provider order identity before the latest observation is loaded and assessed. Exact latest replay preserves its original row; every accepted changed fact is appended rather than overwriting evidence.

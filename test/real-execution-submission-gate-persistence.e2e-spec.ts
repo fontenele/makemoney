@@ -15,6 +15,7 @@ import { AgenticWalletMarketSwapSubmissionReceipt } from '../src/modules/real-tr
 import { AgenticWalletMarketSwapStatusObservationBlockedError } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-observation.store';
 import { AgenticWalletMarketSwapStatusObservation } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-response';
 import { PrismaAgenticWalletMarketSwapSubmissionReceiptStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-submission-receipt.store';
+import { PrismaAgenticWalletMarketSwapReconciliationStateStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-reconciliation-state.store';
 import { PrismaAgenticWalletMarketSwapStatusObservationStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-observation.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
@@ -25,6 +26,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let store: PrismaRealExecutionSubmissionGateStore;
   let receiptStore: PrismaAgenticWalletMarketSwapSubmissionReceiptStore;
   let statusStore: PrismaAgenticWalletMarketSwapStatusObservationStore;
+  let reconciliationStore: PrismaAgenticWalletMarketSwapReconciliationStateStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -38,6 +40,8 @@ describe('Real execution submission gate persistence (e2e)', () => {
       prisma,
       () => new Date('2026-10-03T12:00:06.000Z'),
     );
+    reconciliationStore =
+      new PrismaAgenticWalletMarketSwapReconciliationStateStore(prisma);
   });
 
   beforeEach(async () => {
@@ -251,6 +255,83 @@ describe('Real execution submission gate persistence (e2e)', () => {
     ).rejects.toThrow();
     await expect(prisma.realExecutionStatusObservation.count()).resolves.toBe(
       0,
+    );
+  });
+
+  it('returns no reconciliation state without a durable receipt', async () => {
+    await expect(reconciliationStore.getByGateId(uuid(10))).resolves.toBeNull();
+  });
+
+  it('projects durable receipt and latest status without claiming financial completion', async () => {
+    await store.create(command(10));
+    await receiptStore.record(submissionReceipt(10));
+
+    await expect(
+      reconciliationStore.getByGateId(uuid(10)),
+    ).resolves.toMatchObject({
+      phase: 'awaiting_status_observation',
+      providerStatus: null,
+      statusLookupRequired: true,
+      financialReconciliationComplete: false,
+      actualReceivedQuantity: null,
+      submissionRetryAllowed: false,
+    });
+
+    await statusStore.record(statusObservation(10));
+    await expect(
+      reconciliationStore.getByGateId(uuid(10)),
+    ).resolves.toMatchObject({
+      phase: 'provider_pending',
+      providerStatus: 'PENDING',
+      statusLookupRequired: true,
+      executionSucceeded: false,
+    });
+
+    const transactionHash = `0x${'a'.repeat(64)}`;
+    await statusStore.record(
+      statusObservation(10, {
+        providerStatus: 'FINISHED',
+        transactionHash,
+        updatedAt: new Date('2026-10-03T12:00:07.000Z'),
+        terminal: true,
+        executionSucceeded: true,
+        statusLookupRequired: false,
+      }),
+    );
+    await expect(
+      reconciliationStore.getByGateId(uuid(10)),
+    ).resolves.toMatchObject({
+      phase: 'provider_finished_financial_reconciliation_required',
+      providerStatus: 'FINISHED',
+      transactionHash,
+      statusLookupRequired: false,
+      executionSucceeded: true,
+      financialReconciliationRequired: true,
+      financialReconciliationComplete: false,
+      actualReceivedQuantity: null,
+      submissionRetryAllowed: false,
+    });
+  });
+
+  it('fails closed when directly persisted observation timing contradicts its receipt', async () => {
+    await store.create(command(10));
+    await receiptStore.record(submissionReceipt(10));
+    await prisma.realExecutionStatusObservation.create({
+      data: {
+        id: uuid(22),
+        gateId: uuid(10),
+        providerId: 'agentic_wallet',
+        providerOrderId: '1234567890',
+        providerStatus: 'PENDING',
+        transactionHash: null,
+        bookedAt: new Date('2026-10-03T12:00:05.000Z'),
+        providerUpdatedAt: new Date('2026-10-03T12:00:05.500Z'),
+        recordedAt: new Date('2026-10-03T12:00:04.999Z'),
+      },
+    });
+
+    await expect(reconciliationStore.getByGateId(uuid(10))).rejects.toThrow(
+      'Persisted market-swap reconciliation evidence is inconsistent',
     );
   });
 

@@ -83,7 +83,10 @@ export class PrismaAgenticWalletMarketSwapStatusObservationStore implements Agen
           where: { gateId: observation.gateId },
           orderBy: { sequence: 'desc' },
         });
-        const latest = latestRow === null ? null : mapObservation(latestRow);
+        const latest =
+          latestRow === null
+            ? null
+            : mapPersistedAgenticWalletMarketSwapStatusObservation(latestRow);
         const transition = assessAgenticWalletMarketSwapStatusTransition(
           latest?.observation ?? null,
           observation,
@@ -122,14 +125,17 @@ export class PrismaAgenticWalletMarketSwapStatusObservationStore implements Agen
             recordedAt,
           },
         });
-        return { stored: mapObservation(created), replayed: false };
+        return {
+          stored: mapPersistedAgenticWalletMarketSwapStatusObservation(created),
+          replayed: false,
+        };
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
   }
 }
 
-function mapObservation(row: {
+export function mapPersistedAgenticWalletMarketSwapStatusObservation(row: {
   id: string;
   gateId: string;
   providerId: string;

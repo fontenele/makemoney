@@ -755,6 +755,25 @@ PostgreSQL uses a composite foreign key to bind every observation to the exact r
 - Financial reconciliation remains incomplete, actual received quantity remains unknown, and submission retry remains forbidden.
 - No runtime wiring, route, process invocation, provider call, lookup, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
 
+## M10.42 — Durable swap reconciliation projection
+
+M10.42 adds an unwired read-only Prisma store that reconstructs one conservative state from the exact M10.40 receipt and the highest M10.41 database sequence. A missing receipt returns no state. A receipt without observations remains `awaiting_status_observation`; the three durable provider statuses project to `provider_pending`, `provider_finished_financial_reconciliation_required`, or `provider_failed`.
+
+The reader validates the requested gate identity before persistence access and revalidates every durable receipt and observation field after loading. The receipt must retain the requested gate, and any latest observation must preserve its gate/provider/order identity and cannot have been recorded before the receipt. Malformed or inconsistent database evidence raises a closed error instead of producing a partial or optimistic state.
+
+The projection carries provider status and transaction hash only when durable evidence exists. It derives lookup, terminal, and provider-execution flags from the latest observation, but always keeps `financialReconciliationRequired: true`, `financialReconciliationComplete: false`, `actualReceivedQuantity: null`, and `submissionRetryAllowed: false`. In particular, provider `FINISHED` never becomes a claim about credited target quantity or completed accounting.
+
+### M10.42 acceptance criteria
+
+- A malformed gate identity fails before a database query, while an absent receipt returns no state.
+- A receipt without observations remains explicitly awaiting the first status observation and lookup-required.
+- Only the latest immutable sequence determines pending, finished, or failed projection state.
+- Finished provider status remains financially unreconciled with unknown actual received quantity.
+- Failed provider status remains terminal and cannot authorize a submission retry.
+- Malformed receipt/observation structure, identity divergence, and pre-receipt observation recording fail closed.
+- Unit and PostgreSQL E2E tests cover absence, all projection phases, latest-state selection, conservative financial flags, and inconsistent durable evidence.
+- No schema, write, runtime wiring, route, process invocation, provider call, lookup, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

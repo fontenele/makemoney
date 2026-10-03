@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-03 — Project durable swap reconciliation state
+
+- Added an unwired read-only Prisma store that derives one conservative state from the exact durable receipt and latest status sequence.
+- Distinguished missing receipt, awaiting first observation, provider pending, provider finished but financially unreconciled, and provider failed.
+- Revalidated requested identity, durable receipt/observation structure, exact gate/provider/order correlation, and recording-time order.
+- Kept actual received quantity unknown, financial reconciliation incomplete, and submission retry forbidden in every phase.
+- Added no schema, write, runtime wiring, route, process invocation, provider call, lookup, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 1,992 backend tests across 176 suites, all 89 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Persist monotonic swap status history
 
 - Added an unwired serializable Prisma store for receipt-bound Agentic Wallet status observations.
