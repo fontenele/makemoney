@@ -3,10 +3,10 @@ import {
   AgenticWalletReadCommandRunner,
 } from './agentic-wallet-read-command-runner';
 import { AgenticWalletCliJsonProcess } from './agentic-wallet-cli-json-process';
+import { buildAgenticWalletCliVersionCheckArguments } from './agentic-wallet-cli-version';
 
 export { buildAgenticWalletProcessInvocation } from './agentic-wallet-cli-json-process';
 
-const REQUIRED_CLI_VERSION = '1.10.0';
 const CHAIN_ID_PATTERN = /^[A-Za-z0-9_-]{1,32}$/;
 
 export class AgenticWalletCliProcessRunner implements AgenticWalletReadCommandRunner {
@@ -33,12 +33,7 @@ export function buildAgenticWalletReadArguments(
 ): readonly string[] {
   switch (command.kind) {
     case 'cli_version':
-      return [
-        'cli-check',
-        '--required-version',
-        REQUIRED_CLI_VERSION,
-        '--json',
-      ];
+      return buildAgenticWalletCliVersionCheckArguments();
     case 'wallet_status':
       return ['wallet', 'status', '--json'];
     case 'wallet_chains':

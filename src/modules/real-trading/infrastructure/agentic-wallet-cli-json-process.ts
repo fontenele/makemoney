@@ -11,7 +11,7 @@ export interface AgenticWalletProcessInvocation {
 
 export class AgenticWalletCliJsonProcess {
   constructor(
-    private readonly operation: 'read' | 'quote',
+    private readonly operation: 'read' | 'quote' | 'status lookup',
     private readonly timeoutMs = 5000,
     private readonly executable?: string,
   ) {

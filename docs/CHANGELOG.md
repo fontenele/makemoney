@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-03 — Add a closed read-only swap status lookup runner
+
+- Added a dedicated unwired runner interface and CLI process implementation for one Agentic Wallet status lookup command.
+- Converted only M10.43 lookup-ready decisions to the typed command; terminal and blocked decisions produce no command.
+- Allowlists exactly `market-order list --orderId <id> --json` and rejects unsafe identities or unsupported kinds before process invocation.
+- Extracted one shared pinned Agentic Wallet CLI `1.10.0` contract for quote and status lookup runners.
+- Reused the existing no-shell, bounded-output, timeout-aware, cancelable JSON process without adding retry or polling.
+- Kept runtime wiring, routes, live process invocation, provider calls, response orchestration, status writes, wallet mutation, funding, mutating commands, execution, automatic retry, completed financial reconciliation, real orders, and submission authority absent.
+- Verified all 2,028 backend tests across 178 suites, all 89 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Stop swap status lookup at terminal provider state
 
 - Added a pure unwired decision policy over the latest durable reconciliation projection.

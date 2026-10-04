@@ -793,6 +793,24 @@ The projection validator checks its scope, provider, canonical gate, option-safe
 - Focused unit tests cover both lookup-required phases, both terminal phases, and malformed identity, time, hash, lifecycle, financial, and retry facts; PostgreSQL E2E proves the durable projection drives the same terminal stop.
 - No schema, persistence, runtime wiring, route, process invocation, provider call, lookup, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
 
+## M10.44 — Closed read-only swap status lookup runner
+
+M10.44 adds a dedicated, unwired process runner for one read-only Agentic Wallet operation. Only an M10.43 lookup-ready decision can be converted by the provided boundary helper into `market_order_status_lookup`; terminal and blocked decisions produce no command. The runner independently revalidates the provider order identity and maps the one-item command allowlist to `market-order list --orderId <id> --json`.
+
+Before the lookup, the runner executes the existing pinned CLI check and requires exactly version `1.10.0` with no update required. Quote and status lookup now share one version-contract implementation while retaining operation-specific errors. Both provider commands use the existing JSON process boundary: `spawn` with `shell: false`, hidden Windows process, ignored stdin, suppressed stderr, bounded 1–30 second timeout, caller cancellation, 64 KiB stdout cap, nonzero-exit rejection, and strict JSON parsing.
+
+The runner performs exactly one version check and at most one lookup when explicitly called. It has no retry, loop, schedule, persistence, response interpretation, or terminal-status mutation. It is not registered in NestJS and was not invoked against the local CLI or provider during development or verification.
+
+### M10.44 acceptance criteria
+
+- Only a lookup-ready M10.43 decision converts to the typed runner command; terminal and blocked decisions convert to no command.
+- The runner accepts only `market_order_status_lookup` and the bounded option-safe provider order identity.
+- Arguments exactly match `market-order list --orderId <id> --json`; unsupported kinds and unsafe IDs fail before process invocation.
+- The CLI version must exactly match pinned `1.10.0` before lookup.
+- Process execution remains no-shell, bounded, cancelable, JSON-only, and without automatic retry.
+- Focused tests cover decision conversion, the one-item allowlist, exact arguments, unsafe identities, unsupported command kinds, timeout bounds, and version acceptance/rejection.
+- No schema, persistence, runtime wiring, route, live process invocation, provider call, polling, response interpretation orchestration, status write, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Isolate status lookup in a one-command read-only process runner
+
+M10.44 does not add status lookup to the general wallet observation runner or create a generic market-order executor. A dedicated interface accepts only `market_order_status_lookup`, and only an M10.43 lookup-ready decision converts to that command. The process boundary revalidates the option-safe order identity and has a one-item argument allowlist, so no swap or other mutating subcommand can enter through this runner.
+
+Status lookup and quote runners now share one pinned CLI `1.10.0` validator, but retain separate command contracts and operation-specific errors. The existing no-shell JSON process supplies timeout, cancellation, output bounding, exit checking, and parsing. The new runner is unwired, has no retry or polling loop, and was never invoked live; it returns raw unknown JSON for a future separately controlled interpretation step and grants no submission authority.
+
 ## 2026-10-03 — Stop status lookup from the latest projection, not the immutable receipt
 
 M10.43 prevents the original pending receipt from becoming a perpetual lookup signal. That receipt remains immutable audit evidence, while the latest validated M10.42 projection decides whether status observation is still required. Awaiting and pending states may produce only an inert read-only preview; finished and failed states produce no command.
