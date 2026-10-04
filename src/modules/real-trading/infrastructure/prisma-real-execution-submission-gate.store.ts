@@ -44,7 +44,10 @@ export class PrismaRealExecutionSubmissionGateStore implements RealExecutionSubm
           if (existing.requestFingerprint !== requestFingerprint) {
             throw new RealExecutionSubmissionGateIdempotencyConflictError();
           }
-          return { gate: mapGate(existing), replayed: true };
+          return {
+            gate: mapPersistedRealExecutionSubmissionGate(existing),
+            replayed: true,
+          };
         }
 
         const confirmationRow =
@@ -148,7 +151,10 @@ export class PrismaRealExecutionSubmissionGateStore implements RealExecutionSubm
             createdAt: evaluatedAt,
           },
         });
-        return { gate: mapGate(created), replayed: false };
+        return {
+          gate: mapPersistedRealExecutionSubmissionGate(created),
+          replayed: false,
+        };
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
@@ -222,7 +228,7 @@ function mapConfirmation(row: {
   };
 }
 
-function mapGate(row: {
+export function mapPersistedRealExecutionSubmissionGate(row: {
   id: string;
   confirmationId: string;
   approvalId: string;

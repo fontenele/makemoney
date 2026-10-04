@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-03 — Load durable swap status reconciliation context
+
+- Added an unwired read-only Prisma store that loads a gate, its receipt, latest sequenced status observation, and conservative projection through one Prisma read operation.
+- Returned no complete context for an absent gate or receipt and rejected malformed gate identities before persistence access.
+- Revalidated persisted gate, receipt, observation, exact identities, and receipt-after-gate timing before returning context.
+- Centralized reconciliation projection and exported the existing persisted mappers so M10.42 and M10.46 cannot drift in lifecycle derivation.
+- Added focused unit coverage and PostgreSQL E2E coverage for absence, awaiting and pending context, exact durable correlation, and invalid evidence.
+- Added no schema, runtime wiring, route, process invocation, provider call, lookup, write, polling, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,045 backend tests across 180 suites, all 90 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Compose one explicit swap status reconciliation attempt
 
 - Added an unwired coordinator that performs at most one read-only status lookup and one monotonic observation persistence attempt per explicit call.

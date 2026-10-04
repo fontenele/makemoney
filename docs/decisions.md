@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Load reconciliation context as one durable read model
+
+M10.46 reads the immutable gate, receipt, and latest sequenced status observation through one Prisma read operation instead of asking a future caller to assemble those facts independently. The store returns no context until both gate and receipt exist, revalidates every persisted boundary, and derives the lifecycle through the same centralized projection function used by M10.42.
+
+The context reader remains separate from the M10.45 coordinator. It has no runner or write dependency and cannot initiate a provider lookup merely because durable pending evidence exists. Wiring the reader into a caller-authorized attempt, adding runtime registration, or creating any schedule remains separately reviewable scope.
+
 ## 2026-10-03 — Keep status reconciliation explicit and single-attempt
 
 M10.45 composes the existing read-only and persistence boundaries without introducing a poller. Each caller-authorized invocation revalidates the immutable gate and receipt, loads the latest durable M10.42 projection, applies the M10.43 terminal stop, invokes the M10.44 runner at most once, interprets through M10.38, and delegates valid evidence to the M10.41 monotonic store.

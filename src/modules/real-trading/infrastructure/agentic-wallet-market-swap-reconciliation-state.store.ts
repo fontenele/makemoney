@@ -1,5 +1,13 @@
-import { AgenticWalletMarketSwapProviderStatus } from './agentic-wallet-market-swap-status-response';
-import { isSafeAgenticWalletProviderOrderId } from './agentic-wallet-market-swap-submission-response';
+import {
+  AgenticWalletMarketSwapProviderStatus,
+  isValidAgenticWalletMarketSwapStatusObservation,
+} from './agentic-wallet-market-swap-status-response';
+import type { StoredAgenticWalletMarketSwapStatusObservation } from './agentic-wallet-market-swap-status-observation.store';
+import type { StoredAgenticWalletMarketSwapSubmissionReceipt } from './agentic-wallet-market-swap-submission-receipt.store';
+import {
+  isSafeAgenticWalletProviderOrderId,
+  isValidAgenticWalletMarketSwapSubmissionReceipt,
+} from './agentic-wallet-market-swap-submission-response';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -35,6 +43,62 @@ export interface AgenticWalletMarketSwapReconciliationStateStore {
   getByGateId(
     gateId: string,
   ): Promise<AgenticWalletMarketSwapReconciliationState | null>;
+}
+
+export function projectAgenticWalletMarketSwapReconciliationState(
+  storedReceipt: StoredAgenticWalletMarketSwapSubmissionReceipt,
+  latest: StoredAgenticWalletMarketSwapStatusObservation | null,
+): AgenticWalletMarketSwapReconciliationState {
+  const { receipt, recordedAt: receiptRecordedAt } = storedReceipt;
+  if (
+    !isValidStoredReceipt(storedReceipt) ||
+    (latest !== null &&
+      (!isValidStoredObservation(latest) ||
+        latest.observation.gateId !== receipt.gateId ||
+        latest.observation.providerId !== receipt.providerId ||
+        latest.observation.providerOrderId !== receipt.providerOrderId ||
+        latest.recordedAt.getTime() < receiptRecordedAt.getTime()))
+  ) {
+    throw new Error(
+      'Persisted market-swap reconciliation evidence is inconsistent',
+    );
+  }
+
+  const observation = latest?.observation ?? null;
+  const providerStatus = observation?.providerStatus ?? null;
+  const phase =
+    providerStatus === null
+      ? 'awaiting_status_observation'
+      : providerStatus === 'PENDING'
+        ? 'provider_pending'
+        : providerStatus === 'FINISHED'
+          ? 'provider_finished_financial_reconciliation_required'
+          : 'provider_failed';
+  const state: AgenticWalletMarketSwapReconciliationState = {
+    scope: 'agentic_wallet_market_swap_reconciliation_state',
+    providerId: 'agentic_wallet',
+    gateId: receipt.gateId,
+    providerOrderId: receipt.providerOrderId,
+    phase,
+    providerStatus,
+    transactionHash: observation?.transactionHash ?? null,
+    receiptRecordedAt: new Date(receiptRecordedAt),
+    latestObservationId: latest?.id ?? null,
+    latestObservationRecordedAt: latest?.recordedAt ?? null,
+    terminal: observation?.terminal ?? false,
+    executionSucceeded: observation?.executionSucceeded ?? false,
+    statusLookupRequired: observation?.statusLookupRequired ?? true,
+    financialReconciliationRequired: true,
+    financialReconciliationComplete: false,
+    actualReceivedQuantity: null,
+    submissionRetryAllowed: false,
+  };
+  if (!isValidAgenticWalletMarketSwapReconciliationState(state)) {
+    throw new Error(
+      'Persisted market-swap reconciliation evidence is inconsistent',
+    );
+  }
+  return state;
 }
 
 export function isValidAgenticWalletMarketSwapReconciliationState(
@@ -109,4 +173,29 @@ export class AgenticWalletMarketSwapReconciliationStateIdentityError extends Err
     super('Agentic Wallet market-swap reconciliation gate identity is invalid');
     this.name = AgenticWalletMarketSwapReconciliationStateIdentityError.name;
   }
+}
+
+function isValidStoredReceipt(
+  value: StoredAgenticWalletMarketSwapSubmissionReceipt,
+): boolean {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    isValidAgenticWalletMarketSwapSubmissionReceipt(value.receipt) &&
+    value.recordedAt instanceof Date &&
+    Number.isFinite(value.recordedAt.getTime())
+  );
+}
+
+function isValidStoredObservation(
+  value: StoredAgenticWalletMarketSwapStatusObservation,
+): boolean {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    UUID_PATTERN.test(value.id) &&
+    isValidAgenticWalletMarketSwapStatusObservation(value.observation) &&
+    value.recordedAt instanceof Date &&
+    Number.isFinite(value.recordedAt.getTime())
+  );
 }

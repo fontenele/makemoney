@@ -1,7 +1,7 @@
 import { Prisma } from '../../../generated/prisma/client';
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
-import { StoredRealExecutionSubmissionGate } from '../application/real-execution-submission-gate-store';
 import { isStructurallyValidAgenticWalletMarketSwapGate } from './agentic-wallet-market-swap-command';
+import { mapPersistedRealExecutionSubmissionGate } from './prisma-real-execution-submission-gate.store';
 import {
   AgenticWalletMarketSwapSubmissionReceiptBlockedError,
   AgenticWalletMarketSwapSubmissionReceiptConflictError,
@@ -37,7 +37,8 @@ export class PrismaAgenticWalletMarketSwapSubmissionReceiptStore implements Agen
           where: { gateId: receipt.gateId },
         });
         if (existing) {
-          const stored = mapReceipt(existing);
+          const stored =
+            mapPersistedAgenticWalletMarketSwapSubmissionReceipt(existing);
           if (stored.receipt.providerOrderId !== receipt.providerOrderId) {
             throw new AgenticWalletMarketSwapSubmissionReceiptConflictError();
           }
@@ -59,7 +60,7 @@ export class PrismaAgenticWalletMarketSwapSubmissionReceiptStore implements Agen
         if (!gateRow) {
           throw new AgenticWalletMarketSwapSubmissionReceiptGateNotFoundError();
         }
-        const gate = mapGate(gateRow);
+        const gate = mapPersistedRealExecutionSubmissionGate(gateRow);
         if (!isStructurallyValidAgenticWalletMarketSwapGate(gate)) {
           throw new Error(
             'Persisted real execution submission gate is invalid',
@@ -89,14 +90,17 @@ export class PrismaAgenticWalletMarketSwapSubmissionReceiptStore implements Agen
             recordedAt,
           },
         });
-        return { stored: mapReceipt(created), replayed: false };
+        return {
+          stored: mapPersistedAgenticWalletMarketSwapSubmissionReceipt(created),
+          replayed: false,
+        };
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
   }
 }
 
-function mapReceipt(row: {
+export function mapPersistedAgenticWalletMarketSwapSubmissionReceipt(row: {
   gateId: string;
   providerId: string;
   providerOrderId: string;
@@ -127,50 +131,4 @@ function mapReceipt(row: {
     throw new Error('Persisted market-swap submission receipt is invalid');
   }
   return { receipt, recordedAt: new Date(row.recordedAt) };
-}
-
-function mapGate(row: {
-  id: string;
-  confirmationId: string;
-  approvalId: string;
-  reservationId: string;
-  armId: string;
-  submissionPlanId: string;
-  providerId: string;
-  chainId: string;
-  intentId: string;
-  quoteId: string;
-  payloadCommitmentVersion: string;
-  payloadCommitmentDigest: string;
-  emergencyStopChangeId: string;
-  sourceTokenAddress: string;
-  targetTokenAddress: string;
-  sourceQuantity: string;
-  maximumSlippagePercent: string;
-  mevProtection: boolean;
-  gasLevel: string;
-  status: string;
-  emergencyStopRecheckedAt: Date;
-  confirmationConsumedAt: Date;
-  expiresAt: Date | null;
-  createdAt: Date;
-}): StoredRealExecutionSubmissionGate {
-  return {
-    ...row,
-    providerId: row.providerId as 'agentic_wallet',
-    chainId: row.chainId as '56',
-    payloadCommitmentVersion:
-      row.payloadCommitmentVersion as 'real_execution_intent_quote_v1',
-    mevProtection: row.mevProtection as true,
-    gasLevel: row.gasLevel as 'MEDIUM',
-    status: row.status as 'prepared_not_submitted',
-    expiresAt: row.expiresAt as Date,
-    emergencyStopRecheckedAt: new Date(row.emergencyStopRecheckedAt),
-    confirmationConsumedAt: new Date(row.confirmationConsumedAt),
-    createdAt: new Date(row.createdAt),
-    atomicGateSatisfied: true,
-    confirmationConsumed: true,
-    providerSubmissionStarted: false,
-    submissionAuthorized: false,
-  };
 }

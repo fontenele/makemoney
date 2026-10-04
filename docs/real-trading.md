@@ -830,6 +830,24 @@ Runner and persistence errors propagate to the explicit caller and are never ret
 - Focused tests cover successful pending and finished observations, terminal stop, invalid context, absent/divergent projection, invalid response, cancellation forwarding, and single-call failure behavior.
 - No schema, runtime wiring, route, live process invocation, provider call during verification, polling, schedule, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
 
+## M10.46 — Durable swap status reconciliation context
+
+M10.46 adds an unwired read-only Prisma store for the complete durable input required by a future caller-authorized M10.45 attempt. A canonical gate ID drives one Prisma read operation that includes the immutable submission gate, its exact receipt, and only the latest status observation ordered by the database sequence. A missing gate or missing receipt returns no complete context rather than fabricating lifecycle evidence.
+
+Every returned gate passes the existing structural gate policy. The receipt and optional observation use the same persisted mappers as their authoritative stores, and exact gate/provider/order identities plus receipt-after-gate timing are checked again. One centralized pure projection function now serves both the existing M10.42 state reader and the new context reader, so awaiting, pending, finished-financially-unreconciled, and failed phases cannot drift between read paths.
+
+The reader exposes no runner or write dependency and is not registered in NestJS. It cannot invoke the CLI, call the provider, persist a status, or schedule another read. The M10.45 coordinator remains separately unwired and still requires an explicit caller; connecting these components is future scope.
+
+### M10.46 acceptance criteria
+
+- A malformed gate ID fails before persistence access; an absent gate or receipt returns no complete context.
+- One Prisma read operation loads the exact gate, receipt, and latest observation by immutable database sequence.
+- Persisted gate, receipt, observation, identity correlation, and receipt-after-gate timing are revalidated.
+- The M10.42 state reader and M10.46 context reader share one conservative projection implementation.
+- Awaiting and pending contexts retain lookup-required state; terminal projections remain financially unreconciled and forbid submission retry.
+- Unit and PostgreSQL E2E tests cover identity rejection, absence, awaiting and pending projections, exact durable correlation, and malformed evidence.
+- No schema, runtime wiring, route, process invocation, provider call, lookup, write, polling, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

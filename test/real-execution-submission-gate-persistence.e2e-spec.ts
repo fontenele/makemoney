@@ -18,6 +18,7 @@ import { AgenticWalletMarketSwapStatusObservation } from '../src/modules/real-tr
 import { PrismaAgenticWalletMarketSwapSubmissionReceiptStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-submission-receipt.store';
 import { PrismaAgenticWalletMarketSwapReconciliationStateStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-reconciliation-state.store';
 import { PrismaAgenticWalletMarketSwapStatusObservationStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-observation.store';
+import { PrismaAgenticWalletMarketSwapStatusReconciliationContextStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-reconciliation-context.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -28,6 +29,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let receiptStore: PrismaAgenticWalletMarketSwapSubmissionReceiptStore;
   let statusStore: PrismaAgenticWalletMarketSwapStatusObservationStore;
   let reconciliationStore: PrismaAgenticWalletMarketSwapReconciliationStateStore;
+  let reconciliationContextStore: PrismaAgenticWalletMarketSwapStatusReconciliationContextStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -43,6 +45,8 @@ describe('Real execution submission gate persistence (e2e)', () => {
     );
     reconciliationStore =
       new PrismaAgenticWalletMarketSwapReconciliationStateStore(prisma);
+    reconciliationContextStore =
+      new PrismaAgenticWalletMarketSwapStatusReconciliationContextStore(prisma);
   });
 
   beforeEach(async () => {
@@ -324,6 +328,37 @@ describe('Real execution submission gate persistence (e2e)', () => {
       providerCallStarted: false,
       financialReconciliationComplete: false,
       submissionRetryAllowed: false,
+    });
+  });
+
+  it('loads the exact durable status reconciliation context in one read model', async () => {
+    await store.create(command(10));
+    await expect(
+      reconciliationContextStore.getByGateId(uuid(10)),
+    ).resolves.toBeNull();
+
+    const storedReceipt = await receiptStore.record(submissionReceipt(10));
+    await statusStore.record(statusObservation(10));
+
+    await expect(
+      reconciliationContextStore.getByGateId(uuid(10)),
+    ).resolves.toMatchObject({
+      gate: {
+        id: uuid(10),
+        providerId: 'agentic_wallet',
+        providerSubmissionStarted: false,
+        submissionAuthorized: false,
+      },
+      submissionReceipt: storedReceipt.stored,
+      reconciliationState: {
+        gateId: uuid(10),
+        providerOrderId: '1234567890',
+        phase: 'provider_pending',
+        providerStatus: 'PENDING',
+        statusLookupRequired: true,
+        financialReconciliationComplete: false,
+        submissionRetryAllowed: false,
+      },
     });
   });
 
