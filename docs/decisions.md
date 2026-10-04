@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Keep status reconciliation explicit and single-attempt
+
+M10.45 composes the existing read-only and persistence boundaries without introducing a poller. Each caller-authorized invocation revalidates the immutable gate and receipt, loads the latest durable M10.42 projection, applies the M10.43 terminal stop, invokes the M10.44 runner at most once, interprets through M10.38, and delegates valid evidence to the M10.41 monotonic store.
+
+The coordinator does not catch and retry runner or persistence failures. Invalid provider responses are reported without a write, while concurrent or regressive persistence remains fail-closed in the existing store. The component is unwired and accepts its immutable gate and receipt explicitly; adding a durable context loader, schedule, polling policy, backoff, runtime registration, or financial reconciliation remains separately reviewable future scope.
+
 ## 2026-10-03 — Isolate status lookup in a one-command read-only process runner
 
 M10.44 does not add status lookup to the general wallet observation runner or create a generic market-order executor. A dedicated interface accepts only `market_order_status_lookup`, and only an M10.43 lookup-ready decision converts to that command. The process boundary revalidates the option-safe order identity and has a one-item argument allowlist, so no swap or other mutating subcommand can enter through this runner.

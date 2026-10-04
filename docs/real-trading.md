@@ -811,6 +811,25 @@ The runner performs exactly one version check and at most one lookup when explic
 - Focused tests cover decision conversion, the one-item allowlist, exact arguments, unsafe identities, unsupported command kinds, timeout bounds, and version acceptance/rejection.
 - No schema, persistence, runtime wiring, route, live process invocation, provider call, polling, response interpretation orchestration, status write, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
 
+## M10.45 — One-shot swap status reconciliation attempt
+
+M10.45 adds an unwired coordinator for one caller-authorized reconciliation attempt. It accepts the immutable durable gate and receipt, revalidates both, loads the latest M10.42 projection by gate ID, and requires exact gate, provider, and provider-order correlation. Missing, malformed, or divergent evidence blocks before the runner. A valid terminal projection returns `status_lookup_not_required` without provider access.
+
+For a lookup-required projection, the coordinator reuses M10.43 to create the decision and M10.44 to execute at most one read-only command. The raw response passes through the complete M10.38 gate/receipt correlation and response interpretation. Invalid provider evidence is returned without persistence; a valid pending, finished, or failed observation is delegated once to the M10.41 append-only monotonic store. Store validation remains authoritative for concurrent progress, replay, regression, and terminal immutability.
+
+Runner and persistence errors propagate to the explicit caller and are never retried by this component. There is no loop, timer, backoff, schedule, queue, route, or NestJS registration. Tests use doubles only, so development and verification make no local CLI or provider call. Provider completion still supplies no actual received quantity: every result keeps financial reconciliation required and incomplete and forbids submission retry.
+
+### M10.45 acceptance criteria
+
+- Invalid gate, receipt, correlation, missing projection, malformed projection, or divergent durable identity blocks before provider access.
+- A terminal latest projection performs no lookup and no persistence attempt.
+- One explicit nonterminal invocation performs at most one runner call and forwards caller cancellation.
+- Only a fully valid M10.38 response reaches the M10.41 observation store; invalid responses produce no write.
+- Pending, finished, and failed observations retain their conservative lookup and execution flags while financial reconciliation remains incomplete.
+- Runner and persistence errors propagate without retry, and the monotonic store remains authoritative under concurrent change.
+- Focused tests cover successful pending and finished observations, terminal stop, invalid context, absent/divergent projection, invalid response, cancellation forwarding, and single-call failure behavior.
+- No schema, runtime wiring, route, live process invocation, provider call during verification, polling, schedule, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

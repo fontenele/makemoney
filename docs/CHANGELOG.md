@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-03 — Compose one explicit swap status reconciliation attempt
+
+- Added an unwired coordinator that performs at most one read-only status lookup and one monotonic observation persistence attempt per explicit call.
+- Revalidated the immutable gate and receipt and their exact correlation with the latest durable reconciliation projection before provider access.
+- Stopped before the runner for invalid, missing, divergent, or terminal reconciliation evidence.
+- Reused the conservative status response interpreter and persisted only a valid pending, finished, or failed observation through the existing append-only store.
+- Propagated lookup and persistence failures without retry; invalid provider responses remain unpersisted and never authorize resubmission.
+- Kept financial reconciliation incomplete, actual received quantity unknown, and submission retry forbidden on every returned path.
+- Added no schema, runtime wiring, route, live process invocation, provider call, polling, schedule, wallet mutation, funding, mutating command, executor, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,039 backend tests across 179 suites, all 89 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Add a closed read-only swap status lookup runner
 
 - Added a dedicated unwired runner interface and CLI process implementation for one Agentic Wallet status lookup command.
