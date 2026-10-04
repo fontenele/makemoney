@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-03 — Stop status lookup from the latest projection, not the immutable receipt
+
+M10.43 prevents the original pending receipt from becoming a perpetual lookup signal. That receipt remains immutable audit evidence, while the latest validated M10.42 projection decides whether status observation is still required. Awaiting and pending states may produce only an inert read-only preview; finished and failed states produce no command.
+
+The policy revalidates the entire projection rather than trusting derived booleans in isolation. A forged phase, terminal flag, success claim, timestamp, transaction hash, financial-completion claim, actual received quantity, or retry permission blocks closed. The decision remains pure and unwired: it starts no provider call, schedules no polling, and adds no execution authority.
+
 ## 2026-10-03 — Derive reconciliation state without mutating lifecycle evidence
 
 M10.42 reads the immutable M10.40 receipt and highest M10.41 sequence instead of updating receipt status or maintaining a second mutable lifecycle row. This makes the append-only history authoritative and prevents a projection write from drifting away from provider evidence. Missing receipt, awaiting first observation, pending, finished, and failed remain distinct states.

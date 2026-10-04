@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-03 — Stop swap status lookup at terminal provider state
+
+- Added a pure unwired decision policy over the latest durable reconciliation projection.
+- Produced the exact inert read-only lookup preview only for awaiting-first-observation and provider-pending states.
+- Returned lookup-not-required with no command for provider-finished and provider-failed states.
+- Added full structural validation for projection identity, timestamps, hashes, lifecycle, financial, and retry invariants.
+- Kept provider calls unstarted, actual received quantity unknown, financial reconciliation incomplete, and submission retry forbidden on every path.
+- Added no schema, persistence, runtime wiring, route, process invocation, provider call, lookup, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,016 backend tests across 177 suites, all 89 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Project durable swap reconciliation state
 
 - Added an unwired read-only Prisma store that derives one conservative state from the exact durable receipt and latest status sequence.

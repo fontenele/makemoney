@@ -13,6 +13,7 @@ import {
 import { AgenticWalletMarketSwapSubmissionReceiptConflictError } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-submission-receipt.store';
 import { AgenticWalletMarketSwapSubmissionReceipt } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-submission-response';
 import { AgenticWalletMarketSwapStatusObservationBlockedError } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-observation.store';
+import { decideAgenticWalletMarketSwapStatusLookup } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-lookup-decision';
 import { AgenticWalletMarketSwapStatusObservation } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-response';
 import { PrismaAgenticWalletMarketSwapSubmissionReceiptStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-submission-receipt.store';
 import { PrismaAgenticWalletMarketSwapReconciliationStateStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-reconciliation-state.store';
@@ -266,15 +267,20 @@ describe('Real execution submission gate persistence (e2e)', () => {
     await store.create(command(10));
     await receiptStore.record(submissionReceipt(10));
 
-    await expect(
-      reconciliationStore.getByGateId(uuid(10)),
-    ).resolves.toMatchObject({
+    const awaiting = await reconciliationStore.getByGateId(uuid(10));
+    expect(awaiting).toMatchObject({
       phase: 'awaiting_status_observation',
       providerStatus: null,
       statusLookupRequired: true,
       financialReconciliationComplete: false,
       actualReceivedQuantity: null,
       submissionRetryAllowed: false,
+    });
+    if (awaiting === null) throw new Error('expected reconciliation state');
+    expect(decideAgenticWalletMarketSwapStatusLookup(awaiting)).toMatchObject({
+      status: 'status_command_preview_ready',
+      statusLookupRequired: true,
+      providerCallStarted: false,
     });
 
     await statusStore.record(statusObservation(10));
@@ -298,9 +304,8 @@ describe('Real execution submission gate persistence (e2e)', () => {
         statusLookupRequired: false,
       }),
     );
-    await expect(
-      reconciliationStore.getByGateId(uuid(10)),
-    ).resolves.toMatchObject({
+    const finished = await reconciliationStore.getByGateId(uuid(10));
+    expect(finished).toMatchObject({
       phase: 'provider_finished_financial_reconciliation_required',
       providerStatus: 'FINISHED',
       transactionHash,
@@ -309,6 +314,15 @@ describe('Real execution submission gate persistence (e2e)', () => {
       financialReconciliationRequired: true,
       financialReconciliationComplete: false,
       actualReceivedQuantity: null,
+      submissionRetryAllowed: false,
+    });
+    if (finished === null) throw new Error('expected reconciliation state');
+    expect(decideAgenticWalletMarketSwapStatusLookup(finished)).toMatchObject({
+      status: 'status_lookup_not_required',
+      command: null,
+      statusLookupRequired: false,
+      providerCallStarted: false,
+      financialReconciliationComplete: false,
       submissionRetryAllowed: false,
     });
   });

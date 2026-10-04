@@ -774,6 +774,25 @@ The projection carries provider status and transaction hash only when durable ev
 - Unit and PostgreSQL E2E tests cover absence, all projection phases, latest-state selection, conservative financial flags, and inconsistent durable evidence.
 - No schema, write, runtime wiring, route, process invocation, provider call, lookup, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
 
+## M10.43 — Terminal-aware swap status lookup decision
+
+M10.43 adds a pure unwired decision policy above the M10.42 projection. The immutable M10.40 receipt always retains its original lookup-required acknowledgment state, so it cannot safely decide whether a later lookup should still occur. The new policy instead validates and consumes the latest projected lifecycle state.
+
+`awaiting_status_observation` and `provider_pending` produce the exact inert M10.37 `market-order list --orderId <orderId> --json` preview. `provider_finished_financial_reconciliation_required` and `provider_failed` return `status_lookup_not_required` with no command. This creates an explicit terminal stop without scheduling, invoking, or polling the provider.
+
+The projection validator checks its scope, provider, canonical gate, option-safe provider order ID, valid receipt and observation dates, observation identity presence, canonical optional transaction hash, exact phase/status/terminal/success/lookup combinations, incomplete financial reconciliation, unknown actual received quantity, and forbidden submission retry. Invalid evidence blocks without a command or provider call.
+
+### M10.43 acceptance criteria
+
+- Awaiting-first-observation and pending projections produce only the exact read-only non-executable lookup preview.
+- Finished and failed projections require no further status lookup and produce no command.
+- Finished still requires financial reconciliation and cannot claim an actual received quantity.
+- Failed remains terminal and cannot permit submission retry.
+- Every complete projection invariant is revalidated before a decision; malformed evidence blocks closed.
+- Provider call remains unstarted on ready, terminal, and blocked paths.
+- Focused unit tests cover both lookup-required phases, both terminal phases, and malformed identity, time, hash, lifecycle, financial, and retry facts; PostgreSQL E2E proves the durable projection drives the same terminal stop.
+- No schema, persistence, runtime wiring, route, process invocation, provider call, lookup, polling, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
