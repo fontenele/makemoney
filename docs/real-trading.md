@@ -884,6 +884,26 @@ The claim is released in a `finally` block after every admitted attempt, includi
 - The limitation to process-local coordination is explicit; no multi-process guarantee is claimed.
 - No schema, runtime wiring, route, live process invocation, provider call, polling, waiting, schedule, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
 
+## M10.49 — Pending-status lookup cadence decision
+
+M10.49 adds a pure, unwired cadence decision above M10.43. A state awaiting its first status observation remains immediately eligible for the existing inert read-only command preview. Once the latest durable state is provider `PENDING`, a repeated preview is withheld until the immutable observation recording time plus an explicit minimum interval. The result exposes that exact next eligible instant but never waits, schedules, invokes, or persists anything.
+
+The caller must supply an evaluation time and a safe-integer interval from 1,000 through 3,600,000 milliseconds. Invalid intervals, invalid clocks, evaluation before the receipt, and evaluation before the latest observation fail closed. At the exact eligibility boundary the preview becomes ready. Finished and failed states preserve M10.43's terminal stop without requiring valid cadence inputs because no further lookup is permitted.
+
+This policy is deliberately not integrated into the M10.48 coordinator yet. Selecting an operational interval, injecting an authoritative clock, and enforcing the decision at the runner boundary remain separately reviewable work. Financial reconciliation remains incomplete, actual received quantity remains unknown, and submission retry stays forbidden.
+
+### M10.49 acceptance criteria
+
+- Awaiting the first observation produces the existing inert lookup preview without a cooldown.
+- A provider-pending state before its observation time plus the selected interval returns deferred with no command.
+- The exact interval boundary and later evaluation produce the existing read-only preview.
+- The interval is an explicit safe integer from one second through one hour; invalid values block closed.
+- Invalid or regressed evaluation times block without a command.
+- Finished and failed states remain lookup-not-required regardless of unused cadence inputs.
+- Every result keeps provider call unstarted, financial reconciliation incomplete, and submission retry forbidden.
+- Focused unit tests cover initial, deferred, exact-boundary, terminal, invalid-interval, invalid-clock, and invalid-state behavior.
+- No coordinator integration, schema, persistence, runtime wiring, route, process invocation, provider call, waiting, polling, timer, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

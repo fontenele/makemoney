@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-05 — Bound repeated pending-status lookups without scheduling them
+
+M10.49 adds a pure cadence decision above the M10.43 terminal-aware lookup policy. Awaiting the first observation remains immediately eligible because there is no prior status read to rate-limit. Once durable `PENDING` evidence exists, the next read-only preview is withheld until its immutable observation recording time plus an explicit minimum interval. The interval is a caller-selected safe integer from one second through one hour; no project value is silently chosen.
+
+The decision uses an explicit evaluation time, rejects invalid or regressed clocks, and exposes the exact next eligible instant without waiting or scheduling. Terminal evidence takes precedence and continues to return lookup-not-required regardless of unused cadence inputs. The policy remains separate from M10.48, so integration, runtime configuration, and any cross-process enforcement remain later reviewable scope.
+
 ## 2026-10-04 — Block overlapping reconciliation attempts per gate in-process
 
 M10.48 adds a process-local claim keyed by the canonical gate ID around the complete M10.47 one-shot boundary. While one attempt is active, another explicit call for the same gate returns `reconciliation_attempt_in_progress` before durable context loading, provider access, or persistence. A `finally` release permits a later explicit attempt after either success or failure.

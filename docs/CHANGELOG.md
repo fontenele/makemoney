@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-05 — Add a pending-status lookup cadence decision
+
+- Added a pure, unwired cadence policy above the existing terminal-aware status lookup decision.
+- Kept the first status observation immediately eligible while deferring repeated lookups after durable `PENDING` evidence until an exact time boundary.
+- Required an explicit safe-integer interval from one second through one hour instead of selecting an operational value implicitly.
+- Rejected invalid or regressed evaluation times and exposed the exact next eligible instant without waiting or scheduling.
+- Preserved terminal lookup suppression independently of cadence inputs.
+- Added 14 focused tests covering initial, deferred, boundary-ready, terminal, malformed interval, malformed clock, and malformed-state behavior.
+- Added no coordinator integration, schema, persistence, runtime wiring, route, process invocation, provider call, polling, waiting, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,062 backend tests across 181 suites, all 91 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-04 — Guard concurrent status reconciliation per gate
 
 - Added a process-local active-attempt claim around the complete unwired one-shot reconciliation boundary.
