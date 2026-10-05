@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-05 — Discover due reconciliation without claiming or running it
+
+M10.51 introduces a bounded read model before any automatic status-reconciliation lifecycle. One PostgreSQL query selects only immutable pending-confirmation receipts with no observation or a latest `PENDING` observation whose recording time has reached the explicit cadence boundary. Latest terminal evidence is excluded, and deterministic exact-eligibility/gate ordering plus a 1–100 limit bounds each read.
+
+Discovery deliberately returns advisory gate identities rather than trusted execution context. M10.50 still reloads and validates the gate, receipt, latest projection, clock, and cadence immediately before any runner call, closing races between discovery and attempted reconciliation. The reader does not claim work, coordinate processes, invoke the coordinator, or create a worker; those concurrency and lifecycle choices remain separately reviewable before runtime registration.
+
 ## 2026-10-05 — Enforce cadence at the one-shot runner boundary
 
 M10.50 injects both the evaluation clock and explicit minimum lookup interval into the unwired reconciliation coordinator. After durable context validation, the coordinator applies M10.49 before constructing the dedicated read-only runner command. A pending state inside its interval returns `status_lookup_deferred` with the exact next eligible instant and performs neither provider access nor persistence; the exact boundary admits the existing one-lookup flow.

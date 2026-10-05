@@ -20,6 +20,7 @@ import { PrismaAgenticWalletMarketSwapSubmissionReceiptStore } from '../src/modu
 import { PrismaAgenticWalletMarketSwapReconciliationStateStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-reconciliation-state.store';
 import { PrismaAgenticWalletMarketSwapStatusObservationStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-observation.store';
 import { PrismaAgenticWalletMarketSwapStatusReconciliationContextStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-reconciliation-context.store';
+import { PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-reconciliation-candidate.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -31,6 +32,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let statusStore: PrismaAgenticWalletMarketSwapStatusObservationStore;
   let reconciliationStore: PrismaAgenticWalletMarketSwapReconciliationStateStore;
   let reconciliationContextStore: PrismaAgenticWalletMarketSwapStatusReconciliationContextStore;
+  let reconciliationCandidateStore: PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -48,6 +50,10 @@ describe('Real execution submission gate persistence (e2e)', () => {
       new PrismaAgenticWalletMarketSwapReconciliationStateStore(prisma);
     reconciliationContextStore =
       new PrismaAgenticWalletMarketSwapStatusReconciliationContextStore(prisma);
+    reconciliationCandidateStore =
+      new PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore(
+        prisma,
+      );
   });
 
   beforeEach(async () => {
@@ -398,6 +404,66 @@ describe('Real execution submission gate persistence (e2e)', () => {
     await expect(prisma.realExecutionStatusObservation.count()).resolves.toBe(
       1,
     );
+  });
+
+  it('lists only bounded durable reconciliation candidates whose cadence is due', async () => {
+    await store.create(command(10));
+    await receiptStore.record(submissionReceipt(10));
+
+    await expect(
+      reconciliationCandidateStore.listDue({
+        evaluatedAt: new Date('2026-10-03T12:00:05.000Z'),
+        minimumLookupIntervalMs: 1_000,
+        limit: 1,
+      }),
+    ).resolves.toMatchObject([
+      {
+        gateId: uuid(10),
+        phase: 'awaiting_status_observation',
+        eligibleAt: new Date('2026-10-03T12:00:05.000Z'),
+      },
+    ]);
+
+    await statusStore.record(statusObservation(10));
+    await expect(
+      reconciliationCandidateStore.listDue({
+        evaluatedAt: new Date('2026-10-03T12:00:06.999Z'),
+        minimumLookupIntervalMs: 1_000,
+        limit: 1,
+      }),
+    ).resolves.toEqual([]);
+    await expect(
+      reconciliationCandidateStore.listDue({
+        evaluatedAt: new Date('2026-10-03T12:00:07.000Z'),
+        minimumLookupIntervalMs: 1_000,
+        limit: 1,
+      }),
+    ).resolves.toMatchObject([
+      {
+        gateId: uuid(10),
+        phase: 'provider_pending',
+        latestObservationRecordedAt: new Date('2026-10-03T12:00:06.000Z'),
+        eligibleAt: new Date('2026-10-03T12:00:07.000Z'),
+      },
+    ]);
+
+    await statusStore.record(
+      statusObservation(10, {
+        providerStatus: 'FINISHED',
+        transactionHash: `0x${'a'.repeat(64)}`,
+        updatedAt: new Date('2026-10-03T12:00:06.500Z'),
+        terminal: true,
+        executionSucceeded: true,
+        statusLookupRequired: false,
+      }),
+    );
+    await expect(
+      reconciliationCandidateStore.listDue({
+        evaluatedAt: new Date('2026-10-03T12:00:08.000Z'),
+        minimumLookupIntervalMs: 1_000,
+        limit: 1,
+      }),
+    ).resolves.toEqual([]);
   });
 
   it('enforces pending-status cadence from durable observation time at the runner boundary', async () => {

@@ -924,6 +924,27 @@ The coordinator remains unregistered and has no automatic caller. PostgreSQL E2E
 - Focused unit tests and PostgreSQL E2E cover deferral, exact-boundary admission, malformed inputs, and durable enforcement with test doubles.
 - No schema, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.51 — Bounded due status-reconciliation discovery
+
+M10.51 adds an unwired read-only Prisma store that discovers which durable Agentic Wallet status reconciliations are due without invoking them. The caller supplies a valid evaluation time, the same explicit one-second-to-one-hour minimum interval used by M10.49–M10.50, and a limit from one through 100. A receipt with no status observation is eligible from its recording time; a receipt whose latest observation is `PENDING` is eligible at that observation's recording time plus the interval. Latest `FINISHED` and `FAILED` evidence is excluded by the query.
+
+The query uses each receipt's highest observation sequence, orders candidates by the exact derived eligibility instant and then gate ID, and applies the limit in PostgreSQL. Returned records expose the derived phase and exact eligibility instant but remain advisory. They do not contain the complete gate or grant permission to call the provider. A future caller must pass each gate ID to M10.50, which reloads and revalidates all durable evidence and cadence at the runner boundary; a race can therefore only cause a safe terminal/deferred/block result.
+
+The reader validates every input before persistence access and fails closed if a selected row cannot represent either awaiting-first-observation or provider-pending evidence. It is not registered in NestJS and has no claim, lease, runner, coordinator, timer, worker, or loop. PostgreSQL E2E proves awaiting inclusion, pre-boundary omission, exact-boundary inclusion, and terminal exclusion without calling the Agentic Wallet CLI or provider.
+
+### M10.51 acceptance criteria
+
+- Evaluation time, minimum lookup interval, and limit are explicit and validated before database access.
+- The limit is a safe integer from one through 100, and the interval remains bounded from one second through one hour.
+- Receipts awaiting their first observation are eligible no earlier than their durable recording time.
+- Latest provider-`PENDING` evidence is eligible exactly at its recording time plus the interval.
+- Latest `FINISHED`, `FAILED`, future, or not-yet-due evidence is not returned.
+- Results are deterministically ordered and bounded in PostgreSQL.
+- Selected rows are structurally validated and expose only advisory identity/timing facts with reconciliation incomplete and submission retry forbidden.
+- M10.50 remains responsible for complete context reload, cadence recheck, per-gate guarding, runner invocation, and persistence.
+- Focused unit tests and PostgreSQL E2E cover bounded input, malformed evidence, awaiting, deferred, boundary-ready, and terminal behavior.
+- No schema, claim, lease, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-05 — Add bounded due status-reconciliation discovery
+
+- Added an unwired read-only Prisma candidate store for durable Agentic Wallet status reconciliations whose cadence is due.
+- Made awaiting-first-observation receipts eligible at their recording time and provider-`PENDING` receipts eligible only at the latest observation recording time plus the explicit interval.
+- Excluded terminal latest evidence in the bounded database query and returned deterministic oldest-eligibility-first candidates with gate identity as the tie-breaker.
+- Required a valid evaluation time, a one-second-to-one-hour interval, and a limit from 1 through 100 before persistence access.
+- Kept discovery advisory: M10.50 must reload and revalidate complete durable context before any runner call, and the reader neither claims work nor invokes the coordinator.
+- Added focused unit coverage and PostgreSQL E2E coverage for awaiting, pre-boundary, exact-boundary, terminal, malformed-input, and malformed-row behavior.
+- Added no schema, claim, lease, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,075 backend tests across 182 suites, all 93 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-05 — Enforce pending-status cadence in explicit reconciliation
 
 - Integrated the M10.49 cadence decision into the unwired one-shot status reconciliation coordinator with an injected clock and explicit minimum interval.
