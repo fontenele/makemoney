@@ -7,10 +7,7 @@ import {
   AgenticWalletMarketSwapStatusReconciliationContext,
   AgenticWalletMarketSwapStatusReconciliationContextStore,
 } from './agentic-wallet-market-swap-status-reconciliation-context.store';
-import {
-  AgenticWalletMarketSwapStatusLookupRunner,
-  prepareAgenticWalletMarketSwapStatusLookupCommand,
-} from './agentic-wallet-market-swap-status-lookup-runner';
+import { AgenticWalletMarketSwapStatusLookupRunner } from './agentic-wallet-market-swap-status-lookup-runner';
 import {
   AgenticWalletMarketSwapStatusObservationStore,
   StoredAgenticWalletMarketSwapStatusObservation,
@@ -19,7 +16,10 @@ import {
   AgenticWalletMarketSwapStatusResponseBlocker,
   assessAgenticWalletMarketSwapStatusResponse,
 } from './agentic-wallet-market-swap-status-response';
-import { decideAgenticWalletMarketSwapStatusLookup } from './agentic-wallet-market-swap-status-lookup-decision';
+import {
+  AgenticWalletMarketSwapStatusLookupCadenceBlocker,
+  decideAgenticWalletMarketSwapStatusLookupCadence,
+} from './agentic-wallet-market-swap-status-lookup-cadence';
 import { isValidAgenticWalletMarketSwapSubmissionReceipt } from './agentic-wallet-market-swap-submission-response';
 
 export type AgenticWalletMarketSwapStatusReconciliationAttemptBlocker =
@@ -31,18 +31,22 @@ export type AgenticWalletMarketSwapStatusReconciliationAttemptBlocker =
   | 'reconciliation_context_not_found'
   | 'invalid_reconciliation_state'
   | 'reconciliation_evidence_mismatch'
+  | AgenticWalletMarketSwapStatusLookupCadenceBlocker
   | AgenticWalletMarketSwapStatusResponseBlocker;
 
 export interface AgenticWalletMarketSwapStatusReconciliationAttemptResult {
   readonly scope: 'agentic_wallet_market_swap_status_reconciliation_attempt';
   readonly status:
     | 'blocked'
+    | 'status_lookup_deferred'
     | 'status_lookup_not_required'
     | 'status_response_invalid'
     | 'status_observation_recorded';
   readonly blockers: readonly AgenticWalletMarketSwapStatusReconciliationAttemptBlocker[];
   readonly storedObservation: StoredAgenticWalletMarketSwapStatusObservation | null;
   readonly observationReplayed: boolean;
+  readonly evaluatedAt: Date | null;
+  readonly nextStatusLookupAt: Date | null;
   readonly providerCallStarted: boolean;
   readonly providerCallCompleted: boolean;
   readonly statusLookupRequired: boolean;
@@ -58,6 +62,8 @@ export class AgenticWalletMarketSwapStatusReconciliationAttempt {
     private readonly contextStore: AgenticWalletMarketSwapStatusReconciliationContextStore,
     private readonly lookupRunner: AgenticWalletMarketSwapStatusLookupRunner,
     private readonly observationStore: AgenticWalletMarketSwapStatusObservationStore,
+    private readonly now: () => Date,
+    private readonly minimumLookupIntervalMs: number,
   ) {}
 
   async reconcileOnce(
@@ -103,15 +109,42 @@ export class AgenticWalletMarketSwapStatusReconciliationAttempt {
     if (!matchesEvidence(context, state)) {
       return result('blocked', ['reconciliation_evidence_mismatch']);
     }
+    if (!state.statusLookupRequired) {
+      return result('status_lookup_not_required', [], false);
+    }
 
-    const decision = decideAgenticWalletMarketSwapStatusLookup(state);
+    const evaluatedAt = this.now();
+    const decision = decideAgenticWalletMarketSwapStatusLookupCadence(
+      state,
+      evaluatedAt,
+      this.minimumLookupIntervalMs,
+    );
+    if (decision.status === 'blocked') {
+      return result('blocked', decision.blockers);
+    }
     if (decision.status === 'status_lookup_not_required') {
       return result('status_lookup_not_required', [], false);
     }
-    const command = prepareAgenticWalletMarketSwapStatusLookupCommand(decision);
-    if (command === null) {
+    if (decision.status === 'status_lookup_deferred') {
+      return result(
+        'status_lookup_deferred',
+        [],
+        true,
+        false,
+        false,
+        null,
+        false,
+        decision.evaluatedAt,
+        decision.nextStatusLookupAt,
+      );
+    }
+    if (decision.command === null) {
       return result('blocked', ['invalid_reconciliation_state']);
     }
+    const command = {
+      kind: 'market_order_status_lookup' as const,
+      providerOrderId: decision.command.providerOrderId,
+    };
 
     const response = await this.lookupRunner.run(command, signal);
     const assessment = assessAgenticWalletMarketSwapStatusResponse(
@@ -126,6 +159,10 @@ export class AgenticWalletMarketSwapStatusReconciliationAttempt {
         state.statusLookupRequired,
         true,
         true,
+        null,
+        false,
+        decision.evaluatedAt,
+        decision.nextStatusLookupAt,
       );
     }
 
@@ -138,6 +175,8 @@ export class AgenticWalletMarketSwapStatusReconciliationAttempt {
       true,
       recorded.stored,
       recorded.replayed,
+      decision.evaluatedAt,
+      decision.nextStatusLookupAt,
     );
   }
 }
@@ -176,6 +215,8 @@ function result(
   providerCallCompleted = false,
   storedObservation: StoredAgenticWalletMarketSwapStatusObservation | null = null,
   observationReplayed = false,
+  evaluatedAt: Date | null = null,
+  nextStatusLookupAt: Date | null = null,
 ): AgenticWalletMarketSwapStatusReconciliationAttemptResult {
   return {
     scope: 'agentic_wallet_market_swap_status_reconciliation_attempt',
@@ -183,6 +224,8 @@ function result(
     blockers,
     storedObservation,
     observationReplayed,
+    evaluatedAt,
+    nextStatusLookupAt,
     providerCallStarted,
     providerCallCompleted,
     statusLookupRequired,

@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-05 — Enforce pending-status cadence in explicit reconciliation
+
+- Integrated the M10.49 cadence decision into the unwired one-shot status reconciliation coordinator with an injected clock and explicit minimum interval.
+- Kept the first status observation immediately eligible and returned `status_lookup_deferred` before runner access while durable `PENDING` evidence remains inside the selected interval.
+- Allowed one read-only lookup at the exact durable observation-time boundary plus the interval, while preserving terminal suppression, per-gate overlap protection, one-write maximum, cancellation forwarding, and no retry.
+- Exposed the evaluation instant and next eligible lookup instant in admitted/deferred attempt results for audit without waiting or scheduling.
+- Added unit and PostgreSQL E2E coverage for pre-boundary deferral, exact-boundary admission, invalid clock/interval rejection, and durable runner-boundary enforcement using test doubles only.
+- Added no schema, NestJS registration, route, live process invocation, provider call, polling, timer, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,065 backend tests across 181 suites, all 92 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-05 — Add a pending-status lookup cadence decision
 
 - Added a pure, unwired cadence policy above the existing terminal-aware status lookup decision.

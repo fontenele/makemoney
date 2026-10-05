@@ -9,6 +9,8 @@ import { AgenticWalletMarketSwapStatusReconciliationContext } from './agentic-wa
 import { AgenticWalletMarketSwapSubmissionReceipt } from './agentic-wallet-market-swap-submission-response';
 
 const GATE_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+const EVALUATED_AT = new Date('2026-10-03T12:00:07.000Z');
+const MINIMUM_LOOKUP_INTERVAL_MS = 1_000;
 
 describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
   it('blocks an overlapping attempt for the same gate and releases the gate afterward', async () => {
@@ -51,6 +53,8 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
         status: 'status_observation_recorded',
         blockers: [],
         observationReplayed: false,
+        evaluatedAt: EVALUATED_AT,
+        nextStatusLookupAt: null,
         providerCallStarted: true,
         providerCallCompleted: true,
         statusLookupRequired: true,
@@ -70,6 +74,64 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
         statusLookupRequired: true,
       }),
     );
+  });
+
+  it('defers a repeated pending lookup until the configured cadence boundary', async () => {
+    const harness = createHarness({
+      now: new Date('2026-10-03T12:00:06.999Z'),
+      context: pendingReconciliationContext(),
+    });
+
+    await expect(harness.attempt.reconcileOnce(GATE_ID)).resolves.toMatchObject(
+      {
+        status: 'status_lookup_deferred',
+        blockers: [],
+        evaluatedAt: new Date('2026-10-03T12:00:06.999Z'),
+        nextStatusLookupAt: EVALUATED_AT,
+        providerCallStarted: false,
+        providerCallCompleted: false,
+        statusLookupRequired: true,
+      },
+    );
+    expect(harness.run).not.toHaveBeenCalled();
+    expect(harness.record).not.toHaveBeenCalled();
+  });
+
+  it('allows a repeated pending lookup at the exact cadence boundary', async () => {
+    const harness = createHarness({ context: pendingReconciliationContext() });
+
+    await expect(harness.attempt.reconcileOnce(GATE_ID)).resolves.toMatchObject(
+      {
+        status: 'status_observation_recorded',
+        evaluatedAt: EVALUATED_AT,
+        nextStatusLookupAt: EVALUATED_AT,
+        providerCallStarted: true,
+      },
+    );
+    expect(harness.run).toHaveBeenCalledTimes(1);
+  });
+
+  it('blocks an invalid cadence clock or interval before provider access', async () => {
+    const regressedClock = createHarness({
+      now: new Date('2026-10-03T12:00:05.999Z'),
+      context: pendingReconciliationContext(),
+    });
+    await expect(
+      regressedClock.attempt.reconcileOnce(GATE_ID),
+    ).resolves.toMatchObject({
+      status: 'blocked',
+      blockers: ['invalid_evaluation_time'],
+    });
+    expect(regressedClock.run).not.toHaveBeenCalled();
+
+    const invalidInterval = createHarness({ minimumLookupIntervalMs: 999 });
+    await expect(
+      invalidInterval.attempt.reconcileOnce(GATE_ID),
+    ).resolves.toMatchObject({
+      status: 'blocked',
+      blockers: ['invalid_minimum_lookup_interval'],
+    });
+    expect(invalidInterval.run).not.toHaveBeenCalled();
   });
 
   it('records a finished provider state without claiming financial reconciliation', async () => {
@@ -144,6 +206,7 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
     );
     expect(harness.run).not.toHaveBeenCalled();
     expect(harness.record).not.toHaveBeenCalled();
+    expect(harness.clock).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -303,6 +366,8 @@ function createHarness(
     response?: unknown;
     lookupError?: Error;
     storeError?: Error;
+    now?: Date;
+    minimumLookupIntervalMs?: number;
   } = {},
 ) {
   const context =
@@ -323,16 +388,31 @@ function createHarness(
           replayed: false,
         }),
       );
+  const clock = jest.fn(() => new Date(options.now ?? EVALUATED_AT));
   return {
     attempt: new AgenticWalletMarketSwapStatusReconciliationAttempt(
       { getByGateId },
       { run } as AgenticWalletMarketSwapStatusLookupRunner,
       { record } as AgenticWalletMarketSwapStatusObservationStore,
+      clock,
+      options.minimumLookupIntervalMs ?? MINIMUM_LOOKUP_INTERVAL_MS,
     ),
+    clock,
     getByGateId,
     run,
     record,
   };
+}
+
+function pendingReconciliationContext(): AgenticWalletMarketSwapStatusReconciliationContext {
+  return reconciliationContext({
+    reconciliationState: reconciliationState({
+      phase: 'provider_pending',
+      providerStatus: 'PENDING',
+      latestObservationId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+      latestObservationRecordedAt: new Date('2026-10-03T12:00:06.000Z'),
+    }),
+  });
 }
 
 function providerResponse(

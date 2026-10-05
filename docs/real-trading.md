@@ -904,6 +904,26 @@ This policy is deliberately not integrated into the M10.48 coordinator yet. Sele
 - Focused unit tests cover initial, deferred, exact-boundary, terminal, invalid-interval, invalid-clock, and invalid-state behavior.
 - No coordinator integration, schema, persistence, runtime wiring, route, process invocation, provider call, waiting, polling, timer, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.50 — Pending-status cadence enforcement
+
+M10.50 integrates the M10.49 decision into the unwired M10.48 guarded one-shot coordinator. The coordinator receives an injected clock and explicit minimum interval. It validates and correlates durable gate, receipt, and reconciliation evidence first, evaluates cadence second, and reaches the dedicated read-only runner only when the first observation is still absent or a durable provider-`PENDING` state has reached its exact eligibility boundary.
+
+A pending state inside the interval returns `status_lookup_deferred`, the evaluation instant, and the exact next eligible instant without invoking the runner or observation store. Invalid intervals and regressed clocks block closed. Terminal evidence still returns lookup-not-required, and an admitted call remains bounded to one lookup and one monotonic persistence attempt. The process-local per-gate claim continues to cover the entire operation, including deferred decisions, and every later attempt reloads durable context rather than trusting prior in-memory timing state.
+
+The coordinator remains unregistered and has no automatic caller. PostgreSQL E2E composes the real context and observation stores with a runner test double to prove that durable `PENDING` evidence prevents a call one millisecond before the boundary and permits exactly one call at the boundary. No Agentic Wallet CLI or provider was invoked.
+
+### M10.50 acceptance criteria
+
+- The coordinator takes an explicit clock and minimum interval rather than selecting an operational cadence internally.
+- Durable context is validated before clock evaluation or provider access.
+- Awaiting-first-observation context remains immediately eligible for one read-only lookup.
+- Provider-pending context before the exact cadence boundary returns deferred with no runner call or write.
+- The exact boundary and later instants admit at most one lookup and one monotonic persistence attempt.
+- Invalid or regressed clocks and out-of-range intervals block before provider access.
+- Terminal suppression, same-gate overlap protection, cancellation forwarding, propagated failures, and forbidden submission retry remain unchanged.
+- Focused unit tests and PostgreSQL E2E cover deferral, exact-boundary admission, malformed inputs, and durable enforcement with test doubles.
+- No schema, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

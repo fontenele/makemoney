@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-05 — Enforce cadence at the one-shot runner boundary
+
+M10.50 injects both the evaluation clock and explicit minimum lookup interval into the unwired reconciliation coordinator. After durable context validation, the coordinator applies M10.49 before constructing the dedicated read-only runner command. A pending state inside its interval returns `status_lookup_deferred` with the exact next eligible instant and performs neither provider access nor persistence; the exact boundary admits the existing one-lookup flow.
+
+The interval remains explicit rather than becoming hidden runtime configuration, and the coordinator still has no automatic caller. Terminal suppression takes precedence, the process-local same-gate claim remains around the complete attempt, and invalid time or interval input fails closed. This composes existing safeguards without adding waiting, polling, timers, scheduling, NestJS registration, live CLI access, or execution authority.
+
 ## 2026-10-05 — Bound repeated pending-status lookups without scheduling them
 
 M10.49 adds a pure cadence decision above the M10.43 terminal-aware lookup policy. Awaiting the first observation remains immediately eligible because there is no prior status read to rate-limit. Once durable `PENDING` evidence exists, the next read-only preview is withheld until its immutable observation recording time plus an explicit minimum interval. The interval is a caller-selected safe integer from one second through one hour; no project value is silently chosen.

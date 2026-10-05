@@ -376,6 +376,8 @@ describe('Real execution submission gate persistence (e2e)', () => {
         },
       },
       statusStore,
+      () => new Date('2026-10-03T12:00:07.000Z'),
+      1_000,
     );
 
     await expect(attempt.reconcileOnce(uuid(10))).resolves.toMatchObject({
@@ -395,6 +397,51 @@ describe('Real execution submission gate persistence (e2e)', () => {
     expect(lookupCalls).toBe(1);
     await expect(prisma.realExecutionStatusObservation.count()).resolves.toBe(
       1,
+    );
+  });
+
+  it('enforces pending-status cadence from durable observation time at the runner boundary', async () => {
+    await store.create(command(10));
+    await receiptStore.record(submissionReceipt(10));
+    await statusStore.record(statusObservation(10));
+    let evaluatedAt = new Date('2026-10-03T12:00:06.999Z');
+    let lookupCalls = 0;
+    const attempt = new AgenticWalletMarketSwapStatusReconciliationAttempt(
+      reconciliationContextStore,
+      {
+        run: () => {
+          lookupCalls += 1;
+          return Promise.resolve(finishedStatusLookupResponse());
+        },
+      },
+      statusStore,
+      () => evaluatedAt,
+      1_000,
+    );
+
+    await expect(attempt.reconcileOnce(uuid(10))).resolves.toMatchObject({
+      status: 'status_lookup_deferred',
+      evaluatedAt,
+      nextStatusLookupAt: new Date('2026-10-03T12:00:07.000Z'),
+      providerCallStarted: false,
+      statusLookupRequired: true,
+    });
+    expect(lookupCalls).toBe(0);
+    await expect(prisma.realExecutionStatusObservation.count()).resolves.toBe(
+      1,
+    );
+
+    evaluatedAt = new Date('2026-10-03T12:00:07.000Z');
+    await expect(attempt.reconcileOnce(uuid(10))).resolves.toMatchObject({
+      status: 'status_observation_recorded',
+      evaluatedAt,
+      nextStatusLookupAt: evaluatedAt,
+      providerCallStarted: true,
+      statusLookupRequired: false,
+    });
+    expect(lookupCalls).toBe(1);
+    await expect(prisma.realExecutionStatusObservation.count()).resolves.toBe(
+      2,
     );
   });
 
