@@ -23,6 +23,7 @@ import { decideAgenticWalletMarketSwapStatusLookup } from './agentic-wallet-mark
 import { isValidAgenticWalletMarketSwapSubmissionReceipt } from './agentic-wallet-market-swap-submission-response';
 
 export type AgenticWalletMarketSwapStatusReconciliationAttemptBlocker =
+  | 'reconciliation_attempt_in_progress'
   | 'invalid_submission_gate'
   | 'invalid_submission_receipt'
   | 'invalid_submission_receipt_timing'
@@ -51,6 +52,8 @@ export interface AgenticWalletMarketSwapStatusReconciliationAttemptResult {
 }
 
 export class AgenticWalletMarketSwapStatusReconciliationAttempt {
+  private readonly activeGateIds = new Set<string>();
+
   constructor(
     private readonly contextStore: AgenticWalletMarketSwapStatusReconciliationContextStore,
     private readonly lookupRunner: AgenticWalletMarketSwapStatusLookupRunner,
@@ -58,6 +61,21 @@ export class AgenticWalletMarketSwapStatusReconciliationAttempt {
   ) {}
 
   async reconcileOnce(
+    gateId: string,
+    signal?: AbortSignal,
+  ): Promise<AgenticWalletMarketSwapStatusReconciliationAttemptResult> {
+    if (this.activeGateIds.has(gateId)) {
+      return result('blocked', ['reconciliation_attempt_in_progress']);
+    }
+    this.activeGateIds.add(gateId);
+    try {
+      return await this.reconcileClaimedOnce(gateId, signal);
+    } finally {
+      this.activeGateIds.delete(gateId);
+    }
+  }
+
+  private async reconcileClaimedOnce(
     gateId: string,
     signal?: AbortSignal,
   ): Promise<AgenticWalletMarketSwapStatusReconciliationAttemptResult> {

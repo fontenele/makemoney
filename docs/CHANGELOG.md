@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-04 — Guard concurrent status reconciliation per gate
+
+- Added a process-local active-attempt claim around the complete unwired one-shot reconciliation boundary.
+- Blocked an overlapping call for the same gate before context loading, provider access, or persistence with the explicit `reconciliation_attempt_in_progress` reason.
+- Released the claim after both successful completion and propagated failure so later explicit attempts remain possible.
+- Documented that this guard does not provide multi-process coordination and must be revisited before any multi-instance runtime wiring.
+- Added focused tests for overlap suppression and release after success and runner failure.
+- Added no schema, runtime wiring, route, live process invocation, provider call, polling, waiting, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,048 backend tests across 180 suites, all 91 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-04 — Bind one-shot status reconciliation to durable context
 
 - Changed the unwired one-shot coordinator to accept only a gate ID and load M10.46 gate, receipt, and projection evidence itself.

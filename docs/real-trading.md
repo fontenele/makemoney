@@ -867,6 +867,23 @@ PostgreSQL E2E composes the real context and observation stores with a runner te
 - Unit tests cover context validation, all provider outcomes, terminal stop, invalid response, cancellation, and failures; PostgreSQL E2E covers durable terminal persistence and reload.
 - No schema, runtime wiring, route, live process invocation, provider call, polling, schedule, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
 
+## M10.48 — Per-gate concurrent status reconciliation guard
+
+M10.48 places a process-local active-attempt claim around the complete M10.47 one-shot boundary. The first explicit call for a gate proceeds normally. Any overlapping call for that same gate returns a blocked result with `reconciliation_attempt_in_progress` before loading durable context, starting the provider runner, or attempting persistence. It does not wait for or share the first call, so caller cancellation remains isolated.
+
+The claim is released in a `finally` block after every admitted attempt, including runner and persistence failures. A later explicit call can therefore reload the latest durable state and independently apply the terminal stop. Claims are keyed per gate, and the guard intentionally covers only one coordinator instance in the current process. It is not a database lease or distributed lock; multi-process coordination must be designed separately before any multi-instance runtime wiring.
+
+### M10.48 acceptance criteria
+
+- At most one attempt for a gate can be active in one coordinator instance.
+- An overlapping same-gate call blocks before context loading, provider access, and persistence.
+- The blocked call neither waits for the active call nor shares its cancellation signal.
+- Success and propagated failure both release the gate for a later explicit attempt.
+- The existing durable validation, terminal stop, one-lookup bound, monotonic write, and no-retry behavior remain unchanged for admitted calls.
+- Focused unit tests prove overlap suppression and claim release after success and lookup failure.
+- The limitation to process-local coordination is explicit; no multi-process guarantee is claimed.
+- No schema, runtime wiring, route, live process invocation, provider call, polling, waiting, schedule, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-04 — Block overlapping reconciliation attempts per gate in-process
+
+M10.48 adds a process-local claim keyed by the canonical gate ID around the complete M10.47 one-shot boundary. While one attempt is active, another explicit call for the same gate returns `reconciliation_attempt_in_progress` before durable context loading, provider access, or persistence. A `finally` release permits a later explicit attempt after either success or failure.
+
+The claim is intentionally not described as a distributed lock. The coordinator remains unwired in a single modular monolith, so adding a database-backed lease or advisory-lock protocol before a runtime caller exists would be speculative. Any future multi-process registration must revisit cross-process coordination separately. This milestone adds no waiting, promise sharing, cancellation coupling, retry, polling, schedule, or execution authority.
+
 ## 2026-10-04 — Resolve reconciliation evidence inside the one-shot boundary
 
 M10.47 removes independently supplied gate, receipt, and projection values from the one-shot coordinator API. The explicit caller now provides only a gate ID; the coordinator loads the M10.46 durable context, revalidates its complete correlation, and then applies the existing terminal decision, read-only runner, interpreter, and monotonic store.

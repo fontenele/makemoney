@@ -11,6 +11,38 @@ import { AgenticWalletMarketSwapSubmissionReceipt } from './agentic-wallet-marke
 const GATE_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 
 describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
+  it('blocks an overlapping attempt for the same gate and releases the gate afterward', async () => {
+    const response = deferred<unknown>();
+    const harness = createHarness({ response: response.promise });
+
+    const firstAttempt = harness.attempt.reconcileOnce(GATE_ID);
+    await Promise.resolve();
+    expect(harness.run).toHaveBeenCalledTimes(1);
+
+    await expect(harness.attempt.reconcileOnce(GATE_ID)).resolves.toMatchObject(
+      {
+        status: 'blocked',
+        blockers: ['reconciliation_attempt_in_progress'],
+        providerCallStarted: false,
+        providerCallCompleted: false,
+        statusLookupRequired: false,
+      },
+    );
+    expect(harness.getByGateId).toHaveBeenCalledTimes(1);
+    expect(harness.run).toHaveBeenCalledTimes(1);
+    expect(harness.record).not.toHaveBeenCalled();
+
+    response.resolve(providerResponse());
+    await expect(firstAttempt).resolves.toMatchObject({
+      status: 'status_observation_recorded',
+    });
+
+    await expect(harness.attempt.reconcileOnce(GATE_ID)).resolves.toMatchObject(
+      { status: 'status_observation_recorded' },
+    );
+    expect(harness.run).toHaveBeenCalledTimes(2);
+  });
+
   it('records one valid pending observation from one explicit lookup', async () => {
     const harness = createHarness();
 
@@ -232,6 +264,18 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
     expect(harness.record).not.toHaveBeenCalled();
   });
 
+  it('releases the gate after a failed lookup', async () => {
+    const error = new Error('first lookup failed');
+    const harness = createHarness();
+    harness.run.mockRejectedValueOnce(error);
+
+    await expect(harness.attempt.reconcileOnce(GATE_ID)).rejects.toBe(error);
+    await expect(harness.attempt.reconcileOnce(GATE_ID)).resolves.toMatchObject(
+      { status: 'status_observation_recorded' },
+    );
+    expect(harness.run).toHaveBeenCalledTimes(2);
+  });
+
   it('propagates a persistence failure without another lookup or write', async () => {
     const error = new Error('persistence failed');
     const harness = createHarness({ storeError: error });
@@ -241,6 +285,17 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
     expect(harness.record).toHaveBeenCalledTimes(1);
   });
 });
+
+function deferred<T>(): {
+  readonly promise: Promise<T>;
+  readonly resolve: (value: T) => void;
+} {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((promiseResolve) => {
+    resolve = promiseResolve;
+  });
+  return { promise, resolve };
+}
 
 function createHarness(
   options: {
