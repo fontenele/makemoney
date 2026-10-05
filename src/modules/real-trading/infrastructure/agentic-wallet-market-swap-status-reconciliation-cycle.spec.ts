@@ -70,6 +70,53 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     expect(harness.reconcileOnce).not.toHaveBeenCalled();
   });
 
+  it('isolates the admitted cycle from caller and candidate-store input mutation', async () => {
+    let discoveredInput!: {
+      evaluatedAt: Date;
+      minimumLookupIntervalMs: number;
+      limit: number;
+    };
+    let releaseDiscovery!: (
+      candidates: AgenticWalletMarketSwapStatusReconciliationCandidate[],
+    ) => void;
+    const harness = cycleHarness([]);
+    harness.listDue.mockImplementationOnce(
+      (input) =>
+        new Promise((resolve) => {
+          discoveredInput = input;
+          releaseDiscovery = resolve;
+        }),
+    );
+    const callerInput = {
+      evaluatedAt: new Date(EVALUATED_AT),
+      minimumLookupIntervalMs: 1_000,
+      limit: 5,
+    };
+
+    const activeCycle = harness.cycle.runOnce(callerInput);
+    callerInput.evaluatedAt.setTime(
+      new Date('2026-10-05T12:01:00.000Z').getTime(),
+    );
+    callerInput.minimumLookupIntervalMs = 3_600_000;
+    callerInput.limit = 1;
+    discoveredInput.evaluatedAt.setTime(
+      new Date('2026-10-05T12:02:00.000Z').getTime(),
+    );
+    discoveredInput.minimumLookupIntervalMs = 2_000;
+    discoveredInput.limit = 2;
+    releaseDiscovery([candidate(1)]);
+
+    await expect(activeCycle).resolves.toMatchObject({
+      evaluatedAt: EVALUATED_AT,
+      minimumLookupIntervalMs: 1_000,
+      limit: 5,
+      candidateCount: 1,
+      attemptedCount: 1,
+    });
+    expect(discoveredInput).not.toBe(callerInput);
+    expect(discoveredInput.evaluatedAt).not.toBe(callerInput.evaluatedAt);
+  });
+
   it('blocks an overlapping cycle before discovery without waiting', async () => {
     let releaseDiscovery!: (
       candidates: AgenticWalletMarketSwapStatusReconciliationCandidate[],

@@ -1005,6 +1005,26 @@ Cancellation propagates the signal's original abort reason and is never converte
 - Focused unit tests cover pre-discovery, during-discovery, and between-attempt cancellation plus claim release.
 - No schema, candidate-store cancellation contract, database lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.55 — Reconciliation-cycle input snapshot
+
+M10.55 isolates one admitted M10.54 cycle from mutable caller-owned request state. After the existing input validation and before the first asynchronous boundary, the cycle copies the evaluation `Date`, minimum lookup interval, and batch limit into a private snapshot. Overlap reporting, candidate-batch validation, pending cadence correlation, and the final result use only these captured facts.
+
+The candidate store receives a second defensive copy rather than the private snapshot. This matters because TypeScript `readonly` does not make a JavaScript `Date` immutable at runtime: mutation by a caller or adapter could otherwise change the evaluation instant while discovery is pending. Separate copies keep the originally validated request authoritative without changing the store interface.
+
+The snapshot is process-local and ephemeral. It is not persisted, does not claim candidates, and does not provide cross-process coordination. Existing cancellation gates, overlap suppression, sequential attempt order, inner durable-context reload, fail-fast errors, and no-retry behavior remain unchanged.
+
+### M10.55 acceptance criteria
+
+- The complete cycle input is validated before snapshot creation.
+- Evaluation time, minimum lookup interval, and limit are copied before the first `await`.
+- The internal evaluation `Date` is not the caller-owned instance.
+- Candidate discovery receives a separate object and separate `Date` from the internal snapshot.
+- Caller mutation after invocation cannot change discovery semantics, batch validation, cadence checks, or reporting.
+- Discovery-adapter mutation cannot change internal batch validation, cadence checks, or reporting.
+- Cancellation, overlap suppression, bounds, sequential attempts, durable revalidation, fail-fast propagation, and no retry remain unchanged.
+- Focused unit coverage mutates caller and discovery inputs while discovery is pending and proves the validated snapshot remains authoritative.
+- No schema, persistence change, database lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

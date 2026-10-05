@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-05 — Snapshot reconciliation-cycle inputs
+
+- Captured a private defensive copy of the validated evaluation time, minimum lookup interval, and batch limit before asynchronous work.
+- Used the private snapshot for overlap results, candidate validation, cadence boundaries, and final reporting.
+- Passed a separate defensive copy to candidate discovery so adapter-side mutation cannot alter the cycle's internal facts.
+- Added focused coverage that mutates both the caller request and discovery input while the read is pending.
+- Preserved cancellation, process-local overlap suppression, bounded sequential execution, fail-fast propagation, and no retry.
+- Added no schema, persistence change, database lease, NestJS registration, route, live process invocation, live provider call, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,092 backend tests across 183 suites, all 94 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-05 — Gate reconciliation-cycle work on cancellation
 
 - Checked caller cancellation before candidate discovery, immediately after discovery, and before each sequential reconciliation attempt.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-05 — Snapshot cycle inputs before asynchronous work
+
+M10.55 treats the validated evaluation time, cadence, and batch limit as one admitted-cycle snapshot. The cycle copies the mutable `Date` and primitive fields before its first asynchronous boundary and uses only that private copy for overlap results, candidate validation, cadence checks, and final reporting. Caller mutation after invocation can no longer redefine an active cycle.
+
+Candidate discovery receives a second defensive copy rather than the private snapshot. This also prevents an adapter's accidental mutation of its input object or `Date` from influencing later validation. The store contract and all bounds remain unchanged; no serialization, persistence, lease, worker, runtime registration, provider call, or execution authority is introduced.
+
 ## 2026-10-05 — Gate cycle work on caller cancellation
 
 M10.54 makes the caller's cancellation signal authoritative at every boundary before new cycle work starts. An admitted call checks before candidate discovery, immediately after discovery returns, and before each sequential attempt. This prevents a pre-cancelled call from reading persistence, prevents a discovery that completed after cancellation from initiating provider-facing attempts, and stops before the next gate when cancellation arrives between attempts.

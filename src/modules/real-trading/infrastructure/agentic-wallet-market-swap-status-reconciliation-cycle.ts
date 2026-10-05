@@ -52,8 +52,9 @@ export class AgenticWalletMarketSwapStatusReconciliationCycle {
     signal?: AbortSignal,
   ): Promise<AgenticWalletMarketSwapStatusReconciliationCycleResult> {
     validateStatusReconciliationCandidateInput(input);
+    const cycleInput = snapshotCycleInput(input);
     if (this.active) {
-      return cycleResult(input, [], 'blocked', [
+      return cycleResult(cycleInput, [], 'blocked', [
         'reconciliation_cycle_in_progress',
       ]);
     }
@@ -61,9 +62,11 @@ export class AgenticWalletMarketSwapStatusReconciliationCycle {
     this.active = true;
     try {
       signal?.throwIfAborted();
-      const candidates = await this.candidateStore.listDue(input);
+      const candidates = await this.candidateStore.listDue(
+        snapshotCycleInput(cycleInput),
+      );
       signal?.throwIfAborted();
-      validateCandidateBatch(candidates, input);
+      validateCandidateBatch(candidates, cycleInput);
 
       const outcomes: AgenticWalletMarketSwapStatusReconciliationCycleOutcome[] =
         [];
@@ -76,11 +79,21 @@ export class AgenticWalletMarketSwapStatusReconciliationCycle {
         outcomes.push({ candidate, attempt });
       }
 
-      return cycleResult(input, outcomes, 'completed', []);
+      return cycleResult(cycleInput, outcomes, 'completed', []);
     } finally {
       this.active = false;
     }
   }
+}
+
+function snapshotCycleInput(
+  input: ListDueAgenticWalletMarketSwapStatusReconciliationCandidatesInput,
+): ListDueAgenticWalletMarketSwapStatusReconciliationCandidatesInput {
+  return {
+    evaluatedAt: new Date(input.evaluatedAt),
+    minimumLookupIntervalMs: input.minimumLookupIntervalMs,
+    limit: input.limit,
+  };
 }
 
 function cycleResult(
