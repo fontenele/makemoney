@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-05 — Guard the complete manual reconciliation cycle in-process
+
+M10.53 adds one process-local active-call claim to each M10.52 cycle instance. After input validation, a valid overlapping `runOnce` call returns `reconciliation_cycle_in_progress` immediately, before candidate discovery or any per-gate attempt, and does not wait for or share cancellation with the admitted call. This prevents two callers of the same instance from independently discovering different gates and creating cycle-level provider concurrency.
+
+The claim is released in `finally`, including after candidate-read, runner, or persistence failure. It is intentionally not a database lease or distributed lock, so any future multi-process runtime registration must design cross-process coordination separately. The cycle remains explicit, unwired, bounded, sequential, and fail-fast with no worker, timer, schedule, retry, live provider call, or execution authority.
+
 ## 2026-10-05 — Compose a manual fail-fast reconciliation cycle before scheduling
 
 M10.52 composes due discovery and one-shot attempts only behind an explicit `runOnce` call. The candidate batch is independently checked for the configured bound, structural validity, exact evaluation/cadence coherence, and unique gate identities before any attempt. Candidates then run sequentially so one cycle cannot create internal provider concurrency.

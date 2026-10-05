@@ -965,6 +965,26 @@ Candidate-read, runner, or observation-store exceptions stop the cycle at that p
 - Focused unit tests cover empty/summarized cycles, sequentiality, cancellation, invalid batches, discovery failure, and fail-fast attempt failure; PostgreSQL E2E covers durable terminal completion and the next empty cycle.
 - No schema, claim, lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.53 — Process-local reconciliation-cycle guard
+
+M10.53 adds one process-local active-call claim around the complete M10.52 `runOnce` boundary. Inputs are still validated first. While one valid call is active, another valid call on the same cycle instance returns immediately with `reconciliation_cycle_in_progress`, an empty candidate/outcome summary, and no candidate-store or attempt access. The blocked caller neither waits for the active call nor shares its cancellation signal.
+
+The claim covers discovery and every sequential attempt and is released in a `finally` block after normal completion or any propagated candidate-read, runner, or persistence failure. A later explicit call can therefore discover and reload current durable evidence normally. The existing M10.48 per-gate guard remains a separate inner defense.
+
+This claim coordinates only one cycle instance in one process. It is not a database lease or distributed lock and provides no guarantee across instances or processes; that decision remains mandatory before any multi-process runtime wiring. The cycle remains explicit and unwired with no automatic caller, waiting, polling, timer, worker, schedule, retry, or live provider invocation.
+
+### M10.53 acceptance criteria
+
+- At most one `runOnce` call can be active per cycle instance.
+- A valid overlapping call returns immediately before candidate discovery and every attempt.
+- The blocked result reports `reconciliation_cycle_in_progress` with zero candidates, attempts, outcomes, and outcome counts.
+- The blocked caller does not wait, share cancellation, or retry.
+- Success and propagated discovery, runner, or persistence failure release the claim for a later explicit call.
+- Admitted calls preserve bounded discovery, sequential attempts, cadence revalidation, fail-fast propagation, and no retry.
+- Focused unit tests prove overlap suppression and release after discovery and attempt failures.
+- The limitation to one instance in one process is explicit; no distributed or multi-process guarantee is claimed.
+- No schema, database lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

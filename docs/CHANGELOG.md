@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-05 — Guard concurrent manual reconciliation cycles
+
+- Added one process-local active-cycle claim to each unwired manual status-reconciliation cycle instance.
+- Returned `reconciliation_cycle_in_progress` immediately for a valid overlapping call before candidate discovery or any attempt, without waiting or sharing cancellation.
+- Released the claim after success and propagated discovery, runner, or persistence failure so later explicit calls remain available.
+- Kept the existing bounded, sequential, cadence-aware, fail-fast, and no-retry behavior for admitted calls.
+- Documented that the guard is not a distributed lock and provides no multi-process coordination.
+- Added focused coverage for overlap suppression and claim release after discovery and attempt failures.
+- Added no schema, database lease, NestJS registration, route, live process invocation, live provider call, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,088 backend tests across 183 suites, all 94 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-05 — Compose one manual bounded status-reconciliation cycle
 
 - Added an unwired manually invoked cycle that composes one M10.51 due-candidate read with sequential M10.50 reconciliation attempts.

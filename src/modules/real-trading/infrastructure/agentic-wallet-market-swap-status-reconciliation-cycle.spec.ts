@@ -37,6 +37,8 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
 
     await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
       scope: 'agentic_wallet_market_swap_status_reconciliation_cycle',
+      status: 'completed',
+      blockers: [],
       evaluatedAt: EVALUATED_AT,
       minimumLookupIntervalMs: 1_000,
       limit: 5,
@@ -66,6 +68,34 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
       outcomes: [],
     });
     expect(harness.reconcileOnce).not.toHaveBeenCalled();
+  });
+
+  it('blocks an overlapping cycle before discovery without waiting', async () => {
+    let releaseDiscovery!: (
+      candidates: AgenticWalletMarketSwapStatusReconciliationCandidate[],
+    ) => void;
+    const harness = cycleHarness([]);
+    harness.listDue.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseDiscovery = resolve;
+        }),
+    );
+
+    const activeCycle = harness.cycle.runOnce(INPUT);
+
+    await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+      status: 'blocked',
+      blockers: ['reconciliation_cycle_in_progress'],
+      candidateCount: 0,
+      attemptedCount: 0,
+      outcomes: [],
+    });
+    expect(harness.listDue).toHaveBeenCalledTimes(1);
+    expect(harness.reconcileOnce).not.toHaveBeenCalled();
+
+    releaseDiscovery([]);
+    await expect(activeCycle).resolves.toMatchObject({ status: 'completed' });
   });
 
   it('forwards one caller cancellation signal to every sequential attempt', async () => {
@@ -138,7 +168,10 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     harness.listDue.mockRejectedValueOnce(error);
 
     await expect(harness.cycle.runOnce(INPUT)).rejects.toBe(error);
-    expect(harness.listDue).toHaveBeenCalledTimes(1);
+    await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+      status: 'completed',
+    });
+    expect(harness.listDue).toHaveBeenCalledTimes(2);
     expect(harness.reconcileOnce).not.toHaveBeenCalled();
   });
 
@@ -154,6 +187,10 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     );
 
     await expect(harness.cycle.runOnce(INPUT)).rejects.toBe(error);
+    harness.listDue.mockResolvedValueOnce([]);
+    await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+      status: 'completed',
+    });
     expect(reconcileOnce).toHaveBeenCalledTimes(2);
   });
 });

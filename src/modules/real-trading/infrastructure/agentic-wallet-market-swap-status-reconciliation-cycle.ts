@@ -17,6 +17,9 @@ export interface AgenticWalletMarketSwapStatusReconciliationCycleOutcome {
 
 export interface AgenticWalletMarketSwapStatusReconciliationCycleResult {
   readonly scope: 'agentic_wallet_market_swap_status_reconciliation_cycle';
+  readonly status: 'completed' | 'blocked';
+  readonly blockers:
+    readonly [] | readonly ['reconciliation_cycle_in_progress'];
   readonly evaluatedAt: Date;
   readonly minimumLookupIntervalMs: number;
   readonly limit: number;
@@ -34,6 +37,8 @@ export interface AgenticWalletMarketSwapStatusReconciliationCycleResult {
 }
 
 export class AgenticWalletMarketSwapStatusReconciliationCycle {
+  private active = false;
+
   constructor(
     private readonly candidateStore: AgenticWalletMarketSwapStatusReconciliationCandidateStore,
     private readonly attempt: Pick<
@@ -47,43 +52,62 @@ export class AgenticWalletMarketSwapStatusReconciliationCycle {
     signal?: AbortSignal,
   ): Promise<AgenticWalletMarketSwapStatusReconciliationCycleResult> {
     validateStatusReconciliationCandidateInput(input);
-    const candidates = await this.candidateStore.listDue(input);
-    validateCandidateBatch(candidates, input);
-
-    const outcomes: AgenticWalletMarketSwapStatusReconciliationCycleOutcome[] =
-      [];
-    for (const candidate of candidates) {
-      const attempt = await this.attempt.reconcileOnce(
-        candidate.gateId,
-        signal,
-      );
-      outcomes.push({ candidate, attempt });
+    if (this.active) {
+      return cycleResult(input, [], 'blocked', [
+        'reconciliation_cycle_in_progress',
+      ]);
     }
 
-    return {
-      scope: 'agentic_wallet_market_swap_status_reconciliation_cycle',
-      evaluatedAt: new Date(input.evaluatedAt),
-      minimumLookupIntervalMs: input.minimumLookupIntervalMs,
-      limit: input.limit,
-      candidateCount: candidates.length,
-      attemptedCount: outcomes.length,
-      observationRecordedCount: countStatus(
-        outcomes,
-        'status_observation_recorded',
-      ),
-      lookupDeferredCount: countStatus(outcomes, 'status_lookup_deferred'),
-      lookupNotRequiredCount: countStatus(
-        outcomes,
-        'status_lookup_not_required',
-      ),
-      invalidResponseCount: countStatus(outcomes, 'status_response_invalid'),
-      blockedCount: countStatus(outcomes, 'blocked'),
-      outcomes,
-      automaticRetryPerformed: false,
-      financialReconciliationComplete: false,
-      submissionRetryAllowed: false,
-    };
+    this.active = true;
+    try {
+      const candidates = await this.candidateStore.listDue(input);
+      validateCandidateBatch(candidates, input);
+
+      const outcomes: AgenticWalletMarketSwapStatusReconciliationCycleOutcome[] =
+        [];
+      for (const candidate of candidates) {
+        const attempt = await this.attempt.reconcileOnce(
+          candidate.gateId,
+          signal,
+        );
+        outcomes.push({ candidate, attempt });
+      }
+
+      return cycleResult(input, outcomes, 'completed', []);
+    } finally {
+      this.active = false;
+    }
   }
+}
+
+function cycleResult(
+  input: ListDueAgenticWalletMarketSwapStatusReconciliationCandidatesInput,
+  outcomes: readonly AgenticWalletMarketSwapStatusReconciliationCycleOutcome[],
+  status: AgenticWalletMarketSwapStatusReconciliationCycleResult['status'],
+  blockers: AgenticWalletMarketSwapStatusReconciliationCycleResult['blockers'],
+): AgenticWalletMarketSwapStatusReconciliationCycleResult {
+  return {
+    scope: 'agentic_wallet_market_swap_status_reconciliation_cycle',
+    status,
+    blockers,
+    evaluatedAt: new Date(input.evaluatedAt),
+    minimumLookupIntervalMs: input.minimumLookupIntervalMs,
+    limit: input.limit,
+    candidateCount: outcomes.length,
+    attemptedCount: outcomes.length,
+    observationRecordedCount: countStatus(
+      outcomes,
+      'status_observation_recorded',
+    ),
+    lookupDeferredCount: countStatus(outcomes, 'status_lookup_deferred'),
+    lookupNotRequiredCount: countStatus(outcomes, 'status_lookup_not_required'),
+    invalidResponseCount: countStatus(outcomes, 'status_response_invalid'),
+    blockedCount: countStatus(outcomes, 'blocked'),
+    outcomes,
+    automaticRetryPerformed: false,
+    financialReconciliationComplete: false,
+    submissionRetryAllowed: false,
+  };
 }
 
 function validateCandidateBatch(
