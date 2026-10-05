@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-05 — Gate cycle work on caller cancellation
+
+M10.54 makes the caller's cancellation signal authoritative at every boundary before new cycle work starts. An admitted call checks before candidate discovery, immediately after discovery returns, and before each sequential attempt. This prevents a pre-cancelled call from reading persistence, prevents a discovery that completed after cancellation from initiating provider-facing attempts, and stops before the next gate when cancellation arrives between attempts.
+
+The original abort reason propagates rather than being converted into an outcome or retry. An attempt already in progress continues to receive the same signal and remains responsible for its own bounded cancellation; successfully completed work is not rolled back. The M10.53 `finally` release still runs for cancellation. No candidate-store cancellation contract, automatic caller, worker, schedule, distributed lock, live provider invocation, or execution authority is introduced.
+
 ## 2026-10-05 — Guard the complete manual reconciliation cycle in-process
 
 M10.53 adds one process-local active-call claim to each M10.52 cycle instance. After input validation, a valid overlapping `runOnce` call returns `reconciliation_cycle_in_progress` immediately, before candidate discovery or any per-gate attempt, and does not wait for or share cancellation with the admitted call. This prevents two callers of the same instance from independently discovering different gates and creating cycle-level provider concurrency.

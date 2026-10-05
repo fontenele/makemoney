@@ -60,12 +60,15 @@ export class AgenticWalletMarketSwapStatusReconciliationCycle {
 
     this.active = true;
     try {
+      signal?.throwIfAborted();
       const candidates = await this.candidateStore.listDue(input);
+      signal?.throwIfAborted();
       validateCandidateBatch(candidates, input);
 
       const outcomes: AgenticWalletMarketSwapStatusReconciliationCycleOutcome[] =
         [];
       for (const candidate of candidates) {
+        signal?.throwIfAborted();
         const attempt = await this.attempt.reconcileOnce(
           candidate.gateId,
           signal,

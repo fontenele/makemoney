@@ -116,6 +116,62 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     );
   });
 
+  it('rejects a pre-cancelled cycle before discovery and releases its claim', async () => {
+    const harness = cycleHarness([]);
+    const controller = new AbortController();
+    controller.abort();
+
+    await expect(
+      harness.cycle.runOnce(INPUT, controller.signal),
+    ).rejects.toMatchObject({ name: 'AbortError' });
+    expect(harness.listDue).not.toHaveBeenCalled();
+
+    await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+      status: 'completed',
+    });
+    expect(harness.listDue).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops after discovery when cancellation arrives while candidates load', async () => {
+    let releaseDiscovery!: (
+      candidates: AgenticWalletMarketSwapStatusReconciliationCandidate[],
+    ) => void;
+    const harness = cycleHarness([]);
+    harness.listDue.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseDiscovery = resolve;
+        }),
+    );
+    const controller = new AbortController();
+
+    const activeCycle = harness.cycle.runOnce(INPUT, controller.signal);
+    controller.abort();
+    releaseDiscovery([candidate(1)]);
+
+    await expect(activeCycle).rejects.toMatchObject({ name: 'AbortError' });
+    expect(harness.reconcileOnce).not.toHaveBeenCalled();
+  });
+
+  it('stops before the next candidate when cancellation arrives between attempts', async () => {
+    const controller = new AbortController();
+    const reconcileOnce = jest.fn().mockImplementationOnce(async () => {
+      await Promise.resolve();
+      controller.abort();
+      return attemptResult('status_observation_recorded');
+    });
+    const harness = cycleHarness([candidate(1), candidate(2)], reconcileOnce);
+
+    await expect(
+      harness.cycle.runOnce(INPUT, controller.signal),
+    ).rejects.toMatchObject({ name: 'AbortError' });
+    expect(reconcileOnce).toHaveBeenCalledTimes(1);
+    expect(reconcileOnce).toHaveBeenCalledWith(
+      candidate(1).gateId,
+      controller.signal,
+    );
+  });
+
   it.each([
     { ...INPUT, limit: 0 },
     { ...INPUT, minimumLookupIntervalMs: 999 },

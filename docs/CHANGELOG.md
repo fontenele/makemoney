@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-05 — Gate reconciliation-cycle work on cancellation
+
+- Checked caller cancellation before candidate discovery, immediately after discovery, and before each sequential reconciliation attempt.
+- Prevented pre-cancelled calls from reading persistence and prevented cancellation during discovery from initiating any attempt.
+- Stopped before the next candidate when cancellation arrives between attempts while preserving the same signal for an attempt already in progress.
+- Propagated the original abort reason without conversion, waiting, or retry and released the process-local cycle claim through `finally`.
+- Added focused coverage for pre-discovery, during-discovery, and between-attempt cancellation plus claim release.
+- Added no schema, candidate-store cancellation contract, database lease, NestJS registration, route, live process invocation, live provider call, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,091 backend tests across 183 suites, all 94 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-05 — Guard concurrent manual reconciliation cycles
 
 - Added one process-local active-cycle claim to each unwired manual status-reconciliation cycle instance.

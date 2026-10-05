@@ -985,6 +985,26 @@ This claim coordinates only one cycle instance in one process. It is not a datab
 - The limitation to one instance in one process is explicit; no distributed or multi-process guarantee is claimed.
 - No schema, database lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.54 — Reconciliation-cycle cancellation gates
+
+M10.54 makes the optional caller signal effective across the complete M10.53 cycle boundary rather than only forwarding it to each admitted attempt. After normal input validation and overlap suppression, an admitted call checks cancellation before candidate discovery. It checks again as soon as discovery returns and before every sequential attempt.
+
+A pre-cancelled call therefore performs no candidate-store access. If cancellation arrives while the non-cancelable bounded candidate read is in progress, its returned batch initiates no attempt. If cancellation arrives during or after one attempt, the in-progress attempt receives the same signal and the next gate is not started. Work already completed successfully is not rolled back.
+
+Cancellation propagates the signal's original abort reason and is never converted into a normal cycle result or retried. The M10.53 `finally` release remains authoritative, so a later explicit uncancelled call can proceed. This milestone does not widen the candidate-store interface, register the cycle, choose an operational cadence, or add any automatic lifecycle.
+
+### M10.54 acceptance criteria
+
+- A pre-cancelled admitted call rejects before candidate discovery.
+- Cancellation that arrives during discovery rejects after the bounded read and before batch attempts.
+- Cancellation between sequential attempts prevents the next candidate from starting.
+- An active attempt continues to receive the exact caller signal for its own cancellation handling.
+- The original abort reason propagates without being counted, hidden, or retried.
+- Every cancellation path releases the process-local cycle claim for a later explicit call.
+- Existing input validation, overlap suppression, bounded discovery, batch validation, cadence revalidation, fail-fast propagation, and no-retry behavior remain unchanged.
+- Focused unit tests cover pre-discovery, during-discovery, and between-attempt cancellation plus claim release.
+- No schema, candidate-store cancellation contract, database lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
