@@ -1,0 +1,124 @@
+import {
+  AgenticWalletMarketSwapStatusReconciliationAttempt,
+  AgenticWalletMarketSwapStatusReconciliationAttemptResult,
+} from './agentic-wallet-market-swap-status-reconciliation-attempt';
+import {
+  AgenticWalletMarketSwapStatusReconciliationCandidate,
+  AgenticWalletMarketSwapStatusReconciliationCandidateStore,
+  ListDueAgenticWalletMarketSwapStatusReconciliationCandidatesInput,
+  isValidStatusReconciliationCandidate,
+  validateStatusReconciliationCandidateInput,
+} from './agentic-wallet-market-swap-status-reconciliation-candidate.store';
+
+export interface AgenticWalletMarketSwapStatusReconciliationCycleOutcome {
+  readonly candidate: AgenticWalletMarketSwapStatusReconciliationCandidate;
+  readonly attempt: AgenticWalletMarketSwapStatusReconciliationAttemptResult;
+}
+
+export interface AgenticWalletMarketSwapStatusReconciliationCycleResult {
+  readonly scope: 'agentic_wallet_market_swap_status_reconciliation_cycle';
+  readonly evaluatedAt: Date;
+  readonly minimumLookupIntervalMs: number;
+  readonly limit: number;
+  readonly candidateCount: number;
+  readonly attemptedCount: number;
+  readonly observationRecordedCount: number;
+  readonly lookupDeferredCount: number;
+  readonly lookupNotRequiredCount: number;
+  readonly invalidResponseCount: number;
+  readonly blockedCount: number;
+  readonly outcomes: readonly AgenticWalletMarketSwapStatusReconciliationCycleOutcome[];
+  readonly automaticRetryPerformed: false;
+  readonly financialReconciliationComplete: false;
+  readonly submissionRetryAllowed: false;
+}
+
+export class AgenticWalletMarketSwapStatusReconciliationCycle {
+  constructor(
+    private readonly candidateStore: AgenticWalletMarketSwapStatusReconciliationCandidateStore,
+    private readonly attempt: Pick<
+      AgenticWalletMarketSwapStatusReconciliationAttempt,
+      'reconcileOnce'
+    >,
+  ) {}
+
+  async runOnce(
+    input: ListDueAgenticWalletMarketSwapStatusReconciliationCandidatesInput,
+    signal?: AbortSignal,
+  ): Promise<AgenticWalletMarketSwapStatusReconciliationCycleResult> {
+    validateStatusReconciliationCandidateInput(input);
+    const candidates = await this.candidateStore.listDue(input);
+    validateCandidateBatch(candidates, input);
+
+    const outcomes: AgenticWalletMarketSwapStatusReconciliationCycleOutcome[] =
+      [];
+    for (const candidate of candidates) {
+      const attempt = await this.attempt.reconcileOnce(
+        candidate.gateId,
+        signal,
+      );
+      outcomes.push({ candidate, attempt });
+    }
+
+    return {
+      scope: 'agentic_wallet_market_swap_status_reconciliation_cycle',
+      evaluatedAt: new Date(input.evaluatedAt),
+      minimumLookupIntervalMs: input.minimumLookupIntervalMs,
+      limit: input.limit,
+      candidateCount: candidates.length,
+      attemptedCount: outcomes.length,
+      observationRecordedCount: countStatus(
+        outcomes,
+        'status_observation_recorded',
+      ),
+      lookupDeferredCount: countStatus(outcomes, 'status_lookup_deferred'),
+      lookupNotRequiredCount: countStatus(
+        outcomes,
+        'status_lookup_not_required',
+      ),
+      invalidResponseCount: countStatus(outcomes, 'status_response_invalid'),
+      blockedCount: countStatus(outcomes, 'blocked'),
+      outcomes,
+      automaticRetryPerformed: false,
+      financialReconciliationComplete: false,
+      submissionRetryAllowed: false,
+    };
+  }
+}
+
+function validateCandidateBatch(
+  candidates: readonly AgenticWalletMarketSwapStatusReconciliationCandidate[],
+  input: ListDueAgenticWalletMarketSwapStatusReconciliationCandidatesInput,
+): void {
+  if (!Array.isArray(candidates) || candidates.length > input.limit) {
+    throw new Error(
+      'Agentic Wallet status reconciliation candidate batch is invalid',
+    );
+  }
+  const candidateBatch =
+    candidates as readonly AgenticWalletMarketSwapStatusReconciliationCandidate[];
+  const gateIds = new Set<string>();
+  for (const candidate of candidateBatch) {
+    if (
+      !isValidStatusReconciliationCandidate(candidate) ||
+      candidate.evaluatedAt.getTime() !== input.evaluatedAt.getTime() ||
+      (candidate.phase === 'provider_pending' &&
+        candidate.eligibleAt.getTime() !==
+          candidate.latestObservationRecordedAt!.getTime() +
+            input.minimumLookupIntervalMs) ||
+      gateIds.has(candidate.gateId)
+    ) {
+      throw new Error(
+        'Agentic Wallet status reconciliation candidate batch is invalid',
+      );
+    }
+    gateIds.add(candidate.gateId);
+  }
+}
+
+function countStatus(
+  outcomes: readonly AgenticWalletMarketSwapStatusReconciliationCycleOutcome[],
+  status: AgenticWalletMarketSwapStatusReconciliationAttemptResult['status'],
+): number {
+  return outcomes.filter((outcome) => outcome.attempt.status === status).length;
+}

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-05 — Compose a manual fail-fast reconciliation cycle before scheduling
+
+M10.52 composes due discovery and one-shot attempts only behind an explicit `runOnce` call. The candidate batch is independently checked for the configured bound, structural validity, exact evaluation/cadence coherence, and unique gate identities before any attempt. Candidates then run sequentially so one cycle cannot create internal provider concurrency.
+
+Thrown discovery, runner, or persistence errors stop the batch and propagate instead of being counted and hidden. This avoids continuing provider reads after an operational failure and preserves the existing no-retry contract. Non-throwing conservative outcomes are summarized for the caller. The cycle remains unwired and unscheduled; worker cadence, activation, cross-process claims, and runtime configuration remain separate decisions.
+
 ## 2026-10-05 — Discover due reconciliation without claiming or running it
 
 M10.51 introduces a bounded read model before any automatic status-reconciliation lifecycle. One PostgreSQL query selects only immutable pending-confirmation receipts with no observation or a latest `PENDING` observation whose recording time has reached the explicit cadence boundary. Latest terminal evidence is excluded, and deterministic exact-eligibility/gate ordering plus a 1–100 limit bounds each read.

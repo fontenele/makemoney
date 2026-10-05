@@ -16,6 +16,7 @@ import { AgenticWalletMarketSwapStatusObservationBlockedError } from '../src/mod
 import { decideAgenticWalletMarketSwapStatusLookup } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-lookup-decision';
 import { AgenticWalletMarketSwapStatusObservation } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-response';
 import { AgenticWalletMarketSwapStatusReconciliationAttempt } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-reconciliation-attempt';
+import { AgenticWalletMarketSwapStatusReconciliationCycle } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-reconciliation-cycle';
 import { PrismaAgenticWalletMarketSwapSubmissionReceiptStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-submission-receipt.store';
 import { PrismaAgenticWalletMarketSwapReconciliationStateStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-reconciliation-state.store';
 import { PrismaAgenticWalletMarketSwapStatusObservationStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-observation.store';
@@ -508,6 +509,53 @@ describe('Real execution submission gate persistence (e2e)', () => {
     expect(lookupCalls).toBe(1);
     await expect(prisma.realExecutionStatusObservation.count()).resolves.toBe(
       2,
+    );
+  });
+
+  it('runs one bounded manual reconciliation cycle and stops after terminal persistence', async () => {
+    await store.create(command(10));
+    await receiptStore.record(submissionReceipt(10));
+    let lookupCalls = 0;
+    const attempt = new AgenticWalletMarketSwapStatusReconciliationAttempt(
+      reconciliationContextStore,
+      {
+        run: () => {
+          lookupCalls += 1;
+          return Promise.resolve(finishedStatusLookupResponse());
+        },
+      },
+      statusStore,
+      () => new Date('2026-10-03T12:00:07.000Z'),
+      1_000,
+    );
+    const cycle = new AgenticWalletMarketSwapStatusReconciliationCycle(
+      reconciliationCandidateStore,
+      attempt,
+    );
+    const input = {
+      evaluatedAt: new Date('2026-10-03T12:00:07.000Z'),
+      minimumLookupIntervalMs: 1_000,
+      limit: 1,
+    };
+
+    await expect(cycle.runOnce(input)).resolves.toMatchObject({
+      candidateCount: 1,
+      attemptedCount: 1,
+      observationRecordedCount: 1,
+      lookupDeferredCount: 0,
+      blockedCount: 0,
+      automaticRetryPerformed: false,
+      financialReconciliationComplete: false,
+      submissionRetryAllowed: false,
+    });
+    await expect(cycle.runOnce(input)).resolves.toMatchObject({
+      candidateCount: 0,
+      attemptedCount: 0,
+      observationRecordedCount: 0,
+    });
+    expect(lookupCalls).toBe(1);
+    await expect(prisma.realExecutionStatusObservation.count()).resolves.toBe(
+      1,
     );
   });
 

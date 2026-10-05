@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-05 — Compose one manual bounded status-reconciliation cycle
+
+- Added an unwired manually invoked cycle that composes one M10.51 due-candidate read with sequential M10.50 reconciliation attempts.
+- Revalidated the candidate array, configured bound, candidate structure, exact evaluation time, pending eligibility boundary, and unique gate IDs before the first attempt.
+- Processed at most the explicit 1–100 limit sequentially and forwarded one caller cancellation signal to each admitted attempt.
+- Summarized recorded, deferred, terminal/no-longer-required, invalid-response, and blocked results while keeping financial reconciliation incomplete and submission retry forbidden.
+- Propagated discovery, runner, and persistence failures immediately, stopped the remaining batch, and performed no automatic retry.
+- Added unit coverage for bounds, malformed batches, sequential execution, cancellation, summaries, and fail-fast behavior plus PostgreSQL E2E composition with a runner double.
+- Added no schema, claim, lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,087 backend tests across 183 suites, all 94 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-05 — Add bounded due status-reconciliation discovery
 
 - Added an unwired read-only Prisma candidate store for durable Agentic Wallet status reconciliations whose cadence is due.

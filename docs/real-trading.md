@@ -945,6 +945,26 @@ The reader validates every input before persistence access and fails closed if a
 - Focused unit tests and PostgreSQL E2E cover bounded input, malformed evidence, awaiting, deferred, boundary-ready, and terminal behavior.
 - No schema, claim, lease, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.52 — Manual bounded status-reconciliation cycle
+
+M10.52 adds an unwired `runOnce` composition over M10.51 discovery and M10.50 reconciliation attempts. One explicit caller supplies the evaluation time, minimum lookup interval, batch limit, and optional cancellation signal. The cycle validates inputs before discovery, then independently checks that the returned array stays within the limit, contains only structurally valid cadence-coherent candidates evaluated for the exact requested instant, and has no duplicate gate identity.
+
+Admitted candidates are processed sequentially in deterministic discovery order. Each gate is still reloaded and revalidated by M10.50 immediately before its possible read-only provider call. Non-throwing results are retained and counted as observation recorded, lookup deferred, lookup no longer required, invalid provider response, or blocked. Every cycle result explicitly reports that no automatic retry occurred, financial reconciliation remains incomplete, and submission retry remains forbidden.
+
+Candidate-read, runner, or observation-store exceptions stop the cycle at that point and propagate to the explicit caller. The remaining candidates are not attempted and the failed gate is not retried. This fail-fast choice avoids turning one provider outage into the rest of a bounded batch of calls. PostgreSQL E2E uses the real durable readers/writer with a runner double: the first manual cycle records `FINISHED`, and the second finds no due work without another runner call.
+
+### M10.52 acceptance criteria
+
+- One explicit call performs exactly one bounded candidate discovery.
+- Invalid cycle input blocks before discovery.
+- Oversized, duplicate, structurally invalid, wrong-evaluation, or wrong-cadence candidate batches block before the first attempt.
+- Valid candidates execute sequentially in deterministic discovery order with the caller signal forwarded.
+- Every candidate still passes through M10.50 complete durable-context and cadence revalidation.
+- Non-throwing attempt outcomes are retained and summarized without claiming financial reconciliation.
+- Discovery, runner, and persistence errors propagate, stop the remaining batch, and cause no retry.
+- Focused unit tests cover empty/summarized cycles, sequentiality, cancellation, invalid batches, discovery failure, and fail-fast attempt failure; PostgreSQL E2E covers durable terminal completion and the next empty cycle.
+- No schema, claim, lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
