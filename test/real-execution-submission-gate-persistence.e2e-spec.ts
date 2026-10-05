@@ -15,6 +15,7 @@ import { AgenticWalletMarketSwapSubmissionReceipt } from '../src/modules/real-tr
 import { AgenticWalletMarketSwapStatusObservationBlockedError } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-observation.store';
 import { decideAgenticWalletMarketSwapStatusLookup } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-lookup-decision';
 import { AgenticWalletMarketSwapStatusObservation } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-response';
+import { AgenticWalletMarketSwapStatusReconciliationAttempt } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-reconciliation-attempt';
 import { PrismaAgenticWalletMarketSwapSubmissionReceiptStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-submission-receipt.store';
 import { PrismaAgenticWalletMarketSwapReconciliationStateStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-reconciliation-state.store';
 import { PrismaAgenticWalletMarketSwapStatusObservationStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-observation.store';
@@ -362,6 +363,41 @@ describe('Real execution submission gate persistence (e2e)', () => {
     });
   });
 
+  it('runs one durable-context reconciliation attempt and stops after terminal evidence', async () => {
+    await store.create(command(10));
+    await receiptStore.record(submissionReceipt(10));
+    let lookupCalls = 0;
+    const attempt = new AgenticWalletMarketSwapStatusReconciliationAttempt(
+      reconciliationContextStore,
+      {
+        run: () => {
+          lookupCalls += 1;
+          return Promise.resolve(finishedStatusLookupResponse());
+        },
+      },
+      statusStore,
+    );
+
+    await expect(attempt.reconcileOnce(uuid(10))).resolves.toMatchObject({
+      status: 'status_observation_recorded',
+      providerCallStarted: true,
+      providerCallCompleted: true,
+      statusLookupRequired: false,
+      financialReconciliationComplete: false,
+      submissionRetryAllowed: false,
+    });
+    await expect(attempt.reconcileOnce(uuid(10))).resolves.toMatchObject({
+      status: 'status_lookup_not_required',
+      providerCallStarted: false,
+      providerCallCompleted: false,
+      statusLookupRequired: false,
+    });
+    expect(lookupCalls).toBe(1);
+    await expect(prisma.realExecutionStatusObservation.count()).resolves.toBe(
+      1,
+    );
+  });
+
   it('fails closed when directly persisted observation timing contradicts its receipt', async () => {
     await store.create(command(10));
     await receiptStore.record(submissionReceipt(10));
@@ -530,6 +566,34 @@ function statusObservation(
     actualReceivedQuantity: null,
     submissionRetryAllowed: false,
     ...overrides,
+  };
+}
+
+function finishedStatusLookupResponse(): Record<string, unknown> {
+  return {
+    success: true,
+    data: {
+      total: 1,
+      page: 1,
+      pageSize: 20,
+      list: [
+        {
+          orderType: 'market',
+          orderId: '1234567890',
+          chain: '56',
+          fromToken: '0x55d398326f99059ff775485246999027b3197955',
+          fromTokenName: 'USDT',
+          fromTokenQty: '5',
+          toToken: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+          toTokenName: 'BTCB',
+          status: 'FINISHED',
+          slippage: '0.1',
+          txHash: `0x${'a'.repeat(64)}`,
+          bookTime: '2026-10-03T12:00:05.000Z',
+          updatedTime: '2026-10-03T12:00:07.000Z',
+        },
+      ],
+    },
   };
 }
 

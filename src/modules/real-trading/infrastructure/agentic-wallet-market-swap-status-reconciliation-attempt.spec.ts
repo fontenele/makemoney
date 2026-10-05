@@ -5,24 +5,27 @@ import { AgenticWalletMarketSwapReconciliationState } from './agentic-wallet-mar
 import { AgenticWalletMarketSwapStatusLookupRunner } from './agentic-wallet-market-swap-status-lookup-runner';
 import { AgenticWalletMarketSwapStatusObservationStore } from './agentic-wallet-market-swap-status-observation.store';
 import { AgenticWalletMarketSwapStatusReconciliationAttempt } from './agentic-wallet-market-swap-status-reconciliation-attempt';
+import { AgenticWalletMarketSwapStatusReconciliationContext } from './agentic-wallet-market-swap-status-reconciliation-context.store';
 import { AgenticWalletMarketSwapSubmissionReceipt } from './agentic-wallet-market-swap-submission-response';
+
+const GATE_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 
 describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
   it('records one valid pending observation from one explicit lookup', async () => {
     const harness = createHarness();
 
-    await expect(
-      harness.attempt.reconcileOnce(gate(), receipt()),
-    ).resolves.toMatchObject({
-      status: 'status_observation_recorded',
-      blockers: [],
-      observationReplayed: false,
-      providerCallStarted: true,
-      providerCallCompleted: true,
-      statusLookupRequired: true,
-      financialReconciliationComplete: false,
-      submissionRetryAllowed: false,
-    });
+    await expect(harness.attempt.reconcileOnce(GATE_ID)).resolves.toMatchObject(
+      {
+        status: 'status_observation_recorded',
+        blockers: [],
+        observationReplayed: false,
+        providerCallStarted: true,
+        providerCallCompleted: true,
+        statusLookupRequired: true,
+        financialReconciliationComplete: false,
+        submissionRetryAllowed: false,
+      },
+    );
     expect(harness.run).toHaveBeenCalledTimes(1);
     expect(harness.run).toHaveBeenCalledWith(
       { kind: 'market_order_status_lookup', providerOrderId: '1234567890' },
@@ -45,22 +48,22 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
       }),
     });
 
-    await expect(
-      harness.attempt.reconcileOnce(gate(), receipt()),
-    ).resolves.toMatchObject({
-      status: 'status_observation_recorded',
-      statusLookupRequired: false,
-      financialReconciliationRequired: true,
-      financialReconciliationComplete: false,
-      submissionRetryAllowed: false,
-      storedObservation: {
-        observation: {
-          providerStatus: 'FINISHED',
-          executionSucceeded: true,
-          actualReceivedQuantity: null,
+    await expect(harness.attempt.reconcileOnce(GATE_ID)).resolves.toMatchObject(
+      {
+        status: 'status_observation_recorded',
+        statusLookupRequired: false,
+        financialReconciliationRequired: true,
+        financialReconciliationComplete: false,
+        submissionRetryAllowed: false,
+        storedObservation: {
+          observation: {
+            providerStatus: 'FINISHED',
+            executionSucceeded: true,
+            actualReceivedQuantity: null,
+          },
         },
       },
-    });
+    );
   });
 
   it('records a failed provider state without allowing resubmission', async () => {
@@ -68,43 +71,45 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
       response: providerResponse({ status: 'FAILED' }),
     });
 
-    await expect(
-      harness.attempt.reconcileOnce(gate(), receipt()),
-    ).resolves.toMatchObject({
-      status: 'status_observation_recorded',
-      statusLookupRequired: false,
-      financialReconciliationComplete: false,
-      submissionRetryAllowed: false,
-      storedObservation: {
-        observation: {
-          providerStatus: 'FAILED',
-          terminal: true,
-          executionSucceeded: false,
+    await expect(harness.attempt.reconcileOnce(GATE_ID)).resolves.toMatchObject(
+      {
+        status: 'status_observation_recorded',
+        statusLookupRequired: false,
+        financialReconciliationComplete: false,
+        submissionRetryAllowed: false,
+        storedObservation: {
+          observation: {
+            providerStatus: 'FAILED',
+            terminal: true,
+            executionSucceeded: false,
+          },
         },
       },
-    });
+    );
   });
 
   it('does not call the provider when the latest durable state is terminal', async () => {
     const harness = createHarness({
-      state: reconciliationState({
-        phase: 'provider_failed',
-        providerStatus: 'FAILED',
-        latestObservationId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
-        latestObservationRecordedAt: new Date('2026-10-03T12:00:06.000Z'),
-        terminal: true,
-        statusLookupRequired: false,
+      context: reconciliationContext({
+        reconciliationState: reconciliationState({
+          phase: 'provider_failed',
+          providerStatus: 'FAILED',
+          latestObservationId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+          latestObservationRecordedAt: new Date('2026-10-03T12:00:06.000Z'),
+          terminal: true,
+          statusLookupRequired: false,
+        }),
       }),
     });
 
-    await expect(
-      harness.attempt.reconcileOnce(gate(), receipt()),
-    ).resolves.toMatchObject({
-      status: 'status_lookup_not_required',
-      providerCallStarted: false,
-      providerCallCompleted: false,
-      statusLookupRequired: false,
-    });
+    await expect(harness.attempt.reconcileOnce(GATE_ID)).resolves.toMatchObject(
+      {
+        status: 'status_lookup_not_required',
+        providerCallStarted: false,
+        providerCallCompleted: false,
+        statusLookupRequired: false,
+      },
+    );
     expect(harness.run).not.toHaveBeenCalled();
     expect(harness.record).not.toHaveBeenCalled();
   });
@@ -112,51 +117,66 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
   it.each([
     [
       'gate',
-      gate({ sourceQuantity: '5.0' }),
-      receipt(),
+      reconciliationContext({ gate: gate({ sourceQuantity: '5.0' }) }),
       'invalid_submission_gate',
     ],
     [
       'receipt',
-      gate(),
-      receipt({ terminal: true as false }),
+      reconciliationContext({
+        submissionReceipt: storedReceipt({ terminal: true as false }),
+      }),
       'invalid_submission_receipt',
     ],
     [
       'correlation',
-      gate(),
-      receipt({ gateId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb' }),
+      reconciliationContext({
+        submissionReceipt: storedReceipt({
+          gateId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        }),
+      }),
       'gate_receipt_mismatch',
     ],
+    [
+      'receipt timing',
+      reconciliationContext({
+        submissionReceipt: {
+          receipt: receipt(),
+          recordedAt: new Date('2026-10-03T12:00:04.050Z'),
+        },
+      }),
+      'invalid_submission_receipt_timing',
+    ],
   ])(
-    'blocks invalid %s evidence before durable or provider access',
-    async (_, gateValue, receiptValue, blocker) => {
-      const harness = createHarness();
+    'blocks invalid %s durable context before provider access',
+    async (_, context, blocker) => {
+      const harness = createHarness({ context });
 
       await expect(
-        harness.attempt.reconcileOnce(gateValue, receiptValue),
+        harness.attempt.reconcileOnce(GATE_ID),
       ).resolves.toMatchObject({ status: 'blocked', blockers: [blocker] });
-      expect(harness.getByGateId).not.toHaveBeenCalled();
+      expect(harness.getByGateId).toHaveBeenCalledWith(GATE_ID);
       expect(harness.run).not.toHaveBeenCalled();
       expect(harness.record).not.toHaveBeenCalled();
     },
   );
 
-  it('blocks an absent or identity-divergent durable projection before lookup', async () => {
-    const absent = createHarness({ state: null });
-    await expect(
-      absent.attempt.reconcileOnce(gate(), receipt()),
-    ).resolves.toMatchObject({
+  it('blocks an absent or identity-divergent durable context before lookup', async () => {
+    const absent = createHarness({ context: null });
+    await expect(absent.attempt.reconcileOnce(GATE_ID)).resolves.toMatchObject({
       status: 'blocked',
-      blockers: ['reconciliation_state_not_found'],
+      blockers: ['reconciliation_context_not_found'],
     });
     expect(absent.run).not.toHaveBeenCalled();
 
     const divergent = createHarness({
-      state: reconciliationState({ providerOrderId: 'different-order' }),
+      context: reconciliationContext({
+        reconciliationState: reconciliationState({
+          providerOrderId: 'different-order',
+        }),
+      }),
     });
     await expect(
-      divergent.attempt.reconcileOnce(gate(), receipt()),
+      divergent.attempt.reconcileOnce(GATE_ID),
     ).resolves.toMatchObject({
       status: 'blocked',
       blockers: ['reconciliation_evidence_mismatch'],
@@ -164,12 +184,14 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
     expect(divergent.run).not.toHaveBeenCalled();
 
     const malformed = createHarness({
-      state: reconciliationState({
-        financialReconciliationComplete: true as false,
+      context: reconciliationContext({
+        reconciliationState: reconciliationState({
+          financialReconciliationComplete: true as false,
+        }),
       }),
     });
     await expect(
-      malformed.attempt.reconcileOnce(gate(), receipt()),
+      malformed.attempt.reconcileOnce(GATE_ID),
     ).resolves.toMatchObject({
       status: 'blocked',
       blockers: ['invalid_reconciliation_state'],
@@ -180,16 +202,16 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
   it('does not persist an invalid provider response', async () => {
     const harness = createHarness({ response: { success: false, data: null } });
 
-    await expect(
-      harness.attempt.reconcileOnce(gate(), receipt()),
-    ).resolves.toMatchObject({
-      status: 'status_response_invalid',
-      blockers: ['provider_reported_failure'],
-      providerCallStarted: true,
-      providerCallCompleted: true,
-      statusLookupRequired: true,
-      submissionRetryAllowed: false,
-    });
+    await expect(harness.attempt.reconcileOnce(GATE_ID)).resolves.toMatchObject(
+      {
+        status: 'status_response_invalid',
+        blockers: ['provider_reported_failure'],
+        providerCallStarted: true,
+        providerCallCompleted: true,
+        statusLookupRequired: true,
+        submissionRetryAllowed: false,
+      },
+    );
     expect(harness.run).toHaveBeenCalledTimes(1);
     expect(harness.record).not.toHaveBeenCalled();
   });
@@ -200,7 +222,7 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
     const controller = new AbortController();
 
     await expect(
-      harness.attempt.reconcileOnce(gate(), receipt(), controller.signal),
+      harness.attempt.reconcileOnce(GATE_ID, controller.signal),
     ).rejects.toBe(error);
     expect(harness.run).toHaveBeenCalledTimes(1);
     expect(harness.run).toHaveBeenCalledWith(
@@ -214,9 +236,7 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
     const error = new Error('persistence failed');
     const harness = createHarness({ storeError: error });
 
-    await expect(harness.attempt.reconcileOnce(gate(), receipt())).rejects.toBe(
-      error,
-    );
+    await expect(harness.attempt.reconcileOnce(GATE_ID)).rejects.toBe(error);
     expect(harness.run).toHaveBeenCalledTimes(1);
     expect(harness.record).toHaveBeenCalledTimes(1);
   });
@@ -224,14 +244,15 @@ describe('AgenticWalletMarketSwapStatusReconciliationAttempt', () => {
 
 function createHarness(
   options: {
-    state?: AgenticWalletMarketSwapReconciliationState | null;
+    context?: AgenticWalletMarketSwapStatusReconciliationContext | null;
     response?: unknown;
     lookupError?: Error;
     storeError?: Error;
   } = {},
 ) {
-  const state = 'state' in options ? options.state : reconciliationState();
-  const getByGateId = jest.fn().mockResolvedValue(state);
+  const context =
+    'context' in options ? options.context : reconciliationContext();
+  const getByGateId = jest.fn().mockResolvedValue(context);
   const run = options.lookupError
     ? jest.fn().mockRejectedValue(options.lookupError)
     : jest.fn().mockResolvedValue(options.response ?? providerResponse());
@@ -287,6 +308,26 @@ function providerResponse(
         },
       ],
     },
+  };
+}
+
+function reconciliationContext(
+  overrides: Partial<AgenticWalletMarketSwapStatusReconciliationContext> = {},
+): AgenticWalletMarketSwapStatusReconciliationContext {
+  return {
+    gate: gate(),
+    submissionReceipt: storedReceipt(),
+    reconciliationState: reconciliationState(),
+    ...overrides,
+  };
+}
+
+function storedReceipt(
+  overrides: Partial<AgenticWalletMarketSwapSubmissionReceipt> = {},
+) {
+  return {
+    receipt: receipt(overrides),
+    recordedAt: new Date('2026-10-03T12:00:05.000Z'),
   };
 }
 

@@ -848,6 +848,25 @@ The reader exposes no runner or write dependency and is not registered in NestJS
 - Unit and PostgreSQL E2E tests cover identity rejection, absence, awaiting and pending projections, exact durable correlation, and malformed evidence.
 - No schema, runtime wiring, route, process invocation, provider call, lookup, write, polling, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.47 — Durable-context one-shot status reconciliation
+
+M10.47 narrows the M10.45 attempt API from three caller-supplied durable artifacts to one canonical gate ID. The coordinator loads M10.46 context internally, then independently revalidates the gate, receipt, receipt-after-gate timing, reconciliation projection, and exact gate/provider/order identities. A missing context returns a blocked result before provider access; malformed or inconsistent context also fails closed.
+
+The remainder of the flow stays explicit and bounded. Terminal context returns `status_lookup_not_required`. Nonterminal context can invoke the dedicated read-only runner once, interpret the response conservatively, and delegate one valid observation to the monotonic store. Runner or persistence errors propagate without retry. Caller cancellation is forwarded to the single runner invocation.
+
+PostgreSQL E2E composes the real context and observation stores with a runner test double. It persists one terminal `FINISHED` observation, reloads the durable terminal projection on the next explicit attempt, and proves the runner was called only once. This verifies composition without invoking the Agentic Wallet CLI or provider.
+
+### M10.47 acceptance criteria
+
+- The coordinator accepts only a gate ID and obtains gate, receipt, and projection evidence from M10.46.
+- Missing, malformed, temporally invalid, or identity-divergent context blocks before provider access.
+- Terminal durable context performs no lookup or write.
+- One explicit nonterminal call performs at most one read-only lookup and one monotonic persistence attempt.
+- A later explicit call reloads persisted terminal evidence and stops before a second runner invocation.
+- Runner and store failures propagate without retry, and caller cancellation remains forwarded.
+- Unit tests cover context validation, all provider outcomes, terminal stop, invalid response, cancellation, and failures; PostgreSQL E2E covers durable terminal persistence and reload.
+- No schema, runtime wiring, route, live process invocation, provider call, polling, schedule, wallet mutation, funding, mutating command runner, executor, automatic retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

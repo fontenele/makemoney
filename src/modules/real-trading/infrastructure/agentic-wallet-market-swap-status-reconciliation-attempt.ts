@@ -1,10 +1,12 @@
-import { StoredRealExecutionSubmissionGate } from '../application/real-execution-submission-gate-store';
 import { isStructurallyValidAgenticWalletMarketSwapGate } from './agentic-wallet-market-swap-command';
 import {
   AgenticWalletMarketSwapReconciliationState,
-  AgenticWalletMarketSwapReconciliationStateStore,
   isValidAgenticWalletMarketSwapReconciliationState,
 } from './agentic-wallet-market-swap-reconciliation-state.store';
+import {
+  AgenticWalletMarketSwapStatusReconciliationContext,
+  AgenticWalletMarketSwapStatusReconciliationContextStore,
+} from './agentic-wallet-market-swap-status-reconciliation-context.store';
 import {
   AgenticWalletMarketSwapStatusLookupRunner,
   prepareAgenticWalletMarketSwapStatusLookupCommand,
@@ -18,16 +20,14 @@ import {
   assessAgenticWalletMarketSwapStatusResponse,
 } from './agentic-wallet-market-swap-status-response';
 import { decideAgenticWalletMarketSwapStatusLookup } from './agentic-wallet-market-swap-status-lookup-decision';
-import {
-  AgenticWalletMarketSwapSubmissionReceipt,
-  isValidAgenticWalletMarketSwapSubmissionReceipt,
-} from './agentic-wallet-market-swap-submission-response';
+import { isValidAgenticWalletMarketSwapSubmissionReceipt } from './agentic-wallet-market-swap-submission-response';
 
 export type AgenticWalletMarketSwapStatusReconciliationAttemptBlocker =
   | 'invalid_submission_gate'
   | 'invalid_submission_receipt'
+  | 'invalid_submission_receipt_timing'
   | 'gate_receipt_mismatch'
-  | 'reconciliation_state_not_found'
+  | 'reconciliation_context_not_found'
   | 'invalid_reconciliation_state'
   | 'reconciliation_evidence_mismatch'
   | AgenticWalletMarketSwapStatusResponseBlocker;
@@ -52,34 +52,37 @@ export interface AgenticWalletMarketSwapStatusReconciliationAttemptResult {
 
 export class AgenticWalletMarketSwapStatusReconciliationAttempt {
   constructor(
-    private readonly reconciliationStateStore: AgenticWalletMarketSwapReconciliationStateStore,
+    private readonly contextStore: AgenticWalletMarketSwapStatusReconciliationContextStore,
     private readonly lookupRunner: AgenticWalletMarketSwapStatusLookupRunner,
     private readonly observationStore: AgenticWalletMarketSwapStatusObservationStore,
   ) {}
 
   async reconcileOnce(
-    gate: StoredRealExecutionSubmissionGate,
-    receipt: AgenticWalletMarketSwapSubmissionReceipt,
+    gateId: string,
     signal?: AbortSignal,
   ): Promise<AgenticWalletMarketSwapStatusReconciliationAttemptResult> {
+    const context = await this.contextStore.getByGateId(gateId);
+    if (context === null) {
+      return result('blocked', ['reconciliation_context_not_found']);
+    }
+    const { gate, submissionReceipt, reconciliationState: state } = context;
+    const { receipt } = submissionReceipt;
     if (!isStructurallyValidAgenticWalletMarketSwapGate(gate)) {
       return result('blocked', ['invalid_submission_gate']);
     }
     if (!isValidAgenticWalletMarketSwapSubmissionReceipt(receipt)) {
       return result('blocked', ['invalid_submission_receipt']);
     }
-    if (gate.id !== receipt.gateId) {
+    if (gate.id !== gateId || gate.id !== receipt.gateId) {
       return result('blocked', ['gate_receipt_mismatch']);
     }
-
-    const state = await this.reconciliationStateStore.getByGateId(gate.id);
-    if (state === null) {
-      return result('blocked', ['reconciliation_state_not_found']);
+    if (!isValidStoredReceiptTime(context)) {
+      return result('blocked', ['invalid_submission_receipt_timing']);
     }
     if (!isValidAgenticWalletMarketSwapReconciliationState(state)) {
       return result('blocked', ['invalid_reconciliation_state']);
     }
-    if (!matchesEvidence(gate, receipt, state)) {
+    if (!matchesEvidence(context, state)) {
       return result('blocked', ['reconciliation_evidence_mismatch']);
     }
 
@@ -122,15 +125,28 @@ export class AgenticWalletMarketSwapStatusReconciliationAttempt {
 }
 
 function matchesEvidence(
-  gate: StoredRealExecutionSubmissionGate,
-  receipt: AgenticWalletMarketSwapSubmissionReceipt,
+  context: AgenticWalletMarketSwapStatusReconciliationContext,
   state: AgenticWalletMarketSwapReconciliationState,
 ): boolean {
+  const { gate, submissionReceipt } = context;
+  const { receipt } = submissionReceipt;
   return (
     state.gateId === gate.id &&
     state.gateId === receipt.gateId &&
     state.providerId === receipt.providerId &&
-    state.providerOrderId === receipt.providerOrderId
+    state.providerOrderId === receipt.providerOrderId &&
+    state.receiptRecordedAt.getTime() === submissionReceipt.recordedAt.getTime()
+  );
+}
+
+function isValidStoredReceiptTime(
+  context: AgenticWalletMarketSwapStatusReconciliationContext,
+): boolean {
+  const recordedAt = context.submissionReceipt.recordedAt;
+  return (
+    recordedAt instanceof Date &&
+    Number.isFinite(recordedAt.getTime()) &&
+    recordedAt.getTime() >= context.gate.createdAt.getTime()
   );
 }
 

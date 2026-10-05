@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-04 — Bind one-shot status reconciliation to durable context
+
+- Changed the unwired one-shot coordinator to accept only a gate ID and load M10.46 gate, receipt, and projection evidence itself.
+- Removed caller-supplied gate/receipt/state assembly from the reconciliation attempt boundary.
+- Revalidated stored gate and receipt structure, receipt timing, projection structure, and exact gate/provider/order correlation before lookup.
+- Preserved the terminal stop, single lookup, single monotonic write, cancellation forwarding, and no-retry behavior.
+- Added PostgreSQL E2E proof that one test-double terminal response persists once and the next explicit attempt stops before another runner call.
+- Added no schema, runtime wiring, route, live process invocation, provider call, polling, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,046 backend tests across 180 suites, all 91 PostgreSQL E2E tests across 9 suites with 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-03 — Load durable swap status reconciliation context
 
 - Added an unwired read-only Prisma store that loads a gate, its receipt, latest sequenced status observation, and conservative projection through one Prisma read operation.

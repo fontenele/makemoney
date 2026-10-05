@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-04 — Resolve reconciliation evidence inside the one-shot boundary
+
+M10.47 removes independently supplied gate, receipt, and projection values from the one-shot coordinator API. The explicit caller now provides only a gate ID; the coordinator loads the M10.46 durable context, revalidates its complete correlation, and then applies the existing terminal decision, read-only runner, interpreter, and monotonic store.
+
+This narrows the trust boundary without creating an automatic workflow. The coordinator remains unwired, and every call must still be made explicitly. It has no retry, timer, queue, schedule, route, or runtime registration. A test-double E2E proves terminal persistence stops a later call before the runner, but no live CLI or provider access is enabled.
+
 ## 2026-10-03 — Load reconciliation context as one durable read model
 
 M10.46 reads the immutable gate, receipt, and latest sequenced status observation through one Prisma read operation instead of asking a future caller to assemble those facts independently. The store returns no context until both gate and receipt exist, revalidates every persisted boundary, and derives the lifecycle through the same centralized projection function used by M10.42.
