@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-06 — Enforce cancellation after every reconciliation attempt
+
+- Added a caller-signal gate immediately after each awaited sequential attempt and before result validation or aggregation.
+- Prevented a cancellation arriving during the final attempt from producing a misleading completed-cycle result when an inner adapter returns normally.
+- Propagated the original abort reason, retained already completed durable work without rollback, started no later candidate, and released the process-local claim for a future explicit call.
+- Preserved input/candidate/result isolation, fail-closed attempt-result validation, bounded sequential execution, overlap suppression, fail-fast propagation, and no retry.
+- Added no schema, persistence change, candidate-store cancellation contract, database claim or lease, NestJS registration, route, live process invocation, live provider call, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,096 backend tests across 183 suites, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-06 — Validate and snapshot reconciliation-attempt results
 
 - Added fail-closed validation for every non-throwing attempt result before cycle aggregation.

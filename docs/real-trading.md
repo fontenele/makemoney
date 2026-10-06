@@ -1062,6 +1062,25 @@ Validation occurs immediately after each sequential attempt and before its outco
 - Input/candidate snapshots, cancellation, overlap suppression, bounds, sequential execution, durable inner revalidation, failure propagation, and no retry remain unchanged.
 - No schema, persistence change, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.58 — Post-attempt cancellation gate
+
+M10.58 completes the M10.54 cancellation boundary around each sequential attempt. The cycle now checks the exact caller signal immediately after `reconcileOnce` returns and before validating, snapshotting, or aggregating that result. This covers the final candidate, where no later loop iteration existed to observe cancellation if an inner adapter ignored or raced the signal.
+
+The signal's original abort reason propagates unchanged. Any provider read or durable observation already completed inside the attempt remains authoritative and is not rolled back, but the cancelled cycle does not publish that attempt in a completed summary. No later candidate starts, and the M10.53 `finally` boundary releases the process-local claim so a later explicit uncancelled call can reload current durable state normally.
+
+### M10.58 acceptance criteria
+
+- The caller signal is checked immediately after every awaited attempt.
+- Post-attempt cancellation occurs before attempt-result validation, snapshotting, aggregation, or another candidate.
+- Cancellation during the final attempt cannot return a completed cycle.
+- The signal's original abort reason propagates without conversion or retry.
+- Durable work already completed inside the attempt is not rolled back or compensated.
+- The process-local cycle claim releases after post-attempt cancellation, allowing a later explicit uncancelled reload.
+- Existing pre-discovery, post-discovery, and pre-attempt gates remain unchanged.
+- Input/candidate/result snapshots, bounds, sequentiality, overlap suppression, fail-closed result validation, failure propagation, and no retry remain unchanged.
+- Focused coverage proves final-attempt cancellation propagation and claim release.
+- No schema, persistence change, candidate-store cancellation contract, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

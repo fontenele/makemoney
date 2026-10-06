@@ -313,6 +313,26 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     );
   });
 
+  it('propagates cancellation after the final attempt and releases its claim', async () => {
+    const controller = new AbortController();
+    const reason = new Error('operator cancelled reconciliation');
+    const reconcileOnce = jest.fn(() => {
+      controller.abort(reason);
+      return Promise.resolve(attemptResult('status_lookup_not_required'));
+    });
+    const harness = cycleHarness([candidate(1)], reconcileOnce);
+
+    await expect(harness.cycle.runOnce(INPUT, controller.signal)).rejects.toBe(
+      reason,
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+      status: 'completed',
+      attemptedCount: 1,
+    });
+    expect(reconcileOnce).toHaveBeenCalledTimes(2);
+  });
+
   it.each([
     { ...INPUT, limit: 0 },
     { ...INPUT, minimumLookupIntervalMs: 999 },

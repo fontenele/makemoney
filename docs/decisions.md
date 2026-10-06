@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-06 — Recheck cancellation after every awaited attempt
+
+M10.58 closes the last gap in the manual cycle's cancellation boundary by checking the exact caller signal immediately after `reconcileOnce` returns. Relying only on the next loop iteration allowed a one-candidate or final-candidate cycle to return `completed` when cancellation arrived during an inner adapter that ignored or raced the signal.
+
+Post-attempt cancellation wins before result validation and aggregation and propagates the signal's original reason. Work already durably completed inside the attempt is deliberately not rolled back or misrepresented as absent from persistence; a later explicit call must reload that durable state. The existing `finally` release remains authoritative, and cancellation adds no retry, compensation, waiting, or automatic caller.
+
 ## 2026-10-06 — Treat attempt results as validated cycle-boundary input
 
 M10.57 does not trust a non-throwing M10.50 return merely because it satisfies a TypeScript interface. Before aggregation, the manual cycle checks the status-specific relationship among blockers, provider-call progress, lookup requirement, evaluation/cadence time, replay state, stored observation, and the invariant that financial reconciliation remains incomplete and submission retry remains forbidden. A stored observation must also be structurally valid and correlate with the exact candidate gate and provider order.

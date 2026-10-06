@@ -78,6 +78,7 @@ export class AgenticWalletMarketSwapStatusReconciliationCycle {
           candidate.gateId,
           signal,
         );
+        signal?.throwIfAborted();
         const attempt = validateAndSnapshotStatusReconciliationAttemptResult(
           attemptResult,
           candidate,
