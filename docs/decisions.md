@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-06 — Correlate attempt-result time with candidate eligibility
+
+M10.60 extends the untrusted result boundary from structural lifecycle validation to cross-boundary temporal validation. Any result claiming completed provider access must have an evaluation time at or after the exact eligibility instant admitted by discovery; otherwise the cycle would be accepting evidence of a lookup performed before its own cadence boundary.
+
+A newly persisted observation must likewise have `recordedAt >= evaluatedAt`, preserving causal audit order from admission through durable recording. Exact persistence replays are deliberately exempt from that second comparison because their immutable original row can validly predate the current evaluation and no new write occurs. Temporal divergence fails closed before aggregation and adds no clock repair, retry, persistence, provider call, or execution authority.
+
 ## 2026-10-06 — Revalidate canonical candidate order instead of sorting
 
 M10.59 makes the manual cycle independently enforce the M10.51 reader's canonical order: earlier `eligibleAt` first, then ascending lowercase canonical gate UUID for equal eligibility. This order gives older due work priority and makes a bounded cycle reproducible across identical durable snapshots.

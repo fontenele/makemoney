@@ -112,7 +112,7 @@ function isValidAttemptResult(
       noObservation &&
       result.statusLookupRequired &&
       result.evaluatedAt !== null &&
-      isAdmittedLookupTime(result)
+      isProviderCallTemporallyAdmitted(result, candidate)
     );
   }
   if (result.status !== 'status_observation_recorded') return false;
@@ -123,14 +123,26 @@ function isValidAttemptResult(
     result.providerCallStarted &&
     result.providerCallCompleted &&
     result.evaluatedAt !== null &&
-    isAdmittedLookupTime(result) &&
+    isProviderCallTemporallyAdmitted(result, candidate) &&
     stored !== null &&
     UUID_PATTERN.test(stored.id) &&
     isValidDate(stored.recordedAt) &&
+    (result.observationReplayed ||
+      stored.recordedAt.getTime() >= result.evaluatedAt.getTime()) &&
     isValidAgenticWalletMarketSwapStatusObservation(stored.observation) &&
     stored.observation.gateId === candidate.gateId &&
     stored.observation.providerOrderId === candidate.providerOrderId &&
     result.statusLookupRequired === stored.observation.statusLookupRequired
+  );
+}
+
+function isProviderCallTemporallyAdmitted(
+  result: AgenticWalletMarketSwapStatusReconciliationAttemptResult,
+  candidate: AgenticWalletMarketSwapStatusReconciliationCandidate,
+): boolean {
+  return (
+    result.evaluatedAt!.getTime() >= candidate.eligibleAt.getTime() &&
+    isAdmittedLookupTime(result)
   );
 }
 

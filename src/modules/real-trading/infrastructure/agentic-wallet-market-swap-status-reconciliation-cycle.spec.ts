@@ -211,6 +211,54 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     expect(reconcileOnce).toHaveBeenCalledTimes(1);
   });
 
+  it('rejects a provider call reported before the candidate was eligible', async () => {
+    const malformed = attemptResult('status_response_invalid');
+    malformed.evaluatedAt!.setTime(
+      new Date('2026-10-05T12:00:04.999Z').getTime(),
+    );
+    const harness = cycleHarness(
+      [candidate(1)],
+      jest.fn().mockResolvedValue(malformed),
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+      'Agentic Wallet status reconciliation attempt result is invalid',
+    );
+  });
+
+  it('rejects a newly stored observation recorded before its evaluation', async () => {
+    const malformed = attemptResult('status_observation_recorded');
+    malformed.storedObservation!.recordedAt.setTime(
+      new Date('2026-10-05T12:00:06.999Z').getTime(),
+    );
+    const harness = cycleHarness(
+      [candidate(1)],
+      jest.fn().mockResolvedValue(malformed),
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+      'Agentic Wallet status reconciliation attempt result is invalid',
+    );
+  });
+
+  it('accepts an immutable replay recorded before the current evaluation', async () => {
+    const replay = attemptResult('status_observation_recorded');
+    Object.assign(replay, { observationReplayed: true });
+    replay.storedObservation!.recordedAt.setTime(
+      new Date('2026-10-05T12:00:06.000Z').getTime(),
+    );
+    const harness = cycleHarness(
+      [candidate(1)],
+      jest.fn().mockResolvedValue(replay),
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+      status: 'completed',
+      observationRecordedCount: 1,
+      outcomes: [{ attempt: { observationReplayed: true } }],
+    });
+  });
+
   it('blocks an overlapping cycle before discovery without waiting', async () => {
     let releaseDiscovery!: (
       candidates: AgenticWalletMarketSwapStatusReconciliationCandidate[],

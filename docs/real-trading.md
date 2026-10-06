@@ -1100,6 +1100,23 @@ The cycle fails closed on an order regression rather than sorting the batch itse
 - Focused coverage proves both eligibility and gate tie-break regressions are rejected without attempts.
 - No schema, persistence change, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.60 — Reconciliation-attempt temporal coherence
+
+M10.60 extends the M10.57 result boundary with causal correlation to the exact candidate admitted by discovery. A result that reports a completed provider call is valid only when its `evaluatedAt` is at or after that candidate's `eligibleAt`; an adapter cannot claim a lookup occurred before the durable cadence boundary selected by M10.51.
+
+When the attempt reports a newly stored observation, its durable `recordedAt` must be at or after the evaluation that produced it. An exact immutable replay is intentionally allowed to retain an earlier recording time because it returns an existing row and performs no new persistence. Any temporal divergence stops the batch before aggregation or the next candidate.
+
+### M10.60 acceptance criteria
+
+- `status_response_invalid` and `status_observation_recorded` results require `evaluatedAt >= candidate.eligibleAt`.
+- A newly stored observation requires `recordedAt >= evaluatedAt`.
+- An exact replay may retain its immutable original `recordedAt` before the current evaluation.
+- Temporal divergence fails closed before aggregation and before the next candidate.
+- The PostgreSQL integration fixture uses a monotonic observation-recording clock consistent with the attempted lookup.
+- Canonical candidate order, input/candidate/result snapshots, cancellation, overlap suppression, bounds, sequential execution, fail-fast propagation, and no retry remain unchanged.
+- Focused coverage proves pre-eligibility provider access and pre-evaluation new recording are rejected while an earlier exact replay remains valid.
+- No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

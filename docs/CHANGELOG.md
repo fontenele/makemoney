@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-06 — Enforce reconciliation-attempt temporal coherence
+
+- Rejected non-throwing results that claim a provider call was evaluated before the discovered candidate's eligibility instant.
+- Required a newly persisted status observation to have a recording time at or after the evaluation that produced it.
+- Preserved legitimate immutable replays, whose original durable recording time may precede the current evaluation.
+- Added focused coverage for both temporal regressions and the valid replay exception, and aligned the PostgreSQL cycle fixture with a monotonic recording clock.
+- Preserved canonical candidate order, snapshots, cancellation, overlap suppression, bounded sequential execution, fail-fast propagation, financial incompleteness, and no retry.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,101 backend tests across 183 suites, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-06 — Enforce canonical reconciliation-candidate order
 
 - Revalidated each discovered batch in the same deterministic order promised by M10.51: `eligibleAt` ascending, then canonical `gateId` ascending.

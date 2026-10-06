@@ -516,6 +516,11 @@ describe('Real execution submission gate persistence (e2e)', () => {
     await store.create(command(10));
     await receiptStore.record(submissionReceipt(10));
     let lookupCalls = 0;
+    const cycleStatusStore =
+      new PrismaAgenticWalletMarketSwapStatusObservationStore(
+        prisma,
+        () => new Date('2026-10-03T12:00:07.000Z'),
+      );
     const attempt = new AgenticWalletMarketSwapStatusReconciliationAttempt(
       reconciliationContextStore,
       {
@@ -524,7 +529,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
           return Promise.resolve(finishedStatusLookupResponse());
         },
       },
-      statusStore,
+      cycleStatusStore,
       () => new Date('2026-10-03T12:00:07.000Z'),
       1_000,
     );
