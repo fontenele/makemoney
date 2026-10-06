@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-06 — Validate and snapshot reconciliation-attempt results
+
+- Added fail-closed validation for every non-throwing attempt result before cycle aggregation.
+- Required status-specific blockers, provider-call flags, lookup state, dates, financial invariants, stored-observation structure, and exact candidate gate/order correlation.
+- Copied accepted blocker arrays, timing values, stored records, and provider observation dates before continuing to the next candidate.
+- Added focused coverage proving malformed output stops the batch and later mutation cannot rewrite completed outcome counts or audit evidence.
+- Preserved input/candidate isolation, cancellation, overlap suppression, bounded sequential execution, durable inner revalidation, fail-fast propagation, and no retry.
+- Added no schema, persistence change, database claim or lease, NestJS registration, route, live process invocation, live provider call, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,095 backend tests across 183 suites, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-06 — Snapshot reconciliation candidate batches
 
 - Captured a private ordered copy of every validated discovery candidate before the first sequential attempt.

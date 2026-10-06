@@ -154,6 +154,63 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     );
   });
 
+  it('isolates reporting from mutation of an earlier attempt result', async () => {
+    const firstResult = attemptResult('status_observation_recorded');
+    const originalEvaluatedAt = new Date(firstResult.evaluatedAt!);
+    const reconcileOnce = jest
+      .fn()
+      .mockResolvedValueOnce(firstResult)
+      .mockImplementationOnce(() => {
+        Object.assign(firstResult, {
+          status: 'blocked',
+          providerCallStarted: false,
+          providerCallCompleted: false,
+        });
+        firstResult.evaluatedAt!.setTime(
+          new Date('2026-10-05T12:10:00.000Z').getTime(),
+        );
+        (firstResult.blockers as string[]).push('invalid_reconciliation_state');
+        return Promise.resolve(attemptResult('status_lookup_not_required'));
+      });
+    const harness = cycleHarness([candidate(1), candidate(2)], reconcileOnce);
+
+    const result = await harness.cycle.runOnce(INPUT);
+
+    expect(result).toMatchObject({
+      observationRecordedCount: 1,
+      lookupNotRequiredCount: 1,
+      blockedCount: 0,
+    });
+    expect(result.outcomes[0].attempt).toMatchObject({
+      status: 'status_observation_recorded',
+      blockers: [],
+      evaluatedAt: originalEvaluatedAt,
+      providerCallStarted: true,
+      providerCallCompleted: true,
+    });
+    expect(result.outcomes[0].attempt).not.toBe(firstResult);
+    expect(result.outcomes[0].attempt.evaluatedAt).not.toBe(
+      firstResult.evaluatedAt,
+    );
+    expect(result.outcomes[0].attempt.storedObservation).not.toBe(
+      firstResult.storedObservation,
+    );
+  });
+
+  it('fails closed on a malformed attempt result before the next candidate', async () => {
+    const malformed = {
+      ...attemptResult('status_lookup_not_required'),
+      financialReconciliationComplete: true,
+    } as unknown as AgenticWalletMarketSwapStatusReconciliationAttemptResult;
+    const reconcileOnce = jest.fn().mockResolvedValue(malformed);
+    const harness = cycleHarness([candidate(1), candidate(2)], reconcileOnce);
+
+    await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+      'Agentic Wallet status reconciliation attempt result is invalid',
+    );
+    expect(reconcileOnce).toHaveBeenCalledTimes(1);
+  });
+
   it('blocks an overlapping cycle before discovery without waiting', async () => {
     let releaseDiscovery!: (
       candidates: AgenticWalletMarketSwapStatusReconciliationCandidate[],
@@ -389,17 +446,57 @@ function pendingCandidate(
 function attemptResult(
   status: AgenticWalletMarketSwapStatusReconciliationAttemptResult['status'],
 ): AgenticWalletMarketSwapStatusReconciliationAttemptResult {
+  const providerCallCompleted =
+    status === 'status_response_invalid' ||
+    status === 'status_observation_recorded';
+  const evaluatedAt =
+    status === 'status_lookup_deferred' || providerCallCompleted
+      ? new Date(EVALUATED_AT)
+      : null;
+  const storedObservation =
+    status === 'status_observation_recorded'
+      ? {
+          id: uuid(101),
+          observation: {
+            kind: 'agentic_wallet_market_swap_status_observation' as const,
+            providerId: 'agentic_wallet' as const,
+            gateId: uuid(1),
+            providerOrderId: 'order-1',
+            providerStatus: 'PENDING' as const,
+            transactionHash: null,
+            bookedAt: new Date('2026-10-05T12:00:05.000Z'),
+            updatedAt: new Date('2026-10-05T12:00:06.000Z'),
+            terminal: false,
+            executionSucceeded: false,
+            statusLookupRequired: true,
+            financialReconciliationRequired: true as const,
+            financialReconciliationComplete: false as const,
+            actualReceivedQuantity: null,
+            submissionRetryAllowed: false as const,
+          },
+          recordedAt: new Date(EVALUATED_AT),
+        }
+      : null;
   return {
     scope: 'agentic_wallet_market_swap_status_reconciliation_attempt',
     status,
-    blockers: status === 'blocked' ? ['invalid_reconciliation_state'] : [],
-    storedObservation: null,
+    blockers:
+      status === 'blocked'
+        ? ['invalid_reconciliation_state']
+        : status === 'status_response_invalid'
+          ? ['provider_reported_failure']
+          : [],
+    storedObservation,
     observationReplayed: false,
-    evaluatedAt: null,
-    nextStatusLookupAt: null,
-    providerCallStarted: false,
-    providerCallCompleted: false,
-    statusLookupRequired: status === 'status_lookup_deferred',
+    evaluatedAt,
+    nextStatusLookupAt:
+      status === 'status_lookup_deferred'
+        ? new Date(EVALUATED_AT.getTime() + 1_000)
+        : null,
+    providerCallStarted: providerCallCompleted,
+    providerCallCompleted,
+    statusLookupRequired:
+      status === 'status_lookup_deferred' || providerCallCompleted,
     financialReconciliationRequired: true,
     financialReconciliationComplete: false,
     submissionRetryAllowed: false,

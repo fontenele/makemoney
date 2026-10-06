@@ -1043,6 +1043,25 @@ Copying occurs after validation so malformed, duplicate, oversized, or cadence-d
 - Focused unit coverage mutates the adapter-owned array and candidates during the first attempt and proves the original validated batch remains authoritative.
 - No schema, persistence change, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.57 — Reconciliation-attempt result boundary
+
+M10.57 treats every non-throwing M10.50 result as untrusted cycle-boundary input until its complete lifecycle shape is verified. The cycle checks the closed status and blocker sets, provider-call progress, lookup requirement, replay state, evaluation and cadence dates, financial and retry invariants, and whether a stored observation is required or forbidden. A stored observation must retain a valid durable ID and record time, pass the existing M10.38 structural policy, and correlate with the exact candidate gate and provider order.
+
+Validation occurs immediately after each sequential attempt and before its outcome is retained. Invalid output stops the batch through the existing fail-fast path, starts no later candidate, and is not converted into a normal blocked outcome or retried. A valid result is copied into cycle-owned state before the next `await`, including blockers, nullable dates, durable observation metadata, and provider observation dates. Later mutation therefore cannot rewrite counts or audit evidence already admitted by the cycle.
+
+### M10.57 acceptance criteria
+
+- Every non-throwing attempt result is validated before aggregation and before the next candidate starts.
+- Only the closed attempt status and blocker values are accepted, with unique blockers and status-appropriate empty/non-empty rules.
+- Provider-call flags, lookup requirement, replay state, evaluation time, and next-eligible time must match the reported status.
+- Financial reconciliation must remain required and incomplete, and submission retry must remain forbidden.
+- Stored observations are accepted only for `status_observation_recorded`, must pass existing structural validation, and must match the candidate gate and provider order exactly.
+- Accepted blocker arrays, dates, stored metadata, and nested observation dates are copied before the next asynchronous boundary.
+- Malformed or divergent output stops the remaining batch without retry and releases the process-local cycle claim through the existing `finally` boundary.
+- Focused tests prove fail-closed malformed-output handling and isolation from later mutation of an earlier accepted result.
+- Input/candidate snapshots, cancellation, overlap suppression, bounds, sequential execution, durable inner revalidation, failure propagation, and no retry remain unchanged.
+- No schema, persistence change, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

@@ -2,6 +2,7 @@ import {
   AgenticWalletMarketSwapStatusReconciliationAttempt,
   AgenticWalletMarketSwapStatusReconciliationAttemptResult,
 } from './agentic-wallet-market-swap-status-reconciliation-attempt';
+import { validateAndSnapshotStatusReconciliationAttemptResult } from './agentic-wallet-market-swap-status-reconciliation-attempt-result';
 import {
   AgenticWalletMarketSwapStatusReconciliationCandidate,
   AgenticWalletMarketSwapStatusReconciliationCandidateStore,
@@ -73,9 +74,13 @@ export class AgenticWalletMarketSwapStatusReconciliationCycle {
         [];
       for (const candidate of cycleCandidates) {
         signal?.throwIfAborted();
-        const attempt = await this.attempt.reconcileOnce(
+        const attemptResult = await this.attempt.reconcileOnce(
           candidate.gateId,
           signal,
+        );
+        const attempt = validateAndSnapshotStatusReconciliationAttemptResult(
+          attemptResult,
+          candidate,
         );
         outcomes.push({ candidate, attempt });
       }

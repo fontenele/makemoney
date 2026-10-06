@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-06 — Treat attempt results as validated cycle-boundary input
+
+M10.57 does not trust a non-throwing M10.50 return merely because it satisfies a TypeScript interface. Before aggregation, the manual cycle checks the status-specific relationship among blockers, provider-call progress, lookup requirement, evaluation/cadence time, replay state, stored observation, and the invariant that financial reconciliation remains incomplete and submission retry remains forbidden. A stored observation must also be structurally valid and correlate with the exact candidate gate and provider order.
+
+Accepted results are copied before the next asynchronous attempt, including arrays, all dates, and the nested stored observation. This prevents a test double or future adapter implementation from mutating an earlier result and rewriting the final audit summary. Invalid output propagates as a fail-closed cycle error, stops the remaining batch, and is never converted into a normal blocked count or retried.
+
 ## 2026-10-06 — Snapshot validated candidate batches before attempts
 
 M10.56 treats the ordered candidate batch returned by discovery as adapter-owned mutable state until it has passed complete batch validation. Immediately afterward, and before the first sequential attempt, the cycle copies every candidate record and each mutable `Date`. Only this private snapshot drives gate selection, attempt order, outcome evidence, and final reporting.
