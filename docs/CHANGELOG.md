@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-06 — Snapshot reconciliation candidate batches
+
+- Captured a private ordered copy of every validated discovery candidate before the first sequential attempt.
+- Copied candidate records and every mutable date so later adapter-side mutation cannot change gate selection, attempt order, cadence evidence, or reporting.
+- Added focused coverage that mutates candidate identity and dates and reverses the adapter-owned array during the first attempt.
+- Preserved input isolation, cancellation, process-local overlap suppression, bounded sequential execution, durable inner revalidation, fail-fast propagation, and no retry.
+- Added no schema, persistence change, database lease, NestJS registration, route, live process invocation, live provider call, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,093 backend tests across 183 suites, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-05 — Snapshot reconciliation-cycle inputs
 
 - Captured a private defensive copy of the validated evaluation time, minimum lookup interval, and batch limit before asynchronous work.

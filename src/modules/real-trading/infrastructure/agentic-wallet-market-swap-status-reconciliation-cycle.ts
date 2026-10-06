@@ -67,10 +67,11 @@ export class AgenticWalletMarketSwapStatusReconciliationCycle {
       );
       signal?.throwIfAborted();
       validateCandidateBatch(candidates, cycleInput);
+      const cycleCandidates = snapshotCandidateBatch(candidates);
 
       const outcomes: AgenticWalletMarketSwapStatusReconciliationCycleOutcome[] =
         [];
-      for (const candidate of candidates) {
+      for (const candidate of cycleCandidates) {
         signal?.throwIfAborted();
         const attempt = await this.attempt.reconcileOnce(
           candidate.gateId,
@@ -84,6 +85,30 @@ export class AgenticWalletMarketSwapStatusReconciliationCycle {
       this.active = false;
     }
   }
+}
+
+function snapshotCandidateBatch(
+  candidates: readonly AgenticWalletMarketSwapStatusReconciliationCandidate[],
+): AgenticWalletMarketSwapStatusReconciliationCandidate[] {
+  return candidates.map((candidate) => ({
+    scope: candidate.scope,
+    providerId: candidate.providerId,
+    gateId: candidate.gateId,
+    providerOrderId: candidate.providerOrderId,
+    phase: candidate.phase,
+    receiptRecordedAt: new Date(candidate.receiptRecordedAt),
+    latestObservationId: candidate.latestObservationId,
+    latestObservationRecordedAt:
+      candidate.latestObservationRecordedAt === null
+        ? null
+        : new Date(candidate.latestObservationRecordedAt),
+    eligibleAt: new Date(candidate.eligibleAt),
+    evaluatedAt: new Date(candidate.evaluatedAt),
+    statusLookupRequired: candidate.statusLookupRequired,
+    financialReconciliationRequired: candidate.financialReconciliationRequired,
+    financialReconciliationComplete: candidate.financialReconciliationComplete,
+    submissionRetryAllowed: candidate.submissionRetryAllowed,
+  }));
 }
 
 function snapshotCycleInput(

@@ -117,6 +117,43 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     expect(discoveredInput.evaluatedAt).not.toBe(callerInput.evaluatedAt);
   });
 
+  it('isolates sequential attempts and reporting from candidate-batch mutation', async () => {
+    const returnedCandidates = [candidate(1), candidate(2)];
+    const originalSecondGateId = returnedCandidates[1].gateId;
+    const originalFirstReceiptTime = new Date(
+      returnedCandidates[0].receiptRecordedAt,
+    );
+    const reconcileOnce = jest.fn((gateId: string) => {
+      if (gateId === returnedCandidates[0].gateId) {
+        returnedCandidates[0].receiptRecordedAt.setTime(
+          new Date('2026-10-05T12:00:06.000Z').getTime(),
+        );
+        Object.assign(returnedCandidates[1], { gateId: uuid(99) });
+        returnedCandidates.reverse();
+      }
+      return Promise.resolve(attemptResult('status_lookup_not_required'));
+    });
+    const harness = cycleHarness(returnedCandidates, reconcileOnce);
+
+    const result = await harness.cycle.runOnce(INPUT);
+
+    expect(reconcileOnce.mock.calls.map(([gateId]) => gateId)).toEqual([
+      uuid(1),
+      originalSecondGateId,
+    ]);
+    expect(result.outcomes.map(({ candidate: row }) => row.gateId)).toEqual([
+      uuid(1),
+      originalSecondGateId,
+    ]);
+    expect(result.outcomes[0].candidate).not.toBe(returnedCandidates[1]);
+    expect(result.outcomes[0].candidate.receiptRecordedAt).toEqual(
+      originalFirstReceiptTime,
+    );
+    expect(result.outcomes[0].candidate.receiptRecordedAt).not.toBe(
+      returnedCandidates[1].receiptRecordedAt,
+    );
+  });
+
   it('blocks an overlapping cycle before discovery without waiting', async () => {
     let releaseDiscovery!: (
       candidates: AgenticWalletMarketSwapStatusReconciliationCandidate[],

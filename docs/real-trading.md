@@ -1025,6 +1025,24 @@ The snapshot is process-local and ephemeral. It is not persisted, does not claim
 - Focused unit coverage mutates caller and discovery inputs while discovery is pending and proves the validated snapshot remains authoritative.
 - No schema, persistence change, database lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.56 — Reconciliation-candidate batch snapshot
+
+M10.56 isolates the admitted sequential work from mutable adapter-owned discovery output. After the complete M10.52 candidate-batch validation succeeds and before the first attempt begins, the cycle copies the ordered array, every candidate record, and all candidate `Date` values. Gate selection, attempt order, outcome evidence, and final reporting use only that private snapshot.
+
+Copying occurs after validation so malformed, duplicate, oversized, or cadence-divergent adapter output still fails closed. It occurs before the first attempt `await` so mutation while an earlier gate is being reconciled cannot redirect a later attempt or rewrite its audit row. Each M10.50 attempt still reloads complete durable context, making the snapshot an ephemeral coordination fact rather than a persistence claim or source of financial authority.
+
+### M10.56 acceptance criteria
+
+- The complete discovery batch is validated before snapshot creation.
+- Candidate order, identity, phase, and invariant flags are copied before the first attempt.
+- Every candidate `Date` is a distinct object in the private snapshot.
+- Later mutation, reordering, or truncation of the adapter-owned array cannot alter admitted attempts or reporting.
+- Later mutation of an adapter-owned candidate cannot change a gate ID or cadence evidence used by the cycle.
+- M10.50 continues to reload and validate authoritative durable context for each copied gate ID.
+- Input isolation, cancellation, overlap suppression, bounds, sequential execution, fail-fast propagation, and no retry remain unchanged.
+- Focused unit coverage mutates the adapter-owned array and candidates during the first attempt and proves the original validated batch remains authoritative.
+- No schema, persistence change, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

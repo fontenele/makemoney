@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-06 — Snapshot validated candidate batches before attempts
+
+M10.56 treats the ordered candidate batch returned by discovery as adapter-owned mutable state until it has passed complete batch validation. Immediately afterward, and before the first sequential attempt, the cycle copies every candidate record and each mutable `Date`. Only this private snapshot drives gate selection, attempt order, outcome evidence, and final reporting.
+
+The copy occurs after validation so invalid adapter output still fails closed, and before any attempt `await` so later adapter mutation cannot alter admitted work. The M10.50 attempt continues to reload complete durable context for every gate; this ephemeral snapshot is neither a claim nor authoritative durable evidence and adds no persistence, lease, scheduling, provider call, or execution authority.
+
 ## 2026-10-05 — Snapshot cycle inputs before asynchronous work
 
 M10.55 treats the validated evaluation time, cadence, and batch limit as one admitted-cycle snapshot. The cycle copies the mutable `Date` and primitive fields before its first asynchronous boundary and uses only that private copy for overlap results, candidate validation, cadence checks, and final reporting. Caller mutation after invocation can no longer redefine an active cycle.
