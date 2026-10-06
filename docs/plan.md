@@ -1711,7 +1711,7 @@ M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.11)
 M9 — Polymarket                   DONE (M9.1–M9.66)
-M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.58)
+M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.59)
 ```
 
 ---
@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.66. M10.58 rechecks caller cancellation immediately after every status-reconciliation attempt, so cancellation during the final attempt propagates instead of returning a misleading completed cycle. The complete reconciliation path remains unwired and unscheduled; every attempt reloads durable context, financial reconciliation remains incomplete, and submission retry remains forbidden. The current Agentic Wallet quote remains blocked by partial fee and gas coverage; the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, mutating command runner, or real executor has been added. Real trading remains disabled.
+M9 is closed through M9.66. M10.59 revalidates each status-reconciliation candidate batch in canonical eligibility/gate order before any attempt, so adapter divergence cannot change priority or audit ordering. The complete reconciliation path remains unwired and unscheduled; every attempt reloads durable context, financial reconciliation remains incomplete, and submission retry remains forbidden. The current Agentic Wallet quote remains blocked by partial fee and gas coverage; the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, mutating command runner, or real executor has been added. Real trading remains disabled.
 ```

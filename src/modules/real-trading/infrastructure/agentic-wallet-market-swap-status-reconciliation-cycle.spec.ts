@@ -349,6 +349,18 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
   it.each([
     ['oversized', [candidate(1), candidate(2)], { ...INPUT, limit: 1 }],
     ['duplicate', [candidate(1), candidate(1)], INPUT],
+    ['gate tie-break order', [candidate(2), candidate(1)], INPUT],
+    [
+      'eligibility order',
+      [
+        candidate(1),
+        candidate(2, {
+          receiptRecordedAt: new Date('2026-10-05T12:00:04.000Z'),
+          eligibleAt: new Date('2026-10-05T12:00:04.000Z'),
+        }),
+      ],
+      INPUT,
+    ],
     [
       'wrong evaluation time',
       [

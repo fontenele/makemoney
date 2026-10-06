@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-06 — Enforce canonical reconciliation-candidate order
+
+- Revalidated each discovered batch in the same deterministic order promised by M10.51: `eligibleAt` ascending, then canonical `gateId` ascending.
+- Rejected structurally valid but reordered batches before the first attempt instead of silently sorting divergent adapter output.
+- Added focused coverage for reversed gate tie-break order and regressed eligibility order.
+- Preserved bounds, duplicate rejection, cadence correlation, snapshots, cancellation, overlap suppression, fail-fast propagation, and no retry.
+- Added no schema, persistence change, database claim or lease, NestJS registration, route, live process invocation, live provider call, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,098 backend tests across 183 suites, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks.
+
 ## 2026-10-06 — Enforce cancellation after every reconciliation attempt
 
 - Added a caller-signal gate immediately after each awaited sequential attempt and before result validation or aggregation.

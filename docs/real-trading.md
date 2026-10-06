@@ -1081,6 +1081,25 @@ The signal's original abort reason propagates unchanged. Any provider read or du
 - Focused coverage proves final-attempt cancellation propagation and claim release.
 - No schema, persistence change, candidate-store cancellation contract, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.59 — Canonical reconciliation-candidate order
+
+M10.59 independently verifies that the M10.51 discovery adapter preserved its deterministic database order before the cycle snapshots or attempts the batch. Candidates must be ordered by `eligibleAt` ascending, which prioritizes the oldest due work, and then by ascending canonical lowercase gate UUID when two candidates share the same eligibility instant.
+
+The cycle fails closed on an order regression rather than sorting the batch itself. Silent sorting would conceal adapter divergence and could make the processed order differ from the bounded persistence page that was selected. Empty and single-candidate batches remain valid, while duplicate identity, malformed timing, cadence divergence, and all prior validation continue to apply before the first attempt.
+
+### M10.59 acceptance criteria
+
+- Candidate batches are ordered by ascending `eligibleAt` before any attempt.
+- Equal eligibility instants use ascending canonical `gateId` as the deterministic tie-breaker.
+- An eligibility regression fails closed before every attempt.
+- A gate-ID tie-break regression fails closed before every attempt.
+- The cycle does not silently reorder adapter output.
+- Empty and single-candidate batches remain valid.
+- Bounds, structural validation, duplicate rejection, exact evaluation time, and pending-cadence correlation remain unchanged.
+- Candidate snapshotting occurs only after canonical order validation succeeds.
+- Focused coverage proves both eligibility and gate tie-break regressions are rejected without attempts.
+- No schema, persistence change, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

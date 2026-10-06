@@ -169,6 +169,8 @@ function validateCandidateBatch(
   const candidateBatch =
     candidates as readonly AgenticWalletMarketSwapStatusReconciliationCandidate[];
   const gateIds = new Set<string>();
+  let previous: AgenticWalletMarketSwapStatusReconciliationCandidate | null =
+    null;
   for (const candidate of candidateBatch) {
     if (
       !isValidStatusReconciliationCandidate(candidate) ||
@@ -177,14 +179,29 @@ function validateCandidateBatch(
         candidate.eligibleAt.getTime() !==
           candidate.latestObservationRecordedAt!.getTime() +
             input.minimumLookupIntervalMs) ||
-      gateIds.has(candidate.gateId)
+      gateIds.has(candidate.gateId) ||
+      (previous !== null && !isCanonicalSuccessor(previous, candidate))
     ) {
       throw new Error(
         'Agentic Wallet status reconciliation candidate batch is invalid',
       );
     }
     gateIds.add(candidate.gateId);
+    previous = candidate;
   }
+}
+
+function isCanonicalSuccessor(
+  previous: AgenticWalletMarketSwapStatusReconciliationCandidate,
+  candidate: AgenticWalletMarketSwapStatusReconciliationCandidate,
+): boolean {
+  const previousEligibleAt = previous.eligibleAt.getTime();
+  const candidateEligibleAt = candidate.eligibleAt.getTime();
+  return (
+    candidateEligibleAt > previousEligibleAt ||
+    (candidateEligibleAt === previousEligibleAt &&
+      candidate.gateId > previous.gateId)
+  );
 }
 
 function countStatus(

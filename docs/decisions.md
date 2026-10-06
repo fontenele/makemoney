@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-06 — Revalidate canonical candidate order instead of sorting
+
+M10.59 makes the manual cycle independently enforce the M10.51 reader's canonical order: earlier `eligibleAt` first, then ascending lowercase canonical gate UUID for equal eligibility. This order gives older due work priority and makes a bounded cycle reproducible across identical durable snapshots.
+
+The cycle rejects out-of-order output rather than sorting it. Silent repair would conceal a reader/adapter contract violation and could make the cycle claim an audit order different from the persistence query that selected the bounded page. Validation occurs before the candidate snapshot and first attempt and adds no read, claim, lease, provider call, or execution authority.
+
 ## 2026-10-06 — Recheck cancellation after every awaited attempt
 
 M10.58 closes the last gap in the manual cycle's cancellation boundary by checking the exact caller signal immediately after `reconcileOnce` returns. Relying only on the next loop iteration allowed a one-candidate or final-candidate cycle to return `completed` when cancellation arrived during an inner adapter that ignored or raced the signal.
