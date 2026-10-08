@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-08 — Preserve immutable facts when replaying a known observation identity
+
+M10.70 narrows the replay exception intentionally preserved by M10.69. The candidate's `latestObservationId`, `latestObservationRecordedAt`, and `provider_pending` phase describe one already stored immutable row. If a replay returns that exact identity, its recording time must equal the candidate timestamp and its provider status must remain `PENDING`; the same UUID cannot represent rewritten temporal or terminal facts.
+
+A different replay ID remains valid because an exact observation may have been persisted concurrently after discovery or context reload. The existing structural observation policy derives all terminal and lookup flags from provider status, so checking `PENDING` also preserves those facts. The cycle enforces this at the untrusted result boundary without changing persistence, retry, provider access, scheduling, runtime registration, or execution authority.
+
 ## 2026-10-08 — Require fresh identity for a newly stored status observation
 
 M10.69 correlates `observationReplayed` with the append-only observation identity returned by the store. When persistence is required, the store generates a fresh UUID and a collision fails instead of returning a stored result. A non-replayed result for a discovered `provider_pending` candidate therefore cannot reuse `candidate.latestObservationId`; accepting it would claim that the existing row was both old evidence and a new append.

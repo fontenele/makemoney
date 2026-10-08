@@ -160,9 +160,26 @@ function isValidAttemptResult(
     isValidAgenticWalletMarketSwapStatusObservation(stored.observation) &&
     stored.observation.gateId === candidate.gateId &&
     stored.observation.providerOrderId === candidate.providerOrderId &&
-    (result.observationReplayed ||
-      stored.id !== candidate.latestObservationId) &&
+    isStoredObservationIdentityCoherent(result, candidate) &&
     result.statusLookupRequired === stored.observation.statusLookupRequired
+  );
+}
+
+function isStoredObservationIdentityCoherent(
+  result: AgenticWalletMarketSwapStatusReconciliationAttemptResult,
+  candidate: AgenticWalletMarketSwapStatusReconciliationCandidate,
+): boolean {
+  const stored = result.storedObservation!;
+  if (!result.observationReplayed) {
+    return stored.id !== candidate.latestObservationId;
+  }
+  if (stored.id !== candidate.latestObservationId) return true;
+  return (
+    candidate.phase === 'provider_pending' &&
+    candidate.latestObservationRecordedAt !== null &&
+    stored.recordedAt.getTime() ===
+      candidate.latestObservationRecordedAt.getTime() &&
+    stored.observation.providerStatus === 'PENDING'
   );
 }
 

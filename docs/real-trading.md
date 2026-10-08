@@ -1269,6 +1269,23 @@ An exact replay remains different. Concurrent work can persist the same observat
 - Focused coverage proves rejection of impossible identity reuse and preserves valid fresh identities.
 - No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.70 — Known replay evidence immutability
+
+M10.70 constrains the replay identity exception retained by M10.69. A discovered `provider_pending` candidate carries the identity and recording time of one existing immutable pending observation. When `observationReplayed: true` returns that same ID, the stored result must retain the exact `latestObservationRecordedAt` and provider status `PENDING`; otherwise one durable identity would claim contradictory facts.
+
+The rule does not require every replay to match the discovery identity. Concurrent persistence may create a newer exact observation before the serialized store evaluates the transition, so a different valid replay ID remains admissible and is validated by the existing structure, gate, order, timing, and status rules.
+
+### M10.70 acceptance criteria
+
+- A replay returning `candidate.latestObservationId` preserves `candidate.latestObservationRecordedAt` exactly.
+- The same known identity retains provider status `PENDING` and its structurally derived non-terminal lookup-required flags.
+- A known identity with a different recording time or terminal status fails closed before aggregation and before the next candidate.
+- A replay with a different valid identity remains allowed for concurrent persistence.
+- Non-replayed observations retain the M10.69 fresh-identity requirement.
+- Existing cadence, blocker, timing, observation, financial, snapshot, cancellation, and retry rules remain enforced.
+- Focused coverage proves coherent replay acceptance and both immutable-fact rejection directions.
+- No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

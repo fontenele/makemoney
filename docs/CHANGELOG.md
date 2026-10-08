@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-08 — Preserve immutable evidence for known observation replays
+
+- Required a replay returning the pending candidate's known observation ID to preserve its exact recording time and `PENDING` provider state.
+- Rejected the same UUID paired with a rewritten timestamp or terminal status before aggregation or the next candidate.
+- Preserved replay results with newer valid identities created by concurrent persistence.
+- Added focused rejection coverage plus acceptance of a coherent known-identity replay.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,116 backend tests across 183 suites, the focused 41-test reconciliation-cycle suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-08 — Require fresh identity for newly stored status observations
 
 - Rejected a non-replayed status observation that reuses the discovered pending candidate's latest observation ID.
