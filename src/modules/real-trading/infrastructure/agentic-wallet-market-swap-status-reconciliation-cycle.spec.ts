@@ -254,6 +254,50 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     });
   });
 
+  it('rejects multiple blockers for a pre-provider attempt', async () => {
+    const malformed = attemptResult('blocked');
+    Object.assign(malformed, {
+      blockers: [
+        'invalid_reconciliation_state',
+        'reconciliation_evidence_mismatch',
+      ],
+    });
+    const reconcileOnce = jest.fn().mockResolvedValue(malformed);
+    const harness = cycleHarness([candidate(1), candidate(2)], reconcileOnce);
+
+    await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+      'Agentic Wallet status reconciliation attempt result is invalid',
+    );
+    expect(reconcileOnce).toHaveBeenCalledTimes(1);
+  });
+
+  it('requires status-response blockers in their canonical assessor order', async () => {
+    const canonical = attemptResult('status_response_invalid');
+    Object.assign(canonical, {
+      blockers: ['invalid_order_lookup_payload', 'order_identity_mismatch'],
+    });
+    const reversed = attemptResult('status_response_invalid');
+    Object.assign(reversed, {
+      blockers: ['order_identity_mismatch', 'invalid_order_lookup_payload'],
+    });
+    const canonicalHarness = cycleHarness(
+      [candidate(1)],
+      jest.fn().mockResolvedValue(canonical),
+    );
+    const reversedHarness = cycleHarness(
+      [candidate(1)],
+      jest.fn().mockResolvedValue(reversed),
+    );
+
+    await expect(canonicalHarness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+      status: 'completed',
+      invalidResponseCount: 1,
+    });
+    await expect(reversedHarness.cycle.runOnce(INPUT)).rejects.toThrow(
+      'Agentic Wallet status reconciliation attempt result is invalid',
+    );
+  });
+
   it('rejects a provider call reported before the candidate was eligible', async () => {
     const malformed = attemptResult('status_response_invalid');
     malformed.evaluatedAt!.setTime(

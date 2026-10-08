@@ -3,7 +3,10 @@ import {
   AgenticWalletMarketSwapStatusReconciliationAttemptResult,
 } from './agentic-wallet-market-swap-status-reconciliation-attempt';
 import { AgenticWalletMarketSwapStatusReconciliationCandidate } from './agentic-wallet-market-swap-status-reconciliation-candidate.store';
-import { isValidAgenticWalletMarketSwapStatusObservation } from './agentic-wallet-market-swap-status-response';
+import {
+  AGENTIC_WALLET_MARKET_SWAP_STATUS_RESPONSE_BLOCKER_ORDER,
+  isValidAgenticWalletMarketSwapStatusObservation,
+} from './agentic-wallet-market-swap-status-response';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -42,19 +45,9 @@ const PRE_PROVIDER_BLOCKERS =
     'invalid_minimum_lookup_interval',
   ]);
 const STATUS_RESPONSE_BLOCKERS =
-  new Set<AgenticWalletMarketSwapStatusReconciliationAttemptBlocker>([
-    'invalid_submission_gate',
-    'invalid_submission_receipt',
-    'gate_receipt_mismatch',
-    'invalid_response_envelope',
-    'provider_reported_failure',
-    'invalid_order_lookup_payload',
-    'order_identity_mismatch',
-    'order_payload_mismatch',
-    'invalid_order_status',
-    'invalid_order_timestamps',
-    'invalid_transaction_hash',
-  ]);
+  new Set<AgenticWalletMarketSwapStatusReconciliationAttemptBlocker>(
+    AGENTIC_WALLET_MARKET_SWAP_STATUS_RESPONSE_BLOCKER_ORDER,
+  );
 
 export function validateAndSnapshotStatusReconciliationAttemptResult(
   result: AgenticWalletMarketSwapStatusReconciliationAttemptResult,
@@ -104,7 +97,7 @@ function isValidAttemptResult(
 
   if (result.status === 'blocked') {
     return (
-      result.blockers.length > 0 &&
+      result.blockers.length === 1 &&
       result.blockers.every(isPreProviderBlocker) &&
       noProviderWork &&
       noObservation &&
@@ -137,6 +130,7 @@ function isValidAttemptResult(
     return (
       result.blockers.length > 0 &&
       result.blockers.every(isStatusResponseBlocker) &&
+      hasCanonicalStatusResponseBlockerOrder(result.blockers) &&
       result.providerCallStarted &&
       result.providerCallCompleted &&
       noObservation &&
@@ -176,6 +170,21 @@ function isStatusResponseBlocker(
   blocker: AgenticWalletMarketSwapStatusReconciliationAttemptBlocker,
 ): boolean {
   return STATUS_RESPONSE_BLOCKERS.has(blocker);
+}
+
+function hasCanonicalStatusResponseBlockerOrder(
+  blockers: readonly AgenticWalletMarketSwapStatusReconciliationAttemptBlocker[],
+): boolean {
+  let previousIndex = -1;
+  for (const blocker of blockers) {
+    const index =
+      AGENTIC_WALLET_MARKET_SWAP_STATUS_RESPONSE_BLOCKER_ORDER.indexOf(
+        blocker as (typeof AGENTIC_WALLET_MARKET_SWAP_STATUS_RESPONSE_BLOCKER_ORDER)[number],
+      );
+    if (index <= previousIndex) return false;
+    previousIndex = index;
+  }
+  return true;
 }
 
 function isProviderCallTemporallyAdmitted(

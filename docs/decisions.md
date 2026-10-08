@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-08 — Preserve the producer's blocker emission shape
+
+M10.64 narrows the M10.63 phase-specific sets to the shapes the actual producers emit. Every pre-provider return exits at one explicit guard and therefore carries exactly one blocker. The response assessor may accumulate independent failures, but it appends them in one deterministic validation order. Accepting extra pre-call blockers or reordered post-call blockers would admit audit evidence that no current producer generated.
+
+The response assessor exports its closed canonical order, and the cycle consumes that shared contract at the existing untrusted result boundary. It does not sort or repair blockers, because doing so would conceal producer divergence. Valid ordered multi-blocker response evidence remains intact, while invalid shape stops the batch before aggregation or another candidate without retry, persistence, scheduling, runtime registration, or execution authority.
+
 ## 2026-10-08 — Partition attempt blockers by lifecycle phase
 
 M10.63 narrows the M10.57 closed blocker vocabulary by the phase that can emit each value. A no-provider `blocked` result can carry only overlap, local context/evidence, gate/receipt, or cadence validation failures. A completed-provider `status_response_invalid` result can carry only blockers from the status-response assessor. Accepting the union in either status would permit internally contradictory audit evidence.

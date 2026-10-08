@@ -39,6 +39,20 @@ export type AgenticWalletMarketSwapStatusResponseBlocker =
   | 'invalid_order_timestamps'
   | 'invalid_transaction_hash';
 
+export const AGENTIC_WALLET_MARKET_SWAP_STATUS_RESPONSE_BLOCKER_ORDER = [
+  'invalid_submission_gate',
+  'invalid_submission_receipt',
+  'gate_receipt_mismatch',
+  'invalid_response_envelope',
+  'provider_reported_failure',
+  'invalid_order_lookup_payload',
+  'order_identity_mismatch',
+  'order_payload_mismatch',
+  'invalid_order_status',
+  'invalid_order_timestamps',
+  'invalid_transaction_hash',
+] as const satisfies readonly AgenticWalletMarketSwapStatusResponseBlocker[];
+
 export interface AgenticWalletMarketSwapStatusObservation {
   readonly kind: 'agentic_wallet_market_swap_status_observation';
   readonly providerId: 'agentic_wallet';

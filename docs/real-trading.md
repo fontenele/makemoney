@@ -1168,6 +1168,23 @@ Three blockers intentionally overlap: `invalid_submission_gate`, `invalid_submis
 - Focused coverage proves both invalid cross-phase directions and the intentional shared-blocker cases.
 - No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.64 — Canonical attempt-blocker shape
+
+M10.64 preserves how each M10.63 phase actually emits its blockers. Every pre-provider failure exits from one explicit guard in the one-shot attempt, so `blocked` must contain exactly one blocker. The status-response assessor can accumulate multiple independent failures, but it appends them in a fixed validation order covering gate, receipt, envelope, lookup row, identity, payload, status, timestamps, and transaction hash.
+
+The cycle validates this shape without sorting or repairing untrusted output. Canonically ordered multi-blocker response evidence remains valid, while extra pre-provider blockers or reordered response blockers stop the batch before aggregation or the next candidate. The rule adds no stronger claim that every in-order subset is semantically co-producible; it only closes cardinality and ordering divergence at this increment.
+
+### M10.64 acceptance criteria
+
+- A pre-provider `blocked` result contains exactly one phase-valid blocker.
+- Multiple otherwise valid pre-provider blockers fail closed before the next candidate.
+- `status_response_invalid` blockers follow the response assessor's deterministic append order.
+- Canonically ordered multi-blocker response evidence remains accepted.
+- Reordered response evidence fails closed and is not silently sorted.
+- Existing closed vocabulary, uniqueness, phase, call-progress, timing, observation, financial, and retry rules remain enforced.
+- Focused coverage proves pre-provider cardinality rejection, canonical response acceptance, and reordered response rejection.
+- No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

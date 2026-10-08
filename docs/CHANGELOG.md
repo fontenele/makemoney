@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-08 — Preserve canonical reconciliation-blocker shape
+
+- Required every pre-provider blocked attempt to retain the single blocker emitted by its exact guard.
+- Exported one canonical response-blocker order from the assessor and required multi-blocker status-response failures to preserve it.
+- Rejected extra pre-call blockers and reordered post-call evidence before aggregation or the next candidate without sorting, repair, or retry.
+- Added focused rejection coverage plus acceptance of canonical ordered response evidence while preserving phase correlation, timing, snapshots, cancellation, bounds, financial incompleteness, and no retry.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,107 backend tests across 183 suites, the focused 32-test reconciliation-cycle suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-08 — Correlate reconciliation blockers with attempt status
 
 - Partitioned the closed attempt-blocker vocabulary into pre-provider and status-response sets.
