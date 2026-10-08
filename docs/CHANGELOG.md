@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-08 — Reject fabricated first-observation cadence boundaries
+
+- Required completed provider-call results for `awaiting_status_observation` candidates to retain `nextStatusLookupAt: null`.
+- Completed phase-exact cadence correlation with the non-null monotonic pending-state contract from M10.66–M10.67.
+- Rejected invented first-observation boundaries before aggregation or the next candidate without repair or retry.
+- Added focused coverage for both invalid responses and recorded observations.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,113 backend tests across 183 suites, the focused 38-test reconciliation-cycle suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-08 — Reject regressed pending-candidate cadence boundaries
 
 - Required retained `nextStatusLookupAt` evidence for a discovered `provider_pending` candidate to be at or after its discovered `eligibleAt`.

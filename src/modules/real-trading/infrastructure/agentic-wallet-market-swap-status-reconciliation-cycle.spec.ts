@@ -334,6 +334,24 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     );
   });
 
+  it('rejects completed first-observation work that invents cadence evidence', async () => {
+    for (const status of [
+      'status_response_invalid',
+      'status_observation_recorded',
+    ] as const) {
+      const malformed = attemptResult(status);
+      Object.assign(malformed, { nextStatusLookupAt: new Date(EVALUATED_AT) });
+      const harness = cycleHarness(
+        [candidate(1)],
+        jest.fn().mockResolvedValue(malformed),
+      );
+
+      await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+        'Agentic Wallet status reconciliation attempt result is invalid',
+      );
+    }
+  });
+
   it('rejects completed provider work that drops pending-candidate cadence evidence', async () => {
     for (const status of [
       'status_response_invalid',

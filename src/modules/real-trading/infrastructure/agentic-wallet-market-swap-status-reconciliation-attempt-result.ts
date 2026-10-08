@@ -183,19 +183,21 @@ function isProviderCallTemporallyAdmitted(
   return (
     result.evaluatedAt!.getTime() >= candidate.eligibleAt.getTime() &&
     isAttemptEvaluationAfterDiscovery(result, candidate) &&
-    isCandidateCadenceEvidenceRetained(result, candidate) &&
+    isCandidateCadenceEvidenceCoherent(result, candidate) &&
     isAdmittedLookupTime(result)
   );
 }
 
-function isCandidateCadenceEvidenceRetained(
+function isCandidateCadenceEvidenceCoherent(
   result: AgenticWalletMarketSwapStatusReconciliationAttemptResult,
   candidate: AgenticWalletMarketSwapStatusReconciliationCandidate,
 ): boolean {
+  if (candidate.phase === 'awaiting_status_observation') {
+    return result.nextStatusLookupAt === null;
+  }
   return (
-    candidate.phase !== 'provider_pending' ||
-    (result.nextStatusLookupAt !== null &&
-      result.nextStatusLookupAt.getTime() >= candidate.eligibleAt.getTime())
+    result.nextStatusLookupAt !== null &&
+    result.nextStatusLookupAt.getTime() >= candidate.eligibleAt.getTime()
   );
 }
 

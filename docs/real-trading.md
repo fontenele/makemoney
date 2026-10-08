@@ -1237,6 +1237,22 @@ The existing admission rule supplies the other side of the interval: the boundar
 - First-observation candidates remain permitted to complete provider work with a null boundary.
 - No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.68 — First-observation cadence evidence absence
+
+M10.68 completes the candidate-phase correlation of cadence evidence. The M10.49 policy admits `awaiting_status_observation` immediately and leaves `nextStatusLookupAt` null because the first lookup has no prior observation from which to calculate a minimum-interval boundary. Both `status_response_invalid` and `status_observation_recorded` must preserve that absence when the cycle validates their untrusted results.
+
+This is complementary to M10.66–M10.67 rather than a broader timing rule. A discovered `provider_pending` candidate still requires a non-null boundary at or after its discovered eligibility and at or before the attempt evaluation. A first-observation candidate instead requires exactly null.
+
+### M10.68 acceptance criteria
+
+- Completed provider work for `awaiting_status_observation` retains `nextStatusLookupAt: null`.
+- A non-null first-observation boundary fails closed before aggregation and before the next candidate.
+- The rule applies to both invalid status responses and recorded status observations.
+- Pending candidates retain the existing non-null monotonic interval contract.
+- Existing blocker, phase, call-progress, timing, observation, financial, snapshot, cancellation, and retry rules remain enforced.
+- Focused coverage proves rejection of fabricated first-observation evidence while established null results remain accepted.
+- No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

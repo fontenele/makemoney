@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-08 — Reject fabricated first-observation cadence boundaries
+
+M10.68 completes phase correlation for the cadence evidence constrained by M10.66–M10.67. The pure cadence policy admits `awaiting_status_observation` immediately and returns no `nextStatusLookupAt`, because no prior status observation exists from which to derive a repeated-lookup interval. A completed-call result for that discovered phase must therefore retain `null`; accepting a date would claim producer evidence that cannot exist.
+
+The rule is the exact complement of the pending-state contract: first observation requires absence, while `provider_pending` requires a non-null boundary between discovered eligibility and attempt evaluation. Both invalid status responses and recorded observations pass through the same check at the cycle's untrusted result boundary. No repair, retry, provider access, persistence, scheduling, runtime registration, or execution authority is added.
+
 ## 2026-10-08 — Reject regressed pending-candidate cadence boundaries
 
 M10.67 narrows the non-null M10.66 evidence to the causal range allowed by append-only status observations. A candidate discovered in `provider_pending` carries the boundary derived from the then-latest pending observation. The authoritative context reload may see the same observation or a newer one, so its retained `nextStatusLookupAt` may equal or follow `candidate.eligibleAt`; it cannot legitimately precede it.
