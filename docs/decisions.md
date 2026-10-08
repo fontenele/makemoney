@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-08 — Apply discovery-time monotonicity to deferred attempts
+
+M10.62 recognizes that a due candidate can validly become deferred when the one-shot attempt reloads newer durable pending evidence after discovery. That race explains the outcome, but it does not permit the attempt clock to move backward: the deferral evaluation still occurs causally after candidate selection.
+
+The existing untrusted result boundary therefore reuses the M10.61 comparison for `status_lookup_deferred`. Its `evaluatedAt` must be at or after the candidate's discovery `evaluatedAt`, while `nextStatusLookupAt` must remain strictly later than the attempt evaluation. Divergence fails closed before aggregation and adds no wait, provider access, persistence, retry, schedule, or execution authority.
+
 ## 2026-10-07 — Require attempt time to follow discovery time
 
 M10.61 treats the candidate's immutable discovery `evaluatedAt` as another causal lower bound for completed provider access. Checking only `candidate.eligibleAt` allowed a regressed attempt clock to remain after the cadence boundary while still appearing to precede the discovery operation that selected the candidate.

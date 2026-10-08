@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-08 — Enforce deferred-attempt discovery-time coherence
+
+- Required `status_lookup_deferred` evaluations to occur at or after the discovery snapshot that admitted the candidate.
+- Preserved valid deferral after a concurrent durable-context change while rejecting a regressed attempt clock.
+- Reused the M10.61 discovery-time comparison and retained the strict future `nextStatusLookupAt` rule.
+- Added focused regression coverage and preserved completed-provider timing, cadence, eligibility, observation causality, immutable replay, canonical order, snapshots, cancellation, bounded sequential execution, and no retry.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,103 backend tests across 183 suites, the focused 28-test reconciliation-cycle suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-07 — Enforce discovery-to-attempt clock monotonicity
 
 - Rejected completed provider-call results whose attempt evaluation predates the discovery evaluation embedded in the admitted candidate.

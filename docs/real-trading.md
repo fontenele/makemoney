@@ -1133,6 +1133,23 @@ The untrusted attempt-result boundary now requires every completed provider call
 - Focused coverage proves the discovery-to-attempt regression is rejected.
 - No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.62 — Deferred-attempt discovery-time coherence
+
+M10.62 extends the discovery-time lower bound to the only other attempt outcome carrying an evaluation timestamp: `status_lookup_deferred`. Discovery can select a due candidate, then the one-shot attempt can reload newer durable `PENDING` evidence written concurrently and correctly decide that the next lookup is not yet eligible. That deferral is valid only if its evaluation is causally at or after candidate discovery.
+
+The untrusted attempt-result boundary now requires `result.evaluatedAt >= candidate.evaluatedAt` for deferred outcomes before retaining them. The existing requirement that `nextStatusLookupAt > evaluatedAt` remains independent and unchanged. A clock regression stops the batch before aggregation or the next candidate.
+
+### M10.62 acceptance criteria
+
+- `status_lookup_deferred` requires `result.evaluatedAt >= candidate.evaluatedAt`.
+- `nextStatusLookupAt` remains strictly later than the deferred evaluation.
+- A concurrent context refresh may still produce a valid deferred outcome for a candidate that was due at discovery.
+- Completed-provider results retain the same discovery-time comparison from M10.61.
+- Blocked and terminal outcomes continue to carry no evaluation timestamp.
+- Divergence fails closed before aggregation and before the next candidate.
+- Focused coverage proves a pre-discovery deferred evaluation is rejected.
+- No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

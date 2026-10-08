@@ -101,6 +101,7 @@ function isValidAttemptResult(
       result.statusLookupRequired &&
       result.evaluatedAt !== null &&
       result.nextStatusLookupAt !== null &&
+      isAttemptEvaluationAfterDiscovery(result, candidate) &&
       result.nextStatusLookupAt.getTime() > result.evaluatedAt.getTime()
     );
   }
@@ -142,9 +143,16 @@ function isProviderCallTemporallyAdmitted(
 ): boolean {
   return (
     result.evaluatedAt!.getTime() >= candidate.eligibleAt.getTime() &&
-    result.evaluatedAt!.getTime() >= candidate.evaluatedAt.getTime() &&
+    isAttemptEvaluationAfterDiscovery(result, candidate) &&
     isAdmittedLookupTime(result)
   );
+}
+
+function isAttemptEvaluationAfterDiscovery(
+  result: AgenticWalletMarketSwapStatusReconciliationAttemptResult,
+  candidate: AgenticWalletMarketSwapStatusReconciliationCandidate,
+): boolean {
+  return result.evaluatedAt!.getTime() >= candidate.evaluatedAt.getTime();
 }
 
 function isAttemptResultBlocker(

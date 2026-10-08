@@ -250,6 +250,25 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     }
   });
 
+  it('rejects a deferred attempt evaluated before candidate discovery', async () => {
+    const malformed = attemptResult('status_lookup_deferred');
+    malformed.evaluatedAt!.setTime(
+      new Date('2026-10-05T12:00:06.999Z').getTime(),
+    );
+    const harness = cycleHarness(
+      [
+        candidate(1, {
+          eligibleAt: new Date('2026-10-05T12:00:05.000Z'),
+        }),
+      ],
+      jest.fn().mockResolvedValue(malformed),
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+      'Agentic Wallet status reconciliation attempt result is invalid',
+    );
+  });
+
   it('rejects a newly stored observation recorded before its evaluation', async () => {
     const malformed = attemptResult('status_observation_recorded');
     malformed.storedObservation!.recordedAt.setTime(
