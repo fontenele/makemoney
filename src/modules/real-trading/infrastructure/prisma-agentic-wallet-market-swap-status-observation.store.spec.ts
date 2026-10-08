@@ -70,6 +70,24 @@ describe('PrismaAgenticWalletMarketSwapStatusObservationStore', () => {
     expect(harness.create).toHaveBeenCalledTimes(1);
   });
 
+  it('rejects a new observation recorded before the latest durable row', async () => {
+    const harness = repositoryHarness(new Date('2026-10-03T12:00:05.999Z'));
+    harness.findFirst.mockResolvedValue(observationRow());
+    const finished = observation({
+      providerStatus: 'FINISHED',
+      transactionHash: `0x${'a'.repeat(64)}`,
+      updatedAt: new Date('2026-10-03T12:00:07.000Z'),
+      terminal: true,
+      executionSucceeded: true,
+      statusLookupRequired: false,
+    });
+
+    await expect(harness.store.record(finished)).rejects.toThrow(
+      'Status observation recording time is invalid',
+    );
+    expect(harness.create).not.toHaveBeenCalled();
+  });
+
   it('rejects a regressed transition and preserves its blockers', async () => {
     const harness = repositoryHarness();
     harness.findFirst.mockResolvedValue(

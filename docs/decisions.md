@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-08 — Keep append recording time monotonic with durable sequence
+
+M10.71 closes a persistence-clock gap in the M10.41 append-only store. The transition policy already makes provider evidence monotonic, but a newly generated local `recordedAt` was compared only with the receipt. A clock regression after an existing observation could therefore assign an earlier recording time to a later database sequence.
+
+The serialized, per-gate locked transaction now also requires the append time to equal or follow the latest durable observation's recording time. Equality remains valid because the database sequence deliberately establishes total history order when timestamps tie. Exact replay returns before clock generation and remains idempotent. The change adds no schema, runtime wiring, provider access, retry, scheduling, or execution authority.
+
 ## 2026-10-08 — Preserve immutable facts when replaying a known observation identity
 
 M10.70 narrows the replay exception intentionally preserved by M10.69. The candidate's `latestObservationId`, `latestObservationRecordedAt`, and `provider_pending` phase describe one already stored immutable row. If a replay returns that exact identity, its recording time must equal the candidate timestamp and its provider status must remain `PENDING`; the same UUID cannot represent rewritten temporal or terminal facts.

@@ -1286,6 +1286,22 @@ The rule does not require every replay to match the discovery identity. Concurre
 - Focused coverage proves coherent replay acceptance and both immutable-fact rejection directions.
 - No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.71 — Monotonic status observation recording time
+
+M10.71 closes the remaining local-clock gap in the M10.41 append path. The serializable store already compares every new observation with the latest provider evidence and rejects a recording time before the immutable submission receipt. It now also rejects a new append when the injected local `recordedAt` precedes the latest durable observation selected inside the same per-gate advisory lock.
+
+Equal recording timestamps remain valid: the database-generated sequence intentionally provides the authoritative total order when clock resolution produces a tie. Exact latest replay returns the immutable existing row before a new clock or identity is used, preserving idempotency.
+
+### M10.71 acceptance criteria
+
+- A new status-observation row is recorded at or after both its durable receipt and the latest durable observation.
+- A regressed local clock fails closed before identity generation and insertion even when the provider-status transition is otherwise valid.
+- Equal recording timestamps remain admissible and database sequence continues to order tied rows.
+- Exact latest replay preserves the original row and recording time without requiring a current-clock comparison.
+- Existing receipt correlation, transition monotonicity, financial incompleteness, and retry prohibition remain enforced.
+- Focused coverage proves rejection of a valid terminal progression carrying a regressed append clock.
+- No schema, NestJS registration, route, live process invocation, live provider call, polling, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

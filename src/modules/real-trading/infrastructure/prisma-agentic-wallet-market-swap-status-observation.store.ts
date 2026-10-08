@@ -104,7 +104,9 @@ export class PrismaAgenticWalletMarketSwapStatusObservationStore implements Agen
         if (
           !(recordedAt instanceof Date) ||
           !Number.isFinite(recordedAt.getTime()) ||
-          recordedAt.getTime() < receiptRow.recordedAt.getTime()
+          recordedAt.getTime() < receiptRow.recordedAt.getTime() ||
+          (latest !== null &&
+            recordedAt.getTime() < latest.recordedAt.getTime())
         ) {
           throw new Error('Status observation recording time is invalid');
         }

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-08 — Keep status-observation recording time monotonic
+
+- Required every newly appended status observation to be recorded at or after the latest durable row as well as the submission receipt.
+- Preserved equal recording timestamps because the immutable database sequence remains the authoritative history order.
+- Kept exact latest replay idempotent and independent from the current recording clock.
+- Added focused regression coverage proving that a valid provider-status progression cannot be appended with a regressed local recording time.
+- Added no schema, NestJS registration, route, live process invocation, live provider call, polling, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,117 backend tests across 183 suites, the focused 8-test status-observation-store suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-08 — Preserve immutable evidence for known observation replays
 
 - Required a replay returning the pending candidate's known observation ID to preserve its exact recording time and `PENDING` provider state.
