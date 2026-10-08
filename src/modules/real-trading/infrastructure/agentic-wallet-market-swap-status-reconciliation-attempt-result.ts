@@ -160,6 +160,8 @@ function isValidAttemptResult(
     isValidAgenticWalletMarketSwapStatusObservation(stored.observation) &&
     stored.observation.gateId === candidate.gateId &&
     stored.observation.providerOrderId === candidate.providerOrderId &&
+    (result.observationReplayed ||
+      stored.id !== candidate.latestObservationId) &&
     result.statusLookupRequired === stored.observation.statusLookupRequired
   );
 }

@@ -396,6 +396,9 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     ] as const) {
       const result = attemptResult(status);
       Object.assign(result, { nextStatusLookupAt: new Date(EVALUATED_AT) });
+      if (result.storedObservation !== null) {
+        Object.assign(result.storedObservation, { id: uuid(102) });
+      }
       const harness = cycleHarness(
         [pendingCandidate(1)],
         jest.fn().mockResolvedValue(result),
@@ -416,6 +419,9 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     ] as const) {
       const result = attemptResult(status);
       Object.assign(result, { nextStatusLookupAt: new Date(EVALUATED_AT) });
+      if (result.storedObservation !== null) {
+        Object.assign(result.storedObservation, { id: uuid(102) });
+      }
       const harness = cycleHarness(
         [
           pendingCandidate(1, {
@@ -434,6 +440,39 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
         outcomes: [{ attempt: { status } }],
       });
     }
+  });
+
+  it('rejects a newly stored observation that reuses the pending candidate observation identity', async () => {
+    const malformed = attemptResult('status_observation_recorded');
+    Object.assign(malformed, {
+      nextStatusLookupAt: new Date(EVALUATED_AT),
+    });
+    const harness = cycleHarness(
+      [pendingCandidate(1)],
+      jest.fn().mockResolvedValue(malformed),
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+      'Agentic Wallet status reconciliation attempt result is invalid',
+    );
+  });
+
+  it('accepts a replay that retains the pending candidate observation identity', async () => {
+    const replay = attemptResult('status_observation_recorded');
+    Object.assign(replay, {
+      observationReplayed: true,
+      nextStatusLookupAt: new Date(EVALUATED_AT),
+    });
+    const harness = cycleHarness(
+      [pendingCandidate(1)],
+      jest.fn().mockResolvedValue(replay),
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+      status: 'completed',
+      observationRecordedCount: 1,
+      outcomes: [{ attempt: { observationReplayed: true } }],
+    });
   });
 
   it('rejects completed provider work evaluated before candidate discovery', async () => {

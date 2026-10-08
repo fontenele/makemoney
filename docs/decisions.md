@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-08 — Require fresh identity for a newly stored status observation
+
+M10.69 correlates `observationReplayed` with the append-only observation identity returned by the store. When persistence is required, the store generates a fresh UUID and a collision fails instead of returning a stored result. A non-replayed result for a discovered `provider_pending` candidate therefore cannot reuse `candidate.latestObservationId`; accepting it would claim that the existing row was both old evidence and a new append.
+
+Replay remains intentionally permissive. The authoritative reload or the serialized store may encounter an exact observation inserted concurrently, so a replay may return the candidate's known ID or a newer durable ID. First-observation candidates have no latest ID to conflict with. The cycle checks only the impossible non-replay reuse at its existing untrusted result boundary, without changing persistence, retry, provider access, scheduling, runtime registration, or execution authority.
+
 ## 2026-10-08 — Reject fabricated first-observation cadence boundaries
 
 M10.68 completes phase correlation for the cadence evidence constrained by M10.66–M10.67. The pure cadence policy admits `awaiting_status_observation` immediately and returns no `nextStatusLookupAt`, because no prior status observation exists from which to derive a repeated-lookup interval. A completed-call result for that discovered phase must therefore retain `null`; accepting a date would claim producer evidence that cannot exist.

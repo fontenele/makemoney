@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-08 — Require fresh identity for newly stored status observations
+
+- Rejected a non-replayed status observation that reuses the discovered pending candidate's latest observation ID.
+- Preserved existing and concurrently newer identities for exact replay results.
+- Aligned the untrusted cycle result boundary with the append-only store's fresh-UUID behavior.
+- Added focused rejection coverage and corrected valid pending fixtures to represent genuine new rows.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,115 backend tests across 183 suites, the focused 40-test reconciliation-cycle suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-08 — Reject fabricated first-observation cadence boundaries
 
 - Required completed provider-call results for `awaiting_status_observation` candidates to retain `nextStatusLookupAt: null`.
