@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-08 — Reject regressed pending-candidate cadence boundaries
+
+M10.67 narrows the non-null M10.66 evidence to the causal range allowed by append-only status observations. A candidate discovered in `provider_pending` carries the boundary derived from the then-latest pending observation. The authoritative context reload may see the same observation or a newer one, so its retained `nextStatusLookupAt` may equal or follow `candidate.eligibleAt`; it cannot legitimately precede it.
+
+The existing upper bound remains `result.evaluatedAt`, because a provider call is admitted only when the authoritative cadence boundary has been reached. Together these rules prevent a result from substituting an arbitrary earlier non-null date merely to satisfy M10.66. First-observation candidates remain outside this comparison. The cycle fails closed without repair, retry, provider access, persistence, scheduling, runtime registration, or execution authority.
+
 ## 2026-10-08 — Retain pending-candidate cadence evidence after provider access
 
 M10.66 treats a discovered `provider_pending` phase as proof that the authoritative cadence decision must calculate an exact `nextStatusLookupAt` before any provider call. Both a valid stored observation and an invalid provider response therefore retain that non-null boundary. Accepting `null` would erase causal evidence that the repeated lookup passed through the pending-state interval check.

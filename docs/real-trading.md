@@ -1220,6 +1220,23 @@ The first-observation phase remains distinct: without a prior observation there 
 - Focused coverage proves both rejection without the boundary and acceptance when it is retained.
 - No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.67 — Pending-candidate cadence boundary monotonicity
+
+M10.67 constrains the non-null cadence evidence retained by M10.66. A discovered `provider_pending` candidate carries the eligibility boundary derived from its latest durable pending observation. Since observations are append-only, the authoritative context reloaded by the one-shot attempt may retain that observation or see a newer pending observation. Its resulting `nextStatusLookupAt` may therefore equal or follow `candidate.eligibleAt`, but it cannot precede it.
+
+The existing admission rule supplies the other side of the interval: the boundary must remain at or before the attempt's `evaluatedAt` before a provider call can be reported. First-observation candidates still have no prior-observation cadence boundary and remain permitted to return `null`.
+
+### M10.67 acceptance criteria
+
+- Completed provider work for a discovered `provider_pending` candidate retains `nextStatusLookupAt >= candidate.eligibleAt`.
+- Equality remains valid when the authoritative context has not advanced.
+- A later boundary remains valid when newer pending evidence advances the authoritative context before the attempt.
+- The retained boundary remains at or before the attempt evaluation under the existing admission rule.
+- A regressed boundary fails closed before aggregation and before the next candidate without repair or retry.
+- The rule applies to both invalid status responses and recorded status observations.
+- First-observation candidates remain permitted to complete provider work with a null boundary.
+- No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

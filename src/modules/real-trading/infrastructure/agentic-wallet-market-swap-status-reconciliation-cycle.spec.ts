@@ -351,6 +351,26 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     }
   });
 
+  it('rejects completed provider work with a regressed pending-candidate cadence boundary', async () => {
+    for (const status of [
+      'status_response_invalid',
+      'status_observation_recorded',
+    ] as const) {
+      const malformed = attemptResult(status);
+      Object.assign(malformed, {
+        nextStatusLookupAt: new Date(EVALUATED_AT.getTime() - 1),
+      });
+      const harness = cycleHarness(
+        [pendingCandidate(1)],
+        jest.fn().mockResolvedValue(malformed),
+      );
+
+      await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+        'Agentic Wallet status reconciliation attempt result is invalid',
+      );
+    }
+  });
+
   it('accepts completed provider work with pending-candidate cadence evidence', async () => {
     for (const status of [
       'status_response_invalid',
@@ -360,6 +380,33 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
       Object.assign(result, { nextStatusLookupAt: new Date(EVALUATED_AT) });
       const harness = cycleHarness(
         [pendingCandidate(1)],
+        jest.fn().mockResolvedValue(result),
+      );
+
+      await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+        status: 'completed',
+        candidateCount: 1,
+        outcomes: [{ attempt: { status } }],
+      });
+    }
+  });
+
+  it('accepts a pending-candidate cadence boundary advanced by authoritative reload', async () => {
+    for (const status of [
+      'status_response_invalid',
+      'status_observation_recorded',
+    ] as const) {
+      const result = attemptResult(status);
+      Object.assign(result, { nextStatusLookupAt: new Date(EVALUATED_AT) });
+      const harness = cycleHarness(
+        [
+          pendingCandidate(1, {
+            latestObservationRecordedAt: new Date(
+              EVALUATED_AT.getTime() - INPUT.minimumLookupIntervalMs - 1,
+            ),
+            eligibleAt: new Date(EVALUATED_AT.getTime() - 1),
+          }),
+        ],
         jest.fn().mockResolvedValue(result),
       );
 

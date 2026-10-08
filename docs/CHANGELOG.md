@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-08 — Reject regressed pending-candidate cadence boundaries
+
+- Required retained `nextStatusLookupAt` evidence for a discovered `provider_pending` candidate to be at or after its discovered `eligibleAt`.
+- Preserved equality for the unchanged authoritative context and later boundaries for concurrently advanced pending evidence.
+- Rejected an arbitrary earlier non-null boundary before aggregation or the next candidate without repair or retry.
+- Added focused regression coverage for both invalid responses and recorded observations.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,112 backend tests across 183 suites, the focused 37-test reconciliation-cycle suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-08 — Retain pending-candidate cadence evidence
 
 - Required completed provider-call results for discovered `provider_pending` candidates to retain a non-null `nextStatusLookupAt`.
