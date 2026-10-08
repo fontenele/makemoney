@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-08 — Validate causal coherence within response blocker lists
+
+M10.65 closes the semantic gap intentionally left by M10.64. Canonical order alone could admit combinations that no execution path in the response assessor produces. Invalid gate or receipt structure prevents both gate/receipt mismatch and row validation. Invalid envelope, explicit provider failure, and invalid successful lookup payload are mutually exclusive response branches. Invalid envelope or provider failure also prevents every row-level blocker because no row is parsed.
+
+Invalid lookup payload is deliberately different: pagination or aggregate fields can be malformed while the response still contains exactly one object row, so lookup-payload and row-level blockers may coexist. The assessor owns and exports this coherence policy, and the cycle consumes it at the existing untrusted result boundary without sorting, repair, retry, provider access, persistence, scheduling, runtime registration, or execution authority.
+
 ## 2026-10-08 — Preserve the producer's blocker emission shape
 
 M10.64 narrows the M10.63 phase-specific sets to the shapes the actual producers emit. Every pre-provider return exits at one explicit guard and therefore carries exactly one blocker. The response assessor may accumulate independent failures, but it appends them in one deterministic validation order. Accepting extra pre-call blockers or reordered post-call blockers would admit audit evidence that no current producer generated.

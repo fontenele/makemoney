@@ -5,6 +5,8 @@ import {
 import { AgenticWalletMarketSwapStatusReconciliationCandidate } from './agentic-wallet-market-swap-status-reconciliation-candidate.store';
 import {
   AGENTIC_WALLET_MARKET_SWAP_STATUS_RESPONSE_BLOCKER_ORDER,
+  AgenticWalletMarketSwapStatusResponseBlocker,
+  isCoherentAgenticWalletMarketSwapStatusResponseBlockerList,
   isValidAgenticWalletMarketSwapStatusObservation,
 } from './agentic-wallet-market-swap-status-response';
 
@@ -130,7 +132,9 @@ function isValidAttemptResult(
     return (
       result.blockers.length > 0 &&
       result.blockers.every(isStatusResponseBlocker) &&
-      hasCanonicalStatusResponseBlockerOrder(result.blockers) &&
+      isCoherentAgenticWalletMarketSwapStatusResponseBlockerList(
+        result.blockers as readonly AgenticWalletMarketSwapStatusResponseBlocker[],
+      ) &&
       result.providerCallStarted &&
       result.providerCallCompleted &&
       noObservation &&
@@ -170,21 +174,6 @@ function isStatusResponseBlocker(
   blocker: AgenticWalletMarketSwapStatusReconciliationAttemptBlocker,
 ): boolean {
   return STATUS_RESPONSE_BLOCKERS.has(blocker);
-}
-
-function hasCanonicalStatusResponseBlockerOrder(
-  blockers: readonly AgenticWalletMarketSwapStatusReconciliationAttemptBlocker[],
-): boolean {
-  let previousIndex = -1;
-  for (const blocker of blockers) {
-    const index =
-      AGENTIC_WALLET_MARKET_SWAP_STATUS_RESPONSE_BLOCKER_ORDER.indexOf(
-        blocker as (typeof AGENTIC_WALLET_MARKET_SWAP_STATUS_RESPONSE_BLOCKER_ORDER)[number],
-      );
-    if (index <= previousIndex) return false;
-    previousIndex = index;
-  }
-  return true;
 }
 
 function isProviderCallTemporallyAdmitted(

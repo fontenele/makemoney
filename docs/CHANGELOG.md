@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-08 — Reject impossible status-response blocker combinations
+
+- Added a shared semantic policy for blocker combinations emitted by the Agentic Wallet status-response assessor.
+- Rejected mismatch or row-level blockers when invalid gate/receipt structure prevents those checks.
+- Made invalid envelope, explicit provider failure, and invalid successful lookup payload mutually exclusive while preserving the valid malformed-pagination-plus-row case.
+- Rejected response branches that prevent row parsing when they claim row-level failures, before aggregation or the next candidate and without repair or retry.
+- Added focused impossible-combination coverage while preserving canonical order, phase correlation, timing, snapshots, cancellation, bounds, financial incompleteness, and no retry.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,108 backend tests across 183 suites, the focused 33-test reconciliation-cycle suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-08 — Preserve canonical reconciliation-blocker shape
 
 - Required every pre-provider blocked attempt to retain the single blocker emitted by its exact guard.

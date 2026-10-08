@@ -1185,6 +1185,24 @@ The cycle validates this shape without sorting or repairing untrusted output. Ca
 - Focused coverage proves pre-provider cardinality rejection, canonical response acceptance, and reordered response rejection.
 - No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.65 — Status-response blocker coherence
+
+M10.65 extends canonical order with the causal relationships enforced by the M10.38 response assessor. Invalid gate or receipt structure prevents both the valid-only gate/receipt mismatch check and every row-level validation. The response branches for invalid envelope, explicit provider failure, and invalid successful lookup payload are mutually exclusive. Invalid envelope and provider failure expose no parseable row and therefore cannot accompany identity, payload, status, timestamp, or transaction-hash blockers.
+
+Invalid lookup payload remains compatible with row-level blockers when a successful response contains exactly one object row but its `total`, `page`, or `pageSize` facts are invalid. This distinction prevents the cycle from rejecting evidence that the assessor genuinely emits. The semantic policy is exported by the assessor beside its canonical order and consumed by the untrusted attempt-result boundary.
+
+### M10.65 acceptance criteria
+
+- Invalid gate or receipt blockers cannot coexist with gate/receipt mismatch.
+- Invalid gate or receipt blockers cannot coexist with row-level response blockers.
+- Invalid response envelope, provider-reported failure, and invalid lookup payload are mutually exclusive.
+- Invalid envelope and provider failure cannot coexist with row-level blockers.
+- Invalid lookup payload may coexist with row blockers when one object row remains parseable.
+- Canonical ordering, uniqueness, closed vocabulary, phase, call-progress, timing, observation, financial, and retry rules remain enforced.
+- Impossible evidence fails closed before aggregation and before the next candidate without sorting or repair.
+- Focused coverage exercises each prohibited relationship while the established valid lookup-payload-plus-row case remains accepted.
+- No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

@@ -52,6 +52,55 @@ export const AGENTIC_WALLET_MARKET_SWAP_STATUS_RESPONSE_BLOCKER_ORDER = [
   'invalid_order_timestamps',
   'invalid_transaction_hash',
 ] as const satisfies readonly AgenticWalletMarketSwapStatusResponseBlocker[];
+const STATUS_RESPONSE_ENVELOPE_BLOCKERS = [
+  'invalid_response_envelope',
+  'provider_reported_failure',
+  'invalid_order_lookup_payload',
+] as const satisfies readonly AgenticWalletMarketSwapStatusResponseBlocker[];
+const STATUS_RESPONSE_ROW_BLOCKERS =
+  new Set<AgenticWalletMarketSwapStatusResponseBlocker>([
+    'order_identity_mismatch',
+    'order_payload_mismatch',
+    'invalid_order_status',
+    'invalid_order_timestamps',
+    'invalid_transaction_hash',
+  ]);
+
+export function isCoherentAgenticWalletMarketSwapStatusResponseBlockerList(
+  blockers: readonly AgenticWalletMarketSwapStatusResponseBlocker[],
+): boolean {
+  if (blockers.length === 0) return false;
+
+  let previousIndex = -1;
+  for (const blocker of blockers) {
+    const index =
+      AGENTIC_WALLET_MARKET_SWAP_STATUS_RESPONSE_BLOCKER_ORDER.indexOf(blocker);
+    if (index <= previousIndex) return false;
+    previousIndex = index;
+  }
+
+  const invalidGate = blockers.includes('invalid_submission_gate');
+  const invalidReceipt = blockers.includes('invalid_submission_receipt');
+  const gateReceiptMismatch = blockers.includes('gate_receipt_mismatch');
+  const hasRowBlocker = blockers.some((blocker) =>
+    STATUS_RESPONSE_ROW_BLOCKERS.has(blocker),
+  );
+  const envelopeBlockerCount = STATUS_RESPONSE_ENVELOPE_BLOCKERS.filter(
+    (blocker) => blockers.includes(blocker),
+  ).length;
+  const responsePreventsRowAssessment =
+    blockers.includes('invalid_response_envelope') ||
+    blockers.includes('provider_reported_failure');
+
+  return (
+    !(
+      (invalidGate || invalidReceipt) &&
+      (gateReceiptMismatch || hasRowBlocker)
+    ) &&
+    envelopeBlockerCount <= 1 &&
+    !(responsePreventsRowAssessment && hasRowBlocker)
+  );
+}
 
 export interface AgenticWalletMarketSwapStatusObservation {
   readonly kind: 'agentic_wallet_market_swap_status_observation';

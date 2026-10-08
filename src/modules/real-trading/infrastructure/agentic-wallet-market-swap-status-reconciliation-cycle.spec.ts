@@ -298,6 +298,27 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     );
   });
 
+  it('rejects ordered status-response blocker combinations the assessor cannot emit', async () => {
+    const impossibleBlockerLists = [
+      ['invalid_submission_gate', 'gate_receipt_mismatch'],
+      ['invalid_submission_receipt', 'order_identity_mismatch'],
+      ['invalid_response_envelope', 'provider_reported_failure'],
+      ['provider_reported_failure', 'order_payload_mismatch'],
+    ] as const;
+
+    for (const blockers of impossibleBlockerLists) {
+      const malformed = attemptResult('status_response_invalid');
+      Object.assign(malformed, { blockers });
+      const reconcileOnce = jest.fn().mockResolvedValue(malformed);
+      const harness = cycleHarness([candidate(1), candidate(2)], reconcileOnce);
+
+      await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+        'Agentic Wallet status reconciliation attempt result is invalid',
+      );
+      expect(reconcileOnce).toHaveBeenCalledTimes(1);
+    }
+  });
+
   it('rejects a provider call reported before the candidate was eligible', async () => {
     const malformed = attemptResult('status_response_invalid');
     malformed.evaluatedAt!.setTime(
