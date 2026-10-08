@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-08 — Retain pending-candidate cadence evidence
+
+- Required completed provider-call results for discovered `provider_pending` candidates to retain a non-null `nextStatusLookupAt`.
+- Preserved `null` as the valid boundary for candidates awaiting their first status observation.
+- Rejected missing pending-state cadence evidence before aggregation or the next candidate without repairing or retrying it.
+- Added focused rejection and acceptance coverage for both invalid responses and recorded observations.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,110 backend tests across 183 suites, the focused 35-test reconciliation-cycle suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-08 — Reject impossible status-response blocker combinations
 
 - Added a shared semantic policy for blocker combinations emitted by the Agentic Wallet status-response assessor.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-08 — Retain pending-candidate cadence evidence after provider access
+
+M10.66 treats a discovered `provider_pending` phase as proof that the authoritative cadence decision must calculate an exact `nextStatusLookupAt` before any provider call. Both a valid stored observation and an invalid provider response therefore retain that non-null boundary. Accepting `null` would erase causal evidence that the repeated lookup passed through the pending-state interval check.
+
+The rule remains intentionally asymmetric. A candidate awaiting its first status observation has no previous observation from which to derive a next boundary, so its completed-call result may legitimately retain `null`. The cycle checks this distinction at the existing untrusted result boundary without requiring equality to the discovery boundary, because a newer concurrently persisted pending observation can legitimately move the authoritative boundary. No repair, retry, provider access, persistence, scheduling, runtime registration, or execution authority is added.
+
 ## 2026-10-08 — Validate causal coherence within response blocker lists
 
 M10.65 closes the semantic gap intentionally left by M10.64. Canonical order alone could admit combinations that no execution path in the response assessor produces. Invalid gate or receipt structure prevents both gate/receipt mismatch and row validation. Invalid envelope, explicit provider failure, and invalid successful lookup payload are mutually exclusive response branches. Invalid envelope or provider failure also prevents every row-level blocker because no row is parsed.

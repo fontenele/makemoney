@@ -183,6 +183,8 @@ function isProviderCallTemporallyAdmitted(
   return (
     result.evaluatedAt!.getTime() >= candidate.eligibleAt.getTime() &&
     isAttemptEvaluationAfterDiscovery(result, candidate) &&
+    (candidate.phase !== 'provider_pending' ||
+      result.nextStatusLookupAt !== null) &&
     isAdmittedLookupTime(result)
   );
 }

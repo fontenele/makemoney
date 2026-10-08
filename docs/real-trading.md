@@ -1203,6 +1203,23 @@ Invalid lookup payload remains compatible with row-level blockers when a success
 - Focused coverage exercises each prohibited relationship while the established valid lookup-payload-plus-row case remains accepted.
 - No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.66 — Pending-candidate cadence evidence retention
+
+M10.66 correlates completed provider work with the cadence evidence implied by the discovered candidate phase. A `provider_pending` candidate exists only after a prior durable pending observation, so the authoritative M10.49–M10.50 cadence decision necessarily calculates a non-null `nextStatusLookupAt` before it admits another provider call. Both `status_response_invalid` and `status_observation_recorded` must retain that boundary at the cycle's untrusted result boundary.
+
+The first-observation phase remains distinct: without a prior observation there is no repeated-lookup boundary, and its completed result may legitimately expose `nextStatusLookupAt: null`. The cycle does not force equality between the result boundary and the discovery candidate's `eligibleAt`, because a newer pending observation may be persisted between discovery and the attempt's authoritative context reload.
+
+### M10.66 acceptance criteria
+
+- Completed provider work for a discovered `provider_pending` candidate retains a non-null `nextStatusLookupAt`.
+- The rule applies to both invalid status responses and recorded status observations.
+- A first-observation candidate may still complete provider work with a null next-lookup boundary.
+- The retained boundary remains at or before the attempt evaluation under the existing admission rule.
+- Missing pending cadence evidence fails closed before aggregation and before the next candidate without repair or retry.
+- Existing blocker, phase, call-progress, timing, observation, financial, snapshot, cancellation, and retry rules remain enforced.
+- Focused coverage proves both rejection without the boundary and acceptance when it is retained.
+- No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
