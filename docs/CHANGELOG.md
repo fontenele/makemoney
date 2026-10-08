@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-07 — Enforce discovery-to-attempt clock monotonicity
+
+- Rejected completed provider-call results whose attempt evaluation predates the discovery evaluation embedded in the admitted candidate.
+- Closed the case where a regressed attempt clock remained after `eligibleAt` but appeared to precede candidate selection.
+- Added focused regression coverage and preserved M10.60 eligibility and observation-recording causality.
+- Preserved immutable replay handling, canonical order, snapshots, cancellation, overlap suppression, bounded sequential execution, fail-fast propagation, financial incompleteness, and no retry.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,102 backend tests across 183 suites, the focused 27-test reconciliation-cycle suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-06 — Enforce reconciliation-attempt temporal coherence
 
 - Rejected non-throwing results that claim a provider call was evaluated before the discovered candidate's eligibility instant.

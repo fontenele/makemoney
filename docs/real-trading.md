@@ -1117,6 +1117,22 @@ When the attempt reports a newly stored observation, its durable `recordedAt` mu
 - Focused coverage proves pre-eligibility provider access and pre-evaluation new recording are rejected while an earlier exact replay remains valid.
 - No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.61 — Discovery-to-attempt clock monotonicity
+
+M10.61 closes the remaining cross-boundary clock regression after M10.60. Candidate discovery records one explicit `evaluatedAt` snapshot. Because the later one-shot attempt reloads durable context and reads its own injected clock, a malformed or regressed clock could previously report completed provider access after `eligibleAt` but before the discovery evaluation that caused that attempt to run.
+
+The untrusted attempt-result boundary now requires every completed provider call to satisfy both `attempt.evaluatedAt >= candidate.eligibleAt` and `attempt.evaluatedAt >= candidate.evaluatedAt`. A violation stops the batch before aggregation or the next candidate and is neither repaired nor retried.
+
+### M10.61 acceptance criteria
+
+- `status_response_invalid` and `status_observation_recorded` require `attempt.evaluatedAt >= candidate.evaluatedAt`.
+- A timestamp after eligibility but before discovery still fails closed.
+- The M10.60 eligibility and newly-recorded observation comparisons remain enforced.
+- Deferred, terminal, and blocked outcomes retain their existing status-specific timing rules because they report no provider call.
+- Temporal divergence stops before aggregation and before the next candidate.
+- Focused coverage proves the discovery-to-attempt regression is rejected.
+- No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

@@ -142,6 +142,7 @@ function isProviderCallTemporallyAdmitted(
 ): boolean {
   return (
     result.evaluatedAt!.getTime() >= candidate.eligibleAt.getTime() &&
+    result.evaluatedAt!.getTime() >= candidate.evaluatedAt.getTime() &&
     isAdmittedLookupTime(result)
   );
 }

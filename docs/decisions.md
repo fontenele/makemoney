@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-07 — Require attempt time to follow discovery time
+
+M10.61 treats the candidate's immutable discovery `evaluatedAt` as another causal lower bound for completed provider access. Checking only `candidate.eligibleAt` allowed a regressed attempt clock to remain after the cadence boundary while still appearing to precede the discovery operation that selected the candidate.
+
+The existing result boundary now requires `attempt.evaluatedAt >= candidate.evaluatedAt` in addition to the M10.60 eligibility check. Divergence fails closed before aggregation or later candidates; it is not repaired, retried, or converted into a normal outcome. No provider call, persistence change, scheduling, runtime registration, or execution authority is introduced.
+
 ## 2026-10-06 — Correlate attempt-result time with candidate eligibility
 
 M10.60 extends the untrusted result boundary from structural lifecycle validation to cross-boundary temporal validation. Any result claiming completed provider access must have an evaluation time at or after the exact eligibility instant admitted by discovery; otherwise the cycle would be accepting evidence of a lookup performed before its own cadence boundary.
