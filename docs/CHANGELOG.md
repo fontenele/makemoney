@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-08 — Correlate reconciliation blockers with attempt status
+
+- Partitioned the closed attempt-blocker vocabulary into pre-provider and status-response sets.
+- Rejected response-only failures on no-call `blocked` results and pre-call-only failures on completed-call `status_response_invalid` results.
+- Preserved gate, receipt, and gate/receipt mismatch blockers in both phases because response interpretation revalidates them after the awaited runner boundary.
+- Added focused negative and shared-blocker positive coverage while preserving temporal coherence, canonical order, snapshots, cancellation, bounded sequential execution, financial incompleteness, and no retry.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,105 backend tests across 183 suites, the focused 30-test reconciliation-cycle suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-08 — Enforce deferred-attempt discovery-time coherence
 
 - Required `status_lookup_deferred` evaluations to occur at or after the discovery snapshot that admitted the candidate.

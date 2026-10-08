@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-08 — Partition attempt blockers by lifecycle phase
+
+M10.63 narrows the M10.57 closed blocker vocabulary by the phase that can emit each value. A no-provider `blocked` result can carry only overlap, local context/evidence, gate/receipt, or cadence validation failures. A completed-provider `status_response_invalid` result can carry only blockers from the status-response assessor. Accepting the union in either status would permit internally contradictory audit evidence.
+
+Gate validity, receipt validity, and gate/receipt mismatch blockers deliberately overlap. The response assessor repeats those checks after the awaited runner call, so mutable input corruption at that boundary can validly surface them post-call. Every other blocker belongs to exactly one phase. The cycle rejects divergence before aggregation without retry, repair, provider access, persistence, scheduling, or execution authority.
+
 ## 2026-10-08 — Apply discovery-time monotonicity to deferred attempts
 
 M10.62 recognizes that a due candidate can validly become deferred when the one-shot attempt reloads newer durable pending evidence after discovery. That race explains the outcome, but it does not permit the attempt clock to move backward: the deferral evaluation still occurs causally after candidate selection.

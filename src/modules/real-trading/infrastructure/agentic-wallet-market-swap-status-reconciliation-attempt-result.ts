@@ -28,6 +28,33 @@ const ATTEMPT_BLOCKERS =
     'invalid_order_timestamps',
     'invalid_transaction_hash',
   ]);
+const PRE_PROVIDER_BLOCKERS =
+  new Set<AgenticWalletMarketSwapStatusReconciliationAttemptBlocker>([
+    'reconciliation_attempt_in_progress',
+    'invalid_submission_gate',
+    'invalid_submission_receipt',
+    'invalid_submission_receipt_timing',
+    'gate_receipt_mismatch',
+    'reconciliation_context_not_found',
+    'invalid_reconciliation_state',
+    'reconciliation_evidence_mismatch',
+    'invalid_evaluation_time',
+    'invalid_minimum_lookup_interval',
+  ]);
+const STATUS_RESPONSE_BLOCKERS =
+  new Set<AgenticWalletMarketSwapStatusReconciliationAttemptBlocker>([
+    'invalid_submission_gate',
+    'invalid_submission_receipt',
+    'gate_receipt_mismatch',
+    'invalid_response_envelope',
+    'provider_reported_failure',
+    'invalid_order_lookup_payload',
+    'order_identity_mismatch',
+    'order_payload_mismatch',
+    'invalid_order_status',
+    'invalid_order_timestamps',
+    'invalid_transaction_hash',
+  ]);
 
 export function validateAndSnapshotStatusReconciliationAttemptResult(
   result: AgenticWalletMarketSwapStatusReconciliationAttemptResult,
@@ -78,6 +105,7 @@ function isValidAttemptResult(
   if (result.status === 'blocked') {
     return (
       result.blockers.length > 0 &&
+      result.blockers.every(isPreProviderBlocker) &&
       noProviderWork &&
       noObservation &&
       noTiming &&
@@ -108,6 +136,7 @@ function isValidAttemptResult(
   if (result.status === 'status_response_invalid') {
     return (
       result.blockers.length > 0 &&
+      result.blockers.every(isStatusResponseBlocker) &&
       result.providerCallStarted &&
       result.providerCallCompleted &&
       noObservation &&
@@ -135,6 +164,18 @@ function isValidAttemptResult(
     stored.observation.providerOrderId === candidate.providerOrderId &&
     result.statusLookupRequired === stored.observation.statusLookupRequired
   );
+}
+
+function isPreProviderBlocker(
+  blocker: AgenticWalletMarketSwapStatusReconciliationAttemptBlocker,
+): boolean {
+  return PRE_PROVIDER_BLOCKERS.has(blocker);
+}
+
+function isStatusResponseBlocker(
+  blocker: AgenticWalletMarketSwapStatusReconciliationAttemptBlocker,
+): boolean {
+  return STATUS_RESPONSE_BLOCKERS.has(blocker);
 }
 
 function isProviderCallTemporallyAdmitted(

@@ -211,6 +211,49 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     expect(reconcileOnce).toHaveBeenCalledTimes(1);
   });
 
+  it('rejects blockers that do not belong to the reported attempt status', async () => {
+    const cases = [
+      {
+        result: attemptResult('blocked'),
+        blocker: 'provider_reported_failure',
+      },
+      {
+        result: attemptResult('status_response_invalid'),
+        blocker: 'reconciliation_context_not_found',
+      },
+    ] as const;
+
+    for (const testCase of cases) {
+      Object.assign(testCase.result, { blockers: [testCase.blocker] });
+      const harness = cycleHarness(
+        [candidate(1)],
+        jest.fn().mockResolvedValue(testCase.result),
+      );
+
+      await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+        'Agentic Wallet status reconciliation attempt result is invalid',
+      );
+    }
+  });
+
+  it('accepts shared gate blockers in their valid pre- and post-call statuses', async () => {
+    const blocked = attemptResult('blocked');
+    Object.assign(blocked, { blockers: ['invalid_submission_gate'] });
+    const invalidResponse = attemptResult('status_response_invalid');
+    Object.assign(invalidResponse, { blockers: ['invalid_submission_gate'] });
+    const reconcileOnce = jest
+      .fn()
+      .mockResolvedValueOnce(blocked)
+      .mockResolvedValueOnce(invalidResponse);
+    const harness = cycleHarness([candidate(1), candidate(2)], reconcileOnce);
+
+    await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+      status: 'completed',
+      blockedCount: 1,
+      invalidResponseCount: 1,
+    });
+  });
+
   it('rejects a provider call reported before the candidate was eligible', async () => {
     const malformed = attemptResult('status_response_invalid');
     malformed.evaluatedAt!.setTime(

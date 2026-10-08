@@ -1150,6 +1150,24 @@ The untrusted attempt-result boundary now requires `result.evaluatedAt >= candid
 - Focused coverage proves a pre-discovery deferred evaluation is rejected.
 - No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.63 — Attempt-status blocker correlation
+
+M10.63 partitions the closed blocker vocabulary validated by M10.57 according to the attempt phase that can emit it. `blocked` occurs before provider access and accepts only overlap, context absence or invalidity, gate/receipt correlation and timing, durable-evidence mismatch, or cadence-input failures. `status_response_invalid` occurs only after the runner completes and accepts only the blockers returned by the M10.38 response assessor.
+
+Three blockers intentionally overlap: `invalid_submission_gate`, `invalid_submission_receipt`, and `gate_receipt_mismatch`. The attempt validates those facts before the call, but the response assessor revalidates them after the awaited runner boundary; mutation across that boundary can therefore surface the same failures after provider access. All other blockers are phase-exclusive. A recognized but phase-divergent blocker stops the batch before aggregation or the next candidate.
+
+### M10.63 acceptance criteria
+
+- `blocked` accepts only the exact pre-provider blocker set.
+- `status_response_invalid` accepts only the exact status-response-assessment blocker set.
+- Response-only blockers fail when paired with no provider work.
+- Context, cadence, overlap, and receipt-timing blockers fail when paired with completed provider access.
+- Gate/receipt structural and correlation blockers remain valid in both phases.
+- Empty/non-empty, uniqueness, closed vocabulary, call-progress, timing, observation, financial, and retry rules remain enforced.
+- Divergence fails closed before aggregation and before the next candidate.
+- Focused coverage proves both invalid cross-phase directions and the intentional shared-blocker cases.
+- No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
