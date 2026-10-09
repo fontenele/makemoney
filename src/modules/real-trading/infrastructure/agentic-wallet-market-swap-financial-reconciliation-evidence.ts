@@ -68,7 +68,8 @@ export function assessAgenticWalletMarketSwapFinancialReconciliationEvidence(
     [];
   const gateValid = isStructurallyValidAgenticWalletMarketSwapGate(gate);
   const stateValid = isValidAgenticWalletMarketSwapReconciliationState(state);
-  const evidenceValid = isValidEvidence(evidence);
+  const evidenceValid =
+    isValidAgenticWalletMarketSwapFinancialReconciliationEvidence(evidence);
   addIf(blockers, !gateValid, 'invalid_submission_gate');
   addIf(blockers, !stateValid, 'invalid_reconciliation_state');
   addIf(blockers, !evidenceValid, 'invalid_financial_evidence');
@@ -127,7 +128,7 @@ export function assessAgenticWalletMarketSwapFinancialReconciliationEvidence(
   return result([], snapshotEvidence(evidence));
 }
 
-function isValidEvidence(
+export function isValidAgenticWalletMarketSwapFinancialReconciliationEvidence(
   evidence: AgenticWalletMarketSwapFinancialReconciliationEvidence,
 ): boolean {
   return (
@@ -191,9 +192,11 @@ function snapshotEvidence(
 ): AgenticWalletMarketSwapFinancialReconciliationEvidence {
   return {
     ...evidence,
-    providerFeeComponents: evidence.providerFeeComponents.map((fee) => ({
-      ...fee,
-    })),
+    providerFeeComponents: evidence.providerFeeComponents
+      .map((fee) => ({ ...fee }))
+      .sort((left, right) =>
+        left.assetAddress.localeCompare(right.assetAddress),
+      ),
     observedAt: new Date(evidence.observedAt),
   };
 }

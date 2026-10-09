@@ -13,6 +13,7 @@ import {
 import { AgenticWalletMarketSwapSubmissionReceiptConflictError } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-submission-receipt.store';
 import { AgenticWalletMarketSwapSubmissionReceipt } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-submission-response';
 import { AgenticWalletMarketSwapStatusObservationBlockedError } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-observation.store';
+import { AgenticWalletMarketSwapFinancialReconciliationEvidence } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-financial-reconciliation-evidence';
 import { decideAgenticWalletMarketSwapStatusLookup } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-lookup-decision';
 import { AgenticWalletMarketSwapStatusObservation } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-response';
 import { AgenticWalletMarketSwapStatusReconciliationAttempt } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-reconciliation-attempt';
@@ -22,6 +23,7 @@ import { PrismaAgenticWalletMarketSwapReconciliationStateStore } from '../src/mo
 import { PrismaAgenticWalletMarketSwapStatusObservationStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-observation.store';
 import { PrismaAgenticWalletMarketSwapStatusReconciliationContextStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-reconciliation-context.store';
 import { PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-reconciliation-candidate.store';
+import { PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-financial-reconciliation-evidence.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -34,6 +36,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let reconciliationStore: PrismaAgenticWalletMarketSwapReconciliationStateStore;
   let reconciliationContextStore: PrismaAgenticWalletMarketSwapStatusReconciliationContextStore;
   let reconciliationCandidateStore: PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore;
+  let financialEvidenceStore: PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -54,6 +57,12 @@ describe('Real execution submission gate persistence (e2e)', () => {
     reconciliationCandidateStore =
       new PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore(
         prisma,
+      );
+    financialEvidenceStore =
+      new PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore(
+        prisma,
+        () => new Date('2026-10-03T12:00:08.000Z'),
+        () => uuid(23),
       );
   });
 
@@ -567,6 +576,41 @@ describe('Real execution submission gate persistence (e2e)', () => {
     );
   });
 
+  it('persists complete financial evidence once and replays it unchanged', async () => {
+    await store.create(command(10));
+    await receiptStore.record(submissionReceipt(10));
+    const terminal = await statusStore.record(
+      statusObservation(10, {
+        providerStatus: 'FINISHED',
+        transactionHash: `0x${'a'.repeat(64)}`,
+        updatedAt: new Date('2026-10-03T12:00:06.000Z'),
+        terminal: true,
+        executionSucceeded: true,
+        statusLookupRequired: false,
+      }),
+    );
+    const input = financialEvidence(terminal.stored.id);
+
+    const first = await financialEvidenceStore.record(input);
+    const replay = await financialEvidenceStore.record(input);
+
+    expect(first).toMatchObject({
+      replayed: false,
+      stored: {
+        id: uuid(23),
+        evidence: {
+          actualTargetReceivedQuantity: '0.000071',
+          providerFeeCoverageComplete: true,
+          networkFeeCoverageComplete: true,
+        },
+      },
+    });
+    expect(replay).toEqual({ stored: first.stored, replayed: true });
+    await expect(
+      prisma.realExecutionFinancialReconciliationEvidence.count(),
+    ).resolves.toBe(1);
+  });
+
   it('fails closed when directly persisted observation timing contradicts its receipt', async () => {
     await store.create(command(10));
     await receiptStore.record(submissionReceipt(10));
@@ -590,6 +634,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   });
 
   async function cleanup(): Promise<void> {
+    await prisma.realExecutionFinancialReconciliationEvidence.deleteMany();
     await prisma.realExecutionStatusObservation.deleteMany();
     await prisma.realExecutionSubmissionReceipt.deleteMany();
     await prisma.realExecutionSubmissionGate.deleteMany();
@@ -735,6 +780,32 @@ function statusObservation(
     actualReceivedQuantity: null,
     submissionRetryAllowed: false,
     ...overrides,
+  };
+}
+
+function financialEvidence(
+  statusObservationId: string,
+): AgenticWalletMarketSwapFinancialReconciliationEvidence {
+  return {
+    scope: 'agentic_wallet_market_swap_financial_reconciliation_evidence',
+    providerId: 'agentic_wallet',
+    chainId: '56',
+    gateId: uuid(10),
+    providerOrderId: '1234567890',
+    statusObservationId,
+    transactionHash: `0x${'a'.repeat(64)}`,
+    sourceTokenAddress: '0x55d398326f99059ff775485246999027b3197955',
+    targetTokenAddress: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+    submittedSourceQuantity: '5',
+    actualTargetReceivedQuantity: '0.000071',
+    providerFeeComponents: [],
+    networkFeeAsset: 'BNB',
+    networkFeeQuantity: '0.0003',
+    transactionReceiptObserved: true,
+    targetBalanceDeltaObserved: true,
+    providerFeeCoverageComplete: true,
+    networkFeeCoverageComplete: true,
+    observedAt: new Date('2026-10-03T12:00:07.000Z'),
   };
 }
 

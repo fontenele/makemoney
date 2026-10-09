@@ -64,6 +64,7 @@ export const ModelName = {
   RealExecutionSubmissionGate: 'RealExecutionSubmissionGate',
   RealExecutionSubmissionReceipt: 'RealExecutionSubmissionReceipt',
   RealExecutionStatusObservation: 'RealExecutionStatusObservation',
+  RealExecutionFinancialReconciliationEvidence: 'RealExecutionFinancialReconciliationEvidence',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -323,6 +324,29 @@ export const RealExecutionStatusObservationScalarFieldEnum = {
 } as const
 
 export type RealExecutionStatusObservationScalarFieldEnum = (typeof RealExecutionStatusObservationScalarFieldEnum)[keyof typeof RealExecutionStatusObservationScalarFieldEnum]
+
+
+export const RealExecutionFinancialReconciliationEvidenceScalarFieldEnum = {
+  id: 'id',
+  gateId: 'gateId',
+  statusObservationId: 'statusObservationId',
+  providerId: 'providerId',
+  providerOrderId: 'providerOrderId',
+  chainId: 'chainId',
+  transactionHash: 'transactionHash',
+  sourceTokenAddress: 'sourceTokenAddress',
+  targetTokenAddress: 'targetTokenAddress',
+  submittedSourceQuantity: 'submittedSourceQuantity',
+  actualTargetReceivedQuantity: 'actualTargetReceivedQuantity',
+  providerFeeComponents: 'providerFeeComponents',
+  networkFeeAsset: 'networkFeeAsset',
+  networkFeeQuantity: 'networkFeeQuantity',
+  requestFingerprint: 'requestFingerprint',
+  observedAt: 'observedAt',
+  recordedAt: 'recordedAt'
+} as const
+
+export type RealExecutionFinancialReconciliationEvidenceScalarFieldEnum = (typeof RealExecutionFinancialReconciliationEvidenceScalarFieldEnum)[keyof typeof RealExecutionFinancialReconciliationEvidenceScalarFieldEnum]
 
 
 export const ObservedSpotSymbolScalarFieldEnum = {

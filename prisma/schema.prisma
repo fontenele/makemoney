@@ -193,50 +193,51 @@ model RealExecutionFinalConfirmation {
 }
 
 model RealExecutionSubmissionGate {
-  id                       String                         @id @db.Uuid
-  confirmationId           String                         @unique @map("confirmation_id") @db.Uuid
-  approvalId               String                         @unique @map("approval_id") @db.Uuid
-  reservationId            String                         @unique @map("reservation_id") @db.Uuid
-  armId                    String                         @unique @map("arm_id") @db.Uuid
-  submissionPlanId         String                         @unique @map("submission_plan_id") @db.Uuid
-  providerId               String                         @map("provider_id") @db.VarChar(32)
-  chainId                  String                         @map("chain_id") @db.VarChar(32)
-  intentId                 String                         @unique @map("intent_id") @db.Uuid
-  quoteId                  String                         @unique @map("quote_id") @db.Uuid
-  payloadCommitmentVersion String                         @map("payload_commitment_version") @db.VarChar(64)
-  payloadCommitmentDigest  String                         @map("payload_commitment_digest") @db.Char(64)
-  emergencyStopChangeId    String                         @map("emergency_stop_change_id") @db.VarChar(100)
-  sourceTokenAddress       String                         @map("source_token_address") @db.VarChar(256)
-  targetTokenAddress       String                         @map("target_token_address") @db.VarChar(256)
-  sourceQuantity           String                         @map("source_quantity") @db.Text
-  maximumSlippagePercent   String                         @map("maximum_slippage_percent") @db.Text
-  mevProtection            Boolean                        @map("mev_protection")
-  gasLevel                 String                         @map("gas_level") @db.VarChar(16)
-  status                   String                         @db.VarChar(40)
-  requestFingerprint       String                         @map("request_fingerprint") @db.Char(64)
-  emergencyStopRecheckedAt DateTime                       @map("emergency_stop_rechecked_at")
-  confirmationConsumedAt   DateTime                       @map("confirmation_consumed_at")
-  expiresAt                DateTime?                      @map("expires_at")
-  createdAt                DateTime                       @default(now()) @map("created_at")
-  confirmation             RealExecutionFinalConfirmation @relation(fields: [confirmationId], references: [id], onDelete: Restrict)
-  submissionReceipt        RealExecutionSubmissionReceipt?
+  id                              String                                        @id @db.Uuid
+  confirmationId                  String                                        @unique @map("confirmation_id") @db.Uuid
+  approvalId                      String                                        @unique @map("approval_id") @db.Uuid
+  reservationId                   String                                        @unique @map("reservation_id") @db.Uuid
+  armId                           String                                        @unique @map("arm_id") @db.Uuid
+  submissionPlanId                String                                        @unique @map("submission_plan_id") @db.Uuid
+  providerId                      String                                        @map("provider_id") @db.VarChar(32)
+  chainId                         String                                        @map("chain_id") @db.VarChar(32)
+  intentId                        String                                        @unique @map("intent_id") @db.Uuid
+  quoteId                         String                                        @unique @map("quote_id") @db.Uuid
+  payloadCommitmentVersion        String                                        @map("payload_commitment_version") @db.VarChar(64)
+  payloadCommitmentDigest         String                                        @map("payload_commitment_digest") @db.Char(64)
+  emergencyStopChangeId           String                                        @map("emergency_stop_change_id") @db.VarChar(100)
+  sourceTokenAddress              String                                        @map("source_token_address") @db.VarChar(256)
+  targetTokenAddress              String                                        @map("target_token_address") @db.VarChar(256)
+  sourceQuantity                  String                                        @map("source_quantity") @db.Text
+  maximumSlippagePercent          String                                        @map("maximum_slippage_percent") @db.Text
+  mevProtection                   Boolean                                       @map("mev_protection")
+  gasLevel                        String                                        @map("gas_level") @db.VarChar(16)
+  status                          String                                        @db.VarChar(40)
+  requestFingerprint              String                                        @map("request_fingerprint") @db.Char(64)
+  emergencyStopRecheckedAt        DateTime                                      @map("emergency_stop_rechecked_at")
+  confirmationConsumedAt          DateTime                                      @map("confirmation_consumed_at")
+  expiresAt                       DateTime?                                     @map("expires_at")
+  createdAt                       DateTime                                      @default(now()) @map("created_at")
+  confirmation                    RealExecutionFinalConfirmation                @relation(fields: [confirmationId], references: [id], onDelete: Restrict)
+  submissionReceipt               RealExecutionSubmissionReceipt?
+  financialReconciliationEvidence RealExecutionFinancialReconciliationEvidence?
 
   @@index([providerId, chainId, createdAt])
   @@map("real_execution_submission_gates")
 }
 
 model RealExecutionSubmissionReceipt {
-  gateId                         String                      @id @map("gate_id") @db.Uuid
-  providerId                     String                      @map("provider_id") @db.VarChar(32)
-  providerOrderId                String                      @unique @map("provider_order_id") @db.VarChar(256)
-  lifecycleStatus                String                      @map("lifecycle_status") @db.VarChar(32)
-  providerSubmissionAcknowledged Boolean                     @map("provider_submission_acknowledged")
+  gateId                         String                           @id @map("gate_id") @db.Uuid
+  providerId                     String                           @map("provider_id") @db.VarChar(32)
+  providerOrderId                String                           @unique @map("provider_order_id") @db.VarChar(256)
+  lifecycleStatus                String                           @map("lifecycle_status") @db.VarChar(32)
+  providerSubmissionAcknowledged Boolean                          @map("provider_submission_acknowledged")
   terminal                       Boolean
-  executionSucceeded             Boolean                     @map("execution_succeeded")
-  statusLookupRequired           Boolean                     @map("status_lookup_required")
-  automaticRetryAllowed          Boolean                     @map("automatic_retry_allowed")
-  recordedAt                     DateTime                    @default(now()) @map("recorded_at")
-  gate                           RealExecutionSubmissionGate @relation(fields: [gateId], references: [id], onDelete: Restrict)
+  executionSucceeded             Boolean                          @map("execution_succeeded")
+  statusLookupRequired           Boolean                          @map("status_lookup_required")
+  automaticRetryAllowed          Boolean                          @map("automatic_retry_allowed")
+  recordedAt                     DateTime                         @default(now()) @map("recorded_at")
+  gate                           RealExecutionSubmissionGate      @relation(fields: [gateId], references: [id], onDelete: Restrict)
   statusObservations             RealExecutionStatusObservation[]
 
   @@unique([gateId, providerId, providerOrderId])
@@ -245,21 +246,47 @@ model RealExecutionSubmissionReceipt {
 }
 
 model RealExecutionStatusObservation {
-  id                  String                         @id @db.Uuid
-  sequence            BigInt                         @unique @default(autoincrement())
-  gateId              String                         @map("gate_id") @db.Uuid
-  providerId          String                         @map("provider_id") @db.VarChar(32)
-  providerOrderId     String                         @map("provider_order_id") @db.VarChar(256)
-  providerStatus      String                         @map("provider_status") @db.VarChar(16)
-  transactionHash     String?                        @map("transaction_hash") @db.VarChar(66)
-  bookedAt            DateTime                       @map("booked_at")
-  providerUpdatedAt   DateTime                       @map("provider_updated_at")
-  recordedAt          DateTime                       @default(now()) @map("recorded_at")
-  submissionReceipt   RealExecutionSubmissionReceipt @relation(fields: [gateId, providerId, providerOrderId], references: [gateId, providerId, providerOrderId], onDelete: Restrict)
+  id                              String                                        @id @db.Uuid
+  sequence                        BigInt                                        @unique @default(autoincrement())
+  gateId                          String                                        @map("gate_id") @db.Uuid
+  providerId                      String                                        @map("provider_id") @db.VarChar(32)
+  providerOrderId                 String                                        @map("provider_order_id") @db.VarChar(256)
+  providerStatus                  String                                        @map("provider_status") @db.VarChar(16)
+  transactionHash                 String?                                       @map("transaction_hash") @db.VarChar(66)
+  bookedAt                        DateTime                                      @map("booked_at")
+  providerUpdatedAt               DateTime                                      @map("provider_updated_at")
+  recordedAt                      DateTime                                      @default(now()) @map("recorded_at")
+  submissionReceipt               RealExecutionSubmissionReceipt                @relation(fields: [gateId, providerId, providerOrderId], references: [gateId, providerId, providerOrderId], onDelete: Restrict)
+  financialReconciliationEvidence RealExecutionFinancialReconciliationEvidence?
 
   @@index([gateId, sequence])
   @@index([providerId, providerStatus, recordedAt])
   @@map("real_execution_status_observations")
+}
+
+model RealExecutionFinancialReconciliationEvidence {
+  id                           String                         @id @db.Uuid
+  gateId                       String                         @unique @map("gate_id") @db.Uuid
+  statusObservationId          String                         @unique @map("status_observation_id") @db.Uuid
+  providerId                   String                         @map("provider_id") @db.VarChar(32)
+  providerOrderId              String                         @unique @map("provider_order_id") @db.VarChar(256)
+  chainId                      String                         @map("chain_id") @db.VarChar(32)
+  transactionHash              String                         @unique @map("transaction_hash") @db.VarChar(66)
+  sourceTokenAddress           String                         @map("source_token_address") @db.VarChar(256)
+  targetTokenAddress           String                         @map("target_token_address") @db.VarChar(256)
+  submittedSourceQuantity      String                         @map("submitted_source_quantity") @db.Text
+  actualTargetReceivedQuantity String                         @map("actual_target_received_quantity") @db.Text
+  providerFeeComponents        Json                           @map("provider_fee_components")
+  networkFeeAsset              String                         @map("network_fee_asset") @db.VarChar(16)
+  networkFeeQuantity           String                         @map("network_fee_quantity") @db.Text
+  requestFingerprint           String                         @map("request_fingerprint") @db.Char(64)
+  observedAt                   DateTime                       @map("observed_at")
+  recordedAt                   DateTime                       @default(now()) @map("recorded_at")
+  gate                         RealExecutionSubmissionGate    @relation(fields: [gateId], references: [id], onDelete: Restrict)
+  statusObservation            RealExecutionStatusObservation @relation(fields: [statusObservationId], references: [id], onDelete: Restrict)
+
+  @@index([providerId, recordedAt])
+  @@map("real_execution_financial_reconciliation_evidence")
 }
 
 model ObservedSpotSymbol {

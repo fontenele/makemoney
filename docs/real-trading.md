@@ -1481,3 +1481,23 @@ A ready result is only a defensive `evidence_ready_for_persistence` snapshot. It
 - [Binance's official `binance-skills-hub`](https://github.com/binance/binance-skills-hub), including the Agentic Wallet skill plus preflight, wallet-view, wallet-setting, gas, security, and market-order references (reviewed 2026-09-30).
 - [Binance Agentic Wallet market-order reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/market-order.md), including the distinct quote, swap, and order-list commands, explicit MEV/gas controls, the instruction to report actual received amount, and the published status row that still omits received quantity and complete costs (reviewed again 2026-10-09).
 - [Binance Spot REST security documentation](https://developers.binance.com/en/docs/products/spot/rest-api) was reviewed only to confirm that centralized Spot API keys and permissions are a separate integration model; it is not the selected M10 provider boundary.
+
+## M10.82 — Immutable financial-reconciliation evidence persistence
+
+M10.82 gives the persistence-ready M10.81 snapshot one immutable PostgreSQL destination. The record preserves its exact gate, provider order, terminal status-observation UUID, transaction hash, chain and token direction, submitted source quantity, actual target receipt, complete provider-fee components, network fee, observation time, and a canonical request fingerprint.
+
+Recording runs under a serializable transaction and per-gate advisory lock. Before insertion, the store reloads the durable submission gate, submission receipt, and latest status observation, maps and validates each row, reconstructs the reconciliation state, and reapplies the pure M10.81 evidence assessment. This prevents an earlier in-memory decision from bypassing a newer or divergent durable status. An exact fingerprint replay returns the original row; reuse of the gate with different evidence fails closed. Database uniqueness also prevents reuse of the provider order, terminal observation, or transaction hash across evidence rows.
+
+The new row is evidence, not an accounting mutation. Its existence does not update a wallet balance, value a position, calculate realized or unrealized PnL, mark `financialReconciliationComplete`, authorize a retry, or authorize execution. The store remains unregistered and no source capable of acquiring the required evidence has been introduced.
+
+### M10.82 acceptance criteria
+
+- Complete M10.81 evidence has an immutable PostgreSQL model and migration with exact decimal strings and JSON fee components.
+- Gate, receipt, and latest status observation are reloaded and structurally validated inside the serialized write transaction.
+- The pure M10.81 correlation assessment is reapplied before every first insert.
+- Exact payload replay is idempotent; divergent reuse of the same gate is rejected.
+- Gate, provider order, terminal observation, and transaction hash cannot be reused across evidence records.
+- Persisted rows are mapped through the same structural evidence validator and reject invalid identity, quantities, costs, or recording chronology.
+- Unit tests cover insert, replay, conflict, unfinished provider state, absent context, invalid recording metadata, and malformed persisted data.
+- PostgreSQL E2E coverage applies all 28 migrations from scratch and proves one durable insert plus exact replay.
+- No evidence acquisition, NestJS registration, route, provider call, wallet accounting, valuation, PnL, financial-completion transition, funding, retry, executor, or real order is added.

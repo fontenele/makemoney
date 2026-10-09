@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-09 — Persist financial evidence only after durable-context revalidation
+
+Financial evidence is an accounting-critical fact and cannot be accepted merely because an in-memory caller previously passed the pure M10.81 assessment. Between assessment and persistence, the durable status history could advance or the caller could replay a changed payload.
+
+M10.82 uses one serializable per-gate transaction to reload the immutable gate, submission receipt, and latest status observation, reconstruct the reconciliation state, and reapply the same pure evidence gate. One row is allowed per gate, provider order, terminal observation, and transaction hash. A canonical fingerprint makes exact retries idempotent and rejects divergent reuse. Persistence still does not imply completed reconciliation: acquisition, wallet accounting, valuation, PnL, runtime wiring, and execution remain separate future increments.
+
 ## 2026-10-09 — Require separate complete evidence before financial reconciliation
 
 The current official Agentic Wallet reference says a `FINISHED` market order should be reported with its actual received amount, while the documented order-list response does not expose that amount or a complete provider/network fee breakdown. Treating terminal provider status as completed accounting would therefore invent financial facts and make profit measurement unreliable.

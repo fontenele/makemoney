@@ -1,5 +1,11 @@
 # Current State
 
+M10.82 is complete: the complete M10.81 package can now be recorded exactly once as immutable PostgreSQL financial-reconciliation evidence. A serializable per-gate transaction reloads the immutable submission gate, submission receipt, and latest status observation, reconstructs the reconciliation state, and reapplies the pure fail-closed evidence assessment before insertion.
+
+Exact evidence replay returns the existing record, while a different fingerprint for the same gate is rejected. Unique gate, provider-order, terminal-observation, and transaction-hash identities prevent the same provider execution from being accounted twice. The store remains unregistered and does not acquire evidence, mutate a wallet or accounting balance, calculate valuation or PnL, or change `financialReconciliationComplete: false`.
+
+Post-M10.82 validation passed all 2,153 backend tests across 185 suites, all 95 PostgreSQL E2E tests across 9 suites with all 28 migrations applied from scratch, the focused 22-test evidence/persistence suite, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks. Compose emitted only the existing inaccessible user Docker-config warning.
+
 M10.81 is complete: a pure, unwired financial-reconciliation evidence gate now blocks provider-`FINISHED` swaps unless a separately obtained package proves exact gate, provider-order, terminal-observation, transaction, chain, token, and submitted-source correlation; positive actual target receipt; explicit transaction-receipt and target-balance-delta observation; complete bounded provider-fee components; complete positive BNB network fee; and post-status timing.
 
 The official order-list example still omits actual target receipt and complete fees, so M10.81 does not derive these facts from provider status or quote output. A successful assessment is only `evidence_ready_for_persistence`, defensively copies its evidence, and keeps `financialReconciliationComplete: false`. No evidence loader, schema, repository, wallet accounting, PnL calculation, runtime registration, provider call, funding, mutating runner, executor, retry, or real order was added.

@@ -83,6 +83,11 @@ export type RealExecutionSubmissionReceipt = Prisma.RealExecutionSubmissionRecei
  */
 export type RealExecutionStatusObservation = Prisma.RealExecutionStatusObservationModel
 /**
+ * Model RealExecutionFinancialReconciliationEvidence
+ * 
+ */
+export type RealExecutionFinancialReconciliationEvidence = Prisma.RealExecutionFinancialReconciliationEvidenceModel
+/**
  * Model ObservedSpotSymbol
  * 
  */

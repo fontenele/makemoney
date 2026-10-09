@@ -344,6 +344,7 @@ export type RealExecutionSubmissionGateWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"RealExecutionSubmissionGate"> | Date | string
   confirmation?: Prisma.XOR<Prisma.RealExecutionFinalConfirmationScalarRelationFilter, Prisma.RealExecutionFinalConfirmationWhereInput>
   submissionReceipt?: Prisma.XOR<Prisma.RealExecutionSubmissionReceiptNullableScalarRelationFilter, Prisma.RealExecutionSubmissionReceiptWhereInput> | null
+  financialReconciliationEvidence?: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceNullableScalarRelationFilter, Prisma.RealExecutionFinancialReconciliationEvidenceWhereInput> | null
 }
 
 export type RealExecutionSubmissionGateOrderByWithRelationInput = {
@@ -374,6 +375,7 @@ export type RealExecutionSubmissionGateOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   confirmation?: Prisma.RealExecutionFinalConfirmationOrderByWithRelationInput
   submissionReceipt?: Prisma.RealExecutionSubmissionReceiptOrderByWithRelationInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceOrderByWithRelationInput
 }
 
 export type RealExecutionSubmissionGateWhereUniqueInput = Prisma.AtLeast<{
@@ -407,6 +409,7 @@ export type RealExecutionSubmissionGateWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"RealExecutionSubmissionGate"> | Date | string
   confirmation?: Prisma.XOR<Prisma.RealExecutionFinalConfirmationScalarRelationFilter, Prisma.RealExecutionFinalConfirmationWhereInput>
   submissionReceipt?: Prisma.XOR<Prisma.RealExecutionSubmissionReceiptNullableScalarRelationFilter, Prisma.RealExecutionSubmissionReceiptWhereInput> | null
+  financialReconciliationEvidence?: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceNullableScalarRelationFilter, Prisma.RealExecutionFinancialReconciliationEvidenceWhereInput> | null
 }, "id" | "confirmationId" | "approvalId" | "reservationId" | "armId" | "submissionPlanId" | "intentId" | "quoteId">
 
 export type RealExecutionSubmissionGateOrderByWithAggregationInput = {
@@ -498,6 +501,7 @@ export type RealExecutionSubmissionGateCreateInput = {
   createdAt?: Date | string
   confirmation: Prisma.RealExecutionFinalConfirmationCreateNestedOneWithoutSubmissionGateInput
   submissionReceipt?: Prisma.RealExecutionSubmissionReceiptCreateNestedOneWithoutGateInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceCreateNestedOneWithoutGateInput
 }
 
 export type RealExecutionSubmissionGateUncheckedCreateInput = {
@@ -527,6 +531,7 @@ export type RealExecutionSubmissionGateUncheckedCreateInput = {
   expiresAt?: Date | string | null
   createdAt?: Date | string
   submissionReceipt?: Prisma.RealExecutionSubmissionReceiptUncheckedCreateNestedOneWithoutGateInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedCreateNestedOneWithoutGateInput
 }
 
 export type RealExecutionSubmissionGateUpdateInput = {
@@ -556,6 +561,7 @@ export type RealExecutionSubmissionGateUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmation?: Prisma.RealExecutionFinalConfirmationUpdateOneRequiredWithoutSubmissionGateNestedInput
   submissionReceipt?: Prisma.RealExecutionSubmissionReceiptUpdateOneWithoutGateNestedInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUpdateOneWithoutGateNestedInput
 }
 
 export type RealExecutionSubmissionGateUncheckedUpdateInput = {
@@ -585,6 +591,7 @@ export type RealExecutionSubmissionGateUncheckedUpdateInput = {
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissionReceipt?: Prisma.RealExecutionSubmissionReceiptUncheckedUpdateOneWithoutGateNestedInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedUpdateOneWithoutGateNestedInput
 }
 
 export type RealExecutionSubmissionGateCreateManyInput = {
@@ -810,6 +817,20 @@ export type RealExecutionSubmissionGateUpdateOneRequiredWithoutSubmissionReceipt
   update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionSubmissionGateUpdateToOneWithWhereWithoutSubmissionReceiptInput, Prisma.RealExecutionSubmissionGateUpdateWithoutSubmissionReceiptInput>, Prisma.RealExecutionSubmissionGateUncheckedUpdateWithoutSubmissionReceiptInput>
 }
 
+export type RealExecutionSubmissionGateCreateNestedOneWithoutFinancialReconciliationEvidenceInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionSubmissionGateCreateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionSubmissionGateUncheckedCreateWithoutFinancialReconciliationEvidenceInput>
+  connectOrCreate?: Prisma.RealExecutionSubmissionGateCreateOrConnectWithoutFinancialReconciliationEvidenceInput
+  connect?: Prisma.RealExecutionSubmissionGateWhereUniqueInput
+}
+
+export type RealExecutionSubmissionGateUpdateOneRequiredWithoutFinancialReconciliationEvidenceNestedInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionSubmissionGateCreateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionSubmissionGateUncheckedCreateWithoutFinancialReconciliationEvidenceInput>
+  connectOrCreate?: Prisma.RealExecutionSubmissionGateCreateOrConnectWithoutFinancialReconciliationEvidenceInput
+  upsert?: Prisma.RealExecutionSubmissionGateUpsertWithoutFinancialReconciliationEvidenceInput
+  connect?: Prisma.RealExecutionSubmissionGateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionSubmissionGateUpdateToOneWithWhereWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionSubmissionGateUpdateWithoutFinancialReconciliationEvidenceInput>, Prisma.RealExecutionSubmissionGateUncheckedUpdateWithoutFinancialReconciliationEvidenceInput>
+}
+
 export type RealExecutionSubmissionGateCreateWithoutConfirmationInput = {
   id: string
   approvalId: string
@@ -836,6 +857,7 @@ export type RealExecutionSubmissionGateCreateWithoutConfirmationInput = {
   expiresAt?: Date | string | null
   createdAt?: Date | string
   submissionReceipt?: Prisma.RealExecutionSubmissionReceiptCreateNestedOneWithoutGateInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceCreateNestedOneWithoutGateInput
 }
 
 export type RealExecutionSubmissionGateUncheckedCreateWithoutConfirmationInput = {
@@ -864,6 +886,7 @@ export type RealExecutionSubmissionGateUncheckedCreateWithoutConfirmationInput =
   expiresAt?: Date | string | null
   createdAt?: Date | string
   submissionReceipt?: Prisma.RealExecutionSubmissionReceiptUncheckedCreateNestedOneWithoutGateInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedCreateNestedOneWithoutGateInput
 }
 
 export type RealExecutionSubmissionGateCreateOrConnectWithoutConfirmationInput = {
@@ -908,6 +931,7 @@ export type RealExecutionSubmissionGateUpdateWithoutConfirmationInput = {
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissionReceipt?: Prisma.RealExecutionSubmissionReceiptUpdateOneWithoutGateNestedInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUpdateOneWithoutGateNestedInput
 }
 
 export type RealExecutionSubmissionGateUncheckedUpdateWithoutConfirmationInput = {
@@ -936,6 +960,7 @@ export type RealExecutionSubmissionGateUncheckedUpdateWithoutConfirmationInput =
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissionReceipt?: Prisma.RealExecutionSubmissionReceiptUncheckedUpdateOneWithoutGateNestedInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedUpdateOneWithoutGateNestedInput
 }
 
 export type RealExecutionSubmissionGateCreateWithoutSubmissionReceiptInput = {
@@ -964,6 +989,7 @@ export type RealExecutionSubmissionGateCreateWithoutSubmissionReceiptInput = {
   expiresAt?: Date | string | null
   createdAt?: Date | string
   confirmation: Prisma.RealExecutionFinalConfirmationCreateNestedOneWithoutSubmissionGateInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceCreateNestedOneWithoutGateInput
 }
 
 export type RealExecutionSubmissionGateUncheckedCreateWithoutSubmissionReceiptInput = {
@@ -992,6 +1018,7 @@ export type RealExecutionSubmissionGateUncheckedCreateWithoutSubmissionReceiptIn
   confirmationConsumedAt: Date | string
   expiresAt?: Date | string | null
   createdAt?: Date | string
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedCreateNestedOneWithoutGateInput
 }
 
 export type RealExecutionSubmissionGateCreateOrConnectWithoutSubmissionReceiptInput = {
@@ -1036,6 +1063,7 @@ export type RealExecutionSubmissionGateUpdateWithoutSubmissionReceiptInput = {
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmation?: Prisma.RealExecutionFinalConfirmationUpdateOneRequiredWithoutSubmissionGateNestedInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUpdateOneWithoutGateNestedInput
 }
 
 export type RealExecutionSubmissionGateUncheckedUpdateWithoutSubmissionReceiptInput = {
@@ -1064,6 +1092,139 @@ export type RealExecutionSubmissionGateUncheckedUpdateWithoutSubmissionReceiptIn
   confirmationConsumedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedUpdateOneWithoutGateNestedInput
+}
+
+export type RealExecutionSubmissionGateCreateWithoutFinancialReconciliationEvidenceInput = {
+  id: string
+  approvalId: string
+  reservationId: string
+  armId: string
+  submissionPlanId: string
+  providerId: string
+  chainId: string
+  intentId: string
+  quoteId: string
+  payloadCommitmentVersion: string
+  payloadCommitmentDigest: string
+  emergencyStopChangeId: string
+  sourceTokenAddress: string
+  targetTokenAddress: string
+  sourceQuantity: string
+  maximumSlippagePercent: string
+  mevProtection: boolean
+  gasLevel: string
+  status: string
+  requestFingerprint: string
+  emergencyStopRecheckedAt: Date | string
+  confirmationConsumedAt: Date | string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  confirmation: Prisma.RealExecutionFinalConfirmationCreateNestedOneWithoutSubmissionGateInput
+  submissionReceipt?: Prisma.RealExecutionSubmissionReceiptCreateNestedOneWithoutGateInput
+}
+
+export type RealExecutionSubmissionGateUncheckedCreateWithoutFinancialReconciliationEvidenceInput = {
+  id: string
+  confirmationId: string
+  approvalId: string
+  reservationId: string
+  armId: string
+  submissionPlanId: string
+  providerId: string
+  chainId: string
+  intentId: string
+  quoteId: string
+  payloadCommitmentVersion: string
+  payloadCommitmentDigest: string
+  emergencyStopChangeId: string
+  sourceTokenAddress: string
+  targetTokenAddress: string
+  sourceQuantity: string
+  maximumSlippagePercent: string
+  mevProtection: boolean
+  gasLevel: string
+  status: string
+  requestFingerprint: string
+  emergencyStopRecheckedAt: Date | string
+  confirmationConsumedAt: Date | string
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  submissionReceipt?: Prisma.RealExecutionSubmissionReceiptUncheckedCreateNestedOneWithoutGateInput
+}
+
+export type RealExecutionSubmissionGateCreateOrConnectWithoutFinancialReconciliationEvidenceInput = {
+  where: Prisma.RealExecutionSubmissionGateWhereUniqueInput
+  create: Prisma.XOR<Prisma.RealExecutionSubmissionGateCreateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionSubmissionGateUncheckedCreateWithoutFinancialReconciliationEvidenceInput>
+}
+
+export type RealExecutionSubmissionGateUpsertWithoutFinancialReconciliationEvidenceInput = {
+  update: Prisma.XOR<Prisma.RealExecutionSubmissionGateUpdateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionSubmissionGateUncheckedUpdateWithoutFinancialReconciliationEvidenceInput>
+  create: Prisma.XOR<Prisma.RealExecutionSubmissionGateCreateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionSubmissionGateUncheckedCreateWithoutFinancialReconciliationEvidenceInput>
+  where?: Prisma.RealExecutionSubmissionGateWhereInput
+}
+
+export type RealExecutionSubmissionGateUpdateToOneWithWhereWithoutFinancialReconciliationEvidenceInput = {
+  where?: Prisma.RealExecutionSubmissionGateWhereInput
+  data: Prisma.XOR<Prisma.RealExecutionSubmissionGateUpdateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionSubmissionGateUncheckedUpdateWithoutFinancialReconciliationEvidenceInput>
+}
+
+export type RealExecutionSubmissionGateUpdateWithoutFinancialReconciliationEvidenceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  approvalId?: Prisma.StringFieldUpdateOperationsInput | string
+  reservationId?: Prisma.StringFieldUpdateOperationsInput | string
+  armId?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionPlanId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  intentId?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  targetTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  maximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
+  mevProtection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  gasLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyStopRecheckedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmationConsumedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmation?: Prisma.RealExecutionFinalConfirmationUpdateOneRequiredWithoutSubmissionGateNestedInput
+  submissionReceipt?: Prisma.RealExecutionSubmissionReceiptUpdateOneWithoutGateNestedInput
+}
+
+export type RealExecutionSubmissionGateUncheckedUpdateWithoutFinancialReconciliationEvidenceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  confirmationId?: Prisma.StringFieldUpdateOperationsInput | string
+  approvalId?: Prisma.StringFieldUpdateOperationsInput | string
+  reservationId?: Prisma.StringFieldUpdateOperationsInput | string
+  armId?: Prisma.StringFieldUpdateOperationsInput | string
+  submissionPlanId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  intentId?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  payloadCommitmentDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyStopChangeId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  targetTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  maximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
+  mevProtection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  gasLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  emergencyStopRecheckedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmationConsumedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  submissionReceipt?: Prisma.RealExecutionSubmissionReceiptUncheckedUpdateOneWithoutGateNestedInput
 }
 
 
@@ -1096,6 +1257,7 @@ export type RealExecutionSubmissionGateSelect<ExtArgs extends runtime.Types.Exte
   createdAt?: boolean
   confirmation?: boolean | Prisma.RealExecutionFinalConfirmationDefaultArgs<ExtArgs>
   submissionReceipt?: boolean | Prisma.RealExecutionSubmissionGate$submissionReceiptArgs<ExtArgs>
+  financialReconciliationEvidence?: boolean | Prisma.RealExecutionSubmissionGate$financialReconciliationEvidenceArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionSubmissionGate"]>
 
 export type RealExecutionSubmissionGateSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1188,6 +1350,7 @@ export type RealExecutionSubmissionGateOmit<ExtArgs extends runtime.Types.Extens
 export type RealExecutionSubmissionGateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   confirmation?: boolean | Prisma.RealExecutionFinalConfirmationDefaultArgs<ExtArgs>
   submissionReceipt?: boolean | Prisma.RealExecutionSubmissionGate$submissionReceiptArgs<ExtArgs>
+  financialReconciliationEvidence?: boolean | Prisma.RealExecutionSubmissionGate$financialReconciliationEvidenceArgs<ExtArgs>
 }
 export type RealExecutionSubmissionGateIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   confirmation?: boolean | Prisma.RealExecutionFinalConfirmationDefaultArgs<ExtArgs>
@@ -1201,6 +1364,7 @@ export type $RealExecutionSubmissionGatePayload<ExtArgs extends runtime.Types.Ex
   objects: {
     confirmation: Prisma.$RealExecutionFinalConfirmationPayload<ExtArgs>
     submissionReceipt: Prisma.$RealExecutionSubmissionReceiptPayload<ExtArgs> | null
+    financialReconciliationEvidence: Prisma.$RealExecutionFinancialReconciliationEvidencePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1624,6 +1788,7 @@ export interface Prisma__RealExecutionSubmissionGateClient<T, Null = never, ExtA
   readonly [Symbol.toStringTag]: "PrismaPromise"
   confirmation<T extends Prisma.RealExecutionFinalConfirmationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionFinalConfirmationDefaultArgs<ExtArgs>>): Prisma.Prisma__RealExecutionFinalConfirmationClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionFinalConfirmationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   submissionReceipt<T extends Prisma.RealExecutionSubmissionGate$submissionReceiptArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionSubmissionGate$submissionReceiptArgs<ExtArgs>>): Prisma.Prisma__RealExecutionSubmissionReceiptClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionSubmissionReceiptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  financialReconciliationEvidence<T extends Prisma.RealExecutionSubmissionGate$financialReconciliationEvidenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionSubmissionGate$financialReconciliationEvidenceArgs<ExtArgs>>): Prisma.Prisma__RealExecutionFinancialReconciliationEvidenceClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionFinancialReconciliationEvidencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2095,6 +2260,25 @@ export type RealExecutionSubmissionGate$submissionReceiptArgs<ExtArgs extends ru
    */
   include?: Prisma.RealExecutionSubmissionReceiptInclude<ExtArgs> | null
   where?: Prisma.RealExecutionSubmissionReceiptWhereInput
+}
+
+/**
+ * RealExecutionSubmissionGate.financialReconciliationEvidence
+ */
+export type RealExecutionSubmissionGate$financialReconciliationEvidenceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RealExecutionFinancialReconciliationEvidence
+   */
+  select?: Prisma.RealExecutionFinancialReconciliationEvidenceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RealExecutionFinancialReconciliationEvidence
+   */
+  omit?: Prisma.RealExecutionFinancialReconciliationEvidenceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionFinancialReconciliationEvidenceInclude<ExtArgs> | null
+  where?: Prisma.RealExecutionFinancialReconciliationEvidenceWhereInput
 }
 
 /**

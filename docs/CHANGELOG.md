@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-09 — Persist immutable financial-reconciliation evidence
+
+- Added one immutable PostgreSQL record for complete, correlated M10.81 financial evidence, including actual receipt and explicit provider/network costs.
+- Added a serializable per-gate store that reloads gate, receipt, and latest status context and reapplies the pure fail-closed assessment before inserting.
+- Added fingerprint-based exact replay, divergent-payload conflict rejection, unique provider execution identities, generated Prisma client support, focused tests, and PostgreSQL E2E coverage.
+- Kept the store unwired and `financialReconciliationComplete: false`; added no evidence adapter, provider call, wallet accounting, valuation, PnL, funding, retry, executor, or real order.
+- Verified all 2,153 backend tests across 185 suites, all 95 PostgreSQL E2E tests across 9 suites with all 28 migrations, the focused 22-test evidence/persistence suite, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-09 — Gate financial reconciliation on complete correlated evidence
 
 - Added a pure fail-closed evidence gate for provider-`FINISHED` Agentic Wallet swaps without treating terminal status as completed accounting.

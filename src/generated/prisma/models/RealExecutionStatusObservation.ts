@@ -257,6 +257,7 @@ export type RealExecutionStatusObservationWhereInput = {
   providerUpdatedAt?: Prisma.DateTimeFilter<"RealExecutionStatusObservation"> | Date | string
   recordedAt?: Prisma.DateTimeFilter<"RealExecutionStatusObservation"> | Date | string
   submissionReceipt?: Prisma.XOR<Prisma.RealExecutionSubmissionReceiptScalarRelationFilter, Prisma.RealExecutionSubmissionReceiptWhereInput>
+  financialReconciliationEvidence?: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceNullableScalarRelationFilter, Prisma.RealExecutionFinancialReconciliationEvidenceWhereInput> | null
 }
 
 export type RealExecutionStatusObservationOrderByWithRelationInput = {
@@ -271,6 +272,7 @@ export type RealExecutionStatusObservationOrderByWithRelationInput = {
   providerUpdatedAt?: Prisma.SortOrder
   recordedAt?: Prisma.SortOrder
   submissionReceipt?: Prisma.RealExecutionSubmissionReceiptOrderByWithRelationInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceOrderByWithRelationInput
 }
 
 export type RealExecutionStatusObservationWhereUniqueInput = Prisma.AtLeast<{
@@ -288,6 +290,7 @@ export type RealExecutionStatusObservationWhereUniqueInput = Prisma.AtLeast<{
   providerUpdatedAt?: Prisma.DateTimeFilter<"RealExecutionStatusObservation"> | Date | string
   recordedAt?: Prisma.DateTimeFilter<"RealExecutionStatusObservation"> | Date | string
   submissionReceipt?: Prisma.XOR<Prisma.RealExecutionSubmissionReceiptScalarRelationFilter, Prisma.RealExecutionSubmissionReceiptWhereInput>
+  financialReconciliationEvidence?: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceNullableScalarRelationFilter, Prisma.RealExecutionFinancialReconciliationEvidenceWhereInput> | null
 }, "id" | "sequence">
 
 export type RealExecutionStatusObservationOrderByWithAggregationInput = {
@@ -333,6 +336,7 @@ export type RealExecutionStatusObservationCreateInput = {
   providerUpdatedAt: Date | string
   recordedAt?: Date | string
   submissionReceipt: Prisma.RealExecutionSubmissionReceiptCreateNestedOneWithoutStatusObservationsInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceCreateNestedOneWithoutStatusObservationInput
 }
 
 export type RealExecutionStatusObservationUncheckedCreateInput = {
@@ -346,6 +350,7 @@ export type RealExecutionStatusObservationUncheckedCreateInput = {
   bookedAt: Date | string
   providerUpdatedAt: Date | string
   recordedAt?: Date | string
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedCreateNestedOneWithoutStatusObservationInput
 }
 
 export type RealExecutionStatusObservationUpdateInput = {
@@ -357,6 +362,7 @@ export type RealExecutionStatusObservationUpdateInput = {
   providerUpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissionReceipt?: Prisma.RealExecutionSubmissionReceiptUpdateOneRequiredWithoutStatusObservationsNestedInput
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUpdateOneWithoutStatusObservationNestedInput
 }
 
 export type RealExecutionStatusObservationUncheckedUpdateInput = {
@@ -370,6 +376,7 @@ export type RealExecutionStatusObservationUncheckedUpdateInput = {
   bookedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   providerUpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedUpdateOneWithoutStatusObservationNestedInput
 }
 
 export type RealExecutionStatusObservationCreateManyInput = {
@@ -465,6 +472,11 @@ export type RealExecutionStatusObservationSumOrderByAggregateInput = {
   sequence?: Prisma.SortOrder
 }
 
+export type RealExecutionStatusObservationScalarRelationFilter = {
+  is?: Prisma.RealExecutionStatusObservationWhereInput
+  isNot?: Prisma.RealExecutionStatusObservationWhereInput
+}
+
 export type RealExecutionStatusObservationCreateNestedManyWithoutSubmissionReceiptInput = {
   create?: Prisma.XOR<Prisma.RealExecutionStatusObservationCreateWithoutSubmissionReceiptInput, Prisma.RealExecutionStatusObservationUncheckedCreateWithoutSubmissionReceiptInput> | Prisma.RealExecutionStatusObservationCreateWithoutSubmissionReceiptInput[] | Prisma.RealExecutionStatusObservationUncheckedCreateWithoutSubmissionReceiptInput[]
   connectOrCreate?: Prisma.RealExecutionStatusObservationCreateOrConnectWithoutSubmissionReceiptInput | Prisma.RealExecutionStatusObservationCreateOrConnectWithoutSubmissionReceiptInput[]
@@ -507,6 +519,20 @@ export type RealExecutionStatusObservationUncheckedUpdateManyWithoutSubmissionRe
   deleteMany?: Prisma.RealExecutionStatusObservationScalarWhereInput | Prisma.RealExecutionStatusObservationScalarWhereInput[]
 }
 
+export type RealExecutionStatusObservationCreateNestedOneWithoutFinancialReconciliationEvidenceInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionStatusObservationCreateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionStatusObservationUncheckedCreateWithoutFinancialReconciliationEvidenceInput>
+  connectOrCreate?: Prisma.RealExecutionStatusObservationCreateOrConnectWithoutFinancialReconciliationEvidenceInput
+  connect?: Prisma.RealExecutionStatusObservationWhereUniqueInput
+}
+
+export type RealExecutionStatusObservationUpdateOneRequiredWithoutFinancialReconciliationEvidenceNestedInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionStatusObservationCreateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionStatusObservationUncheckedCreateWithoutFinancialReconciliationEvidenceInput>
+  connectOrCreate?: Prisma.RealExecutionStatusObservationCreateOrConnectWithoutFinancialReconciliationEvidenceInput
+  upsert?: Prisma.RealExecutionStatusObservationUpsertWithoutFinancialReconciliationEvidenceInput
+  connect?: Prisma.RealExecutionStatusObservationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionStatusObservationUpdateToOneWithWhereWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionStatusObservationUpdateWithoutFinancialReconciliationEvidenceInput>, Prisma.RealExecutionStatusObservationUncheckedUpdateWithoutFinancialReconciliationEvidenceInput>
+}
+
 export type RealExecutionStatusObservationCreateWithoutSubmissionReceiptInput = {
   id: string
   sequence?: bigint | number
@@ -515,6 +541,7 @@ export type RealExecutionStatusObservationCreateWithoutSubmissionReceiptInput = 
   bookedAt: Date | string
   providerUpdatedAt: Date | string
   recordedAt?: Date | string
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceCreateNestedOneWithoutStatusObservationInput
 }
 
 export type RealExecutionStatusObservationUncheckedCreateWithoutSubmissionReceiptInput = {
@@ -525,6 +552,7 @@ export type RealExecutionStatusObservationUncheckedCreateWithoutSubmissionReceip
   bookedAt: Date | string
   providerUpdatedAt: Date | string
   recordedAt?: Date | string
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedCreateNestedOneWithoutStatusObservationInput
 }
 
 export type RealExecutionStatusObservationCreateOrConnectWithoutSubmissionReceiptInput = {
@@ -569,6 +597,70 @@ export type RealExecutionStatusObservationScalarWhereInput = {
   recordedAt?: Prisma.DateTimeFilter<"RealExecutionStatusObservation"> | Date | string
 }
 
+export type RealExecutionStatusObservationCreateWithoutFinancialReconciliationEvidenceInput = {
+  id: string
+  sequence?: bigint | number
+  providerStatus: string
+  transactionHash?: string | null
+  bookedAt: Date | string
+  providerUpdatedAt: Date | string
+  recordedAt?: Date | string
+  submissionReceipt: Prisma.RealExecutionSubmissionReceiptCreateNestedOneWithoutStatusObservationsInput
+}
+
+export type RealExecutionStatusObservationUncheckedCreateWithoutFinancialReconciliationEvidenceInput = {
+  id: string
+  sequence?: bigint | number
+  gateId: string
+  providerId: string
+  providerOrderId: string
+  providerStatus: string
+  transactionHash?: string | null
+  bookedAt: Date | string
+  providerUpdatedAt: Date | string
+  recordedAt?: Date | string
+}
+
+export type RealExecutionStatusObservationCreateOrConnectWithoutFinancialReconciliationEvidenceInput = {
+  where: Prisma.RealExecutionStatusObservationWhereUniqueInput
+  create: Prisma.XOR<Prisma.RealExecutionStatusObservationCreateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionStatusObservationUncheckedCreateWithoutFinancialReconciliationEvidenceInput>
+}
+
+export type RealExecutionStatusObservationUpsertWithoutFinancialReconciliationEvidenceInput = {
+  update: Prisma.XOR<Prisma.RealExecutionStatusObservationUpdateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionStatusObservationUncheckedUpdateWithoutFinancialReconciliationEvidenceInput>
+  create: Prisma.XOR<Prisma.RealExecutionStatusObservationCreateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionStatusObservationUncheckedCreateWithoutFinancialReconciliationEvidenceInput>
+  where?: Prisma.RealExecutionStatusObservationWhereInput
+}
+
+export type RealExecutionStatusObservationUpdateToOneWithWhereWithoutFinancialReconciliationEvidenceInput = {
+  where?: Prisma.RealExecutionStatusObservationWhereInput
+  data: Prisma.XOR<Prisma.RealExecutionStatusObservationUpdateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionStatusObservationUncheckedUpdateWithoutFinancialReconciliationEvidenceInput>
+}
+
+export type RealExecutionStatusObservationUpdateWithoutFinancialReconciliationEvidenceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sequence?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  providerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  transactionHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bookedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  providerUpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  submissionReceipt?: Prisma.RealExecutionSubmissionReceiptUpdateOneRequiredWithoutStatusObservationsNestedInput
+}
+
+export type RealExecutionStatusObservationUncheckedUpdateWithoutFinancialReconciliationEvidenceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sequence?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerOrderId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  transactionHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bookedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  providerUpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type RealExecutionStatusObservationCreateManySubmissionReceiptInput = {
   id: string
   sequence?: bigint | number
@@ -587,6 +679,7 @@ export type RealExecutionStatusObservationUpdateWithoutSubmissionReceiptInput = 
   bookedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   providerUpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUpdateOneWithoutStatusObservationNestedInput
 }
 
 export type RealExecutionStatusObservationUncheckedUpdateWithoutSubmissionReceiptInput = {
@@ -597,6 +690,7 @@ export type RealExecutionStatusObservationUncheckedUpdateWithoutSubmissionReceip
   bookedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   providerUpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedUpdateOneWithoutStatusObservationNestedInput
 }
 
 export type RealExecutionStatusObservationUncheckedUpdateManyWithoutSubmissionReceiptInput = {
@@ -623,6 +717,7 @@ export type RealExecutionStatusObservationSelect<ExtArgs extends runtime.Types.E
   providerUpdatedAt?: boolean
   recordedAt?: boolean
   submissionReceipt?: boolean | Prisma.RealExecutionSubmissionReceiptDefaultArgs<ExtArgs>
+  financialReconciliationEvidence?: boolean | Prisma.RealExecutionStatusObservation$financialReconciliationEvidenceArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionStatusObservation"]>
 
 export type RealExecutionStatusObservationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -669,6 +764,7 @@ export type RealExecutionStatusObservationSelectScalar = {
 export type RealExecutionStatusObservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sequence" | "gateId" | "providerId" | "providerOrderId" | "providerStatus" | "transactionHash" | "bookedAt" | "providerUpdatedAt" | "recordedAt", ExtArgs["result"]["realExecutionStatusObservation"]>
 export type RealExecutionStatusObservationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   submissionReceipt?: boolean | Prisma.RealExecutionSubmissionReceiptDefaultArgs<ExtArgs>
+  financialReconciliationEvidence?: boolean | Prisma.RealExecutionStatusObservation$financialReconciliationEvidenceArgs<ExtArgs>
 }
 export type RealExecutionStatusObservationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   submissionReceipt?: boolean | Prisma.RealExecutionSubmissionReceiptDefaultArgs<ExtArgs>
@@ -681,6 +777,7 @@ export type $RealExecutionStatusObservationPayload<ExtArgs extends runtime.Types
   name: "RealExecutionStatusObservation"
   objects: {
     submissionReceipt: Prisma.$RealExecutionSubmissionReceiptPayload<ExtArgs>
+    financialReconciliationEvidence: Prisma.$RealExecutionFinancialReconciliationEvidencePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1088,6 +1185,7 @@ readonly fields: RealExecutionStatusObservationFieldRefs;
 export interface Prisma__RealExecutionStatusObservationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   submissionReceipt<T extends Prisma.RealExecutionSubmissionReceiptDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionSubmissionReceiptDefaultArgs<ExtArgs>>): Prisma.Prisma__RealExecutionSubmissionReceiptClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionSubmissionReceiptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  financialReconciliationEvidence<T extends Prisma.RealExecutionStatusObservation$financialReconciliationEvidenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionStatusObservation$financialReconciliationEvidenceArgs<ExtArgs>>): Prisma.Prisma__RealExecutionFinancialReconciliationEvidenceClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionFinancialReconciliationEvidencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1525,6 +1623,25 @@ export type RealExecutionStatusObservationDeleteManyArgs<ExtArgs extends runtime
    * Limit how many RealExecutionStatusObservations to delete.
    */
   limit?: number
+}
+
+/**
+ * RealExecutionStatusObservation.financialReconciliationEvidence
+ */
+export type RealExecutionStatusObservation$financialReconciliationEvidenceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RealExecutionFinancialReconciliationEvidence
+   */
+  select?: Prisma.RealExecutionFinancialReconciliationEvidenceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RealExecutionFinancialReconciliationEvidence
+   */
+  omit?: Prisma.RealExecutionFinancialReconciliationEvidenceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionFinancialReconciliationEvidenceInclude<ExtArgs> | null
+  where?: Prisma.RealExecutionFinancialReconciliationEvidenceWhereInput
 }
 
 /**
