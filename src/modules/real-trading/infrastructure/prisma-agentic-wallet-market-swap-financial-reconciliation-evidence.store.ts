@@ -47,7 +47,13 @@ export class PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore i
         if (existing) {
           if (existing.requestFingerprint !== requestFingerprint)
             throw new AgenticWalletMarketSwapFinancialReconciliationEvidenceConflictError();
-          return { stored: mapEvidence(existing), replayed: true };
+          return {
+            stored:
+              mapPersistedAgenticWalletMarketSwapFinancialReconciliationEvidence(
+                existing,
+              ),
+            replayed: true,
+          };
         }
 
         const [gateRow, receiptRow, observationRow] = await Promise.all([
@@ -121,7 +127,13 @@ export class PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore i
               recordedAt,
             },
           });
-        return { stored: mapEvidence(created), replayed: false };
+        return {
+          stored:
+            mapPersistedAgenticWalletMarketSwapFinancialReconciliationEvidence(
+              created,
+            ),
+          replayed: false,
+        };
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
@@ -154,7 +166,7 @@ function canonicalize(value: unknown): unknown {
   return value;
 }
 
-function mapEvidence(row: {
+export function mapPersistedAgenticWalletMarketSwapFinancialReconciliationEvidence(row: {
   id: string;
   gateId: string;
   statusObservationId: string;

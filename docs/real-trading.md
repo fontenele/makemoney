@@ -1520,3 +1520,21 @@ Completion still cannot mutate state. The snapshot independently states `account
 - Financial reconciliation completion explicitly leaves accounting mutation required and incomplete.
 - Submission retry remains forbidden.
 - No schema change, evidence loading, persistence mutation, NestJS registration, route, provider call, wallet balance change, valuation, PnL, funding, executor, or real order is added.
+
+## M10.84 — Durable financial-reconciliation completion reader
+
+M10.84 introduces the first durable read boundary for the M10.83 snapshot. A caller supplies one canonical gate UUID; malformed identity is rejected before database access, absence of evidence returns `null`, and a present immutable M10.82 row is mapped through the same stored-evidence validator used by persistence before the pure completion projection runs.
+
+The reader also verifies that the projected gate is exactly the requested gate. This explicit check protects the contract from a corrupted adapter or inconsistent test double even though the database query is keyed by the unique gate column. Malformed JSON fee components, provider identity, actual receipt, fee values, or recording chronology fail during shared mapping rather than being exposed as completion.
+
+The store is read-only and remains unregistered. Loading a completed reconciliation does not mutate accounting, calculate PnL, expose an API route, schedule work, contact the provider, enable retry, or authorize execution.
+
+### M10.84 acceptance criteria
+
+- A canonical gate UUID is required before database access.
+- Missing immutable evidence returns explicit `null`.
+- Present evidence is mapped through the shared persisted-row validator and M10.83 projection.
+- The projected gate must equal the requested gate.
+- Malformed persisted receipt, cost, provider, JSON fee, or time facts fail closed.
+- PostgreSQL E2E coverage proves insert, exact replay, and completed reconciliation loading with accounting still incomplete.
+- The reader remains unregistered and adds no schema change, route, provider call, funding, balance mutation, valuation, PnL, retry, executor, or real order.

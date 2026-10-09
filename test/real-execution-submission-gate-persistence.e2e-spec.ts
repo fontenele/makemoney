@@ -24,6 +24,7 @@ import { PrismaAgenticWalletMarketSwapStatusObservationStore } from '../src/modu
 import { PrismaAgenticWalletMarketSwapStatusReconciliationContextStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-reconciliation-context.store';
 import { PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-reconciliation-candidate.store';
 import { PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-financial-reconciliation-evidence.store';
+import { PrismaAgenticWalletMarketSwapFinancialReconciliationCompletionStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-financial-reconciliation-completion.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -37,6 +38,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let reconciliationContextStore: PrismaAgenticWalletMarketSwapStatusReconciliationContextStore;
   let reconciliationCandidateStore: PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore;
   let financialEvidenceStore: PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore;
+  let financialCompletionStore: PrismaAgenticWalletMarketSwapFinancialReconciliationCompletionStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -63,6 +65,10 @@ describe('Real execution submission gate persistence (e2e)', () => {
         prisma,
         () => new Date('2026-10-03T12:00:08.000Z'),
         () => uuid(23),
+      );
+    financialCompletionStore =
+      new PrismaAgenticWalletMarketSwapFinancialReconciliationCompletionStore(
+        prisma,
       );
   });
 
@@ -576,7 +582,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
     );
   });
 
-  it('persists complete financial evidence once and replays it unchanged', async () => {
+  it('persists complete financial evidence once and loads its completion', async () => {
     await store.create(command(10));
     await receiptStore.record(submissionReceipt(10));
     const terminal = await statusStore.record(
@@ -606,6 +612,17 @@ describe('Real execution submission gate persistence (e2e)', () => {
       },
     });
     expect(replay).toEqual({ stored: first.stored, replayed: true });
+    await expect(
+      financialCompletionStore.getByGateId(uuid(10)),
+    ).resolves.toMatchObject({
+      evidenceId: uuid(23),
+      gateId: uuid(10),
+      actualReceivedQuantity: '0.000071',
+      financialReconciliationComplete: true,
+      accountingMutationRequired: true,
+      accountingMutationComplete: false,
+      submissionRetryAllowed: false,
+    });
     await expect(
       prisma.realExecutionFinancialReconciliationEvidence.count(),
     ).resolves.toBe(1);

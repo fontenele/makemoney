@@ -1,5 +1,11 @@
 # Current State
 
+M10.84 is complete: a read-only Prisma completion store validates a canonical gate UUID before database access, returns `null` when no immutable evidence exists, maps present rows through the shared M10.82 stored-evidence validator, and applies the pure M10.83 completion projection. A valid persisted row that contradicts the requested gate or contains malformed receipt/cost/time facts fails closed.
+
+The PostgreSQL E2E path now proves that one complete evidence insert can be replayed idempotently and then loaded as `financialReconciliationComplete: true` while accounting remains required/incomplete and submission retry remains forbidden. The store remains unregistered and exposes no route; it performs no provider call, balance mutation, valuation, PnL, funding, or execution.
+
+Post-M10.84 validation passed all 2,171 backend tests across 187 suites, the focused 8-test completion-reader suite, all 95 PostgreSQL E2E tests across 9 suites with all 28 migrations applied from scratch, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks. Compose emitted only the existing inaccessible user Docker-config warning.
+
 M10.83 is complete: a pure fail-closed projection now accepts only a structurally valid stored M10.82 evidence envelope, including valid evidence UUID, complete receipt/cost facts, and recording time at or after evidence observation. A successful projection defensively copies all mutable fee and timestamp values and preserves the complete durable correlation identities.
 
 The resulting snapshot reports `financialReconciliationComplete: true` and the actual received quantity, but explicitly keeps `accountingMutationRequired: true`, `accountingMutationComplete: false`, and `submissionRetryAllowed: false`. It does not load evidence, write balances, value assets, calculate PnL, register runtime behavior, call Binance, fund the wallet, or authorize an order.

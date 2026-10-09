@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-09 — Read completion through the validated durable evidence boundary
+
+A completion reader must not trust raw Prisma output or reimplement M10.82/M10.83 validation. Doing so would allow read behavior to drift from persistence and pure completion semantics, particularly for JSON fee components and recording chronology.
+
+M10.84 validates the requested gate identity before database access, reuses the exported persisted-evidence mapper, then invokes the pure completion assessment. It distinguishes absence with `null` and treats malformed or cross-gate rows as integrity failures. The store is read-only and unwired; no route, ledger mutation, valuation, PnL, provider access, retry, or execution authority follows from loading completion.
+
 ## 2026-10-09 — Separate financial reconciliation completion from accounting mutation
 
 Persisted complete receipt and cost evidence is sufficient to say what the provider execution financially delivered, but it is not itself permission to mutate a local wallet ledger or claim profit. Conflating these states would make an evidence write silently become an accounting side effect.

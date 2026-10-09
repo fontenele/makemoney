@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-09 — Load durable financial-reconciliation completion by gate
+
+- Added a read-only completion-store contract with fail-closed canonical gate identity validation.
+- Added a Prisma reader that returns explicit absence or maps immutable M10.82 evidence through the shared validator and pure M10.83 completion projection.
+- Rejected malformed persisted receipt/cost/time facts and valid rows that contradict the requested gate identity.
+- Extended PostgreSQL E2E coverage from immutable evidence insertion/replay through completed reconciliation loading while accounting remains untouched.
+- Added no schema change, route, NestJS registration, provider call, funding, wallet mutation, valuation, PnL, retry, executor, or real order.
+- Verified all 2,171 backend tests across 187 suites, the focused 8-test completion-reader suite, all 95 PostgreSQL E2E tests across 9 suites with all 28 migrations, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-09 — Project durable evidence into completed financial reconciliation
 
 - Added a pure fail-closed completion projection that accepts only a valid stored M10.82 evidence envelope.

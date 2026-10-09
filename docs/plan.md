@@ -1711,7 +1711,7 @@ M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.11)
 M9 — Polymarket                   DONE (M9.1–M9.66)
-M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.83)
+M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.84)
 ```
 
 ---
@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.66. M10.83 purely projects valid durable M10.82 actual-receipt and complete-cost evidence into a defensive financially reconciled snapshot. Accounting mutation remains required and incomplete, and submission retry remains forbidden. The projection is unwired; the official status row does not provide this complete evidence, no acquisition adapter, wallet accounting, valuation, PnL mutation, runtime schedule, or real executor exists, the current quote remains blocked by partial fee and gas coverage, the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, mutating command runner, or real order has been added. Real trading remains disabled.
+M9 is closed through M9.66. M10.84 adds a read-only, fail-closed Prisma reader that loads immutable M10.82 evidence by validated gate identity and applies the pure M10.83 financially reconciled projection. Accounting mutation remains required and incomplete, and submission retry remains forbidden. The reader is unwired; the official status row does not provide this complete evidence, no acquisition adapter, wallet accounting, valuation, PnL mutation, runtime schedule, or real executor exists, the current quote remains blocked by partial fee and gas coverage, the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, mutating command runner, or real order has been added. Real trading remains disabled.
 ```
