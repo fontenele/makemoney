@@ -1441,6 +1441,21 @@ M10.79 applies the same transition and material-advancement comparison to every 
 - First-observation append behavior remains unchanged.
 - No schema, write behavior, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.80 — Shared canonical status-transition policy
+
+M10.77–M10.79 deliberately mirrored the store's transition invariants at the untrusted cycle-result boundary, but the consumer implemented those comparisons separately. Two equivalent implementations can drift when a future transition rule changes, allowing the store and cycle to disagree about the same evidence.
+
+M10.80 reconstructs the complete discovered pending observation from the validated candidate snapshot and delegates every different-identity comparison to `assessAgenticWalletMarketSwapStatusTransition`, the same pure policy used by the serializable observation store. Only an `observation_advanced` assessment is accepted. The cycle continues to enforce immutable known-identity evidence, fresh identity for non-replayed rows, and local recording-time chronology because those are durable-row concerns outside the provider transition policy.
+
+### M10.80 acceptance criteria
+
+- The store and cycle consume the same pure status-transition assessor.
+- Every different-identity pending result must classify as `observation_advanced`.
+- Exact provider replay, booking-time change, provider-time regression, known-hash change, and other blocked transitions retain their existing fail-closed outcomes.
+- Known-identity immutability and local recording chronology remain independently enforced.
+- Existing focused reconciliation-cycle coverage passes unchanged.
+- No schema, write behavior, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

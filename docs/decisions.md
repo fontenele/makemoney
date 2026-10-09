@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-09 — Share one provider status-transition policy across store and cycle
+
+The serializable observation store and manual-cycle result boundary have the same provider-evidence question: whether a pending observation may advance to the returned next observation. Maintaining a second hand-written comparison in the cycle would allow future policy changes to be applied at one boundary but missed at the other.
+
+M10.80 reconstructs the discovered pending observation from the complete M10.76 candidate snapshot and calls the same pure `assessAgenticWalletMarketSwapStatusTransition` function used by the store. A different identity is accepted only when the policy returns `observation_advanced`. UUID and local append-time rules remain outside that policy and stay explicit at the cycle boundary. This is consolidation only and adds no provider access, persistence behavior, retry, scheduling, runtime registration, or execution authority.
+
 ## 2026-10-09 — Validate newly appended results against discovered pending evidence
 
 A result marked `observationReplayed: false` claims that the store appended a new durable row after the provider lookup. The append producer enforces the same monotonic transition policy and exact-replay distinction used for concurrent replay results, but the manual cycle boundary previously checked only fresh identity and local recording time for this branch.

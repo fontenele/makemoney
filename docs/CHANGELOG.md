@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-09 — Share status-transition policy across durable producer and cycle boundary
+
+- Replaced the cycle's duplicated provider-evidence transition comparison with the same pure assessor used by the serializable observation store.
+- Required every different-identity pending result to classify canonically as `observation_advanced`.
+- Kept UUID immutability and local recording-time chronology independently enforced at the durable-result boundary.
+- Added no schema, write behavior, runtime registration, provider call, wait, loop, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,131 backend tests across 183 suites, the focused 51-test reconciliation-cycle suite, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-09 — Validate new status rows against discovered pending evidence
 
 - Applied booking-time immutability, provider-time monotonicity, known-hash immutability, and material-advancement checks to non-replayed newly stored observations.

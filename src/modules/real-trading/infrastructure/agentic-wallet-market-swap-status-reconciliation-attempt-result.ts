@@ -5,10 +5,12 @@ import {
 import { AgenticWalletMarketSwapStatusReconciliationCandidate } from './agentic-wallet-market-swap-status-reconciliation-candidate.store';
 import {
   AGENTIC_WALLET_MARKET_SWAP_STATUS_RESPONSE_BLOCKER_ORDER,
+  AgenticWalletMarketSwapStatusObservation,
   AgenticWalletMarketSwapStatusResponseBlocker,
   isCoherentAgenticWalletMarketSwapStatusResponseBlockerList,
   isValidAgenticWalletMarketSwapStatusObservation,
 } from './agentic-wallet-market-swap-status-response';
+import { assessAgenticWalletMarketSwapStatusTransition } from './agentic-wallet-market-swap-status-transition';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -212,21 +214,34 @@ function isStoredObservationIdentityCoherent(
         candidate.latestObservationUpdatedAt.getTime()
     );
   }
+  if (
+    stored.recordedAt.getTime() <
+    candidate.latestObservationRecordedAt.getTime()
+  )
+    return false;
+
+  const discoveredObservation: AgenticWalletMarketSwapStatusObservation = {
+    kind: 'agentic_wallet_market_swap_status_observation',
+    providerId: 'agentic_wallet',
+    gateId: candidate.gateId,
+    providerOrderId: candidate.providerOrderId,
+    providerStatus: 'PENDING',
+    transactionHash: candidate.latestObservationTransactionHash,
+    bookedAt: candidate.latestObservationBookedAt,
+    updatedAt: candidate.latestObservationUpdatedAt,
+    terminal: false,
+    executionSucceeded: false,
+    statusLookupRequired: true,
+    financialReconciliationRequired: true,
+    financialReconciliationComplete: false,
+    actualReceivedQuantity: null,
+    submissionRetryAllowed: false,
+  };
   return (
-    stored.recordedAt.getTime() >=
-      candidate.latestObservationRecordedAt.getTime() &&
-    stored.observation.bookedAt.getTime() ===
-      candidate.latestObservationBookedAt.getTime() &&
-    stored.observation.updatedAt.getTime() >=
-      candidate.latestObservationUpdatedAt.getTime() &&
-    (candidate.latestObservationTransactionHash === null ||
-      stored.observation.transactionHash ===
-        candidate.latestObservationTransactionHash) &&
-    (stored.observation.providerStatus !== 'PENDING' ||
-      stored.observation.transactionHash !==
-        candidate.latestObservationTransactionHash ||
-      stored.observation.updatedAt.getTime() >
-        candidate.latestObservationUpdatedAt.getTime())
+    assessAgenticWalletMarketSwapStatusTransition(
+      discoveredObservation,
+      stored.observation,
+    ).status === 'observation_advanced'
   );
 }
 
