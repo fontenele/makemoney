@@ -242,6 +242,12 @@ The overview labels the existing 1,000 USDT portfolio as fictional paper capital
 
 The wallet CLI is contacted only after the user selects **Check wallet (read only)**. That explicit action calls `POST /real-trading/wallet-observation` and displays a sanitized snapshot of connection, BSC availability, empty/non-empty asset count, security flags, provider quota, and gas-read availability. Wallet addresses and authentication material are omitted. The observation is browser-memory-only, is not replaced by automatic refreshes, and cannot request a quote, sign, submit, or move funds.
 
+## M10.74 Agentic Wallet session expiry visibility
+
+The same manual observation displays the provider-reported inactivity sign-out deadline and separate maximum sign-in deadline. The current pinned CLI reports a 48-hour sliding inactivity window: authenticated token use advances the provider deadline, and a later manual check retrieves the updated value. The browser updates only the displayed countdown once per second; it makes no wallet request and cannot renew the session.
+
+The absolute timestamp remains visible beside the countdown so clock behavior is auditable. Page load, the 15-second dashboard refresh, and the countdown interval do not reset the deadline. A disconnected or unavailable observation shows no invented expiry.
+
 ## M10.9 Agentic Wallet security posture
 
 The same manual observation now displays a pure provider-settings assessment. A restrictive posture requires an unexpired session, automatic rejection of abnormal transactions, limited-token scope, disabled prediction trading, disabled developer mode, and exactly reconciled quota values. Any failed condition is shown as an explicit blocker.

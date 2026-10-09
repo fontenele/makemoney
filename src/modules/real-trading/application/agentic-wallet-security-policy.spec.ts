@@ -106,6 +106,8 @@ function settings(
     predictionTradingEnabled: false,
     developerModeEnabled: false,
     sessionExpiresAt: new Date('2026-10-03T12:00:00.000Z'),
+    signInMaximumAt: new Date('2027-10-01T12:00:00.000Z'),
+    inactivitySignOutAt: new Date('2026-10-03T12:00:00.000Z'),
     ...overrides,
   };
 }

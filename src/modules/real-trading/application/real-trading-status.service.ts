@@ -55,6 +55,8 @@ export interface RealTradingWalletObservation {
     readonly predictionTradingEnabled: boolean;
     readonly developerModeEnabled: boolean;
     readonly sessionExpiresAt: Date;
+    readonly signInMaximumAt: Date;
+    readonly inactivitySignOutAt: Date;
   } | null;
   readonly securityAssessment: AgenticWalletSecurityAssessment;
   readonly quota: AgenticWalletCapabilityObservation['quota'];

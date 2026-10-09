@@ -1,5 +1,29 @@
 # Technical Decisions
 
+## 2026-10-09 — Treat Agentic Wallet inactivity expiry as provider-owned sliding state
+
+Live reads against the pinned Agentic Wallet CLI 1.10.0 showed `inactiveSignOutTime` advancing to 48 hours after authenticated token use, while `signInMaxTime` remained a separate approximately one-year absolute ceiling. The application therefore does not synthesize a 48-hour timer from page load, observation time, or browser activity. It exposes the provider timestamps, reads settings after the other authenticated observation commands, and counts down to the returned inactivity deadline locally. Only a later explicit wallet observation may replace that deadline.
+
+The provider's `sessionExpireTime` remains available for security-policy evaluation, but the dashboard labels the inactivity deadline and hard sign-in maximum separately. No automatic keepalive is allowed: automatic dashboard refreshes still do not contact the wallet.
+
+## 2026-10-09 — Recover stale Agentic Wallet credentials by explicit sign-out and re-pairing
+
+On Windows, the Agentic Wallet CLI may retain its encrypted session in Windows Credential Manager even when the visible local session JSON contains no session ID. The observed stale credential reached the provider but returned `illegal parameter`; inspecting the JSON file alone incorrectly suggested there was no session to clear.
+
+The supported recovery is to run the pinned CLI on the Windows host, explicitly sign out, confirm `wallet status --json` reports `UNCONNECTED`, complete a fresh official pairing, and verify `CONNECTED`. Tokens, client identifiers, session material, wallet addresses, and pairing secrets must never be copied into logs or documentation. NestJS must continue as one loopback-bound Windows host process; repeated hidden watch processes are not a supported runtime.
+
+## 2026-10-09 — Bound first-observation replay time by its receipt
+
+M10.73 closes the first-observation side of the replay chronology enforced for pending candidates by M10.70–M10.72. An `awaiting_status_observation` candidate contains no previous observation identity or timestamp, so concurrent persistence may legitimately cause its later store call to replay the first row. The durable store nevertheless guarantees that every inserted observation is recorded at or after the immutable submission receipt.
+
+The manual cycle's untrusted result boundary now applies that receipt-time lower bound to every replayed observation. Equality remains valid, pending candidates keep their stronger latest-row comparisons, and non-replayed results remain governed by the later attempt-evaluation bound. The change adds no persistence, repair, retry, provider access, scheduling, runtime registration, or execution authority.
+
+## 2026-10-08 — Correlate concurrent replay time with discovered durable evidence
+
+M10.72 applies the M10.71 producer guarantee at the manual cycle's untrusted result boundary. When discovery found a pending observation and a replay later returns a different UUID, that row can only be a concurrently newer durable identity. Its local recording time must therefore equal or follow the discovered row's `latestObservationRecordedAt`; accepting an earlier time would contradict the serialized append history.
+
+Timestamp equality remains valid because database sequence, not clock uniqueness, orders tied rows. A replay of the known UUID retains M10.70's stricter exact timestamp and pending-state requirements, while a different identity may carry pending or terminal evidence already validated structurally. The cycle adds no persistence, repair, retry, provider access, scheduling, runtime registration, or execution authority.
+
 ## 2026-10-08 — Keep append recording time monotonic with durable sequence
 
 M10.71 closes a persistence-clock gap in the M10.41 append-only store. The transition policy already makes provider evidence monotonic, but a newly generated local `recordedAt` was compared only with the receipt. A clock regression after an existing observation could therefore assign an earlier recording time to a later database sequence.

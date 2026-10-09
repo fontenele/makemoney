@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-10-09 — Show Agentic Wallet expiry and document stale-session recovery
+
+- Confirmed with two sanitized live CLI 1.10.0 reads that authenticated token use advances the inactivity sign-out deadline by 48 hours, independently from the approximately one-year maximum sign-in deadline.
+- Extended the existing manual read-only observation with provider-reported effective session, inactivity, and maximum sign-in timestamps while continuing to omit all credentials, session identifiers, wallet addresses, and token holdings.
+- Moved the settings read after the other authenticated wallet reads so the reported inactivity deadline follows the immediately preceding token use.
+- Added an absolute deadline and live local countdown to the dashboard; the timer never contacts the wallet and cannot renew the session.
+- Documented the Windows Credential Manager stale-session cause, `illegal parameter` symptom, explicit sign-out/re-pair recovery, and single loopback host-process requirement.
+- Added no automatic wallet refresh, keepalive, funding, quote, mutation, signing, submission, executor, or real order.
+- Verified all 2,122 backend tests across 183 suites, all 94 dashboard tests across 17 files, focused wallet tests, formatting, lint, backend/dashboard builds, Compose configuration, whitespace integrity, and a sanitized live observation from the single refreshed host API. Paper valuation remained HTTP 200 through the dashboard proxy.
+
+## 2026-10-09 — Correlate first-observation replay time with its receipt
+
+- Required every replayed status observation to retain a recording time equal to or later than the immutable submission receipt.
+- Rejected a concurrently created first-observation row that purportedly predates the receipt authorizing its durable correlation.
+- Preserved equality, valid first-observation concurrency, and the stricter identity/time rules for pending candidates.
+- Added focused acceptance and rejection coverage at the manual-cycle result boundary.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,121 backend tests across 183 suites, the focused 45-test reconciliation-cycle suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
+## 2026-10-08 — Correlate concurrent replay recording time
+
+- Required a replay with an identity different from the discovered pending observation to retain a recording time equal to or later than that observation.
+- Rejected a purported concurrently newer durable row whose local timestamp predates the discovery snapshot.
+- Preserved equal timestamps under database-sequence ordering and the stricter immutable-fact checks for replay of the known identity.
+- Added focused acceptance and rejection coverage at the manual-cycle result boundary.
+- Added no schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,119 backend tests across 183 suites, the focused 43-test reconciliation-cycle suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 92 dashboard tests across 16 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-08 — Keep status-observation recording time monotonic
 
 - Required every newly appended status observation to be recorded at or after the latest durable row as well as the submission receipt.

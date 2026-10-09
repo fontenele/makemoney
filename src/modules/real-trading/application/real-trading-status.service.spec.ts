@@ -153,6 +153,8 @@ function connectedObservation(): AgenticWalletCapabilityObservation {
       predictionTradingEnabled: false,
       developerModeEnabled: false,
       sessionExpiresAt: new Date('2026-10-02T23:48:42.000Z'),
+      signInMaximumAt: new Date('2027-09-30T23:48:42.000Z'),
+      inactivitySignOutAt: new Date('2026-10-02T23:48:42.000Z'),
     },
     quota: {
       usedUsd: '0',

@@ -1302,6 +1302,68 @@ Equal recording timestamps remain valid: the database-generated sequence intenti
 - Focused coverage proves rejection of a valid terminal progression carrying a regressed append clock.
 - No schema, NestJS registration, route, live process invocation, live provider call, polling, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.72 — Concurrent replay recording-time monotonicity
+
+M10.72 correlates a different-identity replay with the durable append chronology established by M10.71. A candidate discovered in `provider_pending` carries one immutable latest observation ID and recording time. If the authoritative attempt returns `observationReplayed: true` with another UUID, concurrent persistence must have advanced the latest durable row, so that row's `recordedAt` must equal or follow the discovery timestamp.
+
+The comparison deliberately permits equality because database sequence establishes total order when local timestamps tie. A replay returning the candidate's known UUID remains subject to M10.70's stricter requirement to preserve the exact timestamp and `PENDING` state. A different valid UUID may carry pending or terminal provider evidence, but it cannot claim to be newer durable evidence while predating the row already observed.
+
+### M10.72 acceptance criteria
+
+- A different-identity replay for a pending candidate has `storedObservation.recordedAt >= candidate.latestObservationRecordedAt`.
+- A purported concurrent replay with an earlier recording time fails closed before aggregation and before the next candidate.
+- Equal recording timestamps remain valid because database sequence orders tied durable rows.
+- Known-identity replay retains the exact timestamp and pending-state constraints from M10.70.
+- First-observation candidates remain unaffected because they carry no prior observation identity or recording time.
+- Existing structure, cadence, blocker, timing, financial, snapshot, cancellation, and retry rules remain enforced.
+- Focused coverage proves acceptance at equality and rejection immediately before the discovered recording time.
+- No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
+## M10.73 — First-observation replay receipt-time causality
+
+M10.73 applies the durable store's receipt-time lower bound to the concurrency path that has no previous status row. A candidate discovered in `awaiting_status_observation` may race with another attempt that inserts the first observation. The later serialized store call can then return that row with `observationReplayed: true`, but the row's immutable `recordedAt` cannot predate the submission receipt used to authorize and correlate it.
+
+The boundary applies this lower bound to all replay results. For pending candidates it is intentionally redundant with the stronger M10.70 and M10.72 comparisons; for first-observation candidates it closes the remaining chronology gap. Equality remains valid because the receipt and observation clocks may resolve to the same instant, while durable identity and database sequence preserve ordering.
+
+### M10.73 acceptance criteria
+
+- Every replayed stored observation has `storedObservation.recordedAt >= candidate.receiptRecordedAt`.
+- A first-observation replay recorded before the immutable receipt fails closed before aggregation and before the next candidate.
+- Equality at the receipt time remains valid.
+- Pending candidates retain the stricter known-identity and different-identity chronology rules from M10.70 and M10.72.
+- Non-replayed observations retain the existing attempt-evaluation recording-time lower bound.
+- Existing structure, cadence, blocker, timing, financial, snapshot, cancellation, and retry rules remain enforced.
+- Focused coverage proves acceptance at equality and rejection immediately before the receipt time.
+- No schema, persistence behavior, database claim or lease, NestJS registration, route, live process invocation, live provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
+## M10.74 — Session expiry visibility and stale-session recovery
+
+The pinned CLI exposes three distinct timestamps through the existing read-only settings command: effective `sessionExpireTime`, hard `signInMaxTime`, and sliding `inactiveSignOutTime`. Live verification on 2026-10-09 showed the inactivity deadline advancing to exactly 48 hours after the preceding authenticated token use, while the sign-in maximum remained a separate approximately one-year ceiling. This is observed provider behavior, not a locally assumed lifetime.
+
+The adapter runs the settings command last, after address, balance, and gas reads. Because the provider response reflects the preceding authenticated use, this anchors the published inactivity deadline to the immediately preceding command, normally only seconds before the observation completes. The API serializes only the three timestamps and existing non-sensitive settings; it still omits credentials, session identifiers, wallet addresses, and holdings.
+
+The dashboard counts down from the absolute `inactiveSignOutAt` value once per second. This local display interval never contacts the CLI, never serves as a keepalive, and never changes the deadline. Only **Check wallet (read only)** performs authenticated use and can retrieve an advanced provider deadline.
+
+### Windows stale-session recovery runbook
+
+Use this procedure when the dashboard reports the sanitized wallet-observation `503`, especially when direct `baw wallet status --json` returns provider `illegal parameter`:
+
+1. Confirm only one process listens on loopback port 3000 with `Get-NetTCPConnection -LocalPort 3000 -State Listen`. Stop obsolete development watchers before starting the supported host process.
+2. From the Windows host, verify the pinned CLI with `baw cli-check --required-version 1.10.0 --json` and then run `baw wallet status --json`.
+3. Do not infer that the session is absent from `~/.baw/session.json`. The encrypted credential may live in Windows Credential Manager and must not be inspected or logged.
+4. If status returns `illegal parameter`, run `baw auth signout --json`, then confirm `baw wallet status --json` reports `UNCONNECTED`.
+5. Start a new official pairing with `baw auth signin --json`, open its provider URL without modifying it, verify the matching code in the Binance App, and complete `baw auth verify --qrCodeId <id> --json`. Never copy session tokens or credential material into project files or logs.
+6. Confirm `baw wallet status --json` reports `CONNECTED`, start exactly one built NestJS process on the Windows host, and use the dashboard's manual read-only check. Docker Compose continues to run PostgreSQL and Redis only.
+
+### M10.74 acceptance criteria
+
+- The public manual observation exposes valid provider deadlines without exposing session material.
+- The displayed inactivity countdown is derived only from the provider timestamp and performs no keepalive.
+- Settings are observed after other authenticated reads so the deadline reflects recent token use.
+- The 48-hour inactivity window and distinct sign-in maximum are labeled separately.
+- Stale Windows credentials have an explicit sign-out, re-pair, and single-runtime recovery procedure.
+- Funding, quote, signing, mutation, submission, and real execution remain unavailable.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

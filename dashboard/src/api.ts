@@ -555,6 +555,8 @@ export interface AgenticWalletObservation {
     predictionTradingEnabled: boolean;
     developerModeEnabled: boolean;
     sessionExpiresAt: string;
+    signInMaximumAt: string;
+    inactivitySignOutAt: string;
   } | null;
   securityAssessment: {
     scope: 'agentic_wallet_security_posture';

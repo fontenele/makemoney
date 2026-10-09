@@ -509,6 +509,82 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     }
   });
 
+  it('accepts a different-identity replay at the pending candidate recording time', async () => {
+    const replay = attemptResult('status_observation_recorded');
+    Object.assign(replay, {
+      observationReplayed: true,
+      nextStatusLookupAt: new Date(EVALUATED_AT),
+    });
+    Object.assign(replay.storedObservation!, {
+      id: uuid(102),
+      recordedAt: new Date('2026-10-05T12:00:06.000Z'),
+    });
+    const harness = cycleHarness(
+      [pendingCandidate(1)],
+      jest.fn().mockResolvedValue(replay),
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+      status: 'completed',
+      observationRecordedCount: 1,
+      outcomes: [{ attempt: { observationReplayed: true } }],
+    });
+  });
+
+  it('rejects a different-identity replay recorded before the pending candidate', async () => {
+    const replay = attemptResult('status_observation_recorded');
+    Object.assign(replay, {
+      observationReplayed: true,
+      nextStatusLookupAt: new Date(EVALUATED_AT),
+    });
+    Object.assign(replay.storedObservation!, {
+      id: uuid(102),
+      recordedAt: new Date('2026-10-05T12:00:05.999Z'),
+    });
+    const harness = cycleHarness(
+      [pendingCandidate(1)],
+      jest.fn().mockResolvedValue(replay),
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+      'Agentic Wallet status reconciliation attempt result is invalid',
+    );
+  });
+
+  it('accepts a first-observation replay recorded at the receipt time', async () => {
+    const replay = attemptResult('status_observation_recorded');
+    Object.assign(replay, { observationReplayed: true });
+    replay.storedObservation!.recordedAt.setTime(
+      new Date('2026-10-05T12:00:05.000Z').getTime(),
+    );
+    const harness = cycleHarness(
+      [candidate(1)],
+      jest.fn().mockResolvedValue(replay),
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+      status: 'completed',
+      observationRecordedCount: 1,
+      outcomes: [{ attempt: { observationReplayed: true } }],
+    });
+  });
+
+  it('rejects a first-observation replay recorded before the receipt', async () => {
+    const replay = attemptResult('status_observation_recorded');
+    Object.assign(replay, { observationReplayed: true });
+    replay.storedObservation!.recordedAt.setTime(
+      new Date('2026-10-05T12:00:04.999Z').getTime(),
+    );
+    const harness = cycleHarness(
+      [candidate(1)],
+      jest.fn().mockResolvedValue(replay),
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+      'Agentic Wallet status reconciliation attempt result is invalid',
+    );
+  });
+
   it('rejects completed provider work evaluated before candidate discovery', async () => {
     for (const status of [
       'status_response_invalid',

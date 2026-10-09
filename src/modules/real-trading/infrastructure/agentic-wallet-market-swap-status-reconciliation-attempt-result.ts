@@ -160,8 +160,20 @@ function isValidAttemptResult(
     isValidAgenticWalletMarketSwapStatusObservation(stored.observation) &&
     stored.observation.gateId === candidate.gateId &&
     stored.observation.providerOrderId === candidate.providerOrderId &&
+    isStoredObservationRecordingTimeCoherent(result, candidate) &&
     isStoredObservationIdentityCoherent(result, candidate) &&
     result.statusLookupRequired === stored.observation.statusLookupRequired
+  );
+}
+
+function isStoredObservationRecordingTimeCoherent(
+  result: AgenticWalletMarketSwapStatusReconciliationAttemptResult,
+  candidate: AgenticWalletMarketSwapStatusReconciliationCandidate,
+): boolean {
+  return (
+    !result.observationReplayed ||
+    result.storedObservation!.recordedAt.getTime() >=
+      candidate.receiptRecordedAt.getTime()
   );
 }
 
@@ -173,13 +185,22 @@ function isStoredObservationIdentityCoherent(
   if (!result.observationReplayed) {
     return stored.id !== candidate.latestObservationId;
   }
-  if (stored.id !== candidate.latestObservationId) return true;
+  if (
+    candidate.phase !== 'provider_pending' ||
+    candidate.latestObservationRecordedAt === null
+  ) {
+    return true;
+  }
+  if (stored.id === candidate.latestObservationId) {
+    return (
+      stored.recordedAt.getTime() ===
+        candidate.latestObservationRecordedAt.getTime() &&
+      stored.observation.providerStatus === 'PENDING'
+    );
+  }
   return (
-    candidate.phase === 'provider_pending' &&
-    candidate.latestObservationRecordedAt !== null &&
-    stored.recordedAt.getTime() ===
-      candidate.latestObservationRecordedAt.getTime() &&
-    stored.observation.providerStatus === 'PENDING'
+    stored.recordedAt.getTime() >=
+    candidate.latestObservationRecordedAt.getTime()
   );
 }
 

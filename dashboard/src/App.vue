@@ -51,6 +51,7 @@ import { buildPolymarketMarketIdentityRows } from './polymarket-market-identitie
 import { verifyPolymarketReverseIdentities } from './polymarket-reverse-identity';
 import { buildPolymarketResolutionContextRows } from './polymarket-resolution-context';
 import { verifyPolymarketResolutionIdentity } from './polymarket-resolution-identity';
+import { walletExpiryCountdown } from './wallet-session-expiry';
 import DashboardChart from './DashboardChart.vue';
 import {
   dashboardRouteFromHash,
@@ -68,6 +69,8 @@ const agenticWalletObservation = ref<Resource<AgenticWalletObservation> | null>(
   null,
 );
 const agenticWalletObservationLoading = ref(false);
+const walletClockMs = ref(Date.now());
+let walletClockHandle: number | null = null;
 let dashboardRequest = 0;
 const selectedListing = ref<DetectedSpotSymbol | null>(null);
 const listingPerformance = ref<Resource<ListingPerformance> | null>(null);
@@ -103,6 +106,19 @@ const polymarketSearchLoading = ref(false);
 let polymarketSearchRequest = 0;
 
 const apiOnline = computed(() => snapshot.value?.health.status === 'available');
+const walletInactivityCountdown = computed(() => {
+  const observation = agenticWalletObservation.value;
+  if (
+    observation?.status !== 'available' ||
+    observation.data.security === null
+  ) {
+    return '—';
+  }
+  return walletExpiryCountdown(
+    observation.data.security.inactivitySignOutAt,
+    walletClockMs.value,
+  );
+});
 const availableRelatedPolymarketTags = computed(() =>
   relatedPolymarketTags.value?.status === 'available'
     ? relatedPolymarketTags.value.data
@@ -534,10 +550,14 @@ function syncRoute(): void {
 
 onMounted(() => {
   window.addEventListener('hashchange', syncRoute);
+  walletClockHandle = window.setInterval(() => {
+    walletClockMs.value = Date.now();
+  }, 1000);
   autoRefresh.start();
 });
 onUnmounted(() => {
   window.removeEventListener('hashchange', syncRoute);
+  if (walletClockHandle !== null) window.clearInterval(walletClockHandle);
   autoRefresh.stop();
 });
 </script>
@@ -826,6 +846,33 @@ onUnmounted(() => {
                   </dd>
                 </div>
                 <div>
+                  <dt>Inactive sign-out (48h)</dt>
+                  <dd>
+                    {{ walletInactivityCountdown }} ·
+                    {{
+                      agenticWalletObservation.data.security === null
+                        ? 'Unavailable'
+                        : timestamp(
+                            agenticWalletObservation.data.security
+                              .inactivitySignOutAt,
+                          )
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Maximum sign-in expiry</dt>
+                  <dd>
+                    {{
+                      agenticWalletObservation.data.security === null
+                        ? 'Unavailable'
+                        : timestamp(
+                            agenticWalletObservation.data.security
+                              .signInMaximumAt,
+                          )
+                    }}
+                  </dd>
+                </div>
+                <div>
                   <dt>Security posture</dt>
                   <dd>
                     {{
@@ -860,6 +907,12 @@ onUnmounted(() => {
                 investigation. The broad provider daily limit is not a project
                 risk limit; independent local limits are still required before
                 funding or quotes.
+              </p>
+              <p class="wallet-policy-note">
+                The inactivity countdown comes from the provider and advances
+                only after an authenticated token use. This screen counts down
+                locally without renewing the session; use the manual check to
+                obtain the provider's latest deadline.
               </p>
               <p class="wallet-observed-at">
                 Observed

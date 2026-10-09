@@ -36,6 +36,8 @@ describe('AgenticWalletCapabilityAdapter', () => {
         predictionTradingEnabled: false,
         developerModeEnabled: false,
         sessionExpiresAt: new Date('2026-10-01T12:00:00.000Z'),
+        signInMaximumAt: new Date('2027-09-30T12:00:00.000Z'),
+        inactivitySignOutAt: new Date('2026-10-02T12:00:00.000Z'),
       },
       quota: {
         usedUsd: '0',
@@ -66,10 +68,10 @@ describe('AgenticWalletCapabilityAdapter', () => {
       { kind: 'cli_version' },
       { kind: 'wallet_status' },
       { kind: 'wallet_chains' },
-      { kind: 'wallet_settings' },
       { kind: 'wallet_address' },
       { kind: 'wallet_balance', chainId: '56' },
       { kind: 'wallet_gas_price', chainId: '56' },
+      { kind: 'wallet_settings' },
     ]);
   });
 
@@ -167,7 +169,7 @@ describe('AgenticWalletCapabilityAdapter', () => {
         new Date('2026-09-30T12:00:00.000Z'),
       ),
     ).rejects.toThrow('Agentic Wallet approved chain address is unavailable');
-    expect(runner.commands).toHaveLength(5);
+    expect(runner.commands).toHaveLength(4);
   });
 
   it.each([
@@ -185,6 +187,15 @@ describe('AgenticWalletCapabilityAdapter', () => {
         abnormalTxnHandling: 'Allow',
       }),
       'Agentic Wallet abnormal transaction handling is invalid',
+    ],
+    [
+      'invalid inactivity deadline',
+      'wallet_settings',
+      envelope({
+        ...settingsData(),
+        inactiveSignOutTime: 'not-a-date',
+      }),
+      'Agentic Wallet observation date is invalid',
     ],
     [
       'cross-chain balance',
@@ -302,6 +313,8 @@ function settingsData(): Record<string, unknown> {
     quotaLeft: 50000,
     quotaDate: '2026-09-30',
     sessionExpireTime: '2026-10-01T12:00:00.000Z',
+    signInMaxTime: '2027-09-30T12:00:00.000Z',
+    inactiveSignOutTime: '2026-10-02T12:00:00.000Z',
   };
 }
 

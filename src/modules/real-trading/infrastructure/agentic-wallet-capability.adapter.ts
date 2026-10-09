@@ -16,6 +16,8 @@ export interface AgenticWalletSecuritySettings {
   readonly predictionTradingEnabled: boolean;
   readonly developerModeEnabled: boolean;
   readonly sessionExpiresAt: Date;
+  readonly signInMaximumAt: Date;
+  readonly inactivitySignOutAt: Date;
 }
 
 export interface AgenticWalletQuota {
@@ -90,9 +92,6 @@ export class AgenticWalletCapabilityAdapter {
     if (!chains.includes(chainId)) {
       throw new Error('Agentic Wallet approved chain is unavailable');
     }
-    const settings = parseSettings(
-      await this.runner.run({ kind: 'wallet_settings' }, signal),
-    );
     const addresses = parseAddresses(
       await this.runner.run({ kind: 'wallet_address' }, signal),
     );
@@ -106,6 +105,12 @@ export class AgenticWalletCapabilityAdapter {
     const gas = parseGas(
       await this.runner.run({ kind: 'wallet_gas_price', chainId }, signal),
       chainId,
+    );
+    // Keep settings last: the provider's inactivity deadline reflects the
+    // preceding authenticated token use, so this produces the freshest
+    // provider-owned deadline without inventing a local renewal.
+    const settings = parseSettings(
+      await this.runner.run({ kind: 'wallet_settings' }, signal),
     );
 
     return {
@@ -223,7 +228,15 @@ function parseSettings(value: unknown): {
   const sessionExpiresAt = new Date(
     requiredString(data.sessionExpireTime, 'session expiry'),
   );
+  const signInMaximumAt = new Date(
+    requiredString(data.signInMaxTime, 'sign-in maximum'),
+  );
+  const inactivitySignOutAt = new Date(
+    requiredString(data.inactiveSignOutTime, 'inactivity sign-out'),
+  );
   validateDate(sessionExpiresAt);
+  validateDate(signInMaximumAt);
+  validateDate(inactivitySignOutAt);
   return {
     security: {
       dailyLimitUsd: decimal(data.dailyLimit, 'daily limit'),
@@ -232,6 +245,8 @@ function parseSettings(value: unknown): {
       predictionTradingEnabled: data.predictionEnabled,
       developerModeEnabled: developerMode.enabled,
       sessionExpiresAt,
+      signInMaximumAt,
+      inactivitySignOutAt,
     },
     quota: {
       usedUsd: decimal(data.quotaUsed, 'quota used'),
