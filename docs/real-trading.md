@@ -1426,6 +1426,21 @@ For a candidate discovered with provider `PENDING`, a replayed row with a differ
 - Divergence fails before aggregation and before the next candidate.
 - No schema, write behavior, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.79 — Newly stored observation transition coherence
+
+M10.77 and M10.78 initially protected only results marked as durable replays with an identity different from the pending row seen during discovery. A non-replayed result represents a new append after the provider lookup, but its untrusted return shape could still pair a fresh UUID with a booking-time rewrite, provider-time regression, known-hash replacement, or provider evidence identical to the discovered row.
+
+M10.79 applies the same transition and material-advancement comparison to every different-identity result for a pending candidate, regardless of the replay flag. Non-replayed rows retain the stricter existing requirement that their local recording time equal or follow the attempt evaluation. First-observation candidates remain unaffected because discovery has no earlier provider observation to compare.
+
+### M10.79 acceptance criteria
+
+- A newly stored row for a pending candidate uses an identity different from the discovered row.
+- Its booking time remains immutable, provider update time does not regress, and any known transaction hash remains unchanged.
+- Its provider evidence materially advances through a later provider update time, newly populated hash, or terminal transition.
+- An unchanged or impossible transition fails before aggregation and before the next candidate.
+- First-observation append behavior remains unchanged.
+- No schema, write behavior, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-09 — Validate newly appended results against discovered pending evidence
+
+A result marked `observationReplayed: false` claims that the store appended a new durable row after the provider lookup. The append producer enforces the same monotonic transition policy and exact-replay distinction used for concurrent replay results, but the manual cycle boundary previously checked only fresh identity and local recording time for this branch.
+
+M10.79 applies M10.77–M10.78 provider-evidence comparison to both replayed and newly stored different-identity rows. A new row must preserve booking time and any known hash, avoid provider-time regression, and materially differ from the discovered pending evidence. First-observation candidates have no prior provider evidence and remain governed by structural, receipt-time, and evaluation-time rules. This adds validation only, not provider access, persistence behavior, repair, retry, scheduling, runtime registration, or execution authority.
+
 ## 2026-10-09 — Require material provider-evidence advancement for a new replay UUID
 
 The serializable observation store treats exact normalized evidence as an idempotent replay and returns the existing latest row. Consequently, a replayed result with a different UUID cannot coherently contain the exact same provider status, transaction hash, booking time, and provider update time as the pending row discovered earlier.

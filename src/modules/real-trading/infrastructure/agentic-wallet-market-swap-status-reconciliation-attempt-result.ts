@@ -186,9 +186,6 @@ function isStoredObservationIdentityCoherent(
   candidate: AgenticWalletMarketSwapStatusReconciliationCandidate,
 ): boolean {
   const stored = result.storedObservation!;
-  if (!result.observationReplayed) {
-    return stored.id !== candidate.latestObservationId;
-  }
   if (candidate.phase !== 'provider_pending') return true;
   if (
     candidate.latestObservationRecordedAt === null ||
@@ -196,7 +193,13 @@ function isStoredObservationIdentityCoherent(
     candidate.latestObservationUpdatedAt === null
   )
     return false;
+  if (
+    !result.observationReplayed &&
+    stored.id === candidate.latestObservationId
+  )
+    return false;
   if (stored.id === candidate.latestObservationId) {
+    if (!result.observationReplayed) return false;
     return (
       stored.recordedAt.getTime() ===
         candidate.latestObservationRecordedAt.getTime() &&

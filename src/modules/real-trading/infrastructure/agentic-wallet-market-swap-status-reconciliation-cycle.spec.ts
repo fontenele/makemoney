@@ -398,6 +398,9 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
       Object.assign(result, { nextStatusLookupAt: new Date(EVALUATED_AT) });
       if (result.storedObservation !== null) {
         Object.assign(result.storedObservation, { id: uuid(102) });
+        result.storedObservation.observation.updatedAt.setTime(
+          new Date('2026-10-05T12:00:06.001Z').getTime(),
+        );
       }
       const harness = cycleHarness(
         [pendingCandidate(1)],
@@ -421,6 +424,9 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
       Object.assign(result, { nextStatusLookupAt: new Date(EVALUATED_AT) });
       if (result.storedObservation !== null) {
         Object.assign(result.storedObservation, { id: uuid(102) });
+        result.storedObservation.observation.updatedAt.setTime(
+          new Date('2026-10-05T12:00:06.001Z').getTime(),
+        );
       }
       const harness = cycleHarness(
         [
@@ -455,6 +461,51 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
       'Agentic Wallet status reconciliation attempt result is invalid',
     );
+  });
+
+  it('rejects a newly stored observation with an impossible or unchanged pending transition', async () => {
+    for (const divergence of [
+      'booked_at_changed',
+      'updated_at_regressed',
+      'transaction_hash_changed',
+      'provider_evidence_unchanged',
+    ] as const) {
+      const stored = attemptResult('status_observation_recorded');
+      Object.assign(stored, {
+        nextStatusLookupAt: new Date(EVALUATED_AT),
+      });
+      Object.assign(stored.storedObservation!, { id: uuid(102) });
+      let discoveredTransactionHash: string | null = null;
+      if (divergence === 'booked_at_changed') {
+        stored.storedObservation!.observation.bookedAt.setTime(
+          new Date('2026-10-05T12:00:05.001Z').getTime(),
+        );
+      } else if (divergence === 'updated_at_regressed') {
+        stored.storedObservation!.observation.updatedAt.setTime(
+          new Date('2026-10-05T12:00:05.999Z').getTime(),
+        );
+      } else if (divergence === 'transaction_hash_changed') {
+        discoveredTransactionHash = `0x${'a'.repeat(64)}`;
+        Object.assign(stored.storedObservation!.observation, {
+          transactionHash: `0x${'b'.repeat(64)}`,
+        });
+      }
+      const reconcileOnce = jest.fn().mockResolvedValue(stored);
+      const harness = cycleHarness(
+        [
+          pendingCandidate(1, {
+            latestObservationTransactionHash: discoveredTransactionHash,
+          }),
+          pendingCandidate(2),
+        ],
+        reconcileOnce,
+      );
+
+      await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+        'Agentic Wallet status reconciliation attempt result is invalid',
+      );
+      expect(reconcileOnce).toHaveBeenCalledTimes(1);
+    }
   });
 
   it('accepts a replay that retains the pending candidate observation identity', async () => {
