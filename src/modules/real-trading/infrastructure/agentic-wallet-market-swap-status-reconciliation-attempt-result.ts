@@ -211,7 +211,14 @@ function isStoredObservationIdentityCoherent(
   }
   return (
     stored.recordedAt.getTime() >=
-    candidate.latestObservationRecordedAt.getTime()
+      candidate.latestObservationRecordedAt.getTime() &&
+    stored.observation.bookedAt.getTime() ===
+      candidate.latestObservationBookedAt.getTime() &&
+    stored.observation.updatedAt.getTime() >=
+      candidate.latestObservationUpdatedAt.getTime() &&
+    (candidate.latestObservationTransactionHash === null ||
+      stored.observation.transactionHash ===
+        candidate.latestObservationTransactionHash)
   );
 }
 

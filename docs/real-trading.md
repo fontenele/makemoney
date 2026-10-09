@@ -1395,6 +1395,21 @@ When a one-shot attempt reports an exact replay with that discovered UUID, the m
 - A different valid replay UUID remains available for concurrent durable progress.
 - No schema, write behavior, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.77 — Concurrent replay transition coherence
+
+A replay with an observation UUID different from the pending row discovered by the cycle can only represent durable evidence appended concurrently after that discovery snapshot. M10.72 already required its local recording time not to precede the discovered row. M10.77 now applies the provider-evidence transition rules that the serializable observation store used when admitting that later row.
+
+The returned observation must retain the exact provider booking time, its provider update time must equal or follow the discovered value, and a transaction hash that was already non-null cannot be removed or changed. A previously absent hash may appear, and a coherent pending row may advance to either terminal provider status. The exact-known-UUID immutability rules from M10.76 remain stricter and unchanged.
+
+### M10.77 acceptance criteria
+
+- A different-identity replay preserves the discovered provider booking time.
+- Its provider update time equals or follows the discovered provider update time.
+- Any already-known transaction hash is preserved exactly; a previously absent hash may be populated.
+- Coherent concurrent pending or terminal progress remains accepted.
+- Divergence fails before aggregation and before the next candidate.
+- No schema, write behavior, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

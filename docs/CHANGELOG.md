@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-09 — Enforce coherent transitions for concurrent status replays
+
+- Required a different-identity replay returned after pending-candidate discovery to preserve provider booking time, keep provider update time monotonic, and retain any already-known transaction hash.
+- Preserved coherent concurrent pending or terminal progress, including population of a previously absent transaction hash.
+- Rejected impossible replay transitions before cycle aggregation and before the next candidate.
+- Added no schema, write behavior, runtime registration, provider call, wait, loop, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,128 backend tests across 183 suites, the focused 48-test reconciliation-cycle suite, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-09 — Preserve complete evidence for known status replays
 
 - Extended due pending candidates with the immutable transaction hash, booking time, and provider update time from their latest durable observation.

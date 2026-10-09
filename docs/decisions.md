@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-09 — Reapply durable transition rules to concurrent replay evidence
+
+A replay returning a UUID different from the pending observation discovered by the cycle can only be a concurrently appended durable row. M10.72 checked its local append chronology, while M10.76 supplied the complete discovered provider-evidence snapshot. Without another comparison, however, the untrusted attempt result could claim a changed booking time, a regressed provider update time, or replacement of an already-known transaction hash even though the durable store rejects each transition.
+
+M10.77 reuses those transition invariants at the cycle boundary: booking time is immutable, provider update time is monotonic, and a non-null transaction hash is immutable. A previously absent hash may still appear, and valid pending-to-terminal progress remains accepted. This is validation of returned evidence only and adds no provider access, persistence behavior, repair, retry, scheduling, runtime registration, or execution authority.
+
 ## 2026-10-09 — Compare the complete durable row for a known replay identity
 
 M10.70 bound replay of a discovered pending-observation UUID to its local recording time and `PENDING` status, but those two facts did not uniquely describe the immutable database row. The same UUID could still be returned with a rewritten transaction hash, booking time, or provider update time while satisfying the previous cycle boundary.
