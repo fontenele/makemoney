@@ -479,7 +479,13 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
   });
 
   it('rejects a known-identity replay with divergent immutable evidence', async () => {
-    for (const divergence of ['recorded_at', 'provider_status'] as const) {
+    for (const divergence of [
+      'recorded_at',
+      'provider_status',
+      'transaction_hash',
+      'booked_at',
+      'updated_at',
+    ] as const) {
       const replay = attemptResult('status_observation_recorded');
       Object.assign(replay, {
         observationReplayed: true,
@@ -497,6 +503,27 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
           statusLookupRequired: false,
         });
         Object.assign(replay, { statusLookupRequired: false });
+      } else if (divergence === 'transaction_hash') {
+        replay.storedObservation!.recordedAt.setTime(
+          new Date('2026-10-05T12:00:06.000Z').getTime(),
+        );
+        Object.assign(replay.storedObservation!.observation, {
+          transactionHash: `0x${'a'.repeat(64)}`,
+        });
+      } else if (divergence === 'booked_at') {
+        replay.storedObservation!.recordedAt.setTime(
+          new Date('2026-10-05T12:00:06.000Z').getTime(),
+        );
+        replay.storedObservation!.observation.bookedAt.setTime(
+          new Date('2026-10-05T12:00:04.999Z').getTime(),
+        );
+      } else if (divergence === 'updated_at') {
+        replay.storedObservation!.recordedAt.setTime(
+          new Date('2026-10-05T12:00:06.000Z').getTime(),
+        );
+        replay.storedObservation!.observation.updatedAt.setTime(
+          new Date('2026-10-05T12:00:06.001Z').getTime(),
+        );
       }
       const harness = cycleHarness(
         [pendingCandidate(1)],
@@ -916,6 +943,9 @@ function candidate(
     receiptRecordedAt: new Date('2026-10-05T12:00:05.000Z'),
     latestObservationId: null,
     latestObservationRecordedAt: null,
+    latestObservationTransactionHash: null,
+    latestObservationBookedAt: null,
+    latestObservationUpdatedAt: null,
     eligibleAt: new Date('2026-10-05T12:00:05.000Z'),
     evaluatedAt: EVALUATED_AT,
     statusLookupRequired: true,
@@ -934,6 +964,9 @@ function pendingCandidate(
     phase: 'provider_pending',
     latestObservationId: uuid(seed + 100),
     latestObservationRecordedAt: new Date('2026-10-05T12:00:06.000Z'),
+    latestObservationTransactionHash: null,
+    latestObservationBookedAt: new Date('2026-10-05T12:00:05.000Z'),
+    latestObservationUpdatedAt: new Date('2026-10-05T12:00:06.000Z'),
     eligibleAt: EVALUATED_AT,
     ...overrides,
   });

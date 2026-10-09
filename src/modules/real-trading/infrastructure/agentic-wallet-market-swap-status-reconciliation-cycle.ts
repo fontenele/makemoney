@@ -109,6 +109,16 @@ function snapshotCandidateBatch(
       candidate.latestObservationRecordedAt === null
         ? null
         : new Date(candidate.latestObservationRecordedAt),
+    latestObservationTransactionHash:
+      candidate.latestObservationTransactionHash,
+    latestObservationBookedAt:
+      candidate.latestObservationBookedAt === null
+        ? null
+        : new Date(candidate.latestObservationBookedAt),
+    latestObservationUpdatedAt:
+      candidate.latestObservationUpdatedAt === null
+        ? null
+        : new Date(candidate.latestObservationUpdatedAt),
     eligibleAt: new Date(candidate.eligibleAt),
     evaluatedAt: new Date(candidate.evaluatedAt),
     statusLookupRequired: candidate.statusLookupRequired,

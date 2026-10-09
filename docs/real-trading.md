@@ -1380,6 +1380,21 @@ The exact interval boundary is accepted. A deadline even one millisecond beyond 
 - Existing future-time, discovery-time, candidate-eligibility, cadence-evidence, snapshot, cancellation, overlap, sequential, and no-retry rules remain enforced.
 - No schema, persistence behavior, NestJS registration, route, provider call, wait, loop, timer, worker, schedule, wallet mutation, funding, mutating runner, executor, financial completion, or real order is added.
 
+## M10.76 — Complete known-replay observation immutability
+
+M10.76 completes the identity rule introduced by M10.70. A durable status-observation UUID identifies the entire immutable row, not only its provider status and local recording time. The due-candidate reader therefore retains the latest pending row's canonical transaction hash, provider booking time, provider update time, UUID, and local recording time in one validated snapshot.
+
+When a one-shot attempt reports an exact replay with that discovered UUID, the manual cycle requires every retained fact to match the returned observation. A different replay UUID remains admissible because concurrent persistence may advance the durable latest row after discovery; its structure and chronology remain governed by the existing rules.
+
+### M10.76 acceptance criteria
+
+- A pending candidate carries a valid complete snapshot of its latest durable observation.
+- A first-observation candidate carries no fabricated latest-observation fields.
+- Replay of the discovered pending UUID preserves `PENDING`, transaction hash, booking time, provider update time, and local recording time exactly.
+- Divergence in any same-identity fact fails before aggregation and before the next candidate.
+- A different valid replay UUID remains available for concurrent durable progress.
+- No schema, write behavior, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

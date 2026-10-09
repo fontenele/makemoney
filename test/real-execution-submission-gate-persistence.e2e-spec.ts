@@ -444,6 +444,9 @@ describe('Real execution submission gate persistence (e2e)', () => {
         gateId: uuid(10),
         phase: 'provider_pending',
         latestObservationRecordedAt: new Date('2026-10-03T12:00:06.000Z'),
+        latestObservationTransactionHash: null,
+        latestObservationBookedAt: new Date('2026-10-03T12:00:05.000Z'),
+        latestObservationUpdatedAt: new Date('2026-10-03T12:00:05.500Z'),
         eligibleAt: new Date('2026-10-03T12:00:07.000Z'),
       },
     ]);

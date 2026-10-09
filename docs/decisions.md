@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-09 — Compare the complete durable row for a known replay identity
+
+M10.70 bound replay of a discovered pending-observation UUID to its local recording time and `PENDING` status, but those two facts did not uniquely describe the immutable database row. The same UUID could still be returned with a rewritten transaction hash, booking time, or provider update time while satisfying the previous cycle boundary.
+
+M10.76 makes the due candidate carry the complete immutable provider-evidence snapshot selected by the existing latest-sequence query. A replay returning that exact UUID must match every observation field plus `recordedAt`; a different replay UUID remains admissible for valid concurrently advanced evidence. This is a read-boundary and validation change only: it creates no row, provider access, retry, scheduler, or execution authority.
+
 ## 2026-10-09 — Bound deferred reconciliation by the cycle cadence
 
 Candidate discovery and one-shot reconciliation may observe different durable snapshots. A concurrent pending observation can therefore cause the authoritative attempt to defer a candidate that was due when discovered. That concurrency is valid, but it cannot justify an arbitrary future deadline: the newer observation cannot be recorded after the attempt evaluation, and the cadence adds exactly the configured minimum interval.

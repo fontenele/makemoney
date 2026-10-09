@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-09 — Preserve complete evidence for known status replays
+
+- Extended due pending candidates with the immutable transaction hash, booking time, and provider update time from their latest durable observation.
+- Required an exact replay of the discovered observation UUID to preserve every provider-evidence field as well as its existing pending status and local recording time.
+- Rejected malformed candidate snapshots and same-identity hash or provider-time rewrites before cycle aggregation or later work.
+- Preserved valid different-identity replay for concurrently advanced durable evidence.
+- Added no schema, write behavior, runtime registration, provider call, wait, loop, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,126 backend tests across 183 suites, the focused 46-test reconciliation-cycle suite, the focused 13-test candidate-store suite, the focused 17-test PostgreSQL submission/reconciliation E2E suite with all 27 migrations, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-09 — Bound deferred status lookup to one cadence interval
 
 - Passed the cycle's validated minimum lookup interval into the untrusted reconciliation-attempt result boundary.

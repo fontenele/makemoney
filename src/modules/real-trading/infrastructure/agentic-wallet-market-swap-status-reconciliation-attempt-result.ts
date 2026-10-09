@@ -189,17 +189,24 @@ function isStoredObservationIdentityCoherent(
   if (!result.observationReplayed) {
     return stored.id !== candidate.latestObservationId;
   }
+  if (candidate.phase !== 'provider_pending') return true;
   if (
-    candidate.phase !== 'provider_pending' ||
-    candidate.latestObservationRecordedAt === null
-  ) {
-    return true;
-  }
+    candidate.latestObservationRecordedAt === null ||
+    candidate.latestObservationBookedAt === null ||
+    candidate.latestObservationUpdatedAt === null
+  )
+    return false;
   if (stored.id === candidate.latestObservationId) {
     return (
       stored.recordedAt.getTime() ===
         candidate.latestObservationRecordedAt.getTime() &&
-      stored.observation.providerStatus === 'PENDING'
+      stored.observation.providerStatus === 'PENDING' &&
+      stored.observation.transactionHash ===
+        candidate.latestObservationTransactionHash &&
+      stored.observation.bookedAt.getTime() ===
+        candidate.latestObservationBookedAt.getTime() &&
+      stored.observation.updatedAt.getTime() ===
+        candidate.latestObservationUpdatedAt.getTime()
     );
   }
   return (

@@ -19,6 +19,9 @@ describe('PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore', () =
         latestObservationId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
         latestProviderStatus: 'PENDING',
         latestObservationRecordedAt: new Date('2026-10-03T12:00:06.000Z'),
+        latestObservationTransactionHash: null,
+        latestObservationBookedAt: new Date('2026-10-03T12:00:05.000Z'),
+        latestObservationUpdatedAt: new Date('2026-10-03T12:00:06.000Z'),
       }),
     ]);
 
@@ -38,6 +41,9 @@ describe('PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore', () =
         receiptRecordedAt: new Date('2026-10-03T12:00:05.000Z'),
         latestObservationId: null,
         latestObservationRecordedAt: null,
+        latestObservationTransactionHash: null,
+        latestObservationBookedAt: null,
+        latestObservationUpdatedAt: null,
         eligibleAt: new Date('2026-10-03T12:00:05.000Z'),
         evaluatedAt: EVALUATED_AT,
         statusLookupRequired: true,
@@ -96,11 +102,31 @@ describe('PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore', () =
       latestObservationId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
       latestProviderStatus: 'FINISHED',
       latestObservationRecordedAt: new Date('2026-10-03T12:00:06.000Z'),
+      latestObservationBookedAt: new Date('2026-10-03T12:00:05.000Z'),
+      latestObservationUpdatedAt: new Date('2026-10-03T12:00:06.000Z'),
     }),
     row({
       latestObservationId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
       latestProviderStatus: 'PENDING',
       latestObservationRecordedAt: new Date('2026-10-03T12:00:04.000Z'),
+      latestObservationBookedAt: new Date('2026-10-03T12:00:05.000Z'),
+      latestObservationUpdatedAt: new Date('2026-10-03T12:00:06.000Z'),
+    }),
+    row({ latestObservationBookedAt: new Date('2026-10-03T12:00:05.000Z') }),
+    row({
+      latestObservationId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+      latestProviderStatus: 'PENDING',
+      latestObservationRecordedAt: new Date('2026-10-03T12:00:06.000Z'),
+      latestObservationTransactionHash: 'not-a-hash',
+      latestObservationBookedAt: new Date('2026-10-03T12:00:05.000Z'),
+      latestObservationUpdatedAt: new Date('2026-10-03T12:00:06.000Z'),
+    }),
+    row({
+      latestObservationId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+      latestProviderStatus: 'PENDING',
+      latestObservationRecordedAt: new Date('2026-10-03T12:00:06.000Z'),
+      latestObservationBookedAt: new Date('2026-10-03T12:00:06.001Z'),
+      latestObservationUpdatedAt: new Date('2026-10-03T12:00:06.000Z'),
     }),
   ])(
     'fails closed on malformed persisted candidate evidence',
@@ -139,6 +165,9 @@ function row(overrides: Record<string, unknown> = {}) {
     latestObservationId: null,
     latestProviderStatus: null,
     latestObservationRecordedAt: null,
+    latestObservationTransactionHash: null,
+    latestObservationBookedAt: null,
+    latestObservationUpdatedAt: null,
     ...overrides,
   };
 }

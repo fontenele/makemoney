@@ -18,6 +18,9 @@ export interface AgenticWalletMarketSwapStatusReconciliationCandidate {
   readonly receiptRecordedAt: Date;
   readonly latestObservationId: string | null;
   readonly latestObservationRecordedAt: Date | null;
+  readonly latestObservationTransactionHash: string | null;
+  readonly latestObservationBookedAt: Date | null;
+  readonly latestObservationUpdatedAt: Date | null;
   readonly eligibleAt: Date;
   readonly evaluatedAt: Date;
   readonly statusLookupRequired: true;
@@ -113,6 +116,9 @@ export function isValidStatusReconciliationCandidate(
     return (
       candidate.latestObservationId === null &&
       candidate.latestObservationRecordedAt === null &&
+      candidate.latestObservationTransactionHash === null &&
+      candidate.latestObservationBookedAt === null &&
+      candidate.latestObservationUpdatedAt === null &&
       candidate.eligibleAt.getTime() === candidate.receiptRecordedAt.getTime()
     );
   }
@@ -120,10 +126,24 @@ export function isValidStatusReconciliationCandidate(
     candidate.phase === 'provider_pending' &&
     UUID_PATTERN.test(candidate.latestObservationId ?? '') &&
     isValidDate(candidate.latestObservationRecordedAt) &&
+    isValidOptionalTransactionHash(
+      candidate.latestObservationTransactionHash,
+    ) &&
+    isValidDate(candidate.latestObservationBookedAt) &&
+    isValidDate(candidate.latestObservationUpdatedAt) &&
+    candidate.latestObservationUpdatedAt.getTime() >=
+      candidate.latestObservationBookedAt.getTime() &&
     candidate.latestObservationRecordedAt.getTime() >=
       candidate.receiptRecordedAt.getTime() &&
     candidate.eligibleAt.getTime() >=
       candidate.latestObservationRecordedAt.getTime()
+  );
+}
+
+function isValidOptionalTransactionHash(value: unknown): boolean {
+  return (
+    value === null ||
+    (typeof value === 'string' && /^0x[0-9a-f]{64}$/.test(value))
   );
 }
 
