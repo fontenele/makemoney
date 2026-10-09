@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-09 — Separate financial reconciliation completion from accounting mutation
+
+Persisted complete receipt and cost evidence is sufficient to say what the provider execution financially delivered, but it is not itself permission to mutate a local wallet ledger or claim profit. Conflating these states would make an evidence write silently become an accounting side effect.
+
+M10.83 therefore projects a separate immutable completion snapshot only from a structurally valid stored M10.82 envelope. It marks financial reconciliation complete while carrying independent `accountingMutationRequired: true` and `accountingMutationComplete: false` facts, and continues to forbid submission retry. The projection is pure and defensive; durable loading, ledger mutation, valuation, PnL, runtime composition, and execution remain separate future increments.
+
 ## 2026-10-09 — Persist financial evidence only after durable-context revalidation
 
 Financial evidence is an accounting-critical fact and cannot be accepted merely because an in-memory caller previously passed the pure M10.81 assessment. Between assessment and persistence, the durable status history could advance or the caller could replay a changed payload.

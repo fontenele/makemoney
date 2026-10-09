@@ -1,5 +1,11 @@
 # Current State
 
+M10.83 is complete: a pure fail-closed projection now accepts only a structurally valid stored M10.82 evidence envelope, including valid evidence UUID, complete receipt/cost facts, and recording time at or after evidence observation. A successful projection defensively copies all mutable fee and timestamp values and preserves the complete durable correlation identities.
+
+The resulting snapshot reports `financialReconciliationComplete: true` and the actual received quantity, but explicitly keeps `accountingMutationRequired: true`, `accountingMutationComplete: false`, and `submissionRetryAllowed: false`. It does not load evidence, write balances, value assets, calculate PnL, register runtime behavior, call Binance, fund the wallet, or authorize an order.
+
+Post-M10.83 validation passed all 2,163 backend tests across 186 suites, the focused 10-test completion suite, all 95 PostgreSQL E2E tests across 9 suites with all 28 migrations applied from scratch, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace checks. Compose emitted only the existing inaccessible user Docker-config warning.
+
 M10.82 is complete: the complete M10.81 package can now be recorded exactly once as immutable PostgreSQL financial-reconciliation evidence. A serializable per-gate transaction reloads the immutable submission gate, submission receipt, and latest status observation, reconstructs the reconciliation state, and reapplies the pure fail-closed evidence assessment before insertion.
 
 Exact evidence replay returns the existing record, while a different fingerprint for the same gate is rejected. Unique gate, provider-order, terminal-observation, and transaction-hash identities prevent the same provider execution from being accounted twice. The store remains unregistered and does not acquire evidence, mutate a wallet or accounting balance, calculate valuation or PnL, or change `financialReconciliationComplete: false`.

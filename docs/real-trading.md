@@ -1501,3 +1501,22 @@ The new row is evidence, not an accounting mutation. Its existence does not upda
 - Unit tests cover insert, replay, conflict, unfinished provider state, absent context, invalid recording metadata, and malformed persisted data.
 - PostgreSQL E2E coverage applies all 28 migrations from scratch and proves one durable insert plus exact replay.
 - No evidence acquisition, NestJS registration, route, provider call, wallet accounting, valuation, PnL, financial-completion transition, funding, retry, executor, or real order is added.
+
+## M10.83 — Financial-reconciliation completion projection
+
+M10.83 separates two facts that must not be conflated: complete durable knowledge of what a provider execution delivered, and mutation of a local accounting ledger. A pure projection accepts only the stored M10.82 envelope after validating its evidence UUID, complete correlated receipt/cost package, finite recording time, and recording chronology.
+
+The successful snapshot defensively copies the provider-fee list and evidence timestamps and retains every accounting-relevant identity and quantity: gate, provider order, terminal observation, transaction hash, chain, source and target contracts, submitted source quantity, actual received quantity, provider fees, and BNB network fee. It may then state `financialReconciliationComplete: true` without inventing any missing value.
+
+Completion still cannot mutate state. The snapshot independently states `accountingMutationRequired: true`, `accountingMutationComplete: false`, and `submissionRetryAllowed: false`. No repository reader, ledger, valuation, PnL calculator, coordinator, runtime registration, provider call, or order authority is introduced.
+
+### M10.83 acceptance criteria
+
+- Only a structurally valid stored M10.82 evidence envelope can produce completion.
+- The stored UUID is valid and its recording time is finite and not earlier than evidence observation.
+- Completion preserves all provider-execution identity, token, submitted quantity, actual receipt, provider-fee, network-fee, and evidence-time facts.
+- Fee entries and timestamps are defensively copied.
+- Invalid identity, time, actual receipt, fee coverage, receipt observation, or network fee blocks completion.
+- Financial reconciliation completion explicitly leaves accounting mutation required and incomplete.
+- Submission retry remains forbidden.
+- No schema change, evidence loading, persistence mutation, NestJS registration, route, provider call, wallet balance change, valuation, PnL, funding, executor, or real order is added.

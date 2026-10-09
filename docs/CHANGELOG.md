@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-09 — Project durable evidence into completed financial reconciliation
+
+- Added a pure fail-closed completion projection that accepts only a valid stored M10.82 evidence envelope.
+- Preserved gate, provider order, terminal observation, transaction, token, actual-receipt, provider-fee, network-fee, and evidence-time facts in a defensive snapshot.
+- Marked financial reconciliation complete independently from accounting: balance/PnL mutation remains explicitly required and incomplete, and submission retry remains forbidden.
+- Added no evidence loading, persistence change, route, runtime registration, provider call, funding, wallet accounting, valuation, PnL, executor, or real order.
+- Verified all 2,163 backend tests across 186 suites, the focused 10-test completion suite, all 95 PostgreSQL E2E tests across 9 suites with all 28 migrations, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-09 — Persist immutable financial-reconciliation evidence
 
 - Added one immutable PostgreSQL record for complete, correlated M10.81 financial evidence, including actual receipt and explicit provider/network costs.

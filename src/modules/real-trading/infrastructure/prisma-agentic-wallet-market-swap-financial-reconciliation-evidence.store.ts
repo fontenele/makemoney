@@ -14,6 +14,7 @@ import {
   AgenticWalletMarketSwapFinancialReconciliationEvidenceConflictError,
   AgenticWalletMarketSwapFinancialReconciliationEvidenceStore,
   StoredAgenticWalletMarketSwapFinancialReconciliationEvidence,
+  isValidStoredAgenticWalletMarketSwapFinancialReconciliationEvidence,
 } from './agentic-wallet-market-swap-financial-reconciliation-evidence.store';
 import { mapPersistedAgenticWalletMarketSwapStatusObservation } from './prisma-agentic-wallet-market-swap-status-observation.store';
 import { mapPersistedAgenticWalletMarketSwapSubmissionReceipt } from './prisma-agentic-wallet-market-swap-submission-receipt.store';
@@ -193,12 +194,15 @@ function mapEvidence(row: {
     networkFeeCoverageComplete: true,
     observedAt: new Date(row.observedAt),
   } as AgenticWalletMarketSwapFinancialReconciliationEvidence;
+  const stored = {
+    id: row.id,
+    evidence,
+    recordedAt: new Date(row.recordedAt),
+  };
   if (
-    !UUID_PATTERN.test(row.id) ||
     !isValidAgenticWalletMarketSwapFinancialReconciliationEvidence(evidence) ||
-    !Number.isFinite(row.recordedAt.getTime()) ||
-    row.recordedAt.getTime() < row.observedAt.getTime()
+    !isValidStoredAgenticWalletMarketSwapFinancialReconciliationEvidence(stored)
   )
     throw new Error('Persisted financial reconciliation evidence is invalid');
-  return { id: row.id, evidence, recordedAt: new Date(row.recordedAt) };
+  return stored;
 }
