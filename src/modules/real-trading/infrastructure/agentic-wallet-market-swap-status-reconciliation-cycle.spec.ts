@@ -628,6 +628,20 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
     );
   });
 
+  it('rejects a deferred lookup beyond one configured interval', async () => {
+    const malformed = attemptResult('status_lookup_deferred');
+    malformed.nextStatusLookupAt!.setTime(
+      EVALUATED_AT.getTime() + INPUT.minimumLookupIntervalMs + 1,
+    );
+    const reconcileOnce = jest.fn().mockResolvedValue(malformed);
+    const harness = cycleHarness([candidate(1), candidate(2)], reconcileOnce);
+
+    await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+      'Agentic Wallet status reconciliation attempt result is invalid',
+    );
+    expect(reconcileOnce).toHaveBeenCalledTimes(1);
+  });
+
   it('rejects a newly stored observation recorded before its evaluation', async () => {
     const malformed = attemptResult('status_observation_recorded');
     malformed.storedObservation!.recordedAt.setTime(

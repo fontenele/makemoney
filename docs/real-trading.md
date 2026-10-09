@@ -1364,6 +1364,22 @@ Use this procedure when the dashboard reports the sanitized wallet-observation `
 - Stale Windows credentials have an explicit sign-out, re-pair, and single-runtime recovery procedure.
 - Funding, quote, signing, mutation, submission, and real execution remain unavailable.
 
+## M10.75 — Bounded deferred status-lookup horizon
+
+The manual cycle admits candidates from one durable discovery snapshot, while each one-shot attempt reloads authoritative context immediately before deciding cadence. A concurrent pending observation can therefore turn a discovered due candidate into `status_lookup_deferred`. That is a valid race, but the returned future boundary must remain derivable from one configured cadence interval.
+
+M10.75 passes the cycle's already validated `minimumLookupIntervalMs` into the attempt-result validator. A deferred result must retain all existing shape and chronology rules, must have `nextStatusLookupAt > evaluatedAt`, and now must also satisfy `nextStatusLookupAt - evaluatedAt <= minimumLookupIntervalMs`. Since an authoritative latest observation cannot be recorded after the attempt evaluation, adding the configured interval cannot coherently produce a later deadline.
+
+The exact interval boundary is accepted. A deadline even one millisecond beyond it fails closed before cycle aggregation and before the next candidate. Completed provider work retains the M10.66–M10.68 cadence-evidence rules and is not changed by this increment.
+
+### M10.75 acceptance criteria
+
+- Every deferred result is bounded by the exact validated cycle interval.
+- A deadline exactly one interval after attempt evaluation remains valid.
+- A deadline one millisecond beyond the interval fails before aggregation and before the next candidate.
+- Existing future-time, discovery-time, candidate-eligibility, cadence-evidence, snapshot, cancellation, overlap, sequential, and no-retry rules remain enforced.
+- No schema, persistence behavior, NestJS registration, route, provider call, wait, loop, timer, worker, schedule, wallet mutation, funding, mutating runner, executor, financial completion, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).

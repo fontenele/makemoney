@@ -54,8 +54,9 @@ const STATUS_RESPONSE_BLOCKERS =
 export function validateAndSnapshotStatusReconciliationAttemptResult(
   result: AgenticWalletMarketSwapStatusReconciliationAttemptResult,
   candidate: AgenticWalletMarketSwapStatusReconciliationCandidate,
+  minimumLookupIntervalMs: number,
 ): AgenticWalletMarketSwapStatusReconciliationAttemptResult {
-  if (!isValidAttemptResult(result, candidate)) {
+  if (!isValidAttemptResult(result, candidate, minimumLookupIntervalMs)) {
     throw new Error(
       'Agentic Wallet status reconciliation attempt result is invalid',
     );
@@ -66,6 +67,7 @@ export function validateAndSnapshotStatusReconciliationAttemptResult(
 function isValidAttemptResult(
   result: AgenticWalletMarketSwapStatusReconciliationAttemptResult,
   candidate: AgenticWalletMarketSwapStatusReconciliationCandidate,
+  minimumLookupIntervalMs: number,
 ): boolean {
   if (
     typeof result !== 'object' ||
@@ -125,7 +127,9 @@ function isValidAttemptResult(
       result.evaluatedAt !== null &&
       result.nextStatusLookupAt !== null &&
       isAttemptEvaluationAfterDiscovery(result, candidate) &&
-      result.nextStatusLookupAt.getTime() > result.evaluatedAt.getTime()
+      result.nextStatusLookupAt.getTime() > result.evaluatedAt.getTime() &&
+      result.nextStatusLookupAt.getTime() - result.evaluatedAt.getTime() <=
+        minimumLookupIntervalMs
     );
   }
   if (result.status === 'status_response_invalid') {

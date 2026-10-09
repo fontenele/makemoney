@@ -82,6 +82,7 @@ export class AgenticWalletMarketSwapStatusReconciliationCycle {
         const attempt = validateAndSnapshotStatusReconciliationAttemptResult(
           attemptResult,
           candidate,
+          cycleInput.minimumLookupIntervalMs,
         );
         outcomes.push({ candidate, attempt });
       }

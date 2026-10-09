@@ -1,5 +1,11 @@
 # Current State
 
+M10.75 is complete: the unwired manual reconciliation cycle now supplies its already validated `minimumLookupIntervalMs` to the untrusted attempt-result boundary. A `status_lookup_deferred` result must still be strictly in the future, and its `nextStatusLookupAt - evaluatedAt` horizon must now be no greater than that exact cycle interval. Equality at one complete interval remains valid.
+
+This prevents an incoherent attempt implementation from postponing reconciliation arbitrarily while preserving a legitimate concurrent authoritative reload: a newer pending observation may move the next lookup beyond the current evaluation, but never beyond one configured cadence interval because that observation itself cannot be recorded in the future. Invalid evidence fails before aggregation and before the next candidate. No schema, persistence behavior, runtime registration, provider call, waiting, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, financial completion, or real order was added.
+
+Post-M10.75 validation passed all 2,123 backend tests across 183 suites, the focused 46-test reconciliation-cycle suite, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Compose configuration, and whitespace checks. Compose emitted only the existing inaccessible user Docker-config warning.
+
 M10.74 is complete: the manual sanitized Agentic Wallet observation now retains the provider's separate effective session, maximum sign-in, and inactivity sign-out timestamps. Live CLI 1.10.0 verification showed that authenticated token use advances `inactiveSignOutTime` by 48 hours, while `signInMaxTime` remains a separate approximately one-year absolute ceiling. The adapter reads settings last so the returned inactivity deadline follows the immediately preceding authenticated read rather than an older point in the observation sequence.
 
 The dashboard displays the absolute inactivity deadline, a one-second local countdown, and the separate maximum sign-in deadline. The countdown never invokes the provider and never extends a session; only the explicit manual wallet check can obtain a newly advanced provider deadline. Public output remains sanitized and contains no token, session identifier, wallet address, or credential material.

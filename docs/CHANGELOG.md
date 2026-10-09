@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-09 — Bound deferred status lookup to one cadence interval
+
+- Passed the cycle's validated minimum lookup interval into the untrusted reconciliation-attempt result boundary.
+- Rejected `status_lookup_deferred` evidence whose future deadline exceeds one complete configured interval after its attempt evaluation.
+- Preserved the exact interval boundary and valid deferral caused by a concurrent authoritative context reload.
+- Added focused coverage proving rejection occurs before aggregation and before the next candidate.
+- Added no schema, persistence behavior, runtime registration, provider call, wait, loop, timer, worker, schedule, wallet mutation, funding, mutating command, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,123 backend tests across 183 suites, the focused 46-test reconciliation-cycle suite, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Compose configuration, and whitespace integrity.
+
 ## 2026-10-09 — Show Agentic Wallet expiry and document stale-session recovery
 
 - Confirmed with two sanitized live CLI 1.10.0 reads that authenticated token use advances the inactivity sign-out deadline by 48 hours, independently from the approximately one-year maximum sign-in deadline.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-09 — Bound deferred reconciliation by the cycle cadence
+
+Candidate discovery and one-shot reconciliation may observe different durable snapshots. A concurrent pending observation can therefore cause the authoritative attempt to defer a candidate that was due when discovered. That concurrency is valid, but it cannot justify an arbitrary future deadline: the newer observation cannot be recorded after the attempt evaluation, and the cadence adds exactly the configured minimum interval.
+
+M10.75 therefore requires `nextStatusLookupAt - evaluatedAt <= minimumLookupIntervalMs` for every `status_lookup_deferred` attempt result at the cycle boundary. The existing strict future requirement remains, equality at one interval is accepted, and a longer horizon fails closed before result aggregation. The rule binds the attempt to the cycle's validated caller input without exposing provider access or creating a scheduler.
+
 ## 2026-10-09 — Treat Agentic Wallet inactivity expiry as provider-owned sliding state
 
 Live reads against the pinned Agentic Wallet CLI 1.10.0 showed `inactiveSignOutTime` advancing to 48 hours after authenticated token use, while `signInMaxTime` remained a separate approximately one-year absolute ceiling. The application therefore does not synthesize a 48-hour timer from page load, observation time, or browser activity. It exposes the provider timestamps, reads settings after the other authenticated observation commands, and counts down to the returned inactivity deadline locally. Only a later explicit wallet observation may replace that deadline.

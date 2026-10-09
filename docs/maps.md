@@ -238,6 +238,7 @@ Use this keyword map to locate context before changing code. Read the listed doc
 | durable round-trip outcome cohort, bounded top-of-book outcome loading, M7.108 | `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts`, `../src/modules/new-listings/application/listing-checkpoint-round-trip-outcome-cohort-calculator.ts` |
 | round-trip outcome cohort API, GET /new-listings/round-trip/outcomes, fixed configuration query, M7.109 | `../README.md`, `new-listings.md`, `roadmap.md`, `decisions.md` | `../src/modules/new-listings/presentation/new-listings.controller.ts`, `../src/modules/new-listings/application/spot-symbol-detection-read-model.service.ts` |
 | Agentic Wallet session expiry, 48-hour inactivity, stale credential, illegal parameter, M10.74 | `real-trading.md`, `dashboard.md`, `roadmap.md`, `decisions.md`, `../README.md` | `../src/modules/real-trading/infrastructure/agentic-wallet-capability.adapter.ts`, `../src/modules/real-trading/application/real-trading-status.service.ts`, `../dashboard/src/wallet-session-expiry.ts`, `../dashboard/src/App.vue` |
+| deferred status lookup horizon, minimum lookup interval, cadence boundary, M10.75 | `real-trading.md`, `roadmap.md`, `decisions.md` | `../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-reconciliation-attempt-result.ts`, `../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-reconciliation-cycle.ts` |
 
 ## Before every task
 
