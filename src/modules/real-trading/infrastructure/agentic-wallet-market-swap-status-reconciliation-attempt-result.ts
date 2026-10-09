@@ -218,7 +218,12 @@ function isStoredObservationIdentityCoherent(
       candidate.latestObservationUpdatedAt.getTime() &&
     (candidate.latestObservationTransactionHash === null ||
       stored.observation.transactionHash ===
-        candidate.latestObservationTransactionHash)
+        candidate.latestObservationTransactionHash) &&
+    (stored.observation.providerStatus !== 'PENDING' ||
+      stored.observation.transactionHash !==
+        candidate.latestObservationTransactionHash ||
+      stored.observation.updatedAt.getTime() >
+        candidate.latestObservationUpdatedAt.getTime())
   );
 }
 

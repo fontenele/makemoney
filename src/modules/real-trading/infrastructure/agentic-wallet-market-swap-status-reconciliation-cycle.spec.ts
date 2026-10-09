@@ -546,6 +546,53 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
       id: uuid(102),
       recordedAt: new Date('2026-10-05T12:00:06.000Z'),
     });
+    replay.storedObservation!.observation.updatedAt.setTime(
+      new Date('2026-10-05T12:00:06.001Z').getTime(),
+    );
+    const harness = cycleHarness(
+      [pendingCandidate(1)],
+      jest.fn().mockResolvedValue(replay),
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).resolves.toMatchObject({
+      status: 'completed',
+      observationRecordedCount: 1,
+      outcomes: [{ attempt: { observationReplayed: true } }],
+    });
+  });
+
+  it('rejects a different-identity replay without provider-evidence advancement', async () => {
+    const replay = attemptResult('status_observation_recorded');
+    Object.assign(replay, {
+      observationReplayed: true,
+      nextStatusLookupAt: new Date(EVALUATED_AT),
+    });
+    Object.assign(replay.storedObservation!, {
+      id: uuid(102),
+      recordedAt: new Date('2026-10-05T12:00:06.000Z'),
+    });
+    const reconcileOnce = jest.fn().mockResolvedValue(replay);
+    const harness = cycleHarness(
+      [pendingCandidate(1), pendingCandidate(2)],
+      reconcileOnce,
+    );
+
+    await expect(harness.cycle.runOnce(INPUT)).rejects.toThrow(
+      'Agentic Wallet status reconciliation attempt result is invalid',
+    );
+    expect(reconcileOnce).toHaveBeenCalledTimes(1);
+  });
+
+  it('accepts a different-identity pending replay that newly populates the transaction hash', async () => {
+    const replay = attemptResult('status_observation_recorded');
+    Object.assign(replay, {
+      observationReplayed: true,
+      nextStatusLookupAt: new Date(EVALUATED_AT),
+    });
+    Object.assign(replay.storedObservation!, { id: uuid(102) });
+    Object.assign(replay.storedObservation!.observation, {
+      transactionHash: `0x${'a'.repeat(64)}`,
+    });
     const harness = cycleHarness(
       [pendingCandidate(1)],
       jest.fn().mockResolvedValue(replay),
@@ -634,11 +681,10 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
       id: uuid(102),
       observation: {
         ...replay.storedObservation!.observation,
-        providerStatus: 'FINISHED',
-        transactionHash: `0x${'a'.repeat(64)}`,
-        updatedAt: new Date('2026-10-05T12:00:06.500Z'),
+        providerStatus: 'FAILED',
+        transactionHash: null,
         terminal: true,
-        executionSucceeded: true,
+        executionSucceeded: false,
         statusLookupRequired: false,
       },
     });
@@ -655,7 +701,7 @@ describe('AgenticWalletMarketSwapStatusReconciliationCycle', () => {
           attempt: {
             observationReplayed: true,
             storedObservation: {
-              observation: { providerStatus: 'FINISHED' },
+              observation: { providerStatus: 'FAILED' },
             },
           },
         },

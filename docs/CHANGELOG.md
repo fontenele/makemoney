@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-09 — Require material advancement for concurrent status replay identity
+
+- Rejected a replayed status observation that claims a different UUID while retaining provider evidence identical to the pending row discovered by the cycle.
+- Accepted each producer-coherent advancement independently: later provider update time, newly populated transaction hash, or terminal provider status.
+- Preserved equal local recording timestamps because durable sequence remains authoritative for tied rows.
+- Added no schema, write behavior, runtime registration, provider call, wait, loop, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, real order, or submission authority.
+- Verified all 2,130 backend tests across 183 suites, the focused 50-test reconciliation-cycle suite, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-09 — Enforce coherent transitions for concurrent status replays
 
 - Required a different-identity replay returned after pending-candidate discovery to preserve provider booking time, keep provider update time monotonic, and retain any already-known transaction hash.

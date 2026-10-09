@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-09 — Require material provider-evidence advancement for a new replay UUID
+
+The serializable observation store treats exact normalized evidence as an idempotent replay and returns the existing latest row. Consequently, a replayed result with a different UUID cannot coherently contain the exact same provider status, transaction hash, booking time, and provider update time as the pending row discovered earlier.
+
+M10.78 requires at least one transition the store could have persisted: a later provider update time, population of a previously absent transaction hash, or a terminal status change. Equal local recording timestamps remain allowed because durable sequence orders tied writes. The rule validates untrusted attempt output only and adds no persistence behavior, provider access, retry, scheduling, runtime registration, or execution authority.
+
 ## 2026-10-09 — Reapply durable transition rules to concurrent replay evidence
 
 A replay returning a UUID different from the pending observation discovered by the cycle can only be a concurrently appended durable row. M10.72 checked its local append chronology, while M10.76 supplied the complete discovered provider-evidence snapshot. Without another comparison, however, the untrusted attempt result could claim a changed booking time, a regressed provider update time, or replacement of an already-known transaction hash even though the durable store rejects each transition.

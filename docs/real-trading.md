@@ -1410,6 +1410,22 @@ The returned observation must retain the exact provider booking time, its provid
 - Divergence fails before aggregation and before the next candidate.
 - No schema, write behavior, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.78 — Material advancement for concurrent replay identity
+
+The durable observation store returns the current row and its existing UUID when the normalized provider evidence is exactly equal to the latest observation. It creates a fresh UUID only when the accepted evidence actually changes. A different-identity replay at the manual cycle boundary must preserve that producer guarantee rather than merely satisfying monotonic transition constraints.
+
+For a candidate discovered with provider `PENDING`, a replayed row with a different UUID must therefore contain at least one material advancement: a later provider update time, population of a previously absent transaction hash, or transition to `FINISHED` or `FAILED`. Booking time remains immutable and an already-known transaction hash remains fixed under M10.77. Local recording timestamps may still tie because database sequence, not clock uniqueness, orders concurrent rows.
+
+### M10.78 acceptance criteria
+
+- A different UUID with provider evidence identical to the discovered pending row fails closed.
+- A strictly later provider update time is sufficient material advancement.
+- Population of a previously absent transaction hash is sufficient material advancement.
+- A coherent terminal provider transition is sufficient material advancement.
+- Equal local recording timestamps remain valid when provider evidence advanced.
+- Divergence fails before aggregation and before the next candidate.
+- No schema, write behavior, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
