@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-09 — Gate financial reconciliation on complete correlated evidence
+
+- Added a pure fail-closed evidence gate for provider-`FINISHED` Agentic Wallet swaps without treating terminal status as completed accounting.
+- Required exact gate, order, terminal-observation, transaction, chain, token, and source-quantity correlation plus positive actual target receipt.
+- Required explicit transaction receipt, target balance delta, bounded complete provider-fee components, complete positive BNB network fee, and post-status observation time.
+- Kept ready output unpersisted and `financialReconciliationComplete: false`; added no evidence acquisition, schema, repository, wallet accounting, PnL, runtime wiring, funding, provider call, mutating command, executor, retry, or real order.
+- Verified all 2,144 backend tests across 184 suites, the focused 13-test financial-evidence suite, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Prisma validation, Compose configuration, and whitespace integrity.
+
 ## 2026-10-09 — Share status-transition policy across durable producer and cycle boundary
 
 - Replaced the cycle's duplicated provider-evidence transition comparison with the same pure assessor used by the serializable observation store.

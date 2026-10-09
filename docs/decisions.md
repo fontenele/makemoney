@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-09 — Require separate complete evidence before financial reconciliation
+
+The current official Agentic Wallet reference says a `FINISHED` market order should be reported with its actual received amount, while the documented order-list response does not expose that amount or a complete provider/network fee breakdown. Treating terminal provider status as completed accounting would therefore invent financial facts and make profit measurement unreliable.
+
+M10.81 adds a pure evidence gate rather than guessing from the quote or submitted amount. Readiness requires exact durable identity and transaction correlation, positive target receipt, explicit transaction-receipt and target-balance-delta observation, bounded complete provider-fee components, complete positive BNB network fee, and post-status observation time. The output remains persistence-ready only and explicitly keeps reconciliation incomplete. Evidence acquisition, durable storage, wallet accounting, valuation, and PnL remain separate future increments.
+
 ## 2026-10-09 — Share one provider status-transition policy across store and cycle
 
 The serializable observation store and manual-cycle result boundary have the same provider-evidence question: whether a pending observation may advance to the returned next observation. Maintaining a second hand-written comparison in the cycle would allow future policy changes to be applied at one boundary but missed at the other.

@@ -1456,9 +1456,28 @@ M10.80 reconstructs the complete discovered pending observation from the validat
 - Existing focused reconciliation-cycle coverage passes unchanged.
 - No schema, write behavior, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, completed financial reconciliation, or real order is added.
 
+## M10.81 — Financial-reconciliation evidence gate
+
+The current official Agentic Wallet market-order reference still creates an evidentiary gap: it instructs callers to report the actual received amount after `FINISHED`, but the documented `market-order list` row contains submitted source quantity, status, transaction hash, and timestamps without a target received quantity or complete fee breakdown. Provider terminal status therefore remains insufficient for financial accounting.
+
+M10.81 introduces a pure, unwired gate for a separately obtained evidence package. It accepts only an already valid `provider_finished_financial_reconciliation_required` state and exact correlation to the immutable submission gate, provider order, terminal status-observation UUID, transaction hash, chain, token direction, and submitted source quantity. The package must include a positive actual target receipt, explicit transaction-receipt and target-balance-delta observations, complete bounded provider-fee components, a positive BNB network fee with complete coverage, and an observation time at or after the terminal status row.
+
+A ready result is only a defensive `evidence_ready_for_persistence` snapshot. It exposes the candidate actual received quantity but deliberately retains `financialReconciliationComplete: false`; there is no schema, repository, balance mutation, PnL calculation, evidence adapter, provider command, or runtime composition yet.
+
+### M10.81 acceptance criteria
+
+- Only a structurally valid provider-`FINISHED` reconciliation state may proceed.
+- Gate, provider order, terminal observation, transaction hash, chain, token direction, and submitted source quantity match exactly.
+- Actual target received quantity and BNB network fee are canonical positive decimal strings.
+- Provider-fee components are bounded, unique by canonical token address, and canonical non-negative decimals; an empty list represents explicitly complete zero provider fees.
+- Transaction receipt, target balance delta, provider-fee coverage, and network-fee coverage are all explicitly complete.
+- Evidence cannot predate the terminal status observation's local recording time.
+- Ready output is defensively copied, requires future persistence, and keeps financial reconciliation incomplete.
+- No schema, repository, adapter, NestJS registration, route, live process invocation, provider call, waiting, polling, timer, worker, schedule, wallet mutation, funding, mutating command runner, executor, retry, PnL claim, completed financial reconciliation, or real order is added.
+
 ### Official sources reviewed
 
 - [Binance Developer Docs: Agentic Wallet overview](https://developers.binance.com/en/docs/products/agentic-wallet/welcome), install guide, security settings, market-order flow, and Skills reference (reviewed 2026-09-30).
 - [Binance's official `binance-skills-hub`](https://github.com/binance/binance-skills-hub), including the Agentic Wallet skill plus preflight, wallet-view, wallet-setting, gas, security, and market-order references (reviewed 2026-09-30).
-- [Binance Agentic Wallet market-order reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/market-order.md), including the distinct quote, swap, and order-list commands, explicit MEV/gas controls, and published quote, submission, and status response shapes (reviewed again 2026-10-03).
+- [Binance Agentic Wallet market-order reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/market-order.md), including the distinct quote, swap, and order-list commands, explicit MEV/gas controls, the instruction to report actual received amount, and the published status row that still omits received quantity and complete costs (reviewed again 2026-10-09).
 - [Binance Spot REST security documentation](https://developers.binance.com/en/docs/products/spot/rest-api) was reviewed only to confirm that centralized Spot API keys and permissions are a separate integration model; it is not the selected M10 provider boundary.

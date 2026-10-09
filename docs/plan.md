@@ -1711,7 +1711,7 @@ M6 — Backtesting                  DONE (M6.1–M6.32)
 M7 — New Listing Scanner          DONE (M7.1–M7.109)
 M8 — Dashboard                    DONE (M8.1–M8.11)
 M9 — Polymarket                   DONE (M9.1–M9.66)
-M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.80)
+M10 — Agentic Wallet / Real Trading IN PROGRESS (M10.1–M10.81)
 ```
 
 ---
@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.66. M10.80 makes the cycle and serializable store share one canonical provider status-transition policy for every different-identity pending result, while UUID and local recording-time rules remain explicit. Exact known-identity replay remains fully immutable under M10.76. The complete reconciliation path remains unwired and unscheduled; every attempt reloads durable context, financial reconciliation remains incomplete, and submission retry remains forbidden. The current Agentic Wallet quote remains blocked by partial fee and gas coverage; the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, mutating command runner, or real executor has been added. Real trading remains disabled.
+M9 is closed through M9.66. M10.81 adds a pure fail-closed gate for separately obtained actual-receipt and complete-cost evidence after provider `FINISHED`; ready output remains unpersisted and financially incomplete. The official status row does not provide this complete evidence. The reconciliation path remains unwired and unscheduled; no evidence adapter or accounting store exists, submission retry remains forbidden, the current quote remains blocked by partial fee and gas coverage, the wallet remains at zero balance, and no live quote, funding, provider-setting mutation, mutating command runner, or real executor has been added. Real trading remains disabled.
 ```
