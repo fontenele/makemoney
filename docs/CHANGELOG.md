@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-15 — Project an inert accounting mutation plan
+
+- Added a pure fail-closed projection from one structurally valid stored M10.87 accounting balance-evidence envelope.
+- Preserved durable evidence, completion, gate, and transaction identities plus deterministic exact before/after/delta asset transitions and defensive timestamps.
+- Blocked invalid stored UUIDs, recording chronology, coverage, duplicate assets, decimal structure, and balance arithmetic.
+- Kept accounting mutation explicitly unauthorized and incomplete and kept submission retry forbidden.
+- Added no schema, repository, route, runtime registration, provider call, wallet-ledger/PnL mutation, funding, retry, executor, or real order.
+- Verified all 2,228 backend tests across 191 suites, including the focused 14-test mutation-plan suite, all 95 PostgreSQL E2E tests across 9 suites with all 29 migrations, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, and live backend health.
+
 ## 2026-10-15 — Read durable accounting balance evidence by gate
 
 - Added a read-only accounting balance-evidence contract with fail-closed canonical gate UUID validation.

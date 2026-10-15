@@ -1,5 +1,11 @@
 # Current State
 
+M10.88 is complete: a pure fail-closed projection accepts only a structurally valid stored M10.87 accounting balance-evidence envelope and converts it into an inert plan containing the durable accounting/financial/gate/transaction identities, deterministic exact before/after/delta transitions, and defensive evidence timestamps.
+
+Invalid stored identity, chronology, coverage, balance uniqueness, decimal structure, or arithmetic blocks the plan without claiming completed reconciliation or required accounting. A valid plan explicitly keeps `accountingMutationAuthorized: false`, `accountingMutationComplete: false`, and `submissionRetryAllowed: false`. It has no repository, schema, route, provider call, ledger or PnL mutation, runtime registration, funding, executor, or real-order effect.
+
+Post-M10.88 validation passed all 2,228 backend tests across 191 suites, including all 14 focused mutation-plan tests, all 95 PostgreSQL E2E tests across 9 suites with all 29 migrations applied from scratch, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, and the live backend health check with API, PostgreSQL, and Redis up.
+
 M10.87 is complete: a read-only Prisma store validates one canonical gate UUID before database access, returns `null` for absent accounting evidence, and loads a present M10.86 row together with its required M10.82 financial relation. Both rows pass through their shared stored validators before M10.83 and M10.85 are reapplied.
 
 Cross-gate, cross-financial-evidence, malformed, or financially inconsistent rows fail closed. Valid output defensively copies dates and returns balance changes in deterministic asset order. PostgreSQL E2E reloads the immutable row while the existing completion remains `accountingMutationRequired: true` and `accountingMutationComplete: false`. The reader remains unregistered, with no acquisition adapter, route, runtime provider call, wallet mutation, valuation, PnL, funding, retry, executor, or real order.

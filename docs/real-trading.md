@@ -1596,3 +1596,22 @@ Successful output uses the defensive M10.85 balance snapshot and copies the dura
 - Returned balance changes and dates are defensive copies in deterministic asset order.
 - PostgreSQL E2E proves a persisted M10.86 row can be reloaded unchanged while accounting remains incomplete.
 - The reader remains unregistered and adds no schema, acquisition, route, provider call, wallet-ledger mutation, valuation, PnL, funding, retry, executor, or real order.
+
+## M10.88 — Inert accounting mutation plan
+
+M10.88 separates an exact description of future accounting work from authority to perform that work. The pure projection consumes one stored M10.87 accounting balance-evidence envelope and first reapplies its shared structural validator, including durable identities, complete coverage, unique assets, finite chronology, canonical decimals, and exact before/after/delta arithmetic.
+
+A successful plan carries the accounting-evidence, financial-completion, gate, and transaction identities together with the complete balance transitions in deterministic asset order. Every transition and timestamp is defensively copied. No new financial value is calculated and the observed deltas are not converted into PnL or valuation assumptions.
+
+The plan is deliberately inert. Both it and its assessment explicitly state `accountingMutationAuthorized: false`, `accountingMutationComplete: false`, and `submissionRetryAllowed: false`. It has no callback, repository, ledger model, database transaction, route, provider command, or runtime registration through which a balance could change.
+
+### M10.88 acceptance criteria
+
+- Only a structurally valid stored M10.87 accounting balance-evidence envelope can produce a plan.
+- Invalid durable identity, chronology, coverage, asset uniqueness, decimal structure, or balance arithmetic fails closed.
+- The plan preserves the exact evidence, completion, gate, and transaction identities.
+- Exact before, after, and delta quantities are defensively copied and deterministically ordered by asset identity.
+- A blocked result does not claim completed financial reconciliation or required accounting mutation.
+- A valid result keeps accounting mutation required but explicitly unauthorized and incomplete.
+- Submission retry remains forbidden.
+- No schema, persistence access, route, runtime registration, provider call, wallet-ledger/PnL mutation, valuation, funding, executor, or real order is added.

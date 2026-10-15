@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-15 — Separate an exact accounting plan from mutation authority
+
+Durable, revalidated balance evidence is sufficient to describe the exact asset transitions a future accounting operation would need, but its existence is not authorization to write a ledger. Passing a stored envelope directly to a future mutator would conflate evidence, planning, and financial side effects.
+
+M10.88 therefore introduces a pure defensive projection that validates the stored M10.87 envelope and carries only immutable correlation identities, deterministic exact before/after/delta transitions, and evidence times. Both assessment and plan permanently state `accountingMutationAuthorized: false`, `accountingMutationComplete: false`, and `submissionRetryAllowed: false`. A future mutation policy, ledger schema, atomic writer, valuation, and PnL treatment remain separately reviewable increments.
+
 ## 2026-10-15 — Revalidate both sides of the accounting-evidence relation on read
 
 An accounting row can be structurally valid while still contradicting the financial evidence it claims to support. A read boundary that maps only the balance JSON would allow cross-gate, cross-evidence, transaction, receipt, or fee corruption to escape as trusted accounting input.
