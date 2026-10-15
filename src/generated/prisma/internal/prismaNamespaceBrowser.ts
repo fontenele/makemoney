@@ -66,6 +66,7 @@ export const ModelName = {
   RealExecutionStatusObservation: 'RealExecutionStatusObservation',
   RealExecutionFinancialReconciliationEvidence: 'RealExecutionFinancialReconciliationEvidence',
   RealExecutionAccountingBalanceEvidence: 'RealExecutionAccountingBalanceEvidence',
+  RealExecutionAccountingMutationCommitment: 'RealExecutionAccountingMutationCommitment',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -362,6 +363,24 @@ export const RealExecutionAccountingBalanceEvidenceScalarFieldEnum = {
 } as const
 
 export type RealExecutionAccountingBalanceEvidenceScalarFieldEnum = (typeof RealExecutionAccountingBalanceEvidenceScalarFieldEnum)[keyof typeof RealExecutionAccountingBalanceEvidenceScalarFieldEnum]
+
+
+export const RealExecutionAccountingMutationCommitmentScalarFieldEnum = {
+  id: 'id',
+  accountingBalanceEvidenceId: 'accountingBalanceEvidenceId',
+  financialReconciliationEvidenceId: 'financialReconciliationEvidenceId',
+  gateId: 'gateId',
+  transactionHash: 'transactionHash',
+  planFingerprint: 'planFingerprint',
+  balanceTransitions: 'balanceTransitions',
+  evidenceObservedAt: 'evidenceObservedAt',
+  evidenceRecordedAt: 'evidenceRecordedAt',
+  preparedAt: 'preparedAt',
+  requestFingerprint: 'requestFingerprint',
+  recordedAt: 'recordedAt'
+} as const
+
+export type RealExecutionAccountingMutationCommitmentScalarFieldEnum = (typeof RealExecutionAccountingMutationCommitmentScalarFieldEnum)[keyof typeof RealExecutionAccountingMutationCommitmentScalarFieldEnum]
 
 
 export const ObservedSpotSymbolScalarFieldEnum = {

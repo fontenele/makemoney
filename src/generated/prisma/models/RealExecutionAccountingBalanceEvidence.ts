@@ -203,6 +203,7 @@ export type RealExecutionAccountingBalanceEvidenceWhereInput = {
   observedAt?: Prisma.DateTimeFilter<"RealExecutionAccountingBalanceEvidence"> | Date | string
   recordedAt?: Prisma.DateTimeFilter<"RealExecutionAccountingBalanceEvidence"> | Date | string
   financialReconciliationEvidence?: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceScalarRelationFilter, Prisma.RealExecutionFinancialReconciliationEvidenceWhereInput>
+  accountingMutationCommitment?: Prisma.XOR<Prisma.RealExecutionAccountingMutationCommitmentNullableScalarRelationFilter, Prisma.RealExecutionAccountingMutationCommitmentWhereInput> | null
 }
 
 export type RealExecutionAccountingBalanceEvidenceOrderByWithRelationInput = {
@@ -215,6 +216,7 @@ export type RealExecutionAccountingBalanceEvidenceOrderByWithRelationInput = {
   observedAt?: Prisma.SortOrder
   recordedAt?: Prisma.SortOrder
   financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceOrderByWithRelationInput
+  accountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentOrderByWithRelationInput
 }
 
 export type RealExecutionAccountingBalanceEvidenceWhereUniqueInput = Prisma.AtLeast<{
@@ -230,6 +232,7 @@ export type RealExecutionAccountingBalanceEvidenceWhereUniqueInput = Prisma.AtLe
   observedAt?: Prisma.DateTimeFilter<"RealExecutionAccountingBalanceEvidence"> | Date | string
   recordedAt?: Prisma.DateTimeFilter<"RealExecutionAccountingBalanceEvidence"> | Date | string
   financialReconciliationEvidence?: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceScalarRelationFilter, Prisma.RealExecutionFinancialReconciliationEvidenceWhereInput>
+  accountingMutationCommitment?: Prisma.XOR<Prisma.RealExecutionAccountingMutationCommitmentNullableScalarRelationFilter, Prisma.RealExecutionAccountingMutationCommitmentWhereInput> | null
 }, "id" | "financialReconciliationEvidenceId" | "gateId" | "transactionHash">
 
 export type RealExecutionAccountingBalanceEvidenceOrderByWithAggregationInput = {
@@ -269,6 +272,7 @@ export type RealExecutionAccountingBalanceEvidenceCreateInput = {
   observedAt: Date | string
   recordedAt?: Date | string
   financialReconciliationEvidence: Prisma.RealExecutionFinancialReconciliationEvidenceCreateNestedOneWithoutAccountingBalanceEvidenceInput
+  accountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentCreateNestedOneWithoutAccountingBalanceEvidenceInput
 }
 
 export type RealExecutionAccountingBalanceEvidenceUncheckedCreateInput = {
@@ -280,6 +284,7 @@ export type RealExecutionAccountingBalanceEvidenceUncheckedCreateInput = {
   requestFingerprint: string
   observedAt: Date | string
   recordedAt?: Date | string
+  accountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentUncheckedCreateNestedOneWithoutAccountingBalanceEvidenceInput
 }
 
 export type RealExecutionAccountingBalanceEvidenceUpdateInput = {
@@ -291,6 +296,7 @@ export type RealExecutionAccountingBalanceEvidenceUpdateInput = {
   observedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUpdateOneRequiredWithoutAccountingBalanceEvidenceNestedInput
+  accountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentUpdateOneWithoutAccountingBalanceEvidenceNestedInput
 }
 
 export type RealExecutionAccountingBalanceEvidenceUncheckedUpdateInput = {
@@ -302,6 +308,7 @@ export type RealExecutionAccountingBalanceEvidenceUncheckedUpdateInput = {
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   observedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentUncheckedUpdateOneWithoutAccountingBalanceEvidenceNestedInput
 }
 
 export type RealExecutionAccountingBalanceEvidenceCreateManyInput = {
@@ -372,6 +379,11 @@ export type RealExecutionAccountingBalanceEvidenceMinOrderByAggregateInput = {
   recordedAt?: Prisma.SortOrder
 }
 
+export type RealExecutionAccountingBalanceEvidenceScalarRelationFilter = {
+  is?: Prisma.RealExecutionAccountingBalanceEvidenceWhereInput
+  isNot?: Prisma.RealExecutionAccountingBalanceEvidenceWhereInput
+}
+
 export type RealExecutionAccountingBalanceEvidenceCreateNestedOneWithoutFinancialReconciliationEvidenceInput = {
   create?: Prisma.XOR<Prisma.RealExecutionAccountingBalanceEvidenceCreateWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionAccountingBalanceEvidenceUncheckedCreateWithoutFinancialReconciliationEvidenceInput>
   connectOrCreate?: Prisma.RealExecutionAccountingBalanceEvidenceCreateOrConnectWithoutFinancialReconciliationEvidenceInput
@@ -404,6 +416,20 @@ export type RealExecutionAccountingBalanceEvidenceUncheckedUpdateOneWithoutFinan
   update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionAccountingBalanceEvidenceUpdateToOneWithWhereWithoutFinancialReconciliationEvidenceInput, Prisma.RealExecutionAccountingBalanceEvidenceUpdateWithoutFinancialReconciliationEvidenceInput>, Prisma.RealExecutionAccountingBalanceEvidenceUncheckedUpdateWithoutFinancialReconciliationEvidenceInput>
 }
 
+export type RealExecutionAccountingBalanceEvidenceCreateNestedOneWithoutAccountingMutationCommitmentInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionAccountingBalanceEvidenceCreateWithoutAccountingMutationCommitmentInput, Prisma.RealExecutionAccountingBalanceEvidenceUncheckedCreateWithoutAccountingMutationCommitmentInput>
+  connectOrCreate?: Prisma.RealExecutionAccountingBalanceEvidenceCreateOrConnectWithoutAccountingMutationCommitmentInput
+  connect?: Prisma.RealExecutionAccountingBalanceEvidenceWhereUniqueInput
+}
+
+export type RealExecutionAccountingBalanceEvidenceUpdateOneRequiredWithoutAccountingMutationCommitmentNestedInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionAccountingBalanceEvidenceCreateWithoutAccountingMutationCommitmentInput, Prisma.RealExecutionAccountingBalanceEvidenceUncheckedCreateWithoutAccountingMutationCommitmentInput>
+  connectOrCreate?: Prisma.RealExecutionAccountingBalanceEvidenceCreateOrConnectWithoutAccountingMutationCommitmentInput
+  upsert?: Prisma.RealExecutionAccountingBalanceEvidenceUpsertWithoutAccountingMutationCommitmentInput
+  connect?: Prisma.RealExecutionAccountingBalanceEvidenceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionAccountingBalanceEvidenceUpdateToOneWithWhereWithoutAccountingMutationCommitmentInput, Prisma.RealExecutionAccountingBalanceEvidenceUpdateWithoutAccountingMutationCommitmentInput>, Prisma.RealExecutionAccountingBalanceEvidenceUncheckedUpdateWithoutAccountingMutationCommitmentInput>
+}
+
 export type RealExecutionAccountingBalanceEvidenceCreateWithoutFinancialReconciliationEvidenceInput = {
   id: string
   gateId: string
@@ -412,6 +438,7 @@ export type RealExecutionAccountingBalanceEvidenceCreateWithoutFinancialReconcil
   requestFingerprint: string
   observedAt: Date | string
   recordedAt?: Date | string
+  accountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentCreateNestedOneWithoutAccountingBalanceEvidenceInput
 }
 
 export type RealExecutionAccountingBalanceEvidenceUncheckedCreateWithoutFinancialReconciliationEvidenceInput = {
@@ -422,6 +449,7 @@ export type RealExecutionAccountingBalanceEvidenceUncheckedCreateWithoutFinancia
   requestFingerprint: string
   observedAt: Date | string
   recordedAt?: Date | string
+  accountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentUncheckedCreateNestedOneWithoutAccountingBalanceEvidenceInput
 }
 
 export type RealExecutionAccountingBalanceEvidenceCreateOrConnectWithoutFinancialReconciliationEvidenceInput = {
@@ -448,10 +476,72 @@ export type RealExecutionAccountingBalanceEvidenceUpdateWithoutFinancialReconcil
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   observedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentUpdateOneWithoutAccountingBalanceEvidenceNestedInput
 }
 
 export type RealExecutionAccountingBalanceEvidenceUncheckedUpdateWithoutFinancialReconciliationEvidenceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  transactionHash?: Prisma.StringFieldUpdateOperationsInput | string
+  balanceChanges?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  observedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentUncheckedUpdateOneWithoutAccountingBalanceEvidenceNestedInput
+}
+
+export type RealExecutionAccountingBalanceEvidenceCreateWithoutAccountingMutationCommitmentInput = {
+  id: string
+  gateId: string
+  transactionHash: string
+  balanceChanges: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  requestFingerprint: string
+  observedAt: Date | string
+  recordedAt?: Date | string
+  financialReconciliationEvidence: Prisma.RealExecutionFinancialReconciliationEvidenceCreateNestedOneWithoutAccountingBalanceEvidenceInput
+}
+
+export type RealExecutionAccountingBalanceEvidenceUncheckedCreateWithoutAccountingMutationCommitmentInput = {
+  id: string
+  financialReconciliationEvidenceId: string
+  gateId: string
+  transactionHash: string
+  balanceChanges: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  requestFingerprint: string
+  observedAt: Date | string
+  recordedAt?: Date | string
+}
+
+export type RealExecutionAccountingBalanceEvidenceCreateOrConnectWithoutAccountingMutationCommitmentInput = {
+  where: Prisma.RealExecutionAccountingBalanceEvidenceWhereUniqueInput
+  create: Prisma.XOR<Prisma.RealExecutionAccountingBalanceEvidenceCreateWithoutAccountingMutationCommitmentInput, Prisma.RealExecutionAccountingBalanceEvidenceUncheckedCreateWithoutAccountingMutationCommitmentInput>
+}
+
+export type RealExecutionAccountingBalanceEvidenceUpsertWithoutAccountingMutationCommitmentInput = {
+  update: Prisma.XOR<Prisma.RealExecutionAccountingBalanceEvidenceUpdateWithoutAccountingMutationCommitmentInput, Prisma.RealExecutionAccountingBalanceEvidenceUncheckedUpdateWithoutAccountingMutationCommitmentInput>
+  create: Prisma.XOR<Prisma.RealExecutionAccountingBalanceEvidenceCreateWithoutAccountingMutationCommitmentInput, Prisma.RealExecutionAccountingBalanceEvidenceUncheckedCreateWithoutAccountingMutationCommitmentInput>
+  where?: Prisma.RealExecutionAccountingBalanceEvidenceWhereInput
+}
+
+export type RealExecutionAccountingBalanceEvidenceUpdateToOneWithWhereWithoutAccountingMutationCommitmentInput = {
+  where?: Prisma.RealExecutionAccountingBalanceEvidenceWhereInput
+  data: Prisma.XOR<Prisma.RealExecutionAccountingBalanceEvidenceUpdateWithoutAccountingMutationCommitmentInput, Prisma.RealExecutionAccountingBalanceEvidenceUncheckedUpdateWithoutAccountingMutationCommitmentInput>
+}
+
+export type RealExecutionAccountingBalanceEvidenceUpdateWithoutAccountingMutationCommitmentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  transactionHash?: Prisma.StringFieldUpdateOperationsInput | string
+  balanceChanges?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  observedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  financialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceUpdateOneRequiredWithoutAccountingBalanceEvidenceNestedInput
+}
+
+export type RealExecutionAccountingBalanceEvidenceUncheckedUpdateWithoutAccountingMutationCommitmentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  financialReconciliationEvidenceId?: Prisma.StringFieldUpdateOperationsInput | string
   gateId?: Prisma.StringFieldUpdateOperationsInput | string
   transactionHash?: Prisma.StringFieldUpdateOperationsInput | string
   balanceChanges?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -472,6 +562,7 @@ export type RealExecutionAccountingBalanceEvidenceSelect<ExtArgs extends runtime
   observedAt?: boolean
   recordedAt?: boolean
   financialReconciliationEvidence?: boolean | Prisma.RealExecutionFinancialReconciliationEvidenceDefaultArgs<ExtArgs>
+  accountingMutationCommitment?: boolean | Prisma.RealExecutionAccountingBalanceEvidence$accountingMutationCommitmentArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionAccountingBalanceEvidence"]>
 
 export type RealExecutionAccountingBalanceEvidenceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -512,6 +603,7 @@ export type RealExecutionAccountingBalanceEvidenceSelectScalar = {
 export type RealExecutionAccountingBalanceEvidenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "financialReconciliationEvidenceId" | "gateId" | "transactionHash" | "balanceChanges" | "requestFingerprint" | "observedAt" | "recordedAt", ExtArgs["result"]["realExecutionAccountingBalanceEvidence"]>
 export type RealExecutionAccountingBalanceEvidenceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   financialReconciliationEvidence?: boolean | Prisma.RealExecutionFinancialReconciliationEvidenceDefaultArgs<ExtArgs>
+  accountingMutationCommitment?: boolean | Prisma.RealExecutionAccountingBalanceEvidence$accountingMutationCommitmentArgs<ExtArgs>
 }
 export type RealExecutionAccountingBalanceEvidenceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   financialReconciliationEvidence?: boolean | Prisma.RealExecutionFinancialReconciliationEvidenceDefaultArgs<ExtArgs>
@@ -524,6 +616,7 @@ export type $RealExecutionAccountingBalanceEvidencePayload<ExtArgs extends runti
   name: "RealExecutionAccountingBalanceEvidence"
   objects: {
     financialReconciliationEvidence: Prisma.$RealExecutionFinancialReconciliationEvidencePayload<ExtArgs>
+    accountingMutationCommitment: Prisma.$RealExecutionAccountingMutationCommitmentPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -929,6 +1022,7 @@ readonly fields: RealExecutionAccountingBalanceEvidenceFieldRefs;
 export interface Prisma__RealExecutionAccountingBalanceEvidenceClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   financialReconciliationEvidence<T extends Prisma.RealExecutionFinancialReconciliationEvidenceDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionFinancialReconciliationEvidenceDefaultArgs<ExtArgs>>): Prisma.Prisma__RealExecutionFinancialReconciliationEvidenceClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionFinancialReconciliationEvidencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  accountingMutationCommitment<T extends Prisma.RealExecutionAccountingBalanceEvidence$accountingMutationCommitmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionAccountingBalanceEvidence$accountingMutationCommitmentArgs<ExtArgs>>): Prisma.Prisma__RealExecutionAccountingMutationCommitmentClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1364,6 +1458,25 @@ export type RealExecutionAccountingBalanceEvidenceDeleteManyArgs<ExtArgs extends
    * Limit how many RealExecutionAccountingBalanceEvidences to delete.
    */
   limit?: number
+}
+
+/**
+ * RealExecutionAccountingBalanceEvidence.accountingMutationCommitment
+ */
+export type RealExecutionAccountingBalanceEvidence$accountingMutationCommitmentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RealExecutionAccountingMutationCommitment
+   */
+  select?: Prisma.RealExecutionAccountingMutationCommitmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RealExecutionAccountingMutationCommitment
+   */
+  omit?: Prisma.RealExecutionAccountingMutationCommitmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionAccountingMutationCommitmentInclude<ExtArgs> | null
+  where?: Prisma.RealExecutionAccountingMutationCommitmentWhereInput
 }
 
 /**

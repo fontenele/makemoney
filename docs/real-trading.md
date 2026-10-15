@@ -1615,3 +1615,46 @@ The plan is deliberately inert. Both it and its assessment explicitly state `acc
 - A valid result keeps accounting mutation required but explicitly unauthorized and incomplete.
 - Submission retry remains forbidden.
 - No schema, persistence access, route, runtime registration, provider call, wallet-ledger/PnL mutation, valuation, funding, executor, or real order is added.
+
+## M10.89 — Canonical accounting mutation commitment
+
+M10.89 binds the complete inert M10.88 plan to a stable content identity before any future authorization or persistence decision. The pure boundary revalidates the plan scope, durable UUIDs, transaction hash, evidence chronology, exact balance arithmetic, and every safety flag. It also requires a caller-supplied canonical mutation UUID and a finite preparation time no earlier than durable balance-evidence recording.
+
+Accepted transitions are rebuilt from their known fields, defensively copied, and sorted by canonical asset identity before hashing. SHA-256 covers the exact plan identities, transitions, ISO evidence times, and safety flags. Equivalent transition array order and JavaScript property order therefore produce the same fingerprint, and the independent mutation UUID does not change it; a different exact financial fact does.
+
+The resulting commitment is not authorization. It explicitly retains `accountingMutationAuthorized: false`, `accountingMutationComplete: false`, and `submissionRetryAllowed: false`, has no persistence boundary or callable mutation, and cannot change a wallet or ledger.
+
+### M10.89 acceptance criteria
+
+- The complete M10.88 plan is structurally revalidated at the untrusted commitment boundary.
+- A canonical mutation UUID and finite preparation time at or after durable evidence recording are required.
+- Malformed dates fail closed without throwing.
+- Transition array and property ordering do not affect the canonical SHA-256 plan fingerprint.
+- Mutation identity is independent from plan content identity, while different exact plan facts change the fingerprint.
+- Returned plan facts, transitions, and timestamps are defensive copies.
+- Invalid plans do not claim completed financial reconciliation or required accounting mutation; a valid plan retains both facts when only commitment metadata is blocked.
+- Accounting mutation remains explicitly unauthorized and incomplete, and submission retry remains forbidden.
+- No schema, persistence access, route, runtime registration, provider call, wallet-ledger/PnL mutation, valuation, funding, executor, or real order is added.
+
+## M10.90 — Durable accounting mutation commitment
+
+M10.90 gives each inert M10.89 commitment one immutable PostgreSQL destination. Database uniqueness binds the mutation UUID, accounting-evidence UUID, financial-evidence UUID, gate UUID, transaction hash, and canonical plan fingerprint. Exact transitions, evidence observation/recording times, preparation time, local recording time, plan fingerprint, and a separate complete-request fingerprint remain durable.
+
+Recording runs in a serializable transaction under an advisory lock. Invalid commitments fail before persistence access. On first insertion, the store reloads the M10.86 accounting row together with its M10.82 financial relation, passes them through the shared M10.87 revalidation path, projects M10.88 again, and prepares M10.89 again with the requested mutation identity and preparation time. The regenerated plan fingerprint must equal the submitted commitment.
+
+The request fingerprint covers the complete commitment, including preparation metadata. An exact retry returns the original immutable row without loading evidence again; changed reuse of the same accounting evidence conflicts. Persisted rows pass through the shared commitment and stored-envelope validators, and local recording must be finite and no earlier than preparation.
+
+Durability is not mutation authority. The stored value continues to state `accountingMutationAuthorized: false`, `accountingMutationComplete: false`, and `submissionRetryAllowed: false`. The store is unregistered and performs no ledger update, valuation, PnL calculation, provider call, funding, or order execution.
+
+### M10.90 acceptance criteria
+
+- The schema stores one immutable commitment per accounting evidence, financial evidence, gate, transaction, and canonical plan fingerprint.
+- Malformed commitment input fails before persistence access.
+- First insertion reloads the related accounting and financial rows and reapplies M10.87, M10.88, and M10.89 inside a serializable transaction.
+- The regenerated durable plan fingerprint must equal the submitted commitment.
+- Local recording time is finite and at or after commitment preparation.
+- Exact full-commitment replay is idempotent without reloading evidence; divergent reuse conflicts.
+- Persisted rows are mapped through shared structural validators and malformed replay data fails closed.
+- PostgreSQL E2E applies all 30 migrations from scratch and proves immutable commitment insert plus exact replay.
+- Accounting mutation remains explicitly unauthorized and incomplete, and submission retry remains forbidden.
+- The store remains unregistered and adds no route, provider call, wallet-ledger/PnL mutation, valuation, funding, executor, or real order.

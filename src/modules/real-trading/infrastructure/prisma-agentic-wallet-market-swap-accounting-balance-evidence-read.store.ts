@@ -25,33 +25,49 @@ export class PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore imp
       });
     if (row === null) return null;
 
-    const stored =
-      mapPersistedAgenticWalletMarketSwapAccountingBalanceEvidence(row);
-    const storedFinancial =
-      mapPersistedAgenticWalletMarketSwapFinancialReconciliationEvidence(
-        row.financialReconciliationEvidence,
-      );
-    const completionAssessment =
-      assessAgenticWalletMarketSwapFinancialReconciliationCompletion(
-        storedFinancial,
-      );
-    if (completionAssessment.completion === null)
-      throw new Error('Persisted accounting balance evidence is inconsistent');
-    const balanceAssessment =
-      assessAgenticWalletMarketSwapAccountingBalanceEvidence(
-        completionAssessment.completion,
-        stored.evidence,
-      );
-    if (
-      balanceAssessment.evidence === null ||
-      balanceAssessment.evidence.gateId !== gateId
-    )
-      throw new Error('Persisted accounting balance evidence is inconsistent');
-
-    return {
-      id: stored.id,
-      evidence: balanceAssessment.evidence,
-      recordedAt: new Date(stored.recordedAt),
-    };
+    return revalidatePersistedAgenticWalletMarketSwapAccountingBalanceEvidence(
+      row,
+      gateId,
+    );
   }
+}
+
+export function revalidatePersistedAgenticWalletMarketSwapAccountingBalanceEvidence(
+  row: Parameters<
+    typeof mapPersistedAgenticWalletMarketSwapAccountingBalanceEvidence
+  >[0] & {
+    financialReconciliationEvidence: Parameters<
+      typeof mapPersistedAgenticWalletMarketSwapFinancialReconciliationEvidence
+    >[0];
+  },
+  gateId: string,
+) {
+  const stored =
+    mapPersistedAgenticWalletMarketSwapAccountingBalanceEvidence(row);
+  const storedFinancial =
+    mapPersistedAgenticWalletMarketSwapFinancialReconciliationEvidence(
+      row.financialReconciliationEvidence,
+    );
+  const completionAssessment =
+    assessAgenticWalletMarketSwapFinancialReconciliationCompletion(
+      storedFinancial,
+    );
+  if (completionAssessment.completion === null)
+    throw new Error('Persisted accounting balance evidence is inconsistent');
+  const balanceAssessment =
+    assessAgenticWalletMarketSwapAccountingBalanceEvidence(
+      completionAssessment.completion,
+      stored.evidence,
+    );
+  if (
+    balanceAssessment.evidence === null ||
+    balanceAssessment.evidence.gateId !== gateId
+  )
+    throw new Error('Persisted accounting balance evidence is inconsistent');
+
+  return {
+    id: stored.id,
+    evidence: balanceAssessment.evidence,
+    recordedAt: new Date(stored.recordedAt),
+  };
 }

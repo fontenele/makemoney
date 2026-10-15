@@ -265,26 +265,27 @@ model RealExecutionStatusObservation {
 }
 
 model RealExecutionFinancialReconciliationEvidence {
-  id                           String                                  @id @db.Uuid
-  gateId                       String                                  @unique @map("gate_id") @db.Uuid
-  statusObservationId          String                                  @unique @map("status_observation_id") @db.Uuid
-  providerId                   String                                  @map("provider_id") @db.VarChar(32)
-  providerOrderId              String                                  @unique @map("provider_order_id") @db.VarChar(256)
-  chainId                      String                                  @map("chain_id") @db.VarChar(32)
-  transactionHash              String                                  @unique @map("transaction_hash") @db.VarChar(66)
-  sourceTokenAddress           String                                  @map("source_token_address") @db.VarChar(256)
-  targetTokenAddress           String                                  @map("target_token_address") @db.VarChar(256)
-  submittedSourceQuantity      String                                  @map("submitted_source_quantity") @db.Text
-  actualTargetReceivedQuantity String                                  @map("actual_target_received_quantity") @db.Text
-  providerFeeComponents        Json                                    @map("provider_fee_components")
-  networkFeeAsset              String                                  @map("network_fee_asset") @db.VarChar(16)
-  networkFeeQuantity           String                                  @map("network_fee_quantity") @db.Text
-  requestFingerprint           String                                  @map("request_fingerprint") @db.Char(64)
-  observedAt                   DateTime                                @map("observed_at")
-  recordedAt                   DateTime                                @default(now()) @map("recorded_at")
-  gate                         RealExecutionSubmissionGate             @relation(fields: [gateId], references: [id], onDelete: Restrict)
-  statusObservation            RealExecutionStatusObservation          @relation(fields: [statusObservationId], references: [id], onDelete: Restrict)
+  id                           String                                     @id @db.Uuid
+  gateId                       String                                     @unique @map("gate_id") @db.Uuid
+  statusObservationId          String                                     @unique @map("status_observation_id") @db.Uuid
+  providerId                   String                                     @map("provider_id") @db.VarChar(32)
+  providerOrderId              String                                     @unique @map("provider_order_id") @db.VarChar(256)
+  chainId                      String                                     @map("chain_id") @db.VarChar(32)
+  transactionHash              String                                     @unique @map("transaction_hash") @db.VarChar(66)
+  sourceTokenAddress           String                                     @map("source_token_address") @db.VarChar(256)
+  targetTokenAddress           String                                     @map("target_token_address") @db.VarChar(256)
+  submittedSourceQuantity      String                                     @map("submitted_source_quantity") @db.Text
+  actualTargetReceivedQuantity String                                     @map("actual_target_received_quantity") @db.Text
+  providerFeeComponents        Json                                       @map("provider_fee_components")
+  networkFeeAsset              String                                     @map("network_fee_asset") @db.VarChar(16)
+  networkFeeQuantity           String                                     @map("network_fee_quantity") @db.Text
+  requestFingerprint           String                                     @map("request_fingerprint") @db.Char(64)
+  observedAt                   DateTime                                   @map("observed_at")
+  recordedAt                   DateTime                                   @default(now()) @map("recorded_at")
+  gate                         RealExecutionSubmissionGate                @relation(fields: [gateId], references: [id], onDelete: Restrict)
+  statusObservation            RealExecutionStatusObservation             @relation(fields: [statusObservationId], references: [id], onDelete: Restrict)
   accountingBalanceEvidence    RealExecutionAccountingBalanceEvidence?
+  accountingMutationCommitment RealExecutionAccountingMutationCommitment?
 
   @@index([providerId, recordedAt])
   @@map("real_execution_financial_reconciliation_evidence")
@@ -300,9 +301,30 @@ model RealExecutionAccountingBalanceEvidence {
   observedAt                        DateTime                                     @map("observed_at")
   recordedAt                        DateTime                                     @default(now()) @map("recorded_at")
   financialReconciliationEvidence   RealExecutionFinancialReconciliationEvidence @relation(fields: [financialReconciliationEvidenceId], references: [id], onDelete: Restrict)
+  accountingMutationCommitment      RealExecutionAccountingMutationCommitment?
 
   @@index([recordedAt])
   @@map("real_execution_accounting_balance_evidence")
+}
+
+model RealExecutionAccountingMutationCommitment {
+  id                                String                                       @id @db.Uuid
+  accountingBalanceEvidenceId       String                                       @unique @map("accounting_balance_evidence_id") @db.Uuid
+  financialReconciliationEvidenceId String                                       @unique @map("financial_reconciliation_evidence_id") @db.Uuid
+  gateId                            String                                       @unique @map("gate_id") @db.Uuid
+  transactionHash                   String                                       @unique @map("transaction_hash") @db.VarChar(66)
+  planFingerprint                   String                                       @unique @map("plan_fingerprint") @db.Char(64)
+  balanceTransitions                Json                                         @map("balance_transitions")
+  evidenceObservedAt                DateTime                                     @map("evidence_observed_at")
+  evidenceRecordedAt                DateTime                                     @map("evidence_recorded_at")
+  preparedAt                        DateTime                                     @map("prepared_at")
+  requestFingerprint                String                                       @map("request_fingerprint") @db.Char(64)
+  recordedAt                        DateTime                                     @default(now()) @map("recorded_at")
+  accountingBalanceEvidence         RealExecutionAccountingBalanceEvidence       @relation(fields: [accountingBalanceEvidenceId], references: [id], onDelete: Restrict)
+  financialReconciliationEvidence   RealExecutionFinancialReconciliationEvidence @relation(fields: [financialReconciliationEvidenceId], references: [id], onDelete: Restrict)
+
+  @@index([recordedAt])
+  @@map("real_execution_accounting_mutation_commitments")
 }
 
 model ObservedSpotSymbol {

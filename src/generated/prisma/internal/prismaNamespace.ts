@@ -412,6 +412,7 @@ export const ModelName = {
   RealExecutionStatusObservation: 'RealExecutionStatusObservation',
   RealExecutionFinancialReconciliationEvidence: 'RealExecutionFinancialReconciliationEvidence',
   RealExecutionAccountingBalanceEvidence: 'RealExecutionAccountingBalanceEvidence',
+  RealExecutionAccountingMutationCommitment: 'RealExecutionAccountingMutationCommitment',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -430,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1544,6 +1545,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RealExecutionAccountingMutationCommitment: {
+      payload: Prisma.$RealExecutionAccountingMutationCommitmentPayload<ExtArgs>
+      fields: Prisma.RealExecutionAccountingMutationCommitmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload>
+        }
+        update: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionAccountingMutationCommitment>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionAccountingMutationCommitmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionAccountingMutationCommitmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionAccountingMutationCommitmentCountAggregateOutputType> | number
+        }
+      }
+    }
     ObservedSpotSymbol: {
       payload: Prisma.$ObservedSpotSymbolPayload<ExtArgs>
       fields: Prisma.ObservedSpotSymbolFieldRefs
@@ -2082,6 +2157,24 @@ export const RealExecutionAccountingBalanceEvidenceScalarFieldEnum = {
 export type RealExecutionAccountingBalanceEvidenceScalarFieldEnum = (typeof RealExecutionAccountingBalanceEvidenceScalarFieldEnum)[keyof typeof RealExecutionAccountingBalanceEvidenceScalarFieldEnum]
 
 
+export const RealExecutionAccountingMutationCommitmentScalarFieldEnum = {
+  id: 'id',
+  accountingBalanceEvidenceId: 'accountingBalanceEvidenceId',
+  financialReconciliationEvidenceId: 'financialReconciliationEvidenceId',
+  gateId: 'gateId',
+  transactionHash: 'transactionHash',
+  planFingerprint: 'planFingerprint',
+  balanceTransitions: 'balanceTransitions',
+  evidenceObservedAt: 'evidenceObservedAt',
+  evidenceRecordedAt: 'evidenceRecordedAt',
+  preparedAt: 'preparedAt',
+  requestFingerprint: 'requestFingerprint',
+  recordedAt: 'recordedAt'
+} as const
+
+export type RealExecutionAccountingMutationCommitmentScalarFieldEnum = (typeof RealExecutionAccountingMutationCommitmentScalarFieldEnum)[keyof typeof RealExecutionAccountingMutationCommitmentScalarFieldEnum]
+
+
 export const ObservedSpotSymbolScalarFieldEnum = {
   provider: 'provider',
   symbol: 'symbol',
@@ -2452,6 +2545,7 @@ export type GlobalOmitConfig = {
   realExecutionStatusObservation?: Prisma.RealExecutionStatusObservationOmit
   realExecutionFinancialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceOmit
   realExecutionAccountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceOmit
+  realExecutionAccountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
   listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit
   listingCheckpointTopOfBook?: Prisma.ListingCheckpointTopOfBookOmit

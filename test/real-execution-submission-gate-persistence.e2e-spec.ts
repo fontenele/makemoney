@@ -15,6 +15,8 @@ import { AgenticWalletMarketSwapSubmissionReceipt } from '../src/modules/real-tr
 import { AgenticWalletMarketSwapStatusObservationBlockedError } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-observation.store';
 import { AgenticWalletMarketSwapFinancialReconciliationEvidence } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-financial-reconciliation-evidence';
 import { AgenticWalletMarketSwapAccountingBalanceEvidence } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-accounting-balance-evidence';
+import { prepareAgenticWalletMarketSwapAccountingMutationCommitment } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-accounting-mutation-commitment';
+import { assessAgenticWalletMarketSwapAccountingMutationPlan } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-accounting-mutation-plan';
 import { decideAgenticWalletMarketSwapStatusLookup } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-lookup-decision';
 import { AgenticWalletMarketSwapStatusObservation } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-response';
 import { AgenticWalletMarketSwapStatusReconciliationAttempt } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-reconciliation-attempt';
@@ -28,6 +30,7 @@ import { PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore } fro
 import { PrismaAgenticWalletMarketSwapFinancialReconciliationCompletionStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-financial-reconciliation-completion.store';
 import { PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-balance-evidence.store';
 import { PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-balance-evidence-read.store';
+import { PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-commitment.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -44,6 +47,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let financialCompletionStore: PrismaAgenticWalletMarketSwapFinancialReconciliationCompletionStore;
   let accountingBalanceEvidenceStore: PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceStore;
   let accountingBalanceEvidenceReadStore: PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore;
+  let accountingMutationCommitmentStore: PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -84,6 +88,11 @@ describe('Real execution submission gate persistence (e2e)', () => {
     accountingBalanceEvidenceReadStore =
       new PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore(
         prisma,
+      );
+    accountingMutationCommitmentStore =
+      new PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore(
+        prisma,
+        () => new Date('2026-10-03T12:00:12.000Z'),
       );
   });
 
@@ -597,7 +606,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
     );
   });
 
-  it('persists complete financial and accounting evidence without mutating accounting', async () => {
+  it('persists complete financial evidence, accounting evidence, and an inert mutation commitment', async () => {
     await store.create(command(10));
     await receiptStore.record(submissionReceipt(10));
     const terminal = await statusStore.record(
@@ -662,6 +671,42 @@ describe('Real execution submission gate persistence (e2e)', () => {
     await expect(
       accountingBalanceEvidenceReadStore.getByGateId(uuid(10)),
     ).resolves.toEqual(firstAccounting.stored);
+    const planAssessment = assessAgenticWalletMarketSwapAccountingMutationPlan(
+      firstAccounting.stored,
+    );
+    if (planAssessment.plan === null)
+      throw new Error('Accounting mutation plan was blocked');
+    const commitmentAssessment =
+      prepareAgenticWalletMarketSwapAccountingMutationCommitment(
+        planAssessment.plan,
+        uuid(25),
+        new Date('2026-10-03T12:00:11.000Z'),
+      );
+    if (commitmentAssessment.commitment === null)
+      throw new Error('Accounting mutation commitment was blocked');
+    const firstCommitment = await accountingMutationCommitmentStore.record(
+      commitmentAssessment.commitment,
+    );
+    const commitmentReplay = await accountingMutationCommitmentStore.record(
+      commitmentAssessment.commitment,
+    );
+    expect(firstCommitment).toMatchObject({
+      replayed: false,
+      stored: {
+        commitment: {
+          mutationId: uuid(25),
+          planFingerprint: commitmentAssessment.commitment.planFingerprint,
+          accountingMutationAuthorized: false,
+          accountingMutationComplete: false,
+          submissionRetryAllowed: false,
+        },
+        recordedAt: new Date('2026-10-03T12:00:12.000Z'),
+      },
+    });
+    expect(commitmentReplay).toEqual({
+      stored: firstCommitment.stored,
+      replayed: true,
+    });
     await expect(
       financialCompletionStore.getByGateId(uuid(10)),
     ).resolves.toMatchObject({
@@ -675,6 +720,9 @@ describe('Real execution submission gate persistence (e2e)', () => {
     ).resolves.toBe(1);
     await expect(
       prisma.realExecutionAccountingBalanceEvidence.count(),
+    ).resolves.toBe(1);
+    await expect(
+      prisma.realExecutionAccountingMutationCommitment.count(),
     ).resolves.toBe(1);
   });
 
@@ -701,6 +749,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   });
 
   async function cleanup(): Promise<void> {
+    await prisma.realExecutionAccountingMutationCommitment.deleteMany();
     await prisma.realExecutionAccountingBalanceEvidence.deleteMany();
     await prisma.realExecutionFinancialReconciliationEvidence.deleteMany();
     await prisma.realExecutionStatusObservation.deleteMany();

@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-10-15 — Persist immutable accounting mutation commitments
+
+- Added one immutable PostgreSQL commitment row per accounting evidence, financial evidence, gate, transaction hash, and canonical plan fingerprint.
+- Added a serializable Prisma store that rejects invalid commitment input before access and reloads the accounting row with its financial relation.
+- Reused the M10.87 durable read policy and reapplied M10.88/M10.89 before insertion.
+- Added a complete canonical request fingerprint, exact replay without evidence reload, divergent conflict rejection, malformed-row rejection, and recording chronology validation.
+- Extended generated Prisma support and PostgreSQL E2E coverage across all 30 migrations.
+- Kept accounting mutation unauthorized and incomplete and submission retry forbidden; added no route, runtime registration, provider call, wallet-ledger/PnL mutation, funding, retry, executor, or real order.
+- Verified all 2,260 backend tests across 193 suites, including 39 focused commitment/reader tests, all 95 PostgreSQL E2E tests across 9 suites, all 94 dashboard tests across 17 files, formatting, lint, Prisma validation, backend/dashboard builds, and live backend health.
+
+## 2026-10-15 — Commit inert accounting plans canonically
+
+- Added a pure fail-closed commitment boundary that revalidates every M10.88 plan fact and inert safety flag.
+- Required a canonical mutation UUID and a finite preparation time at or after durable balance-evidence recording.
+- Added deterministic SHA-256 plan fingerprints independent of mutation identity, transition array order, and transition property order.
+- Returned defensive plan, transition, and date snapshots and blocked malformed untrusted dates without throwing.
+- Kept accounting mutation explicitly unauthorized and incomplete and submission retry forbidden; added no schema, persistence, route, runtime registration, provider call, ledger/PnL mutation, funding, retry, executor, or real order.
+- Verified all 2,251 backend tests across 192 suites, including the focused 23-test commitment suite, all 95 PostgreSQL E2E tests across 9 suites with all 29 migrations, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, and live backend health.
+
 ## 2026-10-15 — Project an inert accounting mutation plan
 
 - Added a pure fail-closed projection from one structurally valid stored M10.87 accounting balance-evidence envelope.

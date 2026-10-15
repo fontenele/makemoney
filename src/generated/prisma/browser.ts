@@ -93,6 +93,11 @@ export type RealExecutionFinancialReconciliationEvidence = Prisma.RealExecutionF
  */
 export type RealExecutionAccountingBalanceEvidence = Prisma.RealExecutionAccountingBalanceEvidenceModel
 /**
+ * Model RealExecutionAccountingMutationCommitment
+ * 
+ */
+export type RealExecutionAccountingMutationCommitment = Prisma.RealExecutionAccountingMutationCommitmentModel
+/**
  * Model ObservedSpotSymbol
  * 
  */

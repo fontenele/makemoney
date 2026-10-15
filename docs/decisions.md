@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-10-15 — Revalidate durable evidence before committing an accounting plan
+
+A caller-supplied M10.89 commitment may be internally well formed yet refer to stale, absent, or different durable accounting evidence. Persisting it directly would let a valid hash commit financial transitions that the database relation does not support. Replay also needs to distinguish the same complete commitment from changed preparation metadata, not merely compare the plan hash.
+
+M10.90 therefore records under a serializable advisory lock only after loading the accounting row and its financial relation, applying the shared M10.87 revalidation path, and regenerating M10.88/M10.89 from those durable facts. A separate request fingerprint covers the complete commitment, while database uniqueness binds accounting evidence, financial evidence, gate, transaction, and plan fingerprint. Exact replay returns the immutable row; divergence conflicts. The record proves only commitment persistence and grants no accounting authorization or ledger/PnL effect.
+
+## 2026-10-15 — Bind exact accounting plans before any authorization or write
+
+An exact transition plan needs a stable identity and content commitment before a later authorization or persistence boundary can distinguish idempotent replay from changed financial facts. Hashing caller object serialization directly would make equivalent transition ordering or JavaScript property ordering produce different identities.
+
+M10.89 therefore revalidates the complete M10.88 plan, canonicalizes asset and property order, and calculates SHA-256 only over the exact plan facts and ISO timestamps. The separately supplied mutation UUID does not alter the plan fingerprint, while a coherent quantity change does. Preparation cannot predate durable evidence. The commitment remains an inert value with mutation unauthorized and incomplete; persistence, authorization policy, atomic ledger writing, valuation, and PnL stay separate future increments.
+
 ## 2026-10-15 — Separate an exact accounting plan from mutation authority
 
 Durable, revalidated balance evidence is sufficient to describe the exact asset transitions a future accounting operation would need, but its existence is not authorization to write a ledger. Passing a stored envelope directly to a future mutator would conflate evidence, planning, and financial side effects.
