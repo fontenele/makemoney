@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-15 — Reprove durable financial completion before storing balance evidence
+
+Accounting balance evidence depends on the immutable financial-reconciliation record, not on a caller-provided completion object that may be stale, malformed, or unrelated. Persistence also needs stable replay semantics because the same complete set of asset changes can arrive in a different array order.
+
+M10.86 therefore reloads the financial evidence by gate inside a serializable transaction, maps it through the existing durable validator, reapplies M10.83 and M10.85, and only then inserts one immutable row. The request fingerprint sorts changes by canonical asset identity, making reordered exact retries idempotent while divergent reuse conflicts. This durable evidence remains an input to a future accounting mutation; its existence does not mutate a ledger, calculate PnL, mark accounting complete, enable retry, or authorize execution.
+
 ## 2026-10-15 — Prove wallet deltas before permitting future accounting mutation
 
 Completed provider reconciliation establishes what the swap delivered, but it does not prove that a future local ledger mutation matches the wallet's observed asset changes. Treating the M10.84 snapshot alone as accounting authority could omit a source-denominated fee, double-count a target-denominated fee, or accept a network cost with no corresponding BNB debit.

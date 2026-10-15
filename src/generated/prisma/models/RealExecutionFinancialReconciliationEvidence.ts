@@ -276,6 +276,7 @@ export type RealExecutionFinancialReconciliationEvidenceWhereInput = {
   recordedAt?: Prisma.DateTimeFilter<"RealExecutionFinancialReconciliationEvidence"> | Date | string
   gate?: Prisma.XOR<Prisma.RealExecutionSubmissionGateScalarRelationFilter, Prisma.RealExecutionSubmissionGateWhereInput>
   statusObservation?: Prisma.XOR<Prisma.RealExecutionStatusObservationScalarRelationFilter, Prisma.RealExecutionStatusObservationWhereInput>
+  accountingBalanceEvidence?: Prisma.XOR<Prisma.RealExecutionAccountingBalanceEvidenceNullableScalarRelationFilter, Prisma.RealExecutionAccountingBalanceEvidenceWhereInput> | null
 }
 
 export type RealExecutionFinancialReconciliationEvidenceOrderByWithRelationInput = {
@@ -298,6 +299,7 @@ export type RealExecutionFinancialReconciliationEvidenceOrderByWithRelationInput
   recordedAt?: Prisma.SortOrder
   gate?: Prisma.RealExecutionSubmissionGateOrderByWithRelationInput
   statusObservation?: Prisma.RealExecutionStatusObservationOrderByWithRelationInput
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceOrderByWithRelationInput
 }
 
 export type RealExecutionFinancialReconciliationEvidenceWhereUniqueInput = Prisma.AtLeast<{
@@ -323,6 +325,7 @@ export type RealExecutionFinancialReconciliationEvidenceWhereUniqueInput = Prism
   recordedAt?: Prisma.DateTimeFilter<"RealExecutionFinancialReconciliationEvidence"> | Date | string
   gate?: Prisma.XOR<Prisma.RealExecutionSubmissionGateScalarRelationFilter, Prisma.RealExecutionSubmissionGateWhereInput>
   statusObservation?: Prisma.XOR<Prisma.RealExecutionStatusObservationScalarRelationFilter, Prisma.RealExecutionStatusObservationWhereInput>
+  accountingBalanceEvidence?: Prisma.XOR<Prisma.RealExecutionAccountingBalanceEvidenceNullableScalarRelationFilter, Prisma.RealExecutionAccountingBalanceEvidenceWhereInput> | null
 }, "id" | "gateId" | "statusObservationId" | "providerOrderId" | "transactionHash">
 
 export type RealExecutionFinancialReconciliationEvidenceOrderByWithAggregationInput = {
@@ -389,6 +392,7 @@ export type RealExecutionFinancialReconciliationEvidenceCreateInput = {
   recordedAt?: Date | string
   gate: Prisma.RealExecutionSubmissionGateCreateNestedOneWithoutFinancialReconciliationEvidenceInput
   statusObservation: Prisma.RealExecutionStatusObservationCreateNestedOneWithoutFinancialReconciliationEvidenceInput
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceCreateNestedOneWithoutFinancialReconciliationEvidenceInput
 }
 
 export type RealExecutionFinancialReconciliationEvidenceUncheckedCreateInput = {
@@ -409,6 +413,7 @@ export type RealExecutionFinancialReconciliationEvidenceUncheckedCreateInput = {
   requestFingerprint: string
   observedAt: Date | string
   recordedAt?: Date | string
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceUncheckedCreateNestedOneWithoutFinancialReconciliationEvidenceInput
 }
 
 export type RealExecutionFinancialReconciliationEvidenceUpdateInput = {
@@ -429,6 +434,7 @@ export type RealExecutionFinancialReconciliationEvidenceUpdateInput = {
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gate?: Prisma.RealExecutionSubmissionGateUpdateOneRequiredWithoutFinancialReconciliationEvidenceNestedInput
   statusObservation?: Prisma.RealExecutionStatusObservationUpdateOneRequiredWithoutFinancialReconciliationEvidenceNestedInput
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceUpdateOneWithoutFinancialReconciliationEvidenceNestedInput
 }
 
 export type RealExecutionFinancialReconciliationEvidenceUncheckedUpdateInput = {
@@ -449,6 +455,7 @@ export type RealExecutionFinancialReconciliationEvidenceUncheckedUpdateInput = {
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   observedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceUncheckedUpdateOneWithoutFinancialReconciliationEvidenceNestedInput
 }
 
 export type RealExecutionFinancialReconciliationEvidenceCreateManyInput = {
@@ -572,6 +579,11 @@ export type RealExecutionFinancialReconciliationEvidenceMinOrderByAggregateInput
   recordedAt?: Prisma.SortOrder
 }
 
+export type RealExecutionFinancialReconciliationEvidenceScalarRelationFilter = {
+  is?: Prisma.RealExecutionFinancialReconciliationEvidenceWhereInput
+  isNot?: Prisma.RealExecutionFinancialReconciliationEvidenceWhereInput
+}
+
 export type RealExecutionFinancialReconciliationEvidenceCreateNestedOneWithoutGateInput = {
   create?: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceCreateWithoutGateInput, Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedCreateWithoutGateInput>
   connectOrCreate?: Prisma.RealExecutionFinancialReconciliationEvidenceCreateOrConnectWithoutGateInput
@@ -636,6 +648,20 @@ export type RealExecutionFinancialReconciliationEvidenceUncheckedUpdateOneWithou
   update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceUpdateToOneWithWhereWithoutStatusObservationInput, Prisma.RealExecutionFinancialReconciliationEvidenceUpdateWithoutStatusObservationInput>, Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedUpdateWithoutStatusObservationInput>
 }
 
+export type RealExecutionFinancialReconciliationEvidenceCreateNestedOneWithoutAccountingBalanceEvidenceInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceCreateWithoutAccountingBalanceEvidenceInput, Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedCreateWithoutAccountingBalanceEvidenceInput>
+  connectOrCreate?: Prisma.RealExecutionFinancialReconciliationEvidenceCreateOrConnectWithoutAccountingBalanceEvidenceInput
+  connect?: Prisma.RealExecutionFinancialReconciliationEvidenceWhereUniqueInput
+}
+
+export type RealExecutionFinancialReconciliationEvidenceUpdateOneRequiredWithoutAccountingBalanceEvidenceNestedInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceCreateWithoutAccountingBalanceEvidenceInput, Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedCreateWithoutAccountingBalanceEvidenceInput>
+  connectOrCreate?: Prisma.RealExecutionFinancialReconciliationEvidenceCreateOrConnectWithoutAccountingBalanceEvidenceInput
+  upsert?: Prisma.RealExecutionFinancialReconciliationEvidenceUpsertWithoutAccountingBalanceEvidenceInput
+  connect?: Prisma.RealExecutionFinancialReconciliationEvidenceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceUpdateToOneWithWhereWithoutAccountingBalanceEvidenceInput, Prisma.RealExecutionFinancialReconciliationEvidenceUpdateWithoutAccountingBalanceEvidenceInput>, Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedUpdateWithoutAccountingBalanceEvidenceInput>
+}
+
 export type RealExecutionFinancialReconciliationEvidenceCreateWithoutGateInput = {
   id: string
   providerId: string
@@ -653,6 +679,7 @@ export type RealExecutionFinancialReconciliationEvidenceCreateWithoutGateInput =
   observedAt: Date | string
   recordedAt?: Date | string
   statusObservation: Prisma.RealExecutionStatusObservationCreateNestedOneWithoutFinancialReconciliationEvidenceInput
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceCreateNestedOneWithoutFinancialReconciliationEvidenceInput
 }
 
 export type RealExecutionFinancialReconciliationEvidenceUncheckedCreateWithoutGateInput = {
@@ -672,6 +699,7 @@ export type RealExecutionFinancialReconciliationEvidenceUncheckedCreateWithoutGa
   requestFingerprint: string
   observedAt: Date | string
   recordedAt?: Date | string
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceUncheckedCreateNestedOneWithoutFinancialReconciliationEvidenceInput
 }
 
 export type RealExecutionFinancialReconciliationEvidenceCreateOrConnectWithoutGateInput = {
@@ -707,6 +735,7 @@ export type RealExecutionFinancialReconciliationEvidenceUpdateWithoutGateInput =
   observedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   statusObservation?: Prisma.RealExecutionStatusObservationUpdateOneRequiredWithoutFinancialReconciliationEvidenceNestedInput
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceUpdateOneWithoutFinancialReconciliationEvidenceNestedInput
 }
 
 export type RealExecutionFinancialReconciliationEvidenceUncheckedUpdateWithoutGateInput = {
@@ -726,6 +755,7 @@ export type RealExecutionFinancialReconciliationEvidenceUncheckedUpdateWithoutGa
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   observedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceUncheckedUpdateOneWithoutFinancialReconciliationEvidenceNestedInput
 }
 
 export type RealExecutionFinancialReconciliationEvidenceCreateWithoutStatusObservationInput = {
@@ -745,6 +775,7 @@ export type RealExecutionFinancialReconciliationEvidenceCreateWithoutStatusObser
   observedAt: Date | string
   recordedAt?: Date | string
   gate: Prisma.RealExecutionSubmissionGateCreateNestedOneWithoutFinancialReconciliationEvidenceInput
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceCreateNestedOneWithoutFinancialReconciliationEvidenceInput
 }
 
 export type RealExecutionFinancialReconciliationEvidenceUncheckedCreateWithoutStatusObservationInput = {
@@ -764,6 +795,7 @@ export type RealExecutionFinancialReconciliationEvidenceUncheckedCreateWithoutSt
   requestFingerprint: string
   observedAt: Date | string
   recordedAt?: Date | string
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceUncheckedCreateNestedOneWithoutFinancialReconciliationEvidenceInput
 }
 
 export type RealExecutionFinancialReconciliationEvidenceCreateOrConnectWithoutStatusObservationInput = {
@@ -799,11 +831,109 @@ export type RealExecutionFinancialReconciliationEvidenceUpdateWithoutStatusObser
   observedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gate?: Prisma.RealExecutionSubmissionGateUpdateOneRequiredWithoutFinancialReconciliationEvidenceNestedInput
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceUpdateOneWithoutFinancialReconciliationEvidenceNestedInput
 }
 
 export type RealExecutionFinancialReconciliationEvidenceUncheckedUpdateWithoutStatusObservationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerOrderId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  transactionHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  targetTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedSourceQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  actualTargetReceivedQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  providerFeeComponents?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  networkFeeAsset?: Prisma.StringFieldUpdateOperationsInput | string
+  networkFeeQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  observedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceUncheckedUpdateOneWithoutFinancialReconciliationEvidenceNestedInput
+}
+
+export type RealExecutionFinancialReconciliationEvidenceCreateWithoutAccountingBalanceEvidenceInput = {
+  id: string
+  providerId: string
+  providerOrderId: string
+  chainId: string
+  transactionHash: string
+  sourceTokenAddress: string
+  targetTokenAddress: string
+  submittedSourceQuantity: string
+  actualTargetReceivedQuantity: string
+  providerFeeComponents: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  networkFeeAsset: string
+  networkFeeQuantity: string
+  requestFingerprint: string
+  observedAt: Date | string
+  recordedAt?: Date | string
+  gate: Prisma.RealExecutionSubmissionGateCreateNestedOneWithoutFinancialReconciliationEvidenceInput
+  statusObservation: Prisma.RealExecutionStatusObservationCreateNestedOneWithoutFinancialReconciliationEvidenceInput
+}
+
+export type RealExecutionFinancialReconciliationEvidenceUncheckedCreateWithoutAccountingBalanceEvidenceInput = {
+  id: string
+  gateId: string
+  statusObservationId: string
+  providerId: string
+  providerOrderId: string
+  chainId: string
+  transactionHash: string
+  sourceTokenAddress: string
+  targetTokenAddress: string
+  submittedSourceQuantity: string
+  actualTargetReceivedQuantity: string
+  providerFeeComponents: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  networkFeeAsset: string
+  networkFeeQuantity: string
+  requestFingerprint: string
+  observedAt: Date | string
+  recordedAt?: Date | string
+}
+
+export type RealExecutionFinancialReconciliationEvidenceCreateOrConnectWithoutAccountingBalanceEvidenceInput = {
+  where: Prisma.RealExecutionFinancialReconciliationEvidenceWhereUniqueInput
+  create: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceCreateWithoutAccountingBalanceEvidenceInput, Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedCreateWithoutAccountingBalanceEvidenceInput>
+}
+
+export type RealExecutionFinancialReconciliationEvidenceUpsertWithoutAccountingBalanceEvidenceInput = {
+  update: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceUpdateWithoutAccountingBalanceEvidenceInput, Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedUpdateWithoutAccountingBalanceEvidenceInput>
+  create: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceCreateWithoutAccountingBalanceEvidenceInput, Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedCreateWithoutAccountingBalanceEvidenceInput>
+  where?: Prisma.RealExecutionFinancialReconciliationEvidenceWhereInput
+}
+
+export type RealExecutionFinancialReconciliationEvidenceUpdateToOneWithWhereWithoutAccountingBalanceEvidenceInput = {
+  where?: Prisma.RealExecutionFinancialReconciliationEvidenceWhereInput
+  data: Prisma.XOR<Prisma.RealExecutionFinancialReconciliationEvidenceUpdateWithoutAccountingBalanceEvidenceInput, Prisma.RealExecutionFinancialReconciliationEvidenceUncheckedUpdateWithoutAccountingBalanceEvidenceInput>
+}
+
+export type RealExecutionFinancialReconciliationEvidenceUpdateWithoutAccountingBalanceEvidenceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerOrderId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  transactionHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  targetTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedSourceQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  actualTargetReceivedQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  providerFeeComponents?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  networkFeeAsset?: Prisma.StringFieldUpdateOperationsInput | string
+  networkFeeQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  observedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gate?: Prisma.RealExecutionSubmissionGateUpdateOneRequiredWithoutFinancialReconciliationEvidenceNestedInput
+  statusObservation?: Prisma.RealExecutionStatusObservationUpdateOneRequiredWithoutFinancialReconciliationEvidenceNestedInput
+}
+
+export type RealExecutionFinancialReconciliationEvidenceUncheckedUpdateWithoutAccountingBalanceEvidenceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  statusObservationId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.StringFieldUpdateOperationsInput | string
   chainId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -842,6 +972,7 @@ export type RealExecutionFinancialReconciliationEvidenceSelect<ExtArgs extends r
   recordedAt?: boolean
   gate?: boolean | Prisma.RealExecutionSubmissionGateDefaultArgs<ExtArgs>
   statusObservation?: boolean | Prisma.RealExecutionStatusObservationDefaultArgs<ExtArgs>
+  accountingBalanceEvidence?: boolean | Prisma.RealExecutionFinancialReconciliationEvidence$accountingBalanceEvidenceArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionFinancialReconciliationEvidence"]>
 
 export type RealExecutionFinancialReconciliationEvidenceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -912,6 +1043,7 @@ export type RealExecutionFinancialReconciliationEvidenceOmit<ExtArgs extends run
 export type RealExecutionFinancialReconciliationEvidenceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gate?: boolean | Prisma.RealExecutionSubmissionGateDefaultArgs<ExtArgs>
   statusObservation?: boolean | Prisma.RealExecutionStatusObservationDefaultArgs<ExtArgs>
+  accountingBalanceEvidence?: boolean | Prisma.RealExecutionFinancialReconciliationEvidence$accountingBalanceEvidenceArgs<ExtArgs>
 }
 export type RealExecutionFinancialReconciliationEvidenceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gate?: boolean | Prisma.RealExecutionSubmissionGateDefaultArgs<ExtArgs>
@@ -927,6 +1059,7 @@ export type $RealExecutionFinancialReconciliationEvidencePayload<ExtArgs extends
   objects: {
     gate: Prisma.$RealExecutionSubmissionGatePayload<ExtArgs>
     statusObservation: Prisma.$RealExecutionStatusObservationPayload<ExtArgs>
+    accountingBalanceEvidence: Prisma.$RealExecutionAccountingBalanceEvidencePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1342,6 +1475,7 @@ export interface Prisma__RealExecutionFinancialReconciliationEvidenceClient<T, N
   readonly [Symbol.toStringTag]: "PrismaPromise"
   gate<T extends Prisma.RealExecutionSubmissionGateDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionSubmissionGateDefaultArgs<ExtArgs>>): Prisma.Prisma__RealExecutionSubmissionGateClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionSubmissionGatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   statusObservation<T extends Prisma.RealExecutionStatusObservationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionStatusObservationDefaultArgs<ExtArgs>>): Prisma.Prisma__RealExecutionStatusObservationClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionStatusObservationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  accountingBalanceEvidence<T extends Prisma.RealExecutionFinancialReconciliationEvidence$accountingBalanceEvidenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionFinancialReconciliationEvidence$accountingBalanceEvidenceArgs<ExtArgs>>): Prisma.Prisma__RealExecutionAccountingBalanceEvidenceClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionAccountingBalanceEvidencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1786,6 +1920,25 @@ export type RealExecutionFinancialReconciliationEvidenceDeleteManyArgs<ExtArgs e
    * Limit how many RealExecutionFinancialReconciliationEvidences to delete.
    */
   limit?: number
+}
+
+/**
+ * RealExecutionFinancialReconciliationEvidence.accountingBalanceEvidence
+ */
+export type RealExecutionFinancialReconciliationEvidence$accountingBalanceEvidenceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RealExecutionAccountingBalanceEvidence
+   */
+  select?: Prisma.RealExecutionAccountingBalanceEvidenceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RealExecutionAccountingBalanceEvidence
+   */
+  omit?: Prisma.RealExecutionAccountingBalanceEvidenceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionAccountingBalanceEvidenceInclude<ExtArgs> | null
+  where?: Prisma.RealExecutionAccountingBalanceEvidenceWhereInput
 }
 
 /**

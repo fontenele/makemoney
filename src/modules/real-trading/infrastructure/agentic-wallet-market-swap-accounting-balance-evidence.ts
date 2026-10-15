@@ -70,7 +70,8 @@ export function assessAgenticWalletMarketSwapAccountingBalanceEvidence(
   const blockers: AgenticWalletMarketSwapAccountingBalanceEvidenceBlocker[] =
     [];
   const completionValid = isValidCompletion(completion);
-  const evidenceValid = isValidEvidence(evidence);
+  const evidenceValid =
+    isValidAgenticWalletMarketSwapAccountingBalanceEvidence(evidence);
   addIf(
     blockers,
     !completionValid,
@@ -205,7 +206,7 @@ function isValidProviderFees(fees: unknown): boolean {
   return true;
 }
 
-function isValidEvidence(
+export function isValidAgenticWalletMarketSwapAccountingBalanceEvidence(
   value: AgenticWalletMarketSwapAccountingBalanceEvidence,
 ): boolean {
   if (

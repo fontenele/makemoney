@@ -411,6 +411,7 @@ export const ModelName = {
   RealExecutionSubmissionReceipt: 'RealExecutionSubmissionReceipt',
   RealExecutionStatusObservation: 'RealExecutionStatusObservation',
   RealExecutionFinancialReconciliationEvidence: 'RealExecutionFinancialReconciliationEvidence',
+  RealExecutionAccountingBalanceEvidence: 'RealExecutionAccountingBalanceEvidence',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -429,7 +430,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1469,6 +1470,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RealExecutionAccountingBalanceEvidence: {
+      payload: Prisma.$RealExecutionAccountingBalanceEvidencePayload<ExtArgs>
+      fields: Prisma.RealExecutionAccountingBalanceEvidenceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalanceEvidencePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalanceEvidencePayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalanceEvidencePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalanceEvidencePayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalanceEvidencePayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalanceEvidencePayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalanceEvidencePayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalanceEvidencePayload>
+        }
+        update: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalanceEvidencePayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalanceEvidencePayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalanceEvidencePayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionAccountingBalanceEvidence>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionAccountingBalanceEvidenceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionAccountingBalanceEvidenceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionAccountingBalanceEvidenceCountAggregateOutputType> | number
+        }
+      }
+    }
     ObservedSpotSymbol: {
       payload: Prisma.$ObservedSpotSymbolPayload<ExtArgs>
       fields: Prisma.ObservedSpotSymbolFieldRefs
@@ -1993,6 +2068,20 @@ export const RealExecutionFinancialReconciliationEvidenceScalarFieldEnum = {
 export type RealExecutionFinancialReconciliationEvidenceScalarFieldEnum = (typeof RealExecutionFinancialReconciliationEvidenceScalarFieldEnum)[keyof typeof RealExecutionFinancialReconciliationEvidenceScalarFieldEnum]
 
 
+export const RealExecutionAccountingBalanceEvidenceScalarFieldEnum = {
+  id: 'id',
+  financialReconciliationEvidenceId: 'financialReconciliationEvidenceId',
+  gateId: 'gateId',
+  transactionHash: 'transactionHash',
+  balanceChanges: 'balanceChanges',
+  requestFingerprint: 'requestFingerprint',
+  observedAt: 'observedAt',
+  recordedAt: 'recordedAt'
+} as const
+
+export type RealExecutionAccountingBalanceEvidenceScalarFieldEnum = (typeof RealExecutionAccountingBalanceEvidenceScalarFieldEnum)[keyof typeof RealExecutionAccountingBalanceEvidenceScalarFieldEnum]
+
+
 export const ObservedSpotSymbolScalarFieldEnum = {
   provider: 'provider',
   symbol: 'symbol',
@@ -2362,6 +2451,7 @@ export type GlobalOmitConfig = {
   realExecutionSubmissionReceipt?: Prisma.RealExecutionSubmissionReceiptOmit
   realExecutionStatusObservation?: Prisma.RealExecutionStatusObservationOmit
   realExecutionFinancialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceOmit
+  realExecutionAccountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
   listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit
   listingCheckpointTopOfBook?: Prisma.ListingCheckpointTopOfBookOmit

@@ -14,6 +14,7 @@ import { AgenticWalletMarketSwapSubmissionReceiptConflictError } from '../src/mo
 import { AgenticWalletMarketSwapSubmissionReceipt } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-submission-response';
 import { AgenticWalletMarketSwapStatusObservationBlockedError } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-observation.store';
 import { AgenticWalletMarketSwapFinancialReconciliationEvidence } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-financial-reconciliation-evidence';
+import { AgenticWalletMarketSwapAccountingBalanceEvidence } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-accounting-balance-evidence';
 import { decideAgenticWalletMarketSwapStatusLookup } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-lookup-decision';
 import { AgenticWalletMarketSwapStatusObservation } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-response';
 import { AgenticWalletMarketSwapStatusReconciliationAttempt } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-reconciliation-attempt';
@@ -25,6 +26,7 @@ import { PrismaAgenticWalletMarketSwapStatusReconciliationContextStore } from '.
 import { PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-status-reconciliation-candidate.store';
 import { PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-financial-reconciliation-evidence.store';
 import { PrismaAgenticWalletMarketSwapFinancialReconciliationCompletionStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-financial-reconciliation-completion.store';
+import { PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-balance-evidence.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -39,6 +41,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let reconciliationCandidateStore: PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore;
   let financialEvidenceStore: PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore;
   let financialCompletionStore: PrismaAgenticWalletMarketSwapFinancialReconciliationCompletionStore;
+  let accountingBalanceEvidenceStore: PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -69,6 +72,12 @@ describe('Real execution submission gate persistence (e2e)', () => {
     financialCompletionStore =
       new PrismaAgenticWalletMarketSwapFinancialReconciliationCompletionStore(
         prisma,
+      );
+    accountingBalanceEvidenceStore =
+      new PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceStore(
+        prisma,
+        () => new Date('2026-10-03T12:00:10.000Z'),
+        () => uuid(24),
       );
   });
 
@@ -582,7 +591,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
     );
   });
 
-  it('persists complete financial evidence once and loads its completion', async () => {
+  it('persists complete financial and accounting evidence without mutating accounting', async () => {
     await store.create(command(10));
     await receiptStore.record(submissionReceipt(10));
     const terminal = await statusStore.record(
@@ -623,8 +632,40 @@ describe('Real execution submission gate persistence (e2e)', () => {
       accountingMutationComplete: false,
       submissionRetryAllowed: false,
     });
+    const accountingInput = accountingBalanceEvidence(first.stored.id);
+    const firstAccounting =
+      await accountingBalanceEvidenceStore.record(accountingInput);
+    const accountingReplay =
+      await accountingBalanceEvidenceStore.record(accountingInput);
+    expect(firstAccounting).toMatchObject({
+      replayed: false,
+      stored: {
+        id: uuid(24),
+        evidence: {
+          completionEvidenceId: uuid(23),
+          gateId: uuid(10),
+          transactionHash: `0x${'a'.repeat(64)}`,
+          coverageComplete: true,
+        },
+      },
+    });
+    expect(accountingReplay).toEqual({
+      stored: firstAccounting.stored,
+      replayed: true,
+    });
+    await expect(
+      financialCompletionStore.getByGateId(uuid(10)),
+    ).resolves.toMatchObject({
+      financialReconciliationComplete: true,
+      accountingMutationRequired: true,
+      accountingMutationComplete: false,
+      submissionRetryAllowed: false,
+    });
     await expect(
       prisma.realExecutionFinancialReconciliationEvidence.count(),
+    ).resolves.toBe(1);
+    await expect(
+      prisma.realExecutionAccountingBalanceEvidence.count(),
     ).resolves.toBe(1);
   });
 
@@ -651,6 +692,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   });
 
   async function cleanup(): Promise<void> {
+    await prisma.realExecutionAccountingBalanceEvidence.deleteMany();
     await prisma.realExecutionFinancialReconciliationEvidence.deleteMany();
     await prisma.realExecutionStatusObservation.deleteMany();
     await prisma.realExecutionSubmissionReceipt.deleteMany();
@@ -823,6 +865,45 @@ function financialEvidence(
     providerFeeCoverageComplete: true,
     networkFeeCoverageComplete: true,
     observedAt: new Date('2026-10-03T12:00:07.000Z'),
+  };
+}
+
+function accountingBalanceEvidence(
+  completionEvidenceId: string,
+): AgenticWalletMarketSwapAccountingBalanceEvidence {
+  return {
+    scope: 'agentic_wallet_market_swap_accounting_balance_evidence',
+    completionEvidenceId,
+    gateId: uuid(10),
+    transactionHash: `0x${'a'.repeat(64)}`,
+    balanceChanges: [
+      {
+        assetType: 'token',
+        assetAddress: '0x55d398326f99059ff775485246999027b3197955',
+        direction: 'debit',
+        beforeQuantity: '100',
+        afterQuantity: '95',
+        deltaQuantity: '5',
+      },
+      {
+        assetType: 'token',
+        assetAddress: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+        direction: 'credit',
+        beforeQuantity: '0',
+        afterQuantity: '0.000071',
+        deltaQuantity: '0.000071',
+      },
+      {
+        assetType: 'native',
+        assetSymbol: 'BNB',
+        direction: 'debit',
+        beforeQuantity: '1',
+        afterQuantity: '0.9997',
+        deltaQuantity: '0.0003',
+      },
+    ],
+    coverageComplete: true,
+    observedAt: new Date('2026-10-03T12:00:09.000Z'),
   };
 }
 

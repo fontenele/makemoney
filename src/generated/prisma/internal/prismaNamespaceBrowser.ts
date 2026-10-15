@@ -65,6 +65,7 @@ export const ModelName = {
   RealExecutionSubmissionReceipt: 'RealExecutionSubmissionReceipt',
   RealExecutionStatusObservation: 'RealExecutionStatusObservation',
   RealExecutionFinancialReconciliationEvidence: 'RealExecutionFinancialReconciliationEvidence',
+  RealExecutionAccountingBalanceEvidence: 'RealExecutionAccountingBalanceEvidence',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -347,6 +348,20 @@ export const RealExecutionFinancialReconciliationEvidenceScalarFieldEnum = {
 } as const
 
 export type RealExecutionFinancialReconciliationEvidenceScalarFieldEnum = (typeof RealExecutionFinancialReconciliationEvidenceScalarFieldEnum)[keyof typeof RealExecutionFinancialReconciliationEvidenceScalarFieldEnum]
+
+
+export const RealExecutionAccountingBalanceEvidenceScalarFieldEnum = {
+  id: 'id',
+  financialReconciliationEvidenceId: 'financialReconciliationEvidenceId',
+  gateId: 'gateId',
+  transactionHash: 'transactionHash',
+  balanceChanges: 'balanceChanges',
+  requestFingerprint: 'requestFingerprint',
+  observedAt: 'observedAt',
+  recordedAt: 'recordedAt'
+} as const
+
+export type RealExecutionAccountingBalanceEvidenceScalarFieldEnum = (typeof RealExecutionAccountingBalanceEvidenceScalarFieldEnum)[keyof typeof RealExecutionAccountingBalanceEvidenceScalarFieldEnum]
 
 
 export const ObservedSpotSymbolScalarFieldEnum = {

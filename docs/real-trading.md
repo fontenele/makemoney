@@ -1558,3 +1558,22 @@ The successful result defensively copies and deterministically orders the eviden
 - Invalid completion input does not claim completed financial reconciliation; valid completion remains complete while accounting evidence is blocked.
 - Submission retry remains forbidden and accounting mutation remains explicitly incomplete.
 - No schema, persistence, evidence acquisition, NestJS registration, route, provider call, wallet mutation, valuation, PnL, funding, executor, or real order is added.
+
+## M10.86 — Durable accounting balance-evidence persistence
+
+M10.86 gives the persistence-ready M10.85 snapshot one immutable PostgreSQL destination. The row preserves its own UUID, the exact M10.82 financial-evidence UUID, gate and transaction identities, complete canonical balance-change JSON, observation and recording times, and a SHA-256 request fingerprint. Database uniqueness permits only one accounting-evidence row for each financial reconciliation, gate, and transaction hash.
+
+Recording runs inside a serializable transaction under an advisory lock. Malformed balance evidence is rejected before persistence access. For a first insert, the store reloads the durable financial-reconciliation row by gate, maps it through the existing persisted-evidence validator, reapplies the M10.83 completion projection, and then reapplies the M10.85 balance assessment. The recording UUID and clock are also validated, including `recordedAt >= observedAt`.
+
+The fingerprint canonicalizes object keys and balance-change order, so an exact retry with the same asset facts in another array order returns the original immutable row. Reuse of the gate with different evidence fails closed, as does malformed data encountered during replay mapping. Persistence still does not mutate a local ledger or claim completed accounting: M10.84 continues to report `accountingMutationRequired: true` and `accountingMutationComplete: false` after the new row exists.
+
+### M10.86 acceptance criteria
+
+- Complete M10.85 evidence has an immutable PostgreSQL model and migration with exact JSON balance changes.
+- Malformed input fails before persistence access.
+- The durable M10.82 evidence is reloaded and passed through M10.83 and M10.85 inside the serializable write transaction.
+- Generated identity and recording chronology fail closed.
+- Exact balance-change replay is idempotent even when array order differs; divergent reuse conflicts.
+- Persisted rows are mapped through the shared structural validators and malformed replay data fails closed.
+- PostgreSQL E2E applies all 29 migrations from scratch and proves insert, exact replay, and unchanged incomplete-accounting state.
+- The store remains unregistered and adds no evidence acquisition, route, provider call, wallet-ledger mutation, valuation, PnL, funding, retry, executor, or real order.

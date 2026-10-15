@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-15 — Persist immutable accounting balance evidence
+
+- Added one immutable PostgreSQL accounting balance-evidence row per financial reconciliation, gate, and transaction hash.
+- Added a serializable Prisma store that rejects malformed input early, reloads durable financial evidence, and reapplies M10.83 and M10.85 before insertion.
+- Added canonical order-insensitive fingerprints, exact replay, divergent conflict rejection, recording metadata validation, malformed-row rejection, generated Prisma support, focused tests, and PostgreSQL E2E coverage across all 29 migrations.
+- Confirmed persistence leaves accounting mutation required and incomplete and keeps submission retry forbidden.
+- Added no evidence acquisition, route, runtime registration, provider call, wallet-ledger/PnL mutation, funding, retry, executor, or real order.
+- Verified all 2,207 backend tests across 189 suites, including 36 focused M10.85–M10.86 tests, all 95 PostgreSQL E2E tests across 9 suites with all 29 migrations, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, Prisma validation, and whitespace integrity.
+
 ## 2026-10-15 — Gate accounting on correlated wallet balance evidence
 
 - Added a pure fail-closed assessment for complete post-reconciliation wallet balance changes.
