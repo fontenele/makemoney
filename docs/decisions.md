@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-15 — Revalidate both sides of the accounting-evidence relation on read
+
+An accounting row can be structurally valid while still contradicting the financial evidence it claims to support. A read boundary that maps only the balance JSON would allow cross-gate, cross-evidence, transaction, receipt, or fee corruption to escape as trusted accounting input.
+
+M10.87 loads the immutable accounting row and its required financial relation together, maps both through their existing validators, then reapplies M10.83 and M10.85 before returning a defensive snapshot. Absence remains distinct from inconsistency, and malformed caller identity fails before database access. This reader grants no mutation authority; ledger writes, valuation, PnL, runtime composition, and execution remain separate increments.
+
 ## 2026-10-15 — Reprove durable financial completion before storing balance evidence
 
 Accounting balance evidence depends on the immutable financial-reconciliation record, not on a caller-provided completion object that may be stale, malformed, or unrelated. Persistence also needs stable replay semantics because the same complete set of asset changes can arrive in a different array order.

@@ -20,6 +20,12 @@ export interface AgenticWalletMarketSwapAccountingBalanceEvidenceStore {
   }>;
 }
 
+export interface AgenticWalletMarketSwapAccountingBalanceEvidenceReadStore {
+  getByGateId(
+    gateId: string,
+  ): Promise<StoredAgenticWalletMarketSwapAccountingBalanceEvidence | null>;
+}
+
 export function isValidStoredAgenticWalletMarketSwapAccountingBalanceEvidence(
   value: unknown,
 ): value is StoredAgenticWalletMarketSwapAccountingBalanceEvidence {
@@ -66,5 +72,13 @@ export class AgenticWalletMarketSwapAccountingBalanceCompletionNotFoundError ext
     super('Completed financial reconciliation was not found');
     this.name =
       AgenticWalletMarketSwapAccountingBalanceCompletionNotFoundError.name;
+  }
+}
+
+export class AgenticWalletMarketSwapAccountingBalanceEvidenceIdentityError extends Error {
+  constructor() {
+    super('Accounting balance evidence gate identity is invalid');
+    this.name =
+      AgenticWalletMarketSwapAccountingBalanceEvidenceIdentityError.name;
   }
 }

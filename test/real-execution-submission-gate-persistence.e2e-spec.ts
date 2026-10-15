@@ -27,6 +27,7 @@ import { PrismaAgenticWalletMarketSwapStatusReconciliationCandidateStore } from 
 import { PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-financial-reconciliation-evidence.store';
 import { PrismaAgenticWalletMarketSwapFinancialReconciliationCompletionStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-financial-reconciliation-completion.store';
 import { PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-balance-evidence.store';
+import { PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-balance-evidence-read.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -42,6 +43,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let financialEvidenceStore: PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore;
   let financialCompletionStore: PrismaAgenticWalletMarketSwapFinancialReconciliationCompletionStore;
   let accountingBalanceEvidenceStore: PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceStore;
+  let accountingBalanceEvidenceReadStore: PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -78,6 +80,10 @@ describe('Real execution submission gate persistence (e2e)', () => {
         prisma,
         () => new Date('2026-10-03T12:00:10.000Z'),
         () => uuid(24),
+      );
+    accountingBalanceEvidenceReadStore =
+      new PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore(
+        prisma,
       );
   });
 
@@ -653,6 +659,9 @@ describe('Real execution submission gate persistence (e2e)', () => {
       stored: firstAccounting.stored,
       replayed: true,
     });
+    await expect(
+      accountingBalanceEvidenceReadStore.getByGateId(uuid(10)),
+    ).resolves.toEqual(firstAccounting.stored);
     await expect(
       financialCompletionStore.getByGateId(uuid(10)),
     ).resolves.toMatchObject({

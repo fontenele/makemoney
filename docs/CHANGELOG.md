@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-15 — Read durable accounting balance evidence by gate
+
+- Added a read-only accounting balance-evidence contract with fail-closed canonical gate UUID validation.
+- Added a Prisma reader that loads the M10.86 row with its required financial relation and reapplies the shared M10.82, M10.83, and M10.85 policies.
+- Returned explicit absence or a defensive stored snapshot while rejecting cross-gate, cross-evidence, malformed, or financially inconsistent rows.
+- Extended PostgreSQL E2E coverage through durable accounting-evidence reload while accounting remains required and incomplete.
+- Added no schema, acquisition adapter, route, runtime registration, provider call, wallet-ledger/PnL mutation, funding, retry, executor, or real order.
+- Verified all 2,214 backend tests across 190 suites, including the focused 7-test reader suite, all 95 PostgreSQL E2E tests across 9 suites with all 29 migrations, all 94 dashboard tests across 17 files, formatting, lint, backend/dashboard builds, and whitespace integrity.
+
 ## 2026-10-15 — Persist immutable accounting balance evidence
 
 - Added one immutable PostgreSQL accounting balance-evidence row per financial reconciliation, gate, and transaction hash.

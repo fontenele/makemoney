@@ -1577,3 +1577,22 @@ The fingerprint canonicalizes object keys and balance-change order, so an exact 
 - Persisted rows are mapped through the shared structural validators and malformed replay data fails closed.
 - PostgreSQL E2E applies all 29 migrations from scratch and proves insert, exact replay, and unchanged incomplete-accounting state.
 - The store remains unregistered and adds no evidence acquisition, route, provider call, wallet-ledger mutation, valuation, PnL, funding, retry, executor, or real order.
+
+## M10.87 — Durable accounting balance-evidence reader
+
+M10.87 adds the read boundary for the immutable M10.86 row. The caller supplies one canonical gate UUID; malformed identity fails before database access, absence returns `null`, and a present accounting row is loaded in the same Prisma query as its required financial-reconciliation relation.
+
+The reader does not trust either raw row independently. It maps the accounting record through the M10.86 stored-envelope validator, maps the related financial row through the M10.82 validator, reapplies the M10.83 completion projection, and finally reapplies M10.85 to the stored balance changes. The requested gate must still match the revalidated result. Cross-gate, cross-financial-evidence, transaction, receipt, fee, chronology, or balance inconsistencies fail closed.
+
+Successful output uses the defensive M10.85 balance snapshot and copies the durable recording time. Loading it does not turn evidence into authority to write a wallet ledger: accounting remains required and incomplete, submission retry remains forbidden, and no route or runtime registration is introduced.
+
+### M10.87 acceptance criteria
+
+- A canonical gate UUID is required before database access.
+- Missing durable accounting balance evidence returns explicit `null`.
+- Present accounting and related financial rows are mapped through their shared persisted validators.
+- M10.83 and M10.85 are reapplied before any stored snapshot is returned.
+- Requested gate, financial-evidence identity, transaction, cost, balance, and chronology divergence fails closed.
+- Returned balance changes and dates are defensive copies in deterministic asset order.
+- PostgreSQL E2E proves a persisted M10.86 row can be reloaded unchanged while accounting remains incomplete.
+- The reader remains unregistered and adds no schema, acquisition, route, provider call, wallet-ledger mutation, valuation, PnL, funding, retry, executor, or real order.
