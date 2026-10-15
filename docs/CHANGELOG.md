@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-15 — Read durable accounting mutation commitments by gate
+
+- Added a read-only commitment store contract with fail-closed canonical gate UUID validation.
+- Added a Prisma reader that loads each M10.90 commitment with its accounting and financial evidence and reapplies M10.87, M10.88, and M10.89.
+- Returned explicit absence or a defensive stored snapshot while rejecting cross-related, malformed, or divergent durable data.
+- Kept accounting mutation unauthorized and incomplete and submission retry forbidden; added no schema, route, runtime registration, provider call, wallet-ledger/PnL mutation, funding, executor, or real order.
+- Verified all 2,267 backend tests across 194 suites, including the focused 7-test reader suite, all 95 PostgreSQL E2E tests across 9 suites with all 30 migrations applied from scratch, all 94 dashboard tests across 17 files, formatting, lint, Prisma validation, backend/dashboard builds, whitespace checks, and live backend health. The shared-schema E2E suites passed in their deterministic serial mode after a parallel run exposed cross-suite data collisions.
+
 ## 2026-10-15 — Persist immutable accounting mutation commitments
 
 - Added one immutable PostgreSQL commitment row per accounting evidence, financial evidence, gate, transaction hash, and canonical plan fingerprint.

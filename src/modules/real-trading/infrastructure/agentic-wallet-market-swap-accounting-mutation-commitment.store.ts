@@ -18,6 +18,12 @@ export interface AgenticWalletMarketSwapAccountingMutationCommitmentStore {
   }>;
 }
 
+export interface AgenticWalletMarketSwapAccountingMutationCommitmentReadStore {
+  getByGateId(
+    gateId: string,
+  ): Promise<StoredAgenticWalletMarketSwapAccountingMutationCommitment | null>;
+}
+
 export function isValidStoredAgenticWalletMarketSwapAccountingMutationCommitment(
   value: unknown,
 ): value is StoredAgenticWalletMarketSwapAccountingMutationCommitment {
@@ -57,5 +63,13 @@ export class AgenticWalletMarketSwapAccountingMutationEvidenceNotFoundError exte
     super('Durable accounting balance evidence was not found');
     this.name =
       AgenticWalletMarketSwapAccountingMutationEvidenceNotFoundError.name;
+  }
+}
+
+export class AgenticWalletMarketSwapAccountingMutationCommitmentIdentityError extends Error {
+  constructor() {
+    super('Accounting mutation commitment gate identity is invalid');
+    this.name =
+      AgenticWalletMarketSwapAccountingMutationCommitmentIdentityError.name;
   }
 }
