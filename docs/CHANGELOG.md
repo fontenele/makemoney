@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-15 — Authorize exact durable accounting commitments
+
+- Added a pure fail-closed authorization boundary over structurally valid stored M10.90 commitments.
+- Required a canonical authorization UUID, exact mutation/fingerprint/gate/transaction correlation, literal durable-evidence review acknowledgment, and post-recording authorization time.
+- Returned defensive commitment and timestamp snapshots while changing only accounting authorization; completion stays false and submission retry stays forbidden.
+- Added no schema, persistence, route, runtime registration, provider call, wallet-ledger/PnL mutation, funding, executor, or real order.
+- Verified all 2,284 backend tests across 195 suites, including the focused 17-test authorization suite, all 95 PostgreSQL E2E tests across 9 suites with all 30 migrations applied from scratch, all 94 dashboard tests across 17 files, formatting, lint, Prisma validation, backend/dashboard builds, whitespace checks, and live backend health.
+
 ## 2026-10-15 — Read durable accounting mutation commitments by gate
 
 - Added a read-only commitment store contract with fail-closed canonical gate UUID validation.

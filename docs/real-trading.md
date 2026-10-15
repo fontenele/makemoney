@@ -1658,3 +1658,34 @@ Durability is not mutation authority. The stored value continues to state `accou
 - PostgreSQL E2E applies all 30 migrations from scratch and proves immutable commitment insert plus exact replay.
 - Accounting mutation remains explicitly unauthorized and incomplete, and submission retry remains forbidden.
 - The store remains unregistered and adds no route, provider call, wallet-ledger/PnL mutation, valuation, funding, executor, or real order.
+
+## M10.91 — Durable accounting mutation commitment reader
+
+M10.91 adds the read boundary for the immutable M10.90 commitment. A canonical gate UUID is validated before database access; absence returns `null`, while a present commitment is loaded together with its accounting balance evidence and related financial reconciliation evidence.
+
+The reader maps and validates the commitment, reapplies the complete M10.87 evidence policy, regenerates the M10.88 plan and M10.89 commitment, and requires exact equality with the durable value. Valid output is a defensive snapshot. Cross-related, malformed, or divergent durable data fails closed.
+
+### M10.91 acceptance criteria
+
+- Invalid gate identity fails before database access and absence remains explicit.
+- Commitment, accounting evidence, and financial evidence are loaded in one relation.
+- M10.87, M10.88, and M10.89 are reapplied before returning data.
+- The reconstructed and persisted commitments must match exactly.
+- Valid output defensively copies transitions and timestamps.
+- The reader remains unregistered and adds no mutation authority, route, provider call, ledger/PnL mutation, funding, executor, or real order.
+
+## M10.92 — Explicit accounting mutation authorization
+
+M10.92 introduces a pure authorization boundary after durable commitment and before any future local ledger writer. A valid stored M10.90 envelope is necessary but insufficient: the authorization request must bind a separate canonical UUID to the exact mutation UUID, plan fingerprint, gate UUID, and provider transaction hash.
+
+The request also carries the literal `durable_reconciliation_and_balance_evidence_reviewed_for_accounting_mutation` acknowledgment and a finite authorization time no earlier than durable commitment recording. Accepted output defensively snapshots the complete commitment and changes only the authorization fact. It does not claim that accounting has been applied.
+
+### M10.92 acceptance criteria
+
+- Structurally invalid stored commitments block without claiming financial completion or required accounting.
+- Authorization identity, mutation identity, fingerprint, gate, transaction hash, and authorization time are structurally validated.
+- Mutation, fingerprint, gate, and transaction identities must exactly match the durable commitment.
+- The exact literal review acknowledgment is required independently.
+- Authorization cannot predate durable commitment recording; equality is valid.
+- Successful output is defensive, sets `accountingMutationAuthorized: true`, keeps `accountingMutationComplete: false`, and keeps submission retry forbidden.
+- The boundary remains unregistered and unpersisted and adds no schema, route, provider call, wallet-ledger/PnL mutation, valuation, funding, executor, or real order.

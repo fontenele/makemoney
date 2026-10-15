@@ -1,5 +1,15 @@
 # Technical Decisions
 
+## 2026-10-15 — Bind accounting authorization to exact durable content
+
+A durable commitment proves which balance transitions were prepared, but its existence alone must not silently grant authority to mutate the local ledger. Authorization also cannot identify work only by a mutation UUID because a caller could pair that identity with a different plan, gate, or provider transaction.
+
+M10.92 therefore requires a separate canonical authorization UUID, the exact mutation UUID, plan fingerprint, gate UUID, transaction hash, literal accounting-review acknowledgment, and authorization time at or after durable commitment recording. The stored envelope is structurally revalidated and defensively copied. Success changes only the authorization fact; completion remains false, submission retry remains forbidden, and persistence plus ledger/PnL mutation remain separate future increments.
+
+## 2026-10-15 — Reconstruct a durable commitment before trusting a read
+
+A structurally valid commitment row can still contradict its related accounting or financial evidence. M10.91 therefore loads the complete relation, reuses the M10.87 evidence revalidation path, regenerates M10.88/M10.89, and requires exact equality with the stored commitment before returning a defensive snapshot. Absence remains explicit and the reader grants no mutation authority.
+
 ## 2026-10-15 — Revalidate durable evidence before committing an accounting plan
 
 A caller-supplied M10.89 commitment may be internally well formed yet refer to stale, absent, or different durable accounting evidence. Persisting it directly would let a valid hash commit financial transitions that the database relation does not support. Replay also needs to distinguish the same complete commitment from changed preparation metadata, not merely compare the plan hash.

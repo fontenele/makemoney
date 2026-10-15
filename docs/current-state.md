@@ -1,5 +1,11 @@
 # Current State
 
+M10.92 is complete: a pure fail-closed boundary now separates durable accounting commitment from permission to perform a future local accounting mutation. Authorization requires a canonical authorization UUID, exact mutation UUID, plan fingerprint, gate UUID, transaction hash, the literal `durable_reconciliation_and_balance_evidence_reviewed_for_accounting_mutation` acknowledgment, and a finite authorization time at or after durable commitment recording.
+
+The complete stored commitment is structurally revalidated and defensively snapshotted. Malformed durable state, request metadata, missing acknowledgment, correlation divergence, or clock regression blocks authorization. Success changes only `accountingMutationAuthorized` to true; `accountingMutationComplete` remains false and `submissionRetryAllowed` remains false. The boundary is unregistered and unpersisted and adds no schema, route, provider call, ledger/PnL mutation, funding, executor, or real order.
+
+Post-M10.92 validation passed all 2,284 backend tests across 195 suites, including all 17 focused authorization tests, all 95 PostgreSQL E2E tests across 9 suites with all 30 migrations applied from scratch, all 94 dashboard tests across 17 files, formatting, lint, Prisma validation, backend/dashboard builds, whitespace checks, and the live backend health check with API, PostgreSQL, and Redis up.
+
 M10.91 is complete: a read-only Prisma store now retrieves one durable M10.90 accounting mutation commitment by canonical gate UUID. It loads the commitment together with its accounting and financial evidence, reapplies the M10.87 evidence policy, regenerates M10.88 and M10.89, and accepts the row only when the complete reconstructed commitment exactly matches persistence.
 
 Invalid identities are rejected before database access, absence remains explicit, and cross-related, malformed, or divergent durable data fails closed. Valid output is a defensive snapshot. The reader remains unregistered and preserves `accountingMutationAuthorized: false`, `accountingMutationComplete: false`, and `submissionRetryAllowed: false`; it adds no schema, route, provider call, ledger/PnL mutation, funding, executor, or real order.
