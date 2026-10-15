@@ -1538,3 +1538,23 @@ The store is read-only and remains unregistered. Loading a completed reconciliat
 - Malformed persisted receipt, cost, provider, JSON fee, or time facts fail closed.
 - PostgreSQL E2E coverage proves insert, exact replay, and completed reconciliation loading with accounting still incomplete.
 - The reader remains unregistered and adds no schema change, route, provider call, funding, balance mutation, valuation, PnL, retry, executor, or real order.
+
+## M10.85 — Accounting balance-evidence gate
+
+M10.85 adds a pure boundary between completed provider financial reconciliation and any future local accounting mutation. A caller must supply the immutable M10.84 completion snapshot together with one complete wallet balance-change observation correlated by evidence UUID, gate UUID, and transaction hash. The observation must occur at or after durable completion recording.
+
+Every reported asset change is canonical, unique, non-zero, and arithmetically self-consistent: a debit equals `before - after`, while a credit equals `after - before`. The source-token debit must cover the submitted source quantity plus any provider fee denominated in that source token. The target-token credit must equal the already reconciled net actual receipt exactly. Provider fees denominated in a third token require a sufficient debit of that token, and the BNB debit must cover the reconciled network fee. A target-token provider fee is not added to the target credit a second time because the completion snapshot's actual received quantity is the observed net target balance delta.
+
+The successful result defensively copies and deterministically orders the evidence, but remains only ready for future persistence. A malformed completion cannot claim completed financial reconciliation; a valid completion remains financially complete when its separate accounting evidence is blocked. No evidence acquisition, schema, repository, wallet-ledger write, valuation, PnL calculation, runtime registration, provider call, retry, executor, or real order is introduced.
+
+### M10.85 acceptance criteria
+
+- Completion, balance evidence, identity, transaction, chronology, coverage, and exact decimal structure fail closed.
+- Balance changes are unique per token contract or native BNB and reconcile exactly against before/after quantities without native floating-point arithmetic.
+- Source debit covers submitted quantity plus any source-token provider fee.
+- Target credit equals the reconciled net actual receipt exactly.
+- BNB network-fee debit and any third-token provider-fee debit are sufficient.
+- Accepted evidence is defensively copied and deterministically ordered for future persistence.
+- Invalid completion input does not claim completed financial reconciliation; valid completion remains complete while accounting evidence is blocked.
+- Submission retry remains forbidden and accounting mutation remains explicitly incomplete.
+- No schema, persistence, evidence acquisition, NestJS registration, route, provider call, wallet mutation, valuation, PnL, funding, executor, or real order is added.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-15 — Prove wallet deltas before permitting future accounting mutation
+
+Completed provider reconciliation establishes what the swap delivered, but it does not prove that a future local ledger mutation matches the wallet's observed asset changes. Treating the M10.84 snapshot alone as accounting authority could omit a source-denominated fee, double-count a target-denominated fee, or accept a network cost with no corresponding BNB debit.
+
+M10.85 therefore adds a separate pure balance-evidence gate. It correlates one complete post-completion observation by immutable evidence, gate, and transaction identity; verifies exact before/after arithmetic; requires the source debit to cover submitted quantity plus source-token fees; treats actual target receipt as the exact net target credit; and requires sufficient BNB and third-token fee debits. The gate only produces a defensive persistence-ready snapshot. Evidence acquisition, persistence, ledger mutation, valuation, PnL, runtime wiring, and execution remain separate future increments.
+
 ## 2026-10-09 — Read completion through the validated durable evidence boundary
 
 A completion reader must not trust raw Prisma output or reimplement M10.82/M10.83 validation. Doing so would allow read behavior to drift from persistence and pure completion semantics, particularly for JSON fee components and recording chronology.

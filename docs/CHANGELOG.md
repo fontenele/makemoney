@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-15 — Gate accounting on correlated wallet balance evidence
+
+- Added a pure fail-closed assessment for complete post-reconciliation wallet balance changes.
+- Required exact identity and chronology correlation, canonical unique self-consistent deltas, source debit covering submitted quantity plus source-token fees, exact net target credit, sufficient BNB network-fee debit, and sufficient third-token provider-fee debits.
+- Preserved completed financial reconciliation independently when only accounting evidence is blocked, while preventing malformed completion input from claiming completion.
+- Produced only a defensive persistence-ready snapshot; added no schema, evidence acquisition, store, route, runtime registration, provider call, wallet mutation, valuation, PnL, funding, retry, executor, or real order.
+- Verified all 2,199 backend tests across 188 suites, including the focused 28-test accounting balance-evidence suite, plus formatting, lint, and backend/dashboard builds.
+
 ## 2026-10-09 — Load durable financial-reconciliation completion by gate
 
 - Added a read-only completion-store contract with fail-closed canonical gate identity validation.
