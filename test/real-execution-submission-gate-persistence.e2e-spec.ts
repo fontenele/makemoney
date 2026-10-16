@@ -19,6 +19,10 @@ import {
   ACCOUNTING_MUTATION_AUTHORIZATION_ACKNOWLEDGMENT,
   authorizeAgenticWalletMarketSwapAccountingMutation,
 } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-accounting-mutation-authorization';
+import {
+  ACCOUNTING_MUTATION_APPLICATION_ACKNOWLEDGMENT,
+  prepareAgenticWalletMarketSwapAccountingMutationApplication,
+} from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-accounting-mutation-application';
 import { prepareAgenticWalletMarketSwapAccountingMutationCommitment } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-accounting-mutation-commitment';
 import { assessAgenticWalletMarketSwapAccountingMutationPlan } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-accounting-mutation-plan';
 import { decideAgenticWalletMarketSwapStatusLookup } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-status-lookup-decision';
@@ -37,6 +41,7 @@ import { PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore } from 
 import { PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-commitment.store';
 import { PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-authorization.store';
 import { PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-authorization-read.store';
+import { PrismaAgenticWalletMarketSwapAccountingMutationApplicationStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-application.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -56,6 +61,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let accountingMutationCommitmentStore: PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore;
   let accountingMutationAuthorizationStore: PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationStore;
   let accountingMutationAuthorizationReadStore: PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore;
+  let accountingMutationApplicationStore: PrismaAgenticWalletMarketSwapAccountingMutationApplicationStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -110,6 +116,11 @@ describe('Real execution submission gate persistence (e2e)', () => {
     accountingMutationAuthorizationReadStore =
       new PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore(
         prisma,
+      );
+    accountingMutationApplicationStore =
+      new PrismaAgenticWalletMarketSwapAccountingMutationApplicationStore(
+        prisma,
+        () => new Date('2026-10-03T12:00:17.000Z'),
       );
   });
 
@@ -766,6 +777,100 @@ describe('Real execution submission gate persistence (e2e)', () => {
     await expect(
       accountingMutationAuthorizationReadStore.getByGateId(uuid(10)),
     ).resolves.toEqual(firstAuthorization.stored);
+    await prisma.realExecutionAccountingBalance.createMany({
+      data: [
+        {
+          assetIdentity: 'token:0x55d398326f99059ff775485246999027b3197955',
+          assetType: 'token',
+          assetAddress: '0x55d398326f99059ff775485246999027b3197955',
+          quantity: '100',
+          updatedAt: new Date('2026-10-03T12:00:14.500Z'),
+        },
+        {
+          assetIdentity: 'token:0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+          assetType: 'token',
+          assetAddress: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+          quantity: '0',
+          updatedAt: new Date('2026-10-03T12:00:14.500Z'),
+        },
+        {
+          assetIdentity: 'native:BNB',
+          assetType: 'native',
+          assetSymbol: 'BNB',
+          quantity: '1',
+          updatedAt: new Date('2026-10-03T12:00:14.500Z'),
+        },
+      ],
+    });
+    const applicationAssessment =
+      prepareAgenticWalletMarketSwapAccountingMutationApplication(
+        firstAuthorization.stored,
+        {
+          applicationId: uuid(27),
+          authorizationId: uuid(26),
+          mutationId: uuid(25),
+          planFingerprint: commitmentAssessment.commitment.planFingerprint,
+          gateId: uuid(10),
+          transactionHash: `0x${'a'.repeat(64)}`,
+          acknowledgment: ACCOUNTING_MUTATION_APPLICATION_ACKNOWLEDGMENT,
+          currentBalances: [
+            {
+              assetType: 'token',
+              assetAddress: '0x55d398326f99059ff775485246999027b3197955',
+              currentQuantity: '100',
+            },
+            {
+              assetType: 'token',
+              assetAddress: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+              currentQuantity: '0',
+            },
+            {
+              assetType: 'native',
+              assetSymbol: 'BNB',
+              currentQuantity: '1',
+            },
+          ],
+          balanceCoverageComplete: true,
+          balancesObservedAt: new Date('2026-10-03T12:00:15.000Z'),
+          preparedAt: new Date('2026-10-03T12:00:16.000Z'),
+        },
+      );
+    if (applicationAssessment.application === null)
+      throw new Error('Accounting mutation application was blocked');
+    const firstApplication = await accountingMutationApplicationStore.apply(
+      applicationAssessment.application,
+    );
+    const applicationReplay = await accountingMutationApplicationStore.apply(
+      applicationAssessment.application,
+    );
+    expect(firstApplication).toMatchObject({
+      replayed: false,
+      applied: {
+        application: { applicationId: uuid(27) },
+        appliedAt: new Date('2026-10-03T12:00:17.000Z'),
+        accountingMutationComplete: true,
+        submissionRetryAllowed: false,
+      },
+    });
+    expect(applicationReplay).toEqual({
+      applied: firstApplication.applied,
+      replayed: true,
+    });
+    await expect(
+      prisma.realExecutionAccountingBalance.findMany({
+        orderBy: { assetIdentity: 'asc' },
+      }),
+    ).resolves.toMatchObject([
+      { assetIdentity: 'native:BNB', quantity: '0.9997' },
+      {
+        assetIdentity: 'token:0x55d398326f99059ff775485246999027b3197955',
+        quantity: '95',
+      },
+      {
+        assetIdentity: 'token:0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+        quantity: '0.000071',
+      },
+    ]);
     await expect(
       financialCompletionStore.getByGateId(uuid(10)),
     ).resolves.toMatchObject({
@@ -785,6 +890,9 @@ describe('Real execution submission gate persistence (e2e)', () => {
     ).resolves.toBe(1);
     await expect(
       prisma.realExecutionAccountingMutationAuthorization.count(),
+    ).resolves.toBe(1);
+    await expect(
+      prisma.realExecutionAccountingMutationApplication.count(),
     ).resolves.toBe(1);
   });
 
@@ -811,6 +919,8 @@ describe('Real execution submission gate persistence (e2e)', () => {
   });
 
   async function cleanup(): Promise<void> {
+    await prisma.realExecutionAccountingMutationApplication.deleteMany();
+    await prisma.realExecutionAccountingBalance.deleteMany();
     await prisma.realExecutionAccountingMutationAuthorization.deleteMany();
     await prisma.realExecutionAccountingMutationCommitment.deleteMany();
     await prisma.realExecutionAccountingBalanceEvidence.deleteMany();

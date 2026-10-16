@@ -68,6 +68,8 @@ export const ModelName = {
   RealExecutionAccountingBalanceEvidence: 'RealExecutionAccountingBalanceEvidence',
   RealExecutionAccountingMutationCommitment: 'RealExecutionAccountingMutationCommitment',
   RealExecutionAccountingMutationAuthorization: 'RealExecutionAccountingMutationAuthorization',
+  RealExecutionAccountingBalance: 'RealExecutionAccountingBalance',
+  RealExecutionAccountingMutationApplication: 'RealExecutionAccountingMutationApplication',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -399,6 +401,40 @@ export const RealExecutionAccountingMutationAuthorizationScalarFieldEnum = {
 } as const
 
 export type RealExecutionAccountingMutationAuthorizationScalarFieldEnum = (typeof RealExecutionAccountingMutationAuthorizationScalarFieldEnum)[keyof typeof RealExecutionAccountingMutationAuthorizationScalarFieldEnum]
+
+
+export const RealExecutionAccountingBalanceScalarFieldEnum = {
+  assetIdentity: 'assetIdentity',
+  assetType: 'assetType',
+  assetAddress: 'assetAddress',
+  assetSymbol: 'assetSymbol',
+  quantity: 'quantity',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RealExecutionAccountingBalanceScalarFieldEnum = (typeof RealExecutionAccountingBalanceScalarFieldEnum)[keyof typeof RealExecutionAccountingBalanceScalarFieldEnum]
+
+
+export const RealExecutionAccountingMutationApplicationScalarFieldEnum = {
+  id: 'id',
+  authorizationId: 'authorizationId',
+  accountingMutationCommitmentId: 'accountingMutationCommitmentId',
+  accountingBalanceEvidenceId: 'accountingBalanceEvidenceId',
+  financialReconciliationEvidenceId: 'financialReconciliationEvidenceId',
+  gateId: 'gateId',
+  transactionHash: 'transactionHash',
+  planFingerprint: 'planFingerprint',
+  acknowledgment: 'acknowledgment',
+  currentBalances: 'currentBalances',
+  balanceTransitions: 'balanceTransitions',
+  authorizationRecordedAt: 'authorizationRecordedAt',
+  balancesObservedAt: 'balancesObservedAt',
+  preparedAt: 'preparedAt',
+  requestFingerprint: 'requestFingerprint',
+  appliedAt: 'appliedAt'
+} as const
+
+export type RealExecutionAccountingMutationApplicationScalarFieldEnum = (typeof RealExecutionAccountingMutationApplicationScalarFieldEnum)[keyof typeof RealExecutionAccountingMutationApplicationScalarFieldEnum]
 
 
 export const ObservedSpotSymbolScalarFieldEnum = {

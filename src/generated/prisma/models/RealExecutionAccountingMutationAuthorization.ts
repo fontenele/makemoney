@@ -231,6 +231,7 @@ export type RealExecutionAccountingMutationAuthorizationWhereInput = {
   requestFingerprint?: Prisma.StringFilter<"RealExecutionAccountingMutationAuthorization"> | string
   recordedAt?: Prisma.DateTimeFilter<"RealExecutionAccountingMutationAuthorization"> | Date | string
   accountingMutationCommitment?: Prisma.XOR<Prisma.RealExecutionAccountingMutationCommitmentScalarRelationFilter, Prisma.RealExecutionAccountingMutationCommitmentWhereInput>
+  accountingMutationApplication?: Prisma.XOR<Prisma.RealExecutionAccountingMutationApplicationNullableScalarRelationFilter, Prisma.RealExecutionAccountingMutationApplicationWhereInput> | null
 }
 
 export type RealExecutionAccountingMutationAuthorizationOrderByWithRelationInput = {
@@ -246,6 +247,7 @@ export type RealExecutionAccountingMutationAuthorizationOrderByWithRelationInput
   requestFingerprint?: Prisma.SortOrder
   recordedAt?: Prisma.SortOrder
   accountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentOrderByWithRelationInput
+  accountingMutationApplication?: Prisma.RealExecutionAccountingMutationApplicationOrderByWithRelationInput
 }
 
 export type RealExecutionAccountingMutationAuthorizationWhereUniqueInput = Prisma.AtLeast<{
@@ -264,6 +266,7 @@ export type RealExecutionAccountingMutationAuthorizationWhereUniqueInput = Prism
   requestFingerprint?: Prisma.StringFilter<"RealExecutionAccountingMutationAuthorization"> | string
   recordedAt?: Prisma.DateTimeFilter<"RealExecutionAccountingMutationAuthorization"> | Date | string
   accountingMutationCommitment?: Prisma.XOR<Prisma.RealExecutionAccountingMutationCommitmentScalarRelationFilter, Prisma.RealExecutionAccountingMutationCommitmentWhereInput>
+  accountingMutationApplication?: Prisma.XOR<Prisma.RealExecutionAccountingMutationApplicationNullableScalarRelationFilter, Prisma.RealExecutionAccountingMutationApplicationWhereInput> | null
 }, "id" | "accountingMutationCommitmentId" | "accountingBalanceEvidenceId" | "financialReconciliationEvidenceId" | "gateId" | "transactionHash" | "planFingerprint">
 
 export type RealExecutionAccountingMutationAuthorizationOrderByWithAggregationInput = {
@@ -312,6 +315,7 @@ export type RealExecutionAccountingMutationAuthorizationCreateInput = {
   requestFingerprint: string
   recordedAt?: Date | string
   accountingMutationCommitment: Prisma.RealExecutionAccountingMutationCommitmentCreateNestedOneWithoutAccountingMutationAuthorizationInput
+  accountingMutationApplication?: Prisma.RealExecutionAccountingMutationApplicationCreateNestedOneWithoutAccountingMutationAuthorizationInput
 }
 
 export type RealExecutionAccountingMutationAuthorizationUncheckedCreateInput = {
@@ -326,6 +330,7 @@ export type RealExecutionAccountingMutationAuthorizationUncheckedCreateInput = {
   authorizedAt: Date | string
   requestFingerprint: string
   recordedAt?: Date | string
+  accountingMutationApplication?: Prisma.RealExecutionAccountingMutationApplicationUncheckedCreateNestedOneWithoutAccountingMutationAuthorizationInput
 }
 
 export type RealExecutionAccountingMutationAuthorizationUpdateInput = {
@@ -340,6 +345,7 @@ export type RealExecutionAccountingMutationAuthorizationUpdateInput = {
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentUpdateOneRequiredWithoutAccountingMutationAuthorizationNestedInput
+  accountingMutationApplication?: Prisma.RealExecutionAccountingMutationApplicationUpdateOneWithoutAccountingMutationAuthorizationNestedInput
 }
 
 export type RealExecutionAccountingMutationAuthorizationUncheckedUpdateInput = {
@@ -354,6 +360,7 @@ export type RealExecutionAccountingMutationAuthorizationUncheckedUpdateInput = {
   authorizedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountingMutationApplication?: Prisma.RealExecutionAccountingMutationApplicationUncheckedUpdateOneWithoutAccountingMutationAuthorizationNestedInput
 }
 
 export type RealExecutionAccountingMutationAuthorizationCreateManyInput = {
@@ -444,6 +451,11 @@ export type RealExecutionAccountingMutationAuthorizationMinOrderByAggregateInput
   recordedAt?: Prisma.SortOrder
 }
 
+export type RealExecutionAccountingMutationAuthorizationScalarRelationFilter = {
+  is?: Prisma.RealExecutionAccountingMutationAuthorizationWhereInput
+  isNot?: Prisma.RealExecutionAccountingMutationAuthorizationWhereInput
+}
+
 export type RealExecutionAccountingMutationAuthorizationCreateNestedOneWithoutAccountingMutationCommitmentInput = {
   create?: Prisma.XOR<Prisma.RealExecutionAccountingMutationAuthorizationCreateWithoutAccountingMutationCommitmentInput, Prisma.RealExecutionAccountingMutationAuthorizationUncheckedCreateWithoutAccountingMutationCommitmentInput>
   connectOrCreate?: Prisma.RealExecutionAccountingMutationAuthorizationCreateOrConnectWithoutAccountingMutationCommitmentInput
@@ -476,6 +488,20 @@ export type RealExecutionAccountingMutationAuthorizationUncheckedUpdateOneWithou
   update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionAccountingMutationAuthorizationUpdateToOneWithWhereWithoutAccountingMutationCommitmentInput, Prisma.RealExecutionAccountingMutationAuthorizationUpdateWithoutAccountingMutationCommitmentInput>, Prisma.RealExecutionAccountingMutationAuthorizationUncheckedUpdateWithoutAccountingMutationCommitmentInput>
 }
 
+export type RealExecutionAccountingMutationAuthorizationCreateNestedOneWithoutAccountingMutationApplicationInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionAccountingMutationAuthorizationCreateWithoutAccountingMutationApplicationInput, Prisma.RealExecutionAccountingMutationAuthorizationUncheckedCreateWithoutAccountingMutationApplicationInput>
+  connectOrCreate?: Prisma.RealExecutionAccountingMutationAuthorizationCreateOrConnectWithoutAccountingMutationApplicationInput
+  connect?: Prisma.RealExecutionAccountingMutationAuthorizationWhereUniqueInput
+}
+
+export type RealExecutionAccountingMutationAuthorizationUpdateOneRequiredWithoutAccountingMutationApplicationNestedInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionAccountingMutationAuthorizationCreateWithoutAccountingMutationApplicationInput, Prisma.RealExecutionAccountingMutationAuthorizationUncheckedCreateWithoutAccountingMutationApplicationInput>
+  connectOrCreate?: Prisma.RealExecutionAccountingMutationAuthorizationCreateOrConnectWithoutAccountingMutationApplicationInput
+  upsert?: Prisma.RealExecutionAccountingMutationAuthorizationUpsertWithoutAccountingMutationApplicationInput
+  connect?: Prisma.RealExecutionAccountingMutationAuthorizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionAccountingMutationAuthorizationUpdateToOneWithWhereWithoutAccountingMutationApplicationInput, Prisma.RealExecutionAccountingMutationAuthorizationUpdateWithoutAccountingMutationApplicationInput>, Prisma.RealExecutionAccountingMutationAuthorizationUncheckedUpdateWithoutAccountingMutationApplicationInput>
+}
+
 export type RealExecutionAccountingMutationAuthorizationCreateWithoutAccountingMutationCommitmentInput = {
   id: string
   accountingBalanceEvidenceId: string
@@ -487,6 +513,7 @@ export type RealExecutionAccountingMutationAuthorizationCreateWithoutAccountingM
   authorizedAt: Date | string
   requestFingerprint: string
   recordedAt?: Date | string
+  accountingMutationApplication?: Prisma.RealExecutionAccountingMutationApplicationCreateNestedOneWithoutAccountingMutationAuthorizationInput
 }
 
 export type RealExecutionAccountingMutationAuthorizationUncheckedCreateWithoutAccountingMutationCommitmentInput = {
@@ -500,6 +527,7 @@ export type RealExecutionAccountingMutationAuthorizationUncheckedCreateWithoutAc
   authorizedAt: Date | string
   requestFingerprint: string
   recordedAt?: Date | string
+  accountingMutationApplication?: Prisma.RealExecutionAccountingMutationApplicationUncheckedCreateNestedOneWithoutAccountingMutationAuthorizationInput
 }
 
 export type RealExecutionAccountingMutationAuthorizationCreateOrConnectWithoutAccountingMutationCommitmentInput = {
@@ -529,10 +557,84 @@ export type RealExecutionAccountingMutationAuthorizationUpdateWithoutAccountingM
   authorizedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountingMutationApplication?: Prisma.RealExecutionAccountingMutationApplicationUpdateOneWithoutAccountingMutationAuthorizationNestedInput
 }
 
 export type RealExecutionAccountingMutationAuthorizationUncheckedUpdateWithoutAccountingMutationCommitmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountingBalanceEvidenceId?: Prisma.StringFieldUpdateOperationsInput | string
+  financialReconciliationEvidenceId?: Prisma.StringFieldUpdateOperationsInput | string
+  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  transactionHash?: Prisma.StringFieldUpdateOperationsInput | string
+  planFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
+  authorizedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountingMutationApplication?: Prisma.RealExecutionAccountingMutationApplicationUncheckedUpdateOneWithoutAccountingMutationAuthorizationNestedInput
+}
+
+export type RealExecutionAccountingMutationAuthorizationCreateWithoutAccountingMutationApplicationInput = {
+  id: string
+  accountingBalanceEvidenceId: string
+  financialReconciliationEvidenceId: string
+  gateId: string
+  transactionHash: string
+  planFingerprint: string
+  acknowledgment: string
+  authorizedAt: Date | string
+  requestFingerprint: string
+  recordedAt?: Date | string
+  accountingMutationCommitment: Prisma.RealExecutionAccountingMutationCommitmentCreateNestedOneWithoutAccountingMutationAuthorizationInput
+}
+
+export type RealExecutionAccountingMutationAuthorizationUncheckedCreateWithoutAccountingMutationApplicationInput = {
+  id: string
+  accountingMutationCommitmentId: string
+  accountingBalanceEvidenceId: string
+  financialReconciliationEvidenceId: string
+  gateId: string
+  transactionHash: string
+  planFingerprint: string
+  acknowledgment: string
+  authorizedAt: Date | string
+  requestFingerprint: string
+  recordedAt?: Date | string
+}
+
+export type RealExecutionAccountingMutationAuthorizationCreateOrConnectWithoutAccountingMutationApplicationInput = {
+  where: Prisma.RealExecutionAccountingMutationAuthorizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.RealExecutionAccountingMutationAuthorizationCreateWithoutAccountingMutationApplicationInput, Prisma.RealExecutionAccountingMutationAuthorizationUncheckedCreateWithoutAccountingMutationApplicationInput>
+}
+
+export type RealExecutionAccountingMutationAuthorizationUpsertWithoutAccountingMutationApplicationInput = {
+  update: Prisma.XOR<Prisma.RealExecutionAccountingMutationAuthorizationUpdateWithoutAccountingMutationApplicationInput, Prisma.RealExecutionAccountingMutationAuthorizationUncheckedUpdateWithoutAccountingMutationApplicationInput>
+  create: Prisma.XOR<Prisma.RealExecutionAccountingMutationAuthorizationCreateWithoutAccountingMutationApplicationInput, Prisma.RealExecutionAccountingMutationAuthorizationUncheckedCreateWithoutAccountingMutationApplicationInput>
+  where?: Prisma.RealExecutionAccountingMutationAuthorizationWhereInput
+}
+
+export type RealExecutionAccountingMutationAuthorizationUpdateToOneWithWhereWithoutAccountingMutationApplicationInput = {
+  where?: Prisma.RealExecutionAccountingMutationAuthorizationWhereInput
+  data: Prisma.XOR<Prisma.RealExecutionAccountingMutationAuthorizationUpdateWithoutAccountingMutationApplicationInput, Prisma.RealExecutionAccountingMutationAuthorizationUncheckedUpdateWithoutAccountingMutationApplicationInput>
+}
+
+export type RealExecutionAccountingMutationAuthorizationUpdateWithoutAccountingMutationApplicationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountingBalanceEvidenceId?: Prisma.StringFieldUpdateOperationsInput | string
+  financialReconciliationEvidenceId?: Prisma.StringFieldUpdateOperationsInput | string
+  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  transactionHash?: Prisma.StringFieldUpdateOperationsInput | string
+  planFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
+  authorizedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  recordedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentUpdateOneRequiredWithoutAccountingMutationAuthorizationNestedInput
+}
+
+export type RealExecutionAccountingMutationAuthorizationUncheckedUpdateWithoutAccountingMutationApplicationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountingMutationCommitmentId?: Prisma.StringFieldUpdateOperationsInput | string
   accountingBalanceEvidenceId?: Prisma.StringFieldUpdateOperationsInput | string
   financialReconciliationEvidenceId?: Prisma.StringFieldUpdateOperationsInput | string
   gateId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -559,6 +661,7 @@ export type RealExecutionAccountingMutationAuthorizationSelect<ExtArgs extends r
   requestFingerprint?: boolean
   recordedAt?: boolean
   accountingMutationCommitment?: boolean | Prisma.RealExecutionAccountingMutationCommitmentDefaultArgs<ExtArgs>
+  accountingMutationApplication?: boolean | Prisma.RealExecutionAccountingMutationAuthorization$accountingMutationApplicationArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionAccountingMutationAuthorization"]>
 
 export type RealExecutionAccountingMutationAuthorizationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -608,6 +711,7 @@ export type RealExecutionAccountingMutationAuthorizationSelectScalar = {
 export type RealExecutionAccountingMutationAuthorizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountingMutationCommitmentId" | "accountingBalanceEvidenceId" | "financialReconciliationEvidenceId" | "gateId" | "transactionHash" | "planFingerprint" | "acknowledgment" | "authorizedAt" | "requestFingerprint" | "recordedAt", ExtArgs["result"]["realExecutionAccountingMutationAuthorization"]>
 export type RealExecutionAccountingMutationAuthorizationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accountingMutationCommitment?: boolean | Prisma.RealExecutionAccountingMutationCommitmentDefaultArgs<ExtArgs>
+  accountingMutationApplication?: boolean | Prisma.RealExecutionAccountingMutationAuthorization$accountingMutationApplicationArgs<ExtArgs>
 }
 export type RealExecutionAccountingMutationAuthorizationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accountingMutationCommitment?: boolean | Prisma.RealExecutionAccountingMutationCommitmentDefaultArgs<ExtArgs>
@@ -620,6 +724,7 @@ export type $RealExecutionAccountingMutationAuthorizationPayload<ExtArgs extends
   name: "RealExecutionAccountingMutationAuthorization"
   objects: {
     accountingMutationCommitment: Prisma.$RealExecutionAccountingMutationCommitmentPayload<ExtArgs>
+    accountingMutationApplication: Prisma.$RealExecutionAccountingMutationApplicationPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1028,6 +1133,7 @@ readonly fields: RealExecutionAccountingMutationAuthorizationFieldRefs;
 export interface Prisma__RealExecutionAccountingMutationAuthorizationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   accountingMutationCommitment<T extends Prisma.RealExecutionAccountingMutationCommitmentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionAccountingMutationCommitmentDefaultArgs<ExtArgs>>): Prisma.Prisma__RealExecutionAccountingMutationCommitmentClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionAccountingMutationCommitmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  accountingMutationApplication<T extends Prisma.RealExecutionAccountingMutationAuthorization$accountingMutationApplicationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionAccountingMutationAuthorization$accountingMutationApplicationArgs<ExtArgs>>): Prisma.Prisma__RealExecutionAccountingMutationApplicationClient<runtime.Types.Result.GetResult<Prisma.$RealExecutionAccountingMutationApplicationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1466,6 +1572,25 @@ export type RealExecutionAccountingMutationAuthorizationDeleteManyArgs<ExtArgs e
    * Limit how many RealExecutionAccountingMutationAuthorizations to delete.
    */
   limit?: number
+}
+
+/**
+ * RealExecutionAccountingMutationAuthorization.accountingMutationApplication
+ */
+export type RealExecutionAccountingMutationAuthorization$accountingMutationApplicationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RealExecutionAccountingMutationApplication
+   */
+  select?: Prisma.RealExecutionAccountingMutationApplicationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RealExecutionAccountingMutationApplication
+   */
+  omit?: Prisma.RealExecutionAccountingMutationApplicationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealExecutionAccountingMutationApplicationInclude<ExtArgs> | null
+  where?: Prisma.RealExecutionAccountingMutationApplicationWhereInput
 }
 
 /**

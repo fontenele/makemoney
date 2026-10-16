@@ -1,4 +1,7 @@
-import { AgenticWalletMarketSwapBalanceChange } from './agentic-wallet-market-swap-accounting-balance-evidence';
+import {
+  AgenticWalletMarketSwapBalanceChange,
+  isValidAgenticWalletMarketSwapBalanceChange,
+} from './agentic-wallet-market-swap-accounting-balance-evidence';
 import { StoredAgenticWalletMarketSwapAccountingMutationAuthorization } from './agentic-wallet-market-swap-accounting-mutation-authorization.store';
 import { isValidStoredAgenticWalletMarketSwapAccountingMutationAuthorization } from './agentic-wallet-market-swap-accounting-mutation-authorization.store';
 
@@ -85,6 +88,63 @@ export interface AgenticWalletMarketSwapAccountingMutationApplicationAssessment 
   readonly accountingMutationPrepared: boolean;
   readonly accountingMutationComplete: false;
   readonly submissionRetryAllowed: false;
+}
+
+export function isValidAgenticWalletMarketSwapAccountingMutationApplication(
+  value: unknown,
+): value is AgenticWalletMarketSwapAccountingMutationApplication {
+  if (typeof value !== 'object' || value === null || Array.isArray(value))
+    return false;
+  const application = value as Record<string, unknown>;
+  if (
+    application.scope !==
+      'agentic_wallet_market_swap_accounting_mutation_application' ||
+    application.acknowledgment !==
+      ACCOUNTING_MUTATION_APPLICATION_ACKNOWLEDGMENT ||
+    application.financialReconciliationComplete !== true ||
+    application.accountingMutationRequired !== true ||
+    application.accountingMutationAuthorized !== true ||
+    application.accountingMutationPrepared !== true ||
+    application.accountingMutationComplete !== false ||
+    application.submissionRetryAllowed !== false ||
+    !(application.authorizationRecordedAt instanceof Date) ||
+    !Number.isFinite(application.authorizationRecordedAt.getTime())
+  )
+    return false;
+
+  const request = {
+    applicationId: application.applicationId,
+    authorizationId: application.authorizationId,
+    mutationId: application.mutationId,
+    planFingerprint: application.planFingerprint,
+    gateId: application.gateId,
+    transactionHash: application.transactionHash,
+    acknowledgment: application.acknowledgment,
+    currentBalances: application.currentBalances,
+    balanceCoverageComplete: true,
+    balancesObservedAt: application.balancesObservedAt,
+    preparedAt: application.preparedAt,
+  } as AgenticWalletMarketSwapAccountingMutationApplicationRequest;
+  if (!isValidRequest(request)) return false;
+  if (
+    request.balancesObservedAt.getTime() <
+    application.authorizationRecordedAt.getTime()
+  )
+    return false;
+  if (
+    !Array.isArray(application.balanceTransitions) ||
+    application.balanceTransitions.length < 1 ||
+    application.balanceTransitions.length > 20
+  )
+    return false;
+  const identities = new Set<string>();
+  for (const raw of application.balanceTransitions as unknown[]) {
+    if (!isValidAgenticWalletMarketSwapBalanceChange(raw)) return false;
+    const key = identity(raw);
+    if (identities.has(key)) return false;
+    identities.add(key);
+  }
+  return true;
 }
 
 export function prepareAgenticWalletMarketSwapAccountingMutationApplication(

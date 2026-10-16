@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-16 — Apply authorized local accounting atomically
+
+- Added explicit local accounting balances plus one immutable application receipt per authorization, commitment, evidence chain, gate, transaction, and plan fingerprint.
+- Added an unregistered serializable Prisma writer that reloads the complete durable authorization relation and reruns M10.95 against the exact database balance snapshot.
+- Applied every transition with a conditional expected-before update in one transaction, so missing, stale, malformed, or concurrently changed balances roll back the complete application.
+- Added canonical request fingerprinting, exact replay without repeated balance mutation, divergent-reuse conflicts, and persisted receipt revalidation.
+- Extended generated Prisma support and PostgreSQL E2E coverage across all 32 migrations; no route, runtime registration, provider call, valuation, PnL calculation, submission retry, funding, executor, or real order was added.
+- Verified all 2,331 backend tests across 199 suites, including 8 focused writer tests, all 95 PostgreSQL E2E tests across 9 suites, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live backend health.
+
 ## 2026-10-16 — Preflight atomic accounting application
 
 - Added a pure fail-closed boundary that accepts only a structurally valid stored accounting authorization and a complete current local-ledger balance snapshot.

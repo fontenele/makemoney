@@ -414,6 +414,8 @@ export const ModelName = {
   RealExecutionAccountingBalanceEvidence: 'RealExecutionAccountingBalanceEvidence',
   RealExecutionAccountingMutationCommitment: 'RealExecutionAccountingMutationCommitment',
   RealExecutionAccountingMutationAuthorization: 'RealExecutionAccountingMutationAuthorization',
+  RealExecutionAccountingBalance: 'RealExecutionAccountingBalance',
+  RealExecutionAccountingMutationApplication: 'RealExecutionAccountingMutationApplication',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -432,7 +434,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1694,6 +1696,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RealExecutionAccountingBalance: {
+      payload: Prisma.$RealExecutionAccountingBalancePayload<ExtArgs>
+      fields: Prisma.RealExecutionAccountingBalanceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionAccountingBalanceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalancePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionAccountingBalanceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalancePayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionAccountingBalanceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalancePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionAccountingBalanceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalancePayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionAccountingBalanceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalancePayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionAccountingBalanceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalancePayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionAccountingBalanceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionAccountingBalanceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalancePayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionAccountingBalanceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalancePayload>
+        }
+        update: {
+          args: Prisma.RealExecutionAccountingBalanceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalancePayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionAccountingBalanceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionAccountingBalanceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionAccountingBalanceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalancePayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionAccountingBalanceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingBalancePayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionAccountingBalanceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionAccountingBalance>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionAccountingBalanceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionAccountingBalanceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionAccountingBalanceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionAccountingBalanceCountAggregateOutputType> | number
+        }
+      }
+    }
+    RealExecutionAccountingMutationApplication: {
+      payload: Prisma.$RealExecutionAccountingMutationApplicationPayload<ExtArgs>
+      fields: Prisma.RealExecutionAccountingMutationApplicationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionAccountingMutationApplicationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationApplicationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionAccountingMutationApplicationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationApplicationPayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionAccountingMutationApplicationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationApplicationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionAccountingMutationApplicationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationApplicationPayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionAccountingMutationApplicationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationApplicationPayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionAccountingMutationApplicationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationApplicationPayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionAccountingMutationApplicationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionAccountingMutationApplicationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationApplicationPayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionAccountingMutationApplicationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationApplicationPayload>
+        }
+        update: {
+          args: Prisma.RealExecutionAccountingMutationApplicationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationApplicationPayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionAccountingMutationApplicationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionAccountingMutationApplicationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionAccountingMutationApplicationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationApplicationPayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionAccountingMutationApplicationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationApplicationPayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionAccountingMutationApplicationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionAccountingMutationApplication>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionAccountingMutationApplicationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionAccountingMutationApplicationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionAccountingMutationApplicationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionAccountingMutationApplicationCountAggregateOutputType> | number
+        }
+      }
+    }
     ObservedSpotSymbol: {
       payload: Prisma.$ObservedSpotSymbolPayload<ExtArgs>
       fields: Prisma.ObservedSpotSymbolFieldRefs
@@ -2267,6 +2417,40 @@ export const RealExecutionAccountingMutationAuthorizationScalarFieldEnum = {
 export type RealExecutionAccountingMutationAuthorizationScalarFieldEnum = (typeof RealExecutionAccountingMutationAuthorizationScalarFieldEnum)[keyof typeof RealExecutionAccountingMutationAuthorizationScalarFieldEnum]
 
 
+export const RealExecutionAccountingBalanceScalarFieldEnum = {
+  assetIdentity: 'assetIdentity',
+  assetType: 'assetType',
+  assetAddress: 'assetAddress',
+  assetSymbol: 'assetSymbol',
+  quantity: 'quantity',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RealExecutionAccountingBalanceScalarFieldEnum = (typeof RealExecutionAccountingBalanceScalarFieldEnum)[keyof typeof RealExecutionAccountingBalanceScalarFieldEnum]
+
+
+export const RealExecutionAccountingMutationApplicationScalarFieldEnum = {
+  id: 'id',
+  authorizationId: 'authorizationId',
+  accountingMutationCommitmentId: 'accountingMutationCommitmentId',
+  accountingBalanceEvidenceId: 'accountingBalanceEvidenceId',
+  financialReconciliationEvidenceId: 'financialReconciliationEvidenceId',
+  gateId: 'gateId',
+  transactionHash: 'transactionHash',
+  planFingerprint: 'planFingerprint',
+  acknowledgment: 'acknowledgment',
+  currentBalances: 'currentBalances',
+  balanceTransitions: 'balanceTransitions',
+  authorizationRecordedAt: 'authorizationRecordedAt',
+  balancesObservedAt: 'balancesObservedAt',
+  preparedAt: 'preparedAt',
+  requestFingerprint: 'requestFingerprint',
+  appliedAt: 'appliedAt'
+} as const
+
+export type RealExecutionAccountingMutationApplicationScalarFieldEnum = (typeof RealExecutionAccountingMutationApplicationScalarFieldEnum)[keyof typeof RealExecutionAccountingMutationApplicationScalarFieldEnum]
+
+
 export const ObservedSpotSymbolScalarFieldEnum = {
   provider: 'provider',
   symbol: 'symbol',
@@ -2639,6 +2823,8 @@ export type GlobalOmitConfig = {
   realExecutionAccountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceOmit
   realExecutionAccountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentOmit
   realExecutionAccountingMutationAuthorization?: Prisma.RealExecutionAccountingMutationAuthorizationOmit
+  realExecutionAccountingBalance?: Prisma.RealExecutionAccountingBalanceOmit
+  realExecutionAccountingMutationApplication?: Prisma.RealExecutionAccountingMutationApplicationOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
   listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit
   listingCheckpointTopOfBook?: Prisma.ListingCheckpointTopOfBookOmit

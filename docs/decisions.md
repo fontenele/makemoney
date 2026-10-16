@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-16 — Complete local accounting only through one conditional transaction
+
+An authorized M10.95 application can become stale between preparation and persistence, and an ordinary retry after success would see the already-updated balances. Rechecking only the caller snapshot would permit lost updates; rerunning balance writes during replay would duplicate financial effects.
+
+M10.96 therefore reloads the complete durable authorization and current local balances under a serializable transaction plus a dedicated advisory lock, reruns M10.95, and conditionally changes each balance only while its quantity still equals the authorized `beforeQuantity`. Any failed comparison aborts every update. The same transaction records a uniquely correlated immutable receipt. Exact replay is recognized from its canonical request fingerprint before balance inspection and returns the receipt without mutation; divergent reuse conflicts. The store remains outside NestJS runtime wiring and has no provider or order capability.
+
 ## 2026-10-16 — Match the local ledger before preparing an authorized write
 
 A durable authorization proves which wallet-observed transitions may be reflected locally, but it does not prove that the current local ledger still contains their expected starting quantities. Applying transitions over missing, stale, or already-updated balances could overwrite concurrent accounting or duplicate a completed effect.

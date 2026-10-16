@@ -227,7 +227,7 @@ export function isValidAgenticWalletMarketSwapAccountingBalanceEvidence(
 
   const identities = new Set<string>();
   for (const raw of value.balanceChanges as unknown[]) {
-    if (!isValidBalanceChange(raw)) return false;
+    if (!isValidAgenticWalletMarketSwapBalanceChange(raw)) return false;
     const entry = raw;
     const identity =
       entry.assetType === 'token'
@@ -239,7 +239,7 @@ export function isValidAgenticWalletMarketSwapAccountingBalanceEvidence(
   return true;
 }
 
-function isValidBalanceChange(
+export function isValidAgenticWalletMarketSwapBalanceChange(
   value: unknown,
 ): value is AgenticWalletMarketSwapBalanceChange {
   if (typeof value !== 'object' || value === null) return false;

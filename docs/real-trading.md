@@ -1739,3 +1739,24 @@ Successful output defensively copies and deterministically orders both the curre
 - Every current quantity must equal its authorized `beforeQuantity`; missing, extra, duplicate, malformed, or divergent balances fail closed.
 - Balance observation is no earlier than authorization recording, and preparation is no earlier than balance observation.
 - Valid output is defensive and deterministic, marks preparation only, and adds no schema, repository, route, provider call, ledger/PnL mutation, valuation, funding, executor, or real order.
+
+## M10.96 — Atomic local accounting application
+
+M10.96 introduces the first writer for the explicitly authorized accounting path. PostgreSQL now holds canonical local accounting balances by token address or native BNB identity and one immutable application receipt uniquely correlated to the authorization, commitment, accounting evidence, financial evidence, gate, provider transaction, and plan fingerprint.
+
+The unregistered Prisma store rejects malformed application values before access and runs under a serializable transaction with a dedicated advisory lock. It first detects an exact persisted replay by canonical request fingerprint. For a new application it reloads the complete durable authorization relation, reconstructs it through the existing M10.91–M10.93 validators, reads every required accounting balance, and reruns M10.95 using those database quantities. Each update then includes its exact authorized `beforeQuantity` as a condition. Any absent, stale, malformed, or concurrently changed balance aborts every transition and the receipt insertion.
+
+On success the same transaction stores the old balance snapshot, exact transitions, all correlation identities, chronology, acknowledgment, request fingerprint, and application time. The returned completion snapshot alone sets `accountingMutationComplete: true`; `submissionRetryAllowed` remains false. An exact retry returns the immutable receipt before inspecting already-updated balances, so it never repeats a debit or credit. The store has no NestJS registration, controller, provider access, valuation, PnL calculation, funding path, executor, or order capability.
+
+### M10.96 acceptance criteria
+
+- Malformed application input fails before persistence access.
+- First application reloads and revalidates the complete durable authorization relation and reruns M10.95 against the database balance snapshot.
+- Every required balance must exist with a canonical asset shape and exact authorized `beforeQuantity`.
+- All transitions use conditional expected-before updates in one serializable transaction; any mismatch rolls back the complete application.
+- One immutable receipt uniquely binds the full authorization/evidence/gate/transaction/plan chain and application chronology.
+- Exact canonical replay returns the receipt without touching balances; divergent identity reuse conflicts.
+- Persisted receipt mapping reruns the shared authorization and application policies and rejects malformed or cross-related data.
+- Only successful application reports `accountingMutationComplete: true`; submission retry remains forbidden.
+- PostgreSQL E2E applies all 32 migrations from scratch and proves exact balance replacement plus replay without duplicate mutation.
+- The writer remains unregistered and adds no route, provider call, valuation, PnL calculation, funding, executor, or real order.
