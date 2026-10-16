@@ -1689,3 +1689,20 @@ The request also carries the literal `durable_reconciliation_and_balance_evidenc
 - Authorization cannot predate durable commitment recording; equality is valid.
 - Successful output is defensive, sets `accountingMutationAuthorized: true`, keeps `accountingMutationComplete: false`, and keeps submission retry forbidden.
 - The boundary remains unregistered and unpersisted and adds no schema, route, provider call, wallet-ledger/PnL mutation, valuation, funding, executor, or real order.
+
+## M10.93 — Durable accounting mutation authorization
+
+M10.93 gives each valid M10.92 authorization one immutable PostgreSQL destination. The row binds the authorization UUID and exact acknowledgment to the durable mutation commitment, accounting evidence, financial evidence, gate, provider transaction hash, and canonical plan fingerprint. These identities are independently unique so one completed provider execution cannot acquire multiple accounting authorizations through a different correlation key.
+
+The serializable store rejects structurally invalid authorization before persistence access and takes a dedicated advisory lock. Before first insertion it reloads the commitment with its complete accounting and financial evidence relation, reapplies the M10.91 durable read policy, and reruns M10.92 against that reconstructed commitment. Recording time must be finite and no earlier than authorization time.
+
+A canonical SHA-256 request fingerprint covers the complete authorization. Exact replay returns the immutable persisted authorization; changed reuse conflicts, and malformed or cross-related persisted data fails closed. The store is compiled but unregistered and performs no accounting mutation.
+
+### M10.93 acceptance criteria
+
+- One immutable authorization row is allowed per commitment, accounting evidence, financial evidence, gate, transaction hash, and plan fingerprint.
+- Structurally invalid authorization is rejected before database access.
+- The complete durable commitment relation is revalidated through M10.91 and M10.92 before insertion.
+- Recording cannot predate authorization; exact canonical replay is idempotent and divergent reuse conflicts.
+- Persisted acknowledgment, identities, relation content, chronology, and authorization output are revalidated on return.
+- Accounting mutation remains incomplete, submission retry remains forbidden, and the store adds no route, runtime registration, provider call, ledger/PnL mutation, valuation, funding, executor, or real order.

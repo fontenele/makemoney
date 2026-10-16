@@ -308,23 +308,42 @@ model RealExecutionAccountingBalanceEvidence {
 }
 
 model RealExecutionAccountingMutationCommitment {
-  id                                String                                       @id @db.Uuid
-  accountingBalanceEvidenceId       String                                       @unique @map("accounting_balance_evidence_id") @db.Uuid
-  financialReconciliationEvidenceId String                                       @unique @map("financial_reconciliation_evidence_id") @db.Uuid
-  gateId                            String                                       @unique @map("gate_id") @db.Uuid
-  transactionHash                   String                                       @unique @map("transaction_hash") @db.VarChar(66)
-  planFingerprint                   String                                       @unique @map("plan_fingerprint") @db.Char(64)
-  balanceTransitions                Json                                         @map("balance_transitions")
-  evidenceObservedAt                DateTime                                     @map("evidence_observed_at")
-  evidenceRecordedAt                DateTime                                     @map("evidence_recorded_at")
-  preparedAt                        DateTime                                     @map("prepared_at")
-  requestFingerprint                String                                       @map("request_fingerprint") @db.Char(64)
-  recordedAt                        DateTime                                     @default(now()) @map("recorded_at")
-  accountingBalanceEvidence         RealExecutionAccountingBalanceEvidence       @relation(fields: [accountingBalanceEvidenceId], references: [id], onDelete: Restrict)
-  financialReconciliationEvidence   RealExecutionFinancialReconciliationEvidence @relation(fields: [financialReconciliationEvidenceId], references: [id], onDelete: Restrict)
+  id                                String                                        @id @db.Uuid
+  accountingBalanceEvidenceId       String                                        @unique @map("accounting_balance_evidence_id") @db.Uuid
+  financialReconciliationEvidenceId String                                        @unique @map("financial_reconciliation_evidence_id") @db.Uuid
+  gateId                            String                                        @unique @map("gate_id") @db.Uuid
+  transactionHash                   String                                        @unique @map("transaction_hash") @db.VarChar(66)
+  planFingerprint                   String                                        @unique @map("plan_fingerprint") @db.Char(64)
+  balanceTransitions                Json                                          @map("balance_transitions")
+  evidenceObservedAt                DateTime                                      @map("evidence_observed_at")
+  evidenceRecordedAt                DateTime                                      @map("evidence_recorded_at")
+  preparedAt                        DateTime                                      @map("prepared_at")
+  requestFingerprint                String                                        @map("request_fingerprint") @db.Char(64)
+  recordedAt                        DateTime                                      @default(now()) @map("recorded_at")
+  accountingBalanceEvidence         RealExecutionAccountingBalanceEvidence        @relation(fields: [accountingBalanceEvidenceId], references: [id], onDelete: Restrict)
+  financialReconciliationEvidence   RealExecutionFinancialReconciliationEvidence  @relation(fields: [financialReconciliationEvidenceId], references: [id], onDelete: Restrict)
+  accountingMutationAuthorization   RealExecutionAccountingMutationAuthorization?
 
   @@index([recordedAt])
   @@map("real_execution_accounting_mutation_commitments")
+}
+
+model RealExecutionAccountingMutationAuthorization {
+  id                                String                                    @id @db.Uuid
+  accountingMutationCommitmentId    String                                    @unique(map: "real_exec_acct_auth_commitment_key") @map("accounting_mutation_commitment_id") @db.Uuid
+  accountingBalanceEvidenceId       String                                    @unique(map: "real_exec_acct_auth_balance_key") @map("accounting_balance_evidence_id") @db.Uuid
+  financialReconciliationEvidenceId String                                    @unique(map: "real_exec_acct_auth_financial_key") @map("financial_reconciliation_evidence_id") @db.Uuid
+  gateId                            String                                    @unique(map: "real_exec_acct_auth_gate_key") @map("gate_id") @db.Uuid
+  transactionHash                   String                                    @unique(map: "real_exec_acct_auth_tx_key") @map("transaction_hash") @db.VarChar(66)
+  planFingerprint                   String                                    @unique(map: "real_exec_acct_auth_plan_key") @map("plan_fingerprint") @db.Char(64)
+  acknowledgment                    String                                    @map("acknowledgment") @db.VarChar(96)
+  authorizedAt                      DateTime                                  @map("authorized_at")
+  requestFingerprint                String                                    @map("request_fingerprint") @db.Char(64)
+  recordedAt                        DateTime                                  @default(now()) @map("recorded_at")
+  accountingMutationCommitment      RealExecutionAccountingMutationCommitment @relation(fields: [accountingMutationCommitmentId], references: [id], onDelete: Restrict)
+
+  @@index([recordedAt], map: "real_exec_acct_auth_recorded_at_idx")
+  @@map("real_execution_accounting_mutation_authorizations")
 }
 
 model ObservedSpotSymbol {

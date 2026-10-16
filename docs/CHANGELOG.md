@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-16 — Persist immutable accounting mutation authorizations
+
+- Added one immutable PostgreSQL authorization row per commitment, accounting evidence, financial evidence, gate, transaction hash, and canonical plan fingerprint.
+- Added a serializable Prisma store that rejects malformed input before access and revalidates the complete M10.91 durable commitment relation before rerunning M10.92.
+- Added canonical request fingerprinting, exact idempotent replay, divergent reuse conflict, persisted-row validation, and post-authorization recording chronology.
+- Extended generated Prisma support and PostgreSQL E2E coverage across all 31 migrations.
+- Kept accounting mutation incomplete and submission retry forbidden; added no route, runtime registration, provider call, ledger/PnL mutation, valuation, funding, executor, or real order.
+- Verified all 2,292 backend tests across 196 suites, including 8 new focused authorization-store tests, all 95 PostgreSQL E2E tests across 9 suites, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, and whitespace checks. Live health remained unavailable because the API was not running and the bounded startup probe did not expose the endpoint.
+
 ## 2026-10-15 — Authorize exact durable accounting commitments
 
 - Added a pure fail-closed authorization boundary over structurally valid stored M10.90 commitments.

@@ -120,6 +120,11 @@ export type RealExecutionAccountingBalanceEvidence = Prisma.RealExecutionAccount
  */
 export type RealExecutionAccountingMutationCommitment = Prisma.RealExecutionAccountingMutationCommitmentModel
 /**
+ * Model RealExecutionAccountingMutationAuthorization
+ * 
+ */
+export type RealExecutionAccountingMutationAuthorization = Prisma.RealExecutionAccountingMutationAuthorizationModel
+/**
  * Model ObservedSpotSymbol
  * 
  */

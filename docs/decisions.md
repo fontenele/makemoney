@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-16 — Revalidate durable commitment before storing accounting authority
+
+An in-memory M10.92 authorization can be structurally valid while referring to a commitment that is absent, corrupted, or different in PostgreSQL. Persisting it directly would turn caller-supplied content into durable local mutation authority without reproving the financial evidence chain.
+
+M10.93 therefore records authorization only under a serializable advisory lock after loading the commitment with its complete accounting and financial relations, reapplying M10.91, and rerunning M10.92. Unique durable identities prevent a commitment, evidence set, gate, transaction, or plan from receiving multiple authorizations. A canonical fingerprint distinguishes exact replay from changed reuse, and recording chronology is checked independently. Persistence authorizes only a future local accounting write; no ledger/PnL mutation, runtime path, provider call, retry, or execution follows from the row.
+
 ## 2026-10-15 — Bind accounting authorization to exact durable content
 
 A durable commitment proves which balance transitions were prepared, but its existence alone must not silently grant authority to mutate the local ledger. Authorization also cannot identify work only by a mutation UUID because a caller could pair that identity with a different plan, gate, or provider transaction.

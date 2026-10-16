@@ -31,36 +31,48 @@ export class PrismaAgenticWalletMarketSwapAccountingMutationCommitmentReadStore 
       });
     if (row === null) return null;
 
-    const stored =
-      mapPersistedAgenticWalletMarketSwapAccountingMutationCommitment(row);
-    const storedEvidence =
-      revalidatePersistedAgenticWalletMarketSwapAccountingBalanceEvidence(
-        row.accountingBalanceEvidence,
-        gateId,
-      );
-    const planAssessment =
-      assessAgenticWalletMarketSwapAccountingMutationPlan(storedEvidence);
-    if (planAssessment.plan === null)
-      throw new Error(
-        'Persisted accounting mutation commitment is inconsistent',
-      );
-    const commitmentAssessment =
-      prepareAgenticWalletMarketSwapAccountingMutationCommitment(
-        planAssessment.plan,
-        stored.commitment.mutationId,
-        stored.commitment.preparedAt,
-      );
-    if (
-      commitmentAssessment.commitment === null ||
-      !isDeepStrictEqual(commitmentAssessment.commitment, stored.commitment)
-    )
-      throw new Error(
-        'Persisted accounting mutation commitment is inconsistent',
-      );
-
-    return {
-      commitment: commitmentAssessment.commitment,
-      recordedAt: new Date(stored.recordedAt),
-    };
+    return revalidatePersistedAgenticWalletMarketSwapAccountingMutationCommitment(
+      row,
+      gateId,
+    );
   }
+}
+
+export function revalidatePersistedAgenticWalletMarketSwapAccountingMutationCommitment(
+  row: Parameters<
+    typeof mapPersistedAgenticWalletMarketSwapAccountingMutationCommitment
+  >[0] & {
+    accountingBalanceEvidence: Parameters<
+      typeof revalidatePersistedAgenticWalletMarketSwapAccountingBalanceEvidence
+    >[0];
+  },
+  gateId: string,
+) {
+  const stored =
+    mapPersistedAgenticWalletMarketSwapAccountingMutationCommitment(row);
+  const storedEvidence =
+    revalidatePersistedAgenticWalletMarketSwapAccountingBalanceEvidence(
+      row.accountingBalanceEvidence,
+      gateId,
+    );
+  const planAssessment =
+    assessAgenticWalletMarketSwapAccountingMutationPlan(storedEvidence);
+  if (planAssessment.plan === null)
+    throw new Error('Persisted accounting mutation commitment is inconsistent');
+  const commitmentAssessment =
+    prepareAgenticWalletMarketSwapAccountingMutationCommitment(
+      planAssessment.plan,
+      stored.commitment.mutationId,
+      stored.commitment.preparedAt,
+    );
+  if (
+    commitmentAssessment.commitment === null ||
+    !isDeepStrictEqual(commitmentAssessment.commitment, stored.commitment)
+  )
+    throw new Error('Persisted accounting mutation commitment is inconsistent');
+
+  return {
+    commitment: commitmentAssessment.commitment,
+    recordedAt: new Date(stored.recordedAt),
+  };
 }

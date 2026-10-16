@@ -413,6 +413,7 @@ export const ModelName = {
   RealExecutionFinancialReconciliationEvidence: 'RealExecutionFinancialReconciliationEvidence',
   RealExecutionAccountingBalanceEvidence: 'RealExecutionAccountingBalanceEvidence',
   RealExecutionAccountingMutationCommitment: 'RealExecutionAccountingMutationCommitment',
+  RealExecutionAccountingMutationAuthorization: 'RealExecutionAccountingMutationAuthorization',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
   ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
@@ -431,7 +432,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1619,6 +1620,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RealExecutionAccountingMutationAuthorization: {
+      payload: Prisma.$RealExecutionAccountingMutationAuthorizationPayload<ExtArgs>
+      fields: Prisma.RealExecutionAccountingMutationAuthorizationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationAuthorizationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationAuthorizationPayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationAuthorizationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationAuthorizationPayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationAuthorizationPayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationAuthorizationPayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationAuthorizationPayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationAuthorizationPayload>
+        }
+        update: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationAuthorizationPayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationAuthorizationPayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingMutationAuthorizationPayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionAccountingMutationAuthorization>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionAccountingMutationAuthorizationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionAccountingMutationAuthorizationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionAccountingMutationAuthorizationCountAggregateOutputType> | number
+        }
+      }
+    }
     ObservedSpotSymbol: {
       payload: Prisma.$ObservedSpotSymbolPayload<ExtArgs>
       fields: Prisma.ObservedSpotSymbolFieldRefs
@@ -2175,6 +2250,23 @@ export const RealExecutionAccountingMutationCommitmentScalarFieldEnum = {
 export type RealExecutionAccountingMutationCommitmentScalarFieldEnum = (typeof RealExecutionAccountingMutationCommitmentScalarFieldEnum)[keyof typeof RealExecutionAccountingMutationCommitmentScalarFieldEnum]
 
 
+export const RealExecutionAccountingMutationAuthorizationScalarFieldEnum = {
+  id: 'id',
+  accountingMutationCommitmentId: 'accountingMutationCommitmentId',
+  accountingBalanceEvidenceId: 'accountingBalanceEvidenceId',
+  financialReconciliationEvidenceId: 'financialReconciliationEvidenceId',
+  gateId: 'gateId',
+  transactionHash: 'transactionHash',
+  planFingerprint: 'planFingerprint',
+  acknowledgment: 'acknowledgment',
+  authorizedAt: 'authorizedAt',
+  requestFingerprint: 'requestFingerprint',
+  recordedAt: 'recordedAt'
+} as const
+
+export type RealExecutionAccountingMutationAuthorizationScalarFieldEnum = (typeof RealExecutionAccountingMutationAuthorizationScalarFieldEnum)[keyof typeof RealExecutionAccountingMutationAuthorizationScalarFieldEnum]
+
+
 export const ObservedSpotSymbolScalarFieldEnum = {
   provider: 'provider',
   symbol: 'symbol',
@@ -2546,6 +2638,7 @@ export type GlobalOmitConfig = {
   realExecutionFinancialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceOmit
   realExecutionAccountingBalanceEvidence?: Prisma.RealExecutionAccountingBalanceEvidenceOmit
   realExecutionAccountingMutationCommitment?: Prisma.RealExecutionAccountingMutationCommitmentOmit
+  realExecutionAccountingMutationAuthorization?: Prisma.RealExecutionAccountingMutationAuthorizationOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
   listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit
   listingCheckpointTopOfBook?: Prisma.ListingCheckpointTopOfBookOmit

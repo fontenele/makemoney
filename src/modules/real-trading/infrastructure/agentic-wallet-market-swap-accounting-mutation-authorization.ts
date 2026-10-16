@@ -1,3 +1,5 @@
+import { isDeepStrictEqual } from 'node:util';
+
 import { prepareAgenticWalletMarketSwapAccountingMutationCommitment } from './agentic-wallet-market-swap-accounting-mutation-commitment';
 import {
   StoredAgenticWalletMarketSwapAccountingMutationCommitment,
@@ -129,6 +131,44 @@ export function authorizeAgenticWalletMarketSwapAccountingMutation(
     accountingMutationComplete: false,
     submissionRetryAllowed: false,
   };
+}
+
+export function isValidAgenticWalletMarketSwapAccountingMutationAuthorization(
+  value: unknown,
+): value is AgenticWalletMarketSwapAccountingMutationAuthorization {
+  if (typeof value !== 'object' || value === null || Array.isArray(value))
+    return false;
+  const authorization = value as Record<string, unknown>;
+  const stored =
+    authorization.commitment as StoredAgenticWalletMarketSwapAccountingMutationCommitment;
+  if (
+    authorization.scope !==
+      'agentic_wallet_market_swap_accounting_mutation_authorization' ||
+    !isValidStoredAgenticWalletMarketSwapAccountingMutationCommitment(stored)
+  )
+    return false;
+  const assessment = authorizeAgenticWalletMarketSwapAccountingMutation(
+    stored,
+    {
+      authorizationId: authorization.authorizationId as string,
+      mutationId: stored.commitment.mutationId,
+      planFingerprint: stored.commitment.planFingerprint,
+      gateId: stored.commitment.plan.gateId,
+      transactionHash: stored.commitment.plan.transactionHash,
+      acknowledgment:
+        authorization.acknowledgment as typeof ACCOUNTING_MUTATION_AUTHORIZATION_ACKNOWLEDGMENT,
+      authorizedAt: authorization.authorizedAt as Date,
+    },
+  );
+  return (
+    authorization.financialReconciliationComplete === true &&
+    authorization.accountingMutationRequired === true &&
+    authorization.accountingMutationAuthorized === true &&
+    authorization.accountingMutationComplete === false &&
+    authorization.submissionRetryAllowed === false &&
+    assessment.authorization !== null &&
+    isDeepStrictEqual(assessment.authorization, value)
+  );
 }
 
 function isValidRequest(
