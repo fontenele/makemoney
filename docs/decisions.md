@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-16 — Reconstruct completed accounting before trusting a read
+
+An application receipt can claim completed accounting while its durable authorization, commitment, evidence chain, content fingerprint, or chronology has become inconsistent. Reading only the top-level receipt would allow a plausible row to escape without proving that it still represents the exact atomic operation M10.96 accepted.
+
+M10.97 therefore validates the gate UUID before access, loads the entire required relation in one Prisma query, and delegates to the shared M10.96 persisted mapper. The requested gate must match the reconstructed application, absence remains distinct from corruption, and returned arrays plus dates are defensive copies. This reader is not registered in the application and cannot mutate a balance or reach a provider.
+
 ## 2026-10-16 — Complete local accounting only through one conditional transaction
 
 An authorized M10.95 application can become stale between preparation and persistence, and an ordinary retry after success would see the already-updated balances. Rechecking only the caller snapshot would permit lost updates; rerunning balance writes during replay would duplicate financial effects.

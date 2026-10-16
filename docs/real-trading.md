@@ -1760,3 +1760,22 @@ On success the same transaction stores the old balance snapshot, exact transitio
 - Only successful application reports `accountingMutationComplete: true`; submission retry remains forbidden.
 - PostgreSQL E2E applies all 32 migrations from scratch and proves exact balance replacement plus replay without duplicate mutation.
 - The writer remains unregistered and adds no route, provider call, valuation, PnL calculation, funding, executor, or real order.
+
+## M10.97 — Durable accounting application reader
+
+M10.97 adds the read boundary for the immutable M10.96 application receipt. The caller supplies one canonical gate UUID; malformed identity fails before database access, absence returns `null`, and a present receipt is loaded together with its accounting mutation authorization, commitment, accounting balance evidence, and financial reconciliation evidence in one required relation.
+
+The reader does not trust the top-level completion claim independently. It passes the complete row through the shared M10.96 persisted mapper, which reconstructs the durable commitment and authorization, reruns the M10.95 application policy over the stored before-balance snapshot, verifies denormalized identities, exact transitions, request fingerprint, and chronology, and only then returns `accountingMutationComplete: true`. The requested gate is checked again against the reconstructed value.
+
+Successful output contains defensive copies of balances, transitions, and dates. Reading does not touch the current balance table and cannot call a provider or retry a submission. The store remains outside NestJS runtime registration.
+
+### M10.97 acceptance criteria
+
+- A canonical gate UUID is required before persistence access.
+- Missing durable application returns explicit `null`.
+- A present receipt loads with the complete authorization, commitment, accounting-evidence, and financial-evidence relation.
+- The shared M10.96 persisted mapper is reapplied before returning completed accounting.
+- Requested gate, relation identity, receipt content, fingerprint, transition, or chronology divergence fails closed.
+- Returned balances, transitions, and dates are defensive copies.
+- PostgreSQL E2E proves the completed M10.96 receipt can be read unchanged by gate.
+- The reader remains unregistered and adds no schema, route, balance mutation, provider call, valuation, PnL calculation, submission retry, funding, executor, or real order.

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-16 — Read completed accounting applications by gate
+
+- Added a read-only M10.97 store contract with canonical gate UUID validation before persistence access.
+- Added a Prisma reader that loads the M10.96 receipt with its complete authorization, commitment, accounting-evidence, and financial-evidence relation.
+- Reused the shared persisted application mapper to reconstruct prior policies and reject cross-related, malformed, divergent, invalid-fingerprint, or chronologically invalid state.
+- Returned explicit absence or a defensive completed-accounting snapshot without changing balances or contacting a provider.
+- Added no schema, route, runtime registration, valuation, PnL calculation, submission retry, funding, executor, or real order.
+- Verified all 2,340 backend tests across 200 suites, including 9 focused reader tests, all 95 PostgreSQL E2E tests across 9 suites with all 32 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live backend health.
+
 ## 2026-10-16 — Apply authorized local accounting atomically
 
 - Added explicit local accounting balances plus one immutable application receipt per authorization, commitment, evidence chain, gate, transaction, and plan fingerprint.

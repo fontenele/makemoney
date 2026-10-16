@@ -24,6 +24,12 @@ export interface AgenticWalletMarketSwapAccountingMutationApplicationStore {
   }>;
 }
 
+export interface AgenticWalletMarketSwapAccountingMutationApplicationReadStore {
+  getByGateId(
+    gateId: string,
+  ): Promise<AppliedAgenticWalletMarketSwapAccountingMutation | null>;
+}
+
 export class AgenticWalletMarketSwapAccountingMutationApplicationBlockedError extends Error {
   constructor(
     readonly blockers: readonly AgenticWalletMarketSwapAccountingMutationApplicationBlocker[],
@@ -54,5 +60,13 @@ export class AgenticWalletMarketSwapAccountingLedgerMismatchError extends Error 
   constructor() {
     super('Local accounting balances no longer match the authorized plan');
     this.name = AgenticWalletMarketSwapAccountingLedgerMismatchError.name;
+  }
+}
+
+export class AgenticWalletMarketSwapAccountingMutationApplicationIdentityError extends Error {
+  constructor() {
+    super('Accounting mutation application gate identity is invalid');
+    this.name =
+      AgenticWalletMarketSwapAccountingMutationApplicationIdentityError.name;
   }
 }
