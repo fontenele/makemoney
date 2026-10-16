@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-16 — Match the local ledger before preparing an authorized write
+
+A durable authorization proves which wallet-observed transitions may be reflected locally, but it does not prove that the current local ledger still contains their expected starting quantities. Applying transitions over missing, stale, or already-updated balances could overwrite concurrent accounting or duplicate a completed effect.
+
+M10.95 therefore introduces a pure application preflight before any writer or schema. It requires exact coverage of the authorized assets and exact equality between each current local quantity and its `beforeQuantity`, plus a separate application identity, explicit review acknowledgment, complete identity correlation, and post-authorization chronology. Success prepares only a deterministic defensive plan; it does not update a balance or claim completion. A future atomic store must revalidate these facts inside its transaction.
+
 ## 2026-10-16 — Reconstruct durable accounting authorization before trusting a read
 
 An authorization row can be structurally plausible while its commitment or underlying accounting and financial evidence has been corrupted or cross-related. A reader that maps only the top-level authorization fields would let such a row escape as trusted local mutation authority.

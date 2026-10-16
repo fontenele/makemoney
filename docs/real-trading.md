@@ -1721,3 +1721,21 @@ The reader delegates persisted mapping to the same M10.93 boundary used after in
 - M10.91 and M10.92 are reapplied before returning a defensive snapshot.
 - Cross-gate, malformed, divergent, invalid-acknowledgment, or chronologically invalid durable state fails closed.
 - The reader remains unregistered and adds no schema, route, provider call, ledger/PnL mutation, valuation, funding, executor, or real order.
+
+## M10.95 — Atomic accounting application preflight
+
+M10.95 adds the last pure boundary before any future local ledger writer. A structurally valid stored M10.93 authorization is necessary but insufficient: the caller must also provide a bounded, complete, unique snapshot of current local accounting balances. Its token-address and native-asset identities must exactly cover the authorized transitions, and every current quantity must equal the corresponding authorized `beforeQuantity` as a canonical decimal string.
+
+The request binds a separate canonical application UUID to the exact authorization, mutation, plan fingerprint, gate, and provider transaction identities. It requires the literal `authorized_transitions_and_current_ledger_balances_reviewed_for_atomic_application` acknowledgment. Balance observation cannot predate durable authorization recording, and application preparation cannot predate that balance observation.
+
+Successful output defensively copies and deterministically orders both the current balances and authorized transitions. It marks only `accountingMutationPrepared: true`; authorization remains true, but `accountingMutationComplete` remains false and submission retry remains forbidden. No balance is written.
+
+### M10.95 acceptance criteria
+
+- Structurally invalid durable authorization blocks without preserving financial or mutation authority claims.
+- Application, authorization, mutation, fingerprint, gate, and transaction identities are canonical and exactly correlated.
+- The exact literal application-review acknowledgment is required independently.
+- Current local balances are bounded, canonical, unique, explicitly complete, and exactly cover all authorized asset identities.
+- Every current quantity must equal its authorized `beforeQuantity`; missing, extra, duplicate, malformed, or divergent balances fail closed.
+- Balance observation is no earlier than authorization recording, and preparation is no earlier than balance observation.
+- Valid output is defensive and deterministic, marks preparation only, and adds no schema, repository, route, provider call, ledger/PnL mutation, valuation, funding, executor, or real order.

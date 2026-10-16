@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-16 — Preflight atomic accounting application
+
+- Added a pure fail-closed boundary that accepts only a structurally valid stored accounting authorization and a complete current local-ledger balance snapshot.
+- Required canonical application identity, exact authorization/mutation/fingerprint/gate/transaction correlation, literal application-review acknowledgment, and post-authorization chronology.
+- Required bounded unique asset coverage and exact equality between every local current quantity and authorized `beforeQuantity`.
+- Returned defensive, deterministically ordered balance and transition snapshots while marking preparation only; accounting completion and submission retry remain false.
+- Added no schema, repository, route, runtime registration, provider call, ledger/PnL mutation, valuation, funding, executor, or real order.
+- Verified all 2,323 backend tests across 198 suites, including all 24 focused application-preflight tests, all 95 PostgreSQL E2E tests across 9 suites with all 31 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live backend health.
+
 ## 2026-10-16 — Read durable accounting mutation authorizations by gate
 
 - Added a read-only authorization-store contract with fail-closed canonical gate UUID validation.

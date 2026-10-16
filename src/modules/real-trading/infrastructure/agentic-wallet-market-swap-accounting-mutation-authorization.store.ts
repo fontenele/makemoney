@@ -1,6 +1,7 @@
 import {
   AgenticWalletMarketSwapAccountingMutationAuthorization,
   AgenticWalletMarketSwapAccountingMutationAuthorizationBlocker,
+  isValidAgenticWalletMarketSwapAccountingMutationAuthorization,
 } from './agentic-wallet-market-swap-accounting-mutation-authorization';
 
 export interface StoredAgenticWalletMarketSwapAccountingMutationAuthorization {
@@ -21,6 +22,24 @@ export interface AgenticWalletMarketSwapAccountingMutationAuthorizationReadStore
   getByGateId(
     gateId: string,
   ): Promise<StoredAgenticWalletMarketSwapAccountingMutationAuthorization | null>;
+}
+
+export function isValidStoredAgenticWalletMarketSwapAccountingMutationAuthorization(
+  value: unknown,
+): value is StoredAgenticWalletMarketSwapAccountingMutationAuthorization {
+  if (typeof value !== 'object' || value === null || Array.isArray(value))
+    return false;
+  const stored = value as Record<string, unknown>;
+  const authorization = stored.authorization;
+  const recordedAt = stored.recordedAt;
+  return (
+    isValidAgenticWalletMarketSwapAccountingMutationAuthorization(
+      authorization,
+    ) &&
+    recordedAt instanceof Date &&
+    Number.isFinite(recordedAt.getTime()) &&
+    recordedAt.getTime() >= authorization.authorizedAt.getTime()
+  );
 }
 
 export class AgenticWalletMarketSwapAccountingMutationAuthorizationBlockedError extends Error {
