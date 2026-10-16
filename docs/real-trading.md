@@ -1779,3 +1779,24 @@ Successful output contains defensive copies of balances, transitions, and dates.
 - Returned balances, transitions, and dates are defensive copies.
 - PostgreSQL E2E proves the completed M10.96 receipt can be read unchanged by gate.
 - The reader remains unregistered and adds no schema, route, balance mutation, provider call, valuation, PnL calculation, submission retry, funding, executor, or real order.
+
+## M10.98 — Trusted accounting balance initialization preflight
+
+M10.98 closes the provenance gap before any local accounting balance can be initialized. The pure, unwired preflight consumes the existing authenticated Agentic Wallet capability observation rather than accepting arbitrary starting quantities. It requires pinned CLI `1.10.0`, a connected wallet, the approved BSC chain and address, an available balance read, a canonical initialization UUID, the literal `connected_wallet_balances_reviewed_for_local_accounting_initialization` acknowledgment, and a caller-selected observation age bound from one through sixty seconds.
+
+The provider observation must contain exactly one USDT balance at the approved USDT address, exactly one BTCB balance at the approved BTCB address, and exactly one native BNB balance. Asset symbols, lowercase token identities, non-negative decimal quantities, uniqueness, and chronology are validated fail closed. Unrelated valid assets may coexist but are not imported. Successful quantities are canonicalized with decimal arithmetic into the existing local-accounting balance representation and returned with defensive dates and values.
+
+The result is only a prepared initialization snapshot. `accountingBalancesInitialized`, `quoteAuthorized`, and `submissionAuthorized` remain false. There is no persistence, schema, NestJS wiring, route, provider invocation, funding behavior, executor, or real order. A future durable initializer must revalidate these facts inside its own atomic boundary.
+
+### M10.98 acceptance criteria
+
+- Initialization requires one canonical UUID, exact operator acknowledgment, valid preparation time, and a one-to-sixty-second observation-age bound.
+- Only a pinned authenticated observation for the connected approved BSC wallet with an available balance read is accepted.
+- Approved-address USDT, approved-address BTCB, and native BNB must each have exact unique coverage and valid identity.
+- Partial, duplicate, malformed, stale, future, or identity-divergent observations fail closed.
+- Exact decimal quantities are canonicalized without native floating-point arithmetic.
+- Unrelated assets are ignored and never enter the prepared local snapshot.
+- Output dates and balances are defensive copies and the structural validator rejects mutated artifacts.
+- Success prepares exactly three balances but persists nothing and initializes nothing.
+- Quote and submission authorization remain false.
+- No schema, route, runtime registration, new provider command or call, funding, executor, or real order is added.

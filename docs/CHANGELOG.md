@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-16 — Prepare trusted local-accounting starting balances
+
+- Added a pure M10.98 preflight that derives local USDT, BTCB, and native BNB starting balances only from a fresh authenticated Agentic Wallet capability observation.
+- Required the pinned CLI contract, connected approved BSC wallet, successful balance read, complete unique approved-asset coverage, a canonical initialization identity, and an exact operator acknowledgment.
+- Canonicalized provider decimal quantities, ignored unrelated assets, and rejected malformed, partial, duplicate, stale, future, or identity-divergent observations.
+- Kept the result inert and defensive: no balance is persisted or initialized and quote/submission authorization remains false.
+- Added no schema, route, runtime registration, new provider command or call, funding, executor, or real order.
+- Verified all 2,362 backend tests across 201 suites, including 22 focused initialization-preflight tests, all 95 PostgreSQL E2E tests across 9 suites with all 32 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live backend health.
+
 ## 2026-10-16 — Read completed accounting applications by gate
 
 - Added a read-only M10.97 store contract with canonical gate UUID validation before persistence access.

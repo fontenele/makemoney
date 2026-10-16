@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-16 — Seed local accounting only from authenticated wallet observations
+
+The M10.96 balance table needs a trustworthy starting state before it can safely apply authorized transitions. Accepting arbitrary caller-supplied quantities would let local accounting begin from values that were never observed at the connected wallet and would weaken every later exact-before comparison.
+
+M10.98 therefore introduces a pure preflight over the existing authenticated, read-only Agentic Wallet capability observation. It requires explicit operator review, short bounded freshness, the connected approved BSC wallet, and exact unique USDT, BTCB, and native BNB coverage. Provider quantities are canonicalized into the existing local-balance representation, while unrelated holdings are not imported. Success prepares only a defensive snapshot; a future durable initializer must revalidate and atomically persist it. The policy cannot call the provider, initialize a row, request a quote, or authorize submission.
+
 ## 2026-10-16 — Reconstruct completed accounting before trusting a read
 
 An application receipt can claim completed accounting while its durable authorization, commitment, evidence chain, content fingerprint, or chronology has become inconsistent. Reading only the top-level receipt would allow a plausible row to escape without proving that it still represents the exact atomic operation M10.96 accepted.
