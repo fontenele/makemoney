@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-16 — Reconstruct durable accounting authorization before trusting a read
+
+An authorization row can be structurally plausible while its commitment or underlying accounting and financial evidence has been corrupted or cross-related. A reader that maps only the top-level authorization fields would let such a row escape as trusted local mutation authority.
+
+M10.94 therefore loads the complete relation and delegates to the shared M10.93 persisted mapper, which reconstructs the commitment through M10.91 and reruns M10.92 before returning a defensive snapshot. Canonical gate validation happens before persistence access and absence stays distinct from inconsistency. The read boundary remains unregistered and grants no completed-accounting claim or mutation side effect.
+
 ## 2026-10-16 — Revalidate durable commitment before storing accounting authority
 
 An in-memory M10.92 authorization can be structurally valid while referring to a commitment that is absent, corrupted, or different in PostgreSQL. Persisting it directly would turn caller-supplied content into durable local mutation authority without reproving the financial evidence chain.

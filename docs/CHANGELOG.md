@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-16 — Read durable accounting mutation authorizations by gate
+
+- Added a read-only authorization-store contract with fail-closed canonical gate UUID validation.
+- Added a Prisma reader that loads each M10.93 authorization with its commitment, accounting evidence, and financial evidence and reapplies M10.91 and M10.92 through the shared persisted mapper.
+- Returned explicit absence or a defensive stored snapshot while rejecting cross-related, malformed, divergent, invalid-acknowledgment, or chronologically invalid data.
+- Kept accounting mutation incomplete and submission retry forbidden; added no schema, route, runtime registration, provider call, ledger/PnL mutation, valuation, funding, executor, or real order.
+- Verified all 2,299 backend tests across 197 suites, including the focused 7-test reader suite, all 95 PostgreSQL E2E tests across 9 suites with all 31 migrations applied from scratch, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live backend health.
+
 ## 2026-10-16 — Persist immutable accounting mutation authorizations
 
 - Added one immutable PostgreSQL authorization row per commitment, accounting evidence, financial evidence, gate, transaction hash, and canonical plan fingerprint.

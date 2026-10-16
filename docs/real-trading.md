@@ -1706,3 +1706,18 @@ A canonical SHA-256 request fingerprint covers the complete authorization. Exact
 - Recording cannot predate authorization; exact canonical replay is idempotent and divergent reuse conflicts.
 - Persisted acknowledgment, identities, relation content, chronology, and authorization output are revalidated on return.
 - Accounting mutation remains incomplete, submission retry remains forbidden, and the store adds no route, runtime registration, provider call, ledger/PnL mutation, valuation, funding, executor, or real order.
+
+## M10.94 — Durable accounting authorization reading
+
+M10.94 adds a read-only boundary for one immutable M10.93 authorization selected by canonical gate UUID. The Prisma query loads the authorization together with its commitment, accounting balance evidence, and financial reconciliation evidence in one relation. Absence remains an explicit `null` result.
+
+The reader delegates persisted mapping to the same M10.93 boundary used after insertion. That mapper reapplies the M10.91 commitment reconstruction and M10.92 authorization policy, then verifies every denormalized durable identity, the literal acknowledgment, authorization chronology, and recording chronology. A structurally valid authorization row therefore cannot be trusted while its underlying evidence chain is malformed or divergent.
+
+### M10.94 acceptance criteria
+
+- Malformed gate UUIDs are rejected before database access.
+- Missing authorization returns explicit absence without mutation or fallback.
+- Authorization, commitment, accounting evidence, and financial evidence load in one required relation.
+- M10.91 and M10.92 are reapplied before returning a defensive snapshot.
+- Cross-gate, malformed, divergent, invalid-acknowledgment, or chronologically invalid durable state fails closed.
+- The reader remains unregistered and adds no schema, route, provider call, ledger/PnL mutation, valuation, funding, executor, or real order.

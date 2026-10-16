@@ -17,6 +17,12 @@ export interface AgenticWalletMarketSwapAccountingMutationAuthorizationStore {
   }>;
 }
 
+export interface AgenticWalletMarketSwapAccountingMutationAuthorizationReadStore {
+  getByGateId(
+    gateId: string,
+  ): Promise<StoredAgenticWalletMarketSwapAccountingMutationAuthorization | null>;
+}
+
 export class AgenticWalletMarketSwapAccountingMutationAuthorizationBlockedError extends Error {
   constructor(
     readonly blockers: readonly AgenticWalletMarketSwapAccountingMutationAuthorizationBlocker[],
@@ -40,5 +46,13 @@ export class AgenticWalletMarketSwapAccountingMutationCommitmentNotFoundError ex
     super('Durable accounting mutation commitment was not found');
     this.name =
       AgenticWalletMarketSwapAccountingMutationCommitmentNotFoundError.name;
+  }
+}
+
+export class AgenticWalletMarketSwapAccountingMutationAuthorizationIdentityError extends Error {
+  constructor() {
+    super('Accounting mutation authorization gate identity is invalid');
+    this.name =
+      AgenticWalletMarketSwapAccountingMutationAuthorizationIdentityError.name;
   }
 }

@@ -36,6 +36,7 @@ import { PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceStore } from '../
 import { PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-balance-evidence-read.store';
 import { PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-commitment.store';
 import { PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-authorization.store';
+import { PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-authorization-read.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -54,6 +55,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let accountingBalanceEvidenceReadStore: PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore;
   let accountingMutationCommitmentStore: PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore;
   let accountingMutationAuthorizationStore: PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationStore;
+  let accountingMutationAuthorizationReadStore: PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -104,6 +106,10 @@ describe('Real execution submission gate persistence (e2e)', () => {
       new PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationStore(
         prisma,
         () => new Date('2026-10-03T12:00:14.000Z'),
+      );
+    accountingMutationAuthorizationReadStore =
+      new PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore(
+        prisma,
       );
   });
 
@@ -757,6 +763,9 @@ describe('Real execution submission gate persistence (e2e)', () => {
       stored: firstAuthorization.stored,
       replayed: true,
     });
+    await expect(
+      accountingMutationAuthorizationReadStore.getByGateId(uuid(10)),
+    ).resolves.toEqual(firstAuthorization.stored);
     await expect(
       financialCompletionStore.getByGateId(uuid(10)),
     ).resolves.toMatchObject({
