@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-17 — Prepare deterministic ledger reconciliation evidence
+
+- Added a pure M10.107 commitment boundary over successful authenticated wallet/accounting-ledger reconciliation.
+- Revalidated the complete M10.103 reconciliation before preserving any success claim.
+- Required a canonical reconciliation UUID and preparation no earlier than reconciliation.
+- Deeply copied and canonically ordered initialization, current-ledger, and wallet balances plus every date.
+- Calculated and revalidated a deterministic SHA-256 fingerprint independent of balance-array order.
+- Kept the commitment persistence-ready but unstored and permanently non-authorizing.
+- Added no schema, repository, route, runtime registration, provider call, mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+- Verified all 2,449 backend tests across 210 suites, including 9 focused commitment tests, all 96 PostgreSQL E2E tests across 9 suites with all 33 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
 ## 2026-10-17 — Guard concurrent wallet reconciliation attempts per initialization
 
 - Added an unregistered M10.106 process-local guard around the complete M10.105 one-shot boundary.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-17 — Commit reconciliation evidence before choosing persistence
+
+A successful in-memory reconciliation proves wallet and local-ledger agreement at one observed boundary, but passing its mutable nested arrays and dates directly to a future store would leave canonical equality and idempotency undefined. Adding a database model immediately would combine evidence semantics with durable lifecycle decisions.
+
+M10.107 therefore introduces a pure commitment first. It revalidates the complete reconciliation, binds an independent canonical UUID and post-reconciliation preparation time, canonicalizes balance order by exact asset identity, snapshots all nested values, and hashes the exact evidence with SHA-256. A future store can now define uniqueness and replay against one stable artifact, while this increment remains unstored, unwired, and non-authorizing.
+
 ## 2026-10-17 — Suppress overlapping authenticated reads per initialization
 
 M10.105 bounds each individual call but two concurrent callers could still start two authenticated wallet reads for the same durable initialization. Sharing the first promise would also couple callers' cancellation and failure semantics, while introducing a database lease before any runtime registration would overstate the current single-process boundary.

@@ -1959,3 +1959,24 @@ The claim belongs only to one guard instance in one process. It is not a Postgre
 - Focused unit tests cover delegation, pre-claim validation, overlap suppression, cancellation isolation, independent identities, and release after success and failure.
 - The process-local limitation is explicit; no database lease or distributed guarantee is claimed.
 - No schema, route, runtime registration, provider retry, loop, timer, schedule, mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.
+
+## M10.107 — Deterministic ledger reconciliation commitment
+
+M10.107 introduces a pure evidence-preparation boundary after successful M10.103 reconciliation and before any future durable store or valuation consumer. It accepts only a structurally valid reconciliation, a separate canonical reconciliation UUID, and a finite preparation time equal to or later than the reconciliation instant. Invalid evidence cannot retain authenticated-observation or reconciled-ledger claims.
+
+The complete reconciliation is deeply copied. Initial ledger balances, current ledger balances, and authenticated wallet balances are each sorted by exact asset identity, while every nested date receives an independent copy. A deterministic SHA-256 fingerprint covers the full canonical reconciliation content. Equivalent valid balance-array orders therefore produce the same fingerprint, while changed evidence, chronology, fingerprint, or authority flags fail validation.
+
+Successful output marks only reconciliation evidence preparation. It does not persist the commitment, select uniqueness constraints, load a provider, value an asset, mutate accounting, authorize a quote or submission, fund a wallet, run an executor, or place an order.
+
+### M10.107 acceptance criteria
+
+- Only a structurally valid successful M10.103 reconciliation may be committed.
+- The reconciliation identity is a separate canonical UUID.
+- Preparation time is finite and cannot predate reconciliation.
+- Initialization, current-ledger, and wallet balances are deeply copied and deterministically ordered by asset identity.
+- All nested dates are defensively copied.
+- The SHA-256 fingerprint is deterministic across equivalent balance-array order and changes with committed evidence.
+- The exported validator regenerates and compares the canonical commitment and rejects divergent flags or fingerprints.
+- Success remains unstored and keeps quote/submission authorization false.
+- Focused unit tests cover valid preparation, canonical ordering, defensive snapshots, malformed reconciliation, invalid identity, invalid/regressed clock, and tampered commitment validation.
+- No schema, repository, route, runtime registration, provider invocation, mutation, valuation, PnL, funding, executor, or real order is added.

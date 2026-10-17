@@ -1,5 +1,11 @@
 # Current State
 
+M10.107 is complete: a pure fail-closed boundary now prepares one deterministic commitment from a structurally valid successful M10.103 accounting-ledger reconciliation.
+
+The boundary requires a separate canonical reconciliation UUID and a finite preparation time equal to or later than reconciliation. It deeply snapshots the complete initialization, current-ledger, and authenticated wallet balance evidence; canonical asset-identity ordering makes equivalent input order produce the same SHA-256 fingerprint. The exported validator regenerates the commitment and rejects changed content, fingerprints, chronology, identity, or authority flags. Success prepares evidence only: no row is stored, and quote/submission authorization remain false. No schema, repository, route, runtime registration, provider invocation, mutation, valuation, PnL, funding, executor, or real order is added.
+
+Post-M10.107 validation passed all 2,449 backend tests across 210 suites, including all 9 focused commitment tests, all 96 PostgreSQL E2E tests across 9 suites with all 33 migrations applied from scratch, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
 M10.106 is complete: an unregistered process-local guard now prevents overlapping M10.105 reconciliation attempts for the same canonical initialization identity in one guard instance.
 
 The guard reuses M10.105 request validation before consulting or acquiring its in-memory claim. The admitted caller alone delegates its exact age policy and cancellation signal; a concurrent same-identity caller fails immediately before a second provider read or durable reconciliation and neither waits nor shares cancellation. Different initialization identities can proceed independently, and a `finally` release permits a later explicit attempt after either successful completion or propagated failure. This is deliberately not a database lease or distributed lock and provides no guarantee across instances or processes. It remains outside NestJS registration and adds no schema, route, retry, loop, timer, schedule, mutable command, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
