@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-17 — Validate freshness requests before durable reconciliation reads
+
+Calling M10.109 before validating the age policy or evaluation clock would perform unnecessary database work for a request that can never produce current evidence. Retaining the caller's mutable `Date` across that read would also let the accepted temporal boundary change while I/O is pending.
+
+M10.111 therefore validates the complete request before access and captures a private evaluation-time copy before awaiting M10.109. Explicit absence remains distinct from an M10.110 blocked assessment, and reader inconsistency propagates. This composes historical evidence with temporal policy without provider access, runtime wiring, valuation, or execution authority.
+
 ## 2026-10-17 — Measure reconciliation freshness from authenticated observation time
 
 An immutable M10.109 artifact remains historically valid indefinitely, but its wallet facts become stale. Measuring age from reconciliation, preparation, or recording would let local processing and persistence extend the lifetime of older provider evidence; reloading current state would instead collapse the historical and live boundaries.

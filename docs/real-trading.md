@@ -2039,3 +2039,21 @@ Age is measured from the committed `walletObservedAt`. Later reconciliation, pre
 - The exported validator regenerates and compares the complete evidence snapshot.
 - Focused tests cover success, defensive copying, exact boundary, staleness, future evidence, invalid age/clock, corrupt stored evidence, and tampered output.
 - No schema, persistence access, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.
+
+## M10.111 — Durable ledger reconciliation freshness composition
+
+M10.111 connects the durable M10.109 reader to the pure M10.110 temporal policy without introducing a controller, provider call, or runtime registration. A caller supplies one canonical reconciliation UUID, an integer maximum age from one through sixty seconds, and a finite evaluation time. Every request field is validated before persistence access.
+
+The evaluation `Date` is copied before the asynchronous read. Missing durable evidence returns explicit `null`; a present row is passed to M10.110 with the private request snapshot. Stale or future evidence therefore remains an ordinary blocked assessment, while corrupt persisted evidence continues to throw from M10.109 rather than being hidden as absence. PostgreSQL E2E composes initialization, reconciliation recording, durable reconstruction, and freshness assessment.
+
+### M10.111 acceptance criteria
+
+- Canonical reconciliation identity, bounded age policy, and finite evaluation time are required before durable access.
+- The mutable evaluation date is defensively copied before the asynchronous read.
+- M10.109 is invoked at most once with the validated canonical identity.
+- Missing durable evidence returns explicit absence without fabricating freshness state.
+- Present durable evidence is passed through the exact M10.110 policy.
+- Stale/future blockers pass through unchanged and durable inconsistency propagates.
+- Focused tests cover successful composition, absence, pre-access validation, date isolation, stale evidence, and read failure.
+- PostgreSQL E2E proves record, durable read, and current-evidence composition with all migrations applied.
+- No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.

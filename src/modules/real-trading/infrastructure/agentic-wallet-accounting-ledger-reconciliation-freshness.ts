@@ -49,11 +49,10 @@ export function assessAgenticWalletAccountingLedgerReconciliationFreshness(
     'invalid_stored_accounting_ledger_reconciliation_commitment',
   );
   const requestValid =
-    Number.isInteger(maximumAgeMs) &&
-    maximumAgeMs >= 1 &&
-    maximumAgeMs <= 60_000 &&
-    evaluatedAt instanceof Date &&
-    Number.isFinite(evaluatedAt.getTime());
+    isValidAgenticWalletAccountingLedgerReconciliationFreshnessRequest(
+      maximumAgeMs,
+      evaluatedAt,
+    );
   addIf(
     blockers,
     !requestValid,
@@ -92,6 +91,19 @@ export function assessAgenticWalletAccountingLedgerReconciliationFreshness(
     quoteAuthorized: false,
     submissionAuthorized: false,
   };
+}
+
+export function isValidAgenticWalletAccountingLedgerReconciliationFreshnessRequest(
+  maximumAgeMs: number,
+  evaluatedAt: Date,
+): boolean {
+  return (
+    Number.isInteger(maximumAgeMs) &&
+    maximumAgeMs >= 1 &&
+    maximumAgeMs <= 60_000 &&
+    evaluatedAt instanceof Date &&
+    Number.isFinite(evaluatedAt.getTime())
+  );
 }
 
 export function isValidAgenticWalletAccountingLedgerReconciliationFreshEvidence(

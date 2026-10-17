@@ -1,5 +1,11 @@
 # Current State
 
+M10.111 is complete: an unregistered read-only service now composes the durable M10.109 reader with the pure M10.110 freshness policy.
+
+Canonical reconciliation identity, integer one-to-sixty-second maximum age, and finite evaluation time are validated before PostgreSQL access. The service snapshots the mutable evaluation `Date` before awaiting the reader, so caller mutation cannot change the admitted freshness boundary. A missing durable artifact returns explicit `null`; a present artifact preserves M10.110 success or stale/future blockers, while M10.109 corruption propagates rather than becoming absence. PostgreSQL E2E proves the complete record-read-freshness path. The service remains outside NestJS registration and adds no schema, route, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+
+Post-M10.111 validation passed all 2,481 backend tests across 214 suites, including all 8 focused composition tests and the existing 9 freshness-policy tests, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations applied from scratch, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
 M10.110 is complete: a pure fail-closed policy now prevents valid historical accounting-ledger reconciliation commitments from being mistaken for current evidence.
 
 The policy revalidates the complete stored M10.109 artifact and requires an integer maximum age from one through sixty seconds plus a finite evaluation clock. Evaluation cannot predate either the authenticated wallet observation or durable recording. Freshness is measured from `walletObservedAt`, not the later reconciliation, preparation, or recording instants, so those steps cannot artificially extend provider evidence lifetime. Exact age-boundary equality is accepted; one additional millisecond is stale. Successful evidence deeply snapshots the commitment and all dates, remains independently revalidatable, and keeps quote/submission authorization false. There is no persistence access, schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, executor, or real order.

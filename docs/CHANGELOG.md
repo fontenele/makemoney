@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-17 — Compose durable reconciliation freshness
+
+- Added the unregistered M10.111 read-only service over the M10.109 reader and M10.110 freshness policy.
+- Validated canonical identity, bounded age policy, and finite evaluation clock before durable access.
+- Snapshotted the mutable evaluation date before the asynchronous read.
+- Preserved explicit absence, pure stale/future blockers, and propagated durable corruption.
+- Added focused coverage for composition, absence, pre-access validation, defensive request capture, stale evidence, and read failure.
+- Added PostgreSQL E2E coverage for record, reconstructed read, and current-evidence assessment.
+- Added no schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+- Verified all 2,481 backend tests across 214 suites, including 8 focused composition tests and 9 freshness-policy tests, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
 ## 2026-10-17 — Bound ledger reconciliation evidence freshness
 
 - Added the pure M10.110 freshness assessment over stored M10.109 reconciliation evidence.
