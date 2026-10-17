@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-17 — Measure reconciliation freshness from authenticated observation time
+
+An immutable M10.109 artifact remains historically valid indefinitely, but its wallet facts become stale. Measuring age from reconciliation, preparation, or recording would let local processing and persistence extend the lifetime of older provider evidence; reloading current state would instead collapse the historical and live boundaries.
+
+M10.110 therefore stays pure and measures age from the committed authenticated `walletObservedAt`. It separately prevents consumption before durable recording, bounds caller policy from one through sixty seconds, revalidates the stored artifact, and returns a defensive snapshot only when every check passes. Freshness does not imply valuation, quote, submission, or execution authority.
+
 ## 2026-10-17 — Read immutable reconciliation evidence without consulting current state
 
 Once M10.108 records a reconciliation, later accounting changes must not make that historical artifact unreadable. Reloading today's balance table during a read would incorrectly reinterpret immutable evidence against a different ledger moment; trusting the raw row directly would instead bypass the writer's structural and fingerprint guarantees.

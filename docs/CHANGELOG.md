@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-17 — Bound ledger reconciliation evidence freshness
+
+- Added the pure M10.110 freshness assessment over stored M10.109 reconciliation evidence.
+- Revalidated the complete stored commitment before retaining any authenticated or reconciled claim.
+- Required a finite evaluation clock and integer maximum age from one through sixty seconds.
+- Rejected evaluation before the wallet observation or durable recording and measured staleness from the authenticated observation itself.
+- Returned deeply defensive, independently revalidatable evidence with quote/submission authorization still false.
+- Added focused coverage for the exact age boundary, one-millisecond staleness, future evidence, malformed requests, corrupt stored evidence, defensive copying, and tampered output.
+- Added no schema, persistence access, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, executor, or real order.
+- Verified all 2,473 backend tests across 213 suites, including 9 focused freshness tests, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
 ## 2026-10-17 — Read immutable ledger reconciliation commitments
 
 - Added the M10.109 read-store contract and unregistered Prisma implementation keyed by canonical reconciliation UUID.

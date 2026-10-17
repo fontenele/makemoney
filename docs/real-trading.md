@@ -2021,3 +2021,21 @@ The returned artifact contains defensive arrays and dates. The reader does not r
 - Focused unit tests cover successful reconstruction, defensive output, absence, invalid identity, malformed persisted evidence, and identity divergence.
 - PostgreSQL E2E proves a recorded commitment can be read by UUID and an unknown UUID remains absent.
 - No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.
+
+## M10.110 — Ledger reconciliation evidence freshness
+
+M10.110 adds a pure temporal boundary between the immutable historical artifact returned by M10.109 and any future balance consumer. A structurally valid stored commitment is necessary but insufficient: the caller must provide an integer maximum age from one through sixty seconds and a finite evaluation time that does not predate either the authenticated wallet observation or durable recording.
+
+Age is measured from the committed `walletObservedAt`. Later reconciliation, preparation, and persistence timestamps cannot renew the provider fact. Exact boundary equality is accepted, while one additional millisecond is stale. Success regenerates the canonical commitment to produce a deep defensive snapshot, retains the selected age policy and evaluation time, and remains independently revalidatable. It claims only current reconciliation evidence; quote and submission authorization remain false.
+
+### M10.110 acceptance criteria
+
+- The complete stored M10.109 artifact is revalidated before retaining any success claim.
+- Maximum age must be an integer from one through sixty thousand milliseconds.
+- Evaluation time must be finite and cannot predate authenticated observation or durable recording.
+- Freshness is measured from authenticated wallet observation, not later local processing timestamps.
+- Exact maximum-age equality is valid and one additional millisecond is stale.
+- Successful evidence deeply copies the canonical commitment and every mutable date.
+- The exported validator regenerates and compares the complete evidence snapshot.
+- Focused tests cover success, defensive copying, exact boundary, staleness, future evidence, invalid age/clock, corrupt stored evidence, and tampered output.
+- No schema, persistence access, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.
