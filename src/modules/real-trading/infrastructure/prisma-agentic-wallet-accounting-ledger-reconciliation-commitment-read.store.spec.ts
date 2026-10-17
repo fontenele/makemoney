@@ -8,7 +8,10 @@ import {
   isValidAgenticWalletAccountingLedgerReconciliation,
 } from './agentic-wallet-accounting-ledger-reconciliation';
 import { prepareAgenticWalletAccountingLedgerReconciliationCommitment } from './agentic-wallet-accounting-ledger-reconciliation-commitment';
-import { AgenticWalletAccountingLedgerReconciliationCommitmentIdentityError } from './agentic-wallet-accounting-ledger-reconciliation-commitment.store';
+import {
+  AgenticWalletAccountingLedgerReconciliationCommitmentIdentityError,
+  AgenticWalletAccountingLedgerReconciliationInitializationIdentityError,
+} from './agentic-wallet-accounting-ledger-reconciliation-commitment.store';
 import { PrismaAgenticWalletAccountingLedgerReconciliationCommitmentReadStore } from './prisma-agentic-wallet-accounting-ledger-reconciliation-commitment-read.store';
 
 const INITIALIZATION_ID = '018f1f54-7b8c-7a9d-8e0f-123456789abc';
@@ -81,17 +84,69 @@ describe('PrismaAgenticWalletAccountingLedgerReconciliationCommitmentReadStore',
       'Persisted accounting ledger reconciliation commitment identity diverges',
     );
   });
+
+  it('returns the latest deterministically ordered commitment for an initialization', async () => {
+    const row = persistedRow();
+    const harness = readerHarness(row);
+    await expect(
+      harness.reader.getLatestByInitializationId(INITIALIZATION_ID),
+    ).resolves.toMatchObject({
+      commitment: {
+        reconciliationId: RECONCILIATION_ID,
+        reconciliation: { initializationId: INITIALIZATION_ID },
+      },
+    });
+    expect(harness.findFirst).toHaveBeenCalledWith({
+      where: { initializationId: INITIALIZATION_ID },
+      orderBy: [{ recordedAt: 'desc' }, { id: 'desc' }],
+    });
+  });
+
+  it('returns explicit latest absence for an initialization without evidence', async () => {
+    await expect(
+      readerHarness(null).reader.getLatestByInitializationId(INITIALIZATION_ID),
+    ).resolves.toBeNull();
+  });
+
+  it.each(['invalid', INITIALIZATION_ID.toUpperCase()])(
+    'rejects invalid initialization identity %s before latest access',
+    async (identity) => {
+      const harness = readerHarness(null);
+      await expect(
+        harness.reader.getLatestByInitializationId(identity),
+      ).rejects.toBeInstanceOf(
+        AgenticWalletAccountingLedgerReconciliationInitializationIdentityError,
+      );
+      expect(harness.findFirst).not.toHaveBeenCalled();
+    },
+  );
+
+  it('fails closed on corrupt latest evidence without selecting an older row', async () => {
+    const harness = readerHarness(
+      persistedRow({ reconciliationFingerprint: 'f'.repeat(64) }),
+    );
+    await expect(
+      harness.reader.getLatestByInitializationId(INITIALIZATION_ID),
+    ).rejects.toThrow(
+      'Persisted accounting ledger reconciliation commitment is invalid',
+    );
+    expect(harness.findFirst).toHaveBeenCalledTimes(1);
+  });
 });
 
 function readerHarness(row: ReconciliationRow | null) {
   const findUnique = jest
     .fn<() => Promise<ReconciliationRow | null>>()
     .mockResolvedValue(row);
+  const findFirst = jest
+    .fn<() => Promise<ReconciliationRow | null>>()
+    .mockResolvedValue(row);
   const prisma = {
-    realExecutionAccountingLedgerReconciliation: { findUnique },
+    realExecutionAccountingLedgerReconciliation: { findUnique, findFirst },
   } as unknown as PrismaService;
   return {
     findUnique,
+    findFirst,
     reader:
       new PrismaAgenticWalletAccountingLedgerReconciliationCommitmentReadStore(
         prisma,

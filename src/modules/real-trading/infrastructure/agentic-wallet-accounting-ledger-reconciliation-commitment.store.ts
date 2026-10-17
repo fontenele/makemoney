@@ -24,6 +24,12 @@ export interface AgenticWalletAccountingLedgerReconciliationCommitmentReadStore 
   ): Promise<StoredAgenticWalletAccountingLedgerReconciliationCommitment | null>;
 }
 
+export interface AgenticWalletAccountingLedgerReconciliationCommitmentLatestReadStore {
+  getLatestByInitializationId(
+    initializationId: string,
+  ): Promise<StoredAgenticWalletAccountingLedgerReconciliationCommitment | null>;
+}
+
 export function isValidStoredAgenticWalletAccountingLedgerReconciliationCommitment(
   value: unknown,
 ): value is StoredAgenticWalletAccountingLedgerReconciliationCommitment {
@@ -74,5 +80,15 @@ export class AgenticWalletAccountingLedgerReconciliationCommitmentIdentityError 
     super('Accounting ledger reconciliation commitment identity is invalid');
     this.name =
       AgenticWalletAccountingLedgerReconciliationCommitmentIdentityError.name;
+  }
+}
+
+export class AgenticWalletAccountingLedgerReconciliationInitializationIdentityError extends Error {
+  constructor() {
+    super(
+      'Accounting ledger reconciliation initialization identity is invalid',
+    );
+    this.name =
+      AgenticWalletAccountingLedgerReconciliationInitializationIdentityError.name;
   }
 }

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-17 — Read the latest durable reconciliation deterministically
+
+- Added the M10.112 latest-read contract keyed by canonical accounting initialization UUID.
+- Extended the unregistered Prisma reader with total `recordedAt DESC, id DESC` ordering over the existing initialization index.
+- Returned explicit absence and reused the authoritative M10.108 mapper for every selected row.
+- Failed closed on corrupt newest evidence without querying an older fallback.
+- Added focused coverage for deterministic query shape, successful reconstruction, absence, pre-access identity validation, and corrupt latest evidence.
+- Added PostgreSQL E2E coverage for present and absent latest-by-initialization lookup.
+- Added no schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+- Verified all 2,486 backend tests across 214 suites, including 5 focused latest-reader cases and 6 identity-reader cases, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
 ## 2026-10-17 — Compose durable reconciliation freshness
 
 - Added the unregistered M10.111 read-only service over the M10.109 reader and M10.110 freshness policy.

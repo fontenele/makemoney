@@ -2057,3 +2057,21 @@ The evaluation `Date` is copied before the asynchronous read. Missing durable ev
 - Focused tests cover successful composition, absence, pre-access validation, date isolation, stale evidence, and read failure.
 - PostgreSQL E2E proves record, durable read, and current-evidence composition with all migrations applied.
 - No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.
+
+## M10.112 — Latest durable ledger reconciliation reader
+
+M10.112 extends the unregistered M10.109 Prisma reader with lookup by canonical accounting initialization UUID. It uses the existing `(initialization_id, recorded_at)` index and orders by `recordedAt DESC, id DESC`; the UUID provides a deterministic tie-break when two rows share one recording instant.
+
+The query intentionally selects one row only. A valid initialization with no commitment returns explicit `null`. A selected row is reconstructed through the exact M10.108 mapper and its embedded initialization identity must match the request. If the newest row is malformed, the reader fails closed instead of scanning backward for older evidence. This boundary establishes deterministic discovery only: M10.110 remains responsible for temporal freshness.
+
+### M10.112 acceptance criteria
+
+- A canonical initialization UUID is required before persistence access.
+- The newest row is selected by descending recording time and descending reconciliation UUID.
+- A valid initialization without evidence returns explicit absence.
+- Every present row is reconstructed through the authoritative M10.108 persisted mapper.
+- The reconstructed initialization identity must equal the requested identity.
+- Corrupt newest evidence fails closed without older-row fallback.
+- Focused tests cover query ordering, reconstruction, absence, invalid identity, and corrupt newest evidence.
+- PostgreSQL E2E proves present and absent latest-by-initialization lookup.
+- No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.

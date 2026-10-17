@@ -2440,5 +2440,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.66. M10 is complete through M10.111, which composes the durable reconciliation reader with the authenticated-observation freshness policy after validating and defensively copying the complete request before I/O. The service is read-only and unregistered, with no provider access. There is no route, retry, loop, or schedule; quote/submission authorization stays false, the current quote remains blocked by partial fee and gas coverage, the wallet remains at zero balance, and no mutable provider command, live quote, valuation, funding, executor, or real order has been added. Real trading remains disabled.
+M9 is closed through M9.66. M10 is complete through M10.112, which deterministically reads the newest immutable accounting-ledger reconciliation for one canonical initialization identity and fully reconstructs it before returning. The reader is read-only and unregistered, with no provider access or corrupt-row fallback. There is no route, retry, loop, or schedule; quote/submission authorization stays false, the current quote remains blocked by partial fee and gas coverage, the wallet remains at zero balance, and no mutable provider command, live quote, valuation, funding, executor, or real order has been added. Real trading remains disabled.
 ```

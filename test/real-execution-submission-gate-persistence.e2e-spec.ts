@@ -371,6 +371,16 @@ describe('Real execution submission gate persistence (e2e)', () => {
       ),
     ).resolves.toBeNull();
     await expect(
+      accountingLedgerReconciliationCommitmentReadStore.getLatestByInitializationId(
+        uuid(29),
+      ),
+    ).resolves.toEqual(first.stored);
+    await expect(
+      accountingLedgerReconciliationCommitmentReadStore.getLatestByInitializationId(
+        uuid(31),
+      ),
+    ).resolves.toBeNull();
+    await expect(
       accountingLedgerReconciliationFreshnessService.assess(uuid(30), {
         maximumAgeMs: 2_000,
         evaluatedAt: new Date('2026-10-03T12:00:05.000Z'),

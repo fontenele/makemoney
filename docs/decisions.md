@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-17 — Select one newest reconciliation without corrupt-row fallback
+
+A future current-state consumer should not need to know a reconciliation UUID, but selecting by initialization without a total order would make equal recording timestamps ambiguous. Skipping a malformed newest row and returning an older valid row would be worse: it would conceal durable corruption and present stale evidence as authoritative.
+
+M10.112 therefore selects exactly one row by descending recording time and descending UUID, matching the existing initialization/recording index and adding a stable tie-break. That row must pass the shared M10.108 mapper and requested-initialization correlation. Absence is explicit, while corruption propagates without fallback. Selection grants no freshness, valuation, or execution authority.
+
 ## 2026-10-17 — Validate freshness requests before durable reconciliation reads
 
 Calling M10.109 before validating the age policy or evaluation clock would perform unnecessary database work for a request that can never produce current evidence. Retaining the caller's mutable `Date` across that read would also let the accepted temporal boundary change while I/O is pending.

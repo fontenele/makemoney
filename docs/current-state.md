@@ -1,5 +1,11 @@
 # Current State
 
+M10.112 is complete: the unregistered durable reconciliation reader can now select the newest immutable commitment for one canonical initialization identity.
+
+The reader rejects malformed or noncanonical initialization UUIDs before database access and uses the existing initialization/recording index with a total `recordedAt DESC, id DESC` order. A valid initialization without evidence returns explicit `null`. A present row passes through the authoritative M10.108 persisted mapper and must correlate back to the requested initialization. The selected newest row is authoritative for the query: malformed evidence fails closed and is never hidden by retrying an older row. PostgreSQL E2E proves present and absent initialization lookup. No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.
+
+Post-M10.112 validation passed all 2,486 backend tests across 214 suites, including all 5 focused latest-reader cases and the existing 6 identity-reader cases, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations applied from scratch, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
 M10.111 is complete: an unregistered read-only service now composes the durable M10.109 reader with the pure M10.110 freshness policy.
 
 Canonical reconciliation identity, integer one-to-sixty-second maximum age, and finite evaluation time are validated before PostgreSQL access. The service snapshots the mutable evaluation `Date` before awaiting the reader, so caller mutation cannot change the admitted freshness boundary. A missing durable artifact returns explicit `null`; a present artifact preserves M10.110 success or stale/future blockers, while M10.109 corruption propagates rather than becoming absence. PostgreSQL E2E proves the complete record-read-freshness path. The service remains outside NestJS registration and adds no schema, route, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
