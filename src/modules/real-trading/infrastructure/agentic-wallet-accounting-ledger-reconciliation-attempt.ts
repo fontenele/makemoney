@@ -54,14 +54,10 @@ export class AgenticWalletAccountingLedgerReconciliationAttempt {
     maximumObservationAgeMs: number,
     signal?: AbortSignal,
   ): Promise<AgenticWalletAccountingLedgerReconciliationAssessment | null> {
-    if (
-      typeof initializationId !== 'string' ||
-      !UUID_PATTERN.test(initializationId) ||
-      !Number.isSafeInteger(maximumObservationAgeMs) ||
-      maximumObservationAgeMs < 1 ||
-      maximumObservationAgeMs > MAXIMUM_OBSERVATION_AGE_MS
-    )
-      throw new AgenticWalletAccountingLedgerReconciliationAttemptRequestError();
+    assertValidAgenticWalletAccountingLedgerReconciliationAttemptRequest(
+      initializationId,
+      maximumObservationAgeMs,
+    );
     assertNotCancelled(signal);
 
     const observedAt = this.now();
@@ -85,6 +81,20 @@ export class AgenticWalletAccountingLedgerReconciliationAttempt {
       evaluatedAt: new Date(evaluatedAt),
     });
   }
+}
+
+export function assertValidAgenticWalletAccountingLedgerReconciliationAttemptRequest(
+  initializationId: string,
+  maximumObservationAgeMs: number,
+): void {
+  if (
+    typeof initializationId !== 'string' ||
+    !UUID_PATTERN.test(initializationId) ||
+    !Number.isSafeInteger(maximumObservationAgeMs) ||
+    maximumObservationAgeMs < 1 ||
+    maximumObservationAgeMs > MAXIMUM_OBSERVATION_AGE_MS
+  )
+    throw new AgenticWalletAccountingLedgerReconciliationAttemptRequestError();
 }
 
 function assertNotCancelled(signal?: AbortSignal): void {

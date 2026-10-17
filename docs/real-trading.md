@@ -1939,3 +1939,23 @@ Provider failures propagate directly, post-read cancellation and clock failure s
 - Durable absence and policy blockers pass through unchanged.
 - PostgreSQL E2E proves the bounded loader composes with initialized durable ledger reconciliation.
 - No route, runtime registration, loop, timer, schedule, mutable command, accounting mutation, valuation, PnL, funding, executor, or real order is added.
+
+## M10.106 — Per-initialization reconciliation attempt guard
+
+M10.106 adds one process-local active-attempt claim around the complete M10.105 one-shot boundary. The shared request validator runs first, so malformed identity or observation-age policy still fails as a request error rather than being hidden by an existing claim. The first valid call for a canonical initialization identity delegates normally with its exact cancellation signal.
+
+While that call remains active, another valid call for the same initialization fails immediately with an explicit in-progress error. It does not invoke M10.105, wait for the first result, or share either caller's cancellation. A different initialization identity may proceed concurrently. A `finally` block releases the claim after success or any propagated provider, clock, cancellation, durable-read, or reconciliation failure, allowing a later explicit call to reload current evidence normally.
+
+The claim belongs only to one guard instance in one process. It is not a PostgreSQL lease or distributed lock and makes no multi-instance guarantee. The guard remains unregistered and has no automatic caller, retry, loop, timer, schedule, provider authority beyond the single admitted M10.105 attempt, mutation, valuation, PnL, funding, executor, or order capability.
+
+### M10.106 acceptance criteria
+
+- M10.105 identity and observation-age inputs are validated before claim inspection or delegation.
+- At most one attempt per initialization identity can be active in one guard instance.
+- An overlapping same-identity call fails immediately before a second provider read or durable reconciliation.
+- The blocked caller neither waits for the active call nor shares its cancellation signal.
+- Different initialization identities can proceed concurrently.
+- Success and propagated failure both release the claim for a later explicit attempt.
+- Focused unit tests cover delegation, pre-claim validation, overlap suppression, cancellation isolation, independent identities, and release after success and failure.
+- The process-local limitation is explicit; no database lease or distributed guarantee is claimed.
+- No schema, route, runtime registration, provider retry, loop, timer, schedule, mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.

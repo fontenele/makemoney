@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-17 — Guard concurrent wallet reconciliation attempts per initialization
+
+- Added an unregistered M10.106 process-local guard around the complete M10.105 one-shot boundary.
+- Reused the M10.105 request validator before acquiring a canonical initialization claim.
+- Rejected overlapping same-initialization calls immediately without delegation, waiting, or shared cancellation.
+- Allowed different initialization identities to proceed independently and released claims after success or propagated failure.
+- Documented that the guard is per instance and provides no database lease or distributed coordination.
+- Added no schema, route, runtime registration, provider authority, retry, loop, timer, schedule, mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+- Verified all 2,440 backend tests across 209 suites, including 7 focused guard tests, all 96 PostgreSQL E2E tests across 9 suites with all 33 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
 ## 2026-10-17 — Add one bounded read-only wallet reconciliation attempt
 
 - Added an unregistered M10.105 coordinator that permits one Agentic Wallet capability read and one M10.104 reconciliation only.

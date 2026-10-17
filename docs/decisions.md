@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-17 — Suppress overlapping authenticated reads per initialization
+
+M10.105 bounds each individual call but two concurrent callers could still start two authenticated wallet reads for the same durable initialization. Sharing the first promise would also couple callers' cancellation and failure semantics, while introducing a database lease before any runtime registration would overstate the current single-process boundary.
+
+M10.106 therefore wraps the complete one-shot attempt with a per-instance set keyed by canonical initialization UUID. Request validation runs before claim inspection, an overlap fails immediately without waiting or delegation, different identities remain independent, and `finally` releases the claim after every admitted outcome. The guard is explicitly process-local and unregistered; multi-instance coordination remains a separate decision before any operational wiring.
+
 ## 2026-10-17 — Bound live reconciliation to one explicit read attempt
 
 Connecting M10.104 directly to an unrestricted loop, retry policy, or runtime route would make authenticated wallet access implicit and could renew provider inactivity state or repeatedly consume a degraded provider surface. Reusing one timestamp for both observation and completion would also hide command duration from the freshness policy.
