@@ -2003,3 +2003,21 @@ The complete canonical balance sets and timeline are stored with a separate exac
 - Focused unit tests cover first record, replay, identity/fingerprint conflict, invalid input, absent initialization, durable divergence, invalid recording time, and malformed replay.
 - PostgreSQL E2E proves initialization, reconciliation, first durable record, and exact replay with all migrations applied from scratch.
 - No route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.
+
+## M10.109 — Durable ledger reconciliation commitment reader
+
+M10.109 adds the read-only counterpart to the M10.108 store. It accepts only a canonical reconciliation UUID and rejects malformed or noncanonical identity before persistence access. A valid missing identity returns explicit `null`; a present row is passed through the exact M10.108 persisted mapper, which reconstructs and revalidates the complete canonical commitment, balance evidence, chronology, evidence fingerprint, request fingerprint, and recording time.
+
+The returned artifact contains defensive arrays and dates. The reader does not reload the current accounting ledger because M10.108 has already established first-write provenance and the stored row represents an immutable historical boundary. It remains unregistered and cannot call the Agentic Wallet provider, mutate accounting, calculate valuation or PnL, authorize a quote or submission, fund a wallet, run an executor, or place an order.
+
+### M10.109 acceptance criteria
+
+- A canonical reconciliation UUID is required before database access.
+- A valid unknown identity returns explicit absence.
+- Every present row is reconstructed through the authoritative M10.108 persisted mapper.
+- Malformed JSON, dates, chronology, flags, evidence fingerprint, request fingerprint, or identity fails closed.
+- Returned balance arrays and mutable dates are defensive.
+- Reads do not depend on the current accounting-balance table or provider state.
+- Focused unit tests cover successful reconstruction, defensive output, absence, invalid identity, malformed persisted evidence, and identity divergence.
+- PostgreSQL E2E proves a recorded commitment can be read by UUID and an unknown UUID remains absent.
+- No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-17 — Read immutable reconciliation evidence without consulting current state
+
+Once M10.108 records a reconciliation, later accounting changes must not make that historical artifact unreadable. Reloading today's balance table during a read would incorrectly reinterpret immutable evidence against a different ledger moment; trusting the raw row directly would instead bypass the writer's structural and fingerprint guarantees.
+
+M10.109 therefore validates the canonical reconciliation UUID before access and passes every present row through the same persisted mapper used by M10.108. Absence remains distinct from corruption, returned evidence is defensive, and malformed content fails closed. The reader is unregistered and gains no current-ledger, provider, mutation, valuation, or execution authority.
+
 ## 2026-10-17 — Reproduce durable ledger state before recording reconciliation
 
 A structurally valid M10.107 artifact could still be fabricated by an internal caller or become stale if local balances changed after the read. Persisting it without reloading durable provenance would turn caller-supplied current quantities into audit evidence. Conversely, replaying an already recorded artifact must not depend on the ledger still having its historical values.

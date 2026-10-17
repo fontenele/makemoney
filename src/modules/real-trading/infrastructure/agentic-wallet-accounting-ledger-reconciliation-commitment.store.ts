@@ -18,6 +18,12 @@ export interface AgenticWalletAccountingLedgerReconciliationCommitmentStore {
   }>;
 }
 
+export interface AgenticWalletAccountingLedgerReconciliationCommitmentReadStore {
+  getByReconciliationId(
+    reconciliationId: string,
+  ): Promise<StoredAgenticWalletAccountingLedgerReconciliationCommitment | null>;
+}
+
 export function isValidStoredAgenticWalletAccountingLedgerReconciliationCommitment(
   value: unknown,
 ): value is StoredAgenticWalletAccountingLedgerReconciliationCommitment {
@@ -60,5 +66,13 @@ export class AgenticWalletAccountingLedgerReconciliationInitializationNotFoundEr
     super('Durable accounting balance initialization was not found');
     this.name =
       AgenticWalletAccountingLedgerReconciliationInitializationNotFoundError.name;
+  }
+}
+
+export class AgenticWalletAccountingLedgerReconciliationCommitmentIdentityError extends Error {
+  constructor() {
+    super('Accounting ledger reconciliation commitment identity is invalid');
+    this.name =
+      AgenticWalletAccountingLedgerReconciliationCommitmentIdentityError.name;
   }
 }

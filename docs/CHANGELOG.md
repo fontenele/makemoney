@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-17 — Read immutable ledger reconciliation commitments
+
+- Added the M10.109 read-store contract and unregistered Prisma implementation keyed by canonical reconciliation UUID.
+- Rejected malformed identity before database access and returned explicit absence for unknown valid identities.
+- Reused the authoritative M10.108 persisted mapper to reconstruct and revalidate every present row.
+- Preserved immutable historical semantics without reloading current accounting balances or contacting the provider.
+- Added focused tests for reconstruction, defensive output, absence, invalid identity, corrupt evidence, and identity divergence, plus PostgreSQL E2E read/absence coverage.
+- Added no schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+- Verified all 2,464 backend tests across 212 suites, including 6 focused reader tests, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
 ## 2026-10-17 — Persist immutable ledger reconciliation commitments
 
 - Added the M10.108 PostgreSQL model and migration for immutable accounting-ledger reconciliation evidence.
