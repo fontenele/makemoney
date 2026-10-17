@@ -1980,3 +1980,26 @@ Successful output marks only reconciliation evidence preparation. It does not pe
 - Success remains unstored and keeps quote/submission authorization false.
 - Focused unit tests cover valid preparation, canonical ordering, defensive snapshots, malformed reconciliation, invalid identity, invalid/regressed clock, and tampered commitment validation.
 - No schema, repository, route, runtime registration, provider invocation, mutation, valuation, PnL, funding, executor, or real order is added.
+
+## M10.108 — Durable ledger reconciliation commitment
+
+M10.108 gives the M10.107 commitment one immutable PostgreSQL destination. The unregistered store rejects malformed commitments before persistence and performs new writes under a serializable transaction with a dedicated advisory lock. Reconciliation UUID and canonical evidence fingerprint are unique so the same evidence cannot be relabeled as a different event.
+
+Before inserting, the store reloads the referenced M10.99 initialization and every current accounting balance. It uses the shared persisted initialization mapper, validates each raw durable asset identity, and reapplies M10.101 at the reconciliation's original ledger-evaluation instant. The reconstructed snapshot must exactly equal the committed snapshot, including initial/current quantities, update times, and chronology. It then regenerates M10.107 and requires the same evidence fingerprint. This prevents fabricated or stale local-ledger facts from becoming durable audit evidence.
+
+The complete canonical balance sets and timeline are stored with a separate exact request fingerprint and recording time. Exact replay by identity or evidence fingerprint returns the original reconstructed row without reloading today's balances; divergent reuse conflicts. Malformed persisted JSON, dates, fingerprint, or chronology fails closed. PostgreSQL E2E composes the real initialization, snapshot/reconciliation service, and new store without calling the Agentic Wallet provider.
+
+### M10.108 acceptance criteria
+
+- Invalid M10.107 commitments fail before persistence access.
+- New writes use a serializable transaction and dedicated advisory lock.
+- Durable initialization and the complete current accounting balance table are reloaded before insertion.
+- Shared initialization, raw asset-identity, M10.101 snapshot, and M10.107 validators are reapplied.
+- Any absent, corrupt, changed, incomplete, extra, or chronologically divergent durable ledger state blocks the write.
+- Reconciliation UUID and evidence fingerprint are unique.
+- Exact replay returns the immutable original without requiring historical balances to remain current; divergent reuse conflicts.
+- Recording time is finite and cannot predate commitment preparation.
+- Persisted balance JSON, dates, flags, request fingerprint, and evidence fingerprint are fully reconstructed and revalidated.
+- Focused unit tests cover first record, replay, identity/fingerprint conflict, invalid input, absent initialization, durable divergence, invalid recording time, and malformed replay.
+- PostgreSQL E2E proves initialization, reconciliation, first durable record, and exact replay with all migrations applied from scratch.
+- No route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.

@@ -62,7 +62,9 @@ export class PrismaAgenticWalletAccountingLedgerSnapshotReadStore implements Age
         const rows = await tx.realExecutionAccountingBalance.findMany({
           orderBy: { assetIdentity: 'asc' },
         });
-        const balances = rows.map(mapBalance);
+        const balances = rows.map(
+          mapPersistedAgenticWalletAccountingLedgerBalance,
+        );
         const assessment = assessAgenticWalletAccountingLedgerSnapshot(
           initialized,
           balances,
@@ -77,7 +79,9 @@ export class PrismaAgenticWalletAccountingLedgerSnapshotReadStore implements Age
   }
 }
 
-function mapBalance(row: BalanceRow): AgenticWalletAccountingLedgerBalance {
+export function mapPersistedAgenticWalletAccountingLedgerBalance(
+  row: BalanceRow,
+): AgenticWalletAccountingLedgerBalance {
   const expectedIdentity =
     row.assetType === 'token'
       ? `token:${row.assetAddress ?? ''}`

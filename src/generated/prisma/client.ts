@@ -135,6 +135,11 @@ export type RealExecutionAccountingBalance = Prisma.RealExecutionAccountingBalan
  */
 export type RealExecutionAccountingBalanceInitialization = Prisma.RealExecutionAccountingBalanceInitializationModel
 /**
+ * Model RealExecutionAccountingLedgerReconciliation
+ * 
+ */
+export type RealExecutionAccountingLedgerReconciliation = Prisma.RealExecutionAccountingLedgerReconciliationModel
+/**
  * Model RealExecutionAccountingMutationApplication
  * 
  */

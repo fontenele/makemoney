@@ -416,6 +416,7 @@ export const ModelName = {
   RealExecutionAccountingMutationAuthorization: 'RealExecutionAccountingMutationAuthorization',
   RealExecutionAccountingBalance: 'RealExecutionAccountingBalance',
   RealExecutionAccountingBalanceInitialization: 'RealExecutionAccountingBalanceInitialization',
+  RealExecutionAccountingLedgerReconciliation: 'RealExecutionAccountingLedgerReconciliation',
   RealExecutionAccountingMutationApplication: 'RealExecutionAccountingMutationApplication',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
@@ -435,7 +436,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingBalanceInitialization" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingBalanceInitialization" | "realExecutionAccountingLedgerReconciliation" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1845,6 +1846,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RealExecutionAccountingLedgerReconciliation: {
+      payload: Prisma.$RealExecutionAccountingLedgerReconciliationPayload<ExtArgs>
+      fields: Prisma.RealExecutionAccountingLedgerReconciliationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingLedgerReconciliationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingLedgerReconciliationPayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingLedgerReconciliationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingLedgerReconciliationPayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingLedgerReconciliationPayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingLedgerReconciliationPayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingLedgerReconciliationPayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingLedgerReconciliationPayload>
+        }
+        update: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingLedgerReconciliationPayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingLedgerReconciliationPayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionAccountingLedgerReconciliationPayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionAccountingLedgerReconciliation>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionAccountingLedgerReconciliationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionAccountingLedgerReconciliationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionAccountingLedgerReconciliationCountAggregateOutputType> | number
+        }
+      }
+    }
     RealExecutionAccountingMutationApplication: {
       payload: Prisma.$RealExecutionAccountingMutationApplicationPayload<ExtArgs>
       fields: Prisma.RealExecutionAccountingMutationApplicationFieldRefs
@@ -2520,6 +2595,27 @@ export const RealExecutionAccountingBalanceInitializationScalarFieldEnum = {
 export type RealExecutionAccountingBalanceInitializationScalarFieldEnum = (typeof RealExecutionAccountingBalanceInitializationScalarFieldEnum)[keyof typeof RealExecutionAccountingBalanceInitializationScalarFieldEnum]
 
 
+export const RealExecutionAccountingLedgerReconciliationScalarFieldEnum = {
+  id: 'id',
+  initializationId: 'initializationId',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  reconciliationFingerprint: 'reconciliationFingerprint',
+  initialBalances: 'initialBalances',
+  currentBalances: 'currentBalances',
+  initializedAt: 'initializedAt',
+  evaluatedAt: 'evaluatedAt',
+  walletBalances: 'walletBalances',
+  walletObservedAt: 'walletObservedAt',
+  reconciledAt: 'reconciledAt',
+  preparedAt: 'preparedAt',
+  requestFingerprint: 'requestFingerprint',
+  recordedAt: 'recordedAt'
+} as const
+
+export type RealExecutionAccountingLedgerReconciliationScalarFieldEnum = (typeof RealExecutionAccountingLedgerReconciliationScalarFieldEnum)[keyof typeof RealExecutionAccountingLedgerReconciliationScalarFieldEnum]
+
+
 export const RealExecutionAccountingMutationApplicationScalarFieldEnum = {
   id: 'id',
   authorizationId: 'authorizationId',
@@ -2916,6 +3012,7 @@ export type GlobalOmitConfig = {
   realExecutionAccountingMutationAuthorization?: Prisma.RealExecutionAccountingMutationAuthorizationOmit
   realExecutionAccountingBalance?: Prisma.RealExecutionAccountingBalanceOmit
   realExecutionAccountingBalanceInitialization?: Prisma.RealExecutionAccountingBalanceInitializationOmit
+  realExecutionAccountingLedgerReconciliation?: Prisma.RealExecutionAccountingLedgerReconciliationOmit
   realExecutionAccountingMutationApplication?: Prisma.RealExecutionAccountingMutationApplicationOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
   listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit

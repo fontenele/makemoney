@@ -70,6 +70,7 @@ export const ModelName = {
   RealExecutionAccountingMutationAuthorization: 'RealExecutionAccountingMutationAuthorization',
   RealExecutionAccountingBalance: 'RealExecutionAccountingBalance',
   RealExecutionAccountingBalanceInitialization: 'RealExecutionAccountingBalanceInitialization',
+  RealExecutionAccountingLedgerReconciliation: 'RealExecutionAccountingLedgerReconciliation',
   RealExecutionAccountingMutationApplication: 'RealExecutionAccountingMutationApplication',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
@@ -430,6 +431,27 @@ export const RealExecutionAccountingBalanceInitializationScalarFieldEnum = {
 } as const
 
 export type RealExecutionAccountingBalanceInitializationScalarFieldEnum = (typeof RealExecutionAccountingBalanceInitializationScalarFieldEnum)[keyof typeof RealExecutionAccountingBalanceInitializationScalarFieldEnum]
+
+
+export const RealExecutionAccountingLedgerReconciliationScalarFieldEnum = {
+  id: 'id',
+  initializationId: 'initializationId',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  reconciliationFingerprint: 'reconciliationFingerprint',
+  initialBalances: 'initialBalances',
+  currentBalances: 'currentBalances',
+  initializedAt: 'initializedAt',
+  evaluatedAt: 'evaluatedAt',
+  walletBalances: 'walletBalances',
+  walletObservedAt: 'walletObservedAt',
+  reconciledAt: 'reconciledAt',
+  preparedAt: 'preparedAt',
+  requestFingerprint: 'requestFingerprint',
+  recordedAt: 'recordedAt'
+} as const
+
+export type RealExecutionAccountingLedgerReconciliationScalarFieldEnum = (typeof RealExecutionAccountingLedgerReconciliationScalarFieldEnum)[keyof typeof RealExecutionAccountingLedgerReconciliationScalarFieldEnum]
 
 
 export const RealExecutionAccountingMutationApplicationScalarFieldEnum = {

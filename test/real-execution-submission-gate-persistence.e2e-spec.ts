@@ -52,7 +52,9 @@ import { PrismaAgenticWalletAccountingBalanceInitializationReadStore } from '../
 import { PrismaAgenticWalletAccountingLedgerSnapshotReadStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-accounting-ledger-snapshot.store';
 import { AgenticWalletAccountingLedgerReconciliationService } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-ledger-reconciliation.service';
 import { AgenticWalletAccountingLedgerReconciliationAttempt } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-ledger-reconciliation-attempt';
+import { prepareAgenticWalletAccountingLedgerReconciliationCommitment } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-ledger-reconciliation-commitment';
 import { AgenticWalletCapabilityObservation } from '../src/modules/real-trading/infrastructure/agentic-wallet-capability.adapter';
+import { PrismaAgenticWalletAccountingLedgerReconciliationCommitmentStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-accounting-ledger-reconciliation-commitment.store';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -80,6 +82,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let accountingBalanceInitializationReadStore: PrismaAgenticWalletAccountingBalanceInitializationReadStore;
   let accountingLedgerSnapshotReadStore: PrismaAgenticWalletAccountingLedgerSnapshotReadStore;
   let accountingLedgerReconciliationService: AgenticWalletAccountingLedgerReconciliationService;
+  let accountingLedgerReconciliationCommitmentStore: PrismaAgenticWalletAccountingLedgerReconciliationCommitmentStore;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -156,6 +159,11 @@ describe('Real execution submission gate persistence (e2e)', () => {
     accountingLedgerReconciliationService =
       new AgenticWalletAccountingLedgerReconciliationService(
         accountingLedgerSnapshotReadStore,
+      );
+    accountingLedgerReconciliationCommitmentStore =
+      new PrismaAgenticWalletAccountingLedgerReconciliationCommitmentStore(
+        prisma,
+        () => new Date('2026-10-03T12:00:05.000Z'),
       );
   });
 
@@ -296,6 +304,52 @@ describe('Real execution submission gate persistence (e2e)', () => {
     ]);
     await expect(
       prisma.realExecutionAccountingBalanceInitialization.count(),
+    ).resolves.toBe(1);
+  });
+
+  it('immutably records one durable accounting ledger reconciliation commitment', async () => {
+    await accountingBalanceInitializationStore.initialize(
+      accountingBalanceInitialization(),
+    );
+    const assessment = await accountingLedgerReconciliationService.reconcile(
+      uuid(29),
+      accountingBalanceObservation(),
+      {
+        maximumObservationAgeMs: 5_000,
+        evaluatedAt: new Date('2026-10-03T12:00:04.000Z'),
+      },
+    );
+    if (assessment === null || assessment.reconciliation === null)
+      throw new Error('Test reconciliation was blocked');
+    const prepared =
+      prepareAgenticWalletAccountingLedgerReconciliationCommitment(
+        assessment.reconciliation,
+        uuid(30),
+        new Date('2026-10-03T12:00:04.500Z'),
+      ).commitment;
+    if (prepared === null) throw new Error('Test commitment was blocked');
+
+    const first =
+      await accountingLedgerReconciliationCommitmentStore.record(prepared);
+    const replay =
+      await accountingLedgerReconciliationCommitmentStore.record(prepared);
+
+    expect(first).toMatchObject({
+      replayed: false,
+      stored: {
+        commitment: {
+          reconciliationId: uuid(30),
+          reconciliationFingerprint: prepared.reconciliationFingerprint,
+          ledgerBalancesReconciled: true,
+          quoteAuthorized: false,
+          submissionAuthorized: false,
+        },
+        recordedAt: new Date('2026-10-03T12:00:05.000Z'),
+      },
+    });
+    expect(replay).toEqual({ stored: first.stored, replayed: true });
+    await expect(
+      prisma.realExecutionAccountingLedgerReconciliation.count(),
     ).resolves.toBe(1);
   });
 
@@ -1062,6 +1116,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
 
   async function cleanup(): Promise<void> {
     await prisma.realExecutionAccountingMutationApplication.deleteMany();
+    await prisma.realExecutionAccountingLedgerReconciliation.deleteMany();
     await prisma.realExecutionAccountingBalanceInitialization.deleteMany();
     await prisma.realExecutionAccountingBalance.deleteMany();
     await prisma.realExecutionAccountingMutationAuthorization.deleteMany();

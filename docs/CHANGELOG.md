@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-17 — Persist immutable ledger reconciliation commitments
+
+- Added the M10.108 PostgreSQL model and migration for immutable accounting-ledger reconciliation evidence.
+- Added an unregistered serializable Prisma store with a dedicated advisory transaction lock.
+- Revalidated the durable initialization, raw asset identities, complete current balance table, and exact M10.101 snapshot before insertion.
+- Enforced unique reconciliation identity and evidence fingerprint with exact replay and divergent-reuse conflict.
+- Reconstructed and revalidated persisted JSON balances, dates, fingerprints, and recording chronology before returning them.
+- Added focused store tests and PostgreSQL E2E coverage through initialization, reconciliation, first record, and exact replay.
+- Added no route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+- Verified all 2,458 backend tests across 211 suites, including 9 focused store tests, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
 ## 2026-10-17 — Prepare deterministic ledger reconciliation evidence
 
 - Added a pure M10.107 commitment boundary over successful authenticated wallet/accounting-ledger reconciliation.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-17 — Reproduce durable ledger state before recording reconciliation
+
+A structurally valid M10.107 artifact could still be fabricated by an internal caller or become stale if local balances changed after the read. Persisting it without reloading durable provenance would turn caller-supplied current quantities into audit evidence. Conversely, replaying an already recorded artifact must not depend on the ledger still having its historical values.
+
+M10.108 therefore validates before access, serializes new records under a dedicated advisory lock, and reconstructs the M10.101 snapshot from the durable initialization plus the complete current balance table at the commitment's evaluation instant. Only exact equality with M10.107 may insert. UUID and reconciliation fingerprint are both unique; an exact request fingerprint returns the immutable row before current-state reload, while any divergent reuse conflicts. This preserves historical replay without weakening first-write provenance and remains unregistered and non-authorizing.
+
 ## 2026-10-17 — Commit reconciliation evidence before choosing persistence
 
 A successful in-memory reconciliation proves wallet and local-ledger agreement at one observed boundary, but passing its mutable nested arrays and dates directly to a future store would leave canonical equality and idempotency undefined. Adding a database model immediately would combine evidence semantics with durable lifecycle decisions.
