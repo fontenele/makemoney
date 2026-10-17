@@ -130,6 +130,11 @@ export type RealExecutionAccountingMutationAuthorization = Prisma.RealExecutionA
  */
 export type RealExecutionAccountingBalance = Prisma.RealExecutionAccountingBalanceModel
 /**
+ * Model RealExecutionAccountingBalanceInitialization
+ * 
+ */
+export type RealExecutionAccountingBalanceInitialization = Prisma.RealExecutionAccountingBalanceInitializationModel
+/**
  * Model RealExecutionAccountingMutationApplication
  * 
  */

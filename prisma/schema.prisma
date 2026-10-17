@@ -358,6 +358,23 @@ model RealExecutionAccountingBalance {
   @@map("real_execution_accounting_balances")
 }
 
+model RealExecutionAccountingBalanceInitialization {
+  id                     String   @id @db.Uuid
+  providerId             String   @map("provider_id") @db.VarChar(32)
+  chainId                String   @map("chain_id") @db.VarChar(32)
+  acknowledgment         String   @db.VarChar(96)
+  balances               Json
+  walletObservedAt       DateTime @map("wallet_observed_at")
+  maximumObservationAgeMs Int     @map("maximum_observation_age_ms")
+  preparedAt             DateTime @map("prepared_at")
+  requestFingerprint     String   @map("request_fingerprint") @db.Char(64)
+  initializedAt          DateTime @map("initialized_at")
+
+  @@unique([providerId, chainId], map: "real_exec_acct_init_provider_chain_key")
+  @@index([initializedAt], map: "real_exec_acct_init_initialized_at_idx")
+  @@map("real_execution_accounting_balance_initializations")
+}
+
 model RealExecutionAccountingMutationApplication {
   id                                String                                      @id @db.Uuid
   authorizationId                   String                                      @unique(map: "real_exec_acct_app_authorization_key") @map("authorization_id") @db.Uuid

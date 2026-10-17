@@ -1800,3 +1800,142 @@ The result is only a prepared initialization snapshot. `accountingBalancesInitia
 - Success prepares exactly three balances but persists nothing and initializes nothing.
 - Quote and submission authorization remain false.
 - No schema, route, runtime registration, new provider command or call, funding, executor, or real order is added.
+
+## M10.99 — Atomic trusted accounting balance initialization
+
+M10.99 gives the prepared M10.98 snapshot one atomic durable destination. The unregistered Prisma store first rejects malformed initialization artifacts, then enters a serializable transaction protected by a dedicated advisory lock. The wallet observation must still satisfy the snapshot's one-to-sixty-second age bound at the actual initialization clock; preparation-time freshness alone is insufficient.
+
+The transaction requires the complete local accounting balance table to be empty, inserts exactly the canonical USDT, BTCB, and native BNB rows, and records one immutable receipt bound to the initialization UUID, Agentic Wallet provider, BSC chain, exact balances, acknowledgment, observation/preparation times, and canonical request fingerprint. Provider and chain are unique, so a ledger has only one trusted initialization provenance. Exact replay returns the original receipt without inspecting or rewriting balances; changed reuse or unexplained pre-existing balances fail closed. Database checks independently preserve provider, chain, bounded age, and chronology.
+
+The result sets only `accountingBalancesInitialized: true`. `quoteAuthorized` and `submissionAuthorized` remain false. The store is not registered in NestJS and adds no route, provider invocation, wallet funding, executor, or real order.
+
+### M10.99 acceptance criteria
+
+- Malformed M10.98 artifacts fail before persistence access.
+- Initialization rechecks wallet-observation freshness at the transaction clock.
+- A non-empty accounting ledger blocks initialization.
+- Exactly USDT, BTCB, and native BNB plus one immutable receipt are written in one serializable transaction.
+- Provider/chain uniqueness prevents a second independent initialization.
+- Exact replay returns the original receipt without rewriting balances; divergent reuse fails closed.
+- Database constraints preserve the fixed provider, BSC chain, bounded age, and observation/preparation/initialization chronology.
+- Success initializes accounting balances only; quote and submission authorization remain false.
+- No route, runtime registration, provider call, funding, executor, or real order is added.
+
+## M10.100 — Durable accounting balance initialization reader
+
+M10.100 adds the read-only counterpart to the M10.99 initializer. A caller supplies one canonical initialization UUID; malformed identity fails before database access, absence returns `null`, and a present row is passed through the shared M10.99 persisted mapper.
+
+The mapper reconstructs the complete M10.98 initialization artifact and revalidates the fixed Agentic Wallet/BSC identity, exact unique USDT/BTCB/native-BNB balances, acknowledgment, freshness bound, observation/preparation/initialization chronology, and canonical request fingerprint. The reader separately verifies that the reconstructed receipt still matches the requested UUID. Returned balances and dates are defensive copies.
+
+The reader does not inspect or mutate current ledger balances, is not registered in NestJS, and cannot call the provider or authorize funding, quotes, submissions, an executor, or a real order.
+
+### M10.100 acceptance criteria
+
+- A canonical initialization UUID is required before persistence access.
+- Missing durable initialization returns explicit `null`.
+- A present receipt is revalidated through the shared M10.99 persisted mapper.
+- Requested identity, provider, chain, balance payload, acknowledgment, freshness, chronology, or fingerprint divergence fails closed.
+- Returned balances and dates are defensive copies.
+- PostgreSQL E2E proves the M10.99 receipt can be read unchanged by initialization UUID.
+- The reader remains unregistered and adds no schema, route, balance mutation, provider call, funding, quote/submission authorization, executor, or real order.
+
+## M10.101 — Current accounting ledger provenance snapshot
+
+M10.101 adds a pure boundary between the trusted M10.100 initialization receipt and any future durable reader of current accounting state. A valid receipt alone is insufficient: the caller must also supply exactly one current local row for approved-address USDT, approved-address BTCB, and native BNB, plus an explicit finite evaluation time.
+
+Every current quantity must be a canonical non-negative decimal string. Asset identities must be exact and unique, with no missing or unrelated row. Each balance update time must equal or follow durable initialization and must not exceed evaluation time. Initial and current quantities are not required to be equal because separately authorized M10.96 applications may have changed them; this boundary proves provenance, coverage, and chronology only.
+
+Successful output defensively copies the initialization balances, current balances, and dates. It claims only complete initialized ledger coverage. Quote and submission authorization remain false, and no persistence access, valuation, PnL, provider access, funding, executor, or order behavior exists.
+
+### M10.101 acceptance criteria
+
+- One structurally valid M10.100 initialized receipt and a finite evaluation time are required.
+- Current coverage is exactly unique approved USDT, approved BTCB, and native BNB.
+- Current quantities are canonical non-negative decimal strings.
+- Every update is at or after initialization and at or before evaluation.
+- Missing, extra, duplicate, malformed, unknown, pre-initialization, or future rows fail closed.
+- Initial and current balances plus dates are defensive copies.
+- Success confirms initialized complete coverage only; quote and submission authorization remain false.
+- No persistence access, schema, route, runtime registration, mutation, valuation, PnL, provider call, funding, executor, or real order is added.
+
+## M10.102 — Durable current accounting ledger snapshot reader
+
+M10.102 adds the persistence-backed counterpart to M10.101. A caller supplies one canonical initialization UUID and an explicit finite evaluation time; malformed requests fail before database access. The reader opens one repeatable-read transaction and loads both the immutable initialization receipt and the complete current accounting balance table, preventing a snapshot from mixing different committed database views.
+
+A present receipt passes through the shared M10.100 persisted mapper. Each balance retains its raw type, address or symbol, quantity, and update time, while the separately persisted `assetIdentity` must exactly match the identity those raw columns imply. The reader then reruns M10.101 over the complete result. Missing initialization returns `null`; corrupt receipt content, missing or extra balances, identity divergence, malformed quantity, or invalid chronology fails closed.
+
+Successful output is a defensive initialized-ledger snapshot only. The store is not registered in NestJS and cannot mutate a balance, calculate valuation or PnL, call the provider, fund a wallet, request a quote, authorize submission, run an executor, or place an order.
+
+### M10.102 acceptance criteria
+
+- A canonical initialization UUID and finite evaluation time are required before persistence access.
+- Initialization receipt and all current balance rows are loaded under one repeatable-read transaction.
+- Missing initialization returns explicit `null` without loading balances.
+- The M10.100 persisted receipt mapper and M10.101 provenance assessment are both reapplied.
+- Every persisted asset identity must exactly match its raw type/address/symbol columns.
+- Missing, extra, malformed, cross-identified, pre-initialization, or future ledger state fails closed.
+- Returned initial/current balances and dates are defensive copies.
+- PostgreSQL E2E proves a newly initialized ledger can be reconstructed as a complete snapshot.
+- Quote and submission authorization remain false.
+- No schema, route, runtime registration, mutation, valuation, PnL, provider call, funding, executor, or real order is added.
+
+## M10.103 — Authenticated wallet/ledger reconciliation
+
+M10.103 adds a pure boundary before any future valuation or quote composition can trust the current local accounting ledger. A structurally valid M10.102 snapshot is paired with one caller-supplied Agentic Wallet capability observation and an explicit reconciliation clock plus maximum observation age from one through sixty seconds.
+
+The policy reuses M10.98's pinned CLI, authenticated connection, approved BSC chain/address, balance-read capability, exact approved-asset coverage, identity, and decimal canonicalization checks. The reconciliation clock cannot predate the ledger snapshot evaluation, the provider observation cannot be future or stale, and it must equal or follow every current ledger-row update. Canonical USDT, BTCB, and native BNB quantities must equal the local ledger exactly. This detects unexplained wallet drift without assuming its cause or repairing either side.
+
+Successful output defensively copies the complete ledger snapshot, canonical wallet balances, and dates. It confirms authenticated observation and exact balance reconciliation only. Quote and submission authorization remain false, and the policy has no persistence access, provider invocation, mutation, valuation, PnL, funding, executor, or order behavior.
+
+### M10.103 acceptance criteria
+
+- One structurally valid M10.102 snapshot, finite evaluation time, and one-to-sixty-second observation-age bound are required.
+- Wallet evidence must satisfy the existing pinned-CLI authenticated approved-BSC read contract.
+- Approved USDT, BTCB, and native BNB must have exact unique wallet coverage and canonical quantities.
+- Reconciliation evaluation cannot predate snapshot evaluation.
+- Wallet observation cannot be future, stale, or earlier than any current ledger update.
+- Every wallet quantity must equal its exact current local-accounting quantity.
+- Unavailable, partial, malformed, identity-divergent, or quantity-divergent evidence fails closed without repair.
+- Successful ledger, wallet, and date output is defensive and remains non-authorizing.
+- No persistence access, schema, route, runtime registration, provider invocation, mutation, valuation, PnL, funding, executor, or real order is added.
+
+## M10.104 — Durable wallet/ledger reconciliation composition
+
+M10.104 connects the durable M10.102 current-ledger reader to the pure M10.103 reconciliation policy without adding a provider runner or runtime registration. The caller supplies a canonical initialization UUID, an already acquired capability observation, and the reconciliation request. Identity, evaluation time, and the one-to-sixty-second age policy are validated before persistence access.
+
+Before the first asynchronous boundary, the service copies the evaluation date and the complete nested capability observation, including observation/session dates, chain operations, read capabilities, addresses, balances, quota, settings, and gas facts. The snapshot reader receives a separate date copy. Caller mutation while PostgreSQL is pending therefore cannot change the evidence later consumed by M10.103.
+
+Missing durable initialization returns explicit `null`. A present ledger snapshot is passed to the shared reconciliation policy; wallet divergence remains an ordinary blocked assessment, while a malformed durable snapshot is allowed to fail rather than being disguised as absence. PostgreSQL E2E composes initialization, durable reading, and exact wallet reconciliation. The service remains unregistered and cannot invoke the provider, mutate accounting, calculate valuation or PnL, authorize quotes/submissions, fund a wallet, run an executor, or place an order.
+
+### M10.104 acceptance criteria
+
+- Canonical initialization identity and valid reconciliation request are required before durable access.
+- Request and complete capability observation are defensively captured before the asynchronous read.
+- The durable reader receives its own evaluation-date copy.
+- Missing initialization returns explicit `null` without fabricating a blocked or reconciled result.
+- Present durable state is passed through the exact M10.103 policy.
+- Wallet mismatch remains a policy blocker and durable inconsistency propagates fail closed.
+- PostgreSQL E2E proves initialized balances can be read and reconciled through the composition.
+- Output remains non-authorizing and the service remains outside NestJS registration.
+- No schema, route, provider invocation, mutation, valuation, PnL, funding, executor, or real order is added.
+
+## M10.105 — Bounded read-only reconciliation attempt
+
+M10.105 adds an explicit one-shot orchestration boundary over the existing Agentic Wallet capability adapter contract and M10.104. The request carries only a canonical initialization UUID and a maximum observation age from one through sixty seconds. Both are validated before provider access, and pre-cancelled work performs no read.
+
+The coordinator captures a finite pre-read timestamp and passes a defensive copy to one approved-chain capability load. It performs no retry. After the read returns, cancellation is checked before any durable access. A second clock reading must be finite and equal to or later than the first; that post-read time becomes M10.104's evaluation time, so provider-read duration remains visible to the existing freshness policy rather than being erased by a single timestamp.
+
+Provider failures propagate directly, post-read cancellation and clock failure stop before PostgreSQL, and M10.104 absence or M10.103 blockers pass through unchanged. PostgreSQL E2E composes a bounded observation-loader double with the real durable reader and reconciliation service. The attempt is not registered in NestJS and adds no route, loop, timer, worker, schedule, mutable provider command, accounting mutation, valuation, PnL, funding, executor, or real order.
+
+### M10.105 acceptance criteria
+
+- Canonical initialization identity and one-to-sixty-second observation age are required before provider access.
+- A pre-cancelled attempt performs no provider or durable work.
+- Exactly one read-only approved-chain capability load is permitted per call.
+- A separate finite post-read clock cannot regress behind the observation clock.
+- Cancellation after provider return prevents durable reconciliation.
+- Provider failure propagates without retry or durable access.
+- At most one M10.104 reconciliation follows a successful read.
+- Durable absence and policy blockers pass through unchanged.
+- PostgreSQL E2E proves the bounded loader composes with initialized durable ledger reconciliation.
+- No route, runtime registration, loop, timer, schedule, mutable command, accounting mutation, valuation, PnL, funding, executor, or real order is added.

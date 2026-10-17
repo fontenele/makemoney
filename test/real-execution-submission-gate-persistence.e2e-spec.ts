@@ -43,9 +43,21 @@ import { PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationStore } fro
 import { PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-authorization-read.store';
 import { PrismaAgenticWalletMarketSwapAccountingMutationApplicationStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-application.store';
 import { PrismaAgenticWalletMarketSwapAccountingMutationApplicationReadStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-application-read.store';
+import {
+  ACCOUNTING_BALANCE_INITIALIZATION_ACKNOWLEDGMENT,
+  AgenticWalletAccountingBalanceInitialization,
+} from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-balance-initialization';
+import { PrismaAgenticWalletAccountingBalanceInitializationStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-accounting-balance-initialization.store';
+import { PrismaAgenticWalletAccountingBalanceInitializationReadStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-accounting-balance-initialization-read.store';
+import { PrismaAgenticWalletAccountingLedgerSnapshotReadStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-accounting-ledger-snapshot.store';
+import { AgenticWalletAccountingLedgerReconciliationService } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-ledger-reconciliation.service';
+import { AgenticWalletAccountingLedgerReconciliationAttempt } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-ledger-reconciliation-attempt';
+import { AgenticWalletCapabilityObservation } from '../src/modules/real-trading/infrastructure/agentic-wallet-capability.adapter';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
+const USDT = '0x55d398326f99059ff775485246999027b3197955';
+const BTCB = '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c';
 
 describe('Real execution submission gate persistence (e2e)', () => {
   let prisma: PrismaService;
@@ -64,6 +76,10 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let accountingMutationAuthorizationReadStore: PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore;
   let accountingMutationApplicationStore: PrismaAgenticWalletMarketSwapAccountingMutationApplicationStore;
   let accountingMutationApplicationReadStore: PrismaAgenticWalletMarketSwapAccountingMutationApplicationReadStore;
+  let accountingBalanceInitializationStore: PrismaAgenticWalletAccountingBalanceInitializationStore;
+  let accountingBalanceInitializationReadStore: PrismaAgenticWalletAccountingBalanceInitializationReadStore;
+  let accountingLedgerSnapshotReadStore: PrismaAgenticWalletAccountingLedgerSnapshotReadStore;
+  let accountingLedgerReconciliationService: AgenticWalletAccountingLedgerReconciliationService;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -128,6 +144,19 @@ describe('Real execution submission gate persistence (e2e)', () => {
       new PrismaAgenticWalletMarketSwapAccountingMutationApplicationReadStore(
         prisma,
       );
+    accountingBalanceInitializationStore =
+      new PrismaAgenticWalletAccountingBalanceInitializationStore(
+        prisma,
+        () => new Date('2026-10-03T12:00:03.000Z'),
+      );
+    accountingBalanceInitializationReadStore =
+      new PrismaAgenticWalletAccountingBalanceInitializationReadStore(prisma);
+    accountingLedgerSnapshotReadStore =
+      new PrismaAgenticWalletAccountingLedgerSnapshotReadStore(prisma);
+    accountingLedgerReconciliationService =
+      new AgenticWalletAccountingLedgerReconciliationService(
+        accountingLedgerSnapshotReadStore,
+      );
   });
 
   beforeEach(async () => {
@@ -164,6 +193,110 @@ describe('Real execution submission gate persistence (e2e)', () => {
     });
     expect(replay).toEqual({ gate: first.gate, replayed: true });
     await expect(prisma.realExecutionSubmissionGate.count()).resolves.toBe(1);
+  });
+
+  it('atomically initializes trusted accounting balances once and replays the receipt', async () => {
+    const initialization = accountingBalanceInitialization();
+
+    const first =
+      await accountingBalanceInitializationStore.initialize(initialization);
+    const replay =
+      await accountingBalanceInitializationStore.initialize(initialization);
+
+    expect(first).toMatchObject({
+      replayed: false,
+      initialized: {
+        initialization: { initializationId: uuid(29) },
+        initializedAt: new Date('2026-10-03T12:00:03.000Z'),
+        accountingBalancesInitialized: true,
+        quoteAuthorized: false,
+        submissionAuthorized: false,
+      },
+    });
+    expect(replay).toEqual({ initialized: first.initialized, replayed: true });
+    await expect(
+      accountingBalanceInitializationReadStore.getByInitializationId(uuid(29)),
+    ).resolves.toEqual(first.initialized);
+    await expect(
+      accountingLedgerSnapshotReadStore.getByInitializationId(
+        uuid(29),
+        new Date('2026-10-03T12:00:04.000Z'),
+      ),
+    ).resolves.toMatchObject({
+      initializationId: uuid(29),
+      currentBalances: [
+        { assetType: 'native', currentQuantity: '2' },
+        { assetType: 'token', assetAddress: USDT, currentQuantity: '1000.5' },
+        { assetType: 'token', assetAddress: BTCB, currentQuantity: '0.125' },
+      ],
+      ledgerCoverageComplete: true,
+      accountingBalancesInitialized: true,
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    });
+    await expect(
+      accountingLedgerReconciliationService.reconcile(
+        uuid(29),
+        accountingBalanceObservation(),
+        {
+          maximumObservationAgeMs: 5_000,
+          evaluatedAt: new Date('2026-10-03T12:00:04.000Z'),
+        },
+      ),
+    ).resolves.toMatchObject({
+      status: 'accounting_ledger_reconciled',
+      blockers: [],
+      reconciliation: {
+        initializationId: uuid(29),
+        ledgerBalancesReconciled: true,
+        quoteAuthorized: false,
+        submissionAuthorized: false,
+      },
+    });
+    const attemptTimes = [
+      new Date('2026-10-03T12:00:03.500Z'),
+      new Date('2026-10-03T12:00:04.000Z'),
+    ];
+    const reconciliationAttempt =
+      new AgenticWalletAccountingLedgerReconciliationAttempt(
+        {
+          load: (_chainId, observedAt) =>
+            Promise.resolve({
+              ...accountingBalanceObservation(),
+              capabilities: {
+                ...accountingBalanceObservation().capabilities,
+                observedAt: new Date(observedAt),
+              },
+            }),
+        },
+        accountingLedgerReconciliationService,
+        () => new Date(attemptTimes.shift()!),
+      );
+    await expect(
+      reconciliationAttempt.run(uuid(29), 5_000),
+    ).resolves.toMatchObject({
+      status: 'accounting_ledger_reconciled',
+      blockers: [],
+      reconciliation: { ledgerBalancesReconciled: true },
+    });
+    await expect(
+      prisma.realExecutionAccountingBalance.findMany({
+        orderBy: { assetIdentity: 'asc' },
+      }),
+    ).resolves.toMatchObject([
+      { assetIdentity: 'native:BNB', quantity: '2' },
+      {
+        assetIdentity: 'token:0x55d398326f99059ff775485246999027b3197955',
+        quantity: '1000.5',
+      },
+      {
+        assetIdentity: 'token:0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+        quantity: '0.125',
+      },
+    ]);
+    await expect(
+      prisma.realExecutionAccountingBalanceInitialization.count(),
+    ).resolves.toBe(1);
   });
 
   it('allows only one concurrent gate to consume a confirmation', async () => {
@@ -929,6 +1062,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
 
   async function cleanup(): Promise<void> {
     await prisma.realExecutionAccountingMutationApplication.deleteMany();
+    await prisma.realExecutionAccountingBalanceInitialization.deleteMany();
     await prisma.realExecutionAccountingBalance.deleteMany();
     await prisma.realExecutionAccountingMutationAuthorization.deleteMany();
     await prisma.realExecutionAccountingMutationCommitment.deleteMany();
@@ -1172,6 +1306,70 @@ function finishedStatusLookupResponse(): Record<string, unknown> {
         },
       ],
     },
+  };
+}
+
+function accountingBalanceInitialization(): AgenticWalletAccountingBalanceInitialization {
+  return {
+    scope: 'agentic_wallet_accounting_balance_initialization',
+    initializationId: uuid(29),
+    providerId: 'agentic_wallet',
+    chainId: '56',
+    acknowledgment: ACCOUNTING_BALANCE_INITIALIZATION_ACKNOWLEDGMENT,
+    balances: [
+      { assetType: 'native', assetSymbol: 'BNB', currentQuantity: '2' },
+      {
+        assetType: 'token',
+        assetAddress: '0x55d398326f99059ff775485246999027b3197955',
+        currentQuantity: '1000.5',
+      },
+      {
+        assetType: 'token',
+        assetAddress: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+        currentQuantity: '0.125',
+      },
+    ],
+    balanceCoverageComplete: true,
+    walletObservedAt: new Date('2026-10-03T12:00:00.000Z'),
+    maximumObservationAgeMs: 5_000,
+    preparedAt: new Date('2026-10-03T12:00:02.000Z'),
+    accountingBalanceInitializationPrepared: true,
+    accountingBalancesInitialized: false,
+    quoteAuthorized: false,
+    submissionAuthorized: false,
+  };
+}
+
+function accountingBalanceObservation(): AgenticWalletCapabilityObservation {
+  return {
+    cliVersion: '1.10.0',
+    requiredCliVersion: '1.10.0',
+    capabilities: {
+      providerId: 'agentic_wallet',
+      connected: true,
+      chains: [{ chainId: '56', operations: [] }],
+      reads: {
+        securitySettings: true,
+        quota: true,
+        balances: true,
+        gas: true,
+      },
+      observedAt: new Date('2026-10-03T12:00:03.500Z'),
+    },
+    settings: null,
+    quota: null,
+    addresses: [{ chainId: '56', address: '0xwallet' }],
+    balances: [
+      { chainId: '56', tokenAddress: USDT, symbol: 'USDT', quantity: '1000.5' },
+      { chainId: '56', tokenAddress: BTCB, symbol: 'BTCB', quantity: '0.125' },
+      {
+        chainId: '56',
+        tokenAddress: 'native-bnb',
+        symbol: 'BNB',
+        quantity: '2',
+      },
+    ],
+    gas: null,
   };
 }
 

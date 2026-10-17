@@ -1,5 +1,47 @@
 # Technical Decisions
 
+## 2026-10-17 — Bound live reconciliation to one explicit read attempt
+
+Connecting M10.104 directly to an unrestricted loop, retry policy, or runtime route would make authenticated wallet access implicit and could renew provider inactivity state or repeatedly consume a degraded provider surface. Reusing one timestamp for both observation and completion would also hide command duration from the freshness policy.
+
+M10.105 therefore admits only an explicit one-shot call: validate before access, capture a pre-read observation timestamp, execute one read-only capability load, recheck cancellation, capture a distinct non-regressed completion timestamp, and call M10.104 once. Provider errors are never retried and a cancelled or temporally invalid attempt never reaches PostgreSQL. The coordinator remains unregistered, so this increment defines safe orchestration without creating an active runtime behavior.
+
+## 2026-10-17 — Compose durable reconciliation without adding provider authority
+
+M10.103 validates a supplied ledger snapshot, but allowing every future caller to assemble that snapshot independently would reopen the possibility of stale, partial, or fabricated local state. At the same time, coupling the next increment directly to the Agentic Wallet runner would prematurely create a provider-accessing runtime path.
+
+M10.104 therefore composes only the existing durable snapshot reader with the pure reconciliation policy. It validates and defensively snapshots request/provider evidence before the asynchronous read, keeps missing initialization distinct from database inconsistency, and preserves M10.103 blockers verbatim. The caller still supplies an already acquired observation, so the service gains durable read authority but no provider invocation or execution authority.
+
+## 2026-10-17 — Reconcile local accounting before deriving financial state
+
+A provenance-valid local ledger can still diverge from the connected wallet because of an unrecorded external change, missed accounting application, or stale provider evidence. Valuation or quote decisions over that ledger would convert unexplained drift into apparently trustworthy financial state.
+
+M10.103 therefore requires a fresh authenticated Agentic Wallet observation and reuses M10.98's pinned-CLI, connection, chain, address, read-capability, approved-asset, and decimal canonicalization rules. The observation must not predate a ledger update, and every canonical USDT, BTCB, and BNB quantity must equal the current local row. Reconciliation proves only agreement at the observed boundary; it remains pure, unregistered, and permanently non-authorizing.
+
+## 2026-10-17 — Read initialization and current balances from one database view
+
+Applying M10.101 to receipt and balance rows fetched independently could combine facts from different database moments. It could also discard a contradictory persisted `assetIdentity` while reconstructing an otherwise plausible typed balance. Either behavior would weaken the provenance boundary before future valuation or accounting consumers.
+
+M10.102 therefore validates the request before access and loads the initialization receipt plus complete balance table in one repeatable-read transaction. The receipt passes through the shared M10.100 mapper, every stored identity must equal the identity implied by its raw type/address/symbol columns, and the complete result is rerun through M10.101. Absence is distinct from inconsistency. The reader remains unregistered and non-authorizing, so a consistent snapshot cannot mutate accounting or reach a provider.
+
+## 2026-10-17 — Anchor the current ledger to trusted initialization
+
+A valid initialization receipt proves how the accounting ledger began, but it does not prove that an arbitrary later set of rows is complete, uniquely identified, or chronologically possible. Treating partial or extra rows as a current ledger snapshot would weaken every later balance-dependent policy.
+
+M10.101 therefore introduces a pure provenance assessment before any durable current-ledger reader. It accepts only the three approved accounting identities, requires canonical non-negative quantities and one update time per row, and bounds every update between durable initialization and an explicit evaluation clock. Initial and current quantities may legitimately differ because M10.96 can apply authorized transitions; this increment validates provenance and coverage, not economic reconciliation, valuation, or PnL. Success remains non-authorizing and side-effect free.
+
+## 2026-10-17 — Reconstruct initialization before trusting its receipt
+
+An initialization row can look plausible while its exact balance payload, fingerprint, fixed provider/chain, or chronology has diverged. Returning that row directly would weaken the provenance guarantee established by M10.98 and M10.99.
+
+M10.100 validates a canonical receipt UUID before access and delegates every present row to the same persisted mapper used after the atomic write. The reader then checks the requested identity against the reconstructed initialization and returns defensive copies only. Absence is distinct from corruption. The boundary remains read-only and unregistered, so learning that balances were initialized cannot mutate them or grant quote or submission authority.
+
+## 2026-10-16 — Initialize the ledger and its provenance atomically
+
+A trusted M10.98 snapshot is still only an in-memory proposal. Initializing its balances without a durable receipt would lose provenance, while recording the receipt separately could leave either balances without evidence or evidence without balances. A delayed write could also use an observation that was fresh during preparation but stale when persistence actually began.
+
+M10.99 therefore uses one serializable transaction and a dedicated advisory lock to revalidate the prepared snapshot, enforce the observation-age bound against the transaction's injected clock, require the accounting ledger to be empty, insert all three balances, and record one immutable provider/chain initialization receipt. The fixed provider/chain uniqueness makes initialization a one-time boundary. Exact fingerprint replay returns the original receipt without touching balances; divergent reuse and any unexplained pre-existing ledger state fail closed. The store remains outside runtime wiring and grants neither quote nor submission authority.
+
 ## 2026-10-16 — Seed local accounting only from authenticated wallet observations
 
 The M10.96 balance table needs a trustworthy starting state before it can safely apply authorized transitions. Accepting arbitrary caller-supplied quantities would let local accounting begin from values that were never observed at the connected wallet and would weaken every later exact-before comparison.

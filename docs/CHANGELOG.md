@@ -1,5 +1,71 @@
 # Changelog
 
+## 2026-10-17 — Add one bounded read-only wallet reconciliation attempt
+
+- Added an unregistered M10.105 coordinator that permits one Agentic Wallet capability read and one M10.104 reconciliation only.
+- Validated initialization identity and observation-age policy before provider access.
+- Used separate pre-read and post-read clocks, rejecting invalid or regressed time before durable reconciliation.
+- Enforced cancellation before provider access and again after the read, with no retry, loop, timer, or schedule.
+- Preserved provider failure, durable absence, and reconciliation blockers without repair or coercion.
+- Added PostgreSQL E2E composition with a bounded read-loader double and the real durable reconciliation path.
+- Added no route, runtime registration, mutable command, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+- Verified all 2,433 backend tests across 208 suites, including 11 focused attempt tests, all 96 PostgreSQL E2E tests across 9 suites with all 33 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
+## 2026-10-17 — Compose durable ledger reading with wallet reconciliation
+
+- Added an unregistered M10.104 read-only service over the M10.102 snapshot store and M10.103 reconciliation policy.
+- Rejected malformed initialization identity, evaluation clock, and freshness policy before database access.
+- Defensively captured the request and complete capability observation before the asynchronous durable read.
+- Preserved explicit missing initialization, policy-level wallet divergence, and fail-closed propagation of durable inconsistency.
+- Added PostgreSQL E2E coverage for successful reconciliation from a freshly initialized durable ledger.
+- Added no schema, route, runtime registration, provider invocation, mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+- Verified all 2,422 backend tests across 207 suites, including 7 focused composition tests, all 96 PostgreSQL E2E tests across 9 suites with all 33 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
+## 2026-10-17 — Reconcile the current ledger with authenticated wallet balances
+
+- Added a pure M10.103 reconciliation boundary over one valid M10.102 ledger snapshot and one authenticated pinned-CLI Agentic Wallet observation.
+- Reused M10.98 wallet validation and canonical approved-asset extraction instead of accepting caller-supplied wallet quantities.
+- Required fresh post-ledger observation chronology and exact canonical USDT, BTCB, and native BNB equality.
+- Rejected unavailable, stale, future, predating, partial, identity-divergent, or quantity-divergent wallet evidence.
+- Returned defensive non-authorizing reconciliation state with no persistence, route, provider invocation, mutation, valuation, PnL, funding, executor, or real order.
+- Verified all 2,415 backend tests across 206 suites, including 15 focused reconciliation tests, all 96 PostgreSQL E2E tests across 9 suites with all 33 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
+## 2026-10-17 — Read a consistent durable accounting-ledger snapshot
+
+- Added an unregistered M10.102 Prisma reader selected by canonical initialization UUID and explicit finite evaluation time.
+- Loaded the immutable initialization receipt and all current ledger rows in one repeatable-read transaction.
+- Reapplied the M10.100 persisted receipt mapper and M10.101 provenance assessment, including exact durable asset-identity checks.
+- Returned explicit absence or a defensive complete snapshot while corrupt coverage, quantity, identity, and chronology fail closed.
+- Added no schema, route, runtime registration, balance mutation, valuation, PnL, provider call, funding, quote/submission authorization, executor, or real order.
+- Verified all 2,400 backend tests across 205 suites, including 11 focused reader tests, all 96 PostgreSQL E2E tests across 9 suites with all 33 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard checks with fresh Binance-backed valuation.
+
+## 2026-10-17 — Validate current accounting-ledger provenance
+
+- Added a pure M10.101 boundary that combines one valid M10.100 initialization receipt with the current local-accounting balances.
+- Required exact unique USDT, BTCB, and native BNB coverage, canonical non-negative decimals, and update timestamps bounded by initialization and explicit evaluation time.
+- Rejected missing, extra, duplicate, malformed, unknown, pre-initialization, and future ledger facts without repair or inference.
+- Returned defensive initial/current snapshots while keeping quote and submission authorization false.
+- Added no persistence access, schema, route, runtime registration, balance mutation, valuation, PnL, provider call, funding, executor, or real order.
+- Verified all 2,389 backend tests across 204 suites, including 13 focused snapshot-policy tests, all 96 PostgreSQL E2E tests across 9 suites with all 33 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live backend health with fresh Binance-backed valuation.
+
+## 2026-10-17 — Read trusted accounting initialization receipts
+
+- Added an unregistered M10.100 read contract and Prisma reader selected by canonical initialization UUID.
+- Reused the M10.99 persisted mapper to reconstruct and validate the complete M10.98 initialization artifact, chronology, freshness, and request fingerprint.
+- Returned explicit absence or defensive initialized balance/date snapshots while rejecting malformed identity and corrupt or divergent persistence.
+- Kept the reader side-effect free with no balance mutation, route, runtime registration, provider call, funding, quote/submission authorization, executor, or real order.
+- Verified all 2,376 backend tests across 203 suites, including 10 focused reader tests, all 96 PostgreSQL E2E tests across 9 suites with all 33 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live backend health with fresh Binance-backed valuation.
+
+## 2026-10-16 — Initialize trusted local-accounting balances atomically
+
+- Added an unregistered M10.99 serializable Prisma store for the prepared M10.98 balance snapshot.
+- Revalidated snapshot structure and wallet-observation freshness at transaction time, then required an empty ledger before inserting exactly USDT, BTCB, and native BNB.
+- Recorded one immutable provider/chain initialization receipt in the same transaction as all three balances.
+- Made exact replay idempotent while changed reuse and pre-existing accounting state fail closed.
+- Added database constraints for the fixed provider/chain, bounded freshness, and complete initialization chronology.
+- Kept quote/submission authorization false and added no route, runtime registration, provider call, funding, executor, or real order.
+- Verified all 2,366 backend tests across 202 suites, including 4 focused store tests, all 96 PostgreSQL E2E tests across 9 suites with all 33 migrations, all 94 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live backend health.
+
 ## 2026-10-16 — Prepare trusted local-accounting starting balances
 
 - Added a pure M10.98 preflight that derives local USDT, BTCB, and native BNB starting balances only from a fresh authenticated Agentic Wallet capability observation.
