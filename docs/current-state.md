@@ -1,5 +1,11 @@
 # Current State
 
+M10.115 is complete: fresh durable wallet/ledger reconciliation evidence can now be projected into one defensive current-balance snapshot for its canonical accounting initialization.
+
+The pure boundary revalidates the complete M10.110 evidence, requires exact initialization correlation, retains the reconciliation UUID and fingerprint, and canonically orders the reconciled USDT, BTCB, and native BNB quantities. Mutable source balances and dates cannot change the output, and the exported validator regenerates the projection to reject altered claims. It remains unregistered and adds no schema, route, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+
+Post-M10.115 validation passed all 2,511 backend tests across 217 suites, including all 6 focused reconciled-balance projection cases, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations applied from scratch, all 96 dashboard tests across 17 files, formatting, lint, Prisma validation, backend/dashboard builds, Compose validation, whitespace checks, and live API health/valuation checks.
+
 M10.114 is complete: one unregistered read-only composition can now assess the newest durable accounting-ledger reconciliation for a canonical initialization identity without a caller-supplied reconciliation UUID.
 
 Initialization identity, one-to-sixty-second maximum age, and the finite evaluation clock are rejected before persistence access when invalid. The service copies the mutable clock before awaiting M10.112, preserves explicit absence, and sends every present newest commitment through the exact M10.110 freshness policy. Stale evidence remains an ordinary blocker; reader corruption, including malformed newest evidence, propagates without older fallback. No schema, route, runtime registration, provider call, balance mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.

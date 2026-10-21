@@ -60,6 +60,7 @@ import {
   AgenticWalletAccountingLedgerLatestReconciliationFreshnessService,
   AgenticWalletAccountingLedgerReconciliationFreshnessService,
 } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-ledger-reconciliation-freshness.service';
+import { prepareAgenticWalletAccountingReconciledBalanceSnapshot } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-reconciled-balance-snapshot';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -403,20 +404,40 @@ describe('Real execution submission gate persistence (e2e)', () => {
         submissionAuthorized: false,
       },
     });
-    await expect(
-      accountingLedgerLatestReconciliationFreshnessService.assessLatest(
+    const latestFreshness =
+      await accountingLedgerLatestReconciliationFreshnessService.assessLatest(
         uuid(29),
         {
           maximumAgeMs: 2_000,
           evaluatedAt: new Date('2026-10-03T12:00:05.000Z'),
         },
-      ),
-    ).resolves.toMatchObject({
+      );
+    expect(latestFreshness).toMatchObject({
       status: 'reconciliation_evidence_fresh',
       blockers: [],
       evidence: {
         stored: first.stored,
         reconciliationCurrent: true,
+        quoteAuthorized: false,
+        submissionAuthorized: false,
+      },
+    });
+    if (latestFreshness?.evidence === null || latestFreshness === null)
+      throw new Error('Latest reconciliation evidence was unavailable');
+    expect(
+      prepareAgenticWalletAccountingReconciledBalanceSnapshot(
+        latestFreshness.evidence,
+        uuid(29),
+      ),
+    ).toMatchObject({
+      status: 'reconciled_balances_ready',
+      blockers: [],
+      snapshot: {
+        initializationId: uuid(29),
+        reconciliationId: uuid(30),
+        balanceCoverageComplete: true,
+        walletObservationAuthenticated: true,
+        ledgerBalancesReconciled: true,
         quoteAuthorized: false,
         submissionAuthorized: false,
       },

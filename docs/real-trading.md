@@ -2116,3 +2116,22 @@ The composition remains unregistered and read-only. It introduces no provider ac
 - Focused tests cover success, absence, pre-access validation, date isolation, stale evidence, and read failure.
 - PostgreSQL E2E composes durable record, latest-by-initialization selection, and freshness assessment.
 - No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.
+
+## M10.115 — Reconciled balance snapshot projection
+
+M10.115 adds a pure projection boundary for future resource consumers. It accepts only structurally valid fresh M10.110 evidence and a canonical accounting initialization UUID that exactly matches the committed reconciliation. Invalid or mismatched identity and any altered freshness claim fail closed.
+
+Successful output retains the durable reconciliation UUID and fingerprint, authenticated wallet observation time, and freshness evaluation time. It defensively copies and canonically orders exactly the reconciled current USDT, BTCB, and native BNB balances. The exported validator regenerates the entire projection from its embedded evidence, so changed quantities, provenance, chronology, coverage, or authority flags are rejected.
+
+The projection remains unregistered and non-authorizing. It does not independently read the ledger or provider, fabricate missing/stale evidence, value balances, request a quote, reserve resources, mutate accounting, fund a wallet, or submit an order.
+
+### M10.115 acceptance criteria
+
+- Complete fresh M10.110 evidence and one canonical matching initialization UUID are required.
+- The durable reconciliation UUID and fingerprint remain attached to the projected balances.
+- Exactly reconciled USDT, BTCB, and native BNB quantities are defensively copied and canonically ordered.
+- Observation and evaluation times are preserved as defensive copies.
+- The exported validator regenerates the projection and rejects altered claims.
+- Focused tests cover success, invalid evidence, invalid/mismatched identity, mutation isolation, and tampering.
+- PostgreSQL E2E composes durable latest selection, freshness assessment, and balance projection.
+- No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.

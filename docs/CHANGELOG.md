@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-21 — Project fresh reconciled accounting balances
+
+- Added the M10.115 pure projection from fresh M10.110 reconciliation evidence to exact current USDT, BTCB, and native BNB balances.
+- Bound the projection to the canonical initialization UUID and retained its durable reconciliation UUID and fingerprint.
+- Canonically ordered and defensively copied balances and dates, with regeneration-based validation against tampered claims.
+- Added focused and PostgreSQL-chain composition coverage.
+- Verified all 2,511 backend tests across 217 suites, including all 6 focused projection cases, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations, all 96 dashboard tests across 17 files, formatting, lint, Prisma validation, backend/dashboard builds, Compose validation, whitespace checks, and live API health/valuation checks.
+- Added no schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+
 ## 2026-10-21 — Compose latest reconciliation freshness by initialization
 
 - Added the M10.114 unregistered service over the M10.112 latest reader and M10.110 freshness policy.

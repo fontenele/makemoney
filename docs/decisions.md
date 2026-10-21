@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-21 — Project current balances only from fresh reconciled evidence
+
+Future resource checks need exact current quantities, but reading provider balances or the local ledger independently would reopen the divergence that M10.103–M10.114 close. Passing the complete nested reconciliation everywhere would also invite consumers to select balances inconsistently or discard provenance.
+
+M10.115 therefore accepts only revalidatable M10.110 fresh evidence correlated to the caller's canonical initialization identity. It retains the durable reconciliation identity and fingerprint, canonically orders a defensive copy of the exact three reconciled balances, and preserves observation/evaluation times. The projection remains pure, unregistered, and explicitly non-authorizing.
+
 ## 2026-10-21 — Assess current reconciliation by initialization identity
 
 A current-state consumer naturally owns the durable accounting initialization identity, not the UUID of whichever reconciliation happened most recently. Requiring that consumer to discover a reconciliation and then invoke M10.111 separately would duplicate selection logic and leave room for inconsistent ordering or a time-of-check/time-of-use gap.
