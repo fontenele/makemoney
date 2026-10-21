@@ -110,11 +110,82 @@ describe('RealTradingStatusService', () => {
     expect(firstResult).not.toHaveProperty('addresses');
     expect(JSON.stringify(firstResult)).not.toContain('0xprivate-address');
   });
+
+  it('reveals the exact BSC address only for an explicit ready deposit review', async () => {
+    const observation = connectedObservation();
+    observation.addresses = [
+      { chainId: '56', address: '0x1234567890abcdef1234567890abcdef12345678' },
+    ];
+    const wallet = { load: jest.fn(() => Promise.resolve(observation)) };
+    const service = new RealTradingStatusService(
+      config({
+        TRADING_MODE: 'paper',
+        REAL_EXECUTION_ENABLED: false,
+        REAL_RISK_MAX_ORDER_NOTIONAL_USDT: '1',
+        REAL_RISK_MAX_DAILY_SPEND_USDT: '2',
+        REAL_RISK_MAX_BANKROLL_USDT: '12',
+        REAL_RISK_MAX_PROVIDER_FEE_RATE: '0.005',
+        REAL_RISK_MAX_NETWORK_FEE_USDT: '0.5',
+        REAL_RISK_MAX_SLIPPAGE_RATE: '0.005',
+      }),
+      wallet as unknown as AgenticWalletCapabilityAdapter,
+    );
+
+    await expect(service.prepareFundingReadiness()).resolves.toMatchObject({
+      scope: 'agentic_wallet_funding_readiness',
+      status: 'ready_for_operator_deposit',
+      blockers: [],
+      destination: {
+        network: 'BNB Smart Chain',
+        chainId: '56',
+        address: '0x1234567890abcdef1234567890abcdef12345678',
+      },
+      walletReportedEmpty: true,
+      operatorTransferRequired: true,
+      fundingAuthorized: false,
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    });
+    expect(wallet.load).toHaveBeenCalledTimes(1);
+  });
+
+  it('withholds the address when deposit readiness is blocked', async () => {
+    const observation = connectedObservation();
+    observation.addresses = [
+      { chainId: '56', address: '0x1234567890abcdef1234567890abcdef12345678' },
+    ];
+    observation.balances = [
+      {
+        chainId: '56',
+        tokenAddress: '0x55d398326f99059ff775485246999027b3197955',
+        symbol: 'USDT',
+        quantity: '1',
+      },
+    ];
+    const wallet = { load: jest.fn(() => Promise.resolve(observation)) };
+    const service = new RealTradingStatusService(
+      config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
+      wallet as unknown as AgenticWalletCapabilityAdapter,
+    );
+
+    await expect(service.prepareFundingReadiness()).resolves.toMatchObject({
+      status: 'blocked',
+      blockers: ['local_risk_limits_blocked', 'wallet_not_empty'],
+      destination: null,
+      fundingAuthorized: false,
+    });
+  });
 });
 
 function config(values: {
   TRADING_MODE: 'paper' | 'real';
   REAL_EXECUTION_ENABLED: boolean;
+  REAL_RISK_MAX_ORDER_NOTIONAL_USDT?: string;
+  REAL_RISK_MAX_DAILY_SPEND_USDT?: string;
+  REAL_RISK_MAX_BANKROLL_USDT?: string;
+  REAL_RISK_MAX_PROVIDER_FEE_RATE?: string;
+  REAL_RISK_MAX_NETWORK_FEE_USDT?: string;
+  REAL_RISK_MAX_SLIPPAGE_RATE?: string;
 }): ConfigService<Record<string, unknown>, true> {
   const completeValues = {
     REAL_RISK_MAX_ORDER_NOTIONAL_USDT: null,

@@ -3,6 +3,7 @@ import {
   dashboardApiPath,
   loadDashboard,
   observeAgenticWallet,
+  prepareAgenticWalletFunding,
   loadAgenticWalletAuthentication,
   startAgenticWalletAuthentication,
   loadListingPerformance,
@@ -606,6 +607,53 @@ describe('observeAgenticWallet', () => {
     await expect(observeAgenticWallet(request)).resolves.toEqual({
       status: 'unavailable',
       message: 'Agentic Wallet read-only observation is unavailable',
+    });
+  });
+});
+
+describe('Agentic Wallet funding readiness', () => {
+  it('requests an explicit manual readiness check and preserves the address', async () => {
+    const readiness = {
+      scope: 'agentic_wallet_funding_readiness',
+      status: 'ready_for_operator_deposit',
+      blockers: [],
+      observedAt: '2026-10-21T12:00:00.000Z',
+      destination: {
+        network: 'BNB Smart Chain',
+        chainId: '56',
+        address: '0x1234567890abcdef1234567890abcdef12345678',
+      },
+      walletReportedEmpty: true,
+      operatorTransferRequired: true,
+      fundingAuthorized: false,
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    };
+    const request = vi.fn(() => Promise.resolve(Response.json(readiness)));
+
+    await expect(prepareAgenticWalletFunding(request)).resolves.toEqual({
+      status: 'available',
+      data: readiness,
+    });
+    expect(request).toHaveBeenCalledWith(
+      '/api/real-trading/funding-readiness',
+      { method: 'POST', headers: { Accept: 'application/json' } },
+    );
+  });
+
+  it('keeps readiness failures isolated', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json(
+          { message: 'Agentic Wallet funding readiness is unavailable' },
+          { status: 503 },
+        ),
+      ),
+    );
+
+    await expect(prepareAgenticWalletFunding(request)).resolves.toEqual({
+      status: 'unavailable',
+      message: 'Agentic Wallet funding readiness is unavailable',
     });
   });
 });

@@ -4,6 +4,7 @@ import {
   loadDashboard,
   loadAgenticWalletAuthentication,
   observeAgenticWallet,
+  prepareAgenticWalletFunding,
   startAgenticWalletAuthentication,
   loadListingPerformance,
   loadPolymarketEventDetails,
@@ -15,6 +16,7 @@ import {
   updatePolymarketSettings,
   type DashboardSnapshot,
   type AgenticWalletObservation,
+  type AgenticWalletFundingReadiness,
   type AgenticWalletAuthenticationState,
   type DetectedSpotSymbol,
   type ListingPerformance,
@@ -72,6 +74,9 @@ const agenticWalletObservation = ref<Resource<AgenticWalletObservation> | null>(
   null,
 );
 const agenticWalletObservationLoading = ref(false);
+const agenticWalletFundingReadiness =
+  ref<Resource<AgenticWalletFundingReadiness> | null>(null);
+const agenticWalletFundingReadinessLoading = ref(false);
 const agenticWalletAuthentication =
   ref<Resource<AgenticWalletAuthenticationState> | null>(null);
 const agenticWalletAuthenticationLoading = ref(false);
@@ -484,6 +489,16 @@ async function refreshAgenticWalletObservation(): Promise<void> {
   }
 }
 
+async function prepareFundingInstructions(): Promise<void> {
+  if (agenticWalletFundingReadinessLoading.value) return;
+  agenticWalletFundingReadinessLoading.value = true;
+  try {
+    agenticWalletFundingReadiness.value = await prepareAgenticWalletFunding();
+  } finally {
+    agenticWalletFundingReadinessLoading.value = false;
+  }
+}
+
 async function beginAgenticWalletAuthentication(): Promise<void> {
   if (agenticWalletAuthenticationLoading.value) return;
   agenticWalletAuthenticationLoading.value = true;
@@ -825,6 +840,85 @@ onUnmounted(() => {
                 }}
               </button>
             </div>
+
+            <div class="wallet-observation wallet-funding">
+              <div>
+                <strong>Manual funding preparation</strong>
+                <p>
+                  Rechecks the wallet, restrictive settings, local limits, empty
+                  balance, BSC address, and gas visibility before showing a
+                  destination. It never initiates a transfer.
+                </p>
+              </div>
+              <button
+                type="button"
+                :disabled="agenticWalletFundingReadinessLoading"
+                @click="prepareFundingInstructions"
+              >
+                {{
+                  agenticWalletFundingReadinessLoading
+                    ? 'Preparing instructionsâ€¦'
+                    : 'Prepare deposit instructions'
+                }}
+              </button>
+            </div>
+
+            <template
+              v-if="agenticWalletFundingReadiness?.status === 'available'"
+            >
+              <div
+                v-if="
+                  agenticWalletFundingReadiness.data.status ===
+                    'ready_for_operator_deposit' &&
+                  agenticWalletFundingReadiness.data.destination !== null
+                "
+                class="wallet-funding-instructions"
+              >
+                <strong>Ready for your manual deposit</strong>
+                <p>
+                  Use only BNB Smart Chain (BSC, chain 56). Verify the complete
+                  address in the sending app before confirming. Send BSC USDT
+                  plus a small amount of BNB for network gas; this dashboard
+                  does not convert BRL, choose amounts, or move funds.
+                </p>
+                <dl class="wallet-status-grid">
+                  <div>
+                    <dt>Network</dt>
+                    <dd>
+                      {{
+                        agenticWalletFundingReadiness.data.destination.network
+                      }}
+                      (56)
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Wallet address</dt>
+                    <dd class="wallet-address">
+                      {{
+                        agenticWalletFundingReadiness.data.destination.address
+                      }}
+                    </dd>
+                  </div>
+                </dl>
+                <p class="wallet-policy-warning">
+                  A transfer on another network or to a different address can
+                  cause permanent loss. Funding does not enable quotes or real
+                  execution.
+                </p>
+              </div>
+              <p v-else class="wallet-policy-warning">
+                Deposit preparation blocked:
+                {{ agenticWalletFundingReadiness.data.blockers.join(', ') }}
+              </p>
+            </template>
+            <p
+              v-else-if="
+                agenticWalletFundingReadiness?.status === 'unavailable'
+              "
+              class="empty-state wallet-error"
+            >
+              {{ agenticWalletFundingReadiness.message }}
+            </p>
 
             <template
               v-if="agenticWalletAuthentication?.status === 'available'"

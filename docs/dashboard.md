@@ -242,6 +242,12 @@ The overview labels the existing 1,000 USDT portfolio as fictional paper capital
 
 The wallet CLI is contacted only after the user selects **Check wallet (read only)**. That explicit action calls `POST /real-trading/wallet-observation` and displays a sanitized snapshot of connection, BSC availability, empty/non-empty asset count, security flags, provider quota, and gas-read availability. Wallet addresses and authentication material are omitted. The observation is browser-memory-only, is not replaced by automatic refreshes, and cannot request a quote, sign, submit, or move funds.
 
+## M10.117 manual deposit preparation
+
+**Prepare deposit instructions** is a separate explicit action and is never part of the 15-second refresh. It reruns the live read-only checks plus the independent local-limit assessment. Only a fully ready result displays the exact BSC chain-56 address; blocked results display reasons and withhold it.
+
+The panel warns the operator to verify the complete address, use only BNB Smart Chain, and manually provide both BSC USDT and native BNB for gas. It does not convert BRL, choose amounts, copy funds, initiate a transfer, or enable quote/submission behavior. The address remains browser-memory-only and the ordinary wallet observation stays redacted.
+
 ## M10.74 Agentic Wallet session expiry visibility
 
 The same manual observation displays the provider-reported inactivity sign-out deadline and separate maximum sign-in deadline. The current pinned CLI reports a 48-hour sliding inactivity window: authenticated token use advances the provider deadline, and a later manual check retrieves the updated value. The browser updates only the displayed countdown once per second; it makes no wallet request and cannot renew the session.

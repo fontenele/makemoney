@@ -32,6 +32,18 @@ export class RealTradingController {
     }
   }
 
+  @Post('funding-readiness')
+  @HttpCode(200)
+  async prepareFundingReadiness() {
+    try {
+      return await this.status.prepareFundingReadiness();
+    } catch {
+      throw new ServiceUnavailableException(
+        'Agentic Wallet funding readiness is unavailable',
+      );
+    }
+  }
+
   @Get('wallet-authentication')
   getWalletAuthentication() {
     return this.authentication.getState();

@@ -1,5 +1,11 @@
 # Real Trading
 
+## M10.117 — Explicit manual funding readiness
+
+`POST /real-trading/funding-readiness` is a distinct operator-triggered read-only boundary. It performs one fresh pinned-CLI capability observation and reveals the exact chain-56 EVM address only when the wallet is connected, BSC is available, exactly one valid BSC address exists, the M10.9 posture is restrictive, all M10.10 local limits are defined, the balance read is available and reports no BSC assets, and gas data is available. A blocked response returns explicit reasons and no address.
+
+The dashboard labels BNB Smart Chain and chain `56`, instructs the operator to verify the complete address in the sending application, and notes that both BSC USDT and native BNB gas are needed. It performs no BRL conversion and selects no amounts. The ordinary M10.8 observation remains address-redacted, automatic refresh never calls readiness, and every result keeps funding, quote, and submission authorization false. No transfer, signing, token approval, quote, executor, or order command is introduced.
+
 ## M10.1 — Architecture and safety baseline
 
 M10 begins with a documentation-only gate. It does not install the Binance Agentic Wallet skill or CLI, authenticate a wallet, read a balance, request a quote, fund an account, or submit a transaction.

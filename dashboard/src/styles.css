@@ -414,6 +414,24 @@ h1 em {
   line-height: 1.55;
 }
 
+.wallet-funding-instructions {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: 0.8rem;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.wallet-funding-instructions > p {
+  margin: 0.55rem 0 0;
+}
+
+.wallet-address {
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+}
+
 .wallet-policy-note {
   color: var(--muted);
 }

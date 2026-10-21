@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-21 — Add guarded manual funding readiness
+
+- Added an explicit loopback-only read that rechecks the live Agentic Wallet, restrictive security posture, independent local risk limits, reported-empty BSC balance list, gas visibility, and canonical chain-56 address.
+- Reveals the exact address only for a fully ready result; blocked results return reasons and withhold it, while the ordinary observation remains redacted.
+- Added a separate dashboard action with BSC-only, full-address verification, BSC USDT, and native-BNB gas warnings; no automatic refresh invokes it.
+- Kept funding, quote, and submission authorization false and added no transfer, signing, quote, executor, or order command.
+- Verified all 2,522 backend tests across 218 suites, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations, all 98 dashboard tests across 17 files, formatting, lint, Prisma validation, backend/dashboard builds, Compose validation, and whitespace checks.
+
 ## 2026-10-21 — Compose latest reconciled accounting balances
 
 - Added the M10.116 unregistered read-only service over M10.114 latest freshness and M10.115 balance projection.

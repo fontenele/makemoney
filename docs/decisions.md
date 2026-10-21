@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-21 — Reveal a deposit address only through explicit readiness
+
+The ordinary wallet observation intentionally redacts addresses, but asking the operator to recover an address through an unrelated CLI or copy it from stale notes would weaken the chain and identity checks immediately before a first deposit. Automatically exposing it on dashboard refresh would also contact the authenticated wallet without a deliberate action.
+
+M10.117 therefore adds a separate manual read-only request. It reveals exactly one canonical BSC EVM address only when the live wallet is connected, the restrictive security policy passes, independent local limits are defined, the wallet reports no BSC assets, and gas data is readable. Any blocker withholds the address. The result can guide an external operator transfer but cannot initiate or authorize funding, convert BRL, choose asset amounts, request a quote, sign, submit, or execute.
+
 ## 2026-10-21 — Make latest reconciled balance readiness explicit
 
 A balance consumer should not independently coordinate latest-row selection, freshness interpretation, and balance projection. Leaving durable absence as `null` at that boundary would also make it easy to confuse unavailable evidence with an empty wallet.

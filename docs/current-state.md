@@ -1,5 +1,11 @@
 # Current State
 
+M10.117 is complete: the loopback-only runtime and dashboard now provide an explicit guarded preparation step for the operator's first manual Agentic Wallet deposit.
+
+One manual request performs a fresh pinned-CLI read and returns the exact BSC chain-56 address only when connection, chain and canonical EVM address, restrictive provider posture, all six independent local limits, a reported-empty BSC balance list, and gas visibility pass together. Any blocker withholds the address. The ordinary observation remains redacted and automatic dashboard refresh never calls this route. The dashboard warns that only BSC may be used and that the operator must manually provide BSC USDT plus native BNB gas; it performs no BRL conversion or amount selection. Funding, quote, and submission authorization remain false, and no transfer, signature, provider quote, executor, or real order is available.
+
+Post-M10.117 validation passed all 2,522 backend tests across 218 suites, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations applied from scratch, all 98 dashboard tests across 17 files, formatting, lint, Prisma validation, backend/dashboard builds, Compose validation, and whitespace checks.
+
 M10.116 is complete: one unregistered read-only service can now load the latest fresh reconciliation and project its exact reconciled balances through a single initialization-keyed request.
 
 Canonical initialization identity, one-to-sixty-second maximum age, and a finite evaluation clock are rejected before delegation, and the mutable clock is copied first. The service invokes M10.114 once, maps missing durable evidence to an explicit absence blocker, preserves stale/future blockers, and applies M10.115 only to fresh evidence. Provider/storage failures propagate, malformed delegated evidence fails closed, and quote/submission authorization remains false. No schema, route, runtime registration, provider call, mutation, valuation, PnL, funding, executor, or real order is added.
