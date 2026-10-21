@@ -1,5 +1,11 @@
 # Current State
 
+M10.113 is complete: the loopback-only dashboard can explicitly establish the Agentic Wallet CLI session through Binance's official web pairing flow.
+
+The backend admits only `auth signin` and a single foreground `auth verify` for a canonical server-owned QR identity. It rejects non-HTTPS or non-`web3.binance.com` links, malformed pairing codes, and expired or excessively long challenges before exposing them. The verification promise remains alive independently of the initiating HTTP request, concurrent starts coalesce, and the dashboard polls only sanitized process-local state until authentication succeeds or fails. The browser receives no QR identity, raw CLI output, credentials, session token, address, or holding. Success refreshes the existing read-only wallet observation; real execution, funding, quotes, signatures, submissions, and orders remain unavailable.
+
+Post-M10.113 validation passed all 2,497 backend tests across 216 suites, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations applied from scratch, all 96 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard/authentication-state checks. PostgreSQL and Redis remained healthy; the authentication POST was intentionally not invoked during validation because pairing must begin only from an explicit operator action.
+
 M10.112 is complete: the unregistered durable reconciliation reader can now select the newest immutable commitment for one canonical initialization identity.
 
 The reader rejects malformed or noncanonical initialization UUIDs before database access and uses the existing initialization/recording index with a total `recordedAt DESC, id DESC` order. A valid initialization without evidence returns explicit `null`. A present row passes through the authoritative M10.108 persisted mapper and must correlate back to the requested initialization. The selected newest row is authoritative for the query: malformed evidence fails closed and is never hidden by retrying an older row. PostgreSQL E2E proves present and absent initialization lookup. No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.

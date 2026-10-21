@@ -2075,3 +2075,24 @@ The query intentionally selects one row only. A valid initialization with no com
 - Focused tests cover query ordering, reconstruction, absence, invalid identity, and corrupt newest evidence.
 - PostgreSQL E2E proves present and absent latest-by-initialization lookup.
 - No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.
+
+## M10.113 — Dashboard Agentic Wallet web authentication
+
+M10.113 brings the official Agentic Wallet sign-in handshake into the loopback-only dashboard without widening the financial execution surface. An explicit operator click invokes only `auth signin --json`. The returned challenge is accepted only when its URL is HTTPS on exactly `web3.binance.com`, its QR identity is a canonical UUID, its pairing code is exactly six digits, and its expiry is in the future but no more than ten minutes after initiation.
+
+The QR identity never crosses the API boundary. Immediately after accepting a challenge, the backend starts one `auth verify --qrCodeId <id> --json` process and retains its promise until success, failure, or the bounded five-minute provider window ends. Concurrent starts coalesce around the active challenge. The dashboard displays the verbatim official link and pairing code, then polls only process-local sanitized state; a successful result triggers the existing manual read-only capability observation. Process failures never expose raw CLI output.
+
+This increment adds authentication authority only. It cannot sign out, change security settings, request a quote, sign data, submit an order, fund a wallet, mutate accounting, or enable real execution.
+
+### M10.113 acceptance criteria
+
+- Only the exact `auth signin --json` and validated `auth verify --qrCodeId <canonical UUID> --json` commands are admitted.
+- Challenges require the exact official HTTPS host, bounded URL, six-digit pairing code, canonical QR identity, and future expiry of at most ten minutes.
+- The QR identity stays server-side and raw CLI output, credentials, tokens, addresses, and holdings are never exposed.
+- Verification remains alive after the initiating HTTP response and is bounded slightly beyond the provider's documented five-minute wait.
+- Overlapping starts reuse the active process-local challenge instead of launching another verification.
+- `GET /real-trading/wallet-authentication` reads process-local status without provider access.
+- The dashboard renders the official link and pairing code and polls until success or failure.
+- Successful authentication refreshes the existing read-only wallet observation.
+- Focused tests cover accepted and rejected challenges, existing sessions, command identity, coalescing, completion/failure sanitization, and dashboard API methods.
+- No sign-out, security-setting mutation, quote, signature, submission, funding, accounting mutation, executor, or real order is added.

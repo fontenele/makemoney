@@ -3,6 +3,8 @@ import {
   dashboardApiPath,
   loadDashboard,
   observeAgenticWallet,
+  loadAgenticWalletAuthentication,
+  startAgenticWalletAuthentication,
   loadListingPerformance,
   loadPolymarketEventDetails,
   loadPolymarketEventLiveVolume,
@@ -605,6 +607,44 @@ describe('observeAgenticWallet', () => {
       status: 'unavailable',
       message: 'Agentic Wallet read-only observation is unavailable',
     });
+  });
+});
+
+describe('Agentic Wallet authentication', () => {
+  const pending = {
+    scope: 'agentic_wallet_authentication',
+    status: 'awaiting_confirmation',
+    pairingCode: '654321',
+    urlForWeb: 'https://web3.binance.com/en/agent-login?url=opaque',
+    expiresAt: '2026-10-21T12:05:00.000Z',
+    startedAt: '2026-10-21T12:00:00.000Z',
+    completedAt: null,
+    quoteAuthorized: false,
+    submissionAuthorized: false,
+  };
+
+  it('starts the explicit authentication flow with POST', async () => {
+    const request = vi.fn(() => Promise.resolve(Response.json(pending)));
+    await expect(startAgenticWalletAuthentication(request)).resolves.toEqual({
+      status: 'available',
+      data: pending,
+    });
+    expect(request).toHaveBeenCalledWith(
+      '/api/real-trading/wallet-authentication',
+      { method: 'POST', headers: { Accept: 'application/json' } },
+    );
+  });
+
+  it('polls only local authentication state with GET', async () => {
+    const request = vi.fn(() => Promise.resolve(Response.json(pending)));
+    await expect(loadAgenticWalletAuthentication(request)).resolves.toEqual({
+      status: 'available',
+      data: pending,
+    });
+    expect(request).toHaveBeenCalledWith(
+      '/api/real-trading/wallet-authentication',
+      { headers: { Accept: 'application/json' } },
+    );
   });
 });
 

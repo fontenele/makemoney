@@ -2,7 +2,9 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import {
   loadDashboard,
+  loadAgenticWalletAuthentication,
   observeAgenticWallet,
+  startAgenticWalletAuthentication,
   loadListingPerformance,
   loadPolymarketEventDetails,
   loadPolymarketEventLiveVolume,
@@ -13,6 +15,7 @@ import {
   updatePolymarketSettings,
   type DashboardSnapshot,
   type AgenticWalletObservation,
+  type AgenticWalletAuthenticationState,
   type DetectedSpotSymbol,
   type ListingPerformance,
   type PolymarketEventDetails,
@@ -69,8 +72,12 @@ const agenticWalletObservation = ref<Resource<AgenticWalletObservation> | null>(
   null,
 );
 const agenticWalletObservationLoading = ref(false);
+const agenticWalletAuthentication =
+  ref<Resource<AgenticWalletAuthenticationState> | null>(null);
+const agenticWalletAuthenticationLoading = ref(false);
 const walletClockMs = ref(Date.now());
 let walletClockHandle: number | null = null;
+let walletAuthenticationHandle: number | null = null;
 let dashboardRequest = 0;
 const selectedListing = ref<DetectedSpotSymbol | null>(null);
 const listingPerformance = ref<Resource<ListingPerformance> | null>(null);
@@ -477,6 +484,46 @@ async function refreshAgenticWalletObservation(): Promise<void> {
   }
 }
 
+async function beginAgenticWalletAuthentication(): Promise<void> {
+  if (agenticWalletAuthenticationLoading.value) return;
+  agenticWalletAuthenticationLoading.value = true;
+  try {
+    agenticWalletAuthentication.value =
+      await startAgenticWalletAuthentication();
+    scheduleWalletAuthenticationRefresh();
+  } finally {
+    agenticWalletAuthenticationLoading.value = false;
+  }
+}
+
+async function refreshAgenticWalletAuthentication(): Promise<void> {
+  agenticWalletAuthentication.value = await loadAgenticWalletAuthentication();
+  const result = agenticWalletAuthentication.value;
+  if (
+    result.status === 'available' &&
+    (result.data.status === 'connected' ||
+      result.data.status === 'already_connected')
+  ) {
+    await refreshAgenticWalletObservation();
+  }
+  scheduleWalletAuthenticationRefresh();
+}
+
+function scheduleWalletAuthenticationRefresh(): void {
+  if (walletAuthenticationHandle !== null) {
+    window.clearTimeout(walletAuthenticationHandle);
+    walletAuthenticationHandle = null;
+  }
+  if (
+    agenticWalletAuthentication.value?.status === 'available' &&
+    agenticWalletAuthentication.value.data.status === 'awaiting_confirmation'
+  ) {
+    walletAuthenticationHandle = window.setTimeout(() => {
+      void refreshAgenticWalletAuthentication();
+    }, 2000);
+  }
+}
+
 function decimal(value: string | null | undefined, digits = 2): string {
   if (value === null || value === undefined) return '—';
   const parsed = Number(value);
@@ -554,10 +601,14 @@ onMounted(() => {
     walletClockMs.value = Date.now();
   }, 1000);
   autoRefresh.start();
+  void refreshAgenticWalletAuthentication();
 });
 onUnmounted(() => {
   window.removeEventListener('hashchange', syncRoute);
   if (walletClockHandle !== null) window.clearInterval(walletClockHandle);
+  if (walletAuthenticationHandle !== null) {
+    window.clearTimeout(walletAuthenticationHandle);
+  }
   autoRefresh.stop();
 });
 </script>
@@ -753,6 +804,87 @@ onUnmounted(() => {
                 }}
               </button>
             </div>
+
+            <div class="wallet-observation wallet-authentication">
+              <div>
+                <strong>Binance web sign-in</strong>
+                <p>
+                  Starts the official pairing flow and keeps CLI verification
+                  alive while you confirm in the Binance Wallet App.
+                </p>
+              </div>
+              <button
+                type="button"
+                :disabled="agenticWalletAuthenticationLoading"
+                @click="beginAgenticWalletAuthentication"
+              >
+                {{
+                  agenticWalletAuthenticationLoading
+                    ? 'Starting sign-in…'
+                    : 'Connect wallet'
+                }}
+              </button>
+            </div>
+
+            <template
+              v-if="agenticWalletAuthentication?.status === 'available'"
+            >
+              <div
+                v-if="
+                  agenticWalletAuthentication.data.status ===
+                  'awaiting_confirmation'
+                "
+                class="wallet-auth-challenge"
+              >
+                <p>
+                  Pairing code
+                  <strong>{{
+                    agenticWalletAuthentication.data.pairingCode
+                  }}</strong>
+                </p>
+                <a
+                  :href="
+                    agenticWalletAuthentication.data.urlForWeb ?? undefined
+                  "
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open official Binance sign-in
+                </a>
+                <small>
+                  Verify the same pairing code in the app. Expires
+                  {{
+                    agenticWalletAuthentication.data.expiresAt === null
+                      ? '—'
+                      : timestamp(agenticWalletAuthentication.data.expiresAt)
+                  }}.
+                </small>
+              </div>
+              <p
+                v-else-if="
+                  agenticWalletAuthentication.data.status === 'connected' ||
+                  agenticWalletAuthentication.data.status ===
+                    'already_connected'
+                "
+                class="wallet-policy-note"
+              >
+                CLI authentication confirmed. The read-only wallet check was
+                refreshed.
+              </p>
+              <p
+                v-else-if="agenticWalletAuthentication.data.status === 'failed'"
+                class="wallet-policy-warning"
+              >
+                Sign-in was not confirmed. Start a new flow to receive a fresh
+                pairing code.
+              </p>
+            </template>
+            <p
+              v-else-if="agenticWalletAuthentication?.status === 'unavailable'"
+              class="empty-state wallet-error"
+            >
+              {{ agenticWalletAuthentication.message }}
+            </p>
 
             <template v-if="agenticWalletObservation?.status === 'available'">
               <dl class="wallet-status-grid observation-result">

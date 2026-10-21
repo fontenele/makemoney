@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-21 — Add dashboard Agentic Wallet web authentication
+
+- Added an explicit loopback-only dashboard flow for the official Agentic Wallet `auth signin` and `auth verify` sequence.
+- Kept the canonical QR identity and blocking verification process on the host backend while exposing only the validated official link, pairing code, expiry, and sanitized lifecycle state.
+- Added strict official-host, HTTPS, UUID, pairing-code, expiry, command-allowlist, timeout, and concurrent-start boundaries.
+- Added local status polling that performs no provider call and refreshes the existing read-only wallet observation after authentication.
+- Added no sign-out, quote, signature, submission, funding, accounting mutation, executor, or real order authority.
+- Verified all 2,497 backend tests across 216 suites, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations, all 96 dashboard tests across 17 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, whitespace checks, and live API/dashboard/authentication-state checks without implicitly starting a pairing flow.
+
 ## 2026-10-17 — Read the latest durable reconciliation deterministically
 
 - Added the M10.112 latest-read contract keyed by canonical accounting initialization UUID.

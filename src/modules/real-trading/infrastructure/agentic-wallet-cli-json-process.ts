@@ -11,13 +11,19 @@ export interface AgenticWalletProcessInvocation {
 
 export class AgenticWalletCliJsonProcess {
   constructor(
-    private readonly operation: 'read' | 'quote' | 'status lookup',
+    private readonly operation:
+      'read' | 'quote' | 'status lookup' | 'authentication',
     private readonly timeoutMs = 5000,
     private readonly executable?: string,
+    maximumTimeoutMs = 30000,
   ) {
-    if (!Number.isInteger(timeoutMs) || timeoutMs < 1000 || timeoutMs > 30000) {
+    if (
+      !Number.isInteger(timeoutMs) ||
+      timeoutMs < 1000 ||
+      timeoutMs > maximumTimeoutMs
+    ) {
       throw new Error(
-        'Agentic Wallet CLI timeout must be between 1000 and 30000 ms',
+        `Agentic Wallet CLI timeout must be between 1000 and ${maximumTimeoutMs} ms`,
       );
     }
   }

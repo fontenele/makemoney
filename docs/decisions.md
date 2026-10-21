@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-21 — Keep web pairing explicit, bounded, and server-owned
+
+The official Agentic Wallet flow requires `auth signin` followed by a foreground `auth verify` that may block for five minutes. Returning the QR identity to the browser and asking it to drive verification would enlarge the trust boundary and allow a page refresh or closed request to interrupt the CLI session establishment.
+
+M10.113 therefore keeps the canonical QR identity only in the host process, starts exactly one bounded verification immediately after a validated challenge, and exposes only the verbatim official Binance HTTPS link, six-digit pairing code, expiry, and sanitized lifecycle state. Dashboard polling reads memory and never invokes the provider. This authentication-only authority is isolated from every quote, signature, submission, funding, accounting, and execution component.
+
 ## 2026-10-17 — Select one newest reconciliation without corrupt-row fallback
 
 A future current-state consumer should not need to know a reconciliation UUID, but selecting by initialization without a total order would make equal recording timestamps ambiguous. Skipping a malformed newest row and returning an older valid row would be worse: it would conceal durable corruption and present stale evidence as authoritative.

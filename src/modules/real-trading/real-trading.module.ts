@@ -3,6 +3,11 @@ import { RealTradingStatusService } from './application/real-trading-status.serv
 import { AgenticWalletCapabilityAdapter } from './infrastructure/agentic-wallet-capability.adapter';
 import { AgenticWalletCliProcessRunner } from './infrastructure/agentic-wallet-cli-process-runner';
 import { RealTradingController } from './presentation/real-trading.controller';
+import { AgenticWalletAuthenticationService } from './application/agentic-wallet-authentication.service';
+import {
+  AgenticWalletAuthenticationAdapter,
+  AgenticWalletAuthenticationCliProcessRunner,
+} from './infrastructure/agentic-wallet-authentication.adapter';
 
 @Module({
   controllers: [RealTradingController],
@@ -14,6 +19,14 @@ import { RealTradingController } from './presentation/real-trading.controller';
           new AgenticWalletCliProcessRunner(30000),
         ),
     },
+    {
+      provide: AgenticWalletAuthenticationAdapter,
+      useFactory: () =>
+        new AgenticWalletAuthenticationAdapter(
+          new AgenticWalletAuthenticationCliProcessRunner(),
+        ),
+    },
+    AgenticWalletAuthenticationService,
     RealTradingStatusService,
   ],
 })

@@ -580,6 +580,23 @@ export interface AgenticWalletObservation {
   submissionAuthorized: false;
 }
 
+export interface AgenticWalletAuthenticationState {
+  scope: 'agentic_wallet_authentication';
+  status:
+    | 'idle'
+    | 'awaiting_confirmation'
+    | 'connected'
+    | 'already_connected'
+    | 'failed';
+  pairingCode: string | null;
+  urlForWeb: string | null;
+  expiresAt: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  quoteAuthorized: false;
+  submissionAuthorized: false;
+}
+
 export interface DashboardSnapshot {
   health: Resource<HealthResponse>;
   valuation: Resource<PortfolioValuation>;
@@ -722,6 +739,40 @@ export async function observeAgenticWallet(
     return {
       status: 'available',
       data: (await response.json()) as AgenticWalletObservation,
+    };
+  } catch {
+    return { status: 'unavailable', message: 'Local API is unreachable' };
+  }
+}
+
+export async function loadAgenticWalletAuthentication(
+  request: FetchLike = fetch,
+): Promise<Resource<AgenticWalletAuthenticationState>> {
+  return loadResource<AgenticWalletAuthenticationState>(
+    dashboardApiPath('/real-trading/wallet-authentication'),
+    request,
+  );
+}
+
+export async function startAgenticWalletAuthentication(
+  request: FetchLike = fetch,
+): Promise<Resource<AgenticWalletAuthenticationState>> {
+  try {
+    const response = await request(
+      dashboardApiPath('/real-trading/wallet-authentication'),
+      { method: 'POST', headers: { Accept: 'application/json' } },
+    );
+    if (!response.ok) {
+      return {
+        status: 'unavailable',
+        message:
+          (await readProviderErrorMessage(response)) ??
+          `Unavailable (${response.status})`,
+      };
+    }
+    return {
+      status: 'available',
+      data: (await response.json()) as AgenticWalletAuthenticationState,
     };
   } catch {
     return { status: 'unavailable', message: 'Local API is unreachable' };
