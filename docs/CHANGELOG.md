@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-21 — Compose latest reconciliation freshness by initialization
+
+- Added the M10.114 unregistered service over the M10.112 latest reader and M10.110 freshness policy.
+- Validated canonical initialization identity, bounded age policy, and finite evaluation clock before durable access.
+- Snapshotted the mutable evaluation date before selecting the newest commitment.
+- Preserved explicit absence and stale/future blockers while propagating corrupt newest evidence without fallback.
+- Verified all 2,505 backend tests across 216 suites, including all 16 focused freshness-composition cases, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations, all 96 dashboard tests across 17 files, formatting, lint, Prisma validation, backend/dashboard builds, and whitespace checks.
+- Added no schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+
 ## 2026-10-21 — Add dashboard Agentic Wallet web authentication
 
 - Added an explicit loopback-only dashboard flow for the official Agentic Wallet `auth signin` and `auth verify` sequence.

@@ -4,6 +4,7 @@ import {
   isValidAgenticWalletAccountingLedgerReconciliationFreshnessRequest,
 } from './agentic-wallet-accounting-ledger-reconciliation-freshness';
 import { AgenticWalletAccountingLedgerReconciliationCommitmentReadStore } from './agentic-wallet-accounting-ledger-reconciliation-commitment.store';
+import { AgenticWalletAccountingLedgerReconciliationCommitmentLatestReadStore } from './agentic-wallet-accounting-ledger-reconciliation-commitment.store';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -47,6 +48,42 @@ export class AgenticWalletAccountingLedgerReconciliationFreshnessService {
       evaluatedAt: new Date(request.evaluatedAt),
     };
     const stored = await this.store.getByReconciliationId(reconciliationId);
+    if (stored === null) return null;
+    return assessAgenticWalletAccountingLedgerReconciliationFreshness(
+      stored,
+      requestSnapshot.maximumAgeMs,
+      requestSnapshot.evaluatedAt,
+    );
+  }
+}
+
+export class AgenticWalletAccountingLedgerLatestReconciliationFreshnessService {
+  constructor(
+    private readonly store: AgenticWalletAccountingLedgerReconciliationCommitmentLatestReadStore,
+  ) {}
+
+  async assessLatest(
+    initializationId: string,
+    request: AgenticWalletAccountingLedgerReconciliationFreshnessRequest,
+  ): Promise<AgenticWalletAccountingLedgerReconciliationFreshnessAssessment | null> {
+    if (
+      typeof initializationId !== 'string' ||
+      !UUID_PATTERN.test(initializationId) ||
+      typeof request !== 'object' ||
+      request === null ||
+      !isValidAgenticWalletAccountingLedgerReconciliationFreshnessRequest(
+        request.maximumAgeMs,
+        request.evaluatedAt,
+      )
+    )
+      throw new AgenticWalletAccountingLedgerReconciliationFreshnessRequestError();
+
+    const requestSnapshot = {
+      maximumAgeMs: request.maximumAgeMs,
+      evaluatedAt: new Date(request.evaluatedAt),
+    };
+    const stored =
+      await this.store.getLatestByInitializationId(initializationId);
     if (stored === null) return null;
     return assessAgenticWalletAccountingLedgerReconciliationFreshness(
       stored,

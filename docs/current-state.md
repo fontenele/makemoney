@@ -1,5 +1,11 @@
 # Current State
 
+M10.114 is complete: one unregistered read-only composition can now assess the newest durable accounting-ledger reconciliation for a canonical initialization identity without a caller-supplied reconciliation UUID.
+
+Initialization identity, one-to-sixty-second maximum age, and the finite evaluation clock are rejected before persistence access when invalid. The service copies the mutable clock before awaiting M10.112, preserves explicit absence, and sends every present newest commitment through the exact M10.110 freshness policy. Stale evidence remains an ordinary blocker; reader corruption, including malformed newest evidence, propagates without older fallback. No schema, route, runtime registration, provider call, balance mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.
+
+Post-M10.114 validation passed all 2,505 backend tests across 216 suites, including all 16 focused freshness-composition cases, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations applied from scratch, all 96 dashboard tests across 17 files, formatting, lint, Prisma validation, backend/dashboard builds, and whitespace checks.
+
 M10.113 is complete: the loopback-only dashboard can explicitly establish the Agentic Wallet CLI session through Binance's official web pairing flow.
 
 The backend admits only `auth signin` and a single foreground `auth verify` for a canonical server-owned QR identity. It rejects non-HTTPS or non-`web3.binance.com` links, malformed pairing codes, and expired or excessively long challenges before exposing them. The verification promise remains alive independently of the initiating HTTP request, concurrent starts coalesce, and the dashboard polls only sanitized process-local state until authentication succeeds or fails. The browser receives no QR identity, raw CLI output, credentials, session token, address, or holding. Success refreshes the existing read-only wallet observation; real execution, funding, quotes, signatures, submissions, and orders remain unavailable.

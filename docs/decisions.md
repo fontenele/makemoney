@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-21 — Assess current reconciliation by initialization identity
+
+A current-state consumer naturally owns the durable accounting initialization identity, not the UUID of whichever reconciliation happened most recently. Requiring that consumer to discover a reconciliation and then invoke M10.111 separately would duplicate selection logic and leave room for inconsistent ordering or a time-of-check/time-of-use gap.
+
+M10.114 therefore validates and snapshots one initialization-keyed freshness request, asks M10.112 for exactly one newest immutable commitment, and immediately applies M10.110. Explicit absence remains distinct from stale evidence, and corrupt newest evidence propagates rather than falling back to an older row. The service remains unregistered and non-authorizing.
+
 ## 2026-10-21 — Keep web pairing explicit, bounded, and server-owned
 
 The official Agentic Wallet flow requires `auth signin` followed by a foreground `auth verify` that may block for five minutes. Returning the QR identity to the browser and asking it to drive verification would enlarge the trust boundary and allow a page refresh or closed request to interrupt the CLI session establishment.

@@ -2096,3 +2096,23 @@ This increment adds authentication authority only. It cannot sign out, change se
 - Successful authentication refreshes the existing read-only wallet observation.
 - Focused tests cover accepted and rejected challenges, existing sessions, command identity, coalescing, completion/failure sanitization, and dashboard API methods.
 - No sign-out, security-setting mutation, quote, signature, submission, funding, accounting mutation, executor, or real order is added.
+
+## M10.114 — Latest reconciliation freshness by initialization
+
+M10.114 composes the deterministic newest-row lookup from M10.112 with the temporal policy from M10.110. A caller supplies the canonical accounting initialization UUID it already owns, a one-to-sixty-second maximum evidence age, and an explicit evaluation clock. All request fields are validated before persistence access, and the mutable `Date` is copied before the asynchronous boundary.
+
+The service asks the latest-read store exactly once for the newest immutable reconciliation selected by `recordedAt DESC, id DESC`. Absence remains explicit `null`. A present commitment is passed unchanged into M10.110, so freshness continues to be measured from authenticated wallet observation time rather than preparation or recording time. Stale/future evidence remains blocked, while malformed newest evidence propagates without scanning backward.
+
+The composition remains unregistered and read-only. It introduces no provider access, balance mutation, valuation, PnL, funding, quote/submission authorization, executor, or order path.
+
+### M10.114 acceptance criteria
+
+- Canonical initialization identity, bounded age policy, and finite clock are required before durable access.
+- The evaluation clock is defensively captured before the asynchronous latest read.
+- M10.112 is invoked exactly once with the validated initialization identity.
+- Missing latest evidence returns explicit absence without fabricating a freshness result.
+- Present evidence is passed through the exact M10.110 policy.
+- Stale/future blockers remain unchanged and corrupt newest evidence propagates without older fallback.
+- Focused tests cover success, absence, pre-access validation, date isolation, stale evidence, and read failure.
+- PostgreSQL E2E composes durable record, latest-by-initialization selection, and freshness assessment.
+- No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.

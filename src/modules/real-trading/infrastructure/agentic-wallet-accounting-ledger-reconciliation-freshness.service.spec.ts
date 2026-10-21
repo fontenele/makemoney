@@ -9,6 +9,7 @@ import {
 import {
   AgenticWalletAccountingLedgerReconciliationFreshnessRequestError,
   AgenticWalletAccountingLedgerReconciliationFreshnessService,
+  AgenticWalletAccountingLedgerLatestReconciliationFreshnessService,
 } from './agentic-wallet-accounting-ledger-reconciliation-freshness.service';
 
 const INITIALIZATION_ID = '018f1f54-7b8c-7a9d-8e0f-123456789abc';
@@ -131,6 +132,125 @@ describe('AgenticWalletAccountingLedgerReconciliationFreshnessService', () => {
   });
 });
 
+describe('AgenticWalletAccountingLedgerLatestReconciliationFreshnessService', () => {
+  it('selects the latest durable evidence and applies the freshness policy', async () => {
+    const harness = latestServiceHarness(validStored());
+    await expect(
+      harness.service.assessLatest(INITIALIZATION_ID, validRequest()),
+    ).resolves.toMatchObject({
+      status: 'reconciliation_evidence_fresh',
+      blockers: [],
+      evidence: {
+        stored: {
+          commitment: {
+            reconciliationId: RECONCILIATION_ID,
+            reconciliation: { initializationId: INITIALIZATION_ID },
+          },
+        },
+        reconciliationCurrent: true,
+        quoteAuthorized: false,
+        submissionAuthorized: false,
+      },
+    });
+    expect(harness.getLatestByInitializationId.mock.calls).toEqual([
+      [INITIALIZATION_ID],
+    ]);
+  });
+
+  it('returns explicit absence without inventing current evidence', async () => {
+    await expect(
+      latestServiceHarness(null).service.assessLatest(
+        INITIALIZATION_ID,
+        validRequest(),
+      ),
+    ).resolves.toBeNull();
+  });
+
+  it.each([
+    ['invalid identity', 'invalid', validRequest()],
+    [
+      'invalid maximum age',
+      INITIALIZATION_ID,
+      { ...validRequest(), maximumAgeMs: 0 },
+    ],
+    [
+      'invalid evaluation clock',
+      INITIALIZATION_ID,
+      { ...validRequest(), evaluatedAt: new Date(Number.NaN) },
+    ],
+  ] as const)(
+    'rejects %s before latest durable access',
+    async (_name, id, request) => {
+      const harness = latestServiceHarness(null);
+      await expect(
+        harness.service.assessLatest(id, request),
+      ).rejects.toBeInstanceOf(
+        AgenticWalletAccountingLedgerReconciliationFreshnessRequestError,
+      );
+      expect(harness.getLatestByInitializationId).not.toHaveBeenCalled();
+    },
+  );
+
+  it('isolates the evaluation clock before selecting durable evidence', async () => {
+    let release:
+      | ((
+          stored: StoredAgenticWalletAccountingLedgerReconciliationCommitment,
+        ) => void)
+      | null = null;
+    const pending =
+      new Promise<StoredAgenticWalletAccountingLedgerReconciliationCommitment>(
+        (resolve) => {
+          release = resolve;
+        },
+      );
+    const getLatestByInitializationId = jest.fn(() => pending);
+    const service =
+      new AgenticWalletAccountingLedgerLatestReconciliationFreshnessService({
+        getLatestByInitializationId,
+      });
+    const request = validRequest();
+    const resultPromise = service.assessLatest(INITIALIZATION_ID, request);
+
+    request.evaluatedAt.setTime(0);
+    if (release === null) throw new Error('Latest durable read did not start');
+    release(validStored());
+
+    await expect(resultPromise).resolves.toMatchObject({
+      status: 'reconciliation_evidence_fresh',
+      evidence: { evaluatedAt: new Date('2026-10-16T12:01:30.000Z') },
+    });
+  });
+
+  it('preserves a stale latest-evidence blocker', async () => {
+    await expect(
+      latestServiceHarness(validStored()).service.assessLatest(
+        INITIALIZATION_ID,
+        {
+          maximumAgeMs: 60_000,
+          evaluatedAt: new Date('2026-10-16T12:01:55.001Z'),
+        },
+      ),
+    ).resolves.toMatchObject({
+      status: 'blocked',
+      blockers: ['accounting_ledger_reconciliation_evidence_stale'],
+      evidence: null,
+    });
+  });
+
+  it('propagates corrupt latest evidence without older fallback', async () => {
+    const failure = new Error('newest persisted reconciliation inconsistent');
+    const getLatestByInitializationId = jest.fn(() => Promise.reject(failure));
+    const service =
+      new AgenticWalletAccountingLedgerLatestReconciliationFreshnessService({
+        getLatestByInitializationId,
+      });
+    await expect(
+      service.assessLatest(INITIALIZATION_ID, validRequest()),
+    ).rejects.toBe(failure);
+    expect(getLatestByInitializationId).toHaveBeenCalledTimes(1);
+  });
+});
+
 function serviceHarness(
   stored: StoredAgenticWalletAccountingLedgerReconciliationCommitment | null,
 ) {
@@ -144,6 +264,19 @@ function serviceHarness(
     service: new AgenticWalletAccountingLedgerReconciliationFreshnessService({
       getByReconciliationId,
     }),
+  };
+}
+
+function latestServiceHarness(
+  stored: StoredAgenticWalletAccountingLedgerReconciliationCommitment | null,
+) {
+  const getLatestByInitializationId = jest.fn(() => Promise.resolve(stored));
+  return {
+    getLatestByInitializationId,
+    service:
+      new AgenticWalletAccountingLedgerLatestReconciliationFreshnessService({
+        getLatestByInitializationId,
+      }),
   };
 }
 

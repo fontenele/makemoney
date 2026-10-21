@@ -56,7 +56,10 @@ import { prepareAgenticWalletAccountingLedgerReconciliationCommitment } from '..
 import { AgenticWalletCapabilityObservation } from '../src/modules/real-trading/infrastructure/agentic-wallet-capability.adapter';
 import { PrismaAgenticWalletAccountingLedgerReconciliationCommitmentStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-accounting-ledger-reconciliation-commitment.store';
 import { PrismaAgenticWalletAccountingLedgerReconciliationCommitmentReadStore } from '../src/modules/real-trading/infrastructure/prisma-agentic-wallet-accounting-ledger-reconciliation-commitment-read.store';
-import { AgenticWalletAccountingLedgerReconciliationFreshnessService } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-ledger-reconciliation-freshness.service';
+import {
+  AgenticWalletAccountingLedgerLatestReconciliationFreshnessService,
+  AgenticWalletAccountingLedgerReconciliationFreshnessService,
+} from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-ledger-reconciliation-freshness.service';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -87,6 +90,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let accountingLedgerReconciliationCommitmentStore: PrismaAgenticWalletAccountingLedgerReconciliationCommitmentStore;
   let accountingLedgerReconciliationCommitmentReadStore: PrismaAgenticWalletAccountingLedgerReconciliationCommitmentReadStore;
   let accountingLedgerReconciliationFreshnessService: AgenticWalletAccountingLedgerReconciliationFreshnessService;
+  let accountingLedgerLatestReconciliationFreshnessService: AgenticWalletAccountingLedgerLatestReconciliationFreshnessService;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -175,6 +179,10 @@ describe('Real execution submission gate persistence (e2e)', () => {
       );
     accountingLedgerReconciliationFreshnessService =
       new AgenticWalletAccountingLedgerReconciliationFreshnessService(
+        accountingLedgerReconciliationCommitmentReadStore,
+      );
+    accountingLedgerLatestReconciliationFreshnessService =
+      new AgenticWalletAccountingLedgerLatestReconciliationFreshnessService(
         accountingLedgerReconciliationCommitmentReadStore,
       );
   });
@@ -385,6 +393,24 @@ describe('Real execution submission gate persistence (e2e)', () => {
         maximumAgeMs: 2_000,
         evaluatedAt: new Date('2026-10-03T12:00:05.000Z'),
       }),
+    ).resolves.toMatchObject({
+      status: 'reconciliation_evidence_fresh',
+      blockers: [],
+      evidence: {
+        stored: first.stored,
+        reconciliationCurrent: true,
+        quoteAuthorized: false,
+        submissionAuthorized: false,
+      },
+    });
+    await expect(
+      accountingLedgerLatestReconciliationFreshnessService.assessLatest(
+        uuid(29),
+        {
+          maximumAgeMs: 2_000,
+          evaluatedAt: new Date('2026-10-03T12:00:05.000Z'),
+        },
+      ),
     ).resolves.toMatchObject({
       status: 'reconciliation_evidence_fresh',
       blockers: [],
