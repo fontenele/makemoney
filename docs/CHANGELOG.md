@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-21 — Compose latest reconciled accounting balances
+
+- Added the M10.116 unregistered read-only service over M10.114 latest freshness and M10.115 balance projection.
+- Validated canonical initialization identity, bounded freshness age, and finite evaluation clock before delegation and defensively captured the clock.
+- Converted durable absence into an explicit blocker, preserved stale/future blockers, and failed closed on malformed delegated evidence.
+- Added focused and PostgreSQL-chain composition coverage.
+- Verified all 2,520 backend tests across 218 suites, including all 9 focused composition cases, all 97 PostgreSQL E2E tests across 9 suites with all 34 migrations, all 96 dashboard tests across 17 files, formatting, lint, Prisma validation, backend/dashboard builds, Compose validation, whitespace checks, and live API health/valuation checks.
+- Added no schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order.
+
 ## 2026-10-21 — Project fresh reconciled accounting balances
 
 - Added the M10.115 pure projection from fresh M10.110 reconciliation evidence to exact current USDT, BTCB, and native BNB balances.

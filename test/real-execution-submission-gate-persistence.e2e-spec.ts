@@ -61,6 +61,7 @@ import {
   AgenticWalletAccountingLedgerReconciliationFreshnessService,
 } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-ledger-reconciliation-freshness.service';
 import { prepareAgenticWalletAccountingReconciledBalanceSnapshot } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-reconciled-balance-snapshot';
+import { AgenticWalletAccountingLatestReconciledBalanceSnapshotService } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-reconciled-balance-snapshot.service';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
@@ -92,6 +93,7 @@ describe('Real execution submission gate persistence (e2e)', () => {
   let accountingLedgerReconciliationCommitmentReadStore: PrismaAgenticWalletAccountingLedgerReconciliationCommitmentReadStore;
   let accountingLedgerReconciliationFreshnessService: AgenticWalletAccountingLedgerReconciliationFreshnessService;
   let accountingLedgerLatestReconciliationFreshnessService: AgenticWalletAccountingLedgerLatestReconciliationFreshnessService;
+  let accountingLatestReconciledBalanceSnapshotService: AgenticWalletAccountingLatestReconciledBalanceSnapshotService;
 
   beforeAll(async () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
@@ -185,6 +187,10 @@ describe('Real execution submission gate persistence (e2e)', () => {
     accountingLedgerLatestReconciliationFreshnessService =
       new AgenticWalletAccountingLedgerLatestReconciliationFreshnessService(
         accountingLedgerReconciliationCommitmentReadStore,
+      );
+    accountingLatestReconciledBalanceSnapshotService =
+      new AgenticWalletAccountingLatestReconciledBalanceSnapshotService(
+        accountingLedgerLatestReconciliationFreshnessService,
       );
   });
 
@@ -438,6 +444,23 @@ describe('Real execution submission gate persistence (e2e)', () => {
         balanceCoverageComplete: true,
         walletObservationAuthenticated: true,
         ledgerBalancesReconciled: true,
+        quoteAuthorized: false,
+        submissionAuthorized: false,
+      },
+    });
+    await expect(
+      accountingLatestReconciledBalanceSnapshotService.loadLatest(uuid(29), {
+        maximumAgeMs: 2_000,
+        evaluatedAt: new Date('2026-10-03T12:00:05.000Z'),
+      }),
+    ).resolves.toMatchObject({
+      status: 'reconciled_balances_ready',
+      blockers: [],
+      reconciliationFreshnessStatus: 'reconciliation_evidence_fresh',
+      snapshot: {
+        initializationId: uuid(29),
+        reconciliationId: uuid(30),
+        balanceCoverageComplete: true,
         quoteAuthorized: false,
         submissionAuthorized: false,
       },

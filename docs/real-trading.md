@@ -2135,3 +2135,23 @@ The projection remains unregistered and non-authorizing. It does not independent
 - Focused tests cover success, invalid evidence, invalid/mismatched identity, mutation isolation, and tampering.
 - PostgreSQL E2E composes durable latest selection, freshness assessment, and balance projection.
 - No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.
+
+## M10.116 — Latest reconciled balance snapshot composition
+
+M10.116 connects the M10.114 latest-freshness service to the M10.115 balance projection without exposing either coordination concern to a future balance consumer. One canonical accounting initialization UUID, bounded freshness age, and finite evaluation clock are validated before delegation; the clock is copied before the asynchronous boundary.
+
+The service invokes M10.114 exactly once. Missing durable evidence becomes the explicit `accounting_ledger_reconciliation_evidence_absent` blocker rather than an empty balance claim. Stale and future evidence retain their M10.110 blockers and never reach projection. Fresh evidence alone reaches M10.115; malformed delegated evidence fails closed, and durable/provider failures propagate unchanged.
+
+The composition remains unregistered, read-only, and non-authorizing. It adds no provider call, route, balance mutation, valuation, resource reservation, funding, quote, executor, or order path.
+
+### M10.116 acceptance criteria
+
+- Canonical initialization identity, bounded age policy, and finite clock are required before delegation.
+- The evaluation clock is defensively captured before one M10.114 invocation.
+- Durable absence becomes an explicit blocker and never becomes an empty balance snapshot.
+- Stale/future freshness blockers pass through without invoking M10.115.
+- Fresh evidence is projected through the exact M10.115 boundary.
+- Malformed delegated evidence fails closed and delegated failures propagate unchanged.
+- Focused tests cover success, absence, stale evidence, pre-delegation validation, date isolation, malformed evidence, and failure propagation.
+- PostgreSQL E2E composes durable latest selection, freshness, and latest balance projection.
+- No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.

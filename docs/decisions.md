@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-21 — Make latest reconciled balance readiness explicit
+
+A balance consumer should not independently coordinate latest-row selection, freshness interpretation, and balance projection. Leaving durable absence as `null` at that boundary would also make it easy to confuse unavailable evidence with an empty wallet.
+
+M10.116 therefore validates and snapshots the initialization-keyed request before invoking M10.114 exactly once. It converts durable absence into a dedicated blocker, preserves stale/future policy blockers, and invokes M10.115 only when fresh evidence exists. The service stays unregistered, read-only, and non-authorizing.
+
 ## 2026-10-21 — Project current balances only from fresh reconciled evidence
 
 Future resource checks need exact current quantities, but reading provider balances or the local ledger independently would reopen the divergence that M10.103–M10.114 close. Passing the complete nested reconciliation everywhere would also invite consumers to select balances inconsistently or discard provenance.
