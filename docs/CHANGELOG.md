@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-21 — Add local funding-address QR code
+
+- Added browser-local PNG QR generation for a successful M10.117 canonical BSC address, using high error correction and no remote QR service.
+- Kept the payload address-only so network, asset, amount, fee, and final confirmation remain explicit operator choices in the Binance App.
+- Added fail-closed address validation, encoder-error handling, responsive rendering, and focused tests.
+- Verified all 103 dashboard tests across 18 files, complete backend/dashboard builds, formatting, lint, and whitespace checks.
+- Audited production dependencies: ten unrelated existing advisories remain outside the `qrcode` chain; no automatic broad dependency update was made.
+
 ## 2026-10-21 — Add guarded manual funding readiness
 
 - Added an explicit loopback-only read that rechecks the live Agentic Wallet, restrictive security posture, independent local risk limits, reported-empty BSC balance list, gas visibility, and canonical chain-56 address.

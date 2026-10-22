@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, and M10 is in progress through M10.117 manual Agentic Wallet funding readiness. The dedicated BSC BTCB/USDT Agentic Wallet runtime exposes only explicit authentication, read-only observation, and a guarded manual-deposit destination; real execution remains disabled with no provider quote, order, or application-initiated fund movement.
+Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, and M10 is in progress through M10.118 browser-local funding-address QR. The dedicated BSC BTCB/USDT Agentic Wallet runtime exposes only explicit authentication, read-only observation, and a guarded manual-deposit destination with local QR rendering; real execution remains disabled with no provider quote, order, or application-initiated fund movement.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 

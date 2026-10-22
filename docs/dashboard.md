@@ -248,6 +248,12 @@ The wallet CLI is contacted only after the user selects **Check wallet (read onl
 
 The panel warns the operator to verify the complete address, use only BNB Smart Chain, and manually provide both BSC USDT and native BNB for gas. It does not convert BRL, choose amounts, copy funds, initiate a transfer, or enable quote/submission behavior. The address remains browser-memory-only and the ordinary wallet observation stays redacted.
 
+## M10.118 local address QR code
+
+A ready M10.117 result now also renders a PNG QR code suitable for scanning from the Binance App on a separate phone. Generation occurs entirely in browser memory after the canonical EVM address is revalidated. The QR payload is exactly the address and contains no chain URI, asset, amount, fee, or payment request.
+
+The operator must still select **BNB Smart Chain (BSC/BEP20)** in the app and compare the complete displayed address before confirming. Invalid input or encoder failure displays no QR. Automatic refresh never creates one, and no address is sent to a third-party QR service.
+
 ## M10.74 Agentic Wallet session expiry visibility
 
 The same manual observation displays the provider-reported inactivity sign-out deadline and separate maximum sign-in deadline. The current pinned CLI reports a 48-hour sliding inactivity window: authenticated token use advances the provider deadline, and a later manual check retrieves the updated value. The browser updates only the displayed countdown once per second; it makes no wallet request and cannot renew the session.

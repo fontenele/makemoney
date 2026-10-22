@@ -1,5 +1,11 @@
 # Current State
 
+M10.118 is complete: a successful M10.117 destination can now be scanned from the Binance App using a QR code generated entirely in dashboard browser memory.
+
+The dashboard revalidates the exact canonical EVM address before using the local `qrcode` encoder with high error correction. The PNG data URL contains only the address and is neither uploaded nor persisted. BSC/BEP20 selection and complete-address comparison remain mandatory visible operator checks because the QR intentionally carries no chain URI, asset, amount, fee, or payment instruction. Invalid input and local encoder failure withhold the QR. No backend route, provider call, transfer, quote, signature, submission, or execution authority is added.
+
+Post-M10.118 validation passed all 103 dashboard tests across 18 files, the complete backend/dashboard build, formatting, lint, and whitespace checks. Production dependency audit reports ten existing advisories outside the `qrcode` dependency chain; no automatic broad upgrade was applied in this focused increment.
+
 M10.117 is complete: the loopback-only runtime and dashboard now provide an explicit guarded preparation step for the operator's first manual Agentic Wallet deposit.
 
 One manual request performs a fresh pinned-CLI read and returns the exact BSC chain-56 address only when connection, chain and canonical EVM address, restrictive provider posture, all six independent local limits, a reported-empty BSC balance list, and gas visibility pass together. Any blocker withholds the address. The ordinary observation remains redacted and automatic dashboard refresh never calls this route. The dashboard warns that only BSC may be used and that the operator must manually provide BSC USDT plus native BNB gas; it performs no BRL conversion or amount selection. Funding, quote, and submission authorization remain false, and no transfer, signature, provider quote, executor, or real order is available.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-21 — Keep the funding QR local and address-only
+
+The dashboard runs on a PC while the Binance App used for the manual withdrawal runs on a phone. Manual transcription of a 42-character EVM address adds avoidable error, but a remote QR service would disclose the wallet destination and a payment URI could imply an asset, amount, or network selection the receiving app may interpret differently.
+
+M10.118 therefore validates the already admitted M10.117 destination again and generates a high-error-correction PNG entirely in browser memory. The payload is only the hexadecimal address. BSC/BEP20, the complete text address, token, amount, fee, and final confirmation remain separate operator checks in the official app. Failure produces no QR and grants no provider or financial authority.
+
 ## 2026-10-21 — Reveal a deposit address only through explicit readiness
 
 The ordinary wallet observation intentionally redacts addresses, but asking the operator to recover an address through an unrelated CLI or copy it from stale notes would weaken the chain and identity checks immediately before a first deposit. Automatically exposing it on dashboard refresh would also contact the authenticated wallet without a deliberate action.

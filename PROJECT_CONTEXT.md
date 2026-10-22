@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, **M6 — Backtesting (M6.1–M6.32)**, **M7 — New Listing Scanner (M7.1–M7.109)**, **M8 — Dashboard (M8.1–M8.11)**, and **M9 — Polymarket (M9.1–M9.66)**.
-- M10 is in progress through **M10.117 — Manual Funding Readiness**. A separate explicit dashboard action now rechecks the connected BSC wallet, restrictive provider posture, defined local limits, reported-empty balance, gas visibility, and exact EVM address before revealing a manual-deposit destination. The application cannot initiate or authorize funding, quotes, submissions, or orders, and real trading remains disabled.
+- M10 is in progress through **M10.118 — Local Funding Address QR Code**. After the explicit M10.117 readiness check succeeds, the dashboard can encode only the validated BSC address into a browser-local PNG QR code for scanning from the Binance App. The network and complete address remain separately visible and must still be verified; the application cannot initiate or authorize funding, quotes, submissions, or orders, and real trading remains disabled.
 - M6 is closed. M7.1–M7.109 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.

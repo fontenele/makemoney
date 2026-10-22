@@ -1,5 +1,11 @@
 # Real Trading
 
+## M10.118 — Browser-local funding address QR code
+
+After M10.117 returns a ready canonical destination, the dashboard validates the complete EVM address again and generates a high-error-correction PNG QR code in browser memory. The encoder receives only the address; there is no remote QR service, backend request, persisted image, chain URI, token, amount, or payment instruction in the payload.
+
+The visible panel keeps BNB Smart Chain/BEP20 and the complete hexadecimal address alongside the QR. Scanning reduces transcription risk but does not select or prove the network, so the operator must still choose BSC in the Binance App and compare the address before confirmation. Invalid input or local encoder failure withholds the QR. Funding, quote, and submission authorization remain false.
+
 ## M10.117 — Explicit manual funding readiness
 
 `POST /real-trading/funding-readiness` is a distinct operator-triggered read-only boundary. It performs one fresh pinned-CLI capability observation and reveals the exact chain-56 EVM address only when the wallet is connected, BSC is available, exactly one valid BSC address exists, the M10.9 posture is restrictive, all M10.10 local limits are defined, the balance read is available and reports no BSC assets, and gas data is available. A blocked response returns explicit reasons and no address.

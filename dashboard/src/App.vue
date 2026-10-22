@@ -57,6 +57,7 @@ import { verifyPolymarketReverseIdentities } from './polymarket-reverse-identity
 import { buildPolymarketResolutionContextRows } from './polymarket-resolution-context';
 import { verifyPolymarketResolutionIdentity } from './polymarket-resolution-identity';
 import { walletExpiryCountdown } from './wallet-session-expiry';
+import { buildWalletAddressQrCode } from './wallet-address-qr';
 import DashboardChart from './DashboardChart.vue';
 import {
   dashboardRouteFromHash,
@@ -77,6 +78,8 @@ const agenticWalletObservationLoading = ref(false);
 const agenticWalletFundingReadiness =
   ref<Resource<AgenticWalletFundingReadiness> | null>(null);
 const agenticWalletFundingReadinessLoading = ref(false);
+const agenticWalletFundingQrCode = ref<string | null>(null);
+const agenticWalletFundingQrCodeError = ref(false);
 const agenticWalletAuthentication =
   ref<Resource<AgenticWalletAuthenticationState> | null>(null);
 const agenticWalletAuthenticationLoading = ref(false);
@@ -492,8 +495,24 @@ async function refreshAgenticWalletObservation(): Promise<void> {
 async function prepareFundingInstructions(): Promise<void> {
   if (agenticWalletFundingReadinessLoading.value) return;
   agenticWalletFundingReadinessLoading.value = true;
+  agenticWalletFundingQrCode.value = null;
+  agenticWalletFundingQrCodeError.value = false;
   try {
     agenticWalletFundingReadiness.value = await prepareAgenticWalletFunding();
+    const result = agenticWalletFundingReadiness.value;
+    if (
+      result.status === 'available' &&
+      result.data.status === 'ready_for_operator_deposit' &&
+      result.data.destination !== null
+    ) {
+      try {
+        agenticWalletFundingQrCode.value = await buildWalletAddressQrCode(
+          result.data.destination.address,
+        );
+      } catch {
+        agenticWalletFundingQrCodeError.value = true;
+      }
+    }
   } finally {
     agenticWalletFundingReadinessLoading.value = false;
   }
@@ -900,6 +919,32 @@ onUnmounted(() => {
                     </dd>
                   </div>
                 </dl>
+                <div
+                  v-if="agenticWalletFundingQrCode !== null"
+                  class="wallet-address-qr"
+                >
+                  <img
+                    :src="agenticWalletFundingQrCode"
+                    alt="QR code containing only the BSC wallet address"
+                    width="280"
+                    height="280"
+                  />
+                  <div>
+                    <strong>Scan from the Binance App</strong>
+                    <p>
+                      The QR contains only the wallet address. You must still
+                      select BNB Smart Chain (BSC/BEP20) in the app and compare
+                      the complete address before confirming.
+                    </p>
+                  </div>
+                </div>
+                <p
+                  v-else-if="agenticWalletFundingQrCodeError"
+                  class="wallet-policy-warning"
+                >
+                  QR generation failed locally. Do not continue by guessing the
+                  address; prepare the instructions again.
+                </p>
                 <p class="wallet-policy-warning">
                   A transfer on another network or to a different address can
                   cause permanent loss. Funding does not enable quotes or real
