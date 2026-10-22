@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## 2026-10-22 - Preserve below-minimum conversion outcomes as evidence
+
+A provider-finished conversion can deliver less USDT than the accepted minimum. Treating that as structurally invalid would prevent durable audit of the very breach that matters. M10.134 therefore separates evidence completeness from economic classification: complete correlated evidence is persistence-ready, while actual output is explicitly classified against minimum and expected amounts. Financial reconciliation remains incomplete until that package is stored by a later increment.
+
+## 2026-10-22 - Make authenticated wallet valuation initial and manual only
+
+The funded-wallet valuation invokes the slower authenticated CLI and does not need the ordinary dashboard's 15-second cadence. The browser now loads it once at page entry and only again after an explicit Reload action. Its dedicated loader coalesces overlap and retains the previous result while loading; unrelated dashboard resources keep their existing visibility-aware automatic refresh.
+
 ## 2026-10-22 - Compose status reconciliation before runtime polling
 
 The funding-conversion status runner, response assessor, and monotonic store were independently constrained, but runtime exposure before proving their composition would leave durable context correlation and overlap behavior implicit. M10.133 therefore adds a one-shot, unregistered coordinator that derives the lookup payload only from the durable attempt, suppresses overlapping same-attempt calls in-process, performs one read-only lookup, and stores only fully validated evidence.

@@ -426,6 +426,31 @@ h1 em {
   margin: 0.55rem 0 0;
 }
 
+.wallet-valuation-heading,
+.wallet-valuation-unavailable {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.wallet-valuation-heading button,
+.wallet-valuation-unavailable button {
+  min-width: 5.5rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 0.45rem;
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.wallet-valuation-heading button:disabled,
+.wallet-valuation-unavailable button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
 .wallet-address {
   overflow-wrap: anywhere;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;

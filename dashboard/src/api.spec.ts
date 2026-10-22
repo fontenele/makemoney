@@ -91,7 +91,7 @@ describe('loadAgenticWalletFundingValuation', () => {
             bnbUsdt: '742.19',
             usdtBrl: '5.0445',
           },
-          refreshMode: 'automatic_15_seconds_while_dashboard_visible',
+          refreshMode: 'initial_and_manual',
           valuationOnly: true,
           fundingAuthorized: false,
           quoteAuthorized: false,
@@ -178,8 +178,7 @@ describe('loadDashboard', () => {
                               bnbUsdt: '742.19',
                               usdtBrl: '5.0445',
                             },
-                            refreshMode:
-                              'automatic_15_seconds_while_dashboard_visible',
+                            refreshMode: 'initial_and_manual',
                             valuationOnly: true,
                             fundingAuthorized: false,
                             quoteAuthorized: false,

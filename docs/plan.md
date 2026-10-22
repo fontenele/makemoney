@@ -71,6 +71,7 @@ M6.23 Historical Gap Fill:   DONE
 M6.24 Replay API:            DONE
 M6.25 Simulation API:        DONE
 M10.133 Status Reconciliation: DONE
+M10.134 Financial Evidence Gate: DONE
 Next increment:           NOT YET DEFINED
 ```
 
@@ -2441,5 +2442,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.66. M10 is complete through M10.133, which composes durable funding-conversion attempt context, one read-only provider status lookup, strict response validation, and monotonic status persistence behind an unregistered one-shot service. There is no route, polling loop, automatic retry, live invocation, financial reconciliation, conversion authority, or real-trading activation. Real trading remains disabled.
+M9 is closed through M9.66. M10 is complete through M10.134, which validates a complete funding-conversion financial-evidence package after durable provider completion while retaining persistence and reconciliation as future work. Authenticated dashboard valuation is initial/manual only. There is no automatic status or valuation polling, retry, live conversion invocation, financial completion, accounting mutation, conversion authority, or real-trading activation. Real trading remains disabled.
 ```

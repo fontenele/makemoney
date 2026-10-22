@@ -1,5 +1,23 @@
 # Real Trading
 
+## M10.134 — Funding-conversion financial-reconciliation evidence gate
+
+M10.134 introduces the pure evidence boundary after a durable funding-conversion status reaches `FINISHED`. Provider completion alone remains insufficient. The candidate package must contain the exact terminal status identity and hash, submitted native BNB quantity, actual USDT received, complete bounded provider-fee components, positive BNB network fee, explicit transaction-receipt evidence, and independently observed source and target balance deltas.
+
+The gate correlates the attempt, plan, provider order, status row, transaction, BSC token direction, source quantity, and chronology. It compares actual USDT with the accepted minimum and expected quote using exact decimal arithmetic. A below-minimum receipt is classified explicitly and remains eligible for future immutable persistence; rejecting it would erase financially important evidence. Successful output is only a defensive persistence-ready snapshot and keeps financial reconciliation incomplete.
+
+### M10.134 acceptance criteria
+
+- Only valid durable provider-`FINISHED` context with a transaction hash may proceed.
+- Attempt, order, status observation, transaction, BSC direction, and submitted source quantity match exactly.
+- Actual USDT receipt and BNB network fee are canonical positive decimals.
+- Provider fees are bounded, unique, complete, and denominated only in approved BNB or USDT identities.
+- Transaction receipt plus source/target balance deltas and all fee coverage are explicit and complete.
+- Evidence cannot predate the terminal status record.
+- Actual output is classified below minimum, between minimum and expected, or at/above expected without suppressing breach evidence.
+- Output is defensively copied, requires persistence, and keeps financial reconciliation incomplete and retry forbidden.
+- No schema, store, evidence acquisition, route, runtime registration, provider call, accounting mutation, conversion, or real-trading activation is added.
+
 ## M10.133 — One-shot funding-conversion status reconciliation
 
 M10.133 composes the previously separate status boundaries without exposing them at runtime. A read-only Prisma context store accepts one canonical attempt identity and reconstructs the exact provider order, source quantity, and slippage only from durable submission evidence. Terminal and unknown-outcome attempts explicitly require no lookup; malformed or unsupported durable state fails closed.

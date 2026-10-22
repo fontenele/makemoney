@@ -633,7 +633,7 @@ export interface AgenticWalletFundingValuation {
     bnbUsdt: string;
     usdtBrl: string;
   } | null;
-  refreshMode: 'automatic_15_seconds_while_dashboard_visible';
+  refreshMode: 'initial_and_manual';
   valuationOnly: true;
   fundingAuthorized: false;
   quoteAuthorized: false;

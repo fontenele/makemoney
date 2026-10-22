@@ -64,6 +64,7 @@ import { buildPolymarketResolutionContextRows } from './polymarket-resolution-co
 import { verifyPolymarketResolutionIdentity } from './polymarket-resolution-identity';
 import { walletExpiryCountdown } from './wallet-session-expiry';
 import { buildWalletAddressQrCode } from './wallet-address-qr';
+import { createFundingValuationLoader } from './funding-valuation-loader';
 import { buildMonetaryTooltip, type MonetaryAsset } from './monetary-tooltip';
 import DashboardChart from './DashboardChart.vue';
 import {
@@ -82,6 +83,15 @@ const fundingValuation = ref<Resource<AgenticWalletFundingValuation> | null>(
   null,
 );
 const fundingValuationLoading = ref(false);
+const fundingValuationLoader = createFundingValuationLoader({
+  load: loadAgenticWalletFundingValuation,
+  publish: (value) => {
+    fundingValuation.value = value;
+  },
+  setLoading: (value) => {
+    fundingValuationLoading.value = value;
+  },
+});
 const agenticWalletObservation = ref<Resource<AgenticWalletObservation> | null>(
   null,
 );
@@ -466,7 +476,6 @@ async function changePolymarketAvailability(enabled: boolean): Promise<void> {
 async function refresh(): Promise<void> {
   if (refreshing.value) return;
   const request = ++dashboardRequest;
-  void refreshFundingValuation();
   refreshing.value = true;
   try {
     const result = await loadDashboard();
@@ -493,13 +502,7 @@ async function refresh(): Promise<void> {
 }
 
 async function refreshFundingValuation(): Promise<void> {
-  if (fundingValuationLoading.value) return;
-  fundingValuationLoading.value = true;
-  try {
-    fundingValuation.value = await loadAgenticWalletFundingValuation();
-  } finally {
-    fundingValuationLoading.value = false;
-  }
+  await fundingValuationLoader.reload();
 }
 
 const autoRefresh = createDashboardAutoRefresh({
@@ -737,6 +740,7 @@ onMounted(() => {
   walletClockHandle = window.setInterval(() => {
     walletClockMs.value = Date.now();
   }, 1000);
+  void fundingValuationLoader.loadInitial();
   autoRefresh.start();
   void refreshAgenticWalletAuthentication();
 });
@@ -1007,7 +1011,16 @@ onUnmounted(() => {
                   fundingValuation.data.balance !== null
                 "
               >
-                <strong>Current Agentic Wallet balance</strong>
+                <div class="wallet-valuation-heading">
+                  <strong>Current Agentic Wallet balance</strong>
+                  <button
+                    type="button"
+                    :disabled="fundingValuationLoading"
+                    @click="refreshFundingValuation"
+                  >
+                    {{ fundingValuationLoading ? 'Reloading…' : 'Reload' }}
+                  </button>
+                </div>
                 <dl class="wallet-status-grid">
                   <div>
                     <dt>BNB</dt>
@@ -1054,8 +1067,8 @@ onUnmounted(() => {
                   Binance public prices: 1 BNB =
                   {{ fundingValuation.data.prices?.bnbUsdt }} USDT and 1 USDT =
                   {{ fundingValuation.data.prices?.usdtBrl }} BRL. Balance and
-                  prices refresh every 15 seconds while this dashboard is
-                  visible.
+                  prices load when this page opens and only refresh when you
+                  select Reload.
                 </p>
                 <small>
                   Balance read
@@ -1064,23 +1077,42 @@ onUnmounted(() => {
                   {{ timestamp(fundingValuation.data.pricesObservedAt ?? '') }}
                 </small>
               </template>
-              <p
+              <div
                 v-else-if="
                   available(fundingValuation) &&
                   fundingValuation.data.status === 'blocked'
                 "
-                class="wallet-policy-warning"
+                class="wallet-valuation-unavailable"
               >
-                Automatic balance valuation blocked:
-                {{ fundingValuation.data.blockers.join(', ') }}
-              </p>
-              <p v-else class="empty-state wallet-error">
-                {{
-                  fundingValuation?.status === 'unavailable'
-                    ? fundingValuation.message
-                    : 'Loading automatic wallet valuation...'
-                }}
-              </p>
+                <p class="wallet-policy-warning">
+                  Balance valuation blocked:
+                  {{ fundingValuation.data.blockers.join(', ') }}
+                </p>
+                <button
+                  type="button"
+                  :disabled="fundingValuationLoading"
+                  @click="refreshFundingValuation"
+                >
+                  {{ fundingValuationLoading ? 'Reloading…' : 'Reload' }}
+                </button>
+              </div>
+              <div v-else class="wallet-valuation-unavailable">
+                <p class="empty-state wallet-error">
+                  {{
+                    fundingValuation?.status === 'unavailable'
+                      ? fundingValuation.message
+                      : 'Loading wallet valuation...'
+                  }}
+                </p>
+                <button
+                  v-if="fundingValuation !== null"
+                  type="button"
+                  :disabled="fundingValuationLoading"
+                  @click="refreshFundingValuation"
+                >
+                  {{ fundingValuationLoading ? 'Reloading…' : 'Reload' }}
+                </button>
+              </div>
             </div>
 
             <form

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-22 — Gate funding-conversion financial evidence
+
+- Added a pure evidence assessment after durable provider `FINISHED` status.
+- Required complete correlated receipt, source/target balance deltas, provider fees, and BNB network fee.
+- Classified actual USDT against accepted minimum and expected output without hiding below-minimum evidence.
+- Kept reconciliation incomplete pending future persistence; no schema, provider, runtime, or conversion path was added.
+
+## 2026-10-22 — Make wallet valuation initial and manual
+
+- Removed authenticated funding valuation from the ordinary 15-second dashboard refresh.
+- Added an adjacent Reload action while preserving the previous value during a reload.
+- Added a tested initial/manual-only loader with overlap coalescing.
+- Updated the backend and dashboard refresh contract to `initial_and_manual`.
+
 ## 2026-10-22 — Compose one-shot funding-conversion status reconciliation
 
 - Added a durable read-only context loader for exact pending conversion-attempt evidence.

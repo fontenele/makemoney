@@ -16,11 +16,11 @@ Monetary conversion hints use a local Vue directive and CSS pseudo-elements rath
 
 The real-wallet panel includes a blank manual BNB quantity field and a “Preview quote only” action. It shows expected/minimum USDT and BNB remaining only after the operator requests a quote. The panel warns that provider cost coverage is partial, gas sufficiency is unverified, the quote expires quickly, and no conversion is authorized. Changing the input clears the prior preview; automatic dashboard refresh never requests another quote.
 
-## M10.120 automatic monetary valuation
+## M10.120 on-demand monetary valuation
 
-The real-wallet card is refreshed every 15 seconds while the page is visible, but its authenticated valuation request is independent from the ordinary dashboard snapshot. The general dashboard can render as soon as its other resources finish instead of waiting for the slower Agentic Wallet CLI sequence. A valuation already displayed remains visible while the next independent refresh is in flight, and overlapping valuation requests are suppressed.
+The real-wallet card loads its authenticated valuation once when the page opens. Later ordinary 15-second dashboard refreshes do not call the wallet endpoint; the operator must select the adjacent Reload action. The general dashboard remains independent from the slower Agentic Wallet CLI sequence, the last valuation stays visible while a manual reload is in flight, and overlapping initial/manual requests are suppressed.
 
-The card displays exact reported BNB and indicative USDT/BRL equivalents without a separate verification button. Monetary values expose native browser tooltips backed by available Binance conversion evidence; missing evidence leaves the value visible without inventing a conversion. Tooltip calculations use `decimal.js`, while display formatting is presentational.
+The card displays exact reported BNB and indicative USDT/BRL equivalents. Monetary values expose dashboard-native tooltips backed by available Binance conversion evidence; missing evidence leaves the value visible without inventing a conversion. Tooltip calculations use `decimal.js`, while display formatting is presentational.
 
 ## Visualization standard
 

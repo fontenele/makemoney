@@ -152,7 +152,7 @@ export interface AgenticWalletFundingValuation {
     readonly bnbUsdt: string;
     readonly usdtBrl: string;
   } | null;
-  readonly refreshMode: 'automatic_15_seconds_while_dashboard_visible';
+  readonly refreshMode: 'initial_and_manual';
   readonly valuationOnly: true;
   readonly fundingAuthorized: false;
   readonly quoteAuthorized: false;
@@ -516,7 +516,7 @@ function blockedFundingValuation(
     pricesObservedAt: null,
     balance: null,
     prices: null,
-    refreshMode: 'automatic_15_seconds_while_dashboard_visible',
+    refreshMode: 'initial_and_manual',
     valuationOnly: true,
     fundingAuthorized: false,
     quoteAuthorized: false,
@@ -547,7 +547,7 @@ function availableFundingValuation(
       bnbUsdt: prices.bnbUsdtPrice,
       usdtBrl: prices.usdtBrlPrice,
     },
-    refreshMode: 'automatic_15_seconds_while_dashboard_visible',
+    refreshMode: 'initial_and_manual',
     valuationOnly: true,
     fundingAuthorized: false,
     quoteAuthorized: false,
