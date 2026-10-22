@@ -1,5 +1,20 @@
 # Real Trading
 
+## M10.124 — Closed unregistered funding-conversion swap runner
+
+M10.124 adds the first mutable provider primitive for funding conversion, but leaves it structurally unreachable from the running application. `AgenticWalletFundingConversionSwapCliProcessRunner` validates an exact typed envelope and builds only `market-order swap` from native BNB to approved USDT on BSC chain 56, with explicit slippage, MEV enabled, medium gas, and JSON output. It validates CLI 1.10.0 immediately before the future swap command.
+
+The runner is not registered in NestJS and has no application service, route, dashboard action, scheduler, retry, or test that calls `run`. Focused tests exercise only pure argument and version validators.
+
+### M10.124 acceptance criteria
+
+- The exact M10.123 BNB-to-USDT command arguments are reproduced.
+- Any altered operation kind, chain, token direction, MEV setting, or gas level fails closed.
+- Invalid quantity and slippage fail before process access.
+- The pinned CLI version is required before any future mutable invocation.
+- The runner remains absent from runtime dependency injection and has no caller.
+- No provider process, signature, submission, retry, status lookup, or conversion occurs.
+
 ## M10.123 — Inert BNB-to-USDT funding-conversion plan
 
 `POST /real-trading/funding-conversion-plan` accepts the same strict quantity body as M10.121 and deliberately obtains a new fresh wallet verification and provider quote. A successful result assigns a unique plan UUID and hashes the complete financial and provider command envelope: official BSC native BNB and USDT identities, chain 56, exact input, expected and minimum output, remaining BNB, maximum slippage, MEV protection, medium gas level, quote time, and expiry.

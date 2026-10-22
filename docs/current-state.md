@@ -1,5 +1,9 @@
 # Current State
 
+M10.124 is complete: a closed `AgenticWalletFundingConversionSwapCliProcessRunner` can build only the official BSC native-BNB-to-USDT swap arguments used by the M10.123 preview. It rejects any altered operation, chain, token direction, MEV setting, gas level, quantity, or slippage before process invocation and rechecks the pinned CLI version before a future command could run.
+
+The runner is deliberately absent from `RealTradingModule`: no application service, controller, dashboard action, test, or runtime path possesses it. Focused runner/version tests and the backend build pass without starting the CLI. No real quote, signature, submission, swap, or financial transaction was attempted.
+
 M10.123 is complete: `POST /real-trading/funding-conversion-plan` strictly reuses the operator-entered BNB quantity, performs a new M10.121 verification and provider quote, and binds all financially relevant terms to a unique plan plus SHA-256 fingerprint. The plan fixes the official BSC native-BNB and USDT identities, chain 56, exact quantity, expected/minimum USDT, remaining BNB, configured slippage, MEV protection, medium gas level, quote times, partial cost coverage, and unverified gas sufficiency.
 
 The plan separately reports paper mode, disabled execution, and missing provider/chain/token approvals. Its command is only a `market-order swap` preview with `executable`, conversion authorization, submission authorization, provider-submission start, and automatic retry all false. The dashboard can prepare and inspect this artifact but has no confirmation or execution action. No mutable Agentic Wallet runner is registered and no real transaction was attempted.

@@ -9,7 +9,7 @@ Crypto Trader is a personal, local platform for collecting cryptocurrency market
 ## Current position
 
 - Completed milestones: **M0 — Bootstrap**, **M1 — Market Data**, **M2 — Paper Wallet**, **M3 — Paper Trading**, **M4 — Risk Engine**, **M5 — Strategies**, **M6 — Backtesting (M6.1–M6.32)**, **M7 — New Listing Scanner (M7.1–M7.109)**, **M8 — Dashboard (M8.1–M8.11)**, and **M9 — Polymarket (M9.1–M9.66)**.
-- M10 is in progress through **M10.123 — Inert Funding-Conversion Plan**. An explicit dashboard action can bind a fresh BNB-to-USDT quote to an exact fingerprinted `market-order swap` command preview while reporting every independent runtime activation blocker. The command remains non-executable, no swap runner is registered, and conversion, signatures, submissions, orders, and real trading remain disabled.
+- M10 is in progress through **M10.124 — Closed Funding-Conversion Swap Runner**. A new unregistered infrastructure runner can construct only the pinned BSC native-BNB-to-USDT `market-order swap` invocation after validating the exact envelope and CLI version. No service, controller, dashboard action, or runtime provider registration can call it; conversion, signatures, submissions, orders, and real trading remain disabled.
 - M6 is closed. M7.1–M7.109 incrementally implement the new-listing research pipeline through durable catalog detection and observation, descriptive market/book analyses and APIs, comparable price-path and variability cohorts, and exact cost-adjusted checkpoint round-trip cohort and outcome research.
 - The application is a modular NestJS monolith backed by PostgreSQL, Redis, and Prisma.
 - The local API health endpoint is `http://localhost:3000/health`.

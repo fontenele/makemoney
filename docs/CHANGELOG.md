@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-22 — Add a closed unregistered funding-conversion swap runner
+
+- Added a CLI runner that accepts only the pinned BSC native-BNB-to-USDT swap envelope.
+- Required canonical positive quantity, bounded explicit slippage, MEV enabled, medium gas, JSON output, and the pinned Agentic Wallet CLI version.
+- Added focused rejection tests for altered chain, token direction, command kind, MEV, gas, quantity, slippage, and CLI version.
+- Kept the runner outside NestJS registration and all application/controller/dashboard paths; no real CLI process or transaction was started.
+
 ## 2026-10-22 — Prepare an inert BNB-to-USDT conversion plan
 
 - Added loopback-only `POST /real-trading/funding-conversion-plan`, which obtains a new verified quote for the exact operator-entered quantity.

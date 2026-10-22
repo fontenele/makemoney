@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-10-22 - Make the first funding swap primitive unreachable by construction
+
+The provider CLI can mutate the wallet, so argument validation alone is insufficient while confirmation, durable one-shot consumption, receipt persistence, and reconciliation are incomplete. M10.124 therefore introduces the closed runner as an unregistered infrastructure class with no application or runtime caller. This permits exact command validation without creating an HTTP or dependency-injection path to real funds.
+
 ## 2026-10-22 - Keep funding conversion preparation separate from submission
 
 Converting deposited native BNB into strategy USDT is a real wallet mutation, but it is not a BTCB/USDT strategy order and must not inherit that instrument's durable approvals implicitly. M10.123 therefore builds a funding-specific, fingerprinted command preview from a new verified quote and reports the existing independent environment mismatches without treating their future correction as financial authorization.
