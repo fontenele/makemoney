@@ -1,5 +1,9 @@
 # Dashboard
 
+## M10.123 inert funding-conversion plan
+
+The wallet card adds a separate “Prepare conversion - do not execute” action. It requests a new verified quote rather than trusting an older preview, then shows the exact BNB spend, minimum accepted USDT, slippage ceiling, immutable fingerprint, and current activation blockers. The control creates no confirmation and cannot submit the displayed command; changing the amount clears both quote and plan.
+
 ## M10.122 styled monetary tooltips
 
 Monetary conversion hints use a local Vue directive and CSS pseudo-elements rather than native `title` bubbles. A dotted underline identifies converted values; hover and keyboard focus reveal the same exact conversion text on a compact dark panel with an accent border, pointer, shadow, and short transition. When a required rate is unavailable, the directive removes both the tooltip data and keyboard stop.

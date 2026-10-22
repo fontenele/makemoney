@@ -5,6 +5,7 @@ import {
   loadAgenticWalletAuthentication,
   observeAgenticWallet,
   prepareAgenticWalletFunding,
+  prepareAgenticWalletFundingConversion,
   quoteAgenticWalletFundingConversion,
   startAgenticWalletAuthentication,
   loadListingPerformance,
@@ -19,6 +20,7 @@ import {
   type AgenticWalletObservation,
   type AgenticWalletFundingReadiness,
   type AgenticWalletFundingConversionQuote,
+  type AgenticWalletFundingConversionPlan,
   type AgenticWalletAuthenticationState,
   type DetectedSpotSymbol,
   type ListingPerformance,
@@ -85,6 +87,9 @@ const agenticWalletFundingConversionQuantity = ref('');
 const agenticWalletFundingConversionQuote =
   ref<Resource<AgenticWalletFundingConversionQuote> | null>(null);
 const agenticWalletFundingConversionQuoteLoading = ref(false);
+const agenticWalletFundingConversionPlan =
+  ref<Resource<AgenticWalletFundingConversionPlan> | null>(null);
+const agenticWalletFundingConversionPlanLoading = ref(false);
 const agenticWalletFundingQrCode = ref<string | null>(null);
 const agenticWalletFundingQrCodeError = ref(false);
 const agenticWalletAuthentication =
@@ -535,6 +540,19 @@ async function previewFundingConversion(): Promise<void> {
       );
   } finally {
     agenticWalletFundingConversionQuoteLoading.value = false;
+  }
+}
+
+async function prepareFundingConversionPlan(): Promise<void> {
+  if (agenticWalletFundingConversionPlanLoading.value) return;
+  agenticWalletFundingConversionPlanLoading.value = true;
+  try {
+    agenticWalletFundingConversionPlan.value =
+      await prepareAgenticWalletFundingConversion(
+        agenticWalletFundingConversionQuantity.value.trim(),
+      );
+  } finally {
+    agenticWalletFundingConversionPlanLoading.value = false;
   }
 }
 
@@ -1081,7 +1099,10 @@ onUnmounted(() => {
                   autocomplete="off"
                   placeholder="Example: 0.008"
                   aria-label="BNB quantity for conversion quote"
-                  @input="agenticWalletFundingConversionQuote = null"
+                  @input="
+                    agenticWalletFundingConversionQuote = null;
+                    agenticWalletFundingConversionPlan = null;
+                  "
                 />
               </label>
               <button
@@ -1095,6 +1116,20 @@ onUnmounted(() => {
                   agenticWalletFundingConversionQuoteLoading
                     ? 'Loading quote…'
                     : 'Preview quote only'
+                }}
+              </button>
+              <button
+                type="button"
+                :disabled="
+                  agenticWalletFundingConversionPlanLoading ||
+                  agenticWalletFundingConversionQuantity.trim().length === 0
+                "
+                @click="prepareFundingConversionPlan"
+              >
+                {{
+                  agenticWalletFundingConversionPlanLoading
+                    ? 'Preparing plan...'
+                    : 'Prepare conversion - do not execute'
                 }}
               </button>
             </form>
@@ -1217,6 +1252,100 @@ onUnmounted(() => {
               </p>
               <p v-else class="wallet-policy-warning">
                 {{ agenticWalletFundingConversionQuote.message }}
+              </p>
+            </div>
+
+            <div
+              v-if="agenticWalletFundingConversionPlan"
+              class="wallet-funding-instructions"
+              aria-live="polite"
+            >
+              <template
+                v-if="
+                  agenticWalletFundingConversionPlan.status === 'available' &&
+                  agenticWalletFundingConversionPlan.data.status ===
+                    'plan_ready' &&
+                  agenticWalletFundingConversionPlan.data.plan !== null
+                "
+              >
+                <strong>Conversion plan prepared - still not executable</strong>
+                <dl class="wallet-status-grid">
+                  <div>
+                    <dt>Exact spend</dt>
+                    <dd>
+                      {{
+                        agenticWalletFundingConversionPlan.data.plan
+                          .sourceQuantityBnb
+                      }}
+                      BNB
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Minimum accepted</dt>
+                    <dd>
+                      {{
+                        decimal(
+                          agenticWalletFundingConversionPlan.data.plan
+                            .minimumUsdt,
+                          4,
+                        )
+                      }}
+                      USDT
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Slippage ceiling</dt>
+                    <dd>
+                      {{
+                        agenticWalletFundingConversionPlan.data.plan
+                          .maximumSlippagePercent
+                      }}%
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Plan fingerprint</dt>
+                    <dd class="wallet-address">
+                      {{
+                        agenticWalletFundingConversionPlan.data.plan.fingerprint
+                      }}
+                    </dd>
+                  </div>
+                </dl>
+                <p class="wallet-policy-warning">
+                  Provider submission has not started. Final confirmation, fresh
+                  quote, gas validation, runtime activation and a separately
+                  implemented one-shot submission boundary remain required.
+                </p>
+                <p
+                  v-if="
+                    agenticWalletFundingConversionPlan.data.activationBlockers
+                      .length > 0
+                  "
+                  class="wallet-policy-note"
+                >
+                  Activation blockers:
+                  {{
+                    agenticWalletFundingConversionPlan.data.activationBlockers.join(
+                      ', ',
+                    )
+                  }}
+                </p>
+              </template>
+              <p
+                v-else-if="
+                  agenticWalletFundingConversionPlan.status === 'available'
+                "
+                class="wallet-policy-warning"
+              >
+                Conversion plan blocked:
+                {{
+                  agenticWalletFundingConversionPlan.data.quote.blockers.join(
+                    ', ',
+                  )
+                }}
+              </p>
+              <p v-else class="wallet-policy-warning">
+                {{ agenticWalletFundingConversionPlan.message }}
               </p>
             </div>
 

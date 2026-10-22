@@ -13,6 +13,7 @@ import { BinanceFundingValuationPriceClient } from './infrastructure/binance-fun
 import { AgenticWalletFundingConversionQuoteService } from './application/agentic-wallet-funding-conversion-quote.service';
 import { AgenticWalletFundingConversionQuoteAdapter } from './infrastructure/agentic-wallet-funding-conversion-quote.adapter';
 import { AgenticWalletQuoteCliProcessRunner } from './infrastructure/agentic-wallet-quote-cli-process-runner';
+import { AgenticWalletFundingConversionPlanService } from './application/agentic-wallet-funding-conversion-plan.service';
 
 @Module({
   controllers: [RealTradingController],
@@ -49,6 +50,7 @@ import { AgenticWalletQuoteCliProcessRunner } from './infrastructure/agentic-wal
         ),
     },
     AgenticWalletFundingConversionQuoteService,
+    AgenticWalletFundingConversionPlanService,
   ],
 })
 export class RealTradingModule {}

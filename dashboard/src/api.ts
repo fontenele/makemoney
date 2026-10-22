@@ -667,6 +667,47 @@ export interface AgenticWalletFundingConversionQuote {
   submissionAuthorized: false;
 }
 
+export interface AgenticWalletFundingConversionPlan {
+  scope: 'agentic_wallet_funding_conversion_plan';
+  status: 'plan_ready' | 'blocked';
+  quote: AgenticWalletFundingConversionQuote;
+  activationBlockers: string[];
+  executionConfigurationReady: boolean;
+  finalConfirmationRequired: true;
+  plan: {
+    id: string;
+    fingerprint: string;
+    provider: 'agentic_wallet';
+    chainId: '56';
+    sourceTokenAddress: string;
+    targetTokenAddress: string;
+    sourceQuantityBnb: string;
+    expectedUsdt: string;
+    minimumUsdt: string;
+    maximumSlippagePercent: string;
+    remainingQuantityBnb: string;
+    mevProtection: true;
+    gasLevel: 'MEDIUM';
+    confirmationPhrase: string;
+    quotedAt: string;
+    expiresAt: string;
+    costCoverage: 'partial';
+    gasReserveSufficiency: 'unverified';
+    command: {
+      kind: 'agentic_wallet_market_order_swap_command_preview';
+      arguments: string[];
+      executable: false;
+    };
+    automaticRetryAllowed: false;
+    providerSubmissionStarted: false;
+    conversionAuthorized: false;
+    submissionAuthorized: false;
+  } | null;
+  providerSubmissionStarted: false;
+  conversionAuthorized: false;
+  submissionAuthorized: false;
+}
+
 export interface AgenticWalletAuthenticationState {
   scope: 'agentic_wallet_authentication';
   status:
@@ -916,6 +957,39 @@ export async function quoteAgenticWalletFundingConversion(
     return {
       status: 'available',
       data: (await response.json()) as AgenticWalletFundingConversionQuote,
+    };
+  } catch {
+    return { status: 'unavailable', message: 'Local API is unreachable' };
+  }
+}
+
+export async function prepareAgenticWalletFundingConversion(
+  sourceQuantityBnb: string,
+  request: FetchLike = fetch,
+): Promise<Resource<AgenticWalletFundingConversionPlan>> {
+  try {
+    const response = await request(
+      dashboardApiPath('/real-trading/funding-conversion-plan'),
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sourceQuantityBnb }),
+      },
+    );
+    if (!response.ok) {
+      return {
+        status: 'unavailable',
+        message:
+          (await readProviderErrorMessage(response)) ??
+          `Unavailable (${response.status})`,
+      };
+    }
+    return {
+      status: 'available',
+      data: (await response.json()) as AgenticWalletFundingConversionPlan,
     };
   } catch {
     return { status: 'unavailable', message: 'Local API is unreachable' };

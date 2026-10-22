@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-22 - Keep funding conversion preparation separate from submission
+
+Converting deposited native BNB into strategy USDT is a real wallet mutation, but it is not a BTCB/USDT strategy order and must not inherit that instrument's durable approvals implicitly. M10.123 therefore builds a funding-specific, fingerprinted command preview from a new verified quote and reports the existing independent environment mismatches without treating their future correction as financial authorization.
+
+The preview deliberately has no registered mutable runner or confirmation endpoint. A later submission increment must revalidate fresh wallet and quote evidence, prove gas sufficiency, require an immediately preceding exact operator confirmation, execute at most once with no automatic retry, persist the provider receipt, and reconcile terminal status before claiming success.
+
 ## 2026-10-22 — Separate funding-conversion quotes from swaps and strategy quotes
 
 The funded wallet currently holds native BNB while the approved BTC/USDT strategy requires BSC USDT. Extending the existing BTCB/USDT strategy quote adapter to accept BNB would weaken its exact-instrument boundary, and choosing a conversion amount automatically would make an unapproved capital-allocation decision.

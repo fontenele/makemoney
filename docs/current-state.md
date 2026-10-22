@@ -1,5 +1,11 @@
 # Current State
 
+M10.123 is complete: `POST /real-trading/funding-conversion-plan` strictly reuses the operator-entered BNB quantity, performs a new M10.121 verification and provider quote, and binds all financially relevant terms to a unique plan plus SHA-256 fingerprint. The plan fixes the official BSC native-BNB and USDT identities, chain 56, exact quantity, expected/minimum USDT, remaining BNB, configured slippage, MEV protection, medium gas level, quote times, partial cost coverage, and unverified gas sufficiency.
+
+The plan separately reports paper mode, disabled execution, and missing provider/chain/token approvals. Its command is only a `market-order swap` preview with `executable`, conversion authorization, submission authorization, provider-submission start, and automatic retry all false. The dashboard can prepare and inspect this artifact but has no confirmation or execution action. No mutable Agentic Wallet runner is registered and no real transaction was attempted.
+
+Post-M10.123 validation passed all 2,553 backend tests across 222 suites and all 112 dashboard tests across 19 files, plus formatting, lint, complete backend/dashboard builds, and whitespace checks. After restarting only the host API, health remained `ok` and malformed plan input returned `400` before wallet or provider access.
+
 M10.122 is complete: monetary conversions use a reusable dashboard-native tooltip instead of the browser's unstyled title bubble. Eligible values receive a dotted affordance and show a compact dark, bordered, animated conversion card on hover or keyboard focus. Values without complete conversion evidence remain unchanged and unfocusable.
 
 The directive only binds already-derived M10.120 conversion strings to presentation attributes; it does not recalculate money, fetch prices, contact providers, or change any financial authorization. Focused tooltip tests, dashboard type checking/build, formatting, and whitespace checks pass.

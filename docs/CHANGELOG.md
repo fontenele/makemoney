@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-22 — Prepare an inert BNB-to-USDT conversion plan
+
+- Added loopback-only `POST /real-trading/funding-conversion-plan`, which obtains a new verified quote for the exact operator-entered quantity.
+- Bound the complete BNB-to-USDT command terms to a unique identity and SHA-256 fingerprint.
+- Reported the independent mode, execution, provider, chain, source-token, and target-token activation blockers without treating configuration readiness as authorization.
+- Added a dashboard action and inspection panel for the inert plan.
+- Kept the command non-executable and left the runtime without a swap runner, final-confirmation endpoint, submission, retry, signature, or conversion capability.
+- Verified all 2,553 backend tests across 222 suites and all 112 dashboard tests across 19 files, plus formatting, lint, complete backend/dashboard builds, and whitespace checks.
+- Restarted only the host API and verified that malformed plan input returns `400` before wallet/provider access; no live plan or swap was requested.
+
 ## 2026-10-22 — Style monetary conversion tooltips
 
 - Replaced native browser title bubbles on monetary conversions with a dashboard-native CSS tooltip.

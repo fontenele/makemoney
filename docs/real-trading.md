@@ -1,5 +1,21 @@
 # Real Trading
 
+## M10.123 — Inert BNB-to-USDT funding-conversion plan
+
+`POST /real-trading/funding-conversion-plan` accepts the same strict quantity body as M10.121 and deliberately obtains a new fresh wallet verification and provider quote. A successful result assigns a unique plan UUID and hashes the complete financial and provider command envelope: official BSC native BNB and USDT identities, chain 56, exact input, expected and minimum output, remaining BNB, maximum slippage, MEV protection, medium gas level, quote time, and expiry.
+
+The result exposes environment activation blockers independently for trading mode, execution enablement, provider, chain, source token, and target token. Clearing those blockers would still not authorize submission: the command remains a preview with `executable: false`, final confirmation remains required, and conversion/submission flags remain false.
+
+### M10.123 acceptance criteria
+
+- Malformed quantities fail through the existing M10.121 validator before wallet/provider access.
+- A blocked fresh quote creates no plan or command.
+- A successful quote is bound to one unique identity and canonical SHA-256 fingerprint.
+- The preview uses only the official BNB-to-USDT BSC identities and explicit slippage, MEV, and gas settings.
+- Every independent activation mismatch is visible without becoming authorization.
+- The dashboard can prepare and inspect the artifact manually; amount edits clear stale evidence.
+- No mutable provider runner, final-confirmation route, signature, submission, retry, status polling, or conversion exists.
+
 ## M10.121 — Manual BNB-to-USDT funding-conversion quote
 
 `POST /real-trading/funding-conversion-quote` accepts exactly `{ "sourceQuantityBnb": "<canonical positive decimal>" }`. Before provider access it performs a fresh M10.119 wallet verification, requires reported native BNB, loads the configured maximum slippage, and requires the requested quantity to be strictly less than the wallet balance. The route is manual and never participates in dashboard auto-refresh.

@@ -4,6 +4,7 @@ import {
   loadDashboard,
   observeAgenticWallet,
   prepareAgenticWalletFunding,
+  prepareAgenticWalletFundingConversion,
   quoteAgenticWalletFundingConversion,
   verifyAgenticWalletFunding,
   loadAgenticWalletAuthentication,
@@ -811,6 +812,44 @@ describe('Agentic Wallet funding conversion quote', () => {
         'sourceQuantityBnb must be one canonical positive decimal string',
     });
     expect(request).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Agentic Wallet funding conversion plan', () => {
+  it('prepares an inert manual plan through its dedicated route', async () => {
+    const plan = {
+      scope: 'agentic_wallet_funding_conversion_plan',
+      status: 'plan_ready',
+      activationBlockers: ['trading_mode_not_real'],
+      executionConfigurationReady: false,
+      finalConfirmationRequired: true,
+      plan: {
+        id: '019a0db1-bfea-7000-8000-000000000001',
+        fingerprint: 'a'.repeat(64),
+        sourceQuantityBnb: '0.008',
+        minimumUsdt: '5.89',
+        command: { executable: false },
+      },
+      providerSubmissionStarted: false,
+      conversionAuthorized: false,
+      submissionAuthorized: false,
+    };
+    const request = vi.fn(() => Promise.resolve(Response.json(plan)));
+
+    await expect(
+      prepareAgenticWalletFundingConversion('0.008', request),
+    ).resolves.toEqual({ status: 'available', data: plan });
+    expect(request).toHaveBeenCalledWith(
+      '/api/real-trading/funding-conversion-plan',
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sourceQuantityBnb: '0.008' }),
+      },
+    );
   });
 });
 

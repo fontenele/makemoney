@@ -13,6 +13,7 @@ import {
   AgenticWalletFundingConversionQuoteService,
   InvalidFundingConversionQuoteRequestError,
 } from '../application/agentic-wallet-funding-conversion-quote.service';
+import { AgenticWalletFundingConversionPlanService } from '../application/agentic-wallet-funding-conversion-plan.service';
 
 @Controller('real-trading')
 export class RealTradingController {
@@ -20,6 +21,7 @@ export class RealTradingController {
     private readonly status: RealTradingStatusService,
     private readonly authentication: AgenticWalletAuthenticationService,
     private readonly fundingConversionQuote: AgenticWalletFundingConversionQuoteService,
+    private readonly fundingConversionPlan: AgenticWalletFundingConversionPlanService,
   ) {}
 
   @Get('status')
@@ -85,6 +87,21 @@ export class RealTradingController {
       }
       throw new ServiceUnavailableException(
         'Agentic Wallet funding conversion quote is unavailable',
+      );
+    }
+  }
+
+  @Post('funding-conversion-plan')
+  @HttpCode(200)
+  async prepareFundingConversion(@Body() body: unknown) {
+    try {
+      return await this.fundingConversionPlan.prepare(body);
+    } catch (error) {
+      if (error instanceof InvalidFundingConversionQuoteRequestError) {
+        throw new BadRequestException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet funding conversion plan is unavailable',
       );
     }
   }
