@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-22 — Style monetary conversion tooltips
+
+- Replaced native browser title bubbles on monetary conversions with a dashboard-native CSS tooltip.
+- Added a consistent dark surface, conversion accent, border, shadow, motion, dotted affordance, and keyboard-focus behavior.
+- Kept tooltip content tied to existing exact-decimal conversion evidence and withheld the interactive affordance when evidence is unavailable.
+- Added no price request, provider access, quote, conversion, signature, submission, or order behavior.
+- Verified focused tooltip tests, dashboard type checking/build, formatting, and whitespace checks.
+
 ## 2026-10-22 — Add manual BNB-to-USDT quote preview
 
 - Added loopback-only `POST /real-trading/funding-conversion-quote` with an exact operator-supplied BNB quantity and no inferred default.

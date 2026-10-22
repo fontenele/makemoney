@@ -1,5 +1,9 @@
 # Dashboard
 
+## M10.122 styled monetary tooltips
+
+Monetary conversion hints use a local Vue directive and CSS pseudo-elements rather than native `title` bubbles. A dotted underline identifies converted values; hover and keyboard focus reveal the same exact conversion text on a compact dark panel with an accent border, pointer, shadow, and short transition. When a required rate is unavailable, the directive removes both the tooltip data and keyboard stop.
+
 ## M10.121 manual funding-conversion quote
 
 The real-wallet panel includes a blank manual BNB quantity field and a “Preview quote only” action. It shows expected/minimum USDT and BNB remaining only after the operator requests a quote. The panel warns that provider cost coverage is partial, gas sufficiency is unverified, the quote expires quickly, and no conversion is authorized. Changing the input clears the prior preview; automatic dashboard refresh never requests another quote.

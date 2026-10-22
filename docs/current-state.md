@@ -1,5 +1,9 @@
 # Current State
 
+M10.122 is complete: monetary conversions use a reusable dashboard-native tooltip instead of the browser's unstyled title bubble. Eligible values receive a dotted affordance and show a compact dark, bordered, animated conversion card on hover or keyboard focus. Values without complete conversion evidence remain unchanged and unfocusable.
+
+The directive only binds already-derived M10.120 conversion strings to presentation attributes; it does not recalculate money, fetch prices, contact providers, or change any financial authorization. Focused tooltip tests, dashboard type checking/build, formatting, and whitespace checks pass.
+
 M10.121 is complete: the dashboard contains a blank-by-default manual BNB→USDT quote form. `POST /real-trading/funding-conversion-quote` strictly accepts one canonical positive decimal quantity, freshly verifies the approved wallet, requires the request to leave positive BNB, applies the configured maximum slippage, and invokes only the pinned `market-order quote` command with the official BSC native-BNB sentinel and approved USDT contract.
 
 Successful previews show expected and minimum USDT, remaining BNB, a short local expiry, and explicit partial cost coverage. They do not prove the final network fee or whether the remainder is enough for gas. No amount is inferred or prefilled, quotes never refresh automatically, and the runtime contains no funding-conversion swap path. Conversion, signing, submission, and execution authorization remain false.

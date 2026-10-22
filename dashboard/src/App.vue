@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, type Directive } from 'vue';
 import {
   loadDashboard,
   loadAgenticWalletAuthentication,
@@ -617,6 +617,25 @@ function moneyTooltip(
   });
 }
 
+const vMoneyTooltip: Directive<HTMLElement, string | undefined> = {
+  mounted: syncMoneyTooltip,
+  updated: syncMoneyTooltip,
+};
+
+function syncMoneyTooltip(
+  element: HTMLElement,
+  binding: { value: string | undefined },
+): void {
+  const value = binding.value;
+  if (!value) {
+    delete element.dataset.moneyTooltip;
+    element.removeAttribute('tabindex');
+    return;
+  }
+  element.dataset.moneyTooltip = value;
+  element.tabIndex = 0;
+}
+
 function signed(value: string | null | undefined): string {
   if (value === null || value === undefined) return '—';
   const parsed = Number(value);
@@ -779,7 +798,7 @@ onUnmounted(() => {
             <template v-if="available(snapshot?.valuation)">
               <strong
                 class="metric-value"
-                :title="
+                v-money-tooltip="
                   moneyTooltip(snapshot.valuation.data.totalValue, 'USDT')
                 "
               >
@@ -802,12 +821,14 @@ onUnmounted(() => {
               <strong
                 class="metric-value compact"
                 :class="tone(snapshot.position.data.totalPnl)"
-                :title="moneyTooltip(snapshot.position.data.totalPnl, 'USDT')"
+                v-money-tooltip="
+                  moneyTooltip(snapshot.position.data.totalPnl, 'USDT')
+                "
               >
                 {{ signed(snapshot.position.data.totalPnl) }}
               </strong>
               <p
-                :title="
+                v-money-tooltip="
                   moneyTooltip(snapshot.position.data.realizedPnl, 'USDT')
                 "
               >
@@ -956,7 +977,7 @@ onUnmounted(() => {
                   <div>
                     <dt>BNB</dt>
                     <dd
-                      :title="
+                      v-money-tooltip="
                         moneyTooltip(
                           snapshot.fundingValuation.data.balance.quantityBnb,
                           'BNB',
@@ -969,7 +990,7 @@ onUnmounted(() => {
                   <div>
                     <dt>Equivalent in USDT</dt>
                     <dd
-                      :title="
+                      v-money-tooltip="
                         moneyTooltip(
                           snapshot.fundingValuation.data.balance.valueUsdt,
                           'USDT',
@@ -988,7 +1009,7 @@ onUnmounted(() => {
                   <div>
                     <dt>Equivalent in BRL</dt>
                     <dd
-                      :title="
+                      v-money-tooltip="
                         moneyTooltip(
                           snapshot.fundingValuation.data.balance.valueBrl,
                           'BRL',
@@ -1096,7 +1117,7 @@ onUnmounted(() => {
                   <div>
                     <dt>Spend</dt>
                     <dd
-                      :title="
+                      v-money-tooltip="
                         moneyTooltip(
                           agenticWalletFundingConversionQuote.data.quote
                             .sourceQuantityBnb,
@@ -1114,7 +1135,7 @@ onUnmounted(() => {
                   <div>
                     <dt>Expected</dt>
                     <dd
-                      :title="
+                      v-money-tooltip="
                         moneyTooltip(
                           agenticWalletFundingConversionQuote.data.quote
                             .expectedUsdt,
@@ -1135,7 +1156,7 @@ onUnmounted(() => {
                   <div>
                     <dt>Minimum after slippage</dt>
                     <dd
-                      :title="
+                      v-money-tooltip="
                         moneyTooltip(
                           agenticWalletFundingConversionQuote.data.quote
                             .minimumUsdt,
@@ -1156,7 +1177,7 @@ onUnmounted(() => {
                   <div>
                     <dt>BNB left</dt>
                     <dd
-                      :title="
+                      v-money-tooltip="
                         moneyTooltip(
                           agenticWalletFundingConversionQuote.data
                             .remainingQuantityBnb,
@@ -1536,7 +1557,9 @@ onUnmounted(() => {
               <div class="position-quantity">
                 <span>Open quantity</span>
                 <strong
-                  :title="moneyTooltip(snapshot.position.data.quantity, 'BTC')"
+                  v-money-tooltip="
+                    moneyTooltip(snapshot.position.data.quantity, 'BTC')
+                  "
                   >{{ decimal(snapshot.position.data.quantity, 8) }} BTC</strong
                 >
               </div>
@@ -1544,7 +1567,7 @@ onUnmounted(() => {
                 <div>
                   <dt>Average entry</dt>
                   <dd
-                    :title="
+                    v-money-tooltip="
                       moneyTooltip(
                         snapshot.position.data.averageEntryPrice,
                         'USDT',
@@ -1557,7 +1580,7 @@ onUnmounted(() => {
                 <div>
                   <dt>Market mark</dt>
                   <dd
-                    :title="
+                    v-money-tooltip="
                       moneyTooltip(snapshot.position.data.markPrice, 'USDT')
                     "
                   >
@@ -1567,7 +1590,7 @@ onUnmounted(() => {
                 <div>
                   <dt>Net liquidation</dt>
                   <dd
-                    :title="
+                    v-money-tooltip="
                       moneyTooltip(
                         snapshot.position.data.netLiquidationValue,
                         'USDT',
@@ -1581,7 +1604,7 @@ onUnmounted(() => {
                 <div>
                   <dt>Estimated exit fee</dt>
                   <dd
-                    :title="
+                    v-money-tooltip="
                       moneyTooltip(
                         snapshot.position.data.estimatedExitFee,
                         'USDT',
@@ -1640,7 +1663,7 @@ onUnmounted(() => {
                 <div>
                   <dt>Total fees</dt>
                   <dd
-                    :title="
+                    v-money-tooltip="
                       moneyTooltip(snapshot.performance.data.totalFees, 'USDT')
                     "
                   >
@@ -1705,21 +1728,21 @@ onUnmounted(() => {
                 </span>
                 <span
                   role="cell"
-                  :title="moneyTooltip(execution.quantity, 'BTC')"
+                  v-money-tooltip="moneyTooltip(execution.quantity, 'BTC')"
                 >
                   <small>Quantity</small>
                   {{ decimal(execution.quantity, 8) }} BTC
                 </span>
                 <span
                   role="cell"
-                  :title="moneyTooltip(execution.price, 'USDT')"
+                  v-money-tooltip="moneyTooltip(execution.price, 'USDT')"
                 >
                   <small>Price</small>
                   {{ decimal(execution.price) }} USDT
                 </span>
                 <span
                   role="cell"
-                  :title="
+                  v-money-tooltip="
                     moneyTooltip(
                       execution.side === 'buy'
                         ? execution.totalCost
@@ -1874,7 +1897,7 @@ onUnmounted(() => {
                 <div>
                   <span>Initial capital</span>
                   <strong
-                    :title="
+                    v-money-tooltip="
                       moneyTooltip(
                         latestBacktest.result.simulation.capital
                           .initialCapitalUsdt,
@@ -1900,7 +1923,7 @@ onUnmounted(() => {
                           .totalNetReturnUsdt,
                       )
                     "
-                    :title="
+                    v-money-tooltip="
                       moneyTooltip(
                         latestBacktest.result.simulation.capital
                           .finalEquityUsdt,
