@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-22 — Add manual BNB-to-USDT quote preview
+
+- Added loopback-only `POST /real-trading/funding-conversion-quote` with an exact operator-supplied BNB quantity and no inferred default.
+- Added a dedicated adapter that invokes only the pinned `market-order quote` surface with the official BSC native-BNB sentinel, approved USDT address, and configured maximum slippage.
+- Required fresh approved-wallet verification and a strictly positive remaining BNB balance before provider access.
+- Added dashboard presentation for expected/minimum USDT, remaining BNB, expiry, partial cost coverage, and explicitly unverified gas sufficiency.
+- Added no `market-order swap` path, automatic quote refresh, conversion, signature, submission, executor, or order authority.
+- Verified all 2,549 backend tests across 221 suites and all 111 dashboard tests across 19 files, plus formatting, lint, complete backend/dashboard builds, and whitespace checks.
+- Restarted only the host API and verified that malformed input returns `400` before wallet/provider access; no live quote was requested without an operator-selected amount.
+
 ## 2026-10-21 — Show automatic wallet valuation and conversion tooltips
 
 - Added loopback-only `GET /real-trading/funding-valuation`, combining a fresh approved-wallet BNB observation with Binance public BNB/USDT and USDT/BRL last prices using exact decimal arithmetic.

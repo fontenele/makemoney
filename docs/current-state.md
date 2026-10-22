@@ -1,5 +1,11 @@
 # Current State
 
+M10.121 is complete: the dashboard contains a blank-by-default manual BNB→USDT quote form. `POST /real-trading/funding-conversion-quote` strictly accepts one canonical positive decimal quantity, freshly verifies the approved wallet, requires the request to leave positive BNB, applies the configured maximum slippage, and invokes only the pinned `market-order quote` command with the official BSC native-BNB sentinel and approved USDT contract.
+
+Successful previews show expected and minimum USDT, remaining BNB, a short local expiry, and explicit partial cost coverage. They do not prove the final network fee or whether the remainder is enough for gas. No amount is inferred or prefilled, quotes never refresh automatically, and the runtime contains no funding-conversion swap path. Conversion, signing, submission, and execution authorization remain false.
+
+Post-M10.121 validation passed all 2,549 backend tests across 221 suites and all 111 dashboard tests across 19 files, plus formatting, lint, complete backend/dashboard builds, and whitespace checks. After restarting only the host API, a malformed live request returned `400` before wallet/provider access. No live provider quote was requested because the operator has not yet selected a BNB quantity.
+
 M10.120 is complete: the Agentic Wallet card no longer requires a separate balance-verification click. While the dashboard is visible, `GET /real-trading/funding-valuation` refreshes every 15 seconds, performs a fresh bounded approved-wallet read, loads Binance public BNB/USDT and USDT/BRL last prices, and uses exact decimal arithmetic to show BNB plus indicative USDT and BRL equivalents.
 
 Reusable monetary tooltips now show BRL for USDT values and both USDT and BRL for non-USDT crypto values when the required current prices are available. Invalid or missing prices withhold the conversion instead of guessing. These are last-price observations, not executable quotes; the route reveals no address and grants no funding, conversion, accounting, signing, submission, executor, or real-order authority.

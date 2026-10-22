@@ -1,5 +1,9 @@
 # Dashboard
 
+## M10.121 manual funding-conversion quote
+
+The real-wallet panel includes a blank manual BNB quantity field and a “Preview quote only” action. It shows expected/minimum USDT and BNB remaining only after the operator requests a quote. The panel warns that provider cost coverage is partial, gas sufficiency is unverified, the quote expires quickly, and no conversion is authorized. Changing the input clears the prior preview; automatic dashboard refresh never requests another quote.
+
 ## M10.120 automatic monetary valuation
 
 The real-wallet card is loaded with the ordinary dashboard snapshot and refreshed every 15 seconds while the page is visible. It displays exact reported BNB and indicative USDT/BRL equivalents without a separate verification button. Monetary values expose native browser tooltips backed by available Binance conversion evidence; missing evidence leaves the value visible without inventing a conversion. Tooltip calculations use `decimal.js`, while display formatting is presentational.

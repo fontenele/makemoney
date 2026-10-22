@@ -4,6 +4,7 @@ import {
   loadDashboard,
   observeAgenticWallet,
   prepareAgenticWalletFunding,
+  quoteAgenticWalletFundingConversion,
   verifyAgenticWalletFunding,
   loadAgenticWalletAuthentication,
   startAgenticWalletAuthentication,
@@ -741,6 +742,75 @@ describe('Agentic Wallet funding verification', () => {
       '/api/real-trading/funding-verification',
       { method: 'POST', headers: { Accept: 'application/json' } },
     );
+  });
+});
+
+describe('Agentic Wallet funding conversion quote', () => {
+  it('requests only a manual non-executable BNB-to-USDT quote', async () => {
+    const quote = {
+      scope: 'agentic_wallet_funding_conversion_quote',
+      status: 'quote_available',
+      blockers: [],
+      balanceObservedAt: '2026-10-22T12:00:00.000Z',
+      walletBalanceBnb: '0.00975323',
+      requestedQuantityBnb: '0.008',
+      remainingQuantityBnb: '0.00175323',
+      gasReserveSufficiency: 'unverified',
+      quote: {
+        provider: 'agentic_wallet',
+        sourceQuantityBnb: '0.008',
+        expectedUsdt: '5.92',
+        minimumUsdt: '5.8904',
+        observedSlippageRate: '0.005',
+        maximumSlippageRate: '0.005',
+        quotedAt: '2026-10-22T12:00:01.000Z',
+        expiresAt: '2026-10-22T12:00:06.000Z',
+        costCoverage: 'partial',
+        executable: false,
+      },
+      providerCallStarted: true,
+      automaticRefresh: false,
+      conversionAuthorized: false,
+      submissionAuthorized: false,
+    };
+    const request = vi.fn(() => Promise.resolve(Response.json(quote)));
+
+    await expect(
+      quoteAgenticWalletFundingConversion('0.008', request),
+    ).resolves.toEqual({ status: 'available', data: quote });
+    expect(request).toHaveBeenCalledWith(
+      '/api/real-trading/funding-conversion-quote',
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sourceQuantityBnb: '0.008' }),
+      },
+    );
+  });
+
+  it('preserves a validation error without retrying', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json(
+          {
+            message:
+              'sourceQuantityBnb must be one canonical positive decimal string',
+          },
+          { status: 400 },
+        ),
+      ),
+    );
+    await expect(
+      quoteAgenticWalletFundingConversion('invalid', request),
+    ).resolves.toEqual({
+      status: 'unavailable',
+      message:
+        'sourceQuantityBnb must be one canonical positive decimal string',
+    });
+    expect(request).toHaveBeenCalledTimes(1);
   });
 });
 

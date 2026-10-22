@@ -1,4 +1,6 @@
 import {
+  BadRequestException,
+  Body,
   Controller,
   Get,
   HttpCode,
@@ -7,12 +9,17 @@ import {
 } from '@nestjs/common';
 import { RealTradingStatusService } from '../application/real-trading-status.service';
 import { AgenticWalletAuthenticationService } from '../application/agentic-wallet-authentication.service';
+import {
+  AgenticWalletFundingConversionQuoteService,
+  InvalidFundingConversionQuoteRequestError,
+} from '../application/agentic-wallet-funding-conversion-quote.service';
 
 @Controller('real-trading')
 export class RealTradingController {
   constructor(
     private readonly status: RealTradingStatusService,
     private readonly authentication: AgenticWalletAuthenticationService,
+    private readonly fundingConversionQuote: AgenticWalletFundingConversionQuoteService,
   ) {}
 
   @Get('status')
@@ -63,6 +70,21 @@ export class RealTradingController {
     } catch {
       throw new ServiceUnavailableException(
         'Agentic Wallet funding valuation is unavailable',
+      );
+    }
+  }
+
+  @Post('funding-conversion-quote')
+  @HttpCode(200)
+  async quoteFundingConversion(@Body() body: unknown) {
+    try {
+      return await this.fundingConversionQuote.load(body);
+    } catch (error) {
+      if (error instanceof InvalidFundingConversionQuoteRequestError) {
+        throw new BadRequestException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet funding conversion quote is unavailable',
       );
     }
   }

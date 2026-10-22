@@ -459,6 +459,58 @@ h1 em {
   color: var(--red);
 }
 
+.wallet-conversion-quote {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.35fr) auto;
+  align-items: end;
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.wallet-conversion-quote strong,
+.wallet-conversion-quote label {
+  font-size: 13px;
+}
+
+.wallet-conversion-quote p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.wallet-conversion-quote label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+}
+
+.wallet-conversion-quote input {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--ink);
+  font: inherit;
+}
+
+.wallet-conversion-quote button {
+  padding: 10px 14px;
+  border: 1px solid var(--green);
+  border-radius: 3px;
+  color: var(--green-bright);
+  background: transparent;
+  font-size: 11px;
+}
+
+.wallet-conversion-quote button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .wallet-observation button {
   flex: 0 0 auto;
   padding: 10px 14px;
@@ -2598,6 +2650,11 @@ footer {
   .wallet-observation {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .wallet-conversion-quote {
+    grid-template-columns: 1fr;
+    align-items: stretch;
   }
 
   .metric-card {

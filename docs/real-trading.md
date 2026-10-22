@@ -1,5 +1,13 @@
 # Real Trading
 
+## M10.121 — Manual BNB-to-USDT funding-conversion quote
+
+`POST /real-trading/funding-conversion-quote` accepts exactly `{ "sourceQuantityBnb": "<canonical positive decimal>" }`. Before provider access it performs a fresh M10.119 wallet verification, requires reported native BNB, loads the configured maximum slippage, and requires the requested quantity to be strictly less than the wallet balance. The route is manual and never participates in dashboard auto-refresh.
+
+The dedicated adapter invokes only `baw market-order quote` for chain 56, from official native BNB sentinel `0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE` to approved BSC USDT `0x55d398326f99059fF775485246999027B3197955`. It validates exact returned symbols, source quantity, positive target quantity, and observed slippage before returning a short-lived non-executable preview.
+
+The quote reports partial cost coverage: expected/minimum USDT and a positive BNB remainder do not establish the final network fee or sufficient gas. There is deliberately no `market-order swap` wiring, amount default, automatic quote refresh, conversion authorization, signing, submission, or real order. A future mutating conversion would require an independently reviewed gas boundary and explicit operator confirmation immediately before the command.
+
 ## M10.120 — Automatic funded-wallet valuation
 
 `GET /real-trading/funding-valuation` is a loopback-only read used by the dashboard's existing 15-second visible-page refresh. It performs the same bounded approved-asset wallet verification as M10.119, requires reported native BNB, then obtains public Binance BNB/USDT and USDT/BRL last prices. Exact decimal multiplication produces the BNB balance's indicative USDT and BRL values together with separate wallet and price observation times.

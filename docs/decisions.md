@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-22 — Separate funding-conversion quotes from swaps and strategy quotes
+
+The funded wallet currently holds native BNB while the approved BTC/USDT strategy requires BSC USDT. Extending the existing BTCB/USDT strategy quote adapter to accept BNB would weaken its exact-instrument boundary, and choosing a conversion amount automatically would make an unapproved capital-allocation decision.
+
+M10.121 therefore uses a dedicated BNB→USDT quote adapter and the official native-token sentinel. The operator must supply the exact BNB quantity each time; no value is prefilled or refreshed. A fresh wallet read must show more BNB than requested, but the positive remainder is not claimed to be sufficient for gas because the provider quote has partial cost coverage. The route can invoke only `market-order quote`; no swap command is registered or reachable.
+
 ## 2026-10-21 — Keep automatic wallet valuation observable and non-executable
 
 The operator wants the funded balance continuously visible in BNB, USDT, and BRL and wants monetary values to expose conversions without an extra verification action. Reusing an executable swap quote would unnecessarily cross the current financial safety boundary, while browser floating-point conversion could introduce monetary drift.

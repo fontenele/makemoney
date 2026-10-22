@@ -10,6 +10,9 @@ import {
 } from './infrastructure/agentic-wallet-authentication.adapter';
 import { ConfigService } from '@nestjs/config';
 import { BinanceFundingValuationPriceClient } from './infrastructure/binance-funding-valuation-price.client';
+import { AgenticWalletFundingConversionQuoteService } from './application/agentic-wallet-funding-conversion-quote.service';
+import { AgenticWalletFundingConversionQuoteAdapter } from './infrastructure/agentic-wallet-funding-conversion-quote.adapter';
+import { AgenticWalletQuoteCliProcessRunner } from './infrastructure/agentic-wallet-quote-cli-process-runner';
 
 @Module({
   controllers: [RealTradingController],
@@ -38,6 +41,14 @@ import { BinanceFundingValuationPriceClient } from './infrastructure/binance-fun
         ),
     },
     RealTradingStatusService,
+    {
+      provide: AgenticWalletFundingConversionQuoteAdapter,
+      useFactory: () =>
+        new AgenticWalletFundingConversionQuoteAdapter(
+          new AgenticWalletQuoteCliProcessRunner(10000),
+        ),
+    },
+    AgenticWalletFundingConversionQuoteService,
   ],
 })
 export class RealTradingModule {}

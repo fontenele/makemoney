@@ -5,6 +5,7 @@ import {
   loadAgenticWalletAuthentication,
   observeAgenticWallet,
   prepareAgenticWalletFunding,
+  quoteAgenticWalletFundingConversion,
   startAgenticWalletAuthentication,
   loadListingPerformance,
   loadPolymarketEventDetails,
@@ -17,6 +18,7 @@ import {
   type DashboardSnapshot,
   type AgenticWalletObservation,
   type AgenticWalletFundingReadiness,
+  type AgenticWalletFundingConversionQuote,
   type AgenticWalletAuthenticationState,
   type DetectedSpotSymbol,
   type ListingPerformance,
@@ -79,6 +81,10 @@ const agenticWalletObservationLoading = ref(false);
 const agenticWalletFundingReadiness =
   ref<Resource<AgenticWalletFundingReadiness> | null>(null);
 const agenticWalletFundingReadinessLoading = ref(false);
+const agenticWalletFundingConversionQuantity = ref('');
+const agenticWalletFundingConversionQuote =
+  ref<Resource<AgenticWalletFundingConversionQuote> | null>(null);
+const agenticWalletFundingConversionQuoteLoading = ref(false);
 const agenticWalletFundingQrCode = ref<string | null>(null);
 const agenticWalletFundingQrCodeError = ref(false);
 const agenticWalletAuthentication =
@@ -516,6 +522,19 @@ async function prepareFundingInstructions(): Promise<void> {
     }
   } finally {
     agenticWalletFundingReadinessLoading.value = false;
+  }
+}
+
+async function previewFundingConversion(): Promise<void> {
+  if (agenticWalletFundingConversionQuoteLoading.value) return;
+  agenticWalletFundingConversionQuoteLoading.value = true;
+  try {
+    agenticWalletFundingConversionQuote.value =
+      await quoteAgenticWalletFundingConversion(
+        agenticWalletFundingConversionQuantity.value.trim(),
+      );
+  } finally {
+    agenticWalletFundingConversionQuoteLoading.value = false;
   }
 }
 
@@ -1017,6 +1036,166 @@ onUnmounted(() => {
                     ? snapshot.fundingValuation.message
                     : 'Automatic wallet valuation is unavailable'
                 }}
+              </p>
+            </div>
+
+            <form
+              class="wallet-conversion-quote"
+              @submit.prevent="previewFundingConversion"
+            >
+              <div>
+                <strong>BNB → USDT quote preview</strong>
+                <p>
+                  Enter the BNB quantity yourself. This performs one manual,
+                  non-executable quote and never converts funds. The quantity
+                  must be below the wallet balance so some BNB remains, but gas
+                  sufficiency is still unverified.
+                </p>
+              </div>
+              <label>
+                <span>BNB quantity</span>
+                <input
+                  v-model="agenticWalletFundingConversionQuantity"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Example: 0.008"
+                  aria-label="BNB quantity for conversion quote"
+                  @input="agenticWalletFundingConversionQuote = null"
+                />
+              </label>
+              <button
+                type="submit"
+                :disabled="
+                  agenticWalletFundingConversionQuoteLoading ||
+                  agenticWalletFundingConversionQuantity.trim().length === 0
+                "
+              >
+                {{
+                  agenticWalletFundingConversionQuoteLoading
+                    ? 'Loading quote…'
+                    : 'Preview quote only'
+                }}
+              </button>
+            </form>
+
+            <div
+              v-if="agenticWalletFundingConversionQuote"
+              class="wallet-funding-instructions"
+              aria-live="polite"
+            >
+              <template
+                v-if="
+                  agenticWalletFundingConversionQuote.status === 'available' &&
+                  agenticWalletFundingConversionQuote.data.status ===
+                    'quote_available' &&
+                  agenticWalletFundingConversionQuote.data.quote !== null
+                "
+              >
+                <strong>Temporary quote — no conversion authorized</strong>
+                <dl class="wallet-status-grid">
+                  <div>
+                    <dt>Spend</dt>
+                    <dd
+                      :title="
+                        moneyTooltip(
+                          agenticWalletFundingConversionQuote.data.quote
+                            .sourceQuantityBnb,
+                          'BNB',
+                        )
+                      "
+                    >
+                      {{
+                        agenticWalletFundingConversionQuote.data.quote
+                          .sourceQuantityBnb
+                      }}
+                      BNB
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Expected</dt>
+                    <dd
+                      :title="
+                        moneyTooltip(
+                          agenticWalletFundingConversionQuote.data.quote
+                            .expectedUsdt,
+                          'USDT',
+                        )
+                      "
+                    >
+                      {{
+                        decimal(
+                          agenticWalletFundingConversionQuote.data.quote
+                            .expectedUsdt,
+                          4,
+                        )
+                      }}
+                      USDT
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Minimum after slippage</dt>
+                    <dd
+                      :title="
+                        moneyTooltip(
+                          agenticWalletFundingConversionQuote.data.quote
+                            .minimumUsdt,
+                          'USDT',
+                        )
+                      "
+                    >
+                      {{
+                        decimal(
+                          agenticWalletFundingConversionQuote.data.quote
+                            .minimumUsdt,
+                          4,
+                        )
+                      }}
+                      USDT
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>BNB left</dt>
+                    <dd
+                      :title="
+                        moneyTooltip(
+                          agenticWalletFundingConversionQuote.data
+                            .remainingQuantityBnb,
+                          'BNB',
+                        )
+                      "
+                    >
+                      {{
+                        agenticWalletFundingConversionQuote.data
+                          .remainingQuantityBnb
+                      }}
+                      BNB
+                    </dd>
+                  </div>
+                </dl>
+                <p class="wallet-policy-warning">
+                  Partial cost coverage: the provider quote does not prove the
+                  final network fee or that the remaining BNB is sufficient for
+                  gas. It expires
+                  {{
+                    timestamp(
+                      agenticWalletFundingConversionQuote.data.quote.expiresAt,
+                    )
+                  }}.
+                </p>
+              </template>
+              <p
+                v-else-if="
+                  agenticWalletFundingConversionQuote.status === 'available'
+                "
+                class="wallet-policy-warning"
+              >
+                Quote blocked:
+                {{
+                  agenticWalletFundingConversionQuote.data.blockers.join(', ')
+                }}
+              </p>
+              <p v-else class="wallet-policy-warning">
+                {{ agenticWalletFundingConversionQuote.message }}
               </p>
             </div>
 
