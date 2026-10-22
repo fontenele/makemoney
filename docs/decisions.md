@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-10-22 - Separate provider completion from financial reconciliation
+
+A `FINISHED` provider status and transaction hash establish terminal provider evidence but not the actual USDT credited or complete fees paid. M10.131 therefore validates terminal order evidence while keeping financial reconciliation explicitly required and incomplete. Runtime status polling and durable observations remain prerequisites before exposing submission.
+
 ## 2026-10-22 - Prove submission orchestration before runtime exposure
 
 The mutable sequence has several failure boundaries that cannot be made safe by a controller alone. M10.130 first composes and tests the whole sequence as an unregistered service: runtime gates and emergency stop, fresh quote, durable consumption, one provider invocation, and durable outcome. Runtime registration remains deferred until terminal status reconciliation exists and the operator separately approves activation.

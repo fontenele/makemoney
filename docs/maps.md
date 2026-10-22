@@ -2,6 +2,8 @@
 
 Use this keyword map to locate context before changing code. Read the listed documentation and files for the relevant keyword.
 
+- **Funding-conversion terminal-status assessment, M10.131:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the pure assessor and tests are in `../src/modules/real-trading/infrastructure/agentic-wallet-funding-conversion-status-response.ts`. It correlates the complete order payload and leaves even `FINISHED` financially unreconciled.
+
 - **One-shot funding-conversion submission coordinator, M10.130:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the unregistered coordinator and double-only tests are in `../src/modules/real-trading/application/agentic-wallet-funding-conversion-submission.service.ts`. It composes fresh quote, current gates, emergency stop, durable consumption, at-most-once runner invocation, and outcome persistence without any runtime path.
 
 - **Exact fresh-quote funding-conversion claim correlation, M10.129:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the claim contract and Prisma implementation are in the M10.127 files, with source quantity and slippage added to `../prisma/`. Exact decimal equality prevents quote evidence from another quantity or slippage policy from consuming a plan.

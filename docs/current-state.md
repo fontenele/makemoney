@@ -1,5 +1,9 @@
 # Current State
 
+M10.131 is complete: a pure funding-conversion status assessor now validates the exact response expected from a future read-only order lookup. It correlates provider order identity, BSC chain, native BNB-to-USDT direction and symbols, source quantity, slippage, provider chronology, terminal state, and EVM transaction hash.
+
+`PENDING` remains pending, `FAILED` becomes terminal without retry, and `FINISHED` requires a transaction hash but explicitly keeps financial reconciliation incomplete. Eleven focused tests and the backend lint/build pass. The assessor has no store, runner, route, or runtime registration, and no provider call or financial transaction occurred.
+
 M10.130 is complete: an unregistered application coordinator now composes the complete prospective submission sequence. It validates an exact request, checks all runtime approvals and the emergency stop, obtains a new non-expired quote, rechecks the gates, atomically consumes the plan, builds only the pinned BNB-to-USDT command, calls the runner at most once, and persists either pending acknowledgment or unknown outcome.
 
 Claim replay stops before provider access. A thrown provider call is converted into a durable unknown, non-retryable outcome rather than retried or reported as success. Focused tests use doubles for every provider and persistence dependency; lint, formatting, and backend build pass. The coordinator, runner, claim store, and outcome store remain absent from NestJS registration, so no API/dashboard path and no real transaction exist.

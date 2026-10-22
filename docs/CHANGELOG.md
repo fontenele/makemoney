@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-22 — Validate funding-conversion terminal status
+
+- Added pure validation for one exact Agentic Wallet funding-conversion order lookup.
+- Correlated order identity, BSC BNB-to-USDT payload, quantity, slippage, chronology, status, and hash.
+- Kept `FINISHED` separate from financial reconciliation and forbade submission retry in every state.
+- Added focused tests without adding a runner, route, provider call, or transaction.
+
 ## 2026-10-22 — Compose guarded one-shot funding conversion
 
 - Added an unregistered coordinator for runtime gates, emergency stop, fresh quote, durable claim, one runner call, and durable outcome.

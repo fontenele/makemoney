@@ -1,5 +1,19 @@
 # Real Trading
 
+## M10.131 — Funding-conversion terminal-status assessment
+
+M10.131 adds a pure funding-specific assessor for the read-only `market-order list --orderId` response. It requires one exact order, correlates the order identity, BSC chain, native BNB-to-USDT direction, symbols, source quantity, and slippage, and validates provider status, chronology, and transaction hash.
+
+`PENDING` remains non-terminal. `FAILED` is terminal and non-retryable. `FINISHED` requires a canonical EVM transaction hash but still leaves financial reconciliation incomplete; it does not prove the USDT receipt or fees.
+
+### M10.131 acceptance criteria
+
+- Only `PENDING`, `FINISHED`, and `FAILED` provider states are accepted.
+- Order identity and the complete BNB-to-USDT payload must match exactly.
+- Invalid chronology and hashes fail closed; `FINISHED` requires a transaction hash.
+- Every valid observation forbids submission retry and requires financial reconciliation.
+- The assessor has no persistence, runner, route, module registration, or provider access.
+
 ## M10.130 — One-shot funding-conversion submission coordinator
 
 M10.130 composes the guarded submission sequence behind an unregistered application service. It strictly parses one exact plan/fingerprint/phrase/quantity request, requires all runtime activation settings, checks the emergency stop, obtains a fresh quote, rejects expired evidence, rechecks configuration and stop state, claims the plan durably, invokes the closed runner at most once, assesses the response, and persists the outcome.
