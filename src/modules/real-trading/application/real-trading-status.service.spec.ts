@@ -5,6 +5,7 @@ import {
   AgenticWalletCapabilityAdapter,
   AgenticWalletCapabilityObservation,
 } from '../infrastructure/agentic-wallet-capability.adapter';
+import { BinanceFundingValuationPriceClient } from '../infrastructure/binance-funding-valuation-price.client';
 
 describe('RealTradingStatusService', () => {
   beforeEach(() => {
@@ -20,6 +21,7 @@ describe('RealTradingStatusService', () => {
     const service = new RealTradingStatusService(
       config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
       wallet as unknown as AgenticWalletCapabilityAdapter,
+      fundingPrices(),
     );
 
     expect(service.getLocalStatus()).toMatchObject({
@@ -33,7 +35,7 @@ describe('RealTradingStatusService', () => {
         btc: { symbol: 'BTCB' },
         usdt: { symbol: 'USDT' },
       },
-      walletObservationMode: 'manual_read_only',
+      walletObservationMode: 'manual_and_dashboard_automatic_read_only',
       localRiskLimits: {
         scope: 'real_execution_local_risk_limits',
         status: 'blocked',
@@ -69,6 +71,7 @@ describe('RealTradingStatusService', () => {
     const service = new RealTradingStatusService(
       config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
       wallet as unknown as AgenticWalletCapabilityAdapter,
+      fundingPrices(),
     );
 
     const first = service.observeWallet();
@@ -129,6 +132,7 @@ describe('RealTradingStatusService', () => {
         REAL_RISK_MAX_SLIPPAGE_RATE: '0.005',
       }),
       wallet as unknown as AgenticWalletCapabilityAdapter,
+      fundingPrices(),
     );
 
     await expect(service.prepareFundingReadiness()).resolves.toMatchObject({
@@ -166,6 +170,7 @@ describe('RealTradingStatusService', () => {
     const service = new RealTradingStatusService(
       config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
       wallet as unknown as AgenticWalletCapabilityAdapter,
+      fundingPrices(),
     );
 
     await expect(service.prepareFundingReadiness()).resolves.toMatchObject({
@@ -193,6 +198,7 @@ describe('RealTradingStatusService', () => {
     const service = new RealTradingStatusService(
       config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
       wallet as unknown as AgenticWalletCapabilityAdapter,
+      fundingPrices(),
     );
 
     await expect(service.verifyFunding()).resolves.toEqual({
@@ -244,6 +250,7 @@ describe('RealTradingStatusService', () => {
     const service = new RealTradingStatusService(
       config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
       wallet as unknown as AgenticWalletCapabilityAdapter,
+      fundingPrices(),
     );
 
     await expect(service.verifyFunding()).resolves.toMatchObject({
@@ -255,6 +262,81 @@ describe('RealTradingStatusService', () => {
       quoteAuthorized: false,
       submissionAuthorized: false,
     });
+  });
+
+  it('values the automatically observed BNB balance in USDT and BRL exactly', async () => {
+    const observation = connectedObservation();
+    observation.addresses = [
+      { chainId: '56', address: '0x1234567890abcdef1234567890abcdef12345678' },
+    ];
+    observation.balances = [
+      {
+        chainId: '56',
+        tokenAddress: 'native-bnb',
+        symbol: 'BNB',
+        quantity: '0.00975323',
+      },
+    ];
+    const wallet = { load: jest.fn(() => Promise.resolve(observation)) };
+    const { client: prices, load: loadPrices } = fundingPricesMock();
+    const service = new RealTradingStatusService(
+      config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
+      wallet as unknown as AgenticWalletCapabilityAdapter,
+      prices,
+    );
+
+    await expect(service.loadFundingValuation()).resolves.toEqual({
+      scope: 'agentic_wallet_funding_valuation',
+      status: 'available',
+      blockers: [],
+      balanceObservedAt: new Date('2026-10-01T12:00:00.000Z'),
+      pricesObservedAt: new Date('2026-10-01T12:00:00.000Z'),
+      balance: {
+        quantityBnb: '0.00975323',
+        valueUsdt: '7.2387497737',
+        valueBrl: '36.51587323342965',
+      },
+      prices: {
+        provider: 'binance',
+        bnbUsdt: '742.19',
+        usdtBrl: '5.0445',
+      },
+      refreshMode: 'automatic_15_seconds_while_dashboard_visible',
+      valuationOnly: true,
+      fundingAuthorized: false,
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    });
+    expect(loadPrices).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not request Binance prices when BNB is not reported', async () => {
+    const observation = connectedObservation();
+    observation.balances = [
+      {
+        chainId: '56',
+        tokenAddress: '0x55d398326f99059ff775485246999027b3197955',
+        symbol: 'USDT',
+        quantity: '1',
+      },
+    ];
+    const wallet = { load: jest.fn(() => Promise.resolve(observation)) };
+    const { client: prices, load: loadPrices } = fundingPricesMock();
+    const service = new RealTradingStatusService(
+      config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
+      wallet as unknown as AgenticWalletCapabilityAdapter,
+      prices,
+    );
+
+    await expect(service.loadFundingValuation()).resolves.toMatchObject({
+      status: 'blocked',
+      blockers: ['bnb_not_reported'],
+      balance: null,
+      prices: null,
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    });
+    expect(loadPrices).not.toHaveBeenCalled();
   });
 });
 
@@ -332,5 +414,33 @@ function gasLevel() {
     maxPriorityFeePerGas: '0.05',
     tipAmount: null,
     waitTimeEstimateMs: 1000,
+  };
+}
+
+function fundingPrices(): BinanceFundingValuationPriceClient {
+  return {
+    load: jest.fn(() =>
+      Promise.resolve({
+        provider: 'binance' as const,
+        bnbUsdtPrice: '742.19',
+        usdtBrlPrice: '5.0445',
+        observedAt: new Date('2026-10-01T12:00:00.000Z'),
+      }),
+    ),
+  } as unknown as BinanceFundingValuationPriceClient;
+}
+
+function fundingPricesMock() {
+  const load = jest.fn(() =>
+    Promise.resolve({
+      provider: 'binance' as const,
+      bnbUsdtPrice: '742.19',
+      usdtBrlPrice: '5.0445',
+      observedAt: new Date('2026-10-01T12:00:00.000Z'),
+    }),
+  );
+  return {
+    client: { load } as unknown as BinanceFundingValuationPriceClient,
+    load,
   };
 }

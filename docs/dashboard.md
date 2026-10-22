@@ -1,5 +1,9 @@
 # Dashboard
 
+## M10.120 automatic monetary valuation
+
+The real-wallet card is loaded with the ordinary dashboard snapshot and refreshed every 15 seconds while the page is visible. It displays exact reported BNB and indicative USDT/BRL equivalents without a separate verification button. Monetary values expose native browser tooltips backed by available Binance conversion evidence; missing evidence leaves the value visible without inventing a conversion. Tooltip calculations use `decimal.js`, while display formatting is presentational.
+
 ## Visualization standard
 
 Apache ECharts is the dashboard's only chart library. New charts and material chart changes must use it instead of adding another charting package or hand-building SVG plots. Browser conversion of exact backend decimal strings remains presentational only.

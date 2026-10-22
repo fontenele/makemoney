@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-21 — Show automatic wallet valuation and conversion tooltips
+
+- Added loopback-only `GET /real-trading/funding-valuation`, combining a fresh approved-wallet BNB observation with Binance public BNB/USDT and USDT/BRL last prices using exact decimal arithmetic.
+- Replaced the dashboard's extra verification click with automatic 15-second visible-page refresh and persistent BNB, USDT, and BRL presentation.
+- Added reusable monetary tooltips for USDT, BRL, BNB, and BTC values when the necessary price evidence is available; missing evidence never produces a guessed conversion.
+- Kept the valuation indicative and read-only, exposed no wallet address, and added no funding, conversion, executable quote, signature, submission, executor, or order authority.
+- Verified all 2,533 backend tests across 219 suites and all 109 dashboard tests across 19 files, plus formatting, lint, complete backend/dashboard builds, and whitespace checks.
+- Restarted only the host API and live-verified `0.00975323` BNB as `7.232020045` USDT / `36.4877107330385` BRL, with all financial authorization flags false.
+
 ## 2026-10-21 — Verify approved holdings after manual funding
 
 - Added an explicit loopback-only post-funding wallet read for native BNB and the exact approved BSC USDT/BTCB contracts.

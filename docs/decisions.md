@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-21 — Keep automatic wallet valuation observable and non-executable
+
+The operator wants the funded balance continuously visible in BNB, USDT, and BRL and wants monetary values to expose conversions without an extra verification action. Reusing an executable swap quote would unnecessarily cross the current financial safety boundary, while browser floating-point conversion could introduce monetary drift.
+
+M10.120 therefore adds one read-only valuation route that combines the existing bounded approved-wallet observation with Binance public BNB/USDT and USDT/BRL last prices. The backend performs the wallet valuation with exact decimals; dashboard tooltips also use `decimal.js` and appear only when all required price evidence exists. The 15-second refresh runs only while the dashboard is visible. Last prices are explicitly indicative rather than executable, and all funding, quote, signature, submission, and execution authorization remains false.
+
 ## 2026-10-21 — Verify the funded wallet without assuming omitted balances are zero
 
 The operator chose to use only the deposited BNB and add no more capital. The provider's bounded balance response may omit assets rather than return explicit zero rows, so treating absent USDT or BTCB as zero would create stronger evidence than the wallet supplied. Exposing every observed token would also broaden the local financial surface beyond the approved instrument.

@@ -505,7 +505,7 @@ export interface RealTradingStatus {
     };
     decision: 'approved_candidate';
   };
-  walletObservationMode: 'manual_read_only';
+  walletObservationMode: 'manual_and_dashboard_automatic_read_only';
   localRiskLimits: {
     scope: 'real_execution_local_risk_limits';
     status: 'defined' | 'blocked';
@@ -617,6 +617,29 @@ export interface AgenticWalletFundingVerification {
   submissionAuthorized: false;
 }
 
+export interface AgenticWalletFundingValuation {
+  scope: 'agentic_wallet_funding_valuation';
+  status: 'available' | 'blocked';
+  blockers: string[];
+  balanceObservedAt: string;
+  pricesObservedAt: string | null;
+  balance: {
+    quantityBnb: string;
+    valueUsdt: string;
+    valueBrl: string;
+  } | null;
+  prices: {
+    provider: 'binance';
+    bnbUsdt: string;
+    usdtBrl: string;
+  } | null;
+  refreshMode: 'automatic_15_seconds_while_dashboard_visible';
+  valuationOnly: true;
+  fundingAuthorized: false;
+  quoteAuthorized: false;
+  submissionAuthorized: false;
+}
+
 export interface AgenticWalletAuthenticationState {
   scope: 'agentic_wallet_authentication';
   status:
@@ -644,6 +667,7 @@ export interface DashboardSnapshot {
   strategySignals: Resource<StrategySignal[]>;
   backtestRuns: Resource<StoredBacktestRun[]>;
   realTradingStatus: Resource<RealTradingStatus>;
+  fundingValuation: Resource<AgenticWalletFundingValuation>;
   polymarketSettings: Resource<PolymarketSettings>;
   polymarketDataFreshness: Resource<PolymarketDataFreshness>;
   polymarketGlobalOpenInterest: Resource<PolymarketGlobalOpenInterest>;
@@ -695,6 +719,7 @@ export async function loadDashboard(
     strategySignals,
     backtestRuns,
     realTradingStatus,
+    fundingValuation,
   ] = await Promise.all([
     loadResource<HealthResponse>(dashboardApiPath('/health'), request),
     loadResource<PortfolioValuation>(
@@ -729,6 +754,10 @@ export async function loadDashboard(
       dashboardApiPath('/real-trading/status'),
       request,
     ),
+    loadResource<AgenticWalletFundingValuation>(
+      dashboardApiPath('/real-trading/funding-valuation'),
+      request,
+    ),
   ]);
   const polymarketSettings = await polymarketSettingsPromise;
   const polymarketResources =
@@ -751,6 +780,7 @@ export async function loadDashboard(
     strategySignals,
     backtestRuns,
     realTradingStatus,
+    fundingValuation,
     polymarketSettings,
     ...polymarketResources,
     loadedAt: new Date().toISOString(),

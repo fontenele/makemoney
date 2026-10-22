@@ -1,5 +1,11 @@
 # Current State
 
+M10.120 is complete: the Agentic Wallet card no longer requires a separate balance-verification click. While the dashboard is visible, `GET /real-trading/funding-valuation` refreshes every 15 seconds, performs a fresh bounded approved-wallet read, loads Binance public BNB/USDT and USDT/BRL last prices, and uses exact decimal arithmetic to show BNB plus indicative USDT and BRL equivalents.
+
+Reusable monetary tooltips now show BRL for USDT values and both USDT and BRL for non-USDT crypto values when the required current prices are available. Invalid or missing prices withhold the conversion instead of guessing. These are last-price observations, not executable quotes; the route reveals no address and grants no funding, conversion, accounting, signing, submission, executor, or real-order authority.
+
+Post-M10.120 validation passed all 2,533 backend tests across 219 suites and all 109 dashboard tests across 19 files, plus formatting, lint, complete backend/dashboard builds, and whitespace checks. After restarting only the host API, the live route reported `0.00975323` BNB, `7.232020045` USDT, and `36.4877107330385` BRL from public prices `741.50000000` BNB/USDT and `5.04530000` USDT/BRL, with every financial authorization false.
+
 M10.119 is complete: the loopback dashboard can explicitly verify the wallet after manual funding and display only exact provider-reported native BNB and approved BSC USDT/BTCB quantities. Missing approved tokens remain explicitly not reported, while unsupported assets, identity ambiguity, empty or unavailable balance evidence, unavailable gas, disconnection, or chain/address absence block verification. The current-wallet-only policy requires no additional deposit, but BNB without reported USDT is identified as requiring a separately confirmed conversion before it could fund a BTC/USDT buy.
 
 The verification reveals no wallet address or unsupported asset identity, performs no BRL valuation or conversion, and grants no funding, accounting initialization, quote, signature, submission, executor, or real-order authority. Real trading remains disabled.

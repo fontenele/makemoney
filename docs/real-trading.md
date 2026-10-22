@@ -1,5 +1,13 @@
 # Real Trading
 
+## M10.120 — Automatic funded-wallet valuation
+
+`GET /real-trading/funding-valuation` is a loopback-only read used by the dashboard's existing 15-second visible-page refresh. It performs the same bounded approved-asset wallet verification as M10.119, requires reported native BNB, then obtains public Binance BNB/USDT and USDT/BRL last prices. Exact decimal multiplication produces the BNB balance's indicative USDT and BRL values together with separate wallet and price observation times.
+
+Malformed, missing, duplicate, non-positive, or unsuccessful public price responses fail closed. Wallet blockers are returned before requesting prices, and no omitted token is inferred to be zero. The dashboard uses the same available rates for monetary-value tooltips: USDT shows BRL, BRL shows USDT, and BTC or BNB shows both when its asset/USDT price is available.
+
+The public last price is not a swap quote and includes no fee, spread, slippage, liquidity, minimum-order, or network-cost promise. This milestone adds no transfer, conversion, executable quote, signing, accounting mutation, submission, executor, or real order; all authorization flags remain false.
+
 ## M10.119 — Post-funding approved-balance verification
 
 `POST /real-trading/funding-verification` is an explicit loopback-only read after an operator-managed deposit. It performs one fresh pinned-CLI BSC observation and reports only native BNB plus the exact approved USDT and BTCB contract holdings. A token omitted by the provider remains `not_reported`; the application does not turn absence from the provider's bounded balance response into a proven zero.

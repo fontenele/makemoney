@@ -5,7 +5,6 @@ import {
   loadAgenticWalletAuthentication,
   observeAgenticWallet,
   prepareAgenticWalletFunding,
-  verifyAgenticWalletFunding,
   startAgenticWalletAuthentication,
   loadListingPerformance,
   loadPolymarketEventDetails,
@@ -18,7 +17,6 @@ import {
   type DashboardSnapshot,
   type AgenticWalletObservation,
   type AgenticWalletFundingReadiness,
-  type AgenticWalletFundingVerification,
   type AgenticWalletAuthenticationState,
   type DetectedSpotSymbol,
   type ListingPerformance,
@@ -60,6 +58,7 @@ import { buildPolymarketResolutionContextRows } from './polymarket-resolution-co
 import { verifyPolymarketResolutionIdentity } from './polymarket-resolution-identity';
 import { walletExpiryCountdown } from './wallet-session-expiry';
 import { buildWalletAddressQrCode } from './wallet-address-qr';
+import { buildMonetaryTooltip, type MonetaryAsset } from './monetary-tooltip';
 import DashboardChart from './DashboardChart.vue';
 import {
   dashboardRouteFromHash,
@@ -80,9 +79,6 @@ const agenticWalletObservationLoading = ref(false);
 const agenticWalletFundingReadiness =
   ref<Resource<AgenticWalletFundingReadiness> | null>(null);
 const agenticWalletFundingReadinessLoading = ref(false);
-const agenticWalletFundingVerification =
-  ref<Resource<AgenticWalletFundingVerification> | null>(null);
-const agenticWalletFundingVerificationLoading = ref(false);
 const agenticWalletFundingQrCode = ref<string | null>(null);
 const agenticWalletFundingQrCodeError = ref(false);
 const agenticWalletAuthentication =
@@ -523,16 +519,6 @@ async function prepareFundingInstructions(): Promise<void> {
   }
 }
 
-async function verifyFundingBalance(): Promise<void> {
-  if (agenticWalletFundingVerificationLoading.value) return;
-  agenticWalletFundingVerificationLoading.value = true;
-  try {
-    agenticWalletFundingVerification.value = await verifyAgenticWalletFunding();
-  } finally {
-    agenticWalletFundingVerificationLoading.value = false;
-  }
-}
-
 async function beginAgenticWalletAuthentication(): Promise<void> {
   if (agenticWalletAuthenticationLoading.value) return;
   agenticWalletAuthenticationLoading.value = true;
@@ -581,6 +567,35 @@ function decimal(value: string | null | undefined, digits = 2): string {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(parsed);
+}
+
+function brl(value: string | null | undefined): string {
+  if (value === null || value === undefined) return '—';
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return '—';
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(parsed);
+}
+
+function moneyTooltip(
+  value: string | null | undefined,
+  asset: MonetaryAsset,
+): string | undefined {
+  const funding = snapshot.value?.fundingValuation;
+  const prices =
+    funding?.status === 'available' && funding.data.status === 'available'
+      ? funding.data.prices
+      : null;
+  const valuation = snapshot.value?.valuation;
+  return buildMonetaryTooltip(value, asset, {
+    bnbUsdt: prices?.bnbUsdt,
+    btcUsdt: valuation?.status === 'available' ? valuation.data.btcPrice : null,
+    usdtBrl: prices?.usdtBrl,
+  });
 }
 
 function signed(value: string | null | undefined): string {
@@ -743,7 +758,12 @@ onUnmounted(() => {
           <article class="metric-card featured">
             <span class="metric-label">Fictional paper portfolio</span>
             <template v-if="available(snapshot?.valuation)">
-              <strong class="metric-value">
+              <strong
+                class="metric-value"
+                :title="
+                  moneyTooltip(snapshot.valuation.data.totalValue, 'USDT')
+                "
+              >
                 {{ decimal(snapshot.valuation.data.totalValue) }}
                 <small>USDT</small>
               </strong>
@@ -763,10 +783,17 @@ onUnmounted(() => {
               <strong
                 class="metric-value compact"
                 :class="tone(snapshot.position.data.totalPnl)"
+                :title="moneyTooltip(snapshot.position.data.totalPnl, 'USDT')"
               >
                 {{ signed(snapshot.position.data.totalPnl) }}
               </strong>
-              <p>Realized {{ signed(snapshot.position.data.realizedPnl) }}</p>
+              <p
+                :title="
+                  moneyTooltip(snapshot.position.data.realizedPnl, 'USDT')
+                "
+              >
+                Realized {{ signed(snapshot.position.data.realizedPnl) }}
+              </p>
             </template>
             <p v-else class="empty-state">
               {{ snapshot?.position.message ?? 'Loading position…' }}
@@ -897,83 +924,101 @@ onUnmounted(() => {
               </button>
             </div>
 
-            <div class="wallet-observation wallet-funding">
-              <div>
-                <strong>Verify deposited balance</strong>
-                <p>
-                  Reads only the approved BSC holdings reported by the wallet.
-                  It cannot convert BNB, request a quote, or submit an order.
-                </p>
-              </div>
-              <button
-                type="button"
-                :disabled="agenticWalletFundingVerificationLoading"
-                @click="verifyFundingBalance"
-              >
-                {{
-                  agenticWalletFundingVerificationLoading
-                    ? 'Verifying balance...'
-                    : 'Verify deposited balance'
-                }}
-              </button>
-            </div>
-
-            <template
-              v-if="agenticWalletFundingVerification?.status === 'available'"
-            >
-              <div
+            <div class="wallet-funding-instructions" aria-live="polite">
+              <template
                 v-if="
-                  agenticWalletFundingVerification.data.status ===
-                  'funds_observed'
+                  available(snapshot.fundingValuation) &&
+                  snapshot.fundingValuation.data.status === 'available' &&
+                  snapshot.fundingValuation.data.balance !== null
                 "
-                class="wallet-funding-instructions"
               >
-                <strong>Current approved BSC holdings</strong>
+                <strong>Current Agentic Wallet balance</strong>
                 <dl class="wallet-status-grid">
-                  <div
-                    v-for="asset in agenticWalletFundingVerification.data
-                      .assets"
-                    :key="asset.symbol"
-                  >
-                    <dt>{{ asset.symbol }}</dt>
-                    <dd>
+                  <div>
+                    <dt>BNB</dt>
+                    <dd
+                      :title="
+                        moneyTooltip(
+                          snapshot.fundingValuation.data.balance.quantityBnb,
+                          'BNB',
+                        )
+                      "
+                    >
+                      {{ snapshot.fundingValuation.data.balance.quantityBnb }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Equivalent in USDT</dt>
+                    <dd
+                      :title="
+                        moneyTooltip(
+                          snapshot.fundingValuation.data.balance.valueUsdt,
+                          'USDT',
+                        )
+                      "
+                    >
                       {{
-                        asset.reportStatus === 'reported'
-                          ? asset.quantity
-                          : 'Not reported'
+                        decimal(
+                          snapshot.fundingValuation.data.balance.valueUsdt,
+                          2,
+                        )
                       }}
+                      USDT
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Equivalent in BRL</dt>
+                    <dd
+                      :title="
+                        moneyTooltip(
+                          snapshot.fundingValuation.data.balance.valueBrl,
+                          'BRL',
+                        )
+                      "
+                    >
+                      {{ brl(snapshot.fundingValuation.data.balance.valueBrl) }}
                     </dd>
                   </div>
                 </dl>
-                <p
-                  v-if="
-                    agenticWalletFundingVerification.data
-                      .conversionRequiredForBuyCapital
-                  "
-                  class="wallet-policy-warning"
-                >
-                  Only BNB capital is currently reported. The BTC/USDT strategy
-                  needs USDT, so a separately confirmed conversion would be
-                  required while retaining BNB for network gas.
-                </p>
                 <p class="wallet-policy-note">
-                  Additional funding is not required. Quote and submission
-                  remain disabled.
+                  Binance public prices: 1 BNB =
+                  {{ snapshot.fundingValuation.data.prices?.bnbUsdt }} USDT and
+                  1 USDT =
+                  {{ snapshot.fundingValuation.data.prices?.usdtBrl }} BRL.
+                  Balance and prices refresh every 15 seconds while this
+                  dashboard is visible.
                 </p>
-              </div>
-              <p v-else class="wallet-policy-warning">
-                Funding verification blocked:
-                {{ agenticWalletFundingVerification.data.blockers.join(', ') }}
+                <small>
+                  Balance read
+                  {{
+                    timestamp(snapshot.fundingValuation.data.balanceObservedAt)
+                  }}
+                  · Prices read
+                  {{
+                    timestamp(
+                      snapshot.fundingValuation.data.pricesObservedAt ?? '',
+                    )
+                  }}
+                </small>
+              </template>
+              <p
+                v-else-if="
+                  available(snapshot.fundingValuation) &&
+                  snapshot.fundingValuation.data.status === 'blocked'
+                "
+                class="wallet-policy-warning"
+              >
+                Automatic balance valuation blocked:
+                {{ snapshot.fundingValuation.data.blockers.join(', ') }}
               </p>
-            </template>
-            <p
-              v-else-if="
-                agenticWalletFundingVerification?.status === 'unavailable'
-              "
-              class="empty-state wallet-error"
-            >
-              {{ agenticWalletFundingVerification.message }}
-            </p>
+              <p v-else class="empty-state wallet-error">
+                {{
+                  snapshot.fundingValuation.status === 'unavailable'
+                    ? snapshot.fundingValuation.message
+                    : 'Automatic wallet valuation is unavailable'
+                }}
+              </p>
+            </div>
 
             <template
               v-if="agenticWalletFundingReadiness?.status === 'available'"
@@ -1312,30 +1357,58 @@ onUnmounted(() => {
               <div class="position-quantity">
                 <span>Open quantity</span>
                 <strong
+                  :title="moneyTooltip(snapshot.position.data.quantity, 'BTC')"
                   >{{ decimal(snapshot.position.data.quantity, 8) }} BTC</strong
                 >
               </div>
               <dl class="detail-list">
                 <div>
                   <dt>Average entry</dt>
-                  <dd>
+                  <dd
+                    :title="
+                      moneyTooltip(
+                        snapshot.position.data.averageEntryPrice,
+                        'USDT',
+                      )
+                    "
+                  >
                     {{ decimal(snapshot.position.data.averageEntryPrice) }} USDT
                   </dd>
                 </div>
                 <div>
                   <dt>Market mark</dt>
-                  <dd>{{ decimal(snapshot.position.data.markPrice) }} USDT</dd>
+                  <dd
+                    :title="
+                      moneyTooltip(snapshot.position.data.markPrice, 'USDT')
+                    "
+                  >
+                    {{ decimal(snapshot.position.data.markPrice) }} USDT
+                  </dd>
                 </div>
                 <div>
                   <dt>Net liquidation</dt>
-                  <dd>
+                  <dd
+                    :title="
+                      moneyTooltip(
+                        snapshot.position.data.netLiquidationValue,
+                        'USDT',
+                      )
+                    "
+                  >
                     {{ decimal(snapshot.position.data.netLiquidationValue) }}
                     USDT
                   </dd>
                 </div>
                 <div>
                   <dt>Estimated exit fee</dt>
-                  <dd>
+                  <dd
+                    :title="
+                      moneyTooltip(
+                        snapshot.position.data.estimatedExitFee,
+                        'USDT',
+                      )
+                    "
+                  >
                     {{ decimal(snapshot.position.data.estimatedExitFee) }} USDT
                   </dd>
                 </div>
@@ -1387,7 +1460,11 @@ onUnmounted(() => {
               <dl class="detail-list condensed">
                 <div>
                   <dt>Total fees</dt>
-                  <dd>
+                  <dd
+                    :title="
+                      moneyTooltip(snapshot.performance.data.totalFees, 'USDT')
+                    "
+                  >
                     {{ decimal(snapshot.performance.data.totalFees) }} USDT
                   </dd>
                 </div>
@@ -1447,15 +1524,31 @@ onUnmounted(() => {
                     {{ timestamp(execution.executedAt) }}
                   </time>
                 </span>
-                <span role="cell">
+                <span
+                  role="cell"
+                  :title="moneyTooltip(execution.quantity, 'BTC')"
+                >
                   <small>Quantity</small>
                   {{ decimal(execution.quantity, 8) }} BTC
                 </span>
-                <span role="cell">
+                <span
+                  role="cell"
+                  :title="moneyTooltip(execution.price, 'USDT')"
+                >
                   <small>Price</small>
                   {{ decimal(execution.price) }} USDT
                 </span>
-                <span role="cell">
+                <span
+                  role="cell"
+                  :title="
+                    moneyTooltip(
+                      execution.side === 'buy'
+                        ? execution.totalCost
+                        : execution.netProceeds,
+                      'USDT',
+                    )
+                  "
+                >
                   <small>
                     {{
                       execution.side === 'buy' ? 'Total cost' : 'Net proceeds'
@@ -1601,7 +1694,15 @@ onUnmounted(() => {
               <div class="backtest-metrics">
                 <div>
                   <span>Initial capital</span>
-                  <strong>
+                  <strong
+                    :title="
+                      moneyTooltip(
+                        latestBacktest.result.simulation.capital
+                          .initialCapitalUsdt,
+                        'USDT',
+                      )
+                    "
+                  >
                     {{
                       decimal(
                         latestBacktest.result.simulation.capital
@@ -1618,6 +1719,13 @@ onUnmounted(() => {
                       tone(
                         latestBacktest.result.simulation.capital
                           .totalNetReturnUsdt,
+                      )
+                    "
+                    :title="
+                      moneyTooltip(
+                        latestBacktest.result.simulation.capital
+                          .finalEquityUsdt,
+                        'USDT',
                       )
                     "
                   >

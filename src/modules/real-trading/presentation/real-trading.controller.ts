@@ -56,6 +56,17 @@ export class RealTradingController {
     }
   }
 
+  @Get('funding-valuation')
+  async getFundingValuation() {
+    try {
+      return await this.status.loadFundingValuation();
+    } catch {
+      throw new ServiceUnavailableException(
+        'Agentic Wallet funding valuation is unavailable',
+      );
+    }
+  }
+
   @Get('wallet-authentication')
   getWalletAuthentication() {
     return this.authentication.getState();

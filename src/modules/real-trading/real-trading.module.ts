@@ -8,6 +8,8 @@ import {
   AgenticWalletAuthenticationAdapter,
   AgenticWalletAuthenticationCliProcessRunner,
 } from './infrastructure/agentic-wallet-authentication.adapter';
+import { ConfigService } from '@nestjs/config';
+import { BinanceFundingValuationPriceClient } from './infrastructure/binance-funding-valuation-price.client';
 
 @Module({
   controllers: [RealTradingController],
@@ -27,6 +29,14 @@ import {
         ),
     },
     AgenticWalletAuthenticationService,
+    {
+      provide: BinanceFundingValuationPriceClient,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new BinanceFundingValuationPriceClient(
+          config.getOrThrow<string>('BINANCE_REST_BASE_URL'),
+        ),
+    },
     RealTradingStatusService,
   ],
 })

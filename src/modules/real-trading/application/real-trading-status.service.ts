@@ -14,6 +14,10 @@ import {
   assessRealExecutionLocalRiskLimits,
   RealExecutionLocalRiskLimitAssessment,
 } from './real-execution-local-risk-limits';
+import {
+  BinanceFundingValuationPriceClient,
+  BinanceFundingValuationPrices,
+} from '../infrastructure/binance-funding-valuation-price.client';
 
 export interface RealTradingLocalStatus {
   readonly scope: 'real_trading_local_status';
@@ -21,7 +25,7 @@ export interface RealTradingLocalStatus {
   readonly realExecutionEnabled: boolean;
   readonly runtimeExecutionAvailable: false;
   readonly instrument: typeof APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT;
-  readonly walletObservationMode: 'manual_read_only';
+  readonly walletObservationMode: 'manual_and_dashboard_automatic_read_only';
   readonly localRiskLimits: RealExecutionLocalRiskLimitAssessment;
   readonly quoteAuthorized: false;
   readonly submissionAuthorized: false;
@@ -130,6 +134,31 @@ export interface AgenticWalletFundingVerification {
   readonly submissionAuthorized: false;
 }
 
+export interface AgenticWalletFundingValuation {
+  readonly scope: 'agentic_wallet_funding_valuation';
+  readonly status: 'available' | 'blocked';
+  readonly blockers: readonly (
+    AgenticWalletFundingVerificationBlocker | 'bnb_not_reported'
+  )[];
+  readonly balanceObservedAt: Date;
+  readonly pricesObservedAt: Date | null;
+  readonly balance: {
+    readonly quantityBnb: string;
+    readonly valueUsdt: string;
+    readonly valueBrl: string;
+  } | null;
+  readonly prices: {
+    readonly provider: 'binance';
+    readonly bnbUsdt: string;
+    readonly usdtBrl: string;
+  } | null;
+  readonly refreshMode: 'automatic_15_seconds_while_dashboard_visible';
+  readonly valuationOnly: true;
+  readonly fundingAuthorized: false;
+  readonly quoteAuthorized: false;
+  readonly submissionAuthorized: false;
+}
+
 const EVM_ADDRESS_PATTERN = /^0x[0-9a-fA-F]{40}$/;
 const ExactDecimal = Decimal.clone({ precision: 40 });
 
@@ -141,6 +170,7 @@ export class RealTradingStatusService {
   constructor(
     private readonly config: ConfigService<RealTradingEnvironment, true>,
     private readonly wallet: AgenticWalletCapabilityAdapter,
+    private readonly fundingPrices: BinanceFundingValuationPriceClient,
   ) {}
 
   getLocalStatus(): RealTradingLocalStatus {
@@ -152,7 +182,7 @@ export class RealTradingStatusService {
       }),
       runtimeExecutionAvailable: false,
       instrument: APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT,
-      walletObservationMode: 'manual_read_only',
+      walletObservationMode: 'manual_and_dashboard_automatic_read_only',
       localRiskLimits: assessRealExecutionLocalRiskLimits({
         maximumOrderNotionalUsdt: this.config.get(
           'REAL_RISK_MAX_ORDER_NOTIONAL_USDT',
@@ -379,6 +409,27 @@ export class RealTradingStatusService {
     };
   }
 
+  async loadFundingValuation(): Promise<AgenticWalletFundingValuation> {
+    const verification = await this.verifyFunding();
+    const bnb = verification.assets.find((asset) => asset.symbol === 'BNB');
+    const blockers: Array<
+      AgenticWalletFundingVerificationBlocker | 'bnb_not_reported'
+    > = [...verification.blockers];
+    if (bnb?.quantity === null || bnb?.quantity === undefined) {
+      blockers.push('bnb_not_reported');
+    }
+    if (blockers.length !== 0 || bnb?.quantity === null || bnb === undefined) {
+      return blockedFundingValuation(verification.observedAt, blockers);
+    }
+
+    const prices = await this.fundingPrices.load();
+    return availableFundingValuation(
+      verification.observedAt,
+      bnb.quantity,
+      prices,
+    );
+  }
+
   private async loadWalletObservation(): Promise<RealTradingWalletObservation> {
     const observedAt = new Date();
     const observation = await this.wallet.load('56', observedAt);
@@ -450,5 +501,56 @@ function fundingAsset(
     reportStatus:
       balance === null ? ('not_reported' as const) : ('reported' as const),
     quantity: balance?.quantity ?? null,
+  };
+}
+
+function blockedFundingValuation(
+  balanceObservedAt: Date,
+  blockers: AgenticWalletFundingValuation['blockers'],
+): AgenticWalletFundingValuation {
+  return {
+    scope: 'agentic_wallet_funding_valuation',
+    status: 'blocked',
+    blockers,
+    balanceObservedAt,
+    pricesObservedAt: null,
+    balance: null,
+    prices: null,
+    refreshMode: 'automatic_15_seconds_while_dashboard_visible',
+    valuationOnly: true,
+    fundingAuthorized: false,
+    quoteAuthorized: false,
+    submissionAuthorized: false,
+  };
+}
+
+function availableFundingValuation(
+  balanceObservedAt: Date,
+  quantityBnb: string,
+  prices: BinanceFundingValuationPrices,
+): AgenticWalletFundingValuation {
+  const valueUsdt = new ExactDecimal(quantityBnb).times(prices.bnbUsdtPrice);
+  const valueBrl = valueUsdt.times(prices.usdtBrlPrice);
+  return {
+    scope: 'agentic_wallet_funding_valuation',
+    status: 'available',
+    blockers: [],
+    balanceObservedAt,
+    pricesObservedAt: new Date(prices.observedAt),
+    balance: {
+      quantityBnb,
+      valueUsdt: valueUsdt.toFixed(),
+      valueBrl: valueBrl.toFixed(),
+    },
+    prices: {
+      provider: 'binance',
+      bnbUsdt: prices.bnbUsdtPrice,
+      usdtBrl: prices.usdtBrlPrice,
+    },
+    refreshMode: 'automatic_15_seconds_while_dashboard_visible',
+    valuationOnly: true,
+    fundingAuthorized: false,
+    quoteAuthorized: false,
+    submissionAuthorized: false,
   };
 }
