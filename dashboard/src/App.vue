@@ -1303,6 +1303,35 @@ onUnmounted(() => {
                     </dd>
                   </div>
                   <div>
+                    <dt>Minimum BNB gas reserve</dt>
+                    <dd>
+                      {{
+                        agenticWalletFundingConversionPlan.data.plan
+                          .minimumGasReserveBnb ?? 'Not configured'
+                      }}
+                      <template
+                        v-if="
+                          agenticWalletFundingConversionPlan.data.plan
+                            .minimumGasReserveBnb !== null
+                        "
+                      >
+                        BNB
+                      </template>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Confirmation window</dt>
+                    <dd>
+                      until
+                      {{
+                        timestamp(
+                          agenticWalletFundingConversionPlan.data.plan
+                            .confirmationExpiresAt,
+                        )
+                      }}
+                    </dd>
+                  </div>
+                  <div>
                     <dt>Plan fingerprint</dt>
                     <dd class="wallet-address">
                       {{

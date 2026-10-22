@@ -110,6 +110,7 @@ model AgenticWalletFundingConversionPlan {
   minimumUsdt                 String   @map("minimum_usdt") @db.Text
   maximumSlippagePercent      String   @map("maximum_slippage_percent") @db.Text
   remainingQuantityBnb        String   @map("remaining_quantity_bnb") @db.Text
+  minimumGasReserveBnb        String?  @map("minimum_gas_reserve_bnb") @db.Text
   mevProtection               Boolean  @map("mev_protection")
   gasLevel                    String   @map("gas_level") @db.VarChar(16)
   costCoverage                String   @map("cost_coverage") @db.VarChar(16)
@@ -118,6 +119,7 @@ model AgenticWalletFundingConversionPlan {
   executionConfigurationReady Boolean  @map("execution_configuration_ready")
   quotedAt                    DateTime @map("quoted_at")
   quoteExpiresAt              DateTime @map("quote_expires_at")
+  confirmationExpiresAt       DateTime @map("confirmation_expires_at")
   preparedAt                  DateTime @map("prepared_at")
 
   @@index([preparedAt, id])

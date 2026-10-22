@@ -28,6 +28,7 @@ export class PrismaAgenticWalletFundingConversionPlanStore implements AgenticWal
         minimumUsdt: record.plan.minimumUsdt,
         maximumSlippagePercent: record.plan.maximumSlippagePercent,
         remainingQuantityBnb: record.plan.remainingQuantityBnb,
+        minimumGasReserveBnb: record.plan.minimumGasReserveBnb,
         mevProtection: record.plan.mevProtection,
         gasLevel: record.plan.gasLevel,
         costCoverage: record.plan.costCoverage,
@@ -36,6 +37,7 @@ export class PrismaAgenticWalletFundingConversionPlanStore implements AgenticWal
         executionConfigurationReady: record.executionConfigurationReady,
         quotedAt: new Date(record.plan.quotedAt),
         quoteExpiresAt: new Date(record.plan.expiresAt),
+        confirmationExpiresAt: new Date(record.plan.confirmationExpiresAt),
         preparedAt: new Date(record.preparedAt),
       },
     });
@@ -58,6 +60,8 @@ function validateRecord(
     !Number.isFinite(record.preparedAt.getTime()) ||
     record.plan.quotedAt.getTime() > record.preparedAt.getTime() ||
     record.plan.expiresAt.getTime() <= record.preparedAt.getTime() ||
+    record.plan.confirmationExpiresAt.getTime() <=
+      record.preparedAt.getTime() ||
     record.executionConfigurationReady !==
       (record.activationBlockers.length === 0)
   ) {
@@ -73,6 +77,7 @@ function cloneRecord(
       ...record.plan,
       quotedAt: new Date(record.plan.quotedAt),
       expiresAt: new Date(record.plan.expiresAt),
+      confirmationExpiresAt: new Date(record.plan.confirmationExpiresAt),
       command: {
         ...record.plan.command,
         arguments: [...record.plan.command.arguments],

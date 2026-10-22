@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-22 — Separate confirmation lifetime and minimum gas reserve
+
+- Added a sixty-second funding-conversion confirmation deadline independent of the five-second provider quote expiry.
+- Added a blank-by-default validated `FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB` safeguard.
+- Bound the gas-reserve policy and both deadlines into plan fingerprint version 2 and durable storage.
+- Exposed missing/insufficient reserve as activation blockers and displayed the policy/deadline in the dashboard.
+- Kept gas sufficiency explicitly unproven and left the swap runner unregistered and unused.
+
 ## 2026-10-22 — Persist funding-conversion plans before disclosure
 
 - Added an immutable PostgreSQL model and migration for BNB-to-USDT funding-conversion plans.

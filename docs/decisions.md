@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-10-22 - Separate price expiry from confirmation and require a gas floor
+
+A five-second quote is too short for meaningful operator review, while extending that quote locally would fabricate price validity. M10.126 keeps the provider quote expiry unchanged, gives the confirmation plan a separate sixty-second lifetime, and requires any later submission to re-quote against the already accepted minimum output. A separately configured minimum BNB remainder is required as a conservative gas floor, but it does not assert knowledge of the eventual network fee.
+
 ## 2026-10-22 - Persist confirmation plans without storing the confirmation secret
 
 A process-local plan could disappear on restart and would not provide a durable identity for future one-shot consumption. Persisting the generated confirmation phrase in cleartext would also turn the database into a source of submission authorization. M10.125 therefore persists the immutable plan before disclosure but stores only the phrase's SHA-256 digest. A future consumer must present the exact phrase and atomically claim the plan; possession of database contents alone is insufficient.

@@ -2434,6 +2434,7 @@ export const AgenticWalletFundingConversionPlanScalarFieldEnum = {
   minimumUsdt: 'minimumUsdt',
   maximumSlippagePercent: 'maximumSlippagePercent',
   remainingQuantityBnb: 'remainingQuantityBnb',
+  minimumGasReserveBnb: 'minimumGasReserveBnb',
   mevProtection: 'mevProtection',
   gasLevel: 'gasLevel',
   costCoverage: 'costCoverage',
@@ -2442,6 +2443,7 @@ export const AgenticWalletFundingConversionPlanScalarFieldEnum = {
   executionConfigurationReady: 'executionConfigurationReady',
   quotedAt: 'quotedAt',
   quoteExpiresAt: 'quoteExpiresAt',
+  confirmationExpiresAt: 'confirmationExpiresAt',
   preparedAt: 'preparedAt'
 } as const
 

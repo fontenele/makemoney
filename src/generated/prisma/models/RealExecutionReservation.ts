@@ -632,10 +632,6 @@ export type RealExecutionReservationScalarRelationFilter = {
   isNot?: Prisma.RealExecutionReservationWhereInput
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type RealExecutionReservationCreateNestedOneWithoutArmInput = {
   create?: Prisma.XOR<Prisma.RealExecutionReservationCreateWithoutArmInput, Prisma.RealExecutionReservationUncheckedCreateWithoutArmInput>
   connectOrCreate?: Prisma.RealExecutionReservationCreateOrConnectWithoutArmInput

@@ -1,5 +1,21 @@
 # Real Trading
 
+## M10.126 — Funding-conversion confirmation and gas-reserve policy
+
+M10.126 separates price evidence lifetime from operator-review lifetime. The existing provider quote remains valid for five seconds, while a successfully persisted plan receives a separate sixty-second confirmation deadline. Fingerprint version 2 binds both timestamps, so neither can be extended or replaced without producing a different plan.
+
+The new optional `FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB` startup setting accepts only a canonical positive decimal and is blank by default. A successful quote compares its exact remaining BNB against that policy. Missing policy and insufficient remainder are distinct activation blockers. Meeting the threshold is only a conservative local safeguard; provider cost coverage and actual gas sufficiency remain explicitly unverified.
+
+### M10.126 acceptance criteria
+
+- Quote and confirmation expiries are distinct and both fingerprinted/persisted.
+- Confirmation lifetime is fixed at sixty seconds from preparation.
+- Minimum gas reserve accepts only validated positive decimal configuration.
+- Missing and insufficient reserve produce separate activation blockers.
+- The dashboard shows the reserve and confirmation deadline without claiming fee certainty.
+- A future submission must re-quote and may not accept less than the confirmed minimum.
+- No runner registration, confirmation endpoint, signature, submission, or conversion occurs.
+
 ## M10.125 — Durable funding-conversion plans
 
 M10.125 makes M10.123 plan disclosure conditional on durable storage. After a fresh quote produces a valid inert plan, the service hashes its complete generated confirmation phrase and sends the plan plus digest, activation blockers, readiness fact, and preparation time to a dedicated store. Only a successful insert permits the plan to be returned.

@@ -45,6 +45,7 @@ interface Environment {
   REAL_RISK_MAX_PROVIDER_FEE_RATE: string | null;
   REAL_RISK_MAX_NETWORK_FEE_USDT: string | null;
   REAL_RISK_MAX_SLIPPAGE_RATE: string | null;
+  FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB: string | null;
 }
 
 const positiveDecimalPattern =
@@ -177,6 +178,10 @@ const environmentSchema = Joi.object<Environment>({
     .default(null),
   REAL_RISK_MAX_SLIPPAGE_RATE: Joi.string()
     .pattern(/^(?:0|0\.\d*[1-9]\d*|1(?:\.0+)?)$/)
+    .empty('')
+    .default(null),
+  FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB: Joi.string()
+    .pattern(positiveDecimalPattern)
     .empty('')
     .default(null),
 })

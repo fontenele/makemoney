@@ -2,6 +2,8 @@
 
 Use this keyword map to locate context before changing code. Read the listed documentation and files for the relevant keyword.
 
+- **Funding conversion gas reserve, confirmation window, fingerprint v2, M10.126:** start with `real-trading.md`, `dashboard.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; validated configuration is in `../src/config/environment.ts`, policy composition is in `../src/modules/real-trading/application/agentic-wallet-funding-conversion-plan.service.ts`, and durable fields are in `../prisma/`. Missing or insufficient reserve blocks activation, and the policy never claims the final gas fee is known.
+
 - **Durable funding-conversion plan, confirmation digest, plan persistence, M10.125:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the store contract is in `../src/modules/real-trading/application/agentic-wallet-funding-conversion-plan.store.ts`, Prisma implementation and tests are in `../src/modules/real-trading/infrastructure/prisma-agentic-wallet-funding-conversion-plan.store.ts`, and the schema/migration are in `../prisma/`. A plan is returned only after insert, and the raw confirmation phrase is never persisted.
 
 - **Funding-conversion swap CLI runner, closed BNB-to-USDT command, M10.124:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the unregistered runner, pure argument builder, and focused tests are in `../src/modules/real-trading/infrastructure/agentic-wallet-funding-conversion-swap-command-runner.ts` and its adjacent spec. It accepts only the pinned M10.123 BSC envelope and has no runtime caller or NestJS registration.

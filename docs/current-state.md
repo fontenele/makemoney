@@ -1,5 +1,9 @@
 # Current State
 
+M10.126 is complete: a funding-conversion plan now distinguishes its short provider quote expiry from a separate sixty-second confirmation deadline. A future submission must therefore obtain and compare a new quote rather than trying to execute stale price evidence. Fingerprint version 2 binds both deadlines and the minimum gas-reserve policy to the exact plan.
+
+`FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB` is a validated positive exact-decimal configuration that remains blank by default. An absent policy or remaining BNB below it is an explicit activation blocker, and the dashboard displays the configured minimum plus confirmation deadline. This is a conservative reserve policy, not proof of the final network fee. The local migration is applied; focused configuration, plan/store, dashboard API, and build checks pass. No runner registration, signature, submission, or conversion occurred.
+
 M10.125 is complete: successful funding-conversion plans are disclosed only after an immutable PostgreSQL insert. The durable row preserves the exact plan identity/fingerprint, BSC token direction, amount, expected/minimum USDT, remaining BNB, slippage, MEV, gas level, partial-cost/gas claims, activation blockers, configuration-readiness fact, and quote/preparation chronology. Only the SHA-256 digest of the confirmation phrase is stored; the phrase itself never enters Prisma.
 
 Malformed or already-expired plan evidence fails before database access, and database failure prevents the plan from reaching the caller. The migration and generated Prisma client are applied locally. Focused service/store tests, Prisma validation, and the backend build pass. No swap runner was registered or invoked and no financial transaction occurred.

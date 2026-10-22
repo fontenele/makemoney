@@ -22,6 +22,7 @@ interface FundingConversionEnvironment {
   readonly REAL_EXECUTION_APPROVED_CHAIN_ID: string | null;
   readonly REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: string | null;
   readonly REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS: string | null;
+  readonly FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB: string | null;
 }
 
 export type AgenticWalletFundingConversionActivationBlocker =
@@ -30,7 +31,9 @@ export type AgenticWalletFundingConversionActivationBlocker =
   | 'provider_not_approved'
   | 'chain_not_approved'
   | 'source_token_not_approved'
-  | 'target_token_not_approved';
+  | 'target_token_not_approved'
+  | 'minimum_gas_reserve_unconfigured'
+  | 'remaining_bnb_below_minimum_gas_reserve';
 
 export interface AgenticWalletFundingConversionPlan {
   readonly id: string;
@@ -44,11 +47,13 @@ export interface AgenticWalletFundingConversionPlan {
   readonly minimumUsdt: string;
   readonly maximumSlippagePercent: string;
   readonly remainingQuantityBnb: string;
+  readonly minimumGasReserveBnb: string | null;
   readonly mevProtection: true;
   readonly gasLevel: 'MEDIUM';
   readonly confirmationPhrase: string;
   readonly quotedAt: Date;
   readonly expiresAt: Date;
+  readonly confirmationExpiresAt: Date;
   readonly costCoverage: 'partial';
   readonly gasReserveSufficiency: 'unverified';
   readonly command: {
@@ -87,7 +92,7 @@ export class AgenticWalletFundingConversionPlanService {
     request: unknown,
   ): Promise<AgenticWalletFundingConversionPlanResult> {
     const quote = await this.quotes.load(request);
-    const activationBlockers = this.activationBlockers();
+    let activationBlockers = this.activationBlockers();
     if (
       quote.status !== 'quote_available' ||
       quote.quote === null ||
@@ -97,6 +102,30 @@ export class AgenticWalletFundingConversionPlanService {
     }
 
     const id = randomUUID();
+    const preparedAt = new Date();
+    if (preparedAt.getTime() >= quote.quote.expiresAt.getTime()) {
+      throw new Error(
+        'Agentic Wallet funding conversion quote expired before plan persistence',
+      );
+    }
+    const minimumGasReserveBnb = this.config.get(
+      'FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB',
+      { infer: true },
+    );
+    if (minimumGasReserveBnb === null) {
+      activationBlockers = appendBlocker(
+        activationBlockers,
+        'minimum_gas_reserve_unconfigured',
+      );
+    } else if (
+      new Decimal(quote.remainingQuantityBnb).lessThan(minimumGasReserveBnb)
+    ) {
+      activationBlockers = appendBlocker(
+        activationBlockers,
+        'remaining_bnb_below_minimum_gas_reserve',
+      );
+    }
+    const confirmationExpiresAt = new Date(preparedAt.getTime() + 60_000);
     const maximumSlippagePercent = decimalRateToPercent(
       quote.quote.maximumSlippageRate,
     );
@@ -107,8 +136,10 @@ export class AgenticWalletFundingConversionPlanService {
       minimumUsdt: quote.quote.minimumUsdt,
       maximumSlippagePercent,
       remainingQuantityBnb: quote.remainingQuantityBnb,
+      minimumGasReserveBnb,
       quotedAt: quote.quote.quotedAt,
       expiresAt: quote.quote.expiresAt,
+      confirmationExpiresAt,
     });
     const confirmationPhrase = [
       'CONFIRM_BNB_TO_USDT',
@@ -149,11 +180,13 @@ export class AgenticWalletFundingConversionPlanService {
       minimumUsdt: quote.quote.minimumUsdt,
       maximumSlippagePercent,
       remainingQuantityBnb: quote.remainingQuantityBnb,
+      minimumGasReserveBnb,
       mevProtection: true,
       gasLevel: 'MEDIUM',
       confirmationPhrase,
       quotedAt: new Date(quote.quote.quotedAt),
       expiresAt: new Date(quote.quote.expiresAt),
+      confirmationExpiresAt,
       costCoverage: 'partial',
       gasReserveSufficiency: 'unverified',
       command: {
@@ -166,12 +199,6 @@ export class AgenticWalletFundingConversionPlanService {
       conversionAuthorized: false,
       submissionAuthorized: false,
     };
-    const preparedAt = new Date();
-    if (preparedAt.getTime() >= plan.expiresAt.getTime()) {
-      throw new Error(
-        'Agentic Wallet funding conversion quote expired before plan persistence',
-      );
-    }
     await this.plans.create({
       plan,
       confirmationPhraseDigest: createHash('sha256')
@@ -257,13 +284,15 @@ function createFingerprint(input: {
   readonly minimumUsdt: string;
   readonly maximumSlippagePercent: string;
   readonly remainingQuantityBnb: string;
+  readonly minimumGasReserveBnb: string | null;
   readonly quotedAt: Date;
   readonly expiresAt: Date;
+  readonly confirmationExpiresAt: Date;
 }): string {
   return createHash('sha256')
     .update(
       JSON.stringify({
-        version: 'agentic_wallet_funding_conversion_plan_v1',
+        version: 'agentic_wallet_funding_conversion_plan_v2',
         id: input.id,
         provider: PROVIDER_ID,
         chainId: CHAIN_ID,
@@ -274,10 +303,12 @@ function createFingerprint(input: {
         minimumUsdt: input.minimumUsdt,
         maximumSlippagePercent: input.maximumSlippagePercent,
         remainingQuantityBnb: input.remainingQuantityBnb,
+        minimumGasReserveBnb: input.minimumGasReserveBnb,
         mevProtection: true,
         gasLevel: 'MEDIUM',
         quotedAt: input.quotedAt.toISOString(),
         expiresAt: input.expiresAt.toISOString(),
+        confirmationExpiresAt: input.confirmationExpiresAt.toISOString(),
       }),
     )
     .digest('hex');
@@ -297,4 +328,11 @@ function addIf(
   blocker: AgenticWalletFundingConversionActivationBlocker,
 ): void {
   if (condition) blockers.push(blocker);
+}
+
+function appendBlocker(
+  blockers: readonly AgenticWalletFundingConversionActivationBlocker[],
+  blocker: AgenticWalletFundingConversionActivationBlocker,
+): AgenticWalletFundingConversionActivationBlocker[] {
+  return blockers.includes(blocker) ? [...blockers] : [...blockers, blocker];
 }

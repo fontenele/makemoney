@@ -88,15 +88,18 @@ describe('AgenticWalletFundingConversionPlanService', () => {
       'MEDIUM',
       '--json',
     ]);
-    expect(create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        plan: result.plan,
-        confirmationPhraseDigest: expect.stringMatching(/^[a-f0-9]{64}$/),
-        activationBlockers: [],
-        executionConfigurationReady: true,
-        preparedAt: new Date('2026-10-22T12:00:02.000Z'),
-      }),
-    );
+    const persisted = create.mock.calls[0]?.[0] as {
+      plan: unknown;
+      confirmationPhraseDigest: string;
+      activationBlockers: unknown[];
+      executionConfigurationReady: boolean;
+      preparedAt: Date;
+    };
+    expect(persisted.plan).toBe(result.plan);
+    expect(persisted.confirmationPhraseDigest).toMatch(/^[a-f0-9]{64}$/);
+    expect(persisted.activationBlockers).toEqual([]);
+    expect(persisted.executionConfigurationReady).toBe(true);
+    expect(persisted.preparedAt).toEqual(new Date('2026-10-22T12:00:02.000Z'));
   });
 
   it('exposes every independent activation blocker without authorizing submission', async () => {
@@ -109,6 +112,7 @@ describe('AgenticWalletFundingConversionPlanService', () => {
         REAL_EXECUTION_APPROVED_CHAIN_ID: null,
         REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: null,
         REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS: null,
+        FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB: null,
       },
       jest.fn((record) => Promise.resolve({ ...record, stored: true })),
     );
@@ -124,6 +128,7 @@ describe('AgenticWalletFundingConversionPlanService', () => {
         'chain_not_approved',
         'source_token_not_approved',
         'target_token_not_approved',
+        'minimum_gas_reserve_unconfigured',
       ],
       executionConfigurationReady: false,
       finalConfirmationRequired: true,
@@ -153,6 +158,28 @@ describe('AgenticWalletFundingConversionPlanService', () => {
       providerSubmissionStarted: false,
       conversionAuthorized: false,
       submissionAuthorized: false,
+    });
+  });
+
+  it('blocks activation when the configured gas reserve exceeds the remainder', async () => {
+    const environment = enabledEnvironment();
+    environment.FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB = '0.002';
+    const service = createService(
+      jest.fn(() => Promise.resolve(availableQuote())),
+      environment,
+      jest.fn((record) => Promise.resolve({ ...record, stored: true })),
+    );
+
+    await expect(
+      service.prepare({ sourceQuantityBnb: '0.008' }),
+    ).resolves.toMatchObject({
+      status: 'plan_ready',
+      activationBlockers: ['remaining_bnb_below_minimum_gas_reserve'],
+      executionConfigurationReady: false,
+      plan: {
+        minimumGasReserveBnb: '0.002',
+        confirmationExpiresAt: new Date('2026-10-22T12:01:02.000Z'),
+      },
     });
   });
 
@@ -203,6 +230,7 @@ function enabledEnvironment(): Record<string, unknown> {
     REAL_EXECUTION_APPROVED_CHAIN_ID: '56',
     REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: BSC_NATIVE_BNB_ADDRESS,
     REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS: BSC_USDT_ADDRESS,
+    FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB: '0.001',
   };
 }
 

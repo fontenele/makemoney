@@ -686,11 +686,13 @@ export interface AgenticWalletFundingConversionPlan {
     minimumUsdt: string;
     maximumSlippagePercent: string;
     remainingQuantityBnb: string;
+    minimumGasReserveBnb: string | null;
     mevProtection: true;
     gasLevel: 'MEDIUM';
     confirmationPhrase: string;
     quotedAt: string;
     expiresAt: string;
+    confirmationExpiresAt: string;
     costCoverage: 'partial';
     gasReserveSufficiency: 'unverified';
     command: {

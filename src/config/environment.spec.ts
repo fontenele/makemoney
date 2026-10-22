@@ -69,7 +69,26 @@ describe('validateEnvironment real execution', () => {
       REAL_RISK_MAX_PROVIDER_FEE_RATE: null,
       REAL_RISK_MAX_NETWORK_FEE_USDT: null,
       REAL_RISK_MAX_SLIPPAGE_RATE: null,
+      FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB: null,
     });
+  });
+
+  it('accepts only a canonical positive funding-conversion gas reserve', () => {
+    expect(
+      validateEnvironment({
+        ...required,
+        FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB: '0.001',
+      }),
+    ).toMatchObject({ FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB: '0.001' });
+
+    for (const value of ['0', '-0.001', '.001', '01', '1e-3']) {
+      expect(() =>
+        validateEnvironment({
+          ...required,
+          FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB: value,
+        }),
+      ).toThrow('Invalid environment configuration');
+    }
   });
 
   it('accepts only canonical explicit local real-risk limits', () => {

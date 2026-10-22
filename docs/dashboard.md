@@ -1,5 +1,9 @@
 # Dashboard
 
+## M10.126 funding-conversion confirmation and gas policy
+
+The inert plan panel shows the explicit minimum BNB gas reserve or “Not configured” and the separate final-confirmation deadline. The provider quote may expire earlier; this longer window is only for operator review, and any future submission must obtain a new quote without accepting a lower minimum output. The reserve is a local safeguard and is never labeled as proof of the final network fee.
+
 ## M10.123 inert funding-conversion plan
 
 The wallet card adds a separate “Prepare conversion - do not execute” action. It requests a new verified quote rather than trusting an older preview, then shows the exact BNB spend, minimum accepted USDT, slippage ceiling, immutable fingerprint, and current activation blockers. The control creates no confirmation and cannot submit the displayed command; changing the amount clears both quote and plan.

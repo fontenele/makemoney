@@ -37,6 +37,7 @@ export type AgenticWalletFundingConversionPlanMinAggregateOutputType = {
   minimumUsdt: string | null
   maximumSlippagePercent: string | null
   remainingQuantityBnb: string | null
+  minimumGasReserveBnb: string | null
   mevProtection: boolean | null
   gasLevel: string | null
   costCoverage: string | null
@@ -44,6 +45,7 @@ export type AgenticWalletFundingConversionPlanMinAggregateOutputType = {
   executionConfigurationReady: boolean | null
   quotedAt: Date | null
   quoteExpiresAt: Date | null
+  confirmationExpiresAt: Date | null
   preparedAt: Date | null
 }
 
@@ -60,6 +62,7 @@ export type AgenticWalletFundingConversionPlanMaxAggregateOutputType = {
   minimumUsdt: string | null
   maximumSlippagePercent: string | null
   remainingQuantityBnb: string | null
+  minimumGasReserveBnb: string | null
   mevProtection: boolean | null
   gasLevel: string | null
   costCoverage: string | null
@@ -67,6 +70,7 @@ export type AgenticWalletFundingConversionPlanMaxAggregateOutputType = {
   executionConfigurationReady: boolean | null
   quotedAt: Date | null
   quoteExpiresAt: Date | null
+  confirmationExpiresAt: Date | null
   preparedAt: Date | null
 }
 
@@ -83,6 +87,7 @@ export type AgenticWalletFundingConversionPlanCountAggregateOutputType = {
   minimumUsdt: number
   maximumSlippagePercent: number
   remainingQuantityBnb: number
+  minimumGasReserveBnb: number
   mevProtection: number
   gasLevel: number
   costCoverage: number
@@ -91,6 +96,7 @@ export type AgenticWalletFundingConversionPlanCountAggregateOutputType = {
   executionConfigurationReady: number
   quotedAt: number
   quoteExpiresAt: number
+  confirmationExpiresAt: number
   preparedAt: number
   _all: number
 }
@@ -109,6 +115,7 @@ export type AgenticWalletFundingConversionPlanMinAggregateInputType = {
   minimumUsdt?: true
   maximumSlippagePercent?: true
   remainingQuantityBnb?: true
+  minimumGasReserveBnb?: true
   mevProtection?: true
   gasLevel?: true
   costCoverage?: true
@@ -116,6 +123,7 @@ export type AgenticWalletFundingConversionPlanMinAggregateInputType = {
   executionConfigurationReady?: true
   quotedAt?: true
   quoteExpiresAt?: true
+  confirmationExpiresAt?: true
   preparedAt?: true
 }
 
@@ -132,6 +140,7 @@ export type AgenticWalletFundingConversionPlanMaxAggregateInputType = {
   minimumUsdt?: true
   maximumSlippagePercent?: true
   remainingQuantityBnb?: true
+  minimumGasReserveBnb?: true
   mevProtection?: true
   gasLevel?: true
   costCoverage?: true
@@ -139,6 +148,7 @@ export type AgenticWalletFundingConversionPlanMaxAggregateInputType = {
   executionConfigurationReady?: true
   quotedAt?: true
   quoteExpiresAt?: true
+  confirmationExpiresAt?: true
   preparedAt?: true
 }
 
@@ -155,6 +165,7 @@ export type AgenticWalletFundingConversionPlanCountAggregateInputType = {
   minimumUsdt?: true
   maximumSlippagePercent?: true
   remainingQuantityBnb?: true
+  minimumGasReserveBnb?: true
   mevProtection?: true
   gasLevel?: true
   costCoverage?: true
@@ -163,6 +174,7 @@ export type AgenticWalletFundingConversionPlanCountAggregateInputType = {
   executionConfigurationReady?: true
   quotedAt?: true
   quoteExpiresAt?: true
+  confirmationExpiresAt?: true
   preparedAt?: true
   _all?: true
 }
@@ -252,6 +264,7 @@ export type AgenticWalletFundingConversionPlanGroupByOutputType = {
   minimumUsdt: string
   maximumSlippagePercent: string
   remainingQuantityBnb: string
+  minimumGasReserveBnb: string | null
   mevProtection: boolean
   gasLevel: string
   costCoverage: string
@@ -260,6 +273,7 @@ export type AgenticWalletFundingConversionPlanGroupByOutputType = {
   executionConfigurationReady: boolean
   quotedAt: Date
   quoteExpiresAt: Date
+  confirmationExpiresAt: Date
   preparedAt: Date
   _count: AgenticWalletFundingConversionPlanCountAggregateOutputType | null
   _min: AgenticWalletFundingConversionPlanMinAggregateOutputType | null
@@ -297,6 +311,7 @@ export type AgenticWalletFundingConversionPlanWhereInput = {
   minimumUsdt?: Prisma.StringFilter<"AgenticWalletFundingConversionPlan"> | string
   maximumSlippagePercent?: Prisma.StringFilter<"AgenticWalletFundingConversionPlan"> | string
   remainingQuantityBnb?: Prisma.StringFilter<"AgenticWalletFundingConversionPlan"> | string
+  minimumGasReserveBnb?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionPlan"> | string | null
   mevProtection?: Prisma.BoolFilter<"AgenticWalletFundingConversionPlan"> | boolean
   gasLevel?: Prisma.StringFilter<"AgenticWalletFundingConversionPlan"> | string
   costCoverage?: Prisma.StringFilter<"AgenticWalletFundingConversionPlan"> | string
@@ -305,6 +320,7 @@ export type AgenticWalletFundingConversionPlanWhereInput = {
   executionConfigurationReady?: Prisma.BoolFilter<"AgenticWalletFundingConversionPlan"> | boolean
   quotedAt?: Prisma.DateTimeFilter<"AgenticWalletFundingConversionPlan"> | Date | string
   quoteExpiresAt?: Prisma.DateTimeFilter<"AgenticWalletFundingConversionPlan"> | Date | string
+  confirmationExpiresAt?: Prisma.DateTimeFilter<"AgenticWalletFundingConversionPlan"> | Date | string
   preparedAt?: Prisma.DateTimeFilter<"AgenticWalletFundingConversionPlan"> | Date | string
 }
 
@@ -321,6 +337,7 @@ export type AgenticWalletFundingConversionPlanOrderByWithRelationInput = {
   minimumUsdt?: Prisma.SortOrder
   maximumSlippagePercent?: Prisma.SortOrder
   remainingQuantityBnb?: Prisma.SortOrder
+  minimumGasReserveBnb?: Prisma.SortOrderInput | Prisma.SortOrder
   mevProtection?: Prisma.SortOrder
   gasLevel?: Prisma.SortOrder
   costCoverage?: Prisma.SortOrder
@@ -329,6 +346,7 @@ export type AgenticWalletFundingConversionPlanOrderByWithRelationInput = {
   executionConfigurationReady?: Prisma.SortOrder
   quotedAt?: Prisma.SortOrder
   quoteExpiresAt?: Prisma.SortOrder
+  confirmationExpiresAt?: Prisma.SortOrder
   preparedAt?: Prisma.SortOrder
 }
 
@@ -348,6 +366,7 @@ export type AgenticWalletFundingConversionPlanWhereUniqueInput = Prisma.AtLeast<
   minimumUsdt?: Prisma.StringFilter<"AgenticWalletFundingConversionPlan"> | string
   maximumSlippagePercent?: Prisma.StringFilter<"AgenticWalletFundingConversionPlan"> | string
   remainingQuantityBnb?: Prisma.StringFilter<"AgenticWalletFundingConversionPlan"> | string
+  minimumGasReserveBnb?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionPlan"> | string | null
   mevProtection?: Prisma.BoolFilter<"AgenticWalletFundingConversionPlan"> | boolean
   gasLevel?: Prisma.StringFilter<"AgenticWalletFundingConversionPlan"> | string
   costCoverage?: Prisma.StringFilter<"AgenticWalletFundingConversionPlan"> | string
@@ -356,6 +375,7 @@ export type AgenticWalletFundingConversionPlanWhereUniqueInput = Prisma.AtLeast<
   executionConfigurationReady?: Prisma.BoolFilter<"AgenticWalletFundingConversionPlan"> | boolean
   quotedAt?: Prisma.DateTimeFilter<"AgenticWalletFundingConversionPlan"> | Date | string
   quoteExpiresAt?: Prisma.DateTimeFilter<"AgenticWalletFundingConversionPlan"> | Date | string
+  confirmationExpiresAt?: Prisma.DateTimeFilter<"AgenticWalletFundingConversionPlan"> | Date | string
   preparedAt?: Prisma.DateTimeFilter<"AgenticWalletFundingConversionPlan"> | Date | string
 }, "id" | "fingerprint">
 
@@ -372,6 +392,7 @@ export type AgenticWalletFundingConversionPlanOrderByWithAggregationInput = {
   minimumUsdt?: Prisma.SortOrder
   maximumSlippagePercent?: Prisma.SortOrder
   remainingQuantityBnb?: Prisma.SortOrder
+  minimumGasReserveBnb?: Prisma.SortOrderInput | Prisma.SortOrder
   mevProtection?: Prisma.SortOrder
   gasLevel?: Prisma.SortOrder
   costCoverage?: Prisma.SortOrder
@@ -380,6 +401,7 @@ export type AgenticWalletFundingConversionPlanOrderByWithAggregationInput = {
   executionConfigurationReady?: Prisma.SortOrder
   quotedAt?: Prisma.SortOrder
   quoteExpiresAt?: Prisma.SortOrder
+  confirmationExpiresAt?: Prisma.SortOrder
   preparedAt?: Prisma.SortOrder
   _count?: Prisma.AgenticWalletFundingConversionPlanCountOrderByAggregateInput
   _max?: Prisma.AgenticWalletFundingConversionPlanMaxOrderByAggregateInput
@@ -402,6 +424,7 @@ export type AgenticWalletFundingConversionPlanScalarWhereWithAggregatesInput = {
   minimumUsdt?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionPlan"> | string
   maximumSlippagePercent?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionPlan"> | string
   remainingQuantityBnb?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionPlan"> | string
+  minimumGasReserveBnb?: Prisma.StringNullableWithAggregatesFilter<"AgenticWalletFundingConversionPlan"> | string | null
   mevProtection?: Prisma.BoolWithAggregatesFilter<"AgenticWalletFundingConversionPlan"> | boolean
   gasLevel?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionPlan"> | string
   costCoverage?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionPlan"> | string
@@ -410,6 +433,7 @@ export type AgenticWalletFundingConversionPlanScalarWhereWithAggregatesInput = {
   executionConfigurationReady?: Prisma.BoolWithAggregatesFilter<"AgenticWalletFundingConversionPlan"> | boolean
   quotedAt?: Prisma.DateTimeWithAggregatesFilter<"AgenticWalletFundingConversionPlan"> | Date | string
   quoteExpiresAt?: Prisma.DateTimeWithAggregatesFilter<"AgenticWalletFundingConversionPlan"> | Date | string
+  confirmationExpiresAt?: Prisma.DateTimeWithAggregatesFilter<"AgenticWalletFundingConversionPlan"> | Date | string
   preparedAt?: Prisma.DateTimeWithAggregatesFilter<"AgenticWalletFundingConversionPlan"> | Date | string
 }
 
@@ -426,6 +450,7 @@ export type AgenticWalletFundingConversionPlanCreateInput = {
   minimumUsdt: string
   maximumSlippagePercent: string
   remainingQuantityBnb: string
+  minimumGasReserveBnb?: string | null
   mevProtection: boolean
   gasLevel: string
   costCoverage: string
@@ -434,6 +459,7 @@ export type AgenticWalletFundingConversionPlanCreateInput = {
   executionConfigurationReady: boolean
   quotedAt: Date | string
   quoteExpiresAt: Date | string
+  confirmationExpiresAt: Date | string
   preparedAt: Date | string
 }
 
@@ -450,6 +476,7 @@ export type AgenticWalletFundingConversionPlanUncheckedCreateInput = {
   minimumUsdt: string
   maximumSlippagePercent: string
   remainingQuantityBnb: string
+  minimumGasReserveBnb?: string | null
   mevProtection: boolean
   gasLevel: string
   costCoverage: string
@@ -458,6 +485,7 @@ export type AgenticWalletFundingConversionPlanUncheckedCreateInput = {
   executionConfigurationReady: boolean
   quotedAt: Date | string
   quoteExpiresAt: Date | string
+  confirmationExpiresAt: Date | string
   preparedAt: Date | string
 }
 
@@ -474,6 +502,7 @@ export type AgenticWalletFundingConversionPlanUpdateInput = {
   minimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   maximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   remainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  minimumGasReserveBnb?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mevProtection?: Prisma.BoolFieldUpdateOperationsInput | boolean
   gasLevel?: Prisma.StringFieldUpdateOperationsInput | string
   costCoverage?: Prisma.StringFieldUpdateOperationsInput | string
@@ -482,6 +511,7 @@ export type AgenticWalletFundingConversionPlanUpdateInput = {
   executionConfigurationReady?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quotedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quoteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmationExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -498,6 +528,7 @@ export type AgenticWalletFundingConversionPlanUncheckedUpdateInput = {
   minimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   maximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   remainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  minimumGasReserveBnb?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mevProtection?: Prisma.BoolFieldUpdateOperationsInput | boolean
   gasLevel?: Prisma.StringFieldUpdateOperationsInput | string
   costCoverage?: Prisma.StringFieldUpdateOperationsInput | string
@@ -506,6 +537,7 @@ export type AgenticWalletFundingConversionPlanUncheckedUpdateInput = {
   executionConfigurationReady?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quotedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quoteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmationExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -522,6 +554,7 @@ export type AgenticWalletFundingConversionPlanCreateManyInput = {
   minimumUsdt: string
   maximumSlippagePercent: string
   remainingQuantityBnb: string
+  minimumGasReserveBnb?: string | null
   mevProtection: boolean
   gasLevel: string
   costCoverage: string
@@ -530,6 +563,7 @@ export type AgenticWalletFundingConversionPlanCreateManyInput = {
   executionConfigurationReady: boolean
   quotedAt: Date | string
   quoteExpiresAt: Date | string
+  confirmationExpiresAt: Date | string
   preparedAt: Date | string
 }
 
@@ -546,6 +580,7 @@ export type AgenticWalletFundingConversionPlanUpdateManyMutationInput = {
   minimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   maximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   remainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  minimumGasReserveBnb?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mevProtection?: Prisma.BoolFieldUpdateOperationsInput | boolean
   gasLevel?: Prisma.StringFieldUpdateOperationsInput | string
   costCoverage?: Prisma.StringFieldUpdateOperationsInput | string
@@ -554,6 +589,7 @@ export type AgenticWalletFundingConversionPlanUpdateManyMutationInput = {
   executionConfigurationReady?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quotedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quoteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmationExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -570,6 +606,7 @@ export type AgenticWalletFundingConversionPlanUncheckedUpdateManyInput = {
   minimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   maximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   remainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  minimumGasReserveBnb?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mevProtection?: Prisma.BoolFieldUpdateOperationsInput | boolean
   gasLevel?: Prisma.StringFieldUpdateOperationsInput | string
   costCoverage?: Prisma.StringFieldUpdateOperationsInput | string
@@ -578,6 +615,7 @@ export type AgenticWalletFundingConversionPlanUncheckedUpdateManyInput = {
   executionConfigurationReady?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quotedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quoteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmationExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -594,6 +632,7 @@ export type AgenticWalletFundingConversionPlanCountOrderByAggregateInput = {
   minimumUsdt?: Prisma.SortOrder
   maximumSlippagePercent?: Prisma.SortOrder
   remainingQuantityBnb?: Prisma.SortOrder
+  minimumGasReserveBnb?: Prisma.SortOrder
   mevProtection?: Prisma.SortOrder
   gasLevel?: Prisma.SortOrder
   costCoverage?: Prisma.SortOrder
@@ -602,6 +641,7 @@ export type AgenticWalletFundingConversionPlanCountOrderByAggregateInput = {
   executionConfigurationReady?: Prisma.SortOrder
   quotedAt?: Prisma.SortOrder
   quoteExpiresAt?: Prisma.SortOrder
+  confirmationExpiresAt?: Prisma.SortOrder
   preparedAt?: Prisma.SortOrder
 }
 
@@ -618,6 +658,7 @@ export type AgenticWalletFundingConversionPlanMaxOrderByAggregateInput = {
   minimumUsdt?: Prisma.SortOrder
   maximumSlippagePercent?: Prisma.SortOrder
   remainingQuantityBnb?: Prisma.SortOrder
+  minimumGasReserveBnb?: Prisma.SortOrder
   mevProtection?: Prisma.SortOrder
   gasLevel?: Prisma.SortOrder
   costCoverage?: Prisma.SortOrder
@@ -625,6 +666,7 @@ export type AgenticWalletFundingConversionPlanMaxOrderByAggregateInput = {
   executionConfigurationReady?: Prisma.SortOrder
   quotedAt?: Prisma.SortOrder
   quoteExpiresAt?: Prisma.SortOrder
+  confirmationExpiresAt?: Prisma.SortOrder
   preparedAt?: Prisma.SortOrder
 }
 
@@ -641,6 +683,7 @@ export type AgenticWalletFundingConversionPlanMinOrderByAggregateInput = {
   minimumUsdt?: Prisma.SortOrder
   maximumSlippagePercent?: Prisma.SortOrder
   remainingQuantityBnb?: Prisma.SortOrder
+  minimumGasReserveBnb?: Prisma.SortOrder
   mevProtection?: Prisma.SortOrder
   gasLevel?: Prisma.SortOrder
   costCoverage?: Prisma.SortOrder
@@ -648,7 +691,12 @@ export type AgenticWalletFundingConversionPlanMinOrderByAggregateInput = {
   executionConfigurationReady?: Prisma.SortOrder
   quotedAt?: Prisma.SortOrder
   quoteExpiresAt?: Prisma.SortOrder
+  confirmationExpiresAt?: Prisma.SortOrder
   preparedAt?: Prisma.SortOrder
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 
@@ -666,6 +714,7 @@ export type AgenticWalletFundingConversionPlanSelect<ExtArgs extends runtime.Typ
   minimumUsdt?: boolean
   maximumSlippagePercent?: boolean
   remainingQuantityBnb?: boolean
+  minimumGasReserveBnb?: boolean
   mevProtection?: boolean
   gasLevel?: boolean
   costCoverage?: boolean
@@ -674,6 +723,7 @@ export type AgenticWalletFundingConversionPlanSelect<ExtArgs extends runtime.Typ
   executionConfigurationReady?: boolean
   quotedAt?: boolean
   quoteExpiresAt?: boolean
+  confirmationExpiresAt?: boolean
   preparedAt?: boolean
 }, ExtArgs["result"]["agenticWalletFundingConversionPlan"]>
 
@@ -690,6 +740,7 @@ export type AgenticWalletFundingConversionPlanSelectCreateManyAndReturn<ExtArgs 
   minimumUsdt?: boolean
   maximumSlippagePercent?: boolean
   remainingQuantityBnb?: boolean
+  minimumGasReserveBnb?: boolean
   mevProtection?: boolean
   gasLevel?: boolean
   costCoverage?: boolean
@@ -698,6 +749,7 @@ export type AgenticWalletFundingConversionPlanSelectCreateManyAndReturn<ExtArgs 
   executionConfigurationReady?: boolean
   quotedAt?: boolean
   quoteExpiresAt?: boolean
+  confirmationExpiresAt?: boolean
   preparedAt?: boolean
 }, ExtArgs["result"]["agenticWalletFundingConversionPlan"]>
 
@@ -714,6 +766,7 @@ export type AgenticWalletFundingConversionPlanSelectUpdateManyAndReturn<ExtArgs 
   minimumUsdt?: boolean
   maximumSlippagePercent?: boolean
   remainingQuantityBnb?: boolean
+  minimumGasReserveBnb?: boolean
   mevProtection?: boolean
   gasLevel?: boolean
   costCoverage?: boolean
@@ -722,6 +775,7 @@ export type AgenticWalletFundingConversionPlanSelectUpdateManyAndReturn<ExtArgs 
   executionConfigurationReady?: boolean
   quotedAt?: boolean
   quoteExpiresAt?: boolean
+  confirmationExpiresAt?: boolean
   preparedAt?: boolean
 }, ExtArgs["result"]["agenticWalletFundingConversionPlan"]>
 
@@ -738,6 +792,7 @@ export type AgenticWalletFundingConversionPlanSelectScalar = {
   minimumUsdt?: boolean
   maximumSlippagePercent?: boolean
   remainingQuantityBnb?: boolean
+  minimumGasReserveBnb?: boolean
   mevProtection?: boolean
   gasLevel?: boolean
   costCoverage?: boolean
@@ -746,10 +801,11 @@ export type AgenticWalletFundingConversionPlanSelectScalar = {
   executionConfigurationReady?: boolean
   quotedAt?: boolean
   quoteExpiresAt?: boolean
+  confirmationExpiresAt?: boolean
   preparedAt?: boolean
 }
 
-export type AgenticWalletFundingConversionPlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fingerprint" | "confirmationPhraseDigest" | "providerId" | "chainId" | "sourceTokenAddress" | "targetTokenAddress" | "sourceQuantityBnb" | "expectedUsdt" | "minimumUsdt" | "maximumSlippagePercent" | "remainingQuantityBnb" | "mevProtection" | "gasLevel" | "costCoverage" | "gasReserveSufficiency" | "activationBlockers" | "executionConfigurationReady" | "quotedAt" | "quoteExpiresAt" | "preparedAt", ExtArgs["result"]["agenticWalletFundingConversionPlan"]>
+export type AgenticWalletFundingConversionPlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fingerprint" | "confirmationPhraseDigest" | "providerId" | "chainId" | "sourceTokenAddress" | "targetTokenAddress" | "sourceQuantityBnb" | "expectedUsdt" | "minimumUsdt" | "maximumSlippagePercent" | "remainingQuantityBnb" | "minimumGasReserveBnb" | "mevProtection" | "gasLevel" | "costCoverage" | "gasReserveSufficiency" | "activationBlockers" | "executionConfigurationReady" | "quotedAt" | "quoteExpiresAt" | "confirmationExpiresAt" | "preparedAt", ExtArgs["result"]["agenticWalletFundingConversionPlan"]>
 
 export type $AgenticWalletFundingConversionPlanPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AgenticWalletFundingConversionPlan"
@@ -767,6 +823,7 @@ export type $AgenticWalletFundingConversionPlanPayload<ExtArgs extends runtime.T
     minimumUsdt: string
     maximumSlippagePercent: string
     remainingQuantityBnb: string
+    minimumGasReserveBnb: string | null
     mevProtection: boolean
     gasLevel: string
     costCoverage: string
@@ -775,6 +832,7 @@ export type $AgenticWalletFundingConversionPlanPayload<ExtArgs extends runtime.T
     executionConfigurationReady: boolean
     quotedAt: Date
     quoteExpiresAt: Date
+    confirmationExpiresAt: Date
     preparedAt: Date
   }, ExtArgs["result"]["agenticWalletFundingConversionPlan"]>
   composites: {}
@@ -1211,6 +1269,7 @@ export interface AgenticWalletFundingConversionPlanFieldRefs {
   readonly minimumUsdt: Prisma.FieldRef<"AgenticWalletFundingConversionPlan", 'String'>
   readonly maximumSlippagePercent: Prisma.FieldRef<"AgenticWalletFundingConversionPlan", 'String'>
   readonly remainingQuantityBnb: Prisma.FieldRef<"AgenticWalletFundingConversionPlan", 'String'>
+  readonly minimumGasReserveBnb: Prisma.FieldRef<"AgenticWalletFundingConversionPlan", 'String'>
   readonly mevProtection: Prisma.FieldRef<"AgenticWalletFundingConversionPlan", 'Boolean'>
   readonly gasLevel: Prisma.FieldRef<"AgenticWalletFundingConversionPlan", 'String'>
   readonly costCoverage: Prisma.FieldRef<"AgenticWalletFundingConversionPlan", 'String'>
@@ -1219,6 +1278,7 @@ export interface AgenticWalletFundingConversionPlanFieldRefs {
   readonly executionConfigurationReady: Prisma.FieldRef<"AgenticWalletFundingConversionPlan", 'Boolean'>
   readonly quotedAt: Prisma.FieldRef<"AgenticWalletFundingConversionPlan", 'DateTime'>
   readonly quoteExpiresAt: Prisma.FieldRef<"AgenticWalletFundingConversionPlan", 'DateTime'>
+  readonly confirmationExpiresAt: Prisma.FieldRef<"AgenticWalletFundingConversionPlan", 'DateTime'>
   readonly preparedAt: Prisma.FieldRef<"AgenticWalletFundingConversionPlan", 'DateTime'>
 }
     
