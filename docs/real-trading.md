@@ -1,5 +1,20 @@
 # Real Trading
 
+## M10.127 — Durable one-shot funding-conversion claim
+
+M10.127 adds the durable consumption boundary required before a funding conversion may ever reach the mutable runner. A serializable PostgreSQL transaction locks the claim path, reloads the persisted plan, verifies its fingerprint and hashed confirmation phrase, requires the original plan to have been configuration-ready, and compares a caller-supplied fresh quote against the accepted minimum output and gas-reserve floor.
+
+One submission-attempt row may exist per plan. The row contains only the confirmation-derived request fingerprint and fresh financial evidence, never the raw phrase. Exact replay is reported without creating another attempt, divergent reuse conflicts, and every attempt permanently records `automaticRetryAllowed: false`.
+
+### M10.127 acceptance criteria
+
+- Plan consumption is unique and serialized in PostgreSQL.
+- The exact confirmation phrase is verified by digest and never persisted.
+- Expired confirmation, configuration-blocked plans, worse fresh minimum output, and insufficient fresh BNB reserve fail before insertion.
+- A claimed attempt starts as `submission_claimed` and forbids automatic retry.
+- The store remains unregistered and has no controller, dashboard, runner, or provider caller.
+- No signature, provider submission, swap, or financial transaction occurs.
+
 ## M10.126 — Funding-conversion confirmation and gas-reserve policy
 
 M10.126 separates price evidence lifetime from operator-review lifetime. The existing provider quote remains valid for five seconds, while a successfully persisted plan receives a separate sixty-second confirmation deadline. Fingerprint version 2 binds both timestamps, so neither can be extended or replaced without producing a different plan.

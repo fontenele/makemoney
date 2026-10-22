@@ -58,6 +58,7 @@ export const ModelName = {
   HistoricalCandleRecord: 'HistoricalCandleRecord',
   BacktestRun: 'BacktestRun',
   AgenticWalletFundingConversionPlan: 'AgenticWalletFundingConversionPlan',
+  AgenticWalletFundingConversionSubmissionAttempt: 'AgenticWalletFundingConversionSubmissionAttempt',
   RealExecutionReservation: 'RealExecutionReservation',
   RealExecutionArm: 'RealExecutionArm',
   RealExecutionRiskApproval: 'RealExecutionRiskApproval',
@@ -212,6 +213,24 @@ export const AgenticWalletFundingConversionPlanScalarFieldEnum = {
 } as const
 
 export type AgenticWalletFundingConversionPlanScalarFieldEnum = (typeof AgenticWalletFundingConversionPlanScalarFieldEnum)[keyof typeof AgenticWalletFundingConversionPlanScalarFieldEnum]
+
+
+export const AgenticWalletFundingConversionSubmissionAttemptScalarFieldEnum = {
+  id: 'id',
+  planId: 'planId',
+  requestFingerprint: 'requestFingerprint',
+  freshExpectedUsdt: 'freshExpectedUsdt',
+  freshMinimumUsdt: 'freshMinimumUsdt',
+  freshRemainingQuantityBnb: 'freshRemainingQuantityBnb',
+  state: 'state',
+  providerOrderId: 'providerOrderId',
+  responseFingerprint: 'responseFingerprint',
+  automaticRetryAllowed: 'automaticRetryAllowed',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt'
+} as const
+
+export type AgenticWalletFundingConversionSubmissionAttemptScalarFieldEnum = (typeof AgenticWalletFundingConversionSubmissionAttemptScalarFieldEnum)[keyof typeof AgenticWalletFundingConversionSubmissionAttemptScalarFieldEnum]
 
 
 export const RealExecutionReservationScalarFieldEnum = {

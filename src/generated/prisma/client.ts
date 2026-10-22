@@ -75,6 +75,11 @@ export type BacktestRun = Prisma.BacktestRunModel
  */
 export type AgenticWalletFundingConversionPlan = Prisma.AgenticWalletFundingConversionPlanModel
 /**
+ * Model AgenticWalletFundingConversionSubmissionAttempt
+ * 
+ */
+export type AgenticWalletFundingConversionSubmissionAttempt = Prisma.AgenticWalletFundingConversionSubmissionAttemptModel
+/**
  * Model RealExecutionReservation
  * 
  */

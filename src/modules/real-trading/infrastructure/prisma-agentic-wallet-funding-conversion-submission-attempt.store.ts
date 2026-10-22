@@ -1,0 +1,172 @@
+import { createHash } from 'node:crypto';
+
+import { Injectable } from '@nestjs/common';
+import Decimal from 'decimal.js';
+
+import { Prisma } from '../../../generated/prisma/client';
+import { PrismaService } from '../../../infrastructure/database/prisma.service';
+import {
+  AgenticWalletFundingConversionSubmissionAttemptStore,
+  AgenticWalletFundingConversionSubmissionClaim,
+  FundingConversionSubmissionClaimBlockedError,
+  FundingConversionSubmissionClaimConflictError,
+  StoredAgenticWalletFundingConversionSubmissionAttempt,
+} from '../application/agentic-wallet-funding-conversion-submission-attempt.store';
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+const HASH_PATTERN = /^[a-f0-9]{64}$/;
+const DECIMAL_PATTERN = /^(?:0|[1-9]\d*)(?:\.\d+)?$/;
+
+@Injectable()
+export class PrismaAgenticWalletFundingConversionSubmissionAttemptStore implements AgenticWalletFundingConversionSubmissionAttemptStore {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async claim(claim: AgenticWalletFundingConversionSubmissionClaim): Promise<{
+    attempt: StoredAgenticWalletFundingConversionSubmissionAttempt;
+    replayed: boolean;
+  }> {
+    validateClaimShape(claim);
+    const confirmationPhraseDigest = digest(claim.confirmationPhrase);
+    const requestFingerprint = digest(
+      JSON.stringify({
+        confirmationPhraseDigest,
+        freshExpectedUsdt: claim.freshExpectedUsdt,
+        freshMinimumUsdt: claim.freshMinimumUsdt,
+        freshRemainingQuantityBnb: claim.freshRemainingQuantityBnb,
+        id: claim.id,
+        planFingerprint: claim.planFingerprint,
+        planId: claim.planId,
+        startedAt: claim.startedAt.toISOString(),
+      }),
+    );
+
+    return this.prisma.$transaction(
+      async (tx) => {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(20261022, 127)`;
+        const existing =
+          await tx.agenticWalletFundingConversionSubmissionAttempt.findUnique({
+            where: { planId: claim.planId },
+          });
+        if (existing) {
+          if (existing.requestFingerprint !== requestFingerprint) {
+            throw new FundingConversionSubmissionClaimConflictError();
+          }
+          return { attempt: mapAttempt(existing), replayed: true };
+        }
+
+        const plan = await tx.agenticWalletFundingConversionPlan.findUnique({
+          where: { id: claim.planId },
+        });
+        const blockers: string[] = [];
+        if (!plan) blockers.push('plan_not_found');
+        if (plan && plan.fingerprint !== claim.planFingerprint)
+          blockers.push('plan_fingerprint_mismatch');
+        if (plan && plan.confirmationPhraseDigest !== confirmationPhraseDigest)
+          blockers.push('confirmation_phrase_mismatch');
+        if (plan && !plan.executionConfigurationReady)
+          blockers.push('plan_configuration_not_ready');
+        if (
+          plan &&
+          claim.startedAt.getTime() > plan.confirmationExpiresAt.getTime()
+        )
+          blockers.push('confirmation_expired');
+        if (
+          plan &&
+          new Decimal(claim.freshMinimumUsdt).lessThan(plan.minimumUsdt)
+        )
+          blockers.push('fresh_minimum_below_plan_minimum');
+        if (
+          plan &&
+          (plan.minimumGasReserveBnb === null ||
+            new Decimal(claim.freshRemainingQuantityBnb).lessThan(
+              plan.minimumGasReserveBnb,
+            ))
+        )
+          blockers.push('fresh_remaining_bnb_below_gas_reserve');
+        if (blockers.length > 0) {
+          throw new FundingConversionSubmissionClaimBlockedError(blockers);
+        }
+
+        const created =
+          await tx.agenticWalletFundingConversionSubmissionAttempt.create({
+            data: {
+              id: claim.id,
+              planId: claim.planId,
+              requestFingerprint,
+              freshExpectedUsdt: claim.freshExpectedUsdt,
+              freshMinimumUsdt: claim.freshMinimumUsdt,
+              freshRemainingQuantityBnb: claim.freshRemainingQuantityBnb,
+              state: 'submission_claimed',
+              automaticRetryAllowed: false,
+              startedAt: claim.startedAt,
+            },
+          });
+        return { attempt: mapAttempt(created), replayed: false };
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
+  }
+}
+
+function validateClaimShape(
+  claim: AgenticWalletFundingConversionSubmissionClaim,
+): void {
+  if (
+    !UUID_PATTERN.test(claim.id) ||
+    !UUID_PATTERN.test(claim.planId) ||
+    !HASH_PATTERN.test(claim.planFingerprint) ||
+    typeof claim.confirmationPhrase !== 'string' ||
+    claim.confirmationPhrase.length < 1 ||
+    claim.confirmationPhrase.length > 512 ||
+    !isNonNegativeDecimal(claim.freshExpectedUsdt) ||
+    !isNonNegativeDecimal(claim.freshMinimumUsdt) ||
+    !isNonNegativeDecimal(claim.freshRemainingQuantityBnb) ||
+    !(claim.startedAt instanceof Date) ||
+    !Number.isFinite(claim.startedAt.getTime())
+  ) {
+    throw new FundingConversionSubmissionClaimBlockedError(['invalid_claim']);
+  }
+}
+
+function isNonNegativeDecimal(value: string): boolean {
+  return DECIMAL_PATTERN.test(value) && new Decimal(value).isFinite();
+}
+
+function digest(value: string): string {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+function mapAttempt(row: {
+  id: string;
+  planId: string;
+  requestFingerprint: string;
+  freshExpectedUsdt: string;
+  freshMinimumUsdt: string;
+  freshRemainingQuantityBnb: string;
+  state: string;
+  automaticRetryAllowed: boolean;
+  startedAt: Date;
+}): StoredAgenticWalletFundingConversionSubmissionAttempt {
+  if (
+    row.state !== 'submission_claimed' ||
+    row.automaticRetryAllowed !== false ||
+    !HASH_PATTERN.test(row.requestFingerprint) ||
+    !Number.isFinite(row.startedAt.getTime())
+  ) {
+    throw new Error(
+      'Persisted funding conversion submission attempt is invalid',
+    );
+  }
+  return {
+    id: row.id,
+    planId: row.planId,
+    requestFingerprint: row.requestFingerprint,
+    freshExpectedUsdt: row.freshExpectedUsdt,
+    freshMinimumUsdt: row.freshMinimumUsdt,
+    freshRemainingQuantityBnb: row.freshRemainingQuantityBnb,
+    state: 'submission_claimed',
+    automaticRetryAllowed: false,
+    startedAt: new Date(row.startedAt),
+  };
+}

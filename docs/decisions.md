@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-10-22 - Consume funding-conversion plans before provider submission
+
+A provider timeout after a mutable command cannot safely distinguish “not sent” from “sent but response lost.” M10.127 therefore creates a unique durable attempt before any future provider call and permanently disables automatic retry. The claim transaction verifies the original confirmation digest and fresh price/reserve evidence; exact replay can be identified, but must never cause a second provider invocation. Provider outcome recording and terminal reconciliation remain separate required increments before runtime wiring.
+
 ## 2026-10-22 - Separate price expiry from confirmation and require a gas floor
 
 A five-second quote is too short for meaningful operator review, while extending that quote locally would fabricate price validity. M10.126 keeps the provider quote expiry unchanged, gives the confirmation plan a separate sixty-second lifetime, and requires any later submission to re-quote against the already accepted minimum output. A separately configured minimum BNB remainder is required as a conservative gas floor, but it does not assert knowledge of the eventual network fee.

@@ -121,9 +121,29 @@ model AgenticWalletFundingConversionPlan {
   quoteExpiresAt              DateTime @map("quote_expires_at")
   confirmationExpiresAt       DateTime @map("confirmation_expires_at")
   preparedAt                  DateTime @map("prepared_at")
+  submissionAttempt           AgenticWalletFundingConversionSubmissionAttempt?
 
   @@index([preparedAt, id])
   @@map("agentic_wallet_funding_conversion_plans")
+}
+
+model AgenticWalletFundingConversionSubmissionAttempt {
+  id                        String   @id @db.Uuid
+  planId                    String   @unique @map("plan_id") @db.Uuid
+  requestFingerprint        String   @map("request_fingerprint") @db.Char(64)
+  freshExpectedUsdt         String   @map("fresh_expected_usdt") @db.Text
+  freshMinimumUsdt          String   @map("fresh_minimum_usdt") @db.Text
+  freshRemainingQuantityBnb String   @map("fresh_remaining_quantity_bnb") @db.Text
+  state                     String   @db.VarChar(40)
+  providerOrderId           String?  @unique @map("provider_order_id") @db.VarChar(256)
+  responseFingerprint       String?  @map("response_fingerprint") @db.Char(64)
+  automaticRetryAllowed     Boolean  @map("automatic_retry_allowed")
+  startedAt                 DateTime @map("started_at")
+  completedAt               DateTime? @map("completed_at")
+  plan                      AgenticWalletFundingConversionPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([state, startedAt])
+  @@map("agentic_wallet_funding_conversion_submission_attempts")
 }
 
 model RealExecutionReservation {

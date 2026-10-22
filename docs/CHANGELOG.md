@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-22 — Add durable one-shot funding-conversion claims
+
+- Added one unique serializable submission-attempt claim per durable funding-conversion plan.
+- Revalidated the plan fingerprint, confirmation digest/deadline, configuration readiness, fresh minimum USDT, and fresh BNB reserve before consumption.
+- Persisted only fresh financial evidence and a request fingerprint, never the raw confirmation phrase.
+- Made every claim non-retryable and kept the store outside runtime wiring; no provider command or transaction ran.
+
 ## 2026-10-22 — Separate confirmation lifetime and minimum gas reserve
 
 - Added a sixty-second funding-conversion confirmation deadline independent of the five-second provider quote expiry.
