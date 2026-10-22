@@ -31,7 +31,7 @@ btcValue = btcBalance × btcPrice
 totalValue = usdtBalance + btcValue
 ```
 
-The result contains the BTC balance and value, USDT balance, BTC price, total USDT value, and ticker event time. All financial fields are decimal strings and calculations use `decimal.js`. Valuation fails explicitly until the first ticker is available and rejects non-positive or malformed prices.
+The result contains the BTC balance and value, USDT balance, BTC price, total USDT value, and ticker event time. All financial fields are decimal strings and calculations use `decimal.js`. During startup, market data obtains one strict public Binance REST BTC/USDT price snapshot while also starting the live ticker stream. The first valid source wins, so valuation is normally available as soon as the API listens. Valuation still fails explicitly when neither source provides a valid price and rejects non-positive or malformed prices.
 
 Valuation also compares the current time with the ticker `receivedAt`. A price older than `PAPER_VALUATION_MAX_PRICE_AGE_MS` is rejected as stale; a price exactly at the limit remains valid. A system-clock adapter keeps this rule deterministic in tests.
 
@@ -39,7 +39,7 @@ Valuation also compares the current time with the ticker `receivedAt`. A price o
 
 - `GET /paper-wallet/balances` returns the current BTC and USDT decimal-string balances.
 - `GET /paper-wallet/valuation` returns the current USDT valuation.
-- Valuation returns HTTP 503 until the first normalized BTC/USDT ticker is available or when the retained ticker is stale.
+- Valuation returns HTTP 503 only when no normalized BTC/USDT price is available from the startup snapshot or live stream, or when the retained price is stale.
 
 There are no HTTP routes for credit, debit, reset, orders, or any other mutation.
 

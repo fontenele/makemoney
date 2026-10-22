@@ -16,6 +16,8 @@ Official reference: [Binance Spot WebSocket Market Streams](https://developers.b
 
 The ticker client has an independent connection and follows the NestJS module lifecycle.
 
+Before application startup completes, the lifecycle also requests one credential-free `GET /api/v3/ticker/price?symbol=BTCUSDT` snapshot from `BINANCE_REST_BASE_URL`. This bounds the period before paper-wallet valuation has an initial price. The WebSocket starts first and remains the live source; if it publishes while the REST request is in flight, the snapshot does not replace that streaming value. A failed or invalid snapshot is logged and never fabricated.
+
 ## Provider payload
 
 The boundary accepts the documented mini ticker fields:

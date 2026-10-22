@@ -1,5 +1,9 @@
 # Current State
 
+The paper-wallet valuation startup gap is fixed. The market-data lifecycle now starts the BTC/USDT WebSocket and, before application startup completes, loads one public Binance REST price snapshot. The first valid source wins, so a WebSocket event received during the REST request is not replaced by the snapshot. `GET /paper-wallet/valuation` is therefore ready when the API starts whenever either public source succeeds; HTTP 503 remains the honest result when no valid price is available or the retained price is stale.
+
+The REST adapter validates the exact BTCUSDT identity and a positive plain-decimal price, uses no credentials, preserves decimal strings, and is aborted on shutdown. Twelve focused tests plus lint and the backend build pass. No route, wallet mutation, order, or real-fund behavior changed.
+
 M10.132 is complete: validated funding-conversion status observations now have a durable PostgreSQL destination. The serializable store requires exact attempt/order correlation, immutable booking time, non-regressing provider update time, and immutable terminal evidence. Exact replay returns the existing row, while divergent or post-terminal progress fails closed.
 
 `FAILED` records terminal provider failure; `FINISHED` changes the attempt only to `provider_finished_pending_financial_reconciliation`. The local migration initially exposed PostgreSQL's identifier-length collision for generated index names; the empty partial table was verified, removed, the index names were shortened and mapped explicitly in Prisma, and the migration then applied successfully. Seventeen focused tests plus lint, formatting, and backend build pass. The store remains unregistered, with no status runner, route, or provider call.

@@ -21,7 +21,7 @@ The current market-data scope receives BTC/USDT public trade, mini ticker, one-m
 
 M2.1 adds an in-memory fictional wallet for BTC and USDT with configurable initial USDT, exact decimal credit/debit operations, balance queries, and insufficient-funds protection.
 
-M2.2 retains the latest normalized BTC/USDT ticker in memory and values the fictional BTC and USDT balances in USDT with exact decimal arithmetic.
+M2.2 retains the latest normalized BTC/USDT price in memory and values the fictional BTC and USDT balances in USDT with exact decimal arithmetic. Market-data startup now warms that price from a strict public Binance REST snapshot while the WebSocket remains the live source.
 
 M2.3 exposes balances and valuation through local read-only HTTP endpoints. No wallet mutation is exposed.
 

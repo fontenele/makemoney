@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-22 — Warm paper valuation during API startup
+
+- Added a strict public Binance REST BTC/USDT price snapshot adapter with no credentials.
+- Started the WebSocket first, then awaited one REST warm-up before the API becomes available.
+- Preserved a streaming price that arrives during warm-up instead of replacing it with the snapshot.
+- Kept HTTP 503 for genuine missing or stale price evidence and added focused lifecycle/adapter tests.
+
 ## 2026-10-22 — Persist monotonic funding-conversion status
 
 - Added durable status observations correlated to one exact conversion attempt and provider order.

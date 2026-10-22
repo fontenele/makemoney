@@ -13,11 +13,13 @@ import { SpreadCalculator } from './application/spread-calculator';
 import { CANDLE_STREAM } from './domain/candle-stream';
 import { PAIR_METADATA_PROVIDER } from './domain/pair-metadata-provider';
 import { TICKER_STREAM } from './domain/ticker-stream';
+import { TICKER_SNAPSHOT_PROVIDER } from './domain/ticker-snapshot-provider';
 import { TOP_OF_BOOK_STREAM } from './domain/top-of-book-stream';
 import { TRADE_STREAM } from './domain/trade-stream';
 import { BinancePublicCandlesClient } from './infrastructure/binance/binance-public-candles.client';
 import { BinancePairMetadataClient } from './infrastructure/binance/binance-pair-metadata.client';
 import { BinancePublicTickerClient } from './infrastructure/binance/binance-public-ticker.client';
+import { BinancePublicTickerSnapshotClient } from './infrastructure/binance/binance-public-ticker-snapshot.client';
 import { BinancePublicTopOfBookClient } from './infrastructure/binance/binance-public-top-of-book.client';
 import { BinancePublicTradesClient } from './infrastructure/binance/binance-public-trades.client';
 
@@ -45,6 +47,14 @@ import { BinancePublicTradesClient } from './infrastructure/binance/binance-publ
       useFactory: (config: ConfigService): BinancePublicTickerClient =>
         new BinancePublicTickerClient(
           config.getOrThrow<string>('BINANCE_WS_BASE_URL'),
+        ),
+    },
+    {
+      provide: TICKER_SNAPSHOT_PROVIDER,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService): BinancePublicTickerSnapshotClient =>
+        new BinancePublicTickerSnapshotClient(
+          config.getOrThrow<string>('BINANCE_REST_BASE_URL'),
         ),
     },
     {

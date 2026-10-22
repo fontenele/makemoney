@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-10-22 - Make valuation readiness part of market-data startup
+
+Waiting for the first mini-ticker event created an avoidable interval in which the API was healthy but paper valuation returned 503. The market-data lifecycle now starts the WebSocket and concurrently requests one public REST BTCUSDT price, then waits for that bounded warm-up before application startup completes. A streaming event that arrives first remains authoritative; the REST snapshot only fills an empty cache. Provider failure remains explicit rather than introducing a fabricated or persisted price.
+
 ## 2026-10-22 - Persist funding status as monotonic provider evidence
 
 Order polling may repeat or return delayed evidence. M10.132 therefore stores observations by attempt and provider update time, permits only exact replay, prevents time regression and booking-time changes, and makes terminal status immutable. `FINISHED` advances only to a financial-reconciliation-pending state, preserving the distinction between provider completion and credited wallet funds.
