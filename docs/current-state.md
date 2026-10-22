@@ -1,5 +1,9 @@
 # Current State
 
+M10.130 is complete: an unregistered application coordinator now composes the complete prospective submission sequence. It validates an exact request, checks all runtime approvals and the emergency stop, obtains a new non-expired quote, rechecks the gates, atomically consumes the plan, builds only the pinned BNB-to-USDT command, calls the runner at most once, and persists either pending acknowledgment or unknown outcome.
+
+Claim replay stops before provider access. A thrown provider call is converted into a durable unknown, non-retryable outcome rather than retried or reported as success. Focused tests use doubles for every provider and persistence dependency; lint, formatting, and backend build pass. The coordinator, runner, claim store, and outcome store remain absent from NestJS registration, so no API/dashboard path and no real transaction exist.
+
 M10.129 is complete: the durable one-shot claim now correlates every essential fresh quote term to the consumed plan. Fresh source quantity and maximum slippage are fingerprinted and persisted, and both must exactly equal the stored plan values before insertion; fresh minimum output and remaining gas reserve retain their existing lower-bound checks. Decimal normalization is explicit and native floating-point arithmetic is not used.
 
 The follow-up migration and generated Prisma client are applied locally. Focused claim tests now cover quantity and slippage mismatches, and the backend build passes. The claim/outcome stores and mutable runner remain outside runtime registration, so no provider process or financial transaction occurred.

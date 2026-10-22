@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-10-22 - Prove submission orchestration before runtime exposure
+
+The mutable sequence has several failure boundaries that cannot be made safe by a controller alone. M10.130 first composes and tests the whole sequence as an unregistered service: runtime gates and emergency stop, fresh quote, durable consumption, one provider invocation, and durable outcome. Runtime registration remains deferred until terminal status reconciliation exists and the operator separately approves activation.
+
 ## 2026-10-22 - Bind the complete fresh quote before plan consumption
 
 Comparing only fresh output and remaining gas would allow unrelated quote evidence to satisfy a plan accidentally. M10.129 therefore binds the fresh source quantity and slippage ceiling into both the durable claim fingerprint and row, requiring exact decimal equality with the original plan before it can be consumed.

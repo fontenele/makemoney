@@ -1,5 +1,21 @@
 # Real Trading
 
+## M10.130 — One-shot funding-conversion submission coordinator
+
+M10.130 composes the guarded submission sequence behind an unregistered application service. It strictly parses one exact plan/fingerprint/phrase/quantity request, requires all runtime activation settings, checks the emergency stop, obtains a fresh quote, rejects expired evidence, rechecks configuration and stop state, claims the plan durably, invokes the closed runner at most once, assesses the response, and persists the outcome.
+
+A replayed claim stops before the runner. A thrown provider call is converted to `submission_outcome_unknown`, recorded without retry, and never reported as successful. The service is deliberately absent from NestJS dependency injection and has no controller/dashboard path.
+
+### M10.130 acceptance criteria
+
+- Strict malformed or additive input fails before dependency access.
+- Incomplete runtime configuration and active emergency stop fail before quoting.
+- A fresh non-expired exact quote is required before the durable claim.
+- Replayed consumption never reaches the mutable runner.
+- The runner is invoked at most once after a new durable claim.
+- Provider exceptions are persisted as unknown and non-retryable.
+- No runtime registration, route, dashboard action, or real provider call exists.
+
 ## M10.129 — Exact fresh-quote correlation
 
 M10.129 strengthens the M10.127 one-shot claim by persisting and comparing the fresh source quantity and maximum slippage as well as output and reserve evidence. The fresh source quantity must equal the stored plan quantity exactly, and the fresh slippage percentage must equal the stored plan ceiling exactly, using decimal normalization rather than native floating point.

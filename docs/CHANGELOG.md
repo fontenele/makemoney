@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-22 — Compose guarded one-shot funding conversion
+
+- Added an unregistered coordinator for runtime gates, emergency stop, fresh quote, durable claim, one runner call, and durable outcome.
+- Blocked replay before provider access and converted provider exceptions into unknown non-retryable outcomes.
+- Added focused tests with provider and persistence doubles.
+- Kept the coordinator and mutable runner outside the running application; no real transaction ran.
+
 ## 2026-10-22 — Bind complete fresh quote evidence to conversion claims
 
 - Added fresh source quantity and slippage to durable funding-conversion attempts and their request fingerprints.
