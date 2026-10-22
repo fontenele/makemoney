@@ -2,6 +2,8 @@
 
 Use this keyword map to locate context before changing code. Read the listed documentation and files for the relevant keyword.
 
+- **Durable monotonic funding-conversion status, M10.132:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the observation contract is in `../src/modules/real-trading/application/agentic-wallet-funding-conversion-status-observation.store.ts`, the unregistered serializable implementation and tests are in `../src/modules/real-trading/infrastructure/prisma-agentic-wallet-funding-conversion-status-observation.store.ts`, and the model/migration are in `../prisma/`. Terminal finished evidence remains pending financial reconciliation.
+
 - **Funding-conversion terminal-status assessment, M10.131:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the pure assessor and tests are in `../src/modules/real-trading/infrastructure/agentic-wallet-funding-conversion-status-response.ts`. It correlates the complete order payload and leaves even `FINISHED` financially unreconciled.
 
 - **One-shot funding-conversion submission coordinator, M10.130:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the unregistered coordinator and double-only tests are in `../src/modules/real-trading/application/agentic-wallet-funding-conversion-submission.service.ts`. It composes fresh quote, current gates, emergency stop, durable consumption, at-most-once runner invocation, and outcome persistence without any runtime path.

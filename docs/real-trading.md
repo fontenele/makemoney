@@ -1,5 +1,20 @@
 # Real Trading
 
+## M10.132 — Durable monotonic funding-conversion status
+
+M10.132 persists validated M10.131 observations under a serializable per-store lock. Each provider update time is unique per attempt, booking time is immutable across progress, provider time cannot regress, and terminal evidence cannot transition again. Exact replay returns the existing row; divergent reuse fails closed.
+
+A terminal `FAILED` moves the attempt to `provider_failed`. A terminal `FINISHED` moves it only to `provider_finished_pending_financial_reconciliation`; no durable state claims that the expected USDT was credited or that costs are complete.
+
+### M10.132 acceptance criteria
+
+- Every observation belongs to the exact durable attempt and provider order.
+- Provider update time is monotonic and booking time is immutable.
+- Terminal evidence cannot be rewritten or followed by another status.
+- Exact replay is idempotent and divergent reuse conflicts.
+- `FINISHED` remains explicitly pending financial reconciliation.
+- The migration is applied locally; the store remains unregistered and performs no provider call.
+
 ## M10.131 — Funding-conversion terminal-status assessment
 
 M10.131 adds a pure funding-specific assessor for the read-only `market-order list --orderId` response. It requires one exact order, correlates the order identity, BSC chain, native BNB-to-USDT direction, symbols, source quantity, and slippage, and validates provider status, chronology, and transaction hash.

@@ -128,24 +128,41 @@ model AgenticWalletFundingConversionPlan {
 }
 
 model AgenticWalletFundingConversionSubmissionAttempt {
-  id                          String                             @id @db.Uuid
-  planId                      String                             @unique @map("plan_id") @db.Uuid
-  requestFingerprint          String                             @map("request_fingerprint") @db.Char(64)
-  freshSourceQuantityBnb      String                             @map("fresh_source_quantity_bnb") @db.Text
-  freshExpectedUsdt           String                             @map("fresh_expected_usdt") @db.Text
-  freshMinimumUsdt            String                             @map("fresh_minimum_usdt") @db.Text
-  freshMaximumSlippagePercent String                             @map("fresh_maximum_slippage_percent") @db.Text
-  freshRemainingQuantityBnb   String                             @map("fresh_remaining_quantity_bnb") @db.Text
-  state                       String                             @db.VarChar(40)
-  providerOrderId             String?                            @unique @map("provider_order_id") @db.VarChar(256)
-  responseFingerprint         String?                            @map("response_fingerprint") @db.Char(64)
-  automaticRetryAllowed       Boolean                            @map("automatic_retry_allowed")
-  startedAt                   DateTime                           @map("started_at")
-  completedAt                 DateTime?                          @map("completed_at")
-  plan                        AgenticWalletFundingConversionPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
+  id                          String                                            @id @db.Uuid
+  planId                      String                                            @unique @map("plan_id") @db.Uuid
+  requestFingerprint          String                                            @map("request_fingerprint") @db.Char(64)
+  freshSourceQuantityBnb      String                                            @map("fresh_source_quantity_bnb") @db.Text
+  freshExpectedUsdt           String                                            @map("fresh_expected_usdt") @db.Text
+  freshMinimumUsdt            String                                            @map("fresh_minimum_usdt") @db.Text
+  freshMaximumSlippagePercent String                                            @map("fresh_maximum_slippage_percent") @db.Text
+  freshRemainingQuantityBnb   String                                            @map("fresh_remaining_quantity_bnb") @db.Text
+  state                       String                                            @db.VarChar(40)
+  providerOrderId             String?                                           @unique @map("provider_order_id") @db.VarChar(256)
+  responseFingerprint         String?                                           @map("response_fingerprint") @db.Char(64)
+  automaticRetryAllowed       Boolean                                           @map("automatic_retry_allowed")
+  startedAt                   DateTime                                          @map("started_at")
+  completedAt                 DateTime?                                         @map("completed_at")
+  plan                        AgenticWalletFundingConversionPlan                @relation(fields: [planId], references: [id], onDelete: Restrict)
+  statusObservations          AgenticWalletFundingConversionStatusObservation[]
 
   @@index([state, startedAt])
   @@map("agentic_wallet_funding_conversion_submission_attempts")
+}
+
+model AgenticWalletFundingConversionStatusObservation {
+  id                String                                          @id @db.Uuid
+  attemptId         String                                          @map("attempt_id") @db.Uuid
+  providerOrderId   String                                          @map("provider_order_id") @db.VarChar(256)
+  providerStatus    String                                          @map("provider_status") @db.VarChar(16)
+  transactionHash   String?                                         @unique(map: "funding_conversion_status_tx_hash_key") @map("transaction_hash") @db.VarChar(66)
+  bookedAt          DateTime                                        @map("booked_at")
+  providerUpdatedAt DateTime                                        @map("provider_updated_at")
+  recordedAt        DateTime                                        @map("recorded_at")
+  attempt           AgenticWalletFundingConversionSubmissionAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
+
+  @@unique([attemptId, providerUpdatedAt], map: "funding_conversion_status_attempt_updated_key")
+  @@index([attemptId, recordedAt], map: "funding_conversion_status_attempt_recorded_idx")
+  @@map("agentic_wallet_funding_conversion_status_observations")
 }
 
 model RealExecutionReservation {

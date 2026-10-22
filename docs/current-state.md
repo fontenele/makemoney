@@ -1,5 +1,9 @@
 # Current State
 
+M10.132 is complete: validated funding-conversion status observations now have a durable PostgreSQL destination. The serializable store requires exact attempt/order correlation, immutable booking time, non-regressing provider update time, and immutable terminal evidence. Exact replay returns the existing row, while divergent or post-terminal progress fails closed.
+
+`FAILED` records terminal provider failure; `FINISHED` changes the attempt only to `provider_finished_pending_financial_reconciliation`. The local migration initially exposed PostgreSQL's identifier-length collision for generated index names; the empty partial table was verified, removed, the index names were shortened and mapped explicitly in Prisma, and the migration then applied successfully. Seventeen focused tests plus lint, formatting, and backend build pass. The store remains unregistered, with no status runner, route, or provider call.
+
 M10.131 is complete: a pure funding-conversion status assessor now validates the exact response expected from a future read-only order lookup. It correlates provider order identity, BSC chain, native BNB-to-USDT direction and symbols, source quantity, slippage, provider chronology, terminal state, and EVM transaction hash.
 
 `PENDING` remains pending, `FAILED` becomes terminal without retry, and `FINISHED` requires a transaction hash but explicitly keeps financial reconciliation incomplete. Eleven focused tests and the backend lint/build pass. The assessor has no store, runner, route, or runtime registration, and no provider call or financial transaction occurred.

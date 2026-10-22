@@ -405,6 +405,7 @@ export const ModelName = {
   BacktestRun: 'BacktestRun',
   AgenticWalletFundingConversionPlan: 'AgenticWalletFundingConversionPlan',
   AgenticWalletFundingConversionSubmissionAttempt: 'AgenticWalletFundingConversionSubmissionAttempt',
+  AgenticWalletFundingConversionStatusObservation: 'AgenticWalletFundingConversionStatusObservation',
   RealExecutionReservation: 'RealExecutionReservation',
   RealExecutionArm: 'RealExecutionArm',
   RealExecutionRiskApproval: 'RealExecutionRiskApproval',
@@ -438,7 +439,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "agenticWalletFundingConversionPlan" | "agenticWalletFundingConversionSubmissionAttempt" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingBalanceInitialization" | "realExecutionAccountingLedgerReconciliation" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "agenticWalletFundingConversionPlan" | "agenticWalletFundingConversionSubmissionAttempt" | "agenticWalletFundingConversionStatusObservation" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingBalanceInitialization" | "realExecutionAccountingLedgerReconciliation" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1031,6 +1032,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AgenticWalletFundingConversionSubmissionAttemptCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AgenticWalletFundingConversionSubmissionAttemptCountAggregateOutputType> | number
+        }
+      }
+    }
+    AgenticWalletFundingConversionStatusObservation: {
+      payload: Prisma.$AgenticWalletFundingConversionStatusObservationPayload<ExtArgs>
+      fields: Prisma.AgenticWalletFundingConversionStatusObservationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionStatusObservationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionStatusObservationPayload>
+        }
+        findFirst: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionStatusObservationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionStatusObservationPayload>
+        }
+        findMany: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionStatusObservationPayload>[]
+        }
+        create: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionStatusObservationPayload>
+        }
+        createMany: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionStatusObservationPayload>[]
+        }
+        delete: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionStatusObservationPayload>
+        }
+        update: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionStatusObservationPayload>
+        }
+        deleteMany: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionStatusObservationPayload>[]
+        }
+        upsert: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionStatusObservationPayload>
+        }
+        aggregate: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgenticWalletFundingConversionStatusObservation>
+        }
+        groupBy: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgenticWalletFundingConversionStatusObservationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgenticWalletFundingConversionStatusObservationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgenticWalletFundingConversionStatusObservationCountAggregateOutputType> | number
         }
       }
     }
@@ -2545,6 +2620,20 @@ export const AgenticWalletFundingConversionSubmissionAttemptScalarFieldEnum = {
 export type AgenticWalletFundingConversionSubmissionAttemptScalarFieldEnum = (typeof AgenticWalletFundingConversionSubmissionAttemptScalarFieldEnum)[keyof typeof AgenticWalletFundingConversionSubmissionAttemptScalarFieldEnum]
 
 
+export const AgenticWalletFundingConversionStatusObservationScalarFieldEnum = {
+  id: 'id',
+  attemptId: 'attemptId',
+  providerOrderId: 'providerOrderId',
+  providerStatus: 'providerStatus',
+  transactionHash: 'transactionHash',
+  bookedAt: 'bookedAt',
+  providerUpdatedAt: 'providerUpdatedAt',
+  recordedAt: 'recordedAt'
+} as const
+
+export type AgenticWalletFundingConversionStatusObservationScalarFieldEnum = (typeof AgenticWalletFundingConversionStatusObservationScalarFieldEnum)[keyof typeof AgenticWalletFundingConversionStatusObservationScalarFieldEnum]
+
+
 export const RealExecutionReservationScalarFieldEnum = {
   id: 'id',
   providerId: 'providerId',
@@ -3200,6 +3289,7 @@ export type GlobalOmitConfig = {
   backtestRun?: Prisma.BacktestRunOmit
   agenticWalletFundingConversionPlan?: Prisma.AgenticWalletFundingConversionPlanOmit
   agenticWalletFundingConversionSubmissionAttempt?: Prisma.AgenticWalletFundingConversionSubmissionAttemptOmit
+  agenticWalletFundingConversionStatusObservation?: Prisma.AgenticWalletFundingConversionStatusObservationOmit
   realExecutionReservation?: Prisma.RealExecutionReservationOmit
   realExecutionArm?: Prisma.RealExecutionArmOmit
   realExecutionRiskApproval?: Prisma.RealExecutionRiskApprovalOmit

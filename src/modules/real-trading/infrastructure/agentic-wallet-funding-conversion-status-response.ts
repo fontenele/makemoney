@@ -116,6 +116,36 @@ export function assessAgenticWalletFundingConversionStatusResponse(
   };
 }
 
+export function isValidFundingConversionStatusObservation(
+  value: unknown,
+): value is FundingConversionStatusObservation {
+  const observation = asRecord(value);
+  if (observation === null) return false;
+  const status = parseStatus(observation.providerStatus);
+  const bookedAt = observation.bookedAt;
+  const updatedAt = observation.providerUpdatedAt;
+  const hash = observation.transactionHash;
+  return (
+    typeof observation.attemptId === 'string' &&
+    UUID_PATTERN.test(observation.attemptId) &&
+    isSafeAgenticWalletProviderOrderId(observation.providerOrderId) &&
+    status !== null &&
+    (hash === null ||
+      (typeof hash === 'string' && /^0x[a-f0-9]{64}$/.test(hash))) &&
+    (status !== 'FINISHED' || hash !== null) &&
+    bookedAt instanceof Date &&
+    Number.isFinite(bookedAt.getTime()) &&
+    updatedAt instanceof Date &&
+    Number.isFinite(updatedAt.getTime()) &&
+    updatedAt.getTime() >= bookedAt.getTime() &&
+    observation.terminal === (status !== 'PENDING') &&
+    observation.executionSucceeded === (status === 'FINISHED') &&
+    observation.financialReconciliationRequired === true &&
+    observation.financialReconciliationComplete === false &&
+    observation.automaticRetryAllowed === false
+  );
+}
+
 function validContext(value: FundingConversionStatusContext): boolean {
   return (
     UUID_PATTERN.test(value.attemptId) &&

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-22 — Persist monotonic funding-conversion status
+
+- Added durable status observations correlated to one exact conversion attempt and provider order.
+- Enforced immutable booking time, monotonic provider updates, terminal immutability, and exact replay.
+- Kept provider `FINISHED` explicitly pending financial reconciliation.
+- Applied the migration with explicit short PostgreSQL index names; no provider command or transaction ran.
+
 ## 2026-10-22 — Validate funding-conversion terminal status
 
 - Added pure validation for one exact Agentic Wallet funding-conversion order lookup.

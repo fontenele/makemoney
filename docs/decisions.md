@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-10-22 - Persist funding status as monotonic provider evidence
+
+Order polling may repeat or return delayed evidence. M10.132 therefore stores observations by attempt and provider update time, permits only exact replay, prevents time regression and booking-time changes, and makes terminal status immutable. `FINISHED` advances only to a financial-reconciliation-pending state, preserving the distinction between provider completion and credited wallet funds.
+
 ## 2026-10-22 - Separate provider completion from financial reconciliation
 
 A `FINISHED` provider status and transaction hash establish terminal provider evidence but not the actual USDT credited or complete fees paid. M10.131 therefore validates terminal order evidence while keeping financial reconciliation explicitly required and incomplete. Runtime status polling and durable observations remain prerequisites before exposing submission.
