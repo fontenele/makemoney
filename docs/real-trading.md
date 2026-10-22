@@ -1,5 +1,21 @@
 # Real Trading
 
+## M10.125 — Durable funding-conversion plans
+
+M10.125 makes M10.123 plan disclosure conditional on durable storage. After a fresh quote produces a valid inert plan, the service hashes its complete generated confirmation phrase and sends the plan plus digest, activation blockers, readiness fact, and preparation time to a dedicated store. Only a successful insert permits the plan to be returned.
+
+The PostgreSQL row preserves the complete exact provider/financial envelope and quote chronology. It stores neither the raw phrase nor any wallet credential. The store rejects malformed UUIDs/digests, inconsistent readiness, invalid chronology, and plans already expired at preparation time before Prisma access.
+
+### M10.125 acceptance criteria
+
+- A successful plan is inserted before it is exposed through the existing route.
+- Plan UUID and SHA-256 fingerprint are unique durable identities.
+- The raw confirmation phrase is absent from Prisma input and storage.
+- The complete command envelope, quote facts, blockers, readiness, and chronology are retained.
+- Expired, malformed, or inconsistent evidence fails before database access.
+- Persistence failure withholds the plan and propagates as route unavailability.
+- The M10.124 runner remains unregistered and no signature, submission, retry, or conversion occurs.
+
 ## M10.124 — Closed unregistered funding-conversion swap runner
 
 M10.124 adds the first mutable provider primitive for funding conversion, but leaves it structurally unreachable from the running application. `AgenticWalletFundingConversionSwapCliProcessRunner` validates an exact typed envelope and builds only `market-order swap` from native BNB to approved USDT on BSC chain 56, with explicit slippage, MEV enabled, medium gas, and JSON output. It validates CLI 1.10.0 immediately before the future swap command.

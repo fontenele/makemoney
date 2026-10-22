@@ -2,15 +2,27 @@ import { jest } from '@jest/globals';
 import { ConfigService } from '@nestjs/config';
 import { AgenticWalletFundingConversionQuoteService } from './agentic-wallet-funding-conversion-quote.service';
 import { AgenticWalletFundingConversionPlanService } from './agentic-wallet-funding-conversion-plan.service';
+import { AgenticWalletFundingConversionPlanStore } from './agentic-wallet-funding-conversion-plan.store';
 import {
   BSC_NATIVE_BNB_ADDRESS,
   BSC_USDT_ADDRESS,
 } from '../infrastructure/agentic-wallet-funding-conversion-quote.adapter';
 
 describe('AgenticWalletFundingConversionPlanService', () => {
+  beforeEach(() => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-10-22T12:00:02.000Z'));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('binds one fresh BNB-to-USDT quote to an inert command preview', async () => {
     const load = jest.fn(() => Promise.resolve(availableQuote()));
-    const service = createService(load, enabledEnvironment());
+    const create = jest.fn((record) =>
+      Promise.resolve({ ...record, stored: true }),
+    );
+    const service = createService(load, enabledEnvironment(), create);
 
     const result = await service.prepare({ sourceQuantityBnb: '0.008' });
 
@@ -76,6 +88,15 @@ describe('AgenticWalletFundingConversionPlanService', () => {
       'MEDIUM',
       '--json',
     ]);
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        plan: result.plan,
+        confirmationPhraseDigest: expect.stringMatching(/^[a-f0-9]{64}$/),
+        activationBlockers: [],
+        executionConfigurationReady: true,
+        preparedAt: new Date('2026-10-22T12:00:02.000Z'),
+      }),
+    );
   });
 
   it('exposes every independent activation blocker without authorizing submission', async () => {
@@ -89,6 +110,7 @@ describe('AgenticWalletFundingConversionPlanService', () => {
         REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: null,
         REAL_EXECUTION_APPROVED_TARGET_TOKEN_ADDRESS: null,
       },
+      jest.fn((record) => Promise.resolve({ ...record, stored: true })),
     );
 
     await expect(
@@ -120,6 +142,7 @@ describe('AgenticWalletFundingConversionPlanService', () => {
     const service = createService(
       jest.fn(() => Promise.resolve(blocked)),
       enabledEnvironment(),
+      jest.fn((record) => Promise.resolve({ ...record, stored: true })),
     );
 
     await expect(
@@ -133,11 +156,24 @@ describe('AgenticWalletFundingConversionPlanService', () => {
     });
   });
 
+  it('does not expose a plan when durable persistence fails', async () => {
+    const failure = new Error('database unavailable');
+    const service = createService(
+      jest.fn(() => Promise.resolve(availableQuote())),
+      enabledEnvironment(),
+      jest.fn(() => Promise.reject(failure)),
+    );
+    await expect(service.prepare({ sourceQuantityBnb: '0.008' })).rejects.toBe(
+      failure,
+    );
+  });
+
   it('propagates request rejection before constructing a plan', async () => {
     const failure = new Error('invalid request');
     const service = createService(
       jest.fn(() => Promise.reject(failure)),
       enabledEnvironment(),
+      jest.fn((record) => Promise.resolve({ ...record, stored: true })),
     );
     await expect(service.prepare({ sourceQuantityBnb: '0' })).rejects.toBe(
       failure,
@@ -148,12 +184,14 @@ describe('AgenticWalletFundingConversionPlanService', () => {
 function createService(
   load: jest.Mock,
   environment: Record<string, unknown>,
+  create: jest.Mock,
 ): AgenticWalletFundingConversionPlanService {
   return new AgenticWalletFundingConversionPlanService(
     { load } as unknown as AgenticWalletFundingConversionQuoteService,
     {
       get: (name: string) => environment[name],
     } as unknown as ConfigService,
+    { create } as unknown as AgenticWalletFundingConversionPlanStore,
   );
 }
 

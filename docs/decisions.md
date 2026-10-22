@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-10-22 - Persist confirmation plans without storing the confirmation secret
+
+A process-local plan could disappear on restart and would not provide a durable identity for future one-shot consumption. Persisting the generated confirmation phrase in cleartext would also turn the database into a source of submission authorization. M10.125 therefore persists the immutable plan before disclosure but stores only the phrase's SHA-256 digest. A future consumer must present the exact phrase and atomically claim the plan; possession of database contents alone is insufficient.
+
 ## 2026-10-22 - Make the first funding swap primitive unreachable by construction
 
 The provider CLI can mutate the wallet, so argument validation alone is insufficient while confirmation, durable one-shot consumption, receipt persistence, and reconciliation are incomplete. M10.124 therefore introduces the closed runner as an unregistered infrastructure class with no application or runtime caller. This permits exact command validation without creating an HTTP or dependency-injection path to real funds.

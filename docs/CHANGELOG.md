@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-22 — Persist funding-conversion plans before disclosure
+
+- Added an immutable PostgreSQL model and migration for BNB-to-USDT funding-conversion plans.
+- Persisted the complete exact plan envelope, unique fingerprint, activation blockers, and chronology before returning a successful plan.
+- Stored only a SHA-256 digest of the generated confirmation phrase, never the phrase itself.
+- Withheld expired, malformed, or unpersisted plans and added focused service/store coverage.
+- Applied the pending local migrations and regenerated Prisma; no wallet mutation or swap runner registration occurred.
+
 ## 2026-10-22 — Add a closed unregistered funding-conversion swap runner
 
 - Added a CLI runner that accepts only the pinned BSC native-BNB-to-USDT swap envelope.

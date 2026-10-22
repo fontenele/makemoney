@@ -403,6 +403,7 @@ export const ModelName = {
   StrategySignal: 'StrategySignal',
   HistoricalCandleRecord: 'HistoricalCandleRecord',
   BacktestRun: 'BacktestRun',
+  AgenticWalletFundingConversionPlan: 'AgenticWalletFundingConversionPlan',
   RealExecutionReservation: 'RealExecutionReservation',
   RealExecutionArm: 'RealExecutionArm',
   RealExecutionRiskApproval: 'RealExecutionRiskApproval',
@@ -436,7 +437,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingBalanceInitialization" | "realExecutionAccountingLedgerReconciliation" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "agenticWalletFundingConversionPlan" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingBalanceInitialization" | "realExecutionAccountingLedgerReconciliation" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -881,6 +882,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.BacktestRunCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.BacktestRunCountAggregateOutputType> | number
+        }
+      }
+    }
+    AgenticWalletFundingConversionPlan: {
+      payload: Prisma.$AgenticWalletFundingConversionPlanPayload<ExtArgs>
+      fields: Prisma.AgenticWalletFundingConversionPlanFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgenticWalletFundingConversionPlanFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionPlanPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgenticWalletFundingConversionPlanFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionPlanPayload>
+        }
+        findFirst: {
+          args: Prisma.AgenticWalletFundingConversionPlanFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionPlanPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgenticWalletFundingConversionPlanFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionPlanPayload>
+        }
+        findMany: {
+          args: Prisma.AgenticWalletFundingConversionPlanFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionPlanPayload>[]
+        }
+        create: {
+          args: Prisma.AgenticWalletFundingConversionPlanCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionPlanPayload>
+        }
+        createMany: {
+          args: Prisma.AgenticWalletFundingConversionPlanCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgenticWalletFundingConversionPlanCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionPlanPayload>[]
+        }
+        delete: {
+          args: Prisma.AgenticWalletFundingConversionPlanDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionPlanPayload>
+        }
+        update: {
+          args: Prisma.AgenticWalletFundingConversionPlanUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionPlanPayload>
+        }
+        deleteMany: {
+          args: Prisma.AgenticWalletFundingConversionPlanDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgenticWalletFundingConversionPlanUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgenticWalletFundingConversionPlanUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionPlanPayload>[]
+        }
+        upsert: {
+          args: Prisma.AgenticWalletFundingConversionPlanUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionPlanPayload>
+        }
+        aggregate: {
+          args: Prisma.AgenticWalletFundingConversionPlanAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgenticWalletFundingConversionPlan>
+        }
+        groupBy: {
+          args: Prisma.AgenticWalletFundingConversionPlanGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgenticWalletFundingConversionPlanGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgenticWalletFundingConversionPlanCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgenticWalletFundingConversionPlanCountAggregateOutputType> | number
         }
       }
     }
@@ -2346,6 +2421,33 @@ export const BacktestRunScalarFieldEnum = {
 export type BacktestRunScalarFieldEnum = (typeof BacktestRunScalarFieldEnum)[keyof typeof BacktestRunScalarFieldEnum]
 
 
+export const AgenticWalletFundingConversionPlanScalarFieldEnum = {
+  id: 'id',
+  fingerprint: 'fingerprint',
+  confirmationPhraseDigest: 'confirmationPhraseDigest',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  sourceTokenAddress: 'sourceTokenAddress',
+  targetTokenAddress: 'targetTokenAddress',
+  sourceQuantityBnb: 'sourceQuantityBnb',
+  expectedUsdt: 'expectedUsdt',
+  minimumUsdt: 'minimumUsdt',
+  maximumSlippagePercent: 'maximumSlippagePercent',
+  remainingQuantityBnb: 'remainingQuantityBnb',
+  mevProtection: 'mevProtection',
+  gasLevel: 'gasLevel',
+  costCoverage: 'costCoverage',
+  gasReserveSufficiency: 'gasReserveSufficiency',
+  activationBlockers: 'activationBlockers',
+  executionConfigurationReady: 'executionConfigurationReady',
+  quotedAt: 'quotedAt',
+  quoteExpiresAt: 'quoteExpiresAt',
+  preparedAt: 'preparedAt'
+} as const
+
+export type AgenticWalletFundingConversionPlanScalarFieldEnum = (typeof AgenticWalletFundingConversionPlanScalarFieldEnum)[keyof typeof AgenticWalletFundingConversionPlanScalarFieldEnum]
+
+
 export const RealExecutionReservationScalarFieldEnum = {
   id: 'id',
   providerId: 'providerId',
@@ -2999,6 +3101,7 @@ export type GlobalOmitConfig = {
   strategySignal?: Prisma.StrategySignalOmit
   historicalCandleRecord?: Prisma.HistoricalCandleRecordOmit
   backtestRun?: Prisma.BacktestRunOmit
+  agenticWalletFundingConversionPlan?: Prisma.AgenticWalletFundingConversionPlanOmit
   realExecutionReservation?: Prisma.RealExecutionReservationOmit
   realExecutionArm?: Prisma.RealExecutionArmOmit
   realExecutionRiskApproval?: Prisma.RealExecutionRiskApprovalOmit

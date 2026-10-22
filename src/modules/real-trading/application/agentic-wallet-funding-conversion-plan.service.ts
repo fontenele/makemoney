@@ -10,6 +10,7 @@ import {
   BSC_NATIVE_BNB_ADDRESS,
   BSC_USDT_ADDRESS,
 } from '../infrastructure/agentic-wallet-funding-conversion-quote.adapter';
+import { AgenticWalletFundingConversionPlanStore } from './agentic-wallet-funding-conversion-plan.store';
 
 const PROVIDER_ID = 'agentic_wallet';
 const CHAIN_ID = '56';
@@ -79,6 +80,7 @@ export class AgenticWalletFundingConversionPlanService {
   constructor(
     private readonly quotes: AgenticWalletFundingConversionQuoteService,
     private readonly config: ConfigService<FundingConversionEnvironment, true>,
+    private readonly plans: AgenticWalletFundingConversionPlanStore,
   ) {}
 
   async prepare(
@@ -135,7 +137,7 @@ export class AgenticWalletFundingConversionPlanService {
       '--json',
     ] as const;
 
-    return result(quote, activationBlockers, {
+    const plan: AgenticWalletFundingConversionPlan = {
       id,
       fingerprint,
       provider: PROVIDER_ID,
@@ -163,7 +165,23 @@ export class AgenticWalletFundingConversionPlanService {
       providerSubmissionStarted: false,
       conversionAuthorized: false,
       submissionAuthorized: false,
+    };
+    const preparedAt = new Date();
+    if (preparedAt.getTime() >= plan.expiresAt.getTime()) {
+      throw new Error(
+        'Agentic Wallet funding conversion quote expired before plan persistence',
+      );
+    }
+    await this.plans.create({
+      plan,
+      confirmationPhraseDigest: createHash('sha256')
+        .update(confirmationPhrase)
+        .digest('hex'),
+      activationBlockers,
+      executionConfigurationReady: activationBlockers.length === 0,
+      preparedAt,
     });
+    return result(quote, activationBlockers, plan);
   }
 
   private activationBlockers(): AgenticWalletFundingConversionActivationBlocker[] {

@@ -1,5 +1,9 @@
 # Current State
 
+M10.125 is complete: successful funding-conversion plans are disclosed only after an immutable PostgreSQL insert. The durable row preserves the exact plan identity/fingerprint, BSC token direction, amount, expected/minimum USDT, remaining BNB, slippage, MEV, gas level, partial-cost/gas claims, activation blockers, configuration-readiness fact, and quote/preparation chronology. Only the SHA-256 digest of the confirmation phrase is stored; the phrase itself never enters Prisma.
+
+Malformed or already-expired plan evidence fails before database access, and database failure prevents the plan from reaching the caller. The migration and generated Prisma client are applied locally. Focused service/store tests, Prisma validation, and the backend build pass. No swap runner was registered or invoked and no financial transaction occurred.
+
 M10.124 is complete: a closed `AgenticWalletFundingConversionSwapCliProcessRunner` can build only the official BSC native-BNB-to-USDT swap arguments used by the M10.123 preview. It rejects any altered operation, chain, token direction, MEV setting, gas level, quantity, or slippage before process invocation and rechecks the pinned CLI version before a future command could run.
 
 The runner is deliberately absent from `RealTradingModule`: no application service, controller, dashboard action, test, or runtime path possesses it. Focused runner/version tests and the backend build pass without starting the CLI. No real quote, signature, submission, swap, or financial transaction was attempted.

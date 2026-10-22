@@ -14,6 +14,8 @@ import { AgenticWalletFundingConversionQuoteService } from './application/agenti
 import { AgenticWalletFundingConversionQuoteAdapter } from './infrastructure/agentic-wallet-funding-conversion-quote.adapter';
 import { AgenticWalletQuoteCliProcessRunner } from './infrastructure/agentic-wallet-quote-cli-process-runner';
 import { AgenticWalletFundingConversionPlanService } from './application/agentic-wallet-funding-conversion-plan.service';
+import { AgenticWalletFundingConversionPlanStore } from './application/agentic-wallet-funding-conversion-plan.store';
+import { PrismaAgenticWalletFundingConversionPlanStore } from './infrastructure/prisma-agentic-wallet-funding-conversion-plan.store';
 
 @Module({
   controllers: [RealTradingController],
@@ -50,6 +52,10 @@ import { AgenticWalletFundingConversionPlanService } from './application/agentic
         ),
     },
     AgenticWalletFundingConversionQuoteService,
+    {
+      provide: AgenticWalletFundingConversionPlanStore,
+      useClass: PrismaAgenticWalletFundingConversionPlanStore,
+    },
     AgenticWalletFundingConversionPlanService,
   ],
 })

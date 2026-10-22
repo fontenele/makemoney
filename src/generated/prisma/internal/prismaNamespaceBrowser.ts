@@ -57,6 +57,7 @@ export const ModelName = {
   StrategySignal: 'StrategySignal',
   HistoricalCandleRecord: 'HistoricalCandleRecord',
   BacktestRun: 'BacktestRun',
+  AgenticWalletFundingConversionPlan: 'AgenticWalletFundingConversionPlan',
   RealExecutionReservation: 'RealExecutionReservation',
   RealExecutionArm: 'RealExecutionArm',
   RealExecutionRiskApproval: 'RealExecutionRiskApproval',
@@ -182,6 +183,33 @@ export const BacktestRunScalarFieldEnum = {
 } as const
 
 export type BacktestRunScalarFieldEnum = (typeof BacktestRunScalarFieldEnum)[keyof typeof BacktestRunScalarFieldEnum]
+
+
+export const AgenticWalletFundingConversionPlanScalarFieldEnum = {
+  id: 'id',
+  fingerprint: 'fingerprint',
+  confirmationPhraseDigest: 'confirmationPhraseDigest',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  sourceTokenAddress: 'sourceTokenAddress',
+  targetTokenAddress: 'targetTokenAddress',
+  sourceQuantityBnb: 'sourceQuantityBnb',
+  expectedUsdt: 'expectedUsdt',
+  minimumUsdt: 'minimumUsdt',
+  maximumSlippagePercent: 'maximumSlippagePercent',
+  remainingQuantityBnb: 'remainingQuantityBnb',
+  mevProtection: 'mevProtection',
+  gasLevel: 'gasLevel',
+  costCoverage: 'costCoverage',
+  gasReserveSufficiency: 'gasReserveSufficiency',
+  activationBlockers: 'activationBlockers',
+  executionConfigurationReady: 'executionConfigurationReady',
+  quotedAt: 'quotedAt',
+  quoteExpiresAt: 'quoteExpiresAt',
+  preparedAt: 'preparedAt'
+} as const
+
+export type AgenticWalletFundingConversionPlanScalarFieldEnum = (typeof AgenticWalletFundingConversionPlanScalarFieldEnum)[keyof typeof AgenticWalletFundingConversionPlanScalarFieldEnum]
 
 
 export const RealExecutionReservationScalarFieldEnum = {

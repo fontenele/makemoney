@@ -70,6 +70,11 @@ export type HistoricalCandleRecord = Prisma.HistoricalCandleRecordModel
  */
 export type BacktestRun = Prisma.BacktestRunModel
 /**
+ * Model AgenticWalletFundingConversionPlan
+ * 
+ */
+export type AgenticWalletFundingConversionPlan = Prisma.AgenticWalletFundingConversionPlanModel
+/**
  * Model RealExecutionReservation
  * 
  */

@@ -2,6 +2,8 @@
 
 Use this keyword map to locate context before changing code. Read the listed documentation and files for the relevant keyword.
 
+- **Durable funding-conversion plan, confirmation digest, plan persistence, M10.125:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the store contract is in `../src/modules/real-trading/application/agentic-wallet-funding-conversion-plan.store.ts`, Prisma implementation and tests are in `../src/modules/real-trading/infrastructure/prisma-agentic-wallet-funding-conversion-plan.store.ts`, and the schema/migration are in `../prisma/`. A plan is returned only after insert, and the raw confirmation phrase is never persisted.
+
 - **Funding-conversion swap CLI runner, closed BNB-to-USDT command, M10.124:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the unregistered runner, pure argument builder, and focused tests are in `../src/modules/real-trading/infrastructure/agentic-wallet-funding-conversion-swap-command-runner.ts` and its adjacent spec. It accepts only the pinned M10.123 BSC envelope and has no runtime caller or NestJS registration.
 
 - **BNB-to-USDT conversion plan, swap command preview, funding conversion fingerprint, M10.123:** start with `real-trading.md`, `dashboard.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; plan composition and activation blockers are in `../src/modules/real-trading/application/agentic-wallet-funding-conversion-plan.service.ts`, the manual route is in `../src/modules/real-trading/presentation/real-trading.controller.ts`, and dashboard inspection is in `../dashboard/src/App.vue` plus `../dashboard/src/api.ts`. The command is non-executable, and no swap runner or confirmation/submission route is registered.
