@@ -2,6 +2,8 @@
 
 Use this keyword map to locate context before changing code. Read the listed documentation and files for the relevant keyword.
 
+- **One-shot funding-conversion status reconciliation, M10.133:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; durable context loading is in `../src/modules/real-trading/infrastructure/prisma-agentic-wallet-funding-conversion-status-context.store.ts`, and the unregistered coordinator plus focused tests are in `../src/modules/real-trading/application/agentic-wallet-funding-conversion-status.service.ts`. It performs at most one read-only status lookup per explicit call, suppresses overlapping same-attempt calls in-process, and keeps terminal success pending financial reconciliation.
+
 - **Durable monotonic funding-conversion status, M10.132:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the observation contract is in `../src/modules/real-trading/application/agentic-wallet-funding-conversion-status-observation.store.ts`, the unregistered serializable implementation and tests are in `../src/modules/real-trading/infrastructure/prisma-agentic-wallet-funding-conversion-status-observation.store.ts`, and the model/migration are in `../prisma/`. Terminal finished evidence remains pending financial reconciliation.
 
 - **Funding-conversion terminal-status assessment, M10.131:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the pure assessor and tests are in `../src/modules/real-trading/infrastructure/agentic-wallet-funding-conversion-status-response.ts`. It correlates the complete order payload and leaves even `FINISHED` financially unreconciled.

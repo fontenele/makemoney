@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-22 - Compose status reconciliation before runtime polling
+
+The funding-conversion status runner, response assessor, and monotonic store were independently constrained, but runtime exposure before proving their composition would leave durable context correlation and overlap behavior implicit. M10.133 therefore adds a one-shot, unregistered coordinator that derives the lookup payload only from the durable attempt, suppresses overlapping same-attempt calls in-process, performs one read-only lookup, and stores only fully validated evidence.
+
+No cadence, polling lifecycle, retry, controller, or dependency-injection registration is introduced. Provider exceptions propagate, terminal state stops future lookups, and provider `FINISHED` remains separate from financial reconciliation.
+
 ## 2026-10-22 - Isolate authenticated wallet valuation from the dashboard snapshot
 
 The Agentic Wallet valuation performs a bounded sequence of authenticated CLI reads and is materially slower than the ordinary local dashboard resources. Including it in the dashboard's aggregate `Promise.all` made that one provider boundary determine when every unrelated panel became visible.

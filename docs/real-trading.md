@@ -1,5 +1,22 @@
 # Real Trading
 
+## M10.133 — One-shot funding-conversion status reconciliation
+
+M10.133 composes the previously separate status boundaries without exposing them at runtime. A read-only Prisma context store accepts one canonical attempt identity and reconstructs the exact provider order, source quantity, and slippage only from durable submission evidence. Terminal and unknown-outcome attempts explicitly require no lookup; malformed or unsupported durable state fails closed.
+
+The unregistered service suppresses overlapping work for the same attempt in one process, invokes the existing pinned-version no-shell status runner at most once per explicit call, applies M10.131, and passes only valid observations to M10.132. Provider errors propagate without retry, invalid responses are not stored, and terminal `FINISHED` evidence remains pending financial reconciliation.
+
+### M10.133 acceptance criteria
+
+- Canonical attempt identity is validated before context access or claim ownership.
+- Provider lookup context comes only from exact durable quantity, slippage, and order identity.
+- Absent, terminal, unknown-outcome, malformed, and overlapping same-attempt work stops before provider access.
+- One explicit call performs at most one read-only status lookup and forwards caller cancellation.
+- Invalid provider responses are never persisted; valid evidence uses M10.132 monotonic storage.
+- Provider failure is not retried or converted into a success claim.
+- `FINISHED` remains financially unreconciled and submission retry remains forbidden.
+- Focused tests use doubles; there is no module registration, route, timer, polling loop, live provider call, conversion, or real-trading activation.
+
 ## M10.132 — Durable monotonic funding-conversion status
 
 M10.132 persists validated M10.131 observations under a serializable per-store lock. Each provider update time is unique per attempt, booking time is immutable across progress, provider time cannot regress, and terminal evidence cannot transition again. Exact replay returns the existing row; divergent reuse fails closed.

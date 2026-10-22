@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-22 — Compose one-shot funding-conversion status reconciliation
+
+- Added a durable read-only context loader for exact pending conversion-attempt evidence.
+- Added an unregistered coordinator for one status lookup, strict response assessment, and monotonic observation storage.
+- Suppressed overlapping same-attempt calls and withheld absent, terminal, malformed, or invalid evidence from provider/storage access.
+- Kept provider `FINISHED` pending financial reconciliation; no route, polling, retry, live provider call, or conversion was added.
+
 ## 2026-10-22 — Decouple wallet valuation from dashboard loading
 
 - Removed the authenticated Agentic Wallet valuation from the aggregate dashboard snapshot request.

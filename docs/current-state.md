@@ -1,5 +1,9 @@
 # Current State
 
+M10.133 is complete: an unregistered one-shot service now composes durable funding-conversion attempt loading, the existing closed read-only order-status runner, M10.131 response assessment, and M10.132 monotonic persistence. Only an exact `submitted_pending_confirmation` attempt with a safe provider order identity and canonical durable quantity/slippage can reach the runner. Absent, terminal, unknown-outcome, malformed, and overlapping same-attempt work stops before provider access.
+
+The caller cancellation signal is passed to the single lookup, invalid responses are withheld from storage, and recording identity/time are validated after the provider read. `FINISHED` still means only provider-finished pending financial reconciliation. Twenty focused tests cover the coordinator and durable context reader. Both remain outside NestJS registration, with no route, timer, polling loop, automatic retry, live provider call, conversion, or real-trading activation.
+
 The dashboard's automatic Agentic Wallet funding valuation is now isolated from the ordinary dashboard snapshot. General health, paper-trading, strategy, listing, backtest, and enabled Polymarket resources can render without waiting for the authenticated wallet CLI sequence. The wallet card refreshes independently on the same visible-page cycle, retains the last result while loading, and suppresses overlapping valuation reads.
 
 The backend `GET /real-trading/funding-valuation` contract, fresh approved-wallet verification, exact-decimal valuation, and all financial authorization flags are unchanged. All 113 dashboard tests across 19 files, the complete dashboard type-check/build, formatting, and whitespace checks pass.
