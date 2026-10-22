@@ -1,5 +1,20 @@
 # Real Trading
 
+## M10.128 — Durable funding-conversion submission outcome
+
+M10.128 adds a funding-specific response assessor and serializable outcome recorder for a future one-shot provider call. A syntactically safe provider `orderId` establishes only `submitted_pending_confirmation`; it never establishes terminal execution or received USDT. Missing, malformed, rejected, or unsafe responses become `submission_outcome_unknown` and remain non-retryable because the wallet may already have been mutated.
+
+Only a deterministic response fingerprint is persisted alongside the optional order identity and completion time. The original provider response is not retained. An exact durable replay is observable, while any divergent second outcome conflicts.
+
+### M10.128 acceptance criteria
+
+- Provider acknowledgment is never treated as terminal conversion success.
+- Ambiguous and rejected responses are recorded as unknown, with no automatic retry.
+- The provider response is fingerprinted deterministically rather than stored verbatim.
+- Outcome recording may transition only an existing `submission_claimed` attempt.
+- Exact replay is idempotent and divergent outcome reuse fails closed.
+- The assessor and store remain unregistered; no provider process or transaction occurs.
+
 ## M10.127 — Durable one-shot funding-conversion claim
 
 M10.127 adds the durable consumption boundary required before a funding conversion may ever reach the mutable runner. A serializable PostgreSQL transaction locks the claim path, reloads the persisted plan, verifies its fingerprint and hashed confirmation phrase, requires the original plan to have been configuration-ready, and compares a caller-supplied fresh quote against the accepted minimum output and gas-reserve floor.

@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-10-22 - Treat funding swap acknowledgment as pending, never success
+
+The mutable CLI returns an order identity before terminal chain outcome is established. M10.128 therefore records a safe `orderId` only as pending confirmation and classifies every ambiguous response as outcome unknown. Both states prohibit automatic retry. Durable terminal status lookup and financial reconciliation are required before the system may claim that BNB was converted or USDT was received.
+
 ## 2026-10-22 - Consume funding-conversion plans before provider submission
 
 A provider timeout after a mutable command cannot safely distinguish “not sent” from “sent but response lost.” M10.127 therefore creates a unique durable attempt before any future provider call and permanently disables automatic retry. The claim transaction verifies the original confirmation digest and fresh price/reserve evidence; exact replay can be identified, but must never cause a second provider invocation. Provider outcome recording and terminal reconciliation remain separate required increments before runtime wiring.

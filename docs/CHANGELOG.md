@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-22 — Persist funding-conversion submission outcomes safely
+
+- Added a funding-specific response assessor that treats an order ID only as pending terminal confirmation.
+- Classified malformed, rejected, absent, and unsafe responses as unknown and non-retryable.
+- Added serializable outcome recording with deterministic response fingerprints and no raw provider response retention.
+- Kept the assessor/store outside runtime wiring; no provider command or financial transaction ran.
+
 ## 2026-10-22 — Add durable one-shot funding-conversion claims
 
 - Added one unique serializable submission-attempt claim per durable funding-conversion plan.

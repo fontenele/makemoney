@@ -1,5 +1,9 @@
 # Current State
 
+M10.128 is complete: a funding-specific pure response assessor now classifies a safe provider order identity only as `submitted_pending_confirmation`. Malformed, rejected, absent, or unsafe responses become `submission_outcome_unknown`; both states explicitly keep execution success false, require later status lookup, and permanently forbid automatic retry.
+
+An unregistered serializable Prisma store can move only an existing `submission_claimed` row to one of those outcomes, retaining a deterministic response fingerprint rather than the raw response. Exact replay is idempotent and divergent second outcomes conflict. Focused assessor/store tests and the backend build pass. Nothing is registered in NestJS and no provider command, signature, submission, swap, or financial transaction occurred.
+
 M10.127 is complete: a funding-conversion plan can now be consumed at most once by an unregistered serializable Prisma store. Before inserting the durable `submission_claimed` attempt it reloads the plan, verifies the exact plan fingerprint and confirmation-phrase digest, requires the original configuration-readiness fact, enforces the separate confirmation deadline, and rejects a fresh minimum USDT below the accepted floor or fresh remaining BNB below the configured reserve.
 
 The attempt stores fresh financial evidence and a SHA-256 request fingerprint, never the raw phrase, and permanently forbids automatic retry. Exact replay is observable without a second insert; divergent reuse conflicts. The migration and generated client are present, focused tests and the backend build pass. The store remains absent from runtime dependency injection, so no provider process, signature, submission, swap, or financial transaction occurred. The local ignored environment now uses the operator-approved `0.001 BNB` reserve while trading remains paper and real execution remains disabled.
