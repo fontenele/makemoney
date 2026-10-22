@@ -3,8 +3,10 @@ export interface AgenticWalletFundingConversionSubmissionClaim {
   readonly planId: string;
   readonly planFingerprint: string;
   readonly confirmationPhrase: string;
+  readonly freshSourceQuantityBnb: string;
   readonly freshExpectedUsdt: string;
   readonly freshMinimumUsdt: string;
+  readonly freshMaximumSlippagePercent: string;
   readonly freshRemainingQuantityBnb: string;
   readonly startedAt: Date;
 }
@@ -13,8 +15,10 @@ export interface StoredAgenticWalletFundingConversionSubmissionAttempt {
   readonly id: string;
   readonly planId: string;
   readonly requestFingerprint: string;
+  readonly freshSourceQuantityBnb: string;
   readonly freshExpectedUsdt: string;
   readonly freshMinimumUsdt: string;
+  readonly freshMaximumSlippagePercent: string;
   readonly freshRemainingQuantityBnb: string;
   readonly state: 'submission_claimed';
   readonly automaticRetryAllowed: false;

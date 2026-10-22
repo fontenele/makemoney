@@ -1,5 +1,9 @@
 # Current State
 
+M10.129 is complete: the durable one-shot claim now correlates every essential fresh quote term to the consumed plan. Fresh source quantity and maximum slippage are fingerprinted and persisted, and both must exactly equal the stored plan values before insertion; fresh minimum output and remaining gas reserve retain their existing lower-bound checks. Decimal normalization is explicit and native floating-point arithmetic is not used.
+
+The follow-up migration and generated Prisma client are applied locally. Focused claim tests now cover quantity and slippage mismatches, and the backend build passes. The claim/outcome stores and mutable runner remain outside runtime registration, so no provider process or financial transaction occurred.
+
 M10.128 is complete: a funding-specific pure response assessor now classifies a safe provider order identity only as `submitted_pending_confirmation`. Malformed, rejected, absent, or unsafe responses become `submission_outcome_unknown`; both states explicitly keep execution success false, require later status lookup, and permanently forbid automatic retry.
 
 An unregistered serializable Prisma store can move only an existing `submission_claimed` row to one of those outcomes, retaining a deterministic response fingerprint rather than the raw response. Exact replay is idempotent and divergent second outcomes conflict. Focused assessor/store tests and the backend build pass. Nothing is registered in NestJS and no provider command, signature, submission, swap, or financial transaction occurred.

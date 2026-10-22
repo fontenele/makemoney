@@ -1,5 +1,17 @@
 # Real Trading
 
+## M10.129 — Exact fresh-quote correlation
+
+M10.129 strengthens the M10.127 one-shot claim by persisting and comparing the fresh source quantity and maximum slippage as well as output and reserve evidence. The fresh source quantity must equal the stored plan quantity exactly, and the fresh slippage percentage must equal the stored plan ceiling exactly, using decimal normalization rather than native floating point.
+
+### M10.129 acceptance criteria
+
+- Fresh source quantity and slippage are included in the claim fingerprint and durable attempt.
+- Both values must match the consumed plan exactly before insertion.
+- Mismatched quantity or slippage fails closed without consuming the plan.
+- The migration is applied locally and focused regression tests pass.
+- The claim/outcome stores and swap runner remain unregistered; no provider call or transaction occurs.
+
 ## M10.128 — Durable funding-conversion submission outcome
 
 M10.128 adds a funding-specific response assessor and serializable outcome recorder for a future one-shot provider call. A syntactically safe provider `orderId` establishes only `submitted_pending_confirmation`; it never establishes terminal execution or received USDT. Missing, malformed, rejected, or unsafe responses become `submission_outcome_unknown` and remain non-retryable because the wallet may already have been mutated.

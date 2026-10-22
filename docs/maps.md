@@ -2,6 +2,8 @@
 
 Use this keyword map to locate context before changing code. Read the listed documentation and files for the relevant keyword.
 
+- **Exact fresh-quote funding-conversion claim correlation, M10.129:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the claim contract and Prisma implementation are in the M10.127 files, with source quantity and slippage added to `../prisma/`. Exact decimal equality prevents quote evidence from another quantity or slippage policy from consuming a plan.
+
 - **Durable funding-conversion submission outcome, M10.128:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; pure response classification is in `../src/modules/real-trading/infrastructure/agentic-wallet-funding-conversion-submission-response.ts`, and the unregistered serializable recorder is in `../src/modules/real-trading/infrastructure/prisma-agentic-wallet-funding-conversion-submission-outcome.store.ts`. An order ID is pending rather than successful, ambiguous outcomes forbid retry, and no runtime provider path exists.
 
 - **Durable one-shot funding-conversion claim, M10.127:** start with `real-trading.md`, `roadmap.md`, `decisions.md`, and `current-state.md`; the claim contract is in `../src/modules/real-trading/application/agentic-wallet-funding-conversion-submission-attempt.store.ts`, the unregistered serializable implementation and tests are in `../src/modules/real-trading/infrastructure/prisma-agentic-wallet-funding-conversion-submission-attempt.store.ts`, and the schema/migration are in `../prisma/`. One row consumes one plan, raw confirmation text is never stored, automatic retry is forbidden, and no runtime provider path exists.

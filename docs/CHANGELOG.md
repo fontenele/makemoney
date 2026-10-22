@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-22 — Bind complete fresh quote evidence to conversion claims
+
+- Added fresh source quantity and slippage to durable funding-conversion attempts and their request fingerprints.
+- Required exact decimal equality with the consumed plan before one-shot insertion.
+- Added focused mismatch tests and applied the follow-up local migration.
+- Kept every mutable component unreachable at runtime; no provider command or transaction ran.
+
 ## 2026-10-22 — Persist funding-conversion submission outcomes safely
 
 - Added a funding-specific response assessor that treats an order ID only as pending terminal confirmation.

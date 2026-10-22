@@ -56,7 +56,9 @@ describe('PrismaAgenticWalletFundingConversionSubmissionAttemptStore', () => {
 
   it.each([
     ['confirmation phrase', { confirmationPhrase: 'wrong phrase' }],
+    ['source quantity', { freshSourceQuantityBnb: '0.007' }],
     ['fresh minimum', { freshMinimumUsdt: '5.80' }],
+    ['slippage', { freshMaximumSlippagePercent: '0.6' }],
     ['gas reserve', { freshRemainingQuantityBnb: '0.0009' }],
     [
       'confirmation expiry',
@@ -98,8 +100,10 @@ describe('PrismaAgenticWalletFundingConversionSubmissionAttemptStore', () => {
             id: input.id,
             planId: input.planId,
             requestFingerprint: 'f'.repeat(64),
+            freshSourceQuantityBnb: input.freshSourceQuantityBnb,
             freshExpectedUsdt: input.freshExpectedUsdt,
             freshMinimumUsdt: input.freshMinimumUsdt,
+            freshMaximumSlippagePercent: input.freshMaximumSlippagePercent,
             freshRemainingQuantityBnb: input.freshRemainingQuantityBnb,
             state: 'submission_claimed',
             automaticRetryAllowed: false,
@@ -127,8 +131,10 @@ function claim(): AgenticWalletFundingConversionSubmissionClaim {
     planId: '019a0db1-bfea-7000-8000-000000000001',
     planFingerprint: 'a'.repeat(64),
     confirmationPhrase: 'CONFIRM_BNB_TO_USDT exact one-time phrase',
+    freshSourceQuantityBnb: '0.008',
     freshExpectedUsdt: '5.95',
     freshMinimumUsdt: '5.92025',
+    freshMaximumSlippagePercent: '0.5',
     freshRemainingQuantityBnb: '0.00175323',
     startedAt: new Date('2026-10-22T12:00:30.000Z'),
   };
@@ -142,7 +148,9 @@ function plan(input: AgenticWalletFundingConversionSubmissionClaim) {
       .update(input.confirmationPhrase)
       .digest('hex'),
     executionConfigurationReady: true,
+    sourceQuantityBnb: '0.008',
     minimumUsdt: '5.8904',
+    maximumSlippagePercent: '0.5',
     minimumGasReserveBnb: '0.001',
     confirmationExpiresAt: new Date('2026-10-22T12:01:02.000Z'),
   };

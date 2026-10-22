@@ -28,8 +28,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptMinAggregateOutputTyp
   id: string | null
   planId: string | null
   requestFingerprint: string | null
+  freshSourceQuantityBnb: string | null
   freshExpectedUsdt: string | null
   freshMinimumUsdt: string | null
+  freshMaximumSlippagePercent: string | null
   freshRemainingQuantityBnb: string | null
   state: string | null
   providerOrderId: string | null
@@ -43,8 +45,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptMaxAggregateOutputTyp
   id: string | null
   planId: string | null
   requestFingerprint: string | null
+  freshSourceQuantityBnb: string | null
   freshExpectedUsdt: string | null
   freshMinimumUsdt: string | null
+  freshMaximumSlippagePercent: string | null
   freshRemainingQuantityBnb: string | null
   state: string | null
   providerOrderId: string | null
@@ -58,8 +62,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptCountAggregateOutputT
   id: number
   planId: number
   requestFingerprint: number
+  freshSourceQuantityBnb: number
   freshExpectedUsdt: number
   freshMinimumUsdt: number
+  freshMaximumSlippagePercent: number
   freshRemainingQuantityBnb: number
   state: number
   providerOrderId: number
@@ -75,8 +81,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptMinAggregateInputType
   id?: true
   planId?: true
   requestFingerprint?: true
+  freshSourceQuantityBnb?: true
   freshExpectedUsdt?: true
   freshMinimumUsdt?: true
+  freshMaximumSlippagePercent?: true
   freshRemainingQuantityBnb?: true
   state?: true
   providerOrderId?: true
@@ -90,8 +98,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptMaxAggregateInputType
   id?: true
   planId?: true
   requestFingerprint?: true
+  freshSourceQuantityBnb?: true
   freshExpectedUsdt?: true
   freshMinimumUsdt?: true
+  freshMaximumSlippagePercent?: true
   freshRemainingQuantityBnb?: true
   state?: true
   providerOrderId?: true
@@ -105,8 +115,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptCountAggregateInputTy
   id?: true
   planId?: true
   requestFingerprint?: true
+  freshSourceQuantityBnb?: true
   freshExpectedUsdt?: true
   freshMinimumUsdt?: true
+  freshMaximumSlippagePercent?: true
   freshRemainingQuantityBnb?: true
   state?: true
   providerOrderId?: true
@@ -193,8 +205,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptGroupByOutputType = {
   id: string
   planId: string
   requestFingerprint: string
+  freshSourceQuantityBnb: string
   freshExpectedUsdt: string
   freshMinimumUsdt: string
+  freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
   state: string
   providerOrderId: string | null
@@ -229,8 +243,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptWhereInput = {
   id?: Prisma.UuidFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   planId?: Prisma.UuidFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   requestFingerprint?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
+  freshSourceQuantityBnb?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshExpectedUsdt?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshMinimumUsdt?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
+  freshMaximumSlippagePercent?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshRemainingQuantityBnb?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   state?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   providerOrderId?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
@@ -245,8 +261,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptOrderByWithRelationIn
   id?: Prisma.SortOrder
   planId?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  freshSourceQuantityBnb?: Prisma.SortOrder
   freshExpectedUsdt?: Prisma.SortOrder
   freshMinimumUsdt?: Prisma.SortOrder
+  freshMaximumSlippagePercent?: Prisma.SortOrder
   freshRemainingQuantityBnb?: Prisma.SortOrder
   state?: Prisma.SortOrder
   providerOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -265,8 +283,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptWhereUniqueInput = Pr
   OR?: Prisma.AgenticWalletFundingConversionSubmissionAttemptWhereInput[]
   NOT?: Prisma.AgenticWalletFundingConversionSubmissionAttemptWhereInput | Prisma.AgenticWalletFundingConversionSubmissionAttemptWhereInput[]
   requestFingerprint?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
+  freshSourceQuantityBnb?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshExpectedUsdt?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshMinimumUsdt?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
+  freshMaximumSlippagePercent?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshRemainingQuantityBnb?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   state?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   responseFingerprint?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
@@ -280,8 +300,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptOrderByWithAggregatio
   id?: Prisma.SortOrder
   planId?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  freshSourceQuantityBnb?: Prisma.SortOrder
   freshExpectedUsdt?: Prisma.SortOrder
   freshMinimumUsdt?: Prisma.SortOrder
+  freshMaximumSlippagePercent?: Prisma.SortOrder
   freshRemainingQuantityBnb?: Prisma.SortOrder
   state?: Prisma.SortOrder
   providerOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -301,8 +323,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptScalarWhereWithAggreg
   id?: Prisma.UuidWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   planId?: Prisma.UuidWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   requestFingerprint?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
+  freshSourceQuantityBnb?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshExpectedUsdt?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshMinimumUsdt?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
+  freshMaximumSlippagePercent?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshRemainingQuantityBnb?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   state?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   providerOrderId?: Prisma.StringNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
@@ -315,8 +339,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptScalarWhereWithAggreg
 export type AgenticWalletFundingConversionSubmissionAttemptCreateInput = {
   id: string
   requestFingerprint: string
+  freshSourceQuantityBnb: string
   freshExpectedUsdt: string
   freshMinimumUsdt: string
+  freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
   state: string
   providerOrderId?: string | null
@@ -331,8 +357,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedCreateInput 
   id: string
   planId: string
   requestFingerprint: string
+  freshSourceQuantityBnb: string
   freshExpectedUsdt: string
   freshMinimumUsdt: string
+  freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
   state: string
   providerOrderId?: string | null
@@ -345,8 +373,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedCreateInput 
 export type AgenticWalletFundingConversionSubmissionAttemptUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  freshSourceQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
   freshExpectedUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -361,8 +391,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedUpdateInput 
   id?: Prisma.StringFieldUpdateOperationsInput | string
   planId?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  freshSourceQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
   freshExpectedUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -376,8 +408,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptCreateManyInput = {
   id: string
   planId: string
   requestFingerprint: string
+  freshSourceQuantityBnb: string
   freshExpectedUsdt: string
   freshMinimumUsdt: string
+  freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
   state: string
   providerOrderId?: string | null
@@ -390,8 +424,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptCreateManyInput = {
 export type AgenticWalletFundingConversionSubmissionAttemptUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  freshSourceQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
   freshExpectedUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -405,8 +441,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedUpdateManyIn
   id?: Prisma.StringFieldUpdateOperationsInput | string
   planId?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  freshSourceQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
   freshExpectedUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -425,8 +463,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptCountOrderByAggregate
   id?: Prisma.SortOrder
   planId?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  freshSourceQuantityBnb?: Prisma.SortOrder
   freshExpectedUsdt?: Prisma.SortOrder
   freshMinimumUsdt?: Prisma.SortOrder
+  freshMaximumSlippagePercent?: Prisma.SortOrder
   freshRemainingQuantityBnb?: Prisma.SortOrder
   state?: Prisma.SortOrder
   providerOrderId?: Prisma.SortOrder
@@ -440,8 +480,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptMaxOrderByAggregateIn
   id?: Prisma.SortOrder
   planId?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  freshSourceQuantityBnb?: Prisma.SortOrder
   freshExpectedUsdt?: Prisma.SortOrder
   freshMinimumUsdt?: Prisma.SortOrder
+  freshMaximumSlippagePercent?: Prisma.SortOrder
   freshRemainingQuantityBnb?: Prisma.SortOrder
   state?: Prisma.SortOrder
   providerOrderId?: Prisma.SortOrder
@@ -455,8 +497,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptMinOrderByAggregateIn
   id?: Prisma.SortOrder
   planId?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  freshSourceQuantityBnb?: Prisma.SortOrder
   freshExpectedUsdt?: Prisma.SortOrder
   freshMinimumUsdt?: Prisma.SortOrder
+  freshMaximumSlippagePercent?: Prisma.SortOrder
   freshRemainingQuantityBnb?: Prisma.SortOrder
   state?: Prisma.SortOrder
   providerOrderId?: Prisma.SortOrder
@@ -501,8 +545,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedUpdateOneWit
 export type AgenticWalletFundingConversionSubmissionAttemptCreateWithoutPlanInput = {
   id: string
   requestFingerprint: string
+  freshSourceQuantityBnb: string
   freshExpectedUsdt: string
   freshMinimumUsdt: string
+  freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
   state: string
   providerOrderId?: string | null
@@ -515,8 +561,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptCreateWithoutPlanInpu
 export type AgenticWalletFundingConversionSubmissionAttemptUncheckedCreateWithoutPlanInput = {
   id: string
   requestFingerprint: string
+  freshSourceQuantityBnb: string
   freshExpectedUsdt: string
   freshMinimumUsdt: string
+  freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
   state: string
   providerOrderId?: string | null
@@ -545,8 +593,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptUpdateToOneWithWhereW
 export type AgenticWalletFundingConversionSubmissionAttemptUpdateWithoutPlanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  freshSourceQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
   freshExpectedUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -559,8 +609,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptUpdateWithoutPlanInpu
 export type AgenticWalletFundingConversionSubmissionAttemptUncheckedUpdateWithoutPlanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  freshSourceQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
   freshExpectedUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -576,8 +628,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptSelect<ExtArgs extend
   id?: boolean
   planId?: boolean
   requestFingerprint?: boolean
+  freshSourceQuantityBnb?: boolean
   freshExpectedUsdt?: boolean
   freshMinimumUsdt?: boolean
+  freshMaximumSlippagePercent?: boolean
   freshRemainingQuantityBnb?: boolean
   state?: boolean
   providerOrderId?: boolean
@@ -592,8 +646,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptSelectCreateManyAndRe
   id?: boolean
   planId?: boolean
   requestFingerprint?: boolean
+  freshSourceQuantityBnb?: boolean
   freshExpectedUsdt?: boolean
   freshMinimumUsdt?: boolean
+  freshMaximumSlippagePercent?: boolean
   freshRemainingQuantityBnb?: boolean
   state?: boolean
   providerOrderId?: boolean
@@ -608,8 +664,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptSelectUpdateManyAndRe
   id?: boolean
   planId?: boolean
   requestFingerprint?: boolean
+  freshSourceQuantityBnb?: boolean
   freshExpectedUsdt?: boolean
   freshMinimumUsdt?: boolean
+  freshMaximumSlippagePercent?: boolean
   freshRemainingQuantityBnb?: boolean
   state?: boolean
   providerOrderId?: boolean
@@ -624,8 +682,10 @@ export type AgenticWalletFundingConversionSubmissionAttemptSelectScalar = {
   id?: boolean
   planId?: boolean
   requestFingerprint?: boolean
+  freshSourceQuantityBnb?: boolean
   freshExpectedUsdt?: boolean
   freshMinimumUsdt?: boolean
+  freshMaximumSlippagePercent?: boolean
   freshRemainingQuantityBnb?: boolean
   state?: boolean
   providerOrderId?: boolean
@@ -635,7 +695,7 @@ export type AgenticWalletFundingConversionSubmissionAttemptSelectScalar = {
   completedAt?: boolean
 }
 
-export type AgenticWalletFundingConversionSubmissionAttemptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planId" | "requestFingerprint" | "freshExpectedUsdt" | "freshMinimumUsdt" | "freshRemainingQuantityBnb" | "state" | "providerOrderId" | "responseFingerprint" | "automaticRetryAllowed" | "startedAt" | "completedAt", ExtArgs["result"]["agenticWalletFundingConversionSubmissionAttempt"]>
+export type AgenticWalletFundingConversionSubmissionAttemptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planId" | "requestFingerprint" | "freshSourceQuantityBnb" | "freshExpectedUsdt" | "freshMinimumUsdt" | "freshMaximumSlippagePercent" | "freshRemainingQuantityBnb" | "state" | "providerOrderId" | "responseFingerprint" | "automaticRetryAllowed" | "startedAt" | "completedAt", ExtArgs["result"]["agenticWalletFundingConversionSubmissionAttempt"]>
 export type AgenticWalletFundingConversionSubmissionAttemptInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   plan?: boolean | Prisma.AgenticWalletFundingConversionPlanDefaultArgs<ExtArgs>
 }
@@ -655,8 +715,10 @@ export type $AgenticWalletFundingConversionSubmissionAttemptPayload<ExtArgs exte
     id: string
     planId: string
     requestFingerprint: string
+    freshSourceQuantityBnb: string
     freshExpectedUsdt: string
     freshMinimumUsdt: string
+    freshMaximumSlippagePercent: string
     freshRemainingQuantityBnb: string
     state: string
     providerOrderId: string | null
@@ -1091,8 +1153,10 @@ export interface AgenticWalletFundingConversionSubmissionAttemptFieldRefs {
   readonly id: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
   readonly planId: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
   readonly requestFingerprint: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
+  readonly freshSourceQuantityBnb: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
   readonly freshExpectedUsdt: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
   readonly freshMinimumUsdt: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
+  readonly freshMaximumSlippagePercent: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
   readonly freshRemainingQuantityBnb: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
   readonly state: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
   readonly providerOrderId: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>

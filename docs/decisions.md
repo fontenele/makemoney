@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-10-22 - Bind the complete fresh quote before plan consumption
+
+Comparing only fresh output and remaining gas would allow unrelated quote evidence to satisfy a plan accidentally. M10.129 therefore binds the fresh source quantity and slippage ceiling into both the durable claim fingerprint and row, requiring exact decimal equality with the original plan before it can be consumed.
+
 ## 2026-10-22 - Treat funding swap acknowledgment as pending, never success
 
 The mutable CLI returns an order identity before terminal chain outcome is established. M10.128 therefore records a safe `orderId` only as pending confirmation and classifies every ambiguous response as outcome unknown. Both states prohibit automatic retry. Durable terminal status lookup and financial reconciliation are required before the system may claim that BNB was converted or USDT was received.

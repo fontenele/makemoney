@@ -31,8 +31,10 @@ export class PrismaAgenticWalletFundingConversionSubmissionAttemptStore implemen
     const requestFingerprint = digest(
       JSON.stringify({
         confirmationPhraseDigest,
+        freshSourceQuantityBnb: claim.freshSourceQuantityBnb,
         freshExpectedUsdt: claim.freshExpectedUsdt,
         freshMinimumUsdt: claim.freshMinimumUsdt,
+        freshMaximumSlippagePercent: claim.freshMaximumSlippagePercent,
         freshRemainingQuantityBnb: claim.freshRemainingQuantityBnb,
         id: claim.id,
         planFingerprint: claim.planFingerprint,
@@ -68,6 +70,18 @@ export class PrismaAgenticWalletFundingConversionSubmissionAttemptStore implemen
           blockers.push('plan_configuration_not_ready');
         if (
           plan &&
+          new Decimal(claim.freshSourceQuantityBnb).toFixed() !==
+            new Decimal(plan.sourceQuantityBnb).toFixed()
+        )
+          blockers.push('fresh_source_quantity_mismatch');
+        if (
+          plan &&
+          new Decimal(claim.freshMaximumSlippagePercent).toFixed() !==
+            new Decimal(plan.maximumSlippagePercent).toFixed()
+        )
+          blockers.push('fresh_slippage_mismatch');
+        if (
+          plan &&
           claim.startedAt.getTime() > plan.confirmationExpiresAt.getTime()
         )
           blockers.push('confirmation_expired');
@@ -94,8 +108,10 @@ export class PrismaAgenticWalletFundingConversionSubmissionAttemptStore implemen
               id: claim.id,
               planId: claim.planId,
               requestFingerprint,
+              freshSourceQuantityBnb: claim.freshSourceQuantityBnb,
               freshExpectedUsdt: claim.freshExpectedUsdt,
               freshMinimumUsdt: claim.freshMinimumUsdt,
+              freshMaximumSlippagePercent: claim.freshMaximumSlippagePercent,
               freshRemainingQuantityBnb: claim.freshRemainingQuantityBnb,
               state: 'submission_claimed',
               automaticRetryAllowed: false,
@@ -119,8 +135,10 @@ function validateClaimShape(
     typeof claim.confirmationPhrase !== 'string' ||
     claim.confirmationPhrase.length < 1 ||
     claim.confirmationPhrase.length > 512 ||
+    !isNonNegativeDecimal(claim.freshSourceQuantityBnb) ||
     !isNonNegativeDecimal(claim.freshExpectedUsdt) ||
     !isNonNegativeDecimal(claim.freshMinimumUsdt) ||
+    !isNonNegativeDecimal(claim.freshMaximumSlippagePercent) ||
     !isNonNegativeDecimal(claim.freshRemainingQuantityBnb) ||
     !(claim.startedAt instanceof Date) ||
     !Number.isFinite(claim.startedAt.getTime())
@@ -141,8 +159,10 @@ function mapAttempt(row: {
   id: string;
   planId: string;
   requestFingerprint: string;
+  freshSourceQuantityBnb: string;
   freshExpectedUsdt: string;
   freshMinimumUsdt: string;
+  freshMaximumSlippagePercent: string;
   freshRemainingQuantityBnb: string;
   state: string;
   automaticRetryAllowed: boolean;
@@ -162,8 +182,10 @@ function mapAttempt(row: {
     id: row.id,
     planId: row.planId,
     requestFingerprint: row.requestFingerprint,
+    freshSourceQuantityBnb: row.freshSourceQuantityBnb,
     freshExpectedUsdt: row.freshExpectedUsdt,
     freshMinimumUsdt: row.freshMinimumUsdt,
+    freshMaximumSlippagePercent: row.freshMaximumSlippagePercent,
     freshRemainingQuantityBnb: row.freshRemainingQuantityBnb,
     state: 'submission_claimed',
     automaticRetryAllowed: false,

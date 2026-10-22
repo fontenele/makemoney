@@ -98,29 +98,29 @@ model BacktestRun {
 }
 
 model AgenticWalletFundingConversionPlan {
-  id                          String   @id @db.Uuid
-  fingerprint                 String   @unique @db.Char(64)
-  confirmationPhraseDigest    String   @map("confirmation_phrase_digest") @db.Char(64)
-  providerId                  String   @map("provider_id") @db.VarChar(32)
-  chainId                     String   @map("chain_id") @db.VarChar(32)
-  sourceTokenAddress          String   @map("source_token_address") @db.VarChar(42)
-  targetTokenAddress          String   @map("target_token_address") @db.VarChar(42)
-  sourceQuantityBnb           String   @map("source_quantity_bnb") @db.Text
-  expectedUsdt                String   @map("expected_usdt") @db.Text
-  minimumUsdt                 String   @map("minimum_usdt") @db.Text
-  maximumSlippagePercent      String   @map("maximum_slippage_percent") @db.Text
-  remainingQuantityBnb        String   @map("remaining_quantity_bnb") @db.Text
-  minimumGasReserveBnb        String?  @map("minimum_gas_reserve_bnb") @db.Text
-  mevProtection               Boolean  @map("mev_protection")
-  gasLevel                    String   @map("gas_level") @db.VarChar(16)
-  costCoverage                String   @map("cost_coverage") @db.VarChar(16)
-  gasReserveSufficiency       String   @map("gas_reserve_sufficiency") @db.VarChar(16)
-  activationBlockers          Json     @map("activation_blockers")
-  executionConfigurationReady Boolean  @map("execution_configuration_ready")
-  quotedAt                    DateTime @map("quoted_at")
-  quoteExpiresAt              DateTime @map("quote_expires_at")
-  confirmationExpiresAt       DateTime @map("confirmation_expires_at")
-  preparedAt                  DateTime @map("prepared_at")
+  id                          String                                           @id @db.Uuid
+  fingerprint                 String                                           @unique @db.Char(64)
+  confirmationPhraseDigest    String                                           @map("confirmation_phrase_digest") @db.Char(64)
+  providerId                  String                                           @map("provider_id") @db.VarChar(32)
+  chainId                     String                                           @map("chain_id") @db.VarChar(32)
+  sourceTokenAddress          String                                           @map("source_token_address") @db.VarChar(42)
+  targetTokenAddress          String                                           @map("target_token_address") @db.VarChar(42)
+  sourceQuantityBnb           String                                           @map("source_quantity_bnb") @db.Text
+  expectedUsdt                String                                           @map("expected_usdt") @db.Text
+  minimumUsdt                 String                                           @map("minimum_usdt") @db.Text
+  maximumSlippagePercent      String                                           @map("maximum_slippage_percent") @db.Text
+  remainingQuantityBnb        String                                           @map("remaining_quantity_bnb") @db.Text
+  minimumGasReserveBnb        String?                                          @map("minimum_gas_reserve_bnb") @db.Text
+  mevProtection               Boolean                                          @map("mev_protection")
+  gasLevel                    String                                           @map("gas_level") @db.VarChar(16)
+  costCoverage                String                                           @map("cost_coverage") @db.VarChar(16)
+  gasReserveSufficiency       String                                           @map("gas_reserve_sufficiency") @db.VarChar(16)
+  activationBlockers          Json                                             @map("activation_blockers")
+  executionConfigurationReady Boolean                                          @map("execution_configuration_ready")
+  quotedAt                    DateTime                                         @map("quoted_at")
+  quoteExpiresAt              DateTime                                         @map("quote_expires_at")
+  confirmationExpiresAt       DateTime                                         @map("confirmation_expires_at")
+  preparedAt                  DateTime                                         @map("prepared_at")
   submissionAttempt           AgenticWalletFundingConversionSubmissionAttempt?
 
   @@index([preparedAt, id])
@@ -128,19 +128,21 @@ model AgenticWalletFundingConversionPlan {
 }
 
 model AgenticWalletFundingConversionSubmissionAttempt {
-  id                        String   @id @db.Uuid
-  planId                    String   @unique @map("plan_id") @db.Uuid
-  requestFingerprint        String   @map("request_fingerprint") @db.Char(64)
-  freshExpectedUsdt         String   @map("fresh_expected_usdt") @db.Text
-  freshMinimumUsdt          String   @map("fresh_minimum_usdt") @db.Text
-  freshRemainingQuantityBnb String   @map("fresh_remaining_quantity_bnb") @db.Text
-  state                     String   @db.VarChar(40)
-  providerOrderId           String?  @unique @map("provider_order_id") @db.VarChar(256)
-  responseFingerprint       String?  @map("response_fingerprint") @db.Char(64)
-  automaticRetryAllowed     Boolean  @map("automatic_retry_allowed")
-  startedAt                 DateTime @map("started_at")
-  completedAt               DateTime? @map("completed_at")
-  plan                      AgenticWalletFundingConversionPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
+  id                          String                             @id @db.Uuid
+  planId                      String                             @unique @map("plan_id") @db.Uuid
+  requestFingerprint          String                             @map("request_fingerprint") @db.Char(64)
+  freshSourceQuantityBnb      String                             @map("fresh_source_quantity_bnb") @db.Text
+  freshExpectedUsdt           String                             @map("fresh_expected_usdt") @db.Text
+  freshMinimumUsdt            String                             @map("fresh_minimum_usdt") @db.Text
+  freshMaximumSlippagePercent String                             @map("fresh_maximum_slippage_percent") @db.Text
+  freshRemainingQuantityBnb   String                             @map("fresh_remaining_quantity_bnb") @db.Text
+  state                       String                             @db.VarChar(40)
+  providerOrderId             String?                            @unique @map("provider_order_id") @db.VarChar(256)
+  responseFingerprint         String?                            @map("response_fingerprint") @db.Char(64)
+  automaticRetryAllowed       Boolean                            @map("automatic_retry_allowed")
+  startedAt                   DateTime                           @map("started_at")
+  completedAt                 DateTime?                          @map("completed_at")
+  plan                        AgenticWalletFundingConversionPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
 
   @@index([state, startedAt])
   @@map("agentic_wallet_funding_conversion_submission_attempts")
