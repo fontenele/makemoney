@@ -60,6 +60,7 @@ export const ModelName = {
   AgenticWalletFundingConversionPlan: 'AgenticWalletFundingConversionPlan',
   AgenticWalletFundingConversionSubmissionAttempt: 'AgenticWalletFundingConversionSubmissionAttempt',
   AgenticWalletFundingConversionStatusObservation: 'AgenticWalletFundingConversionStatusObservation',
+  AgenticWalletFundingConversionFinancialReconciliation: 'AgenticWalletFundingConversionFinancialReconciliation',
   RealExecutionReservation: 'RealExecutionReservation',
   RealExecutionArm: 'RealExecutionArm',
   RealExecutionRiskApproval: 'RealExecutionRiskApproval',
@@ -248,6 +249,32 @@ export const AgenticWalletFundingConversionStatusObservationScalarFieldEnum = {
 } as const
 
 export type AgenticWalletFundingConversionStatusObservationScalarFieldEnum = (typeof AgenticWalletFundingConversionStatusObservationScalarFieldEnum)[keyof typeof AgenticWalletFundingConversionStatusObservationScalarFieldEnum]
+
+
+export const AgenticWalletFundingConversionFinancialReconciliationScalarFieldEnum = {
+  id: 'id',
+  attemptId: 'attemptId',
+  planId: 'planId',
+  statusObservationId: 'statusObservationId',
+  providerOrderId: 'providerOrderId',
+  transactionHash: 'transactionHash',
+  chainId: 'chainId',
+  sourceTokenAddress: 'sourceTokenAddress',
+  targetTokenAddress: 'targetTokenAddress',
+  submittedSourceQuantityBnb: 'submittedSourceQuantityBnb',
+  expectedUsdt: 'expectedUsdt',
+  minimumUsdt: 'minimumUsdt',
+  actualUsdtReceived: 'actualUsdtReceived',
+  outputAssessment: 'outputAssessment',
+  providerFeeComponents: 'providerFeeComponents',
+  networkFeeAsset: 'networkFeeAsset',
+  networkFeeQuantityBnb: 'networkFeeQuantityBnb',
+  observedAt: 'observedAt',
+  requestFingerprint: 'requestFingerprint',
+  recordedAt: 'recordedAt'
+} as const
+
+export type AgenticWalletFundingConversionFinancialReconciliationScalarFieldEnum = (typeof AgenticWalletFundingConversionFinancialReconciliationScalarFieldEnum)[keyof typeof AgenticWalletFundingConversionFinancialReconciliationScalarFieldEnum]
 
 
 export const RealExecutionReservationScalarFieldEnum = {

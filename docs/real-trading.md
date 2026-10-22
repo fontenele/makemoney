@@ -1,5 +1,27 @@
 # Real Trading
 
+## M10.135 — Durable funding-conversion financial reconciliation
+
+M10.135 gives the complete M10.134 package one immutable PostgreSQL destination. Before the first insert, the unregistered store validates the caller-supplied reconciliation identity and recording time, takes a dedicated advisory lock in a serializable transaction, reloads the exact submission attempt with its plan and referenced terminal status observation, and reapplies the pure M10.134 assessment against the durable source quantity, accepted minimum, expected output, order identity, transaction hash, and chronology.
+
+The stored row binds the plan, attempt, status observation, provider order, transaction, token direction, submitted BNB, expected/minimum/actual USDT, bounded provider-fee components, positive BNB network fee, evidence time, output classification, and a deterministic canonical request fingerprint. One-to-one and unique database constraints prevent the same attempt, observation, order, transaction, or request from being relabeled. Exact replay returns the original defensive artifact; divergent reuse conflicts, and malformed persisted evidence fails closed.
+
+Persistence changes `financialReconciliationComplete` to true because all required financial effects are now durably evidenced. This is not a claim of economic success: `below_accepted_minimum` remains a valid completed reconciliation and is never promoted to an expected-output result. The store remains outside NestJS registration and cannot acquire evidence, call the provider, mutate accounting, retry, convert funds, or activate real trading.
+
+### M10.135 acceptance criteria
+
+- Canonical reconciliation identity, complete M10.134 evidence, and a finite non-regressed recording time are required before persistence access.
+- First writes use a serializable transaction and a dedicated PostgreSQL advisory lock.
+- The exact attempt, related plan, and referenced status observation are reloaded from durable state.
+- Only `provider_finished_pending_financial_reconciliation` with matching non-retryable attempt/order/status evidence may proceed.
+- M10.134 is reapplied against durable source quantity, minimum output, expected output, terminal identity, and chronology.
+- One attempt, status observation, provider order, transaction hash, and canonical request fingerprint identify at most one immutable reconciliation.
+- Exact replay returns the original row without reloading context; changed identity or evidence conflicts.
+- Persisted evidence, decimal bounds, output classification, chronology, and request fingerprint are reconstructed and revalidated.
+- Below-minimum output remains durably classified while complete financial evidence makes reconciliation complete.
+- Focused tests cover first record, below-minimum evidence, replay, conflict, missing/divergent/nonterminal context, durable reassessment, invalid recording metadata, and malformed replay.
+- No route, runtime registration, provider/evidence acquisition, accounting mutation, automatic retry, conversion, or real order is added.
+
 ## M10.134 — Funding-conversion financial-reconciliation evidence gate
 
 M10.134 introduces the pure evidence boundary after a durable funding-conversion status reaches `FINISHED`. Provider completion alone remains insufficient. The candidate package must contain the exact terminal status identity and hash, submitted native BNB quantity, actual USDT received, complete bounded provider-fee components, positive BNB network fee, explicit transaction-receipt evidence, and independently observed source and target balance deltas.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-22 — Persist funding-conversion financial reconciliation
+
+- Added an immutable serializable PostgreSQL store for complete M10.134 evidence.
+- Reloaded and revalidated the exact durable attempt, plan, and terminal status before first insert.
+- Added deterministic replay/conflict protection and preserved below-minimum output as explicit durable breach evidence.
+- Kept the store unregistered, with no route, evidence acquisition, accounting mutation, provider call, retry, or conversion path.
+- Applied both local migrations and passed 2,678 backend tests, 115 dashboard tests, formatting, Prisma validation, lint, full build, and Compose validation.
+
 ## 2026-10-22 — Gate funding-conversion financial evidence
 
 - Added a pure evidence assessment after durable provider `FINISHED` status.

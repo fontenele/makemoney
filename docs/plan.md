@@ -72,6 +72,7 @@ M6.24 Replay API:            DONE
 M6.25 Simulation API:        DONE
 M10.133 Status Reconciliation: DONE
 M10.134 Financial Evidence Gate: DONE
+M10.135 Durable Financial Reconciliation: DONE
 Next increment:           NOT YET DEFINED
 ```
 

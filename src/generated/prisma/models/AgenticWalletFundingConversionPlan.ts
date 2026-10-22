@@ -323,6 +323,7 @@ export type AgenticWalletFundingConversionPlanWhereInput = {
   confirmationExpiresAt?: Prisma.DateTimeFilter<"AgenticWalletFundingConversionPlan"> | Date | string
   preparedAt?: Prisma.DateTimeFilter<"AgenticWalletFundingConversionPlan"> | Date | string
   submissionAttempt?: Prisma.XOR<Prisma.AgenticWalletFundingConversionSubmissionAttemptNullableScalarRelationFilter, Prisma.AgenticWalletFundingConversionSubmissionAttemptWhereInput> | null
+  financialReconciliations?: Prisma.AgenticWalletFundingConversionFinancialReconciliationListRelationFilter
 }
 
 export type AgenticWalletFundingConversionPlanOrderByWithRelationInput = {
@@ -350,6 +351,7 @@ export type AgenticWalletFundingConversionPlanOrderByWithRelationInput = {
   confirmationExpiresAt?: Prisma.SortOrder
   preparedAt?: Prisma.SortOrder
   submissionAttempt?: Prisma.AgenticWalletFundingConversionSubmissionAttemptOrderByWithRelationInput
+  financialReconciliations?: Prisma.AgenticWalletFundingConversionFinancialReconciliationOrderByRelationAggregateInput
 }
 
 export type AgenticWalletFundingConversionPlanWhereUniqueInput = Prisma.AtLeast<{
@@ -380,6 +382,7 @@ export type AgenticWalletFundingConversionPlanWhereUniqueInput = Prisma.AtLeast<
   confirmationExpiresAt?: Prisma.DateTimeFilter<"AgenticWalletFundingConversionPlan"> | Date | string
   preparedAt?: Prisma.DateTimeFilter<"AgenticWalletFundingConversionPlan"> | Date | string
   submissionAttempt?: Prisma.XOR<Prisma.AgenticWalletFundingConversionSubmissionAttemptNullableScalarRelationFilter, Prisma.AgenticWalletFundingConversionSubmissionAttemptWhereInput> | null
+  financialReconciliations?: Prisma.AgenticWalletFundingConversionFinancialReconciliationListRelationFilter
 }, "id" | "fingerprint">
 
 export type AgenticWalletFundingConversionPlanOrderByWithAggregationInput = {
@@ -465,6 +468,7 @@ export type AgenticWalletFundingConversionPlanCreateInput = {
   confirmationExpiresAt: Date | string
   preparedAt: Date | string
   submissionAttempt?: Prisma.AgenticWalletFundingConversionSubmissionAttemptCreateNestedOneWithoutPlanInput
+  financialReconciliations?: Prisma.AgenticWalletFundingConversionFinancialReconciliationCreateNestedManyWithoutPlanInput
 }
 
 export type AgenticWalletFundingConversionPlanUncheckedCreateInput = {
@@ -492,6 +496,7 @@ export type AgenticWalletFundingConversionPlanUncheckedCreateInput = {
   confirmationExpiresAt: Date | string
   preparedAt: Date | string
   submissionAttempt?: Prisma.AgenticWalletFundingConversionSubmissionAttemptUncheckedCreateNestedOneWithoutPlanInput
+  financialReconciliations?: Prisma.AgenticWalletFundingConversionFinancialReconciliationUncheckedCreateNestedManyWithoutPlanInput
 }
 
 export type AgenticWalletFundingConversionPlanUpdateInput = {
@@ -519,6 +524,7 @@ export type AgenticWalletFundingConversionPlanUpdateInput = {
   confirmationExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissionAttempt?: Prisma.AgenticWalletFundingConversionSubmissionAttemptUpdateOneWithoutPlanNestedInput
+  financialReconciliations?: Prisma.AgenticWalletFundingConversionFinancialReconciliationUpdateManyWithoutPlanNestedInput
 }
 
 export type AgenticWalletFundingConversionPlanUncheckedUpdateInput = {
@@ -546,6 +552,7 @@ export type AgenticWalletFundingConversionPlanUncheckedUpdateInput = {
   confirmationExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissionAttempt?: Prisma.AgenticWalletFundingConversionSubmissionAttemptUncheckedUpdateOneWithoutPlanNestedInput
+  financialReconciliations?: Prisma.AgenticWalletFundingConversionFinancialReconciliationUncheckedUpdateManyWithoutPlanNestedInput
 }
 
 export type AgenticWalletFundingConversionPlanCreateManyInput = {
@@ -725,6 +732,20 @@ export type AgenticWalletFundingConversionPlanUpdateOneRequiredWithoutSubmission
   update?: Prisma.XOR<Prisma.XOR<Prisma.AgenticWalletFundingConversionPlanUpdateToOneWithWhereWithoutSubmissionAttemptInput, Prisma.AgenticWalletFundingConversionPlanUpdateWithoutSubmissionAttemptInput>, Prisma.AgenticWalletFundingConversionPlanUncheckedUpdateWithoutSubmissionAttemptInput>
 }
 
+export type AgenticWalletFundingConversionPlanCreateNestedOneWithoutFinancialReconciliationsInput = {
+  create?: Prisma.XOR<Prisma.AgenticWalletFundingConversionPlanCreateWithoutFinancialReconciliationsInput, Prisma.AgenticWalletFundingConversionPlanUncheckedCreateWithoutFinancialReconciliationsInput>
+  connectOrCreate?: Prisma.AgenticWalletFundingConversionPlanCreateOrConnectWithoutFinancialReconciliationsInput
+  connect?: Prisma.AgenticWalletFundingConversionPlanWhereUniqueInput
+}
+
+export type AgenticWalletFundingConversionPlanUpdateOneRequiredWithoutFinancialReconciliationsNestedInput = {
+  create?: Prisma.XOR<Prisma.AgenticWalletFundingConversionPlanCreateWithoutFinancialReconciliationsInput, Prisma.AgenticWalletFundingConversionPlanUncheckedCreateWithoutFinancialReconciliationsInput>
+  connectOrCreate?: Prisma.AgenticWalletFundingConversionPlanCreateOrConnectWithoutFinancialReconciliationsInput
+  upsert?: Prisma.AgenticWalletFundingConversionPlanUpsertWithoutFinancialReconciliationsInput
+  connect?: Prisma.AgenticWalletFundingConversionPlanWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AgenticWalletFundingConversionPlanUpdateToOneWithWhereWithoutFinancialReconciliationsInput, Prisma.AgenticWalletFundingConversionPlanUpdateWithoutFinancialReconciliationsInput>, Prisma.AgenticWalletFundingConversionPlanUncheckedUpdateWithoutFinancialReconciliationsInput>
+}
+
 export type AgenticWalletFundingConversionPlanCreateWithoutSubmissionAttemptInput = {
   id: string
   fingerprint: string
@@ -749,6 +770,7 @@ export type AgenticWalletFundingConversionPlanCreateWithoutSubmissionAttemptInpu
   quoteExpiresAt: Date | string
   confirmationExpiresAt: Date | string
   preparedAt: Date | string
+  financialReconciliations?: Prisma.AgenticWalletFundingConversionFinancialReconciliationCreateNestedManyWithoutPlanInput
 }
 
 export type AgenticWalletFundingConversionPlanUncheckedCreateWithoutSubmissionAttemptInput = {
@@ -775,6 +797,7 @@ export type AgenticWalletFundingConversionPlanUncheckedCreateWithoutSubmissionAt
   quoteExpiresAt: Date | string
   confirmationExpiresAt: Date | string
   preparedAt: Date | string
+  financialReconciliations?: Prisma.AgenticWalletFundingConversionFinancialReconciliationUncheckedCreateNestedManyWithoutPlanInput
 }
 
 export type AgenticWalletFundingConversionPlanCreateOrConnectWithoutSubmissionAttemptInput = {
@@ -817,6 +840,7 @@ export type AgenticWalletFundingConversionPlanUpdateWithoutSubmissionAttemptInpu
   quoteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmationExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  financialReconciliations?: Prisma.AgenticWalletFundingConversionFinancialReconciliationUpdateManyWithoutPlanNestedInput
 }
 
 export type AgenticWalletFundingConversionPlanUncheckedUpdateWithoutSubmissionAttemptInput = {
@@ -843,8 +867,162 @@ export type AgenticWalletFundingConversionPlanUncheckedUpdateWithoutSubmissionAt
   quoteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmationExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  financialReconciliations?: Prisma.AgenticWalletFundingConversionFinancialReconciliationUncheckedUpdateManyWithoutPlanNestedInput
 }
 
+export type AgenticWalletFundingConversionPlanCreateWithoutFinancialReconciliationsInput = {
+  id: string
+  fingerprint: string
+  confirmationPhraseDigest: string
+  providerId: string
+  chainId: string
+  sourceTokenAddress: string
+  targetTokenAddress: string
+  sourceQuantityBnb: string
+  expectedUsdt: string
+  minimumUsdt: string
+  maximumSlippagePercent: string
+  remainingQuantityBnb: string
+  minimumGasReserveBnb?: string | null
+  mevProtection: boolean
+  gasLevel: string
+  costCoverage: string
+  gasReserveSufficiency: string
+  activationBlockers: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  executionConfigurationReady: boolean
+  quotedAt: Date | string
+  quoteExpiresAt: Date | string
+  confirmationExpiresAt: Date | string
+  preparedAt: Date | string
+  submissionAttempt?: Prisma.AgenticWalletFundingConversionSubmissionAttemptCreateNestedOneWithoutPlanInput
+}
+
+export type AgenticWalletFundingConversionPlanUncheckedCreateWithoutFinancialReconciliationsInput = {
+  id: string
+  fingerprint: string
+  confirmationPhraseDigest: string
+  providerId: string
+  chainId: string
+  sourceTokenAddress: string
+  targetTokenAddress: string
+  sourceQuantityBnb: string
+  expectedUsdt: string
+  minimumUsdt: string
+  maximumSlippagePercent: string
+  remainingQuantityBnb: string
+  minimumGasReserveBnb?: string | null
+  mevProtection: boolean
+  gasLevel: string
+  costCoverage: string
+  gasReserveSufficiency: string
+  activationBlockers: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  executionConfigurationReady: boolean
+  quotedAt: Date | string
+  quoteExpiresAt: Date | string
+  confirmationExpiresAt: Date | string
+  preparedAt: Date | string
+  submissionAttempt?: Prisma.AgenticWalletFundingConversionSubmissionAttemptUncheckedCreateNestedOneWithoutPlanInput
+}
+
+export type AgenticWalletFundingConversionPlanCreateOrConnectWithoutFinancialReconciliationsInput = {
+  where: Prisma.AgenticWalletFundingConversionPlanWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgenticWalletFundingConversionPlanCreateWithoutFinancialReconciliationsInput, Prisma.AgenticWalletFundingConversionPlanUncheckedCreateWithoutFinancialReconciliationsInput>
+}
+
+export type AgenticWalletFundingConversionPlanUpsertWithoutFinancialReconciliationsInput = {
+  update: Prisma.XOR<Prisma.AgenticWalletFundingConversionPlanUpdateWithoutFinancialReconciliationsInput, Prisma.AgenticWalletFundingConversionPlanUncheckedUpdateWithoutFinancialReconciliationsInput>
+  create: Prisma.XOR<Prisma.AgenticWalletFundingConversionPlanCreateWithoutFinancialReconciliationsInput, Prisma.AgenticWalletFundingConversionPlanUncheckedCreateWithoutFinancialReconciliationsInput>
+  where?: Prisma.AgenticWalletFundingConversionPlanWhereInput
+}
+
+export type AgenticWalletFundingConversionPlanUpdateToOneWithWhereWithoutFinancialReconciliationsInput = {
+  where?: Prisma.AgenticWalletFundingConversionPlanWhereInput
+  data: Prisma.XOR<Prisma.AgenticWalletFundingConversionPlanUpdateWithoutFinancialReconciliationsInput, Prisma.AgenticWalletFundingConversionPlanUncheckedUpdateWithoutFinancialReconciliationsInput>
+}
+
+export type AgenticWalletFundingConversionPlanUpdateWithoutFinancialReconciliationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  confirmationPhraseDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  targetTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  expectedUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  minimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  maximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
+  remainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  minimumGasReserveBnb?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mevProtection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  gasLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  costCoverage?: Prisma.StringFieldUpdateOperationsInput | string
+  gasReserveSufficiency?: Prisma.StringFieldUpdateOperationsInput | string
+  activationBlockers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  executionConfigurationReady?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quotedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  quoteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmationExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  submissionAttempt?: Prisma.AgenticWalletFundingConversionSubmissionAttemptUpdateOneWithoutPlanNestedInput
+}
+
+export type AgenticWalletFundingConversionPlanUncheckedUpdateWithoutFinancialReconciliationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  confirmationPhraseDigest?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  targetTokenAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  expectedUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  minimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
+  maximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
+  remainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  minimumGasReserveBnb?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mevProtection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  gasLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  costCoverage?: Prisma.StringFieldUpdateOperationsInput | string
+  gasReserveSufficiency?: Prisma.StringFieldUpdateOperationsInput | string
+  activationBlockers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  executionConfigurationReady?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quotedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  quoteExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmationExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  submissionAttempt?: Prisma.AgenticWalletFundingConversionSubmissionAttemptUncheckedUpdateOneWithoutPlanNestedInput
+}
+
+
+/**
+ * Count Type AgenticWalletFundingConversionPlanCountOutputType
+ */
+
+export type AgenticWalletFundingConversionPlanCountOutputType = {
+  financialReconciliations: number
+}
+
+export type AgenticWalletFundingConversionPlanCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  financialReconciliations?: boolean | AgenticWalletFundingConversionPlanCountOutputTypeCountFinancialReconciliationsArgs
+}
+
+/**
+ * AgenticWalletFundingConversionPlanCountOutputType without action
+ */
+export type AgenticWalletFundingConversionPlanCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgenticWalletFundingConversionPlanCountOutputType
+   */
+  select?: Prisma.AgenticWalletFundingConversionPlanCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * AgenticWalletFundingConversionPlanCountOutputType without action
+ */
+export type AgenticWalletFundingConversionPlanCountOutputTypeCountFinancialReconciliationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgenticWalletFundingConversionFinancialReconciliationWhereInput
+}
 
 
 export type AgenticWalletFundingConversionPlanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -872,6 +1050,8 @@ export type AgenticWalletFundingConversionPlanSelect<ExtArgs extends runtime.Typ
   confirmationExpiresAt?: boolean
   preparedAt?: boolean
   submissionAttempt?: boolean | Prisma.AgenticWalletFundingConversionPlan$submissionAttemptArgs<ExtArgs>
+  financialReconciliations?: boolean | Prisma.AgenticWalletFundingConversionPlan$financialReconciliationsArgs<ExtArgs>
+  _count?: boolean | Prisma.AgenticWalletFundingConversionPlanCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agenticWalletFundingConversionPlan"]>
 
 export type AgenticWalletFundingConversionPlanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -955,6 +1135,8 @@ export type AgenticWalletFundingConversionPlanSelectScalar = {
 export type AgenticWalletFundingConversionPlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fingerprint" | "confirmationPhraseDigest" | "providerId" | "chainId" | "sourceTokenAddress" | "targetTokenAddress" | "sourceQuantityBnb" | "expectedUsdt" | "minimumUsdt" | "maximumSlippagePercent" | "remainingQuantityBnb" | "minimumGasReserveBnb" | "mevProtection" | "gasLevel" | "costCoverage" | "gasReserveSufficiency" | "activationBlockers" | "executionConfigurationReady" | "quotedAt" | "quoteExpiresAt" | "confirmationExpiresAt" | "preparedAt", ExtArgs["result"]["agenticWalletFundingConversionPlan"]>
 export type AgenticWalletFundingConversionPlanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   submissionAttempt?: boolean | Prisma.AgenticWalletFundingConversionPlan$submissionAttemptArgs<ExtArgs>
+  financialReconciliations?: boolean | Prisma.AgenticWalletFundingConversionPlan$financialReconciliationsArgs<ExtArgs>
+  _count?: boolean | Prisma.AgenticWalletFundingConversionPlanCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AgenticWalletFundingConversionPlanIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 export type AgenticWalletFundingConversionPlanIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -963,6 +1145,7 @@ export type $AgenticWalletFundingConversionPlanPayload<ExtArgs extends runtime.T
   name: "AgenticWalletFundingConversionPlan"
   objects: {
     submissionAttempt: Prisma.$AgenticWalletFundingConversionSubmissionAttemptPayload<ExtArgs> | null
+    financialReconciliations: Prisma.$AgenticWalletFundingConversionFinancialReconciliationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1383,6 +1566,7 @@ readonly fields: AgenticWalletFundingConversionPlanFieldRefs;
 export interface Prisma__AgenticWalletFundingConversionPlanClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   submissionAttempt<T extends Prisma.AgenticWalletFundingConversionPlan$submissionAttemptArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AgenticWalletFundingConversionPlan$submissionAttemptArgs<ExtArgs>>): Prisma.Prisma__AgenticWalletFundingConversionSubmissionAttemptClient<runtime.Types.Result.GetResult<Prisma.$AgenticWalletFundingConversionSubmissionAttemptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  financialReconciliations<T extends Prisma.AgenticWalletFundingConversionPlan$financialReconciliationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AgenticWalletFundingConversionPlan$financialReconciliationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgenticWalletFundingConversionFinancialReconciliationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1844,6 +2028,30 @@ export type AgenticWalletFundingConversionPlan$submissionAttemptArgs<ExtArgs ext
    */
   include?: Prisma.AgenticWalletFundingConversionSubmissionAttemptInclude<ExtArgs> | null
   where?: Prisma.AgenticWalletFundingConversionSubmissionAttemptWhereInput
+}
+
+/**
+ * AgenticWalletFundingConversionPlan.financialReconciliations
+ */
+export type AgenticWalletFundingConversionPlan$financialReconciliationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgenticWalletFundingConversionFinancialReconciliation
+   */
+  select?: Prisma.AgenticWalletFundingConversionFinancialReconciliationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgenticWalletFundingConversionFinancialReconciliation
+   */
+  omit?: Prisma.AgenticWalletFundingConversionFinancialReconciliationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgenticWalletFundingConversionFinancialReconciliationInclude<ExtArgs> | null
+  where?: Prisma.AgenticWalletFundingConversionFinancialReconciliationWhereInput
+  orderBy?: Prisma.AgenticWalletFundingConversionFinancialReconciliationOrderByWithRelationInput | Prisma.AgenticWalletFundingConversionFinancialReconciliationOrderByWithRelationInput[]
+  cursor?: Prisma.AgenticWalletFundingConversionFinancialReconciliationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgenticWalletFundingConversionFinancialReconciliationScalarFieldEnum | Prisma.AgenticWalletFundingConversionFinancialReconciliationScalarFieldEnum[]
 }
 
 /**

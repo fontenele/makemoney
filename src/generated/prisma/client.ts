@@ -85,6 +85,11 @@ export type AgenticWalletFundingConversionSubmissionAttempt = Prisma.AgenticWall
  */
 export type AgenticWalletFundingConversionStatusObservation = Prisma.AgenticWalletFundingConversionStatusObservationModel
 /**
+ * Model AgenticWalletFundingConversionFinancialReconciliation
+ * 
+ */
+export type AgenticWalletFundingConversionFinancialReconciliation = Prisma.AgenticWalletFundingConversionFinancialReconciliationModel
+/**
  * Model RealExecutionReservation
  * 
  */

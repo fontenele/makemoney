@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## 2026-10-22 - Complete reconciliation without erasing an economic breach
+
+Financial reconciliation answers whether the terminal transaction and all monetary effects are completely evidenced; it does not assert that the provider honored the accepted minimum. M10.135 therefore marks a complete persisted package as reconciled even when `actualUsdtReceived` is below `minimumUsdt`, while storing the `below_accepted_minimum` classification as immutable audit evidence. Downstream accounting or incident policy must consume that distinction explicitly.
+
 ## 2026-10-22 - Preserve below-minimum conversion outcomes as evidence
 
 A provider-finished conversion can deliver less USDT than the accepted minimum. Treating that as structurally invalid would prevent durable audit of the very breach that matters. M10.134 therefore separates evidence completeness from economic classification: complete correlated evidence is persistence-ready, while actual output is explicitly classified against minimum and expected amounts. Financial reconciliation remains incomplete until that package is stored by a later increment.
