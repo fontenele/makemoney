@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref, type Directive } from 'vue';
 import {
   loadDashboard,
   loadAgenticWalletAuthentication,
+  loadAgenticWalletFundingValuation,
   observeAgenticWallet,
   prepareAgenticWalletFunding,
   prepareAgenticWalletFundingConversion,
@@ -21,6 +22,7 @@ import {
   type AgenticWalletFundingReadiness,
   type AgenticWalletFundingConversionQuote,
   type AgenticWalletFundingConversionPlan,
+  type AgenticWalletFundingValuation,
   type AgenticWalletAuthenticationState,
   type DetectedSpotSymbol,
   type ListingPerformance,
@@ -76,6 +78,10 @@ const currentRoute = ref<DashboardRoute>(
 
 const snapshot = ref<DashboardSnapshot | null>(null);
 const refreshing = ref(false);
+const fundingValuation = ref<Resource<AgenticWalletFundingValuation> | null>(
+  null,
+);
+const fundingValuationLoading = ref(false);
 const agenticWalletObservation = ref<Resource<AgenticWalletObservation> | null>(
   null,
 );
@@ -460,6 +466,7 @@ async function changePolymarketAvailability(enabled: boolean): Promise<void> {
 async function refresh(): Promise<void> {
   if (refreshing.value) return;
   const request = ++dashboardRequest;
+  void refreshFundingValuation();
   refreshing.value = true;
   try {
     const result = await loadDashboard();
@@ -482,6 +489,16 @@ async function refresh(): Promise<void> {
     }
   } finally {
     refreshing.value = false;
+  }
+}
+
+async function refreshFundingValuation(): Promise<void> {
+  if (fundingValuationLoading.value) return;
+  fundingValuationLoading.value = true;
+  try {
+    fundingValuation.value = await loadAgenticWalletFundingValuation();
+  } finally {
+    fundingValuationLoading.value = false;
   }
 }
 
@@ -622,7 +639,7 @@ function moneyTooltip(
   value: string | null | undefined,
   asset: MonetaryAsset,
 ): string | undefined {
-  const funding = snapshot.value?.fundingValuation;
+  const funding = fundingValuation.value;
   const prices =
     funding?.status === 'available' && funding.data.status === 'available'
       ? funding.data.prices
@@ -985,9 +1002,9 @@ onUnmounted(() => {
             <div class="wallet-funding-instructions" aria-live="polite">
               <template
                 v-if="
-                  available(snapshot.fundingValuation) &&
-                  snapshot.fundingValuation.data.status === 'available' &&
-                  snapshot.fundingValuation.data.balance !== null
+                  available(fundingValuation) &&
+                  fundingValuation.data.status === 'available' &&
+                  fundingValuation.data.balance !== null
                 "
               >
                 <strong>Current Agentic Wallet balance</strong>
@@ -997,12 +1014,12 @@ onUnmounted(() => {
                     <dd
                       v-money-tooltip="
                         moneyTooltip(
-                          snapshot.fundingValuation.data.balance.quantityBnb,
+                          fundingValuation.data.balance.quantityBnb,
                           'BNB',
                         )
                       "
                     >
-                      {{ snapshot.fundingValuation.data.balance.quantityBnb }}
+                      {{ fundingValuation.data.balance.quantityBnb }}
                     </dd>
                   </div>
                   <div>
@@ -1010,17 +1027,12 @@ onUnmounted(() => {
                     <dd
                       v-money-tooltip="
                         moneyTooltip(
-                          snapshot.fundingValuation.data.balance.valueUsdt,
+                          fundingValuation.data.balance.valueUsdt,
                           'USDT',
                         )
                       "
                     >
-                      {{
-                        decimal(
-                          snapshot.fundingValuation.data.balance.valueUsdt,
-                          2,
-                        )
-                      }}
+                      {{ decimal(fundingValuation.data.balance.valueUsdt, 2) }}
                       USDT
                     </dd>
                   </div>
@@ -1029,51 +1041,44 @@ onUnmounted(() => {
                     <dd
                       v-money-tooltip="
                         moneyTooltip(
-                          snapshot.fundingValuation.data.balance.valueBrl,
+                          fundingValuation.data.balance.valueBrl,
                           'BRL',
                         )
                       "
                     >
-                      {{ brl(snapshot.fundingValuation.data.balance.valueBrl) }}
+                      {{ brl(fundingValuation.data.balance.valueBrl) }}
                     </dd>
                   </div>
                 </dl>
                 <p class="wallet-policy-note">
                   Binance public prices: 1 BNB =
-                  {{ snapshot.fundingValuation.data.prices?.bnbUsdt }} USDT and
-                  1 USDT =
-                  {{ snapshot.fundingValuation.data.prices?.usdtBrl }} BRL.
-                  Balance and prices refresh every 15 seconds while this
-                  dashboard is visible.
+                  {{ fundingValuation.data.prices?.bnbUsdt }} USDT and 1 USDT =
+                  {{ fundingValuation.data.prices?.usdtBrl }} BRL. Balance and
+                  prices refresh every 15 seconds while this dashboard is
+                  visible.
                 </p>
                 <small>
                   Balance read
-                  {{
-                    timestamp(snapshot.fundingValuation.data.balanceObservedAt)
-                  }}
+                  {{ timestamp(fundingValuation.data.balanceObservedAt) }}
                   · Prices read
-                  {{
-                    timestamp(
-                      snapshot.fundingValuation.data.pricesObservedAt ?? '',
-                    )
-                  }}
+                  {{ timestamp(fundingValuation.data.pricesObservedAt ?? '') }}
                 </small>
               </template>
               <p
                 v-else-if="
-                  available(snapshot.fundingValuation) &&
-                  snapshot.fundingValuation.data.status === 'blocked'
+                  available(fundingValuation) &&
+                  fundingValuation.data.status === 'blocked'
                 "
                 class="wallet-policy-warning"
               >
                 Automatic balance valuation blocked:
-                {{ snapshot.fundingValuation.data.blockers.join(', ') }}
+                {{ fundingValuation.data.blockers.join(', ') }}
               </p>
               <p v-else class="empty-state wallet-error">
                 {{
-                  snapshot.fundingValuation.status === 'unavailable'
-                    ? snapshot.fundingValuation.message
-                    : 'Automatic wallet valuation is unavailable'
+                  fundingValuation?.status === 'unavailable'
+                    ? fundingValuation.message
+                    : 'Loading automatic wallet valuation...'
                 }}
               </p>
             </div>

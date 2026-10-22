@@ -18,7 +18,9 @@ The real-wallet panel includes a blank manual BNB quantity field and a “Previe
 
 ## M10.120 automatic monetary valuation
 
-The real-wallet card is loaded with the ordinary dashboard snapshot and refreshed every 15 seconds while the page is visible. It displays exact reported BNB and indicative USDT/BRL equivalents without a separate verification button. Monetary values expose native browser tooltips backed by available Binance conversion evidence; missing evidence leaves the value visible without inventing a conversion. Tooltip calculations use `decimal.js`, while display formatting is presentational.
+The real-wallet card is refreshed every 15 seconds while the page is visible, but its authenticated valuation request is independent from the ordinary dashboard snapshot. The general dashboard can render as soon as its other resources finish instead of waiting for the slower Agentic Wallet CLI sequence. A valuation already displayed remains visible while the next independent refresh is in flight, and overlapping valuation requests are suppressed.
+
+The card displays exact reported BNB and indicative USDT/BRL equivalents without a separate verification button. Monetary values expose native browser tooltips backed by available Binance conversion evidence; missing evidence leaves the value visible without inventing a conversion. Tooltip calculations use `decimal.js`, while display formatting is presentational.
 
 ## Visualization standard
 

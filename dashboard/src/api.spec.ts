@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   dashboardApiPath,
+  loadAgenticWalletFundingValuation,
   loadDashboard,
   observeAgenticWallet,
   prepareAgenticWalletFunding,
@@ -67,6 +68,51 @@ describe('dashboardApiPath', () => {
   it('uses the Vite proxy only during development', () => {
     expect(dashboardApiPath('/health', true)).toBe('/api/health');
     expect(dashboardApiPath('/health', false)).toBe('/health');
+  });
+});
+
+describe('loadAgenticWalletFundingValuation', () => {
+  it('loads the slow wallet valuation independently from the dashboard snapshot', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json({
+          scope: 'agentic_wallet_funding_valuation',
+          status: 'available',
+          blockers: [],
+          balanceObservedAt: '2026-10-22T03:00:00.000Z',
+          pricesObservedAt: '2026-10-22T03:00:01.000Z',
+          balance: {
+            quantityBnb: '0.00975323',
+            valueUsdt: '7.2387497737',
+            valueBrl: '36.51587323342965',
+          },
+          prices: {
+            provider: 'binance',
+            bnbUsdt: '742.19',
+            usdtBrl: '5.0445',
+          },
+          refreshMode: 'automatic_15_seconds_while_dashboard_visible',
+          valuationOnly: true,
+          fundingAuthorized: false,
+          quoteAuthorized: false,
+          submissionAuthorized: false,
+        }),
+      ),
+    );
+
+    await expect(
+      loadAgenticWalletFundingValuation(request),
+    ).resolves.toMatchObject({
+      status: 'available',
+      data: {
+        status: 'available',
+        balance: { quantityBnb: '0.00975323' },
+      },
+    });
+    expect(request).toHaveBeenCalledWith(
+      '/api/real-trading/funding-valuation',
+      { headers: { Accept: 'application/json' } },
+    );
   });
 });
 
@@ -221,7 +267,12 @@ describe('loadDashboard', () => {
 
     const snapshot = await loadDashboard(request);
 
-    expect(request).toHaveBeenCalledTimes(15);
+    expect(request).toHaveBeenCalledTimes(14);
+    expect(
+      request.mock.calls.some(([input]) =>
+        input.toString().endsWith('/real-trading/funding-valuation'),
+      ),
+    ).toBe(false);
     expect(snapshot.health.status).toBe('available');
     expect(snapshot.valuation).toMatchObject({
       status: 'available',
@@ -251,17 +302,6 @@ describe('loadDashboard', () => {
         tradingMode: 'paper',
         realExecutionEnabled: false,
         runtimeExecutionAvailable: false,
-      },
-    });
-    expect(snapshot.fundingValuation).toMatchObject({
-      status: 'available',
-      data: {
-        status: 'available',
-        balance: {
-          quantityBnb: '0.00975323',
-          valueUsdt: '7.2387497737',
-          valueBrl: '36.51587323342965',
-        },
       },
     });
     expect(snapshot.polymarketSettings).toMatchObject({
@@ -319,7 +359,7 @@ describe('loadDashboard', () => {
 
     const snapshot = await loadDashboard(request);
 
-    expect(request).toHaveBeenCalledTimes(11);
+    expect(request).toHaveBeenCalledTimes(10);
     expect(
       request.mock.calls.some(([input]) =>
         input.toString().includes('/polymarket/open-interest'),
@@ -443,7 +483,6 @@ describe('loadDashboard', () => {
     expect(snapshot.strategySignals.status).toBe('unavailable');
     expect(snapshot.backtestRuns.status).toBe('unavailable');
     expect(snapshot.realTradingStatus.status).toBe('unavailable');
-    expect(snapshot.fundingValuation.status).toBe('unavailable');
     expect(snapshot.polymarketSettings.status).toBe('unavailable');
     expect(snapshot.polymarketDataFreshness.status).toBe('unavailable');
     expect(snapshot.polymarketGlobalOpenInterest.status).toBe('unavailable');

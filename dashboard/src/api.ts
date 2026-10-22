@@ -737,7 +737,6 @@ export interface DashboardSnapshot {
   strategySignals: Resource<StrategySignal[]>;
   backtestRuns: Resource<StoredBacktestRun[]>;
   realTradingStatus: Resource<RealTradingStatus>;
-  fundingValuation: Resource<AgenticWalletFundingValuation>;
   polymarketSettings: Resource<PolymarketSettings>;
   polymarketDataFreshness: Resource<PolymarketDataFreshness>;
   polymarketGlobalOpenInterest: Resource<PolymarketGlobalOpenInterest>;
@@ -789,7 +788,6 @@ export async function loadDashboard(
     strategySignals,
     backtestRuns,
     realTradingStatus,
-    fundingValuation,
   ] = await Promise.all([
     loadResource<HealthResponse>(dashboardApiPath('/health'), request),
     loadResource<PortfolioValuation>(
@@ -824,10 +822,6 @@ export async function loadDashboard(
       dashboardApiPath('/real-trading/status'),
       request,
     ),
-    loadResource<AgenticWalletFundingValuation>(
-      dashboardApiPath('/real-trading/funding-valuation'),
-      request,
-    ),
   ]);
   const polymarketSettings = await polymarketSettingsPromise;
   const polymarketResources =
@@ -850,11 +844,19 @@ export async function loadDashboard(
     strategySignals,
     backtestRuns,
     realTradingStatus,
-    fundingValuation,
     polymarketSettings,
     ...polymarketResources,
     loadedAt: new Date().toISOString(),
   };
+}
+
+export function loadAgenticWalletFundingValuation(
+  request: FetchLike = fetch,
+): Promise<Resource<AgenticWalletFundingValuation>> {
+  return loadResource<AgenticWalletFundingValuation>(
+    dashboardApiPath('/real-trading/funding-valuation'),
+    request,
+  );
 }
 
 export async function observeAgenticWallet(

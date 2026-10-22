@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-22 - Isolate authenticated wallet valuation from the dashboard snapshot
+
+The Agentic Wallet valuation performs a bounded sequence of authenticated CLI reads and is materially slower than the ordinary local dashboard resources. Including it in the dashboard's aggregate `Promise.all` made that one provider boundary determine when every unrelated panel became visible.
+
+The dashboard now owns valuation as an independent resource. Each visible-page refresh starts it without awaiting it before publishing the general snapshot, retains the prior valuation while a new read is pending, and refuses an overlapping valuation read. The backend route, exact-decimal calculation, fresh wallet verification, 15-second visible-page cadence, and financial authorization boundaries are unchanged.
+
 ## 2026-10-22 - Make valuation readiness part of market-data startup
 
 Waiting for the first mini-ticker event created an avoidable interval in which the API was healthy but paper valuation returned 503. The market-data lifecycle now starts the WebSocket and concurrently requests one public REST BTCUSDT price, then waits for that bounded warm-up before application startup completes. A streaming event that arrives first remains authoritative; the REST snapshot only fills an empty cache. Provider failure remains explicit rather than introducing a fabricated or persisted price.

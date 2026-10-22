@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-22 — Decouple wallet valuation from dashboard loading
+
+- Removed the authenticated Agentic Wallet valuation from the aggregate dashboard snapshot request.
+- Added an independent valuation loader so unrelated panels render without waiting for the slow CLI sequence.
+- Preserved the last valuation while refreshing and suppressed overlapping wallet valuation reads.
+- Kept the backend route, exact-decimal calculations, visible-page cadence, and all financial authorization boundaries unchanged.
+
 ## 2026-10-22 — Warm paper valuation during API startup
 
 - Added a strict public Binance REST BTC/USDT price snapshot adapter with no credentials.

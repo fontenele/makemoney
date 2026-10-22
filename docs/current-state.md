@@ -1,5 +1,9 @@
 # Current State
 
+The dashboard's automatic Agentic Wallet funding valuation is now isolated from the ordinary dashboard snapshot. General health, paper-trading, strategy, listing, backtest, and enabled Polymarket resources can render without waiting for the authenticated wallet CLI sequence. The wallet card refreshes independently on the same visible-page cycle, retains the last result while loading, and suppresses overlapping valuation reads.
+
+The backend `GET /real-trading/funding-valuation` contract, fresh approved-wallet verification, exact-decimal valuation, and all financial authorization flags are unchanged. All 113 dashboard tests across 19 files, the complete dashboard type-check/build, formatting, and whitespace checks pass.
+
 The paper-wallet valuation startup gap is fixed. The market-data lifecycle now starts the BTC/USDT WebSocket and, before application startup completes, loads one public Binance REST price snapshot. The first valid source wins, so a WebSocket event received during the REST request is not replaced by the snapshot. `GET /paper-wallet/valuation` is therefore ready when the API starts whenever either public source succeeds; HTTP 503 remains the honest result when no valid price is available or the retained price is stale.
 
 The REST adapter validates the exact BTCUSDT identity and a positive plain-decimal price, uses no credentials, preserves decimal strings, and is aborted on shutdown. Twelve focused tests plus lint and the backend build pass. No route, wallet mutation, order, or real-fund behavior changed.
