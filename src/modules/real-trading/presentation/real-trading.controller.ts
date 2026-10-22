@@ -44,6 +44,18 @@ export class RealTradingController {
     }
   }
 
+  @Post('funding-verification')
+  @HttpCode(200)
+  async verifyFunding() {
+    try {
+      return await this.status.verifyFunding();
+    } catch {
+      throw new ServiceUnavailableException(
+        'Agentic Wallet funding verification is unavailable',
+      );
+    }
+  }
+
   @Get('wallet-authentication')
   getWalletAuthentication() {
     return this.authentication.getState();

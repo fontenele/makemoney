@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-21 — Verify the funded wallet without assuming omitted balances are zero
+
+The operator chose to use only the deposited BNB and add no more capital. The provider's bounded balance response may omit assets rather than return explicit zero rows, so treating absent USDT or BTCB as zero would create stronger evidence than the wallet supplied. Exposing every observed token would also broaden the local financial surface beyond the approved instrument.
+
+M10.119 therefore adds a separate manual post-funding read that reports exact quantities only for native BNB and the approved BSC USDT/BTCB contracts, labels missing approved assets as `not_reported`, and blocks unsupported or ambiguous holdings. Positive BNB without reported USDT is descriptive evidence that conversion is required for buy capital, not authorization to convert. Additional funding is not required, and every funding, quote, signature, submission, and execution flag remains false.
+
 ## 2026-10-21 — Keep the funding QR local and address-only
 
 The dashboard runs on a PC while the Binance App used for the manual withdrawal runs on a phone. Manual transcription of a 42-character EVM address adds avoidable error, but a remote QR service would disclose the wallet destination and a payment URI could imply an asset, amount, or network selection the receiving app may interpret differently.

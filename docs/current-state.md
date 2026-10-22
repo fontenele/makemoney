@@ -1,5 +1,11 @@
 # Current State
 
+M10.119 is complete: the loopback dashboard can explicitly verify the wallet after manual funding and display only exact provider-reported native BNB and approved BSC USDT/BTCB quantities. Missing approved tokens remain explicitly not reported, while unsupported assets, identity ambiguity, empty or unavailable balance evidence, unavailable gas, disconnection, or chain/address absence block verification. The current-wallet-only policy requires no additional deposit, but BNB without reported USDT is identified as requiring a separately confirmed conversion before it could fund a BTC/USDT buy.
+
+The verification reveals no wallet address or unsupported asset identity, performs no BRL valuation or conversion, and grants no funding, accounting initialization, quote, signature, submission, executor, or real-order authority. Real trading remains disabled.
+
+Post-M10.119 validation passed all 2,524 backend tests across 218 suites, all 104 dashboard tests across 18 files, focused backend/dashboard API tests, formatting, lint, complete backend/dashboard builds, and whitespace checks. After restarting only the host API, live verification reported exactly `0.00975323` BNB, USDT/BTCB as not reported, zero unsupported assets, conversion required, no additional funding required, and every financial authorization false.
+
 M10.118 is complete: a successful M10.117 destination can now be scanned from the Binance App using a QR code generated entirely in dashboard browser memory.
 
 The dashboard revalidates the exact canonical EVM address before using the local `qrcode` encoder with high error correction. The PNG data URL contains only the address and is neither uploaded nor persisted. BSC/BEP20 selection and complete-address comparison remain mandatory visible operator checks because the QR intentionally carries no chain URI, asset, amount, fee, or payment instruction. Invalid input and local encoder failure withhold the QR. No backend route, provider call, transfer, quote, signature, submission, or execution authority is added.

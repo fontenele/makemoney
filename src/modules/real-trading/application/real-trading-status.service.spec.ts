@@ -175,6 +175,87 @@ describe('RealTradingStatusService', () => {
       fundingAuthorized: false,
     });
   });
+
+  it('reports exact approved holdings after manual funding without authorizing use', async () => {
+    const observation = connectedObservation();
+    observation.addresses = [
+      { chainId: '56', address: '0x1234567890abcdef1234567890abcdef12345678' },
+    ];
+    observation.balances = [
+      {
+        chainId: '56',
+        tokenAddress: 'native-bnb',
+        symbol: 'BNB',
+        quantity: '0.00975323',
+      },
+    ];
+    const wallet = { load: jest.fn(() => Promise.resolve(observation)) };
+    const service = new RealTradingStatusService(
+      config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
+      wallet as unknown as AgenticWalletCapabilityAdapter,
+    );
+
+    await expect(service.verifyFunding()).resolves.toEqual({
+      scope: 'agentic_wallet_funding_verification',
+      status: 'funds_observed',
+      blockers: [],
+      observedAt: new Date('2026-10-01T12:00:00.000Z'),
+      assets: [
+        {
+          symbol: 'BNB',
+          role: 'network_gas',
+          reportStatus: 'reported',
+          quantity: '0.00975323',
+        },
+        {
+          symbol: 'USDT',
+          role: 'strategy_quote_asset',
+          reportStatus: 'not_reported',
+          quantity: null,
+        },
+        {
+          symbol: 'BTCB',
+          role: 'strategy_base_asset',
+          reportStatus: 'not_reported',
+          quantity: null,
+        },
+      ],
+      unsupportedAssetCount: 0,
+      strategyQuoteAssetReported: false,
+      conversionRequiredForBuyCapital: true,
+      additionalFundingRequired: false,
+      fundingAuthorized: false,
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    });
+  });
+
+  it('blocks funding verification when an unsupported asset is reported', async () => {
+    const observation = connectedObservation();
+    observation.balances = [
+      {
+        chainId: '56',
+        tokenAddress: '0x1111111111111111111111111111111111111111',
+        symbol: 'OTHER',
+        quantity: '1',
+      },
+    ];
+    const wallet = { load: jest.fn(() => Promise.resolve(observation)) };
+    const service = new RealTradingStatusService(
+      config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
+      wallet as unknown as AgenticWalletCapabilityAdapter,
+    );
+
+    await expect(service.verifyFunding()).resolves.toMatchObject({
+      status: 'blocked',
+      blockers: ['unsupported_asset_reported'],
+      unsupportedAssetCount: 1,
+      strategyQuoteAssetReported: false,
+      conversionRequiredForBuyCapital: false,
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    });
+  });
 });
 
 function config(values: {

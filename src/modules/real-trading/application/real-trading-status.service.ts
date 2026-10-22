@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import Decimal from 'decimal.js';
 import { APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT } from './real-execution-instrument-approval';
 import {
   AgenticWalletCapabilityAdapter,
@@ -98,7 +99,39 @@ export interface AgenticWalletFundingReadiness {
   readonly submissionAuthorized: false;
 }
 
+export type AgenticWalletFundingVerificationBlocker =
+  | 'wallet_disconnected'
+  | 'approved_chain_unavailable'
+  | 'approved_chain_address_unavailable'
+  | 'balance_read_unavailable'
+  | 'wallet_empty'
+  | 'approved_asset_identity_invalid'
+  | 'unsupported_asset_reported'
+  | 'gas_read_unavailable';
+
+export interface AgenticWalletFundingVerification {
+  readonly scope: 'agentic_wallet_funding_verification';
+  readonly status: 'funds_observed' | 'blocked';
+  readonly blockers: readonly AgenticWalletFundingVerificationBlocker[];
+  readonly observedAt: Date;
+  readonly assets: readonly {
+    readonly symbol: 'BNB' | 'USDT' | 'BTCB';
+    readonly role:
+      'network_gas' | 'strategy_quote_asset' | 'strategy_base_asset';
+    readonly reportStatus: 'reported' | 'not_reported';
+    readonly quantity: string | null;
+  }[];
+  readonly unsupportedAssetCount: number;
+  readonly strategyQuoteAssetReported: boolean;
+  readonly conversionRequiredForBuyCapital: boolean;
+  readonly additionalFundingRequired: false;
+  readonly fundingAuthorized: false;
+  readonly quoteAuthorized: false;
+  readonly submissionAuthorized: false;
+}
+
 const EVM_ADDRESS_PATTERN = /^0x[0-9a-fA-F]{40}$/;
+const ExactDecimal = Decimal.clone({ precision: 40 });
 
 @Injectable()
 export class RealTradingStatusService {
@@ -246,6 +279,106 @@ export class RealTradingStatusService {
     };
   }
 
+  async verifyFunding(): Promise<AgenticWalletFundingVerification> {
+    const observedAt = new Date();
+    const observation = await this.wallet.load('56', observedAt);
+    const instrument = APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT;
+    const usdt = observation.balances.filter(
+      (balance) =>
+        balance.tokenAddress.toLowerCase() === instrument.usdt.tokenAddress,
+    );
+    const btcb = observation.balances.filter(
+      (balance) =>
+        balance.tokenAddress.toLowerCase() === instrument.btc.tokenAddress,
+    );
+    const bnb = observation.balances.filter(
+      (balance) =>
+        balance.symbol === 'BNB' &&
+        balance.tokenAddress.toLowerCase() !== instrument.usdt.tokenAddress &&
+        balance.tokenAddress.toLowerCase() !== instrument.btc.tokenAddress,
+    );
+    const approved = new Set([...usdt, ...btcb, ...bnb]);
+    const unsupportedAssetCount = observation.balances.filter(
+      (balance) => !approved.has(balance),
+    ).length;
+    const identityInvalid =
+      usdt.length > 1 ||
+      btcb.length > 1 ||
+      bnb.length > 1 ||
+      (usdt.length === 1 && usdt[0].symbol !== 'USDT') ||
+      (btcb.length === 1 && btcb[0].symbol !== 'BTCB');
+    const blockers: AgenticWalletFundingVerificationBlocker[] = [];
+
+    addFundingVerificationBlocker(
+      blockers,
+      !observation.capabilities.connected,
+      'wallet_disconnected',
+    );
+    addFundingVerificationBlocker(
+      blockers,
+      !observation.capabilities.chains.some((chain) => chain.chainId === '56'),
+      'approved_chain_unavailable',
+    );
+    addFundingVerificationBlocker(
+      blockers,
+      !observation.addresses.some((address) => address.chainId === '56'),
+      'approved_chain_address_unavailable',
+    );
+    addFundingVerificationBlocker(
+      blockers,
+      !observation.capabilities.reads.balances,
+      'balance_read_unavailable',
+    );
+    addFundingVerificationBlocker(
+      blockers,
+      observation.balances.length === 0,
+      'wallet_empty',
+    );
+    addFundingVerificationBlocker(
+      blockers,
+      identityInvalid,
+      'approved_asset_identity_invalid',
+    );
+    addFundingVerificationBlocker(
+      blockers,
+      unsupportedAssetCount !== 0,
+      'unsupported_asset_reported',
+    );
+    addFundingVerificationBlocker(
+      blockers,
+      !observation.capabilities.reads.gas || observation.gas === null,
+      'gas_read_unavailable',
+    );
+
+    const assets = [
+      fundingAsset('BNB', 'network_gas', identityInvalid ? [] : bnb),
+      fundingAsset('USDT', 'strategy_quote_asset', identityInvalid ? [] : usdt),
+      fundingAsset('BTCB', 'strategy_base_asset', identityInvalid ? [] : btcb),
+    ] as const;
+    const strategyQuoteAssetReported =
+      assets[1].quantity !== null &&
+      new ExactDecimal(assets[1].quantity).greaterThan(0);
+    const bnbReported =
+      assets[0].quantity !== null &&
+      new ExactDecimal(assets[0].quantity).greaterThan(0);
+
+    return {
+      scope: 'agentic_wallet_funding_verification',
+      status: blockers.length === 0 ? 'funds_observed' : 'blocked',
+      blockers,
+      observedAt,
+      assets,
+      unsupportedAssetCount,
+      strategyQuoteAssetReported,
+      conversionRequiredForBuyCapital:
+        bnbReported && !strategyQuoteAssetReported,
+      additionalFundingRequired: false,
+      fundingAuthorized: false,
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    };
+  }
+
   private async loadWalletObservation(): Promise<RealTradingWalletObservation> {
     const observedAt = new Date();
     const observation = await this.wallet.load('56', observedAt);
@@ -295,4 +428,27 @@ function addFundingBlocker(
   blocker: AgenticWalletFundingReadinessBlocker,
 ): void {
   if (condition && !blockers.includes(blocker)) blockers.push(blocker);
+}
+
+function addFundingVerificationBlocker(
+  blockers: AgenticWalletFundingVerificationBlocker[],
+  condition: boolean,
+  blocker: AgenticWalletFundingVerificationBlocker,
+): void {
+  if (condition && !blockers.includes(blocker)) blockers.push(blocker);
+}
+
+function fundingAsset(
+  symbol: 'BNB' | 'USDT' | 'BTCB',
+  role: 'network_gas' | 'strategy_quote_asset' | 'strategy_base_asset',
+  balances: readonly AgenticWalletCapabilityObservation['balances'][number][],
+) {
+  const balance = balances.length === 1 ? balances[0] : null;
+  return {
+    symbol,
+    role,
+    reportStatus:
+      balance === null ? ('not_reported' as const) : ('reported' as const),
+    quantity: balance?.quantity ?? null,
+  };
 }

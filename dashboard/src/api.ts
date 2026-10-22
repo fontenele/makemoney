@@ -597,6 +597,26 @@ export interface AgenticWalletFundingReadiness {
   submissionAuthorized: false;
 }
 
+export interface AgenticWalletFundingVerification {
+  scope: 'agentic_wallet_funding_verification';
+  status: 'funds_observed' | 'blocked';
+  blockers: string[];
+  observedAt: string;
+  assets: {
+    symbol: 'BNB' | 'USDT' | 'BTCB';
+    role: 'network_gas' | 'strategy_quote_asset' | 'strategy_base_asset';
+    reportStatus: 'reported' | 'not_reported';
+    quantity: string | null;
+  }[];
+  unsupportedAssetCount: number;
+  strategyQuoteAssetReported: boolean;
+  conversionRequiredForBuyCapital: boolean;
+  additionalFundingRequired: false;
+  fundingAuthorized: false;
+  quoteAuthorized: false;
+  submissionAuthorized: false;
+}
+
 export interface AgenticWalletAuthenticationState {
   scope: 'agentic_wallet_authentication';
   status:
@@ -781,6 +801,31 @@ export async function prepareAgenticWalletFunding(
     return {
       status: 'available',
       data: (await response.json()) as AgenticWalletFundingReadiness,
+    };
+  } catch {
+    return { status: 'unavailable', message: 'Local API is unreachable' };
+  }
+}
+
+export async function verifyAgenticWalletFunding(
+  request: FetchLike = fetch,
+): Promise<Resource<AgenticWalletFundingVerification>> {
+  try {
+    const response = await request(
+      dashboardApiPath('/real-trading/funding-verification'),
+      { method: 'POST', headers: { Accept: 'application/json' } },
+    );
+    if (!response.ok) {
+      return {
+        status: 'unavailable',
+        message:
+          (await readProviderErrorMessage(response)) ??
+          `Unavailable (${response.status})`,
+      };
+    }
+    return {
+      status: 'available',
+      data: (await response.json()) as AgenticWalletFundingVerification,
     };
   } catch {
     return { status: 'unavailable', message: 'Local API is unreachable' };

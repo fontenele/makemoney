@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-21 — Verify approved holdings after manual funding
+
+- Added an explicit loopback-only post-funding wallet read for native BNB and the exact approved BSC USDT/BTCB contracts.
+- Preserved provider-omitted approved assets as `not_reported`, blocked unsupported or ambiguous holdings, and exposed no wallet address or unapproved asset identity.
+- Added dashboard visibility for exact reported quantities and the BNB-only conversion requirement while recording that no additional funding is required.
+- Kept BRL valuation, conversion, accounting initialization, funding, quote, signature, submission, executor, and real-order authority unavailable.
+- Verified all 2,524 backend tests across 218 suites, all 104 dashboard tests across 18 files, formatting, lint, complete backend/dashboard builds, and whitespace checks.
+- Restarted only the host API and live-verified `0.00975323` BNB, USDT/BTCB not reported, no unsupported assets, conversion required, no additional funding required, and all financial authorization flags false.
+
 ## 2026-10-21 — Add local funding-address QR code
 
 - Added browser-local PNG QR generation for a successful M10.117 canonical BSC address, using high error correction and no remote QR service.

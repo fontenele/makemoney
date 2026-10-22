@@ -5,6 +5,7 @@ import {
   loadAgenticWalletAuthentication,
   observeAgenticWallet,
   prepareAgenticWalletFunding,
+  verifyAgenticWalletFunding,
   startAgenticWalletAuthentication,
   loadListingPerformance,
   loadPolymarketEventDetails,
@@ -17,6 +18,7 @@ import {
   type DashboardSnapshot,
   type AgenticWalletObservation,
   type AgenticWalletFundingReadiness,
+  type AgenticWalletFundingVerification,
   type AgenticWalletAuthenticationState,
   type DetectedSpotSymbol,
   type ListingPerformance,
@@ -78,6 +80,9 @@ const agenticWalletObservationLoading = ref(false);
 const agenticWalletFundingReadiness =
   ref<Resource<AgenticWalletFundingReadiness> | null>(null);
 const agenticWalletFundingReadinessLoading = ref(false);
+const agenticWalletFundingVerification =
+  ref<Resource<AgenticWalletFundingVerification> | null>(null);
+const agenticWalletFundingVerificationLoading = ref(false);
 const agenticWalletFundingQrCode = ref<string | null>(null);
 const agenticWalletFundingQrCodeError = ref(false);
 const agenticWalletAuthentication =
@@ -518,6 +523,16 @@ async function prepareFundingInstructions(): Promise<void> {
   }
 }
 
+async function verifyFundingBalance(): Promise<void> {
+  if (agenticWalletFundingVerificationLoading.value) return;
+  agenticWalletFundingVerificationLoading.value = true;
+  try {
+    agenticWalletFundingVerification.value = await verifyAgenticWalletFunding();
+  } finally {
+    agenticWalletFundingVerificationLoading.value = false;
+  }
+}
+
 async function beginAgenticWalletAuthentication(): Promise<void> {
   if (agenticWalletAuthenticationLoading.value) return;
   agenticWalletAuthenticationLoading.value = true;
@@ -881,6 +896,84 @@ onUnmounted(() => {
                 }}
               </button>
             </div>
+
+            <div class="wallet-observation wallet-funding">
+              <div>
+                <strong>Verify deposited balance</strong>
+                <p>
+                  Reads only the approved BSC holdings reported by the wallet.
+                  It cannot convert BNB, request a quote, or submit an order.
+                </p>
+              </div>
+              <button
+                type="button"
+                :disabled="agenticWalletFundingVerificationLoading"
+                @click="verifyFundingBalance"
+              >
+                {{
+                  agenticWalletFundingVerificationLoading
+                    ? 'Verifying balance...'
+                    : 'Verify deposited balance'
+                }}
+              </button>
+            </div>
+
+            <template
+              v-if="agenticWalletFundingVerification?.status === 'available'"
+            >
+              <div
+                v-if="
+                  agenticWalletFundingVerification.data.status ===
+                  'funds_observed'
+                "
+                class="wallet-funding-instructions"
+              >
+                <strong>Current approved BSC holdings</strong>
+                <dl class="wallet-status-grid">
+                  <div
+                    v-for="asset in agenticWalletFundingVerification.data
+                      .assets"
+                    :key="asset.symbol"
+                  >
+                    <dt>{{ asset.symbol }}</dt>
+                    <dd>
+                      {{
+                        asset.reportStatus === 'reported'
+                          ? asset.quantity
+                          : 'Not reported'
+                      }}
+                    </dd>
+                  </div>
+                </dl>
+                <p
+                  v-if="
+                    agenticWalletFundingVerification.data
+                      .conversionRequiredForBuyCapital
+                  "
+                  class="wallet-policy-warning"
+                >
+                  Only BNB capital is currently reported. The BTC/USDT strategy
+                  needs USDT, so a separately confirmed conversion would be
+                  required while retaining BNB for network gas.
+                </p>
+                <p class="wallet-policy-note">
+                  Additional funding is not required. Quote and submission
+                  remain disabled.
+                </p>
+              </div>
+              <p v-else class="wallet-policy-warning">
+                Funding verification blocked:
+                {{ agenticWalletFundingVerification.data.blockers.join(', ') }}
+              </p>
+            </template>
+            <p
+              v-else-if="
+                agenticWalletFundingVerification?.status === 'unavailable'
+              "
+              class="empty-state wallet-error"
+            >
+              {{ agenticWalletFundingVerification.message }}
+            </p>
 
             <template
               v-if="agenticWalletFundingReadiness?.status === 'available'"

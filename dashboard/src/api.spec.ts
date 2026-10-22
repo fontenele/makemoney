@@ -4,6 +4,7 @@ import {
   loadDashboard,
   observeAgenticWallet,
   prepareAgenticWalletFunding,
+  verifyAgenticWalletFunding,
   loadAgenticWalletAuthentication,
   startAgenticWalletAuthentication,
   loadListingPerformance,
@@ -655,6 +656,54 @@ describe('Agentic Wallet funding readiness', () => {
       status: 'unavailable',
       message: 'Agentic Wallet funding readiness is unavailable',
     });
+  });
+});
+
+describe('Agentic Wallet funding verification', () => {
+  it('requests one explicit post-deposit read and preserves exact quantities', async () => {
+    const verification = {
+      scope: 'agentic_wallet_funding_verification',
+      status: 'funds_observed',
+      blockers: [],
+      observedAt: '2026-10-22T02:34:17.422Z',
+      assets: [
+        {
+          symbol: 'BNB',
+          role: 'network_gas',
+          reportStatus: 'reported',
+          quantity: '0.00975323',
+        },
+        {
+          symbol: 'USDT',
+          role: 'strategy_quote_asset',
+          reportStatus: 'not_reported',
+          quantity: null,
+        },
+        {
+          symbol: 'BTCB',
+          role: 'strategy_base_asset',
+          reportStatus: 'not_reported',
+          quantity: null,
+        },
+      ],
+      unsupportedAssetCount: 0,
+      strategyQuoteAssetReported: false,
+      conversionRequiredForBuyCapital: true,
+      additionalFundingRequired: false,
+      fundingAuthorized: false,
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    };
+    const request = vi.fn(() => Promise.resolve(Response.json(verification)));
+
+    await expect(verifyAgenticWalletFunding(request)).resolves.toEqual({
+      status: 'available',
+      data: verification,
+    });
+    expect(request).toHaveBeenCalledWith(
+      '/api/real-trading/funding-verification',
+      { method: 'POST', headers: { Accept: 'application/json' } },
+    );
   });
 });
 

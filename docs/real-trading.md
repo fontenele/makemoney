@@ -1,5 +1,13 @@
 # Real Trading
 
+## M10.119 — Post-funding approved-balance verification
+
+`POST /real-trading/funding-verification` is an explicit loopback-only read after an operator-managed deposit. It performs one fresh pinned-CLI BSC observation and reports only native BNB plus the exact approved USDT and BTCB contract holdings. A token omitted by the provider remains `not_reported`; the application does not turn absence from the provider's bounded balance response into a proven zero.
+
+The verification blocks on a disconnected wallet, missing approved chain/address, unavailable or empty balances, ambiguous approved identities, unsupported reported assets, or unavailable gas data. It exposes neither the wallet address nor unapproved asset identities. When positive BNB is reported without positive USDT, the result states that a conversion would be required for BTC/USDT buy capital, while `additionalFundingRequired` remains false under the operator's current-wallet-only decision.
+
+This action performs no BRL valuation, funding, conversion, quote, signing, accounting initialization, submission, or order. Every financial authorization remains false, and any future real conversion requires a new explicit confirmation immediately before its first mutating command.
+
 ## M10.118 — Browser-local funding address QR code
 
 After M10.117 returns a ready canonical destination, the dashboard validates the complete EVM address again and generates a high-error-correction PNG QR code in browser memory. The encoder receives only the address; there is no remote QR service, backend request, persisted image, chain URI, token, amount, or payment instruction in the payload.
