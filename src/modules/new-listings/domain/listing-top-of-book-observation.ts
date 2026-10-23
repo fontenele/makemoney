@@ -1,7 +1,7 @@
 import { SpotSymbol } from './spot-symbol-catalog';
 import Decimal from 'decimal.js';
+import { isCanonicalBinanceSymbol } from './binance-spot-identity';
 
-const CANONICAL_SYMBOL_PATTERN = /^[A-Z0-9]{1,30}$/;
 const NON_NEGATIVE_INTEGER_PATTERN = /^(?:0|[1-9]\d*)$/;
 const NON_NEGATIVE_DECIMAL_PATTERN = /^(?:0|[1-9]\d*)(?:\.\d+)?$/;
 const POSITIVE_DECIMAL_PATTERN = /^(?:[1-9]\d*(?:\.\d+)?|0\.\d*[1-9]\d*)$/;
@@ -39,7 +39,7 @@ export function validateListingTopOfBookObservation(
   if (observation.provider !== 'binance') {
     throw new Error('Listing top-of-book provider is unsupported');
   }
-  if (!CANONICAL_SYMBOL_PATTERN.test(observation.symbol)) {
+  if (!isCanonicalBinanceSymbol(observation.symbol)) {
     throw new Error('Listing top-of-book symbol must be canonical');
   }
   if (!NON_NEGATIVE_INTEGER_PATTERN.test(observation.updateId)) {

@@ -1,0 +1,37 @@
+import { PrismaService } from '../../../infrastructure/database/prisma.service';
+import {
+  AgenticWalletFundingConversionFinancialReconciliationReadStore,
+  FundingConversionFinancialReconciliationIdentityError,
+  StoredFundingConversionFinancialReconciliation,
+} from '../application/agentic-wallet-funding-conversion-financial-reconciliation.store';
+import { mapPersistedFundingConversionFinancialReconciliation } from './prisma-agentic-wallet-funding-conversion-financial-reconciliation.store';
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+
+export class PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore implements AgenticWalletFundingConversionFinancialReconciliationReadStore {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async getByReconciliationId(
+    reconciliationId: string,
+  ): Promise<StoredFundingConversionFinancialReconciliation | null> {
+    if (
+      typeof reconciliationId !== 'string' ||
+      !UUID_PATTERN.test(reconciliationId)
+    )
+      throw new FundingConversionFinancialReconciliationIdentityError();
+
+    const row =
+      await this.prisma.agenticWalletFundingConversionFinancialReconciliation.findUnique(
+        { where: { id: reconciliationId } },
+      );
+    if (row === null) return null;
+    const reconciliation =
+      mapPersistedFundingConversionFinancialReconciliation(row);
+    if (reconciliation.id !== reconciliationId)
+      throw new Error(
+        'Persisted funding conversion financial reconciliation identity diverges',
+      );
+    return reconciliation;
+  }
+}

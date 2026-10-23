@@ -28,6 +28,12 @@ export abstract class AgenticWalletFundingConversionFinancialReconciliationStore
   }>;
 }
 
+export interface AgenticWalletFundingConversionFinancialReconciliationReadStore {
+  getByReconciliationId(
+    reconciliationId: string,
+  ): Promise<StoredFundingConversionFinancialReconciliation | null>;
+}
+
 export class FundingConversionFinancialReconciliationBlockedError extends Error {
   constructor(
     readonly blockers: readonly FundingConversionFinancialReconciliationEvidenceBlocker[],
@@ -38,3 +44,9 @@ export class FundingConversionFinancialReconciliationBlockedError extends Error 
 
 export class FundingConversionFinancialReconciliationConflictError extends Error {}
 export class FundingConversionFinancialReconciliationContextNotFoundError extends Error {}
+export class FundingConversionFinancialReconciliationIdentityError extends Error {
+  constructor() {
+    super('Funding conversion financial reconciliation identity is invalid');
+    this.name = FundingConversionFinancialReconciliationIdentityError.name;
+  }
+}

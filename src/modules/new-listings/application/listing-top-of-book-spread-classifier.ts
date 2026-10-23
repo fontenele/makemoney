@@ -6,6 +6,7 @@ import {
 } from '../domain/listing-top-of-book-spread-classification';
 import { ListingTopOfBookSpreadEvolution } from '../domain/listing-top-of-book-spread-evolution';
 import { LISTING_OBSERVATION_CHECKPOINTS } from '../domain/listing-observation-schedule';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 
 const ClassificationDecimal = Decimal.clone({
   precision: 40,
@@ -13,7 +14,6 @@ const ClassificationDecimal = Decimal.clone({
   toExpNeg: -40,
   toExpPos: 40,
 });
-const CANONICAL_SYMBOL_PATTERN = /^[A-Z0-9]{1,30}$/;
 
 export class ListingTopOfBookSpreadClassifier {
   classify(
@@ -81,7 +81,7 @@ function validateEvolution(evolution: ListingTopOfBookSpreadEvolution): void {
   }
   if (
     evolution.provider !== 'binance' ||
-    !CANONICAL_SYMBOL_PATTERN.test(evolution.symbol) ||
+    !isCanonicalBinanceSymbol(evolution.symbol) ||
     evolution.baselineLabel !== 'T+0' ||
     !baseline.isFinite() ||
     baseline.isNegative() ||

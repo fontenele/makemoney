@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## 2026-10-23 - Reuse the authoritative financial-reconciliation mapper for reads
+
+M10.136 reads an immutable funding-conversion reconciliation by canonical UUID and delegates reconstruction to M10.135's persisted mapper. This prevents the writer replay path and future consumers from developing different validation rules for fingerprints, financial classification, evidence coverage, or chronology.
+
+Valid absence is explicit, while malformed identity fails before persistence access and corrupt or identity-divergent durable evidence fails closed. The reader does not reload mutable context and remains unregistered, so read capability adds no provider, accounting, conversion, or execution authority.
+
+## 2026-10-23 - Preserve provider Unicode identities across the listing pipeline
+
+Binance's public Spot catalog now includes valid USDT pairs whose base assets use Han characters. Treating ASCII-only syntax as provider validity rejected the complete strict snapshot and stopped all future comparison. M7.110 centralizes identity validation around NFC-normalized uppercase Unicode letters and numbers while retaining the database length bounds and exact provider string.
+
+The policy is applied end to end rather than skipping unsupported rows: catalog persistence, checkpoint providers, stored top-of-book reads, derived cohorts, cursors, and per-symbol routes all accept the same identity. Lowercase, punctuation, decomposed equivalents, and oversized input remain invalid. Existing conservative baseline semantics remain unchanged, so recovery does not mislabel the current catalog as historical new listings.
+
 ## 2026-10-22 - Complete reconciliation without erasing an economic breach
 
 Financial reconciliation answers whether the terminal transaction and all monetary effects are completely evidenced; it does not assert that the provider honored the accepted minimum. M10.135 therefore marks a complete persisted package as reconciled even when `actualUsdtReceived` is below `minimumUsdt`, while storing the `below_accepted_minimum` classification as immutable audit evidence. Downstream accounting or incident policy must consume that distinction explicitly.

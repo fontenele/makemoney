@@ -5,6 +5,7 @@ import {
   LISTING_OBSERVATION_CHECKPOINTS,
   ListingObservationCheckpointLabel,
 } from '../domain/listing-observation-schedule';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 
 const CohortDecimal = Decimal.clone({
   precision: 40,
@@ -12,7 +13,6 @@ const CohortDecimal = Decimal.clone({
   toExpNeg: -40,
   toExpPos: 40,
 });
-const CANONICAL_SYMBOL_PATTERN = /^[A-Z0-9]{1,30}$/;
 
 interface MutableSpreadEvolutionAggregate {
   changes: InstanceType<typeof CohortDecimal>[];
@@ -76,7 +76,7 @@ function validateEvolution(
   const baseline = new CohortDecimal(evolution.baselineSpreadBasisPoints);
   if (
     evolution.provider !== 'binance' ||
-    !CANONICAL_SYMBOL_PATTERN.test(evolution.symbol) ||
+    !isCanonicalBinanceSymbol(evolution.symbol) ||
     evolution.baselineLabel !== 'T+0' ||
     !baseline.isFinite() ||
     baseline.isNegative()

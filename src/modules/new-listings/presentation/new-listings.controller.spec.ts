@@ -1107,6 +1107,16 @@ describe('NewListingsController', () => {
     ).rejects.toThrow('detected symbol was not found');
   });
 
+  it('accepts a canonical Unicode observation identity', async () => {
+    const listObservations = jest.fn(() => Promise.resolve([]));
+    const controller = new NewListingsController({ listObservations });
+
+    await expect(
+      controller.observations('binance', '币安人生USDT'),
+    ).resolves.toEqual([]);
+    expect(listObservations).toHaveBeenCalledWith('binance', '币安人生USDT');
+  });
+
   it('returns the durable top-of-book timeline for a detected symbol', async () => {
     const listTopOfBook = jest.fn(() => Promise.resolve([]));
     const controller = new NewListingsController({ listTopOfBook });
@@ -1506,6 +1516,21 @@ describe('NewListingsController', () => {
     expect(listRecent).toHaveBeenCalledWith(
       { limit: 50, detectedFrom: undefined, detectedTo: undefined },
       { provider: 'binance', symbol: 'NEWUSDT' },
+    );
+  });
+
+  it('accepts a provider cursor containing a canonical Unicode symbol', async () => {
+    const listRecent = jest.fn(() => Promise.resolve([]));
+    const controller = new NewListingsController({ listRecent });
+    await controller.list(
+      undefined,
+      undefined,
+      undefined,
+      'binance:币安人生USDT',
+    );
+    expect(listRecent).toHaveBeenCalledWith(
+      { limit: 50, detectedFrom: undefined, detectedTo: undefined },
+      { provider: 'binance', symbol: '币安人生USDT' },
     );
   });
 

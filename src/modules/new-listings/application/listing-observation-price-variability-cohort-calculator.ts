@@ -5,6 +5,7 @@ import {
   ListingObservationPriceVariability,
 } from '../domain/listing-observation-price-variability';
 import { LISTING_OBSERVATION_CHECKPOINTS } from '../domain/listing-observation-schedule';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 
 const CohortDecimal = Decimal.clone({
   precision: 40,
@@ -82,7 +83,7 @@ function validateIdentity(
   path: ListingObservationPriceVariability,
   symbols: Set<string>,
 ): void {
-  if (path.provider !== 'binance' || !/^[A-Z0-9]{1,30}$/.test(path.symbol)) {
+  if (path.provider !== 'binance' || !isCanonicalBinanceSymbol(path.symbol)) {
     throw new Error('Listing price variability cohort identity is invalid');
   }
   if (symbols.has(path.symbol)) {

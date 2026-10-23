@@ -4,11 +4,11 @@ import {
   ListingTopOfBookObservationRequest,
   validateListingTopOfBookObservation,
 } from '../domain/listing-top-of-book-observation';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 
 type HttpClient = (input: string, init?: RequestInit) => Promise<Response>;
 type Clock = () => Date;
 const TIMEOUT_MS = 10_000;
-const SYMBOL_PATTERN = /^[A-Z0-9]{1,30}$/;
 
 export class BinanceListingTopOfBookClient implements ListingTopOfBookObservationProvider {
   constructor(
@@ -74,7 +74,10 @@ export class BinanceListingTopOfBookClient implements ListingTopOfBookObservatio
 }
 
 function validateRequest(request: ListingTopOfBookObservationRequest): void {
-  if (request.provider !== 'binance' || !SYMBOL_PATTERN.test(request.symbol)) {
+  if (
+    request.provider !== 'binance' ||
+    !isCanonicalBinanceSymbol(request.symbol)
+  ) {
     throw new Error('Invalid Binance listing top-of-book request');
   }
 }

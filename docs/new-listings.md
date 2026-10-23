@@ -112,7 +112,7 @@ The cycle service is registered for later scheduling but has no production proce
 
 The checkpoint processor now has a provider-neutral data boundary to target before any Binance adapter is introduced. Each observation carries the provider and canonical exchange symbol, exact-string last price, base and quote volumes, a non-negative safe-integer trade count, the provider's market-window open and close times, and the independent local receive time.
 
-Validation requires a positive price, non-negative volumes, a canonical uppercase alphanumeric symbol, valid times, and a non-inverted provider window. It deliberately does not compare the provider clock with the local receive clock, because clock skew must not turn a valid public response into corrupt data. This increment adds no HTTP request, persistence, checkpoint processor, timer, score, signal, or trade.
+Validation requires a positive price, non-negative volumes, a canonical provider symbol, valid times, and a non-inverted provider window. M7.110 later broadened that shared identity from ASCII-only to NFC-normalized uppercase Unicode letters and numbers. It deliberately does not compare the provider clock with the local receive clock, because clock skew must not turn a valid public response into corrupt data. This increment adds no HTTP request, persistence, checkpoint processor, timer, score, signal, or trade.
 
 ## M7.21 public Binance rolling-ticker adapter
 
@@ -142,7 +142,7 @@ A NestJS lifecycle worker can now invoke the production cycle at the validated c
 
 `GET /new-listings/:provider/:symbol/observations` exposes only completed checkpoint samples for one durable detected symbol, ordered by checkpoint target time from `T+0` through `T+24h`. Price and volume values remain exact decimal strings and each item includes its schedule identity, target and completion times, provider window, receive time, and trade count.
 
-The path accepts only `binance` and a canonical uppercase alphanumeric symbol. Invalid identities return `400`, an identity that is not a durable detection returns `404`, and a known detection with no completed sample returns an empty array. Pending/leased checkpoints, claim metadata, alerts, scoring, derived returns, signals, and trading are not exposed.
+The path accepts only `binance` and the shared canonical provider symbol format. Invalid identities return `400`, an identity that is not a durable detection returns `404`, and a known detection with no completed sample returns an empty array. Pending/leased checkpoints, claim metadata, alerts, scoring, derived returns, signals, and trading are not exposed.
 
 ## M7.26 exact T+0-relative price performance
 
@@ -308,7 +308,7 @@ Database return order is normalized to the canonical schedule. Persisted observa
 
 ## M7.53 durable top-of-book timeline API
 
-`GET /new-listings/:provider/:symbol/top-of-book` exposes the M7.52 durable timeline through the local read-only API. Provider must be `binance` and symbol must be canonical uppercase alphanumeric with 1–30 characters. Invalid identity returns `400`, an identity that is not a durable detection returns `404`, and a known detection without stored books returns an empty array.
+`GET /new-listings/:provider/:symbol/top-of-book` exposes the M7.52 durable timeline through the local read-only API. Provider must be `binance` and symbol must match the shared 1–30-character canonical provider format. Invalid identity returns `400`, an identity that is not a durable detection returns `404`, and a known detection without stored books returns an empty array.
 
 Each item preserves checkpoint label, offset, target time, update ID, exact bid/ask prices and quantities, and local receive time in canonical schedule order. The route reads PostgreSQL only and cannot trigger Binance loading, checkpoint processing, persistence, scoring, alerts, signals, or trading.
 
@@ -356,7 +356,7 @@ An unknown detection retains the established not-found behavior, a known detecti
 
 ## M7.61 durable top-of-book imbalance API
 
-`GET /new-listings/:provider/:symbol/top-of-book/imbalance` exposes the M7.60 on-demand timeline through the local read-only API. Provider must be `binance`, symbol must be canonical uppercase alphanumeric with 1–30 characters, an unknown durable detection returns `404`, and a known detection without stored books returns an empty array.
+`GET /new-listings/:provider/:symbol/top-of-book/imbalance` exposes the M7.60 on-demand timeline through the local read-only API. Provider must be `binance`, symbol must match the shared 1–30-character canonical provider format, an unknown durable detection returns `404`, and a known detection without stored books returns an empty array.
 
 Each response item retains its checkpoint metadata and exact displayed bid/ask quote notionals. The normalized imbalance remains `null` when both displayed quantities are zero. The route reads stored snapshots only and cannot invoke Binance, collect or persist data, score a listing, emit a signal, or trade.
 
@@ -392,7 +392,7 @@ No derived value is stored, so newly completed checkpoint books are visible on t
 
 ## M7.67 durable top-of-book imbalance evolution API
 
-`GET /new-listings/:provider/:symbol/top-of-book/imbalance/evolution` exposes the M7.66 on-demand evolution through the local read-only API. Provider must be `binance`, symbol must be canonical uppercase alphanumeric with 1–30 characters, an unknown durable detection returns `404`, and an existing detection without an available T+0 imbalance returns `503`.
+`GET /new-listings/:provider/:symbol/top-of-book/imbalance/evolution` exposes the M7.66 on-demand evolution through the local read-only API. Provider must be `binance`, symbol must match the shared 1–30-character canonical provider format, an unknown durable detection returns `404`, and an existing detection without an available T+0 imbalance returns `503`.
 
 Later zero-notional books retain `null` imbalance and change values. The route reads PostgreSQL only, cannot trigger Binance collection or persist a derived result, and does not convert imbalance evolution into pressure, prediction, score, alert, signal, or trading instruction.
 
@@ -428,7 +428,7 @@ No derived value is stored, so newly completed checkpoint books are visible on t
 
 ## M7.73 durable top-of-book spread evolution API
 
-`GET /new-listings/:provider/:symbol/top-of-book/spread/evolution` exposes the M7.72 on-demand evolution through the local read-only API. Provider must be `binance`, symbol must be canonical uppercase alphanumeric with 1–30 characters, an unknown durable detection returns `404`, and an existing detection without a stored T+0 book returns `503`.
+`GET /new-listings/:provider/:symbol/top-of-book/spread/evolution` exposes the M7.72 on-demand evolution through the local read-only API. Provider must be `binance`, symbol must match the shared 1–30-character canonical provider format, an unknown durable detection returns `404`, and an existing detection without a stored T+0 book returns `503`.
 
 Positive basis-point changes mean spread widening and negative changes mean tightening. The route reads PostgreSQL only, cannot trigger Binance collection or persist a derived result, and does not convert spread evolution into a score, alert, signal, or trading instruction.
 
@@ -647,3 +647,9 @@ An empty durable cohort preserves the explicit empty aggregate, and absence of t
 `GET /new-listings/round-trip/outcomes` exposes M7.108 through the local read-only API. Optional `limit` accepts integers from 1 through 100 and defaults to 50; optional `provider` accepts only `binance` and defaults to it. Explicit `entryLabel`, `exitLabel`, `feeRate`, and `slippageRate` are mandatory, and `+` in checkpoint labels must be encoded as `%2B`.
 
 Invalid or missing query input returns `400` before read-model access. The response preserves the fixed configuration, total/available/unavailable coverage, profitable/losing/break-even counts, and exact conditional average winning and losing net return rates. The endpoint cannot choose or rank pairs, infer costs, optimize, model depth or fills, persist a projection, emit a signal, simulate an order, or trade.
+
+## M7.110 canonical Unicode Binance Spot identities
+
+Binance now returns valid USDT Spot symbols whose base asset contains non-ASCII letters. Rejecting those rows caused the strict catalog adapter to reject the complete snapshot, preventing baseline refresh and future detections. Catalog ingestion and every downstream symbol boundary now use one shared policy: NFC-normalized Unicode letters and numbers, uppercase where casing exists, with the existing 20-character asset and 30-character symbol limits.
+
+Provider identities such as `币安人生USDT` and `牛来USDT` can therefore persist, receive checkpoints, pass derived research validation, appear in cursors, and be addressed through URL-encoded per-symbol routes. Lowercase Latin text, punctuation, decomposed Unicode, and oversized identities still fail closed. Detection semantics do not change: the first successful non-empty catalog establishes the durable baseline and reports zero additions; only a symbol absent from a later successful observation is marked newly observed.

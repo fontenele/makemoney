@@ -8,6 +8,7 @@ import {
   ListingCheckpointRoundTripSelection,
 } from '../domain/listing-checkpoint-round-trip';
 import { LISTING_OBSERVATION_CHECKPOINTS } from '../domain/listing-observation-schedule';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 import { validateListingCheckpointRoundTripSelection } from './listing-checkpoint-round-trip-calculator';
 
 const CohortDecimal = Decimal.clone({
@@ -68,7 +69,7 @@ function validateSampleIdentity(
 ): void {
   if (
     sample.provider !== 'binance' ||
-    !/^[A-Z0-9]{1,30}$/.test(sample.symbol)
+    !isCanonicalBinanceSymbol(sample.symbol)
   ) {
     throw new Error('Listing round trip cohort identity is invalid');
   }

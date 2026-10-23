@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js';
 import { ListingObservationPatternClassification } from '../domain/listing-observation-pattern-classification';
 import { ListingObservationPatternCohort } from '../domain/listing-observation-pattern-cohort';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 import { validateListingObservationPatternThresholds } from './listing-observation-pattern-classifier';
 
 const CohortPatternDecimal = Decimal.clone({
@@ -76,7 +77,7 @@ function validateClassification(
 ) {
   if (
     classification.provider !== 'binance' ||
-    !/^[A-Z0-9]{1,40}$/.test(classification.symbol)
+    !isCanonicalBinanceSymbol(classification.symbol)
   ) {
     throw new Error('Listing observation pattern classification is invalid');
   }

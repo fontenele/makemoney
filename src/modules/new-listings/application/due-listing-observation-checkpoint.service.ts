@@ -17,6 +17,7 @@ import {
   ListingTopOfBookObservation,
   validateListingTopOfBookObservation,
 } from '../domain/listing-top-of-book-observation';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 
 export const MAX_DUE_LISTING_OBSERVATION_CHECKPOINT_LIMIT = 100;
 
@@ -110,7 +111,7 @@ export class DueListingObservationCheckpointService {
     if (input.provider !== 'binance') {
       throw new Error('Checkpoint provider must be binance');
     }
-    if (!/^[A-Z0-9]{1,30}$/.test(input.symbol)) {
+    if (!isCanonicalBinanceSymbol(input.symbol)) {
       throw new Error('Checkpoint symbol must be canonical');
     }
     if (!LISTING_OBSERVATION_CHECKPOINT_LABELS.has(input.label)) {

@@ -50,6 +50,29 @@ describe('BinanceSpotSymbolCatalogClient', () => {
     ).toThrow('Invalid Binance USDT Spot symbol');
   });
 
+  it('preserves canonical Unicode symbols returned by Binance', () => {
+    const client = new BinanceSpotSymbolCatalogClient(
+      'https://example.com',
+      fetch,
+      () => receivedAt,
+    );
+
+    expect(
+      client.normalize({
+        symbols: [
+          symbol('币安人生USDT', '币安人生'),
+          symbol('牛来USDT', '牛来'),
+        ],
+      }).symbols,
+    ).toEqual([
+      expect.objectContaining({
+        symbol: '币安人生USDT',
+        baseAsset: '币安人生',
+      }),
+      expect.objectContaining({ symbol: '牛来USDT', baseAsset: '牛来' }),
+    ]);
+  });
+
   it('loads the unauthenticated exchange information endpoint', async () => {
     const http = jest
       .fn<(input: string, init?: RequestInit) => Promise<Response>>()

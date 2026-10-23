@@ -4,11 +4,11 @@ import {
   ListingMarketObservationRequest,
   validateListingMarketObservation,
 } from '../domain/listing-market-observation';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 
 type HttpClient = (input: string, init?: RequestInit) => Promise<Response>;
 type Clock = () => Date;
 const TIMEOUT_MS = 10_000;
-const SYMBOL_PATTERN = /^[A-Z0-9]{1,30}$/;
 
 export class BinanceListingMarketObservationClient implements ListingMarketObservationProvider {
   constructor(
@@ -76,7 +76,10 @@ export class BinanceListingMarketObservationClient implements ListingMarketObser
 }
 
 function validateRequest(request: ListingMarketObservationRequest): void {
-  if (request.provider !== 'binance' || !SYMBOL_PATTERN.test(request.symbol)) {
+  if (
+    request.provider !== 'binance' ||
+    !isCanonicalBinanceSymbol(request.symbol)
+  ) {
     throw new Error('Invalid Binance listing market observation request');
   }
 }

@@ -59,6 +59,7 @@ import {
 import { validateListingCheckpointRoundTripSelection } from '../application/listing-checkpoint-round-trip-calculator';
 import { ListingCheckpointRoundTripCohort } from '../domain/listing-checkpoint-round-trip-cohort';
 import { ListingCheckpointRoundTripOutcomeCohort } from '../domain/listing-checkpoint-round-trip-outcome-cohort';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 
 @Controller('new-listings')
 export class NewListingsController {
@@ -602,9 +603,9 @@ export class NewListingsController {
 
 function validObservationIdentity(provider: string, symbol: string) {
   const parsedProvider = optionalProvider(provider);
-  if (!parsedProvider || !/^[A-Z0-9]{1,30}$/.test(symbol)) {
+  if (!parsedProvider || !isCanonicalBinanceSymbol(symbol)) {
     throw new BadRequestException(
-      'symbol must be an uppercase provider symbol from 1 to 30 characters',
+      'symbol must be a canonical provider symbol from 1 to 30 characters',
     );
   }
   return { provider: parsedProvider, symbol };
@@ -737,9 +738,15 @@ function optionalBoolean(value: string | undefined, field: string) {
 
 function optionalCursor(value?: string) {
   if (value === undefined) return undefined;
-  const match = /^(binance):([A-Z0-9]{1,40})$/.exec(value);
-  const symbol = match?.[2];
-  if (!symbol) {
+  const separator = value.indexOf(':');
+  const provider = value.slice(0, separator);
+  const symbol = value.slice(separator + 1);
+  if (
+    separator <= 0 ||
+    value.indexOf(':', separator + 1) !== -1 ||
+    provider !== 'binance' ||
+    !isCanonicalBinanceSymbol(symbol)
+  ) {
     throw new BadRequestException('cursor must use provider:symbol format');
   }
   return { provider: 'binance' as const, symbol };

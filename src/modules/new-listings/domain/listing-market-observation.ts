@@ -1,6 +1,6 @@
 import { SpotSymbol } from './spot-symbol-catalog';
+import { isCanonicalBinanceSymbol } from './binance-spot-identity';
 
-const CANONICAL_SYMBOL_PATTERN = /^[A-Z0-9]{1,30}$/;
 const NON_NEGATIVE_DECIMAL_PATTERN = /^(?:0|[1-9]\d*)(?:\.\d+)?$/;
 const POSITIVE_DECIMAL_PATTERN = /^(?:[1-9]\d*(?:\.\d+)?|0\.\d*[1-9]\d*)$/;
 
@@ -38,7 +38,7 @@ export function validateListingMarketObservation(
   if (observation.provider !== 'binance') {
     throw new Error('Listing market observation provider is unsupported');
   }
-  if (!CANONICAL_SYMBOL_PATTERN.test(observation.symbol)) {
+  if (!isCanonicalBinanceSymbol(observation.symbol)) {
     throw new Error('Listing market observation symbol must be canonical');
   }
   if (!POSITIVE_DECIMAL_PATTERN.test(observation.lastPrice)) {

@@ -1,5 +1,11 @@
 # Real Trading
 
+## M10.136 durable funding-conversion financial-reconciliation reader
+
+An unregistered read-only Prisma boundary retrieves one M10.135 reconciliation by its canonical UUID. Identity validation runs before database access, a valid unknown identity returns explicit absence, and a present row is reconstructed through the same authoritative mapper used by the writer's replay path.
+
+The reader therefore revalidates the deterministic request fingerprint, exact financial fields, evidence coverage, chronology, and output classification on every read. Corrupt evidence and a returned identity that diverges from the request fail closed. The reader does not reload provider state or mutable attempt context and adds no NestJS registration, route, provider access, evidence acquisition, accounting mutation, retry, conversion, or real-trading authority.
+
 ## M10.135 — Durable funding-conversion financial reconciliation
 
 M10.135 gives the complete M10.134 package one immutable PostgreSQL destination. Before the first insert, the unregistered store validates the caller-supplied reconciliation identity and recording time, takes a dedicated advisory lock in a serializable transaction, reloads the exact submission attempt with its plan and referenced terminal status observation, and reapplies the pure M10.134 assessment against the durable source quantity, accepted minimum, expected output, order identity, transaction hash, and chronology.

@@ -5,6 +5,7 @@ import {
   LISTING_OBSERVATION_CHECKPOINTS,
   ListingObservationCheckpointLabel,
 } from '../domain/listing-observation-schedule';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 
 const CohortDecimal = Decimal.clone({
   precision: 40,
@@ -12,7 +13,6 @@ const CohortDecimal = Decimal.clone({
   toExpNeg: -40,
   toExpPos: 40,
 });
-const CANONICAL_SYMBOL_PATTERN = /^[A-Z0-9]{1,30}$/;
 
 interface MutableCheckpointAggregate {
   offsetMs: number;
@@ -90,7 +90,7 @@ function validatePerformance(
 ): void {
   if (
     performance.provider !== 'binance' ||
-    !CANONICAL_SYMBOL_PATTERN.test(performance.symbol) ||
+    !isCanonicalBinanceSymbol(performance.symbol) ||
     performance.baselineLabel !== 'T+0' ||
     !new CohortDecimal(performance.baselinePrice).isPositive()
   ) {

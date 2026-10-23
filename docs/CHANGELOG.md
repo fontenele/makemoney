@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-23 — Read durable funding-conversion reconciliation evidence
+
+- Added an unregistered read contract and Prisma reader for one canonical reconciliation UUID.
+- Returned explicit absence and rejected invalid identity before persistence access.
+- Reused the M10.135 persisted mapper so corrupt fingerprints, financial evidence, classification, chronology, and divergent identity fail closed.
+- Added six focused tests without adding schema, route, provider access, accounting mutation, or conversion authority.
+- Passed all 2,700 backend tests, 115 dashboard tests, formatting, lint, full build, Prisma validation, and Compose validation.
+
+## 2026-10-23 — Restore Binance new-listing catalog refresh
+
+- Added one shared canonical Unicode Binance Spot identity policy across catalog, checkpoints, research calculations, cursors, and per-symbol routes.
+- Accepted current valid provider pairs `币安人生USDT` and `牛来USDT` while retaining normalization, casing, character-class, and database-length checks.
+- Restored successful live loading of all 770 current USDT pairs; the first successful snapshot remains baseline-only and does not fabricate historical detections.
+- Added focused identity, catalog, and controller coverage; no route, schema, financial behavior, or trading authority changed.
+
 ## 2026-10-22 — Persist funding-conversion financial reconciliation
 
 - Added an immutable serializable PostgreSQL store for complete M10.134 evidence.

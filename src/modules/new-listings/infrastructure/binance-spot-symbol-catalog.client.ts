@@ -3,11 +3,14 @@ import {
   SpotSymbolCatalog,
   SpotSymbolCatalogProvider,
 } from '../domain/spot-symbol-catalog';
+import {
+  isCanonicalBinanceAsset,
+  isCanonicalBinanceSymbol,
+} from '../domain/binance-spot-identity';
 
 type HttpClient = (input: string, init?: RequestInit) => Promise<Response>;
 type Clock = () => Date;
 const TIMEOUT_MS = 10_000;
-const ASSET = /^[A-Z0-9]{1,20}$/;
 
 export class BinanceSpotSymbolCatalogClient implements SpotSymbolCatalogProvider {
   constructor(
@@ -52,8 +55,8 @@ function normalizeSymbol(value: unknown): SpotSymbol | undefined {
     typeof value.baseAsset !== 'string' ||
     typeof value.status !== 'string' ||
     typeof value.isSpotTradingAllowed !== 'boolean' ||
-    !ASSET.test(value.symbol) ||
-    !ASSET.test(value.baseAsset) ||
+    !isCanonicalBinanceSymbol(value.symbol) ||
+    !isCanonicalBinanceAsset(value.baseAsset) ||
     value.status.length === 0
   ) {
     throw new Error('Invalid Binance USDT Spot symbol');

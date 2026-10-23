@@ -5,6 +5,7 @@ import {
 } from '../domain/listing-observation-pattern-classification';
 import { ListingObservationPricePerformance } from '../domain/listing-observation-price-performance';
 import { LISTING_OBSERVATION_CHECKPOINTS } from '../domain/listing-observation-schedule';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 
 const PatternDecimal = Decimal.clone({
   precision: 40,
@@ -128,7 +129,7 @@ function positiveRate(value: string, field: string) {
 function validatePerformance(performance: ListingObservationPricePerformance) {
   if (
     performance.provider !== 'binance' ||
-    !/^[A-Z0-9]{1,40}$/.test(performance.symbol) ||
+    !isCanonicalBinanceSymbol(performance.symbol) ||
     performance.baselineLabel !== 'T+0' ||
     performance.points.length === 0
   ) {

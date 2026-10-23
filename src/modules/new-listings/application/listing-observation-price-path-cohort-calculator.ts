@@ -5,6 +5,7 @@ import {
   ListingObservationPricePathStatistics,
 } from '../domain/listing-observation-price-path-statistics';
 import { LISTING_OBSERVATION_CHECKPOINTS } from '../domain/listing-observation-schedule';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 
 const CohortDecimal = Decimal.clone({
   precision: 40,
@@ -38,7 +39,7 @@ export class ListingObservationPricePathCohortCalculator {
     for (const path of statistics) {
       if (
         path.provider !== 'binance' ||
-        !/^[A-Z0-9]{1,30}$/.test(path.symbol)
+        !isCanonicalBinanceSymbol(path.symbol)
       ) {
         throw new Error('Listing price-path cohort identity is invalid');
       }

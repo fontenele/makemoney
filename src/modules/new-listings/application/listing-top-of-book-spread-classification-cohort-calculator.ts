@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js';
 import { ListingTopOfBookSpreadClassification } from '../domain/listing-top-of-book-spread-classification';
 import { ListingTopOfBookSpreadClassificationCohort } from '../domain/listing-top-of-book-spread-classification-cohort';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 import { validateListingTopOfBookSpreadThresholds } from './listing-top-of-book-spread-classifier';
 
 const CohortSpreadClassificationDecimal = Decimal.clone({
@@ -60,7 +61,7 @@ function validateClassification(
 ): void {
   if (
     classification.provider !== 'binance' ||
-    !/^[A-Z0-9]{1,30}$/.test(classification.symbol)
+    !isCanonicalBinanceSymbol(classification.symbol)
   ) {
     throw new Error('Listing top-of-book spread classification is invalid');
   }

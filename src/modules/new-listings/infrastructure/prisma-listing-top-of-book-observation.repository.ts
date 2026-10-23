@@ -10,6 +10,7 @@ import {
   ListingTopOfBookObservation,
   validateListingTopOfBookObservation,
 } from '../domain/listing-top-of-book-observation';
+import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 
 @Injectable()
 export class PrismaListingTopOfBookObservationRepository implements ListingTopOfBookObservationRepository {
@@ -47,7 +48,7 @@ export class PrismaListingTopOfBookObservationRepository implements ListingTopOf
     provider: ListingTopOfBookObservation['provider'],
     symbol: string,
   ): Promise<StoredListingTopOfBookCheckpoint[]> {
-    if (provider !== 'binance' || !/^[A-Z0-9]{1,30}$/.test(symbol)) {
+    if (provider !== 'binance' || !isCanonicalBinanceSymbol(symbol)) {
       throw new Error('Invalid listing top-of-book detection identity');
     }
     const rows = await this.prisma.listingCheckpointTopOfBook.findMany({
