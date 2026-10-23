@@ -58,6 +58,12 @@ export interface AgenticWalletFundingConversionFinancialReconciliationTransactio
   ): Promise<StoredFundingConversionFinancialReconciliation | null>;
 }
 
+export interface AgenticWalletFundingConversionFinancialReconciliationRequestFingerprintReadStore {
+  getByRequestFingerprint(
+    requestFingerprint: string,
+  ): Promise<StoredFundingConversionFinancialReconciliation | null>;
+}
+
 export class FundingConversionFinancialReconciliationBlockedError extends Error {
   constructor(
     readonly blockers: readonly FundingConversionFinancialReconciliationEvidenceBlocker[],
@@ -112,5 +118,15 @@ export class FundingConversionFinancialReconciliationTransactionIdentityError ex
     );
     this.name =
       FundingConversionFinancialReconciliationTransactionIdentityError.name;
+  }
+}
+
+export class FundingConversionFinancialReconciliationRequestFingerprintIdentityError extends Error {
+  constructor() {
+    super(
+      'Funding conversion financial reconciliation request fingerprint identity is invalid',
+    );
+    this.name =
+      FundingConversionFinancialReconciliationRequestFingerprintIdentityError.name;
   }
 }

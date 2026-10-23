@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-23 — Read durable funding-conversion reconciliation by request fingerprint
+
+- Added a separate unregistered read contract for the reconciliation associated with one canonical lowercase SHA-256 request fingerprint.
+- Shared the M10.135 writer's canonical fingerprint validator and reused the existing unique `requestFingerprint` constraint, requiring no schema or migration change.
+- Recalculated fingerprints through the authoritative mapper, returned explicit absence, rejected request-fingerprint divergence, and kept the internal fingerprint out of the public snapshot.
+- Expanded focused reader coverage to 38 tests without adding a route, provider access, accounting mutation, or conversion authority.
+- Passed all 2,732 backend tests, 115 dashboard tests, formatting, lint, full build, Prisma validation, Compose validation, and whitespace checks.
+
 ## 2026-10-23 — Read durable funding-conversion reconciliation by transaction
 
 - Added a separate unregistered read contract for the reconciliation associated with one canonical lowercase EVM transaction hash.

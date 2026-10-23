@@ -1,5 +1,22 @@
 # Real Trading
 
+## M10.141 request-fingerprint-keyed funding-conversion financial-reconciliation reader
+
+The unregistered M10.136 Prisma boundary now also retrieves the one immutable financial reconciliation associated with a canonical SHA-256 request fingerprint. Validation uses the writer's shared 64-character lowercase hexadecimal policy before database access, the existing unique `requestFingerprint` constraint makes the lookup unambiguous without a schema change, and a valid fingerprint without reconciliation returns explicit absence.
+
+Present rows still pass through the authoritative M10.135 persisted mapper, which recalculates the fingerprint from the exact reconciliation identity, plan, financial fields, evidence, and chronology while revalidating economic classification. A row whose durable request fingerprint diverges from the requested identity fails closed after successful reconstruction. The fingerprint remains an internal correlation key and is not added to the returned public snapshot. The reader does not reload mutable context and adds no NestJS registration, route, provider access, evidence acquisition, accounting mutation, retry, conversion, or real-trading authority.
+
+### M10.141 acceptance criteria
+
+- A canonical lowercase 64-character SHA-256 request fingerprint is required before persistence access.
+- The lookup uses the existing unique request fingerprint and returns at most one reconciliation.
+- A valid request fingerprint without reconciliation returns explicit absence.
+- Present evidence is reconstructed and its fingerprint recalculated through the M10.135 authoritative persisted mapper.
+- Corrupt evidence and durable request-fingerprint-identity divergence fail closed.
+- The request fingerprint remains internal and is not disclosed in the returned reconciliation snapshot.
+- Focused tests cover reconstruction, absence, invalid identity, malformed evidence, and divergent durable request fingerprint.
+- No schema, route, runtime registration, provider/evidence acquisition, accounting mutation, retry, conversion, or real order is added.
+
 ## M10.140 transaction-keyed funding-conversion financial-reconciliation reader
 
 The unregistered M10.136 Prisma boundary now also retrieves the one immutable financial reconciliation associated with a canonical EVM transaction hash. Validation uses the funding-conversion status boundary's shared lowercase `0x` plus 64 hexadecimal character policy before database access, the existing unique `transactionHash` constraint makes the lookup unambiguous without a schema change, and a valid transaction without reconciliation returns explicit absence.

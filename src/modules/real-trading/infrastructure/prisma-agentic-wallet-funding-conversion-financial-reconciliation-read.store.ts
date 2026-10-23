@@ -3,18 +3,23 @@ import {
   AgenticWalletFundingConversionFinancialReconciliationAttemptReadStore,
   AgenticWalletFundingConversionFinancialReconciliationProviderOrderReadStore,
   AgenticWalletFundingConversionFinancialReconciliationReadStore,
+  AgenticWalletFundingConversionFinancialReconciliationRequestFingerprintReadStore,
   AgenticWalletFundingConversionFinancialReconciliationStatusObservationReadStore,
   AgenticWalletFundingConversionFinancialReconciliationTransactionReadStore,
   FundingConversionFinancialReconciliationAttemptIdentityError,
   FundingConversionFinancialReconciliationIdentityError,
   FundingConversionFinancialReconciliationProviderOrderIdentityError,
+  FundingConversionFinancialReconciliationRequestFingerprintIdentityError,
   FundingConversionFinancialReconciliationStatusObservationIdentityError,
   FundingConversionFinancialReconciliationTransactionIdentityError,
   StoredFundingConversionFinancialReconciliation,
 } from '../application/agentic-wallet-funding-conversion-financial-reconciliation.store';
 import { isCanonicalFundingConversionTransactionHash } from './agentic-wallet-funding-conversion-status-response';
 import { isSafeAgenticWalletProviderOrderId } from './agentic-wallet-market-swap-submission-response';
-import { mapPersistedFundingConversionFinancialReconciliation } from './prisma-agentic-wallet-funding-conversion-financial-reconciliation.store';
+import {
+  isCanonicalFundingConversionFinancialReconciliationRequestFingerprint,
+  mapPersistedFundingConversionFinancialReconciliation,
+} from './prisma-agentic-wallet-funding-conversion-financial-reconciliation.store';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -25,7 +30,8 @@ export class PrismaAgenticWalletFundingConversionFinancialReconciliationReadStor
     AgenticWalletFundingConversionFinancialReconciliationAttemptReadStore,
     AgenticWalletFundingConversionFinancialReconciliationStatusObservationReadStore,
     AgenticWalletFundingConversionFinancialReconciliationProviderOrderReadStore,
-    AgenticWalletFundingConversionFinancialReconciliationTransactionReadStore
+    AgenticWalletFundingConversionFinancialReconciliationTransactionReadStore,
+    AgenticWalletFundingConversionFinancialReconciliationRequestFingerprintReadStore
 {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -131,6 +137,30 @@ export class PrismaAgenticWalletFundingConversionFinancialReconciliationReadStor
     if (reconciliation.evidence.transactionHash !== transactionHash)
       throw new Error(
         'Persisted funding conversion financial reconciliation transaction identity diverges',
+      );
+    return reconciliation;
+  }
+
+  async getByRequestFingerprint(
+    requestFingerprint: string,
+  ): Promise<StoredFundingConversionFinancialReconciliation | null> {
+    if (
+      !isCanonicalFundingConversionFinancialReconciliationRequestFingerprint(
+        requestFingerprint,
+      )
+    )
+      throw new FundingConversionFinancialReconciliationRequestFingerprintIdentityError();
+
+    const row =
+      await this.prisma.agenticWalletFundingConversionFinancialReconciliation.findUnique(
+        { where: { requestFingerprint } },
+      );
+    if (row === null) return null;
+    const reconciliation =
+      mapPersistedFundingConversionFinancialReconciliation(row);
+    if (row.requestFingerprint !== requestFingerprint)
+      throw new Error(
+        'Persisted funding conversion financial reconciliation request fingerprint identity diverges',
       );
     return reconciliation;
   }

@@ -271,7 +271,9 @@ export function mapPersistedFundingConversionFinancialReconciliation(row: {
     !isValidFundingConversionFinancialReconciliationEvidence(evidence) ||
     expectedAssessment === null ||
     row.outputAssessment !== expectedAssessment ||
-    !HASH_PATTERN.test(row.requestFingerprint) ||
+    !isCanonicalFundingConversionFinancialReconciliationRequestFingerprint(
+      row.requestFingerprint,
+    ) ||
     !(row.recordedAt instanceof Date) ||
     !Number.isFinite(row.recordedAt.getTime()) ||
     row.recordedAt.getTime() < evidence.observedAt.getTime() ||
@@ -299,6 +301,12 @@ export function mapPersistedFundingConversionFinancialReconciliation(row: {
     financialReconciliationComplete: true,
     automaticRetryAllowed: false,
   };
+}
+
+export function isCanonicalFundingConversionFinancialReconciliationRequestFingerprint(
+  value: unknown,
+): value is string {
+  return typeof value === 'string' && HASH_PATTERN.test(value);
 }
 
 function classify(

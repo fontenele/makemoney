@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-23 - Keep request fingerprints internal while allowing exact durable correlation
+
+M10.141 extends the unregistered financial-reconciliation reader with a request-fingerprint-keyed contract. The durable schema already guarantees one reconciliation per `requestFingerprint`, so `findUnique` supplies an exact lookup without adding an index, ordering rule, fallback, or schema migration.
+
+The writer's canonical lowercase SHA-256 policy is now shared with the reader and is applied before access. A present row still passes through the M10.135 mapper, which recalculates the fingerprint from the complete durable package; the raw row fingerprint is then compared with the requested key to detect adapter divergence. The returned public reconciliation remains unchanged and does not disclose this internal idempotency/correlation key. No mutable context is reloaded and no runtime authority is added.
+
 ## 2026-10-23 - Share the canonical transaction identity across status and reconciliation reads
 
 M10.140 extends the unregistered financial-reconciliation reader with a separate transaction-keyed contract. The durable schema already guarantees one reconciliation per `transactionHash`, so `findUnique` supplies an exact lookup without adding an index, ordering rule, fallback, or schema migration.

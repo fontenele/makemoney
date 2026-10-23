@@ -5,6 +5,7 @@ import {
   FundingConversionFinancialReconciliationAttemptIdentityError,
   FundingConversionFinancialReconciliationIdentityError,
   FundingConversionFinancialReconciliationProviderOrderIdentityError,
+  FundingConversionFinancialReconciliationRequestFingerprintIdentityError,
   FundingConversionFinancialReconciliationStatusObservationIdentityError,
   FundingConversionFinancialReconciliationTransactionIdentityError,
 } from '../application/agentic-wallet-funding-conversion-financial-reconciliation.store';
@@ -339,6 +340,68 @@ describe('PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore',
       harness.reader.getByTransactionHash(TRANSACTION_HASH),
     ).rejects.toThrow(
       'Persisted funding conversion financial reconciliation transaction identity diverges',
+    );
+  });
+
+  it('returns the reconciliation for its unique request fingerprint', async () => {
+    const row = await persistedRow();
+    const harness = readerHarness(row);
+
+    await expect(
+      harness.reader.getByRequestFingerprint(row.requestFingerprint),
+    ).resolves.toMatchObject({
+      id: RECONCILIATION_ID,
+      attemptId: ATTEMPT_ID,
+      financialReconciliationComplete: true,
+      automaticRetryAllowed: false,
+    });
+    expect(harness.findUnique).toHaveBeenCalledWith({
+      where: { requestFingerprint: row.requestFingerprint },
+    });
+  });
+
+  it('returns explicit absence for a request fingerprint without reconciliation', async () => {
+    await expect(
+      readerHarness(null).reader.getByRequestFingerprint('a'.repeat(64)),
+    ).resolves.toBeNull();
+  });
+
+  it('rejects malformed persisted evidence selected by request fingerprint', async () => {
+    const row = await persistedRow();
+    const harness = readerHarness({
+      ...row,
+      outputAssessment: 'expected_output_satisfied',
+    });
+    await expect(
+      harness.reader.getByRequestFingerprint(row.requestFingerprint),
+    ).rejects.toThrow(
+      'Persisted funding conversion financial reconciliation is invalid',
+    );
+  });
+
+  it.each(['invalid', 'A'.repeat(64)])(
+    'rejects invalid request fingerprint %s before persistence access',
+    async (identity) => {
+      const harness = readerHarness(null);
+      await expect(
+        harness.reader.getByRequestFingerprint(identity),
+      ).rejects.toBeInstanceOf(
+        FundingConversionFinancialReconciliationRequestFingerprintIdentityError,
+      );
+      expect(harness.findUnique).not.toHaveBeenCalled();
+    },
+  );
+
+  it('rejects a row whose request fingerprint identity diverges from the request', async () => {
+    const requestedRow = await persistedRow();
+    const divergentRow = await persistedRow(
+      '019a0db1-bfea-7000-8000-000000000005',
+    );
+    const harness = readerHarness(divergentRow);
+    await expect(
+      harness.reader.getByRequestFingerprint(requestedRow.requestFingerprint),
+    ).rejects.toThrow(
+      'Persisted funding conversion financial reconciliation request fingerprint identity diverges',
     );
   });
 });
