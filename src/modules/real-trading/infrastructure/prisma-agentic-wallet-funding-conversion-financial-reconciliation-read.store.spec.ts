@@ -6,6 +6,7 @@ import {
   FundingConversionFinancialReconciliationIdentityError,
   FundingConversionFinancialReconciliationProviderOrderIdentityError,
   FundingConversionFinancialReconciliationStatusObservationIdentityError,
+  FundingConversionFinancialReconciliationTransactionIdentityError,
 } from '../application/agentic-wallet-funding-conversion-financial-reconciliation.store';
 import { FundingConversionFinancialReconciliationEvidence } from './agentic-wallet-funding-conversion-financial-reconciliation-evidence';
 import {
@@ -273,6 +274,73 @@ describe('PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore',
       'Persisted funding conversion financial reconciliation provider order identity diverges',
     );
   });
+
+  it('returns the reconciliation for its unique transaction hash', async () => {
+    const harness = readerHarness(await persistedRow());
+
+    await expect(
+      harness.reader.getByTransactionHash(TRANSACTION_HASH),
+    ).resolves.toMatchObject({
+      id: RECONCILIATION_ID,
+      attemptId: ATTEMPT_ID,
+      evidence: { transactionHash: TRANSACTION_HASH },
+      financialReconciliationComplete: true,
+      automaticRetryAllowed: false,
+    });
+    expect(harness.findUnique).toHaveBeenCalledWith({
+      where: { transactionHash: TRANSACTION_HASH },
+    });
+  });
+
+  it('returns explicit absence for a transaction without reconciliation', async () => {
+    await expect(
+      readerHarness(null).reader.getByTransactionHash(TRANSACTION_HASH),
+    ).resolves.toBeNull();
+  });
+
+  it('rejects malformed persisted evidence selected by transaction hash', async () => {
+    const row = await persistedRow();
+    const harness = readerHarness({
+      ...row,
+      outputAssessment: 'expected_output_satisfied',
+    });
+    await expect(
+      harness.reader.getByTransactionHash(TRANSACTION_HASH),
+    ).rejects.toThrow(
+      'Persisted funding conversion financial reconciliation is invalid',
+    );
+  });
+
+  it.each(['invalid', TRANSACTION_HASH.toUpperCase()])(
+    'rejects invalid transaction identity %s before persistence access',
+    async (identity) => {
+      const harness = readerHarness(null);
+      await expect(
+        harness.reader.getByTransactionHash(identity),
+      ).rejects.toBeInstanceOf(
+        FundingConversionFinancialReconciliationTransactionIdentityError,
+      );
+      expect(harness.findUnique).not.toHaveBeenCalled();
+    },
+  );
+
+  it('rejects a row whose transaction identity diverges from the request', async () => {
+    const divergentTransactionHash = `0x${'b'.repeat(64)}`;
+    const harness = readerHarness(
+      await persistedRow(
+        RECONCILIATION_ID,
+        ATTEMPT_ID,
+        STATUS_ID,
+        PROVIDER_ORDER_ID,
+        divergentTransactionHash,
+      ),
+    );
+    await expect(
+      harness.reader.getByTransactionHash(TRANSACTION_HASH),
+    ).rejects.toThrow(
+      'Persisted funding conversion financial reconciliation transaction identity diverges',
+    );
+  });
 });
 
 function readerHarness(row: ReconciliationRow | null) {
@@ -296,6 +364,7 @@ async function persistedRow(
   attemptId = ATTEMPT_ID,
   statusObservationId = STATUS_ID,
   providerOrderId = PROVIDER_ORDER_ID,
+  transactionHash = TRANSACTION_HASH,
 ) {
   const create = jest.fn(({ data }: { data: Record<string, unknown> }) =>
     Promise.resolve({ ...data }),
@@ -315,7 +384,12 @@ async function persistedRow(
       findUnique: jest
         .fn<() => Promise<ReturnType<typeof statusRow>>>()
         .mockResolvedValue(
-          statusRow(attemptId, statusObservationId, providerOrderId),
+          statusRow(
+            attemptId,
+            statusObservationId,
+            providerOrderId,
+            transactionHash,
+          ),
         ),
     },
   };
@@ -328,7 +402,7 @@ async function persistedRow(
     prisma,
   ).record(
     id,
-    evidence(attemptId, statusObservationId, providerOrderId),
+    evidence(attemptId, statusObservationId, providerOrderId, transactionHash),
     RECORDED_AT,
   );
   return create.mock.calls[0][0].data as ReconciliationRow;
@@ -338,6 +412,7 @@ function evidence(
   attemptId = ATTEMPT_ID,
   statusObservationId = STATUS_ID,
   providerOrderId = PROVIDER_ORDER_ID,
+  transactionHash = TRANSACTION_HASH,
 ): FundingConversionFinancialReconciliationEvidence {
   return {
     scope:
@@ -345,7 +420,7 @@ function evidence(
     attemptId,
     providerOrderId,
     statusObservationId,
-    transactionHash: TRANSACTION_HASH,
+    transactionHash,
     chainId: '56',
     sourceTokenAddress: BSC_NATIVE_BNB_ADDRESS.toLowerCase(),
     targetTokenAddress: BSC_USDT_ADDRESS.toLowerCase(),
@@ -384,13 +459,14 @@ function statusRow(
   attemptId = ATTEMPT_ID,
   id = STATUS_ID,
   providerOrderId = PROVIDER_ORDER_ID,
+  transactionHash = TRANSACTION_HASH,
 ) {
   return {
     id,
     attemptId,
     providerOrderId,
     providerStatus: 'FINISHED',
-    transactionHash: TRANSACTION_HASH,
+    transactionHash,
     bookedAt: new Date('2026-10-22T12:00:30.000Z'),
     providerUpdatedAt: new Date('2026-10-22T12:00:31.000Z'),
     recordedAt: new Date('2026-10-22T12:00:32.000Z'),

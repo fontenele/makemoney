@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-23 - Share the canonical transaction identity across status and reconciliation reads
+
+M10.140 extends the unregistered financial-reconciliation reader with a separate transaction-keyed contract. The durable schema already guarantees one reconciliation per `transactionHash`, so `findUnique` supplies an exact lookup without adding an index, ordering rule, fallback, or schema migration.
+
+The canonical lowercase EVM hash policy is now named and exported from the funding-conversion status boundary instead of being duplicated at the reader. Validation happens before access, absence remains explicit, and present evidence passes through the M10.135 authoritative mapper. The reader additionally verifies that the reconstructed embedded transaction hash equals the requested identity, preventing a persistence adapter anomaly from relabeling financial evidence. No receipt, provider, observation, or mutable attempt state is reloaded, and no runtime authority is added.
+
 ## 2026-10-23 - Reuse the safe provider-order grammar for keyed reconciliation reading
 
 M10.139 extends the unregistered financial-reconciliation reader with a separate provider-order-keyed contract. The durable schema already guarantees one reconciliation per `providerOrderId`, so `findUnique` supplies an exact lookup without adding an index, ordering rule, fallback, or schema migration.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-23 — Read durable funding-conversion reconciliation by transaction
+
+- Added a separate unregistered read contract for the reconciliation associated with one canonical lowercase EVM transaction hash.
+- Shared the funding-conversion status boundary's canonical transaction validator and reused the existing unique `transactionHash` constraint, requiring no schema or migration change.
+- Returned explicit absence and reused the M10.135 mapper so corrupt or transaction-divergent evidence fails closed.
+- Expanded focused reader coverage to 32 tests without adding a route, provider access, accounting mutation, or conversion authority.
+- Passed all 2,726 backend tests, 115 dashboard tests, formatting, lint, full build, Prisma validation, Compose validation, and whitespace checks.
+
 ## 2026-10-23 — Read durable funding-conversion reconciliation by provider order
 
 - Added a separate unregistered read contract for the reconciliation associated with one safe Agentic Wallet provider order identity.

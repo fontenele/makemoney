@@ -4,12 +4,15 @@ import {
   AgenticWalletFundingConversionFinancialReconciliationProviderOrderReadStore,
   AgenticWalletFundingConversionFinancialReconciliationReadStore,
   AgenticWalletFundingConversionFinancialReconciliationStatusObservationReadStore,
+  AgenticWalletFundingConversionFinancialReconciliationTransactionReadStore,
   FundingConversionFinancialReconciliationAttemptIdentityError,
   FundingConversionFinancialReconciliationIdentityError,
   FundingConversionFinancialReconciliationProviderOrderIdentityError,
   FundingConversionFinancialReconciliationStatusObservationIdentityError,
+  FundingConversionFinancialReconciliationTransactionIdentityError,
   StoredFundingConversionFinancialReconciliation,
 } from '../application/agentic-wallet-funding-conversion-financial-reconciliation.store';
+import { isCanonicalFundingConversionTransactionHash } from './agentic-wallet-funding-conversion-status-response';
 import { isSafeAgenticWalletProviderOrderId } from './agentic-wallet-market-swap-submission-response';
 import { mapPersistedFundingConversionFinancialReconciliation } from './prisma-agentic-wallet-funding-conversion-financial-reconciliation.store';
 
@@ -21,7 +24,8 @@ export class PrismaAgenticWalletFundingConversionFinancialReconciliationReadStor
     AgenticWalletFundingConversionFinancialReconciliationReadStore,
     AgenticWalletFundingConversionFinancialReconciliationAttemptReadStore,
     AgenticWalletFundingConversionFinancialReconciliationStatusObservationReadStore,
-    AgenticWalletFundingConversionFinancialReconciliationProviderOrderReadStore
+    AgenticWalletFundingConversionFinancialReconciliationProviderOrderReadStore,
+    AgenticWalletFundingConversionFinancialReconciliationTransactionReadStore
 {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -107,6 +111,26 @@ export class PrismaAgenticWalletFundingConversionFinancialReconciliationReadStor
     if (reconciliation.evidence.providerOrderId !== providerOrderId)
       throw new Error(
         'Persisted funding conversion financial reconciliation provider order identity diverges',
+      );
+    return reconciliation;
+  }
+
+  async getByTransactionHash(
+    transactionHash: string,
+  ): Promise<StoredFundingConversionFinancialReconciliation | null> {
+    if (!isCanonicalFundingConversionTransactionHash(transactionHash))
+      throw new FundingConversionFinancialReconciliationTransactionIdentityError();
+
+    const row =
+      await this.prisma.agenticWalletFundingConversionFinancialReconciliation.findUnique(
+        { where: { transactionHash } },
+      );
+    if (row === null) return null;
+    const reconciliation =
+      mapPersistedFundingConversionFinancialReconciliation(row);
+    if (reconciliation.evidence.transactionHash !== transactionHash)
+      throw new Error(
+        'Persisted funding conversion financial reconciliation transaction identity diverges',
       );
     return reconciliation;
   }

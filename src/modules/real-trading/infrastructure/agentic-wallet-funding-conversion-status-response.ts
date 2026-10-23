@@ -10,6 +10,7 @@ const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const DECIMAL_PATTERN = /^(?:0|[1-9]\d*)(?:\.\d+)?$/;
 const TX_HASH_PATTERN = /^0x[a-fA-F0-9]{64}$/;
+const CANONICAL_TX_HASH_PATTERN = /^0x[a-f0-9]{64}$/;
 
 export interface FundingConversionStatusContext {
   readonly attemptId: string;
@@ -131,7 +132,8 @@ export function isValidFundingConversionStatusObservation(
     isSafeAgenticWalletProviderOrderId(observation.providerOrderId) &&
     status !== null &&
     (hash === null ||
-      (typeof hash === 'string' && /^0x[a-f0-9]{64}$/.test(hash))) &&
+      (typeof hash === 'string' &&
+        isCanonicalFundingConversionTransactionHash(hash))) &&
     (status !== 'FINISHED' || hash !== null) &&
     bookedAt instanceof Date &&
     Number.isFinite(bookedAt.getTime()) &&
@@ -144,6 +146,12 @@ export function isValidFundingConversionStatusObservation(
     observation.financialReconciliationComplete === false &&
     observation.automaticRetryAllowed === false
   );
+}
+
+export function isCanonicalFundingConversionTransactionHash(
+  value: unknown,
+): value is string {
+  return typeof value === 'string' && CANONICAL_TX_HASH_PATTERN.test(value);
 }
 
 function validContext(value: FundingConversionStatusContext): boolean {

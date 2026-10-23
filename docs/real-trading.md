@@ -1,5 +1,21 @@
 # Real Trading
 
+## M10.140 transaction-keyed funding-conversion financial-reconciliation reader
+
+The unregistered M10.136 Prisma boundary now also retrieves the one immutable financial reconciliation associated with a canonical EVM transaction hash. Validation uses the funding-conversion status boundary's shared lowercase `0x` plus 64 hexadecimal character policy before database access, the existing unique `transactionHash` constraint makes the lookup unambiguous without a schema change, and a valid transaction without reconciliation returns explicit absence.
+
+Present rows still pass through the authoritative M10.135 persisted mapper, which revalidates fingerprints, exact financial fields, evidence coverage, chronology, and economic classification. A mapped row whose embedded transaction hash diverges from the requested identity fails closed. The reader does not reload provider, observation, receipt, or mutable attempt state and adds no NestJS registration, route, provider access, evidence acquisition, accounting mutation, retry, conversion, or real-trading authority.
+
+### M10.140 acceptance criteria
+
+- A canonical lowercase EVM transaction hash is required before persistence access.
+- The lookup uses the existing unique transaction identity and returns at most one reconciliation.
+- A valid transaction without reconciliation returns explicit absence.
+- Present evidence is reconstructed through the M10.135 authoritative persisted mapper.
+- Corrupt evidence and returned transaction-identity divergence fail closed.
+- Focused tests cover reconstruction, absence, invalid identity, and divergent returned transaction identity.
+- No schema, route, runtime registration, provider/evidence acquisition, accounting mutation, retry, conversion, or real order is added.
+
 ## M10.139 provider-order-keyed funding-conversion financial-reconciliation reader
 
 The unregistered M10.136 Prisma boundary now also retrieves the one immutable financial reconciliation associated with a safe Agentic Wallet provider order identity. Validation uses the existing option-safe bounded order-ID grammar before database access, the existing unique `providerOrderId` constraint makes the lookup unambiguous without a schema change, and a valid provider order without reconciliation returns explicit absence.
