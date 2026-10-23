@@ -73,7 +73,8 @@ M6.25 Simulation API:        DONE
 M10.133 Status Reconciliation: DONE
 M10.134 Financial Evidence Gate: DONE
 M10.135 Durable Financial Reconciliation: DONE
-Next increment:           NOT YET DEFINED
+M10.143 One-Shot Financial Reconciliation: DONE
+Next objective: Concrete complete financial-evidence acquisition or an explicit provider-capability blocker
 ```
 
 The detailed sections below preserve the original product plan. For current delivery status and exact increment boundaries, `docs/roadmap.md` and `docs/current-state.md` are authoritative.

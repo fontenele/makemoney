@@ -1,5 +1,25 @@
 # Real Trading
 
+## M10.143 one-shot funding-conversion financial-reconciliation coordinator
+
+M10.143 closes the application-composition gap between the M10.134 evidence boundary and M10.135 durable store without pretending that concrete provider evidence acquisition already exists. One unregistered service accepts a canonical submission-attempt UUID, first checks the M10.137 attempt-keyed reader, and returns an already completed reconciliation without another external read.
+
+When reconciliation is absent, the service claims that attempt in-process and requests at most one untrusted evidence package through a dedicated read-only port. Explicit absence and malformed evidence are returned without persistence. Complete M10.134-shaped evidence receives a separately generated canonical reconciliation UUID and finite non-regressed recording time before delegation to M10.135, which remains the authoritative durable-context reassessment. Reader or store failures propagate without retry, cancellation is checked before external reading and persistence, and `finally` releases the process-local claim.
+
+The evidence port deliberately has no implementation or NestJS registration in this increment. A future concrete adapter must prove how transaction receipt, exact BNB/USDT balance deltas, provider fees, and BNB network fee are obtained completely; inability to obtain any required fact must remain explicit absence or failure, never inferred success.
+
+### M10.143 acceptance criteria
+
+- Invalid attempt identity and pre-canceled work stop before dependency access.
+- Existing durable reconciliation returns immediately without evidence acquisition or persistence.
+- At most one evidence read and one store call occur per explicit invocation.
+- Overlapping same-attempt work is blocked in-process without waiting; claims release after success or failure.
+- Missing or malformed evidence is never persisted and never claims financial completion.
+- Recording identity/time are validated after the evidence read and before M10.135 delegation.
+- Reader and store failures propagate without automatic retry.
+- Successful output reports only the M10.135 stored reconciliation and its replay fact.
+- No concrete evidence adapter, schema, route, runtime registration, provider call, accounting mutation, conversion, or real order is added.
+
 ## M10.142 plan-keyed funding-conversion financial-reconciliation reader
 
 The unregistered M10.136 Prisma boundary now also retrieves the immutable financial reconciliation associated with a canonical funding-conversion plan UUID. Validation happens before database access. The query starts from the submission attempt's existing unique `planId`, then selects its existing optional one-to-one financial-reconciliation relation. This relational path returns at most one result without adding a redundant uniqueness constraint or schema migration.

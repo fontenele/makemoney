@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-23 - Return M10 to a finite execution-readiness path
+
+M10 exists to make a narrowly approved real execution safe and auditable; it is not a goal to enumerate every possible read key. M10.139–M10.142 added valid durable correlations but were inferred rather than preplanned. Starting with M10.143, new increments must close a named remaining activation or reconciliation gap from the roadmap's finite closure path.
+
+Financial evidence acquisition and durable recording remain separate authorities. M10.143 therefore composes an untrusted read-only evidence port with the existing authoritative M10.135 store, short-circuits already completed attempts, and limits one process to one active read per attempt. It does not implement an adapter because no current boundary has yet proven complete receipt, balance-delta, provider-fee, and network-fee acquisition. Missing facts cannot be guessed, and failures are not retried automatically.
+
 ## 2026-10-23 - Resolve plan-keyed reconciliation through existing one-to-one relations
 
 M10.142 adds plan-keyed reconciliation reading without making the reconciliation table's denormalized `planId` independently unique. The durable model already guarantees at most one submission attempt per plan and at most one financial reconciliation per attempt. Starting from the unique attempt `planId` and selecting its optional reconciliation therefore expresses the actual domain ownership and avoids a redundant constraint or migration.

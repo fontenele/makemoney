@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-23 — Compose one-shot funding-conversion financial reconciliation
+
+- Added an unregistered coordinator that short-circuits completed attempts, suppresses same-attempt overlap, and processes at most one read-only financial-evidence package per explicit call.
+- Added an intentionally unimplemented evidence-reader port; concrete receipt, balance-delta, provider-fee, and network-fee acquisition remains a named blocker rather than inferred data.
+- Delegated only complete evidence to M10.135 with checked recording identity/time, cancellation boundaries, propagated failures, and no automatic retry.
+- Added 12 focused tests and documented a finite M10 closure path toward disabled-by-default real-executor readiness and separately confirmed optional live use.
+- Passed all 2,751 backend tests, 115 dashboard tests, formatting, lint, full build, Prisma validation, Compose validation, and whitespace checks.
+
 ## 2026-10-23 — Read durable funding-conversion reconciliation by plan
 
 - Added a separate unregistered read contract for the reconciliation associated with one canonical funding-conversion plan UUID.
