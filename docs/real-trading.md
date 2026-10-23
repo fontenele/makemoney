@@ -1,5 +1,21 @@
 # Real Trading
 
+## M10.137 attempt-keyed funding-conversion financial-reconciliation reader
+
+The unregistered M10.136 Prisma boundary now also retrieves the one immutable financial reconciliation associated with a canonical funding-conversion submission-attempt UUID. Validation happens before database access, the existing unique `attemptId` constraint makes the lookup unambiguous without a schema change, and a valid attempt without reconciliation returns explicit absence.
+
+Present rows still pass through the authoritative M10.135 persisted mapper, which revalidates fingerprints, exact financial fields, evidence coverage, chronology, and economic classification. A mapped row whose attempt identity diverges from the requested identity fails closed. The reader does not reload provider or mutable attempt state and adds no NestJS registration, route, provider access, evidence acquisition, accounting mutation, retry, conversion, or real-trading authority.
+
+### M10.137 acceptance criteria
+
+- A canonical lowercase submission-attempt UUID is required before persistence access.
+- The lookup uses the existing unique attempt identity and returns at most one reconciliation.
+- A valid attempt without reconciliation returns explicit absence.
+- Present evidence is reconstructed through the M10.135 authoritative persisted mapper.
+- Corrupt evidence and returned attempt-identity divergence fail closed.
+- Focused tests cover reconstruction, absence, invalid identity, and divergent returned attempt identity.
+- No schema, route, runtime registration, provider/evidence acquisition, accounting mutation, retry, conversion, or real order is added.
+
 ## M10.136 durable funding-conversion financial-reconciliation reader
 
 An unregistered read-only Prisma boundary retrieves one M10.135 reconciliation by its canonical UUID. Identity validation runs before database access, a valid unknown identity returns explicit absence, and a present row is reconstructed through the same authoritative mapper used by the writer's replay path.

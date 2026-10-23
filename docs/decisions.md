@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-23 - Resolve funding reconciliation through the unique attempt identity
+
+M10.137 extends the unregistered financial-reconciliation reader with a separate attempt-keyed contract. The durable schema already guarantees one reconciliation per `attemptId`, so `findUnique` supplies an exact lookup without adding an index, ordering rule, fallback, or schema migration.
+
+The attempt UUID is validated before access, absence remains explicit, and present evidence passes through the M10.135 authoritative mapper. The reader additionally verifies that the reconstructed attempt identity equals the requested identity, preventing a persistence adapter anomaly from relabeling evidence. No mutable attempt or provider state is reloaded, and no runtime authority is added.
+
 ## 2026-10-23 - Reuse the authoritative financial-reconciliation mapper for reads
 
 M10.136 reads an immutable funding-conversion reconciliation by canonical UUID and delegates reconstruction to M10.135's persisted mapper. This prevents the writer replay path and future consumers from developing different validation rules for fingerprints, financial classification, evidence coverage, or chronology.

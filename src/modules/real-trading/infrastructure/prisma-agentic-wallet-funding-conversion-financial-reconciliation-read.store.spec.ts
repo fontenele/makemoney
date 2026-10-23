@@ -1,7 +1,10 @@
 import { jest } from '@jest/globals';
 
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
-import { FundingConversionFinancialReconciliationIdentityError } from '../application/agentic-wallet-funding-conversion-financial-reconciliation.store';
+import {
+  FundingConversionFinancialReconciliationAttemptIdentityError,
+  FundingConversionFinancialReconciliationIdentityError,
+} from '../application/agentic-wallet-funding-conversion-financial-reconciliation.store';
 import { FundingConversionFinancialReconciliationEvidence } from './agentic-wallet-funding-conversion-financial-reconciliation-evidence';
 import {
   BSC_NATIVE_BNB_ADDRESS,
@@ -84,6 +87,63 @@ describe('PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore',
     );
     expect(row.id).toBe(RECONCILIATION_ID);
   });
+
+  it('returns the reconciliation for its unique attempt identity', async () => {
+    const harness = readerHarness(await persistedRow());
+
+    await expect(
+      harness.reader.getByAttemptId(ATTEMPT_ID),
+    ).resolves.toMatchObject({
+      id: RECONCILIATION_ID,
+      attemptId: ATTEMPT_ID,
+      planId: PLAN_ID,
+      financialReconciliationComplete: true,
+      automaticRetryAllowed: false,
+    });
+    expect(harness.findUnique).toHaveBeenCalledWith({
+      where: { attemptId: ATTEMPT_ID },
+    });
+  });
+
+  it('returns explicit absence for an attempt without reconciliation', async () => {
+    await expect(
+      readerHarness(null).reader.getByAttemptId(ATTEMPT_ID),
+    ).resolves.toBeNull();
+  });
+
+  it('rejects malformed persisted evidence selected by attempt', async () => {
+    const row = await persistedRow();
+    const harness = readerHarness({
+      ...row,
+      outputAssessment: 'expected_output_satisfied',
+    });
+    await expect(harness.reader.getByAttemptId(ATTEMPT_ID)).rejects.toThrow(
+      'Persisted funding conversion financial reconciliation is invalid',
+    );
+  });
+
+  it.each(['invalid', ATTEMPT_ID.toUpperCase()])(
+    'rejects invalid attempt identity %s before persistence access',
+    async (identity) => {
+      const harness = readerHarness(null);
+      await expect(
+        harness.reader.getByAttemptId(identity),
+      ).rejects.toBeInstanceOf(
+        FundingConversionFinancialReconciliationAttemptIdentityError,
+      );
+      expect(harness.findUnique).not.toHaveBeenCalled();
+    },
+  );
+
+  it('rejects a row whose attempt identity diverges from the request', async () => {
+    const divergentAttemptId = '019a0db1-bfea-7000-8000-000000000005';
+    const harness = readerHarness(
+      await persistedRow(RECONCILIATION_ID, divergentAttemptId),
+    );
+    await expect(harness.reader.getByAttemptId(ATTEMPT_ID)).rejects.toThrow(
+      'Persisted funding conversion financial reconciliation attempt identity diverges',
+    );
+  });
 });
 
 function readerHarness(row: ReconciliationRow | null) {
@@ -102,7 +162,7 @@ function readerHarness(row: ReconciliationRow | null) {
   };
 }
 
-async function persistedRow(id = RECONCILIATION_ID) {
+async function persistedRow(id = RECONCILIATION_ID, attemptId = ATTEMPT_ID) {
   const create = jest.fn(({ data }: { data: Record<string, unknown> }) =>
     Promise.resolve({ ...data }),
   );
@@ -115,12 +175,12 @@ async function persistedRow(id = RECONCILIATION_ID) {
     agenticWalletFundingConversionSubmissionAttempt: {
       findUnique: jest
         .fn<() => Promise<ReturnType<typeof attemptRow>>>()
-        .mockResolvedValue(attemptRow()),
+        .mockResolvedValue(attemptRow(attemptId)),
     },
     agenticWalletFundingConversionStatusObservation: {
       findUnique: jest
         .fn<() => Promise<ReturnType<typeof statusRow>>>()
-        .mockResolvedValue(statusRow()),
+        .mockResolvedValue(statusRow(attemptId)),
     },
   };
   const prisma = {
@@ -130,15 +190,17 @@ async function persistedRow(id = RECONCILIATION_ID) {
   } as unknown as PrismaService;
   await new PrismaAgenticWalletFundingConversionFinancialReconciliationStore(
     prisma,
-  ).record(id, evidence(), RECORDED_AT);
+  ).record(id, evidence(attemptId), RECORDED_AT);
   return create.mock.calls[0][0].data as ReconciliationRow;
 }
 
-function evidence(): FundingConversionFinancialReconciliationEvidence {
+function evidence(
+  attemptId = ATTEMPT_ID,
+): FundingConversionFinancialReconciliationEvidence {
   return {
     scope:
       'agentic_wallet_funding_conversion_financial_reconciliation_evidence',
-    attemptId: ATTEMPT_ID,
+    attemptId,
     providerOrderId: 'order_123',
     statusObservationId: STATUS_ID,
     transactionHash: TRANSACTION_HASH,
@@ -162,9 +224,9 @@ function evidence(): FundingConversionFinancialReconciliationEvidence {
   };
 }
 
-function attemptRow() {
+function attemptRow(id = ATTEMPT_ID) {
   return {
-    id: ATTEMPT_ID,
+    id,
     planId: PLAN_ID,
     freshSourceQuantityBnb: '0.008',
     freshExpectedUsdt: '5.95',
@@ -176,10 +238,10 @@ function attemptRow() {
   };
 }
 
-function statusRow() {
+function statusRow(attemptId = ATTEMPT_ID) {
   return {
     id: STATUS_ID,
-    attemptId: ATTEMPT_ID,
+    attemptId,
     providerOrderId: 'order_123',
     providerStatus: 'FINISHED',
     transactionHash: TRANSACTION_HASH,

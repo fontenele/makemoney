@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-23 — Read durable funding-conversion reconciliation by attempt
+
+- Added a separate unregistered read contract for the reconciliation associated with one canonical submission-attempt UUID.
+- Reused the existing unique `attemptId` constraint, requiring no schema or migration change.
+- Returned explicit absence and reused the M10.135 mapper so corrupt or attempt-divergent evidence fails closed.
+- Expanded focused reader coverage to 12 tests without adding a route, provider access, accounting mutation, or conversion authority.
+- Passed all 2,706 backend tests, 115 dashboard tests, formatting, lint, full build, Prisma validation, and Compose validation.
+
 ## 2026-10-23 — Read durable funding-conversion reconciliation evidence
 
 - Added an unregistered read contract and Prisma reader for one canonical reconciliation UUID.
