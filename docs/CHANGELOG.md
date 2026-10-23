@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-23 — Read durable funding-conversion reconciliation by plan
+
+- Added a separate unregistered read contract for the reconciliation associated with one canonical funding-conversion plan UUID.
+- Traversed the existing unique plan-to-attempt and optional one-to-one attempt-to-reconciliation relations in one query, requiring no redundant constraint or migration.
+- Returned explicit absence for either missing relation edge and reused the M10.135 mapper so corrupt or plan/attempt-divergent evidence fails closed.
+- Expanded focused reader coverage to 45 tests without adding a route, provider access, accounting mutation, or conversion authority.
+- Passed all 2,739 backend tests, 115 dashboard tests, formatting, lint, full build, Prisma validation, Compose validation, and whitespace checks.
+
 ## 2026-10-23 — Read durable funding-conversion reconciliation by request fingerprint
 
 - Added a separate unregistered read contract for the reconciliation associated with one canonical lowercase SHA-256 request fingerprint.

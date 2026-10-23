@@ -1,6 +1,7 @@
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
 import {
   AgenticWalletFundingConversionFinancialReconciliationAttemptReadStore,
+  AgenticWalletFundingConversionFinancialReconciliationPlanReadStore,
   AgenticWalletFundingConversionFinancialReconciliationProviderOrderReadStore,
   AgenticWalletFundingConversionFinancialReconciliationReadStore,
   AgenticWalletFundingConversionFinancialReconciliationRequestFingerprintReadStore,
@@ -8,6 +9,7 @@ import {
   AgenticWalletFundingConversionFinancialReconciliationTransactionReadStore,
   FundingConversionFinancialReconciliationAttemptIdentityError,
   FundingConversionFinancialReconciliationIdentityError,
+  FundingConversionFinancialReconciliationPlanIdentityError,
   FundingConversionFinancialReconciliationProviderOrderIdentityError,
   FundingConversionFinancialReconciliationRequestFingerprintIdentityError,
   FundingConversionFinancialReconciliationStatusObservationIdentityError,
@@ -31,7 +33,8 @@ export class PrismaAgenticWalletFundingConversionFinancialReconciliationReadStor
     AgenticWalletFundingConversionFinancialReconciliationStatusObservationReadStore,
     AgenticWalletFundingConversionFinancialReconciliationProviderOrderReadStore,
     AgenticWalletFundingConversionFinancialReconciliationTransactionReadStore,
-    AgenticWalletFundingConversionFinancialReconciliationRequestFingerprintReadStore
+    AgenticWalletFundingConversionFinancialReconciliationRequestFingerprintReadStore,
+    AgenticWalletFundingConversionFinancialReconciliationPlanReadStore
 {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -161,6 +164,34 @@ export class PrismaAgenticWalletFundingConversionFinancialReconciliationReadStor
     if (row.requestFingerprint !== requestFingerprint)
       throw new Error(
         'Persisted funding conversion financial reconciliation request fingerprint identity diverges',
+      );
+    return reconciliation;
+  }
+
+  async getByPlanId(
+    planId: string,
+  ): Promise<StoredFundingConversionFinancialReconciliation | null> {
+    if (typeof planId !== 'string' || !UUID_PATTERN.test(planId))
+      throw new FundingConversionFinancialReconciliationPlanIdentityError();
+
+    const attempt =
+      await this.prisma.agenticWalletFundingConversionSubmissionAttempt.findUnique(
+        {
+          where: { planId },
+          select: { id: true, financialReconciliation: true },
+        },
+      );
+    if (attempt === null || attempt.financialReconciliation === null)
+      return null;
+    const reconciliation = mapPersistedFundingConversionFinancialReconciliation(
+      attempt.financialReconciliation,
+    );
+    if (
+      reconciliation.planId !== planId ||
+      reconciliation.attemptId !== attempt.id
+    )
+      throw new Error(
+        'Persisted funding conversion financial reconciliation plan correlation diverges',
       );
     return reconciliation;
   }

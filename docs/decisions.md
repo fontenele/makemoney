@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-23 - Resolve plan-keyed reconciliation through existing one-to-one relations
+
+M10.142 adds plan-keyed reconciliation reading without making the reconciliation table's denormalized `planId` independently unique. The durable model already guarantees at most one submission attempt per plan and at most one financial reconciliation per attempt. Starting from the unique attempt `planId` and selecting its optional reconciliation therefore expresses the actual domain ownership and avoids a redundant constraint or migration.
+
+The plan UUID is validated before access. Absence at either relationship edge is explicit. A present row still passes through the M10.135 mapper, after which both its plan identity and attempt identity must equal the query path. This detects a malformed denormalized relation without interpreting mutable attempt lifecycle state. No runtime authority is added.
+
 ## 2026-10-23 - Keep request fingerprints internal while allowing exact durable correlation
 
 M10.141 extends the unregistered financial-reconciliation reader with a request-fingerprint-keyed contract. The durable schema already guarantees one reconciliation per `requestFingerprint`, so `findUnique` supplies an exact lookup without adding an index, ordering rule, fallback, or schema migration.

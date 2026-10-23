@@ -1,5 +1,21 @@
 # Real Trading
 
+## M10.142 plan-keyed funding-conversion financial-reconciliation reader
+
+The unregistered M10.136 Prisma boundary now also retrieves the immutable financial reconciliation associated with a canonical funding-conversion plan UUID. Validation happens before database access. The query starts from the submission attempt's existing unique `planId`, then selects its existing optional one-to-one financial-reconciliation relation. This relational path returns at most one result without adding a redundant uniqueness constraint or schema migration.
+
+A plan with no submission attempt and an attempt with no reconciliation both return explicit absence. Present rows pass through the authoritative M10.135 persisted mapper, and the reconstructed reconciliation must match both the requested plan and the selected attempt. Malformed evidence or denormalized plan/attempt correlation divergence fails closed. The attempt is used only as an immutable correlation selector; its mutable lifecycle state is not interpreted. No NestJS registration, route, provider access, evidence acquisition, accounting mutation, retry, conversion, or real-trading authority is added.
+
+### M10.142 acceptance criteria
+
+- A canonical lowercase funding-conversion plan UUID is required before persistence access.
+- One query follows the unique plan-to-attempt and optional one-to-one attempt-to-reconciliation relations.
+- Missing attempt or missing reconciliation returns explicit absence.
+- Present evidence is reconstructed through the M10.135 authoritative persisted mapper.
+- Corrupt evidence and returned plan or attempt correlation divergence fail closed.
+- Focused tests cover reconstruction, both absence forms, invalid identity, malformed evidence, and plan/attempt divergence.
+- No schema, route, runtime registration, provider/evidence acquisition, accounting mutation, retry, conversion, or real order is added.
+
 ## M10.141 request-fingerprint-keyed funding-conversion financial-reconciliation reader
 
 The unregistered M10.136 Prisma boundary now also retrieves the one immutable financial reconciliation associated with a canonical SHA-256 request fingerprint. Validation uses the writer's shared 64-character lowercase hexadecimal policy before database access, the existing unique `requestFingerprint` constraint makes the lookup unambiguous without a schema change, and a valid fingerprint without reconciliation returns explicit absence.

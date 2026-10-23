@@ -4,6 +4,7 @@ import { PrismaService } from '../../../infrastructure/database/prisma.service';
 import {
   FundingConversionFinancialReconciliationAttemptIdentityError,
   FundingConversionFinancialReconciliationIdentityError,
+  FundingConversionFinancialReconciliationPlanIdentityError,
   FundingConversionFinancialReconciliationProviderOrderIdentityError,
   FundingConversionFinancialReconciliationRequestFingerprintIdentityError,
   FundingConversionFinancialReconciliationStatusObservationIdentityError,
@@ -404,6 +405,92 @@ describe('PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore',
       'Persisted funding conversion financial reconciliation request fingerprint identity diverges',
     );
   });
+
+  it('returns the reconciliation correlated through its unique plan attempt', async () => {
+    const row = await persistedRow();
+    const harness = planReaderHarness({
+      id: ATTEMPT_ID,
+      financialReconciliation: row,
+    });
+
+    await expect(harness.reader.getByPlanId(PLAN_ID)).resolves.toMatchObject({
+      id: RECONCILIATION_ID,
+      attemptId: ATTEMPT_ID,
+      planId: PLAN_ID,
+      financialReconciliationComplete: true,
+      automaticRetryAllowed: false,
+    });
+    expect(harness.findUnique).toHaveBeenCalledWith({
+      where: { planId: PLAN_ID },
+      select: { id: true, financialReconciliation: true },
+    });
+  });
+
+  it('returns explicit absence when a plan attempt or its reconciliation is absent', async () => {
+    await expect(
+      planReaderHarness(null).reader.getByPlanId(PLAN_ID),
+    ).resolves.toBeNull();
+    await expect(
+      planReaderHarness({
+        id: ATTEMPT_ID,
+        financialReconciliation: null,
+      }).reader.getByPlanId(PLAN_ID),
+    ).resolves.toBeNull();
+  });
+
+  it('rejects malformed persisted evidence selected by plan', async () => {
+    const row = await persistedRow();
+    const harness = planReaderHarness({
+      id: ATTEMPT_ID,
+      financialReconciliation: {
+        ...row,
+        outputAssessment: 'expected_output_satisfied',
+      },
+    });
+    await expect(harness.reader.getByPlanId(PLAN_ID)).rejects.toThrow(
+      'Persisted funding conversion financial reconciliation is invalid',
+    );
+  });
+
+  it.each(['invalid', PLAN_ID.toUpperCase()])(
+    'rejects invalid plan identity %s before persistence access',
+    async (identity) => {
+      const harness = planReaderHarness(null);
+      await expect(harness.reader.getByPlanId(identity)).rejects.toBeInstanceOf(
+        FundingConversionFinancialReconciliationPlanIdentityError,
+      );
+      expect(harness.findUnique).not.toHaveBeenCalled();
+    },
+  );
+
+  it('rejects a row whose plan identity diverges from the request', async () => {
+    const divergentPlanId = '019a0db1-bfea-7000-8000-000000000005';
+    const harness = planReaderHarness({
+      id: ATTEMPT_ID,
+      financialReconciliation: await persistedRow(
+        RECONCILIATION_ID,
+        ATTEMPT_ID,
+        STATUS_ID,
+        PROVIDER_ORDER_ID,
+        TRANSACTION_HASH,
+        divergentPlanId,
+      ),
+    });
+    await expect(harness.reader.getByPlanId(PLAN_ID)).rejects.toThrow(
+      'Persisted funding conversion financial reconciliation plan correlation diverges',
+    );
+  });
+
+  it('rejects a row whose attempt correlation diverges from the selected plan attempt', async () => {
+    const divergentAttemptId = '019a0db1-bfea-7000-8000-000000000005';
+    const harness = planReaderHarness({
+      id: divergentAttemptId,
+      financialReconciliation: await persistedRow(),
+    });
+    await expect(harness.reader.getByPlanId(PLAN_ID)).rejects.toThrow(
+      'Persisted funding conversion financial reconciliation plan correlation diverges',
+    );
+  });
 });
 
 function readerHarness(row: ReconciliationRow | null) {
@@ -422,12 +509,34 @@ function readerHarness(row: ReconciliationRow | null) {
   };
 }
 
+function planReaderHarness(
+  attempt: {
+    id: string;
+    financialReconciliation: ReconciliationRow | null;
+  } | null,
+) {
+  const findUnique = jest
+    .fn<() => Promise<typeof attempt>>()
+    .mockResolvedValue(attempt);
+  const prisma = {
+    agenticWalletFundingConversionSubmissionAttempt: { findUnique },
+  } as unknown as PrismaService;
+  return {
+    findUnique,
+    reader:
+      new PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore(
+        prisma,
+      ),
+  };
+}
+
 async function persistedRow(
   id = RECONCILIATION_ID,
   attemptId = ATTEMPT_ID,
   statusObservationId = STATUS_ID,
   providerOrderId = PROVIDER_ORDER_ID,
   transactionHash = TRANSACTION_HASH,
+  planId = PLAN_ID,
 ) {
   const create = jest.fn(({ data }: { data: Record<string, unknown> }) =>
     Promise.resolve({ ...data }),
@@ -441,7 +550,7 @@ async function persistedRow(
     agenticWalletFundingConversionSubmissionAttempt: {
       findUnique: jest
         .fn<() => Promise<ReturnType<typeof attemptRow>>>()
-        .mockResolvedValue(attemptRow(attemptId, providerOrderId)),
+        .mockResolvedValue(attemptRow(attemptId, providerOrderId, planId)),
     },
     agenticWalletFundingConversionStatusObservation: {
       findUnique: jest
@@ -504,17 +613,21 @@ function evidence(
   };
 }
 
-function attemptRow(id = ATTEMPT_ID, providerOrderId = PROVIDER_ORDER_ID) {
+function attemptRow(
+  id = ATTEMPT_ID,
+  providerOrderId = PROVIDER_ORDER_ID,
+  planId = PLAN_ID,
+) {
   return {
     id,
-    planId: PLAN_ID,
+    planId,
     freshSourceQuantityBnb: '0.008',
     freshExpectedUsdt: '5.95',
     freshMinimumUsdt: '5.92025',
     state: 'provider_finished_pending_financial_reconciliation',
     providerOrderId,
     automaticRetryAllowed: false,
-    plan: { id: PLAN_ID },
+    plan: { id: planId },
   };
 }
 
