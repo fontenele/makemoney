@@ -2443,5 +2443,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.66. M10 is complete through M10.137, which adds an unregistered attempt-keyed reader for the immutable M10.135 funding-conversion financial reconciliation. Canonical attempt identity is validated before access, absence is explicit, and present evidence is revalidated through the authoritative persisted mapper. Authenticated dashboard valuation is initial/manual only. There is no automatic status or valuation polling, retry, live conversion invocation, accounting mutation, conversion authority, or real-trading activation. Real trading remains disabled.
+M9 is closed through M9.66. M10 is complete through M10.138, which adds an unregistered status-observation-keyed reader for the immutable M10.135 funding-conversion financial reconciliation. Canonical terminal observation identity is validated before access, absence is explicit, and present evidence is revalidated through the authoritative persisted mapper. Authenticated dashboard valuation is initial/manual only. There is no automatic status or valuation polling, retry, live conversion invocation, accounting mutation, conversion authority, or real-trading activation. Real trading remains disabled.
 ```

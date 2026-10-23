@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-23 — Read durable funding-conversion reconciliation by status observation
+
+- Added a separate unregistered read contract for the reconciliation associated with one canonical terminal status-observation UUID.
+- Reused the existing unique `statusObservationId` constraint, requiring no schema or migration change.
+- Returned explicit absence and reused the M10.135 mapper so corrupt or status-observation-divergent evidence fails closed.
+- Expanded focused reader coverage to 18 tests without adding a route, provider access, accounting mutation, or conversion authority.
+- Passed all 2,712 backend tests, 115 dashboard tests, formatting, lint, full build, Prisma validation, Compose validation, and whitespace checks.
+
 ## 2026-10-23 — Read durable funding-conversion reconciliation by attempt
 
 - Added a separate unregistered read contract for the reconciliation associated with one canonical submission-attempt UUID.

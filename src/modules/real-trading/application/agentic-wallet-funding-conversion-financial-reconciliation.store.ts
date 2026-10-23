@@ -40,6 +40,12 @@ export interface AgenticWalletFundingConversionFinancialReconciliationAttemptRea
   ): Promise<StoredFundingConversionFinancialReconciliation | null>;
 }
 
+export interface AgenticWalletFundingConversionFinancialReconciliationStatusObservationReadStore {
+  getByStatusObservationId(
+    statusObservationId: string,
+  ): Promise<StoredFundingConversionFinancialReconciliation | null>;
+}
+
 export class FundingConversionFinancialReconciliationBlockedError extends Error {
   constructor(
     readonly blockers: readonly FundingConversionFinancialReconciliationEvidenceBlocker[],
@@ -64,5 +70,15 @@ export class FundingConversionFinancialReconciliationAttemptIdentityError extend
     );
     this.name =
       FundingConversionFinancialReconciliationAttemptIdentityError.name;
+  }
+}
+
+export class FundingConversionFinancialReconciliationStatusObservationIdentityError extends Error {
+  constructor() {
+    super(
+      'Funding conversion financial reconciliation status observation identity is invalid',
+    );
+    this.name =
+      FundingConversionFinancialReconciliationStatusObservationIdentityError.name;
   }
 }

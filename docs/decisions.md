@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-23 - Resolve funding reconciliation through terminal status evidence
+
+M10.138 extends the unregistered financial-reconciliation reader with a separate status-observation-keyed contract. The durable schema already guarantees one reconciliation per `statusObservationId`, so `findUnique` supplies an exact lookup without adding an index, ordering rule, fallback, or schema migration.
+
+The status-observation UUID is validated before access, absence remains explicit, and present evidence passes through the M10.135 authoritative mapper. The reader additionally verifies that the reconstructed embedded status-observation identity equals the requested identity, preventing a persistence adapter anomaly from relabeling terminal evidence. No observation, mutable attempt, or provider state is reloaded, and no runtime authority is added.
+
 ## 2026-10-23 - Resolve funding reconciliation through the unique attempt identity
 
 M10.137 extends the unregistered financial-reconciliation reader with a separate attempt-keyed contract. The durable schema already guarantees one reconciliation per `attemptId`, so `findUnique` supplies an exact lookup without adding an index, ordering rule, fallback, or schema migration.

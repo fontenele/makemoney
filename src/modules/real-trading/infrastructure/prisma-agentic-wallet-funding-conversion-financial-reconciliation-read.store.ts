@@ -2,8 +2,10 @@ import { PrismaService } from '../../../infrastructure/database/prisma.service';
 import {
   AgenticWalletFundingConversionFinancialReconciliationAttemptReadStore,
   AgenticWalletFundingConversionFinancialReconciliationReadStore,
+  AgenticWalletFundingConversionFinancialReconciliationStatusObservationReadStore,
   FundingConversionFinancialReconciliationAttemptIdentityError,
   FundingConversionFinancialReconciliationIdentityError,
+  FundingConversionFinancialReconciliationStatusObservationIdentityError,
   StoredFundingConversionFinancialReconciliation,
 } from '../application/agentic-wallet-funding-conversion-financial-reconciliation.store';
 import { mapPersistedFundingConversionFinancialReconciliation } from './prisma-agentic-wallet-funding-conversion-financial-reconciliation.store';
@@ -14,7 +16,8 @@ const UUID_PATTERN =
 export class PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore
   implements
     AgenticWalletFundingConversionFinancialReconciliationReadStore,
-    AgenticWalletFundingConversionFinancialReconciliationAttemptReadStore
+    AgenticWalletFundingConversionFinancialReconciliationAttemptReadStore,
+    AgenticWalletFundingConversionFinancialReconciliationStatusObservationReadStore
 {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -57,6 +60,29 @@ export class PrismaAgenticWalletFundingConversionFinancialReconciliationReadStor
     if (reconciliation.attemptId !== attemptId)
       throw new Error(
         'Persisted funding conversion financial reconciliation attempt identity diverges',
+      );
+    return reconciliation;
+  }
+
+  async getByStatusObservationId(
+    statusObservationId: string,
+  ): Promise<StoredFundingConversionFinancialReconciliation | null> {
+    if (
+      typeof statusObservationId !== 'string' ||
+      !UUID_PATTERN.test(statusObservationId)
+    )
+      throw new FundingConversionFinancialReconciliationStatusObservationIdentityError();
+
+    const row =
+      await this.prisma.agenticWalletFundingConversionFinancialReconciliation.findUnique(
+        { where: { statusObservationId } },
+      );
+    if (row === null) return null;
+    const reconciliation =
+      mapPersistedFundingConversionFinancialReconciliation(row);
+    if (reconciliation.evidence.statusObservationId !== statusObservationId)
+      throw new Error(
+        'Persisted funding conversion financial reconciliation status observation identity diverges',
       );
     return reconciliation;
   }

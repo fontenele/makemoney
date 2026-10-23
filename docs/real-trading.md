@@ -1,5 +1,21 @@
 # Real Trading
 
+## M10.138 status-observation-keyed funding-conversion financial-reconciliation reader
+
+The unregistered M10.136 Prisma boundary now also retrieves the one immutable financial reconciliation associated with a canonical terminal status-observation UUID. Validation happens before database access, the existing unique `statusObservationId` constraint makes the lookup unambiguous without a schema change, and a valid observation without reconciliation returns explicit absence.
+
+Present rows still pass through the authoritative M10.135 persisted mapper, which revalidates fingerprints, exact financial fields, evidence coverage, chronology, and economic classification. A mapped row whose embedded status-observation identity diverges from the requested identity fails closed. The reader does not reload provider, observation, or mutable attempt state and adds no NestJS registration, route, provider access, evidence acquisition, accounting mutation, retry, conversion, or real-trading authority.
+
+### M10.138 acceptance criteria
+
+- A canonical lowercase terminal status-observation UUID is required before persistence access.
+- The lookup uses the existing unique status-observation identity and returns at most one reconciliation.
+- A valid status observation without reconciliation returns explicit absence.
+- Present evidence is reconstructed through the M10.135 authoritative persisted mapper.
+- Corrupt evidence and returned status-observation-identity divergence fail closed.
+- Focused tests cover reconstruction, absence, invalid identity, and divergent returned status-observation identity.
+- No schema, route, runtime registration, provider/evidence acquisition, accounting mutation, retry, conversion, or real order is added.
+
 ## M10.137 attempt-keyed funding-conversion financial-reconciliation reader
 
 The unregistered M10.136 Prisma boundary now also retrieves the one immutable financial reconciliation associated with a canonical funding-conversion submission-attempt UUID. Validation happens before database access, the existing unique `attemptId` constraint makes the lookup unambiguous without a schema change, and a valid attempt without reconciliation returns explicit absence.
