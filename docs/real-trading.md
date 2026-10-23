@@ -1,5 +1,21 @@
 # Real Trading
 
+## M10.139 provider-order-keyed funding-conversion financial-reconciliation reader
+
+The unregistered M10.136 Prisma boundary now also retrieves the one immutable financial reconciliation associated with a safe Agentic Wallet provider order identity. Validation uses the existing option-safe bounded order-ID grammar before database access, the existing unique `providerOrderId` constraint makes the lookup unambiguous without a schema change, and a valid provider order without reconciliation returns explicit absence.
+
+Present rows still pass through the authoritative M10.135 persisted mapper, which revalidates fingerprints, exact financial fields, evidence coverage, chronology, and economic classification. A mapped row whose embedded provider order identity diverges from the requested identity fails closed. The reader does not reload provider, observation, or mutable attempt state and adds no NestJS registration, route, provider access, evidence acquisition, accounting mutation, retry, conversion, or real-trading authority.
+
+### M10.139 acceptance criteria
+
+- A provider order identity matching the shared bounded option-safe grammar is required before persistence access.
+- The lookup uses the existing unique provider order identity and returns at most one reconciliation.
+- A valid provider order without reconciliation returns explicit absence.
+- Present evidence is reconstructed through the M10.135 authoritative persisted mapper.
+- Corrupt evidence and returned provider-order-identity divergence fail closed.
+- Focused tests cover reconstruction, absence, invalid identity, and divergent returned provider order identity.
+- No schema, route, runtime registration, provider/evidence acquisition, accounting mutation, retry, conversion, or real order is added.
+
 ## M10.138 status-observation-keyed funding-conversion financial-reconciliation reader
 
 The unregistered M10.136 Prisma boundary now also retrieves the one immutable financial reconciliation associated with a canonical terminal status-observation UUID. Validation happens before database access, the existing unique `statusObservationId` constraint makes the lookup unambiguous without a schema change, and a valid observation without reconciliation returns explicit absence.

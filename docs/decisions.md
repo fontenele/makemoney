@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-23 - Reuse the safe provider-order grammar for keyed reconciliation reading
+
+M10.139 extends the unregistered financial-reconciliation reader with a separate provider-order-keyed contract. The durable schema already guarantees one reconciliation per `providerOrderId`, so `findUnique` supplies an exact lookup without adding an index, ordering rule, fallback, or schema migration.
+
+The shared bounded option-safe Agentic Wallet order-ID grammar is applied before access, absence remains explicit, and present evidence passes through the M10.135 authoritative mapper. The reader additionally verifies that the reconstructed embedded provider order identity equals the requested identity, preventing a persistence adapter anomaly from relabeling provider evidence. No provider, observation, mutable attempt, or transaction state is reloaded, and no runtime authority is added.
+
 ## 2026-10-23 - Resolve funding reconciliation through terminal status evidence
 
 M10.138 extends the unregistered financial-reconciliation reader with a separate status-observation-keyed contract. The durable schema already guarantees one reconciliation per `statusObservationId`, so `findUnique` supplies an exact lookup without adding an index, ordering rule, fallback, or schema migration.

@@ -46,6 +46,12 @@ export interface AgenticWalletFundingConversionFinancialReconciliationStatusObse
   ): Promise<StoredFundingConversionFinancialReconciliation | null>;
 }
 
+export interface AgenticWalletFundingConversionFinancialReconciliationProviderOrderReadStore {
+  getByProviderOrderId(
+    providerOrderId: string,
+  ): Promise<StoredFundingConversionFinancialReconciliation | null>;
+}
+
 export class FundingConversionFinancialReconciliationBlockedError extends Error {
   constructor(
     readonly blockers: readonly FundingConversionFinancialReconciliationEvidenceBlocker[],
@@ -80,5 +86,15 @@ export class FundingConversionFinancialReconciliationStatusObservationIdentityEr
     );
     this.name =
       FundingConversionFinancialReconciliationStatusObservationIdentityError.name;
+  }
+}
+
+export class FundingConversionFinancialReconciliationProviderOrderIdentityError extends Error {
+  constructor() {
+    super(
+      'Funding conversion financial reconciliation provider order identity is invalid',
+    );
+    this.name =
+      FundingConversionFinancialReconciliationProviderOrderIdentityError.name;
   }
 }

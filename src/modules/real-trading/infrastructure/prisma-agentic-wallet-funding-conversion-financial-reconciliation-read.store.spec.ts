@@ -4,6 +4,7 @@ import { PrismaService } from '../../../infrastructure/database/prisma.service';
 import {
   FundingConversionFinancialReconciliationAttemptIdentityError,
   FundingConversionFinancialReconciliationIdentityError,
+  FundingConversionFinancialReconciliationProviderOrderIdentityError,
   FundingConversionFinancialReconciliationStatusObservationIdentityError,
 } from '../application/agentic-wallet-funding-conversion-financial-reconciliation.store';
 import { FundingConversionFinancialReconciliationEvidence } from './agentic-wallet-funding-conversion-financial-reconciliation-evidence';
@@ -19,6 +20,7 @@ const ATTEMPT_ID = '019a0db1-bfea-7000-8000-000000000002';
 const STATUS_ID = '019a0db1-bfea-7000-8000-000000000003';
 const RECONCILIATION_ID = '019a0db1-bfea-7000-8000-000000000004';
 const TRANSACTION_HASH = `0x${'a'.repeat(64)}`;
+const PROVIDER_ORDER_ID = 'order_123';
 const OBSERVED_AT = new Date('2026-10-22T12:00:33.000Z');
 const RECORDED_AT = new Date('2026-10-22T12:00:34.000Z');
 
@@ -206,6 +208,71 @@ describe('PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore',
       'Persisted funding conversion financial reconciliation status observation identity diverges',
     );
   });
+
+  it('returns the reconciliation for its unique provider order identity', async () => {
+    const harness = readerHarness(await persistedRow());
+
+    await expect(
+      harness.reader.getByProviderOrderId(PROVIDER_ORDER_ID),
+    ).resolves.toMatchObject({
+      id: RECONCILIATION_ID,
+      attemptId: ATTEMPT_ID,
+      evidence: { providerOrderId: PROVIDER_ORDER_ID },
+      financialReconciliationComplete: true,
+      automaticRetryAllowed: false,
+    });
+    expect(harness.findUnique).toHaveBeenCalledWith({
+      where: { providerOrderId: PROVIDER_ORDER_ID },
+    });
+  });
+
+  it('returns explicit absence for a provider order without reconciliation', async () => {
+    await expect(
+      readerHarness(null).reader.getByProviderOrderId(PROVIDER_ORDER_ID),
+    ).resolves.toBeNull();
+  });
+
+  it('rejects malformed persisted evidence selected by provider order', async () => {
+    const row = await persistedRow();
+    const harness = readerHarness({
+      ...row,
+      outputAssessment: 'expected_output_satisfied',
+    });
+    await expect(
+      harness.reader.getByProviderOrderId(PROVIDER_ORDER_ID),
+    ).rejects.toThrow(
+      'Persisted funding conversion financial reconciliation is invalid',
+    );
+  });
+
+  it.each(['', '-unsafe', '../unsafe', 'a'.repeat(257)])(
+    'rejects invalid provider order identity %s before persistence access',
+    async (identity) => {
+      const harness = readerHarness(null);
+      await expect(
+        harness.reader.getByProviderOrderId(identity),
+      ).rejects.toBeInstanceOf(
+        FundingConversionFinancialReconciliationProviderOrderIdentityError,
+      );
+      expect(harness.findUnique).not.toHaveBeenCalled();
+    },
+  );
+
+  it('rejects a row whose provider order identity diverges from the request', async () => {
+    const harness = readerHarness(
+      await persistedRow(
+        RECONCILIATION_ID,
+        ATTEMPT_ID,
+        STATUS_ID,
+        'other_order',
+      ),
+    );
+    await expect(
+      harness.reader.getByProviderOrderId(PROVIDER_ORDER_ID),
+    ).rejects.toThrow(
+      'Persisted funding conversion financial reconciliation provider order identity diverges',
+    );
+  });
 });
 
 function readerHarness(row: ReconciliationRow | null) {
@@ -228,6 +295,7 @@ async function persistedRow(
   id = RECONCILIATION_ID,
   attemptId = ATTEMPT_ID,
   statusObservationId = STATUS_ID,
+  providerOrderId = PROVIDER_ORDER_ID,
 ) {
   const create = jest.fn(({ data }: { data: Record<string, unknown> }) =>
     Promise.resolve({ ...data }),
@@ -241,12 +309,14 @@ async function persistedRow(
     agenticWalletFundingConversionSubmissionAttempt: {
       findUnique: jest
         .fn<() => Promise<ReturnType<typeof attemptRow>>>()
-        .mockResolvedValue(attemptRow(attemptId)),
+        .mockResolvedValue(attemptRow(attemptId, providerOrderId)),
     },
     agenticWalletFundingConversionStatusObservation: {
       findUnique: jest
         .fn<() => Promise<ReturnType<typeof statusRow>>>()
-        .mockResolvedValue(statusRow(attemptId, statusObservationId)),
+        .mockResolvedValue(
+          statusRow(attemptId, statusObservationId, providerOrderId),
+        ),
     },
   };
   const prisma = {
@@ -256,19 +326,24 @@ async function persistedRow(
   } as unknown as PrismaService;
   await new PrismaAgenticWalletFundingConversionFinancialReconciliationStore(
     prisma,
-  ).record(id, evidence(attemptId, statusObservationId), RECORDED_AT);
+  ).record(
+    id,
+    evidence(attemptId, statusObservationId, providerOrderId),
+    RECORDED_AT,
+  );
   return create.mock.calls[0][0].data as ReconciliationRow;
 }
 
 function evidence(
   attemptId = ATTEMPT_ID,
   statusObservationId = STATUS_ID,
+  providerOrderId = PROVIDER_ORDER_ID,
 ): FundingConversionFinancialReconciliationEvidence {
   return {
     scope:
       'agentic_wallet_funding_conversion_financial_reconciliation_evidence',
     attemptId,
-    providerOrderId: 'order_123',
+    providerOrderId,
     statusObservationId,
     transactionHash: TRANSACTION_HASH,
     chainId: '56',
@@ -291,7 +366,7 @@ function evidence(
   };
 }
 
-function attemptRow(id = ATTEMPT_ID) {
+function attemptRow(id = ATTEMPT_ID, providerOrderId = PROVIDER_ORDER_ID) {
   return {
     id,
     planId: PLAN_ID,
@@ -299,17 +374,21 @@ function attemptRow(id = ATTEMPT_ID) {
     freshExpectedUsdt: '5.95',
     freshMinimumUsdt: '5.92025',
     state: 'provider_finished_pending_financial_reconciliation',
-    providerOrderId: 'order_123',
+    providerOrderId,
     automaticRetryAllowed: false,
     plan: { id: PLAN_ID },
   };
 }
 
-function statusRow(attemptId = ATTEMPT_ID, id = STATUS_ID) {
+function statusRow(
+  attemptId = ATTEMPT_ID,
+  id = STATUS_ID,
+  providerOrderId = PROVIDER_ORDER_ID,
+) {
   return {
     id,
     attemptId,
-    providerOrderId: 'order_123',
+    providerOrderId,
     providerStatus: 'FINISHED',
     transactionHash: TRANSACTION_HASH,
     bookedAt: new Date('2026-10-22T12:00:30.000Z'),

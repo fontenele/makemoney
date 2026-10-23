@@ -1,13 +1,16 @@
 import { PrismaService } from '../../../infrastructure/database/prisma.service';
 import {
   AgenticWalletFundingConversionFinancialReconciliationAttemptReadStore,
+  AgenticWalletFundingConversionFinancialReconciliationProviderOrderReadStore,
   AgenticWalletFundingConversionFinancialReconciliationReadStore,
   AgenticWalletFundingConversionFinancialReconciliationStatusObservationReadStore,
   FundingConversionFinancialReconciliationAttemptIdentityError,
   FundingConversionFinancialReconciliationIdentityError,
+  FundingConversionFinancialReconciliationProviderOrderIdentityError,
   FundingConversionFinancialReconciliationStatusObservationIdentityError,
   StoredFundingConversionFinancialReconciliation,
 } from '../application/agentic-wallet-funding-conversion-financial-reconciliation.store';
+import { isSafeAgenticWalletProviderOrderId } from './agentic-wallet-market-swap-submission-response';
 import { mapPersistedFundingConversionFinancialReconciliation } from './prisma-agentic-wallet-funding-conversion-financial-reconciliation.store';
 
 const UUID_PATTERN =
@@ -17,7 +20,8 @@ export class PrismaAgenticWalletFundingConversionFinancialReconciliationReadStor
   implements
     AgenticWalletFundingConversionFinancialReconciliationReadStore,
     AgenticWalletFundingConversionFinancialReconciliationAttemptReadStore,
-    AgenticWalletFundingConversionFinancialReconciliationStatusObservationReadStore
+    AgenticWalletFundingConversionFinancialReconciliationStatusObservationReadStore,
+    AgenticWalletFundingConversionFinancialReconciliationProviderOrderReadStore
 {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -83,6 +87,26 @@ export class PrismaAgenticWalletFundingConversionFinancialReconciliationReadStor
     if (reconciliation.evidence.statusObservationId !== statusObservationId)
       throw new Error(
         'Persisted funding conversion financial reconciliation status observation identity diverges',
+      );
+    return reconciliation;
+  }
+
+  async getByProviderOrderId(
+    providerOrderId: string,
+  ): Promise<StoredFundingConversionFinancialReconciliation | null> {
+    if (!isSafeAgenticWalletProviderOrderId(providerOrderId))
+      throw new FundingConversionFinancialReconciliationProviderOrderIdentityError();
+
+    const row =
+      await this.prisma.agenticWalletFundingConversionFinancialReconciliation.findUnique(
+        { where: { providerOrderId } },
+      );
+    if (row === null) return null;
+    const reconciliation =
+      mapPersistedFundingConversionFinancialReconciliation(row);
+    if (reconciliation.evidence.providerOrderId !== providerOrderId)
+      throw new Error(
+        'Persisted funding conversion financial reconciliation provider order identity diverges',
       );
     return reconciliation;
   }

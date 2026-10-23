@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-23 — Read durable funding-conversion reconciliation by provider order
+
+- Added a separate unregistered read contract for the reconciliation associated with one safe Agentic Wallet provider order identity.
+- Reused the shared bounded option-safe order-ID grammar and existing unique `providerOrderId` constraint, requiring no schema or migration change.
+- Returned explicit absence and reused the M10.135 mapper so corrupt or provider-order-divergent evidence fails closed.
+- Expanded focused reader coverage to 26 tests without adding a route, provider access, accounting mutation, or conversion authority.
+- Passed all 2,720 backend tests, 115 dashboard tests, formatting, lint, full build, Prisma validation, Compose validation, and whitespace checks.
+
 ## 2026-10-23 — Read durable funding-conversion reconciliation by status observation
 
 - Added a separate unregistered read contract for the reconciliation associated with one canonical terminal status-observation UUID.
