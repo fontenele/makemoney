@@ -70,12 +70,18 @@ describe('AgenticWalletFundingConversionFinancialReconciliationService', () => {
   });
 
   it('returns explicit unavailable evidence without persistence', async () => {
-    const harness = createHarness({ loadedEvidence: null });
+    const harness = createHarness({
+      loadedEvidence: {
+        status: 'evidence_unavailable',
+        blockers: ['terminal_funding_conversion_context_unavailable'],
+      },
+    });
 
     await expect(
       harness.service.reconcileOnce(ATTEMPT_ID),
     ).resolves.toMatchObject({
       status: 'evidence_unavailable',
+      blockers: ['terminal_funding_conversion_context_unavailable'],
       evidenceReadStarted: true,
       evidenceReadCompleted: true,
       financialReconciliationComplete: false,
@@ -86,7 +92,10 @@ describe('AgenticWalletFundingConversionFinancialReconciliationService', () => {
 
   it('withholds malformed evidence from persistence', async () => {
     const harness = createHarness({
-      loadedEvidence: { ...evidence(), transactionHash: 'invalid' },
+      loadedEvidence: {
+        status: 'evidence_available',
+        evidence: { ...evidence(), transactionHash: 'invalid' },
+      },
     });
 
     await expect(
@@ -116,15 +125,16 @@ describe('AgenticWalletFundingConversionFinancialReconciliationService', () => {
   });
 
   it('suppresses overlapping work for the same attempt', async () => {
-    let release!: (
-      value: FundingConversionFinancialReconciliationEvidence,
-    ) => void;
-    const pending =
-      new Promise<FundingConversionFinancialReconciliationEvidence>(
-        (resolve) => {
-          release = resolve;
-        },
-      );
+    let release!: (value: {
+      status: 'evidence_available';
+      evidence: FundingConversionFinancialReconciliationEvidence;
+    }) => void;
+    const pending = new Promise<{
+      status: 'evidence_available';
+      evidence: FundingConversionFinancialReconciliationEvidence;
+    }>((resolve) => {
+      release = resolve;
+    });
     const harness = createHarness({ loadedEvidence: pending });
     const first = harness.service.reconcileOnce(ATTEMPT_ID);
     await Promise.resolve();
@@ -136,7 +146,7 @@ describe('AgenticWalletFundingConversionFinancialReconciliationService', () => {
       blockers: ['financial_reconciliation_in_progress'],
       evidenceReadStarted: false,
     });
-    release(evidence());
+    release({ status: 'evidence_available', evidence: evidence() });
     await expect(first).resolves.toMatchObject({
       status: 'reconciliation_recorded',
     });
@@ -206,7 +216,7 @@ function createHarness(options?: {
     .mockImplementation(async () =>
       options !== undefined && 'loadedEvidence' in options
         ? await options.loadedEvidence
-        : evidence(),
+        : { status: 'evidence_available', evidence: evidence() },
     );
   const record = jest
     .fn<

@@ -74,7 +74,11 @@ M10.133 Status Reconciliation: DONE
 M10.134 Financial Evidence Gate: DONE
 M10.135 Durable Financial Reconciliation: DONE
 M10.143 One-Shot Financial Reconciliation: DONE
-Next objective: Concrete complete financial-evidence acquisition or an explicit provider-capability blocker
+M10.144 Financial-Evidence Capability Review and Exact Pre-Balance Snapshot: DONE
+M10.145 Funding-Conversion Provider-Fee Evidence: DONE
+M10.146 Complete Funding-Conversion Financial Evidence: DONE
+M10.147 Guarded Funding-Conversion Operator Submission: DONE
+Next objective: register explicit funding-conversion status and financial reconciliation, then synchronize the local ledger before any strategy execution
 ```
 
 The detailed sections below preserve the original product plan. For current delivery status and exact increment boundaries, `docs/roadmap.md` and `docs/current-state.md` are authoritative.

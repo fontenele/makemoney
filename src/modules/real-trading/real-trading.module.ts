@@ -16,8 +16,24 @@ import { AgenticWalletQuoteCliProcessRunner } from './infrastructure/agentic-wal
 import { AgenticWalletFundingConversionPlanService } from './application/agentic-wallet-funding-conversion-plan.service';
 import { AgenticWalletFundingConversionPlanStore } from './application/agentic-wallet-funding-conversion-plan.store';
 import { PrismaAgenticWalletFundingConversionPlanStore } from './infrastructure/prisma-agentic-wallet-funding-conversion-plan.store';
+import { RiskEngineModule } from '../risk-engine/risk-engine.module';
+import { EmergencyStopService } from '../risk-engine/application/emergency-stop.service';
+import {
+  AgenticWalletFundingConversionSubmissionService,
+  FundingConversionSubmissionEnvironment,
+} from './application/agentic-wallet-funding-conversion-submission.service';
+import { AgenticWalletFundingConversionPreBalanceReader } from './application/agentic-wallet-funding-conversion-pre-balance.reader';
+import { BscFundingConversionPreBalanceReader } from './infrastructure/bsc-funding-conversion-pre-balance.reader';
+import { AgenticWalletFundingConversionFeeEvidenceReader } from './application/agentic-wallet-funding-conversion-fee-evidence.reader';
+import { AgenticWalletFundingConversionFeeEvidenceAdapter } from './infrastructure/agentic-wallet-funding-conversion-fee-evidence.adapter';
+import { AgenticWalletFundingConversionSubmissionAttemptStore } from './application/agentic-wallet-funding-conversion-submission-attempt.store';
+import { PrismaAgenticWalletFundingConversionSubmissionAttemptStore } from './infrastructure/prisma-agentic-wallet-funding-conversion-submission-attempt.store';
+import { AgenticWalletFundingConversionSubmissionOutcomeStore } from './application/agentic-wallet-funding-conversion-submission-outcome.store';
+import { PrismaAgenticWalletFundingConversionSubmissionOutcomeStore } from './infrastructure/prisma-agentic-wallet-funding-conversion-submission-outcome.store';
+import { AgenticWalletFundingConversionSwapCliProcessRunner } from './infrastructure/agentic-wallet-funding-conversion-swap-command-runner';
 
 @Module({
+  imports: [RiskEngineModule],
   controllers: [RealTradingController],
   providers: [
     {
@@ -57,6 +73,53 @@ import { PrismaAgenticWalletFundingConversionPlanStore } from './infrastructure/
       useClass: PrismaAgenticWalletFundingConversionPlanStore,
     },
     AgenticWalletFundingConversionPlanService,
+    {
+      provide: AgenticWalletFundingConversionPreBalanceReader,
+      useClass: BscFundingConversionPreBalanceReader,
+    },
+    {
+      provide: AgenticWalletFundingConversionFeeEvidenceReader,
+      useClass: AgenticWalletFundingConversionFeeEvidenceAdapter,
+    },
+    {
+      provide: AgenticWalletFundingConversionSubmissionAttemptStore,
+      useClass: PrismaAgenticWalletFundingConversionSubmissionAttemptStore,
+    },
+    {
+      provide: AgenticWalletFundingConversionSubmissionOutcomeStore,
+      useClass: PrismaAgenticWalletFundingConversionSubmissionOutcomeStore,
+    },
+    {
+      provide: AgenticWalletFundingConversionSubmissionService,
+      inject: [
+        AgenticWalletFundingConversionQuoteService,
+        ConfigService,
+        EmergencyStopService,
+        AgenticWalletFundingConversionPreBalanceReader,
+        AgenticWalletFundingConversionFeeEvidenceReader,
+        AgenticWalletFundingConversionSubmissionAttemptStore,
+        AgenticWalletFundingConversionSubmissionOutcomeStore,
+      ],
+      useFactory: (
+        quotes: AgenticWalletFundingConversionQuoteService,
+        config: ConfigService<FundingConversionSubmissionEnvironment, true>,
+        emergencyStop: EmergencyStopService,
+        preBalances: AgenticWalletFundingConversionPreBalanceReader,
+        feeEvidence: AgenticWalletFundingConversionFeeEvidenceReader,
+        attempts: AgenticWalletFundingConversionSubmissionAttemptStore,
+        outcomes: AgenticWalletFundingConversionSubmissionOutcomeStore,
+      ) =>
+        new AgenticWalletFundingConversionSubmissionService(
+          quotes,
+          config,
+          emergencyStop,
+          preBalances,
+          feeEvidence,
+          attempts,
+          new AgenticWalletFundingConversionSwapCliProcessRunner(30000),
+          outcomes,
+        ),
+    },
   ],
 })
 export class RealTradingModule {}

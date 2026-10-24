@@ -1,5 +1,48 @@
 # Changelog
 
+## 2026-10-24 — Register guarded funding-conversion operator submission
+
+- Added loopback-only `POST /real-trading/funding-conversion-submission` after explicit user authorization to make this narrowly bounded financial path reachable.
+- Reused the SHA-256 Bearer-token guard and exported it from the Risk Engine module; an absent token digest fails with 503 and invalid credentials fail with 401 before application or provider access.
+- Registered the existing fresh-quote, exact pre-balance, current provider-fee, serializable one-shot claim, pinned swap runner, and immutable outcome stores without weakening any runtime, emergency-stop, plan, confirmation, gas-reserve, identity, or chronology check.
+- Mapped malformed input to 400, safety/plan conflicts to 409, and unexpected dependency failures to sanitized 503 responses.
+- Added E2E coverage proving the current environment stops before provider access both without configured operator authentication and with valid authentication while real execution is disabled.
+- Updated the root API route table. The local environment remains paper-only, execution-disabled, and without a control-token digest; no CLI provider call, conversion, or real order occurred.
+- All 2,794 backend tests across 245 suites, 99 serial E2E tests across 9 suites, and 115 dashboard tests across 20 files pass with formatting, lint, and backend/dashboard builds.
+
+## 2026-10-24 — Compose complete funding-conversion financial evidence
+
+- Bound every new funding-conversion submission claim and request fingerprint to its exact canonical BSC wallet address; applied the backward-compatible nullable migration locally while legacy absence remains fail-closed.
+- Added an unregistered terminal-context reader that reconstructs the exact finished attempt, plan, order, status observation, fixed-block pre-balances, and persisted zero provider-fee evidence.
+- Added a bounded pinned-CLI 1.10.0 transaction-receipt adapter for `wallet tx-history --tx`, requiring one confirmed BSC swap, exact hash, native-BNB send, approved-USDT receive, same wallet, exact 18-decimal raw quantities, and a positive BNB network fee.
+- Reused the finalized-block BSC balance boundary for the post-conversion snapshot and required a strictly later block.
+- Composed M10.134 evidence only when the receipt and exact fixed-block equations reconcile both BNB outflow (submitted source plus network fee) and USDT inflow; divergence, malformed chronology, unrelated wallet activity, and incomplete durable context fail closed.
+- Marked complete evidence acquisition available while retaining `fundingConversionActivationAllowed: false`; the readers remain unregistered and verification made no provider call, conversion, or real order.
+- Added four suites and brought the backend total to 2,794 tests across 245 suites. Full formatting, lint, backend/dashboard builds and tests, serial E2E, Prisma generation/validation/migration status, Compose validation, and whitespace checks pass.
+
+## 2026-10-24 — Capture funding-conversion provider-fee evidence
+
+- Recorded the current official Binance Agentic Wallet service-fee rule: Group-1-to-Group-1 swaps are 0%, while the mutable fee must be checked in real time.
+- Added a bounded pinned-CLI text adapter that reads the exact BNB/USDT quote fee, fee USD, estimated gas USD, gas mode, and quote context without submitting a swap.
+- Required the later fee quote to retain the exact source/slippage context, report zero provider fee, and remain at or above the fresh approved minimum before claim.
+- Atomically fingerprinted and persisted provider-fee and estimated-network-fee evidence with the M10.144 fixed-block pre-balance snapshot; invalid chronology, nonzero fees, corrupt evidence, and legacy absence fail closed.
+- Replaced the resolved fee-classification blocker with `complete_post_conversion_evidence_acquisition_unimplemented`; conversion activation remains forbidden.
+- Corrected the Nest CLI entry target so `npm run start` and `npm run start:dev` use the generated `dist/src/main` artifact.
+- Applied the additive fee-evidence migration locally. All 2,773 backend tests across 241 suites, 97 serial E2E tests across 9 suites, and 115 dashboard tests across 20 files pass with formatting, lint, full build, Prisma validation, Compose validation, and whitespace checks.
+- Made the E2E script run in-band because all E2E files intentionally recreate and share the same disposable PostgreSQL schema; parallel workers caused cross-suite cleanup and fixture collisions.
+
+## 2026-10-23 — Review incomplete funding-conversion financial evidence
+
+- Added a bounded read-only BSC JSON-RPC client that fixes one block and reads exact native BNB plus approved USDT balances at that same block.
+- Required the unregistered submission flow to compare exact BNB with its fresh quote and block on divergence before a durable claim or swap runner.
+- Atomically fingerprinted and persisted pre-conversion block, BNB, USDT, and observation time with the one-shot claim while retaining the existing minimum BNB gas-reserve check.
+- Added a backward-compatible nullable migration for legacy attempts; every new claim requires complete snapshot evidence and legacy absence fails closed.
+- Audited Agentic Wallet CLI 1.10.0 and current official provider references for market-order status, transaction details, balances, fees, and gas.
+- Recorded the facts the provider can supply without discarding them: confirmed transaction send/receive instructions, network fee, and current balances.
+- Changed the one-shot evidence port to return typed availability and propagate exact capability blockers instead of collapsing absence to `null`.
+- Corrected the ownership boundary and resolved the project-owned snapshot requirement. The remaining fail-closed requirement is authoritative current provider-fee classification.
+- Added four focused capability tests, five fixed-block balance-reader tests, and updated coordinator/submission/store coverage, including exact quote/snapshot divergence; all 2,761 backend tests across 240 suites and 115 dashboard tests across 20 files pass alongside formatting, lint, backend/dashboard builds, Prisma validation, Compose validation, and whitespace checks, with no provider call or financial mutation. The additive migration is applied locally.
+
 ## 2026-10-23 — Compose one-shot funding-conversion financial reconciliation
 
 - Added an unregistered coordinator that short-circuits completed attempts, suppresses same-attempt overlap, and processes at most one read-only financial-evidence package per explicit call.

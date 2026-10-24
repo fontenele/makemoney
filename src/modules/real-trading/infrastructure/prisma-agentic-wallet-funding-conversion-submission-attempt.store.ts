@@ -36,6 +36,17 @@ export class PrismaAgenticWalletFundingConversionSubmissionAttemptStore implemen
         freshMinimumUsdt: claim.freshMinimumUsdt,
         freshMaximumSlippagePercent: claim.freshMaximumSlippagePercent,
         freshRemainingQuantityBnb: claim.freshRemainingQuantityBnb,
+        preConversionWalletAddress: claim.preConversionWalletAddress,
+        preConversionBalanceBlockNumber: claim.preConversionBalanceBlockNumber,
+        preConversionBnbBalance: claim.preConversionBnbBalance,
+        preConversionUsdtBalance: claim.preConversionUsdtBalance,
+        preConversionBalanceObservedAt:
+          claim.preConversionBalanceObservedAt.toISOString(),
+        providerFeeRate: claim.providerFeeRate,
+        providerFeeUsd: claim.providerFeeUsd,
+        estimatedNetworkFeeUsd: claim.estimatedNetworkFeeUsd,
+        feeEvidenceGasMode: claim.feeEvidenceGasMode,
+        feeEvidenceObservedAt: claim.feeEvidenceObservedAt.toISOString(),
         id: claim.id,
         planFingerprint: claim.planFingerprint,
         planId: claim.planId,
@@ -113,6 +124,18 @@ export class PrismaAgenticWalletFundingConversionSubmissionAttemptStore implemen
               freshMinimumUsdt: claim.freshMinimumUsdt,
               freshMaximumSlippagePercent: claim.freshMaximumSlippagePercent,
               freshRemainingQuantityBnb: claim.freshRemainingQuantityBnb,
+              preConversionWalletAddress: claim.preConversionWalletAddress,
+              preConversionBalanceBlockNumber:
+                claim.preConversionBalanceBlockNumber,
+              preConversionBnbBalance: claim.preConversionBnbBalance,
+              preConversionUsdtBalance: claim.preConversionUsdtBalance,
+              preConversionBalanceObservedAt:
+                claim.preConversionBalanceObservedAt,
+              providerFeeRate: claim.providerFeeRate,
+              providerFeeUsd: claim.providerFeeUsd,
+              estimatedNetworkFeeUsd: claim.estimatedNetworkFeeUsd,
+              feeEvidenceGasMode: claim.feeEvidenceGasMode,
+              feeEvidenceObservedAt: claim.feeEvidenceObservedAt,
               state: 'submission_claimed',
               automaticRetryAllowed: false,
               startedAt: claim.startedAt,
@@ -140,8 +163,27 @@ function validateClaimShape(
     !isNonNegativeDecimal(claim.freshMinimumUsdt) ||
     !isNonNegativeDecimal(claim.freshMaximumSlippagePercent) ||
     !isNonNegativeDecimal(claim.freshRemainingQuantityBnb) ||
+    !/^0x[0-9a-f]{40}$/.test(claim.preConversionWalletAddress) ||
+    !/^0x(?:0|[1-9a-f][0-9a-f]*)$/.test(
+      claim.preConversionBalanceBlockNumber,
+    ) ||
+    !isNonNegativeDecimal(claim.preConversionBnbBalance) ||
+    !isNonNegativeDecimal(claim.preConversionUsdtBalance) ||
+    claim.providerFeeRate !== '0' ||
+    claim.providerFeeUsd !== '0' ||
+    !isNonNegativeDecimal(claim.estimatedNetworkFeeUsd) ||
+    !/^[a-z]{1,16}$/.test(claim.feeEvidenceGasMode) ||
+    !(claim.preConversionBalanceObservedAt instanceof Date) ||
+    !Number.isFinite(claim.preConversionBalanceObservedAt.getTime()) ||
+    !(claim.feeEvidenceObservedAt instanceof Date) ||
+    !Number.isFinite(claim.feeEvidenceObservedAt.getTime()) ||
     !(claim.startedAt instanceof Date) ||
-    !Number.isFinite(claim.startedAt.getTime())
+    !Number.isFinite(claim.startedAt.getTime()) ||
+    claim.preConversionBalanceObservedAt.getTime() >
+      claim.startedAt.getTime() ||
+    claim.feeEvidenceObservedAt.getTime() <
+      claim.preConversionBalanceObservedAt.getTime() ||
+    claim.feeEvidenceObservedAt.getTime() > claim.startedAt.getTime()
   ) {
     throw new FundingConversionSubmissionClaimBlockedError(['invalid_claim']);
   }
@@ -164,6 +206,16 @@ function mapAttempt(row: {
   freshMinimumUsdt: string;
   freshMaximumSlippagePercent: string;
   freshRemainingQuantityBnb: string;
+  preConversionWalletAddress: string | null;
+  preConversionBalanceBlockNumber: string | null;
+  preConversionBnbBalance: string | null;
+  preConversionUsdtBalance: string | null;
+  preConversionBalanceObservedAt: Date | null;
+  providerFeeRate: string | null;
+  providerFeeUsd: string | null;
+  estimatedNetworkFeeUsd: string | null;
+  feeEvidenceGasMode: string | null;
+  feeEvidenceObservedAt: Date | null;
   state: string;
   automaticRetryAllowed: boolean;
   startedAt: Date;
@@ -172,7 +224,29 @@ function mapAttempt(row: {
     row.state !== 'submission_claimed' ||
     row.automaticRetryAllowed !== false ||
     !HASH_PATTERN.test(row.requestFingerprint) ||
-    !Number.isFinite(row.startedAt.getTime())
+    !Number.isFinite(row.startedAt.getTime()) ||
+    row.preConversionWalletAddress === null ||
+    !/^0x[0-9a-f]{40}$/.test(row.preConversionWalletAddress) ||
+    row.preConversionBalanceBlockNumber === null ||
+    row.preConversionBnbBalance === null ||
+    row.preConversionUsdtBalance === null ||
+    row.preConversionBalanceObservedAt === null ||
+    !/^0x(?:0|[1-9a-f][0-9a-f]*)$/.test(row.preConversionBalanceBlockNumber) ||
+    !isNonNegativeDecimal(row.preConversionBnbBalance) ||
+    !isNonNegativeDecimal(row.preConversionUsdtBalance) ||
+    !Number.isFinite(row.preConversionBalanceObservedAt.getTime()) ||
+    row.providerFeeRate !== '0' ||
+    row.providerFeeUsd !== '0' ||
+    row.estimatedNetworkFeeUsd === null ||
+    row.feeEvidenceGasMode === null ||
+    row.feeEvidenceObservedAt === null ||
+    !isNonNegativeDecimal(row.estimatedNetworkFeeUsd) ||
+    !/^[a-z]{1,16}$/.test(row.feeEvidenceGasMode) ||
+    !Number.isFinite(row.feeEvidenceObservedAt.getTime()) ||
+    row.preConversionBalanceObservedAt.getTime() > row.startedAt.getTime() ||
+    row.feeEvidenceObservedAt.getTime() <
+      row.preConversionBalanceObservedAt.getTime() ||
+    row.feeEvidenceObservedAt.getTime() > row.startedAt.getTime()
   ) {
     throw new Error(
       'Persisted funding conversion submission attempt is invalid',
@@ -187,6 +261,18 @@ function mapAttempt(row: {
     freshMinimumUsdt: row.freshMinimumUsdt,
     freshMaximumSlippagePercent: row.freshMaximumSlippagePercent,
     freshRemainingQuantityBnb: row.freshRemainingQuantityBnb,
+    preConversionWalletAddress: row.preConversionWalletAddress,
+    preConversionBalanceBlockNumber: row.preConversionBalanceBlockNumber,
+    preConversionBnbBalance: row.preConversionBnbBalance,
+    preConversionUsdtBalance: row.preConversionUsdtBalance,
+    preConversionBalanceObservedAt: new Date(
+      row.preConversionBalanceObservedAt,
+    ),
+    providerFeeRate: row.providerFeeRate,
+    providerFeeUsd: row.providerFeeUsd,
+    estimatedNetworkFeeUsd: row.estimatedNetworkFeeUsd,
+    feeEvidenceGasMode: row.feeEvidenceGasMode,
+    feeEvidenceObservedAt: new Date(row.feeEvidenceObservedAt),
     state: 'submission_claimed',
     automaticRetryAllowed: false,
     startedAt: new Date(row.startedAt),

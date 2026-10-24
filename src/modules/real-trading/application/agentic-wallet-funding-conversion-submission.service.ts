@@ -12,13 +12,15 @@ import { assessAgenticWalletFundingConversionSubmissionResponse } from '../infra
 import { AgenticWalletFundingConversionQuoteService } from './agentic-wallet-funding-conversion-quote.service';
 import { AgenticWalletFundingConversionSubmissionAttemptStore } from './agentic-wallet-funding-conversion-submission-attempt.store';
 import { AgenticWalletFundingConversionSubmissionOutcomeStore } from './agentic-wallet-funding-conversion-submission-outcome.store';
+import { AgenticWalletFundingConversionPreBalanceReader } from './agentic-wallet-funding-conversion-pre-balance.reader';
+import { AgenticWalletFundingConversionFeeEvidenceReader } from './agentic-wallet-funding-conversion-fee-evidence.reader';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const HASH_PATTERN = /^[a-f0-9]{64}$/;
 const POSITIVE_DECIMAL_PATTERN = /^(?:[1-9]\d*(?:\.\d+)?|0\.\d*[1-9]\d*)$/;
 
-interface FundingConversionSubmissionEnvironment {
+export interface FundingConversionSubmissionEnvironment {
   readonly TRADING_MODE: 'paper' | 'real';
   readonly REAL_EXECUTION_ENABLED: boolean;
   readonly REAL_EXECUTION_APPROVED_PROVIDER_ID: string | null;
@@ -54,6 +56,8 @@ export class AgenticWalletFundingConversionSubmissionService {
       true
     >,
     private readonly emergencyStop: EmergencyStopStatus,
+    private readonly preBalances: AgenticWalletFundingConversionPreBalanceReader,
+    private readonly feeEvidence: AgenticWalletFundingConversionFeeEvidenceReader,
     private readonly attempts: AgenticWalletFundingConversionSubmissionAttemptStore,
     private readonly runner: AgenticWalletFundingConversionSwapCommandRunner,
     private readonly outcomes: AgenticWalletFundingConversionSubmissionOutcomeStore,
@@ -72,13 +76,45 @@ export class AgenticWalletFundingConversionSubmissionService {
     if (
       quote.status !== 'quote_available' ||
       quote.quote === null ||
-      quote.remainingQuantityBnb === null
+      quote.remainingQuantityBnb === null ||
+      quote.walletAddress === null
     ) {
       throw new FundingConversionSubmissionBlockedError(
         'fresh_quote_unavailable',
       );
     }
 
+    const preBalance = await this.preBalances.load(quote.walletAddress);
+    if (
+      preBalance.walletAddress !== quote.walletAddress.toLowerCase() ||
+      !new Decimal(preBalance.bnbBalance).equals(quote.walletBalanceBnb ?? '-1')
+    ) {
+      throw new FundingConversionSubmissionBlockedError(
+        'pre_conversion_balance_diverged_from_fresh_quote',
+      );
+    }
+    const maximumSlippagePercent = new Decimal(quote.quote.maximumSlippageRate)
+      .times(100)
+      .toFixed();
+    const fees = await this.feeEvidence.load({
+      sourceQuantityBnb: quote.quote.sourceQuantityBnb,
+      maximumSlippagePercent,
+    });
+    if (
+      fees.scope !== 'agentic_wallet_funding_conversion_fee_evidence' ||
+      fees.provider !== 'agentic_wallet' ||
+      fees.chainId !== '56' ||
+      fees.providerFeeRate !== '0' ||
+      fees.providerFeeUsd !== '0' ||
+      fees.sourceQuantityBnb !== quote.quote.sourceQuantityBnb ||
+      fees.maximumSlippagePercent !== maximumSlippagePercent ||
+      !new Decimal(fees.expectedUsdt).greaterThanOrEqualTo(
+        quote.quote.minimumUsdt,
+      )
+    )
+      throw new FundingConversionSubmissionBlockedError(
+        'provider_fee_classification_not_approved',
+      );
     const startedAt = this.now();
     if (startedAt.getTime() >= quote.quote.expiresAt.getTime()) {
       throw new FundingConversionSubmissionBlockedError('fresh_quote_expired');
@@ -86,9 +122,6 @@ export class AgenticWalletFundingConversionSubmissionService {
     this.assertRuntimeReady();
     this.assertEmergencyStopInactive();
 
-    const maximumSlippagePercent = new Decimal(quote.quote.maximumSlippageRate)
-      .times(100)
-      .toFixed();
     const claimed = await this.attempts.claim({
       id: this.newId(),
       planId: input.planId,
@@ -99,6 +132,16 @@ export class AgenticWalletFundingConversionSubmissionService {
       freshMinimumUsdt: quote.quote.minimumUsdt,
       freshMaximumSlippagePercent: maximumSlippagePercent,
       freshRemainingQuantityBnb: quote.remainingQuantityBnb,
+      preConversionWalletAddress: preBalance.walletAddress,
+      preConversionBalanceBlockNumber: preBalance.blockNumber,
+      preConversionBnbBalance: preBalance.bnbBalance,
+      preConversionUsdtBalance: preBalance.usdtBalance,
+      preConversionBalanceObservedAt: preBalance.observedAt,
+      providerFeeRate: fees.providerFeeRate,
+      providerFeeUsd: fees.providerFeeUsd,
+      estimatedNetworkFeeUsd: fees.estimatedNetworkFeeUsd,
+      feeEvidenceGasMode: fees.gasMode,
+      feeEvidenceObservedAt: fees.observedAt,
       startedAt,
     });
     if (claimed.replayed) {

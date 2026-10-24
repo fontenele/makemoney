@@ -11,7 +11,11 @@ export function buildAgenticWalletCliVersionCheckArguments(): readonly string[] 
 
 export function validateAgenticWalletCliVersion(
   value: unknown,
-  operation: 'quote' | 'status lookup' | 'funding conversion swap',
+  operation:
+    | 'quote'
+    | 'status lookup'
+    | 'funding conversion swap'
+    | 'funding conversion receipt',
 ): void {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     throw new Error(

@@ -1,5 +1,27 @@
 # Technical Decisions
 
+## 2026-10-24 - Expose funding conversion only as an authenticated one-shot operator action
+
+M10.147 uses the user's `continue` after the documented authorization boundary solely to register the already bounded funding-conversion submission path. It does not authorize or perform a transaction in this development session. A first actual conversion still requires the operator to deliberately configure every independent runtime safeguard, prepare a fresh durable plan, and send the exact returned confirmation phrase within sixty seconds through the protected loopback route.
+
+The route reuses the Risk Engine's timing-safe SHA-256 Bearer guard rather than adding another raw credential. Authentication is necessary but insufficient: real mode, execution enablement, the exact Agentic Wallet/BSC/BNB/USDT allowlist, gas reserve, emergency-stop state, fresh quote and holdings, fixed-block pre-balance, current zero provider fee, plan fingerprint, phrase digest, quantity/slippage/minimum-output agreement, and one-shot durable claim are all rechecked. No single environment variable grants submission authority. The claim occurs before the CLI call so an ambiguous outcome cannot be retried automatically.
+
+Status and financial reconciliation remain the next runtime increment. A submitted conversion therefore cannot yet be treated as reconciled capital or strategy-ready accounting merely because the operator route exists.
+
+## 2026-10-24 - Require receipt and two exact fixed-block balance equations
+
+M10.146 treats the provider transaction history as necessary but not sufficient financial evidence. The pinned CLI receipt must identify one confirmed BSC swap with the terminal status hash, one native-BNB send, one approved-USDT receive, the same durable wallet on both movements, exact 18-decimal raw quantities, and a positive native-BNB network fee. The mutable zero provider fee remains grounded in the separately persisted immediate quote evidence from M10.145.
+
+The project-owned finalized-block reader is reused for a post-conversion snapshot. Evidence exists only when the post block is later than the pre block, `pre BNB - post BNB` equals the submitted BNB plus receipt network fee, and `post USDT - pre USDT` equals the receipt USDT. This deliberately fails closed on unrelated wallet activity rather than attributing an ambiguous delta to the conversion. The wallet address therefore joins the submission claim and fingerprint durably; nullable migration shape preserves old rows, but legacy absence cannot enter the evidence path.
+
+Complete evidence acquisition does not imply conversion authority. All new components remain outside NestJS registration, and `fundingConversionActivationAllowed` stays false. Making the explicit funding-conversion operator flow reachable is a separate authorization boundary because it would expose a real financial transaction path.
+
+## 2026-10-24 - Bind mutable provider-fee policy to the immediate quote
+
+Binance's current official service-fee schedule classifies Agentic Wallet Group-1-to-Group-1 swaps at 0%, but states that token groups and rates can change and that the applicable fee is reflected in real time. M10.145 therefore does not hard-code the schedule as sufficient execution evidence. The pinned CLI's read-only quote display is captured immediately before the one-shot claim, and any nonzero provider fee blocks the conversion path.
+
+The fee quote is a second, later observation than the JSON quote already used for the approved minimum. It must retain exact source quantity and slippage context, and its expected USDT must remain at or above that minimum; otherwise the claim is withheld. Provider-fee rate/USD, estimated network-fee USD, gas mode, and observation time join the request fingerprint and durable attempt atomically. The quote is evidence only: the adapter remains unregistered, no live quote was issued during verification, and complete post-conversion receipt and balance-delta composition remains a separate fail-closed increment.
+
 ## 2026-10-23 - Return M10 to a finite execution-readiness path
 
 M10 exists to make a narrowly approved real execution safe and auditable; it is not a goal to enumerate every possible read key. M10.139–M10.142 added valid durable correlations but were inferred rather than preplanned. Starting with M10.143, new increments must close a named remaining activation or reconciliation gap from the roadmap's finite closure path.

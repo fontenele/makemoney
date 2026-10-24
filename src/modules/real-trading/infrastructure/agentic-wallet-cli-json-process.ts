@@ -16,7 +16,8 @@ export class AgenticWalletCliJsonProcess {
       | 'quote'
       | 'status lookup'
       | 'authentication'
-      | 'funding conversion swap',
+      | 'funding conversion swap'
+      | 'funding conversion receipt',
     private readonly timeoutMs = 5000,
     private readonly executable?: string,
     maximumTimeoutMs = 30000,

@@ -1,5 +1,97 @@
 # Real Trading
 
+## M10.147 — Guarded funding-conversion operator submission
+
+M10.147 registers the previously unregistered one-shot BNB-to-USDT submission service after the user explicitly authorized crossing the documented reachability boundary. The new `POST /real-trading/funding-conversion-submission` route is available only on the loopback-bound API and uses the existing timing-safe SHA-256 Bearer guard. With no configured digest it fails with 503; invalid credentials fail with 401 before the request reaches the conversion service.
+
+Authentication alone cannot submit. The service requires real trading mode, independent real-execution enablement, exact Agentic Wallet/BSC/native-BNB/approved-USDT allowlist, configured minimum BNB gas reserve, and inactive emergency stop. It then obtains new verified holdings and a new quote, captures an exact finalized-block pre-balance, captures the current provider fee, and rechecks all gates immediately before a serializable one-shot claim. The claim reloads the durable plan and verifies its fingerprint, confirmation-phrase digest, sixty-second confirmation expiry, quantity, slippage, minimum output, and gas-reserved remainder before the pinned CLI swap runner becomes reachable.
+
+The durable claim occurs before submission. A provider error or malformed response is recorded as an unknown outcome with status lookup required and automatic retry forbidden; the same plan cannot be consumed again. The current local environment remains paper-only, execution-disabled, and without the Bearer digest, and verification exercises only pre-provider failure paths. No live quote, balance read, swap, conversion, or real order was issued.
+
+### M10.147 acceptance criteria
+
+- The operator route is loopback-only and protected by timing-safe Bearer authentication.
+- Strict request shape requires plan UUID, plan fingerprint, exact confirmation phrase, and canonical positive BNB quantity.
+- Authentication, runtime configuration, allowlist, gas reserve, emergency stop, quote, balances, fees, plan, confirmation, and one-shot claim are independent fail-closed gates.
+- The exact durable plan is consumed before the mutable provider command; divergent replay conflicts and automatic retry remains forbidden.
+- Provider or response ambiguity is durably retained as an unknown outcome requiring status reconciliation.
+- HTTP failures are classified as 400, 401/503 authentication, 409 safety/plan conflict, or sanitized 503 dependency failure.
+- Tests use only disabled/unconfigured paths and doubles; no provider call or financial transaction occurs.
+- Status, financial reconciliation, and exact local-ledger synchronization remain required before strategy execution.
+
+## M10.146 — Complete funding-conversion financial evidence
+
+M10.146 closes the concrete evidence-acquisition gap behind the M10.143 one-shot coordinator. New submission attempts durably retain the exact canonical BSC wallet address alongside M10.144's fixed-block pre-balances and M10.145's immediate fee evidence. The wallet address participates in the request fingerprint, so a replay cannot silently substitute another wallet. The nullable migration preserves existing data, while every new claim and every financial-evidence context requires the field.
+
+An unregistered Prisma reader reconstructs only a finished, non-retryable attempt with its exact plan, provider order, latest terminal `FINISHED` observation, pre-balance snapshot, and zero provider-fee evidence. A bounded pinned-CLI adapter issues only `wallet tx-history --tx <hash> --binanceChainId 56 --json` after verifying CLI 1.10.0. It accepts exactly one confirmed swap and one hash entry, then requires a single native-BNB send and approved-USDT receive for the same wallet, exact 18-decimal raw quantities, valid chronology, and a positive BNB network fee.
+
+The post-balance adapter reuses the M10.144 finalized-block BSC RPC reader. The complete reader requires its block to be later than the durable pre block and reconciles both independent equations exactly: BNB outflow must equal submitted source plus receipt network fee, and USDT inflow must equal the receipt output. Any extra wallet activity, identity divergence, malformed chronology, missing context, or amount mismatch is withheld or fails closed. Only a fully reconciled package is returned to M10.143 for the already authoritative M10.134 assessment and M10.135 persistence.
+
+### M10.146 acceptance criteria
+
+- The durable submission claim and fingerprint bind the exact canonical BSC wallet address.
+- A terminal context is reconstructed only from complete, internally correlated durable evidence.
+- The receipt reader verifies pinned CLI version, transaction hash, chain, confirmed swap status, movement direction, token identities, wallet identity, decimals, quantities, and positive network fee.
+- Pre/post BNB and USDT deltas reconcile exactly against the receipt at a strictly later finalized block.
+- Persisted zero provider-fee evidence yields an explicit empty provider-fee component set rather than an inferred unknown fee.
+- Missing context is explicit; corrupt context, receipt, chronology, wallet identity, block progression, or balance deltas fail closed.
+- Capability review reports complete evidence acquisition but keeps conversion activation forbidden.
+- No route, NestJS registration, live provider/RPC call during verification, conversion, or real order is added.
+
+### Official source reviewed
+
+- [Binance Agentic Wallet wallet-view reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/wallet-view.md), reviewed 2026-10-24.
+
+## M10.145 — Funding-conversion provider-fee evidence
+
+M10.145 resolves M10.144's remaining external fact against the current official Binance sources. The Agentic Wallet market-order reference delegates fees to the Binance Wallet schedule. That schedule classifies Agentic Wallet Group-1-to-Group-1 swaps at 0%, while explicitly warning that token groups and rates can change and that the applicable service fee is reflected in real time.
+
+A bounded adapter for pinned CLI 1.10.0 therefore captures the immediate read-only BNB-to-USDT quote display rather than treating the schedule as a timeless constant. It validates the exact source quantity and slippage context and extracts expected USDT, provider-fee rate, fee USD, estimated network-fee USD, gas mode, and observation time. The application submission boundary accepts only Agentic Wallet on chain 56, exact zero provider fee, and a later expected output that remains at or above the fresh quote's already approved minimum.
+
+The serializable one-shot claim fingerprints and persists this fee evidence atomically with M10.144's fixed-block pre-conversion balances. Claim and replay validation reject nonzero fees, malformed decimals, invalid gas mode, impossible chronology, corrupt durable rows, and legacy absence. The financial-evidence capability reader now exposes only `complete_post_conversion_evidence_acquisition_unimplemented`; receipt and post-conversion fixed-block balance-delta composition remains the next increment.
+
+### M10.145 acceptance criteria
+
+- Current authoritative provider-fee policy is documented without assuming it is immutable.
+- One bounded pinned-CLI read-only quote captures exact real-time fee and estimated gas evidence.
+- Source quantity, slippage, provider, chain, fee, and approved-minimum correlation fail closed before claim.
+- Fee evidence is included in the one-shot request fingerprint and persisted atomically with pre-balances.
+- Nonzero provider fees, malformed evidence, invalid chronology, corrupt replay, and legacy absence are rejected.
+- The adapter, submission service, and financial-evidence reader remain unregistered in NestJS.
+- Complete post-conversion evidence composition, conversion activation, and real trading remain unavailable.
+
+### Official sources reviewed
+
+- [Binance Agentic Wallet market-order reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/market-order.md), reviewed 2026-10-24.
+- [Binance Wallet service-fee schedule](https://www.binance.com/en/support/faq/detail/87cbb1ca0df34a348eaecb73c26167d7), reviewed 2026-10-24.
+- [Binance Wallet service-fee token groups](https://www.binance.com/en/binancewallet/trading-fee-token-groups), reviewed 2026-10-24.
+
+## M10.144 — Funding-conversion financial-evidence capability review
+
+M10.144 resolves the M10.143 evidence-port question against the installed Agentic Wallet CLI 1.10.0 and current official Binance references. The provider surface is not empty: `market-order list --orderId` exposes terminal status and transaction hash; `wallet tx-history --tx` exposes confirmed transaction send/receive instructions and the settled network-fee field; and `wallet balance` exposes current BNB and USDT balances. These available facts are recorded explicitly.
+
+They do not yet form the complete M10.134 package, but the pre-conversion balance is not a provider limitation. A bounded read-only adapter now obtains the official BSC block number, then queries native BNB and approved USDT `balanceOf` at that exact block. This bypasses the CLI's display threshold without inferring zero. The unregistered submission flow loads the snapshot after its fresh quote, rejects exact BNB divergence, and passes the block, BNB, USDT, and observation time into the serializable one-shot claim. The claim fingerprints and persists those facts atomically with the approved quantity and remaining BNB, which must still satisfy `FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB`.
+
+The application evidence-reader contract returns a discriminated available/unavailable result. With the project-owned snapshot resolved, the unregistered capability reader now retains only `authoritative_provider_fee_classification_unavailable`. Binance's current fee schedule states that Agentic Wallet Group-1-to-Group-1 swaps have a 0% service fee, but token groups are dynamic; the exact BNB/USDT classification must be captured from an authoritative current source rather than assumed. Complete evidence acquisition and conversion activation remain false until that requirement is satisfied.
+
+### M10.144 acceptance criteria
+
+- Facts exposed by the pinned provider are distinguished from facts that remain unavailable.
+- Project-owned pre-conversion balance capture is not mislabeled as a provider limitation.
+- Missing evidence is named precisely and cannot be normalized as success, zero fees, or inferred balance change.
+- The one-shot coordinator retains structured provider-capability blockers.
+- Invalid attempt identity and cancellation fail before any possible external access.
+- The capability reader performs no CLI call and is not registered in NestJS.
+- Funding conversion and real-trading activation remain forbidden.
+
+### Official sources reviewed
+
+- [Binance Agentic Wallet market-order reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/market-order.md), reviewed 2026-10-23.
+- [Binance Agentic Wallet wallet-view reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/wallet-view.md), reviewed 2026-10-23.
+- [Binance Agentic Wallet gas reference](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/binance-agentic-wallet/references/gas.md), reviewed 2026-10-23.
+- [Binance Wallet service-fee schedule](https://www.binance.com/en/support/faq/detail/87cbb1ca0df34a348eaecb73c26167d7), reviewed 2026-10-23.
+- [BNB Smart Chain JSON-RPC endpoints](https://docs.bnbchain.org/bnb-smart-chain/developers/json_rpc/json-rpc-endpoint/), reviewed 2026-10-23.
+
 ## M10.143 one-shot funding-conversion financial-reconciliation coordinator
 
 M10.143 closes the application-composition gap between the M10.134 evidence boundary and M10.135 durable store without pretending that concrete provider evidence acquisition already exists. One unregistered service accepts a canonical submission-attempt UUID, first checks the M10.137 attempt-keyed reader, and returns an already completed reconciliation without another external read.

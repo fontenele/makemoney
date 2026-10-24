@@ -6,6 +6,8 @@ import {
   HttpCode,
   Post,
   ServiceUnavailableException,
+  ConflictException,
+  UseGuards,
 } from '@nestjs/common';
 import { RealTradingStatusService } from '../application/real-trading-status.service';
 import { AgenticWalletAuthenticationService } from '../application/agentic-wallet-authentication.service';
@@ -14,6 +16,20 @@ import {
   InvalidFundingConversionQuoteRequestError,
 } from '../application/agentic-wallet-funding-conversion-quote.service';
 import { AgenticWalletFundingConversionPlanService } from '../application/agentic-wallet-funding-conversion-plan.service';
+import {
+  AgenticWalletFundingConversionSubmissionService,
+  FundingConversionSubmissionBlockedError,
+  InvalidFundingConversionSubmissionRequestError,
+} from '../application/agentic-wallet-funding-conversion-submission.service';
+import {
+  FundingConversionSubmissionClaimBlockedError,
+  FundingConversionSubmissionClaimConflictError,
+} from '../application/agentic-wallet-funding-conversion-submission-attempt.store';
+import {
+  FundingConversionSubmissionOutcomeBlockedError,
+  FundingConversionSubmissionOutcomeConflictError,
+} from '../application/agentic-wallet-funding-conversion-submission-outcome.store';
+import { RiskControlAuthGuard } from '../../risk-engine/presentation/risk-control-auth.guard';
 
 @Controller('real-trading')
 export class RealTradingController {
@@ -22,6 +38,7 @@ export class RealTradingController {
     private readonly authentication: AgenticWalletAuthenticationService,
     private readonly fundingConversionQuote: AgenticWalletFundingConversionQuoteService,
     private readonly fundingConversionPlan: AgenticWalletFundingConversionPlanService,
+    private readonly fundingConversionSubmission: AgenticWalletFundingConversionSubmissionService,
   ) {}
 
   @Get('status')
@@ -102,6 +119,33 @@ export class RealTradingController {
       }
       throw new ServiceUnavailableException(
         'Agentic Wallet funding conversion plan is unavailable',
+      );
+    }
+  }
+
+  @Post('funding-conversion-submission')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async submitFundingConversion(@Body() body: unknown) {
+    try {
+      return await this.fundingConversionSubmission.submit(body);
+    } catch (error) {
+      if (error instanceof InvalidFundingConversionSubmissionRequestError) {
+        throw new BadRequestException(
+          'Invalid funding conversion submission request',
+        );
+      }
+      if (
+        error instanceof FundingConversionSubmissionBlockedError ||
+        error instanceof FundingConversionSubmissionClaimBlockedError ||
+        error instanceof FundingConversionSubmissionClaimConflictError ||
+        error instanceof FundingConversionSubmissionOutcomeBlockedError ||
+        error instanceof FundingConversionSubmissionOutcomeConflictError
+      ) {
+        throw new ConflictException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet funding conversion submission is unavailable',
       );
     }
   }

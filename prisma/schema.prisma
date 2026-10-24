@@ -129,23 +129,33 @@ model AgenticWalletFundingConversionPlan {
 }
 
 model AgenticWalletFundingConversionSubmissionAttempt {
-  id                          String                                                 @id @db.Uuid
-  planId                      String                                                 @unique @map("plan_id") @db.Uuid
-  requestFingerprint          String                                                 @map("request_fingerprint") @db.Char(64)
-  freshSourceQuantityBnb      String                                                 @map("fresh_source_quantity_bnb") @db.Text
-  freshExpectedUsdt           String                                                 @map("fresh_expected_usdt") @db.Text
-  freshMinimumUsdt            String                                                 @map("fresh_minimum_usdt") @db.Text
-  freshMaximumSlippagePercent String                                                 @map("fresh_maximum_slippage_percent") @db.Text
-  freshRemainingQuantityBnb   String                                                 @map("fresh_remaining_quantity_bnb") @db.Text
-  state                       String                                                 @db.VarChar(40)
-  providerOrderId             String?                                                @unique @map("provider_order_id") @db.VarChar(256)
-  responseFingerprint         String?                                                @map("response_fingerprint") @db.Char(64)
-  automaticRetryAllowed       Boolean                                                @map("automatic_retry_allowed")
-  startedAt                   DateTime                                               @map("started_at")
-  completedAt                 DateTime?                                              @map("completed_at")
-  plan                        AgenticWalletFundingConversionPlan                     @relation(fields: [planId], references: [id], onDelete: Restrict)
-  statusObservations          AgenticWalletFundingConversionStatusObservation[]
-  financialReconciliation     AgenticWalletFundingConversionFinancialReconciliation?
+  id                              String                                                 @id @db.Uuid
+  planId                          String                                                 @unique @map("plan_id") @db.Uuid
+  requestFingerprint              String                                                 @map("request_fingerprint") @db.Char(64)
+  freshSourceQuantityBnb          String                                                 @map("fresh_source_quantity_bnb") @db.Text
+  freshExpectedUsdt               String                                                 @map("fresh_expected_usdt") @db.Text
+  freshMinimumUsdt                String                                                 @map("fresh_minimum_usdt") @db.Text
+  freshMaximumSlippagePercent     String                                                 @map("fresh_maximum_slippage_percent") @db.Text
+  freshRemainingQuantityBnb       String                                                 @map("fresh_remaining_quantity_bnb") @db.Text
+  preConversionWalletAddress      String?                                                @map("pre_conversion_wallet_address") @db.VarChar(42)
+  preConversionBalanceBlockNumber String?                                                @map("pre_conversion_balance_block_number") @db.VarChar(66)
+  preConversionBnbBalance         String?                                                @map("pre_conversion_bnb_balance") @db.Text
+  preConversionUsdtBalance        String?                                                @map("pre_conversion_usdt_balance") @db.Text
+  preConversionBalanceObservedAt  DateTime?                                              @map("pre_conversion_balance_observed_at")
+  providerFeeRate                 String?                                                @map("provider_fee_rate") @db.VarChar(80)
+  providerFeeUsd                  String?                                                @map("provider_fee_usd") @db.VarChar(80)
+  estimatedNetworkFeeUsd          String?                                                @map("estimated_network_fee_usd") @db.VarChar(80)
+  feeEvidenceGasMode              String?                                                @map("fee_evidence_gas_mode") @db.VarChar(16)
+  feeEvidenceObservedAt           DateTime?                                              @map("fee_evidence_observed_at")
+  state                           String                                                 @db.VarChar(40)
+  providerOrderId                 String?                                                @unique @map("provider_order_id") @db.VarChar(256)
+  responseFingerprint             String?                                                @map("response_fingerprint") @db.Char(64)
+  automaticRetryAllowed           Boolean                                                @map("automatic_retry_allowed")
+  startedAt                       DateTime                                               @map("started_at")
+  completedAt                     DateTime?                                              @map("completed_at")
+  plan                            AgenticWalletFundingConversionPlan                     @relation(fields: [planId], references: [id], onDelete: Restrict)
+  statusObservations              AgenticWalletFundingConversionStatusObservation[]
+  financialReconciliation         AgenticWalletFundingConversionFinancialReconciliation?
 
   @@index([state, startedAt])
   @@map("agentic_wallet_funding_conversion_submission_attempts")

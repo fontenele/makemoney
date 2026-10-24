@@ -102,7 +102,8 @@ export class PrismaAgenticWalletFundingConversionFinancialReconciliationStore im
             'invalid_reconciliation_context',
           ]);
 
-        const statusObservation = mapStatusObservation(statusRow);
+        const statusObservation =
+          mapFundingConversionStatusObservation(statusRow);
         const context: FundingConversionFinancialReconciliationContext = {
           scope:
             'agentic_wallet_funding_conversion_financial_reconciliation_context',
@@ -175,7 +176,7 @@ export class PrismaAgenticWalletFundingConversionFinancialReconciliationStore im
   }
 }
 
-function mapStatusObservation(row: {
+export function mapFundingConversionStatusObservation(row: {
   id: string;
   attemptId: string;
   providerOrderId: string;

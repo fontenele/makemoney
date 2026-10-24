@@ -33,6 +33,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptMinAggregateOutputTyp
   freshMinimumUsdt: string | null
   freshMaximumSlippagePercent: string | null
   freshRemainingQuantityBnb: string | null
+  preConversionWalletAddress: string | null
+  preConversionBalanceBlockNumber: string | null
+  preConversionBnbBalance: string | null
+  preConversionUsdtBalance: string | null
+  preConversionBalanceObservedAt: Date | null
+  providerFeeRate: string | null
+  providerFeeUsd: string | null
+  estimatedNetworkFeeUsd: string | null
+  feeEvidenceGasMode: string | null
+  feeEvidenceObservedAt: Date | null
   state: string | null
   providerOrderId: string | null
   responseFingerprint: string | null
@@ -50,6 +60,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptMaxAggregateOutputTyp
   freshMinimumUsdt: string | null
   freshMaximumSlippagePercent: string | null
   freshRemainingQuantityBnb: string | null
+  preConversionWalletAddress: string | null
+  preConversionBalanceBlockNumber: string | null
+  preConversionBnbBalance: string | null
+  preConversionUsdtBalance: string | null
+  preConversionBalanceObservedAt: Date | null
+  providerFeeRate: string | null
+  providerFeeUsd: string | null
+  estimatedNetworkFeeUsd: string | null
+  feeEvidenceGasMode: string | null
+  feeEvidenceObservedAt: Date | null
   state: string | null
   providerOrderId: string | null
   responseFingerprint: string | null
@@ -67,6 +87,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptCountAggregateOutputT
   freshMinimumUsdt: number
   freshMaximumSlippagePercent: number
   freshRemainingQuantityBnb: number
+  preConversionWalletAddress: number
+  preConversionBalanceBlockNumber: number
+  preConversionBnbBalance: number
+  preConversionUsdtBalance: number
+  preConversionBalanceObservedAt: number
+  providerFeeRate: number
+  providerFeeUsd: number
+  estimatedNetworkFeeUsd: number
+  feeEvidenceGasMode: number
+  feeEvidenceObservedAt: number
   state: number
   providerOrderId: number
   responseFingerprint: number
@@ -86,6 +116,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptMinAggregateInputType
   freshMinimumUsdt?: true
   freshMaximumSlippagePercent?: true
   freshRemainingQuantityBnb?: true
+  preConversionWalletAddress?: true
+  preConversionBalanceBlockNumber?: true
+  preConversionBnbBalance?: true
+  preConversionUsdtBalance?: true
+  preConversionBalanceObservedAt?: true
+  providerFeeRate?: true
+  providerFeeUsd?: true
+  estimatedNetworkFeeUsd?: true
+  feeEvidenceGasMode?: true
+  feeEvidenceObservedAt?: true
   state?: true
   providerOrderId?: true
   responseFingerprint?: true
@@ -103,6 +143,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptMaxAggregateInputType
   freshMinimumUsdt?: true
   freshMaximumSlippagePercent?: true
   freshRemainingQuantityBnb?: true
+  preConversionWalletAddress?: true
+  preConversionBalanceBlockNumber?: true
+  preConversionBnbBalance?: true
+  preConversionUsdtBalance?: true
+  preConversionBalanceObservedAt?: true
+  providerFeeRate?: true
+  providerFeeUsd?: true
+  estimatedNetworkFeeUsd?: true
+  feeEvidenceGasMode?: true
+  feeEvidenceObservedAt?: true
   state?: true
   providerOrderId?: true
   responseFingerprint?: true
@@ -120,6 +170,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptCountAggregateInputTy
   freshMinimumUsdt?: true
   freshMaximumSlippagePercent?: true
   freshRemainingQuantityBnb?: true
+  preConversionWalletAddress?: true
+  preConversionBalanceBlockNumber?: true
+  preConversionBnbBalance?: true
+  preConversionUsdtBalance?: true
+  preConversionBalanceObservedAt?: true
+  providerFeeRate?: true
+  providerFeeUsd?: true
+  estimatedNetworkFeeUsd?: true
+  feeEvidenceGasMode?: true
+  feeEvidenceObservedAt?: true
   state?: true
   providerOrderId?: true
   responseFingerprint?: true
@@ -210,6 +270,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptGroupByOutputType = {
   freshMinimumUsdt: string
   freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
+  preConversionWalletAddress: string | null
+  preConversionBalanceBlockNumber: string | null
+  preConversionBnbBalance: string | null
+  preConversionUsdtBalance: string | null
+  preConversionBalanceObservedAt: Date | null
+  providerFeeRate: string | null
+  providerFeeUsd: string | null
+  estimatedNetworkFeeUsd: string | null
+  feeEvidenceGasMode: string | null
+  feeEvidenceObservedAt: Date | null
   state: string
   providerOrderId: string | null
   responseFingerprint: string | null
@@ -248,6 +318,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptWhereInput = {
   freshMinimumUsdt?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshMaximumSlippagePercent?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshRemainingQuantityBnb?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
+  preConversionWalletAddress?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  preConversionBalanceBlockNumber?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  preConversionBnbBalance?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  preConversionUsdtBalance?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  preConversionBalanceObservedAt?: Prisma.DateTimeNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | Date | string | null
+  providerFeeRate?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  providerFeeUsd?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  estimatedNetworkFeeUsd?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  feeEvidenceGasMode?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  feeEvidenceObservedAt?: Prisma.DateTimeNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | Date | string | null
   state?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   providerOrderId?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
   responseFingerprint?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
@@ -268,6 +348,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptOrderByWithRelationIn
   freshMinimumUsdt?: Prisma.SortOrder
   freshMaximumSlippagePercent?: Prisma.SortOrder
   freshRemainingQuantityBnb?: Prisma.SortOrder
+  preConversionWalletAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  preConversionBalanceBlockNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  preConversionBnbBalance?: Prisma.SortOrderInput | Prisma.SortOrder
+  preConversionUsdtBalance?: Prisma.SortOrderInput | Prisma.SortOrder
+  preConversionBalanceObservedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerFeeRate?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerFeeUsd?: Prisma.SortOrderInput | Prisma.SortOrder
+  estimatedNetworkFeeUsd?: Prisma.SortOrderInput | Prisma.SortOrder
+  feeEvidenceGasMode?: Prisma.SortOrderInput | Prisma.SortOrder
+  feeEvidenceObservedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrder
   providerOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   responseFingerprint?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -292,6 +382,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptWhereUniqueInput = Pr
   freshMinimumUsdt?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshMaximumSlippagePercent?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshRemainingQuantityBnb?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
+  preConversionWalletAddress?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  preConversionBalanceBlockNumber?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  preConversionBnbBalance?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  preConversionUsdtBalance?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  preConversionBalanceObservedAt?: Prisma.DateTimeNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | Date | string | null
+  providerFeeRate?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  providerFeeUsd?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  estimatedNetworkFeeUsd?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  feeEvidenceGasMode?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  feeEvidenceObservedAt?: Prisma.DateTimeNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | Date | string | null
   state?: Prisma.StringFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   responseFingerprint?: Prisma.StringNullableFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
   automaticRetryAllowed?: Prisma.BoolFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | boolean
@@ -311,6 +411,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptOrderByWithAggregatio
   freshMinimumUsdt?: Prisma.SortOrder
   freshMaximumSlippagePercent?: Prisma.SortOrder
   freshRemainingQuantityBnb?: Prisma.SortOrder
+  preConversionWalletAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  preConversionBalanceBlockNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  preConversionBnbBalance?: Prisma.SortOrderInput | Prisma.SortOrder
+  preConversionUsdtBalance?: Prisma.SortOrderInput | Prisma.SortOrder
+  preConversionBalanceObservedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerFeeRate?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerFeeUsd?: Prisma.SortOrderInput | Prisma.SortOrder
+  estimatedNetworkFeeUsd?: Prisma.SortOrderInput | Prisma.SortOrder
+  feeEvidenceGasMode?: Prisma.SortOrderInput | Prisma.SortOrder
+  feeEvidenceObservedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrder
   providerOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   responseFingerprint?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -334,6 +444,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptScalarWhereWithAggreg
   freshMinimumUsdt?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshMaximumSlippagePercent?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   freshRemainingQuantityBnb?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
+  preConversionWalletAddress?: Prisma.StringNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  preConversionBalanceBlockNumber?: Prisma.StringNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  preConversionBnbBalance?: Prisma.StringNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  preConversionUsdtBalance?: Prisma.StringNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  preConversionBalanceObservedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | Date | string | null
+  providerFeeRate?: Prisma.StringNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  providerFeeUsd?: Prisma.StringNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  estimatedNetworkFeeUsd?: Prisma.StringNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  feeEvidenceGasMode?: Prisma.StringNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
+  feeEvidenceObservedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | Date | string | null
   state?: Prisma.StringWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string
   providerOrderId?: Prisma.StringNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
   responseFingerprint?: Prisma.StringNullableWithAggregatesFilter<"AgenticWalletFundingConversionSubmissionAttempt"> | string | null
@@ -350,6 +470,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptCreateInput = {
   freshMinimumUsdt: string
   freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
+  preConversionWalletAddress?: string | null
+  preConversionBalanceBlockNumber?: string | null
+  preConversionBnbBalance?: string | null
+  preConversionUsdtBalance?: string | null
+  preConversionBalanceObservedAt?: Date | string | null
+  providerFeeRate?: string | null
+  providerFeeUsd?: string | null
+  estimatedNetworkFeeUsd?: string | null
+  feeEvidenceGasMode?: string | null
+  feeEvidenceObservedAt?: Date | string | null
   state: string
   providerOrderId?: string | null
   responseFingerprint?: string | null
@@ -370,6 +500,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedCreateInput 
   freshMinimumUsdt: string
   freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
+  preConversionWalletAddress?: string | null
+  preConversionBalanceBlockNumber?: string | null
+  preConversionBnbBalance?: string | null
+  preConversionUsdtBalance?: string | null
+  preConversionBalanceObservedAt?: Date | string | null
+  providerFeeRate?: string | null
+  providerFeeUsd?: string | null
+  estimatedNetworkFeeUsd?: string | null
+  feeEvidenceGasMode?: string | null
+  feeEvidenceObservedAt?: Date | string | null
   state: string
   providerOrderId?: string | null
   responseFingerprint?: string | null
@@ -388,6 +528,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUpdateInput = {
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  preConversionWalletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceBlockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBnbBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionUsdtBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerFeeRate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estimatedNetworkFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceGasMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -408,6 +558,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedUpdateInput 
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  preConversionWalletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceBlockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBnbBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionUsdtBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerFeeRate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estimatedNetworkFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceGasMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -427,6 +587,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptCreateManyInput = {
   freshMinimumUsdt: string
   freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
+  preConversionWalletAddress?: string | null
+  preConversionBalanceBlockNumber?: string | null
+  preConversionBnbBalance?: string | null
+  preConversionUsdtBalance?: string | null
+  preConversionBalanceObservedAt?: Date | string | null
+  providerFeeRate?: string | null
+  providerFeeUsd?: string | null
+  estimatedNetworkFeeUsd?: string | null
+  feeEvidenceGasMode?: string | null
+  feeEvidenceObservedAt?: Date | string | null
   state: string
   providerOrderId?: string | null
   responseFingerprint?: string | null
@@ -443,6 +613,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUpdateManyMutationInp
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  preConversionWalletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceBlockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBnbBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionUsdtBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerFeeRate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estimatedNetworkFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceGasMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -460,6 +640,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedUpdateManyIn
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  preConversionWalletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceBlockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBnbBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionUsdtBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerFeeRate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estimatedNetworkFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceGasMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -482,6 +672,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptCountOrderByAggregate
   freshMinimumUsdt?: Prisma.SortOrder
   freshMaximumSlippagePercent?: Prisma.SortOrder
   freshRemainingQuantityBnb?: Prisma.SortOrder
+  preConversionWalletAddress?: Prisma.SortOrder
+  preConversionBalanceBlockNumber?: Prisma.SortOrder
+  preConversionBnbBalance?: Prisma.SortOrder
+  preConversionUsdtBalance?: Prisma.SortOrder
+  preConversionBalanceObservedAt?: Prisma.SortOrder
+  providerFeeRate?: Prisma.SortOrder
+  providerFeeUsd?: Prisma.SortOrder
+  estimatedNetworkFeeUsd?: Prisma.SortOrder
+  feeEvidenceGasMode?: Prisma.SortOrder
+  feeEvidenceObservedAt?: Prisma.SortOrder
   state?: Prisma.SortOrder
   providerOrderId?: Prisma.SortOrder
   responseFingerprint?: Prisma.SortOrder
@@ -499,6 +699,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptMaxOrderByAggregateIn
   freshMinimumUsdt?: Prisma.SortOrder
   freshMaximumSlippagePercent?: Prisma.SortOrder
   freshRemainingQuantityBnb?: Prisma.SortOrder
+  preConversionWalletAddress?: Prisma.SortOrder
+  preConversionBalanceBlockNumber?: Prisma.SortOrder
+  preConversionBnbBalance?: Prisma.SortOrder
+  preConversionUsdtBalance?: Prisma.SortOrder
+  preConversionBalanceObservedAt?: Prisma.SortOrder
+  providerFeeRate?: Prisma.SortOrder
+  providerFeeUsd?: Prisma.SortOrder
+  estimatedNetworkFeeUsd?: Prisma.SortOrder
+  feeEvidenceGasMode?: Prisma.SortOrder
+  feeEvidenceObservedAt?: Prisma.SortOrder
   state?: Prisma.SortOrder
   providerOrderId?: Prisma.SortOrder
   responseFingerprint?: Prisma.SortOrder
@@ -516,6 +726,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptMinOrderByAggregateIn
   freshMinimumUsdt?: Prisma.SortOrder
   freshMaximumSlippagePercent?: Prisma.SortOrder
   freshRemainingQuantityBnb?: Prisma.SortOrder
+  preConversionWalletAddress?: Prisma.SortOrder
+  preConversionBalanceBlockNumber?: Prisma.SortOrder
+  preConversionBnbBalance?: Prisma.SortOrder
+  preConversionUsdtBalance?: Prisma.SortOrder
+  preConversionBalanceObservedAt?: Prisma.SortOrder
+  providerFeeRate?: Prisma.SortOrder
+  providerFeeUsd?: Prisma.SortOrder
+  estimatedNetworkFeeUsd?: Prisma.SortOrder
+  feeEvidenceGasMode?: Prisma.SortOrder
+  feeEvidenceObservedAt?: Prisma.SortOrder
   state?: Prisma.SortOrder
   providerOrderId?: Prisma.SortOrder
   responseFingerprint?: Prisma.SortOrder
@@ -597,6 +817,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptCreateWithoutPlanInpu
   freshMinimumUsdt: string
   freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
+  preConversionWalletAddress?: string | null
+  preConversionBalanceBlockNumber?: string | null
+  preConversionBnbBalance?: string | null
+  preConversionUsdtBalance?: string | null
+  preConversionBalanceObservedAt?: Date | string | null
+  providerFeeRate?: string | null
+  providerFeeUsd?: string | null
+  estimatedNetworkFeeUsd?: string | null
+  feeEvidenceGasMode?: string | null
+  feeEvidenceObservedAt?: Date | string | null
   state: string
   providerOrderId?: string | null
   responseFingerprint?: string | null
@@ -615,6 +845,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedCreateWithou
   freshMinimumUsdt: string
   freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
+  preConversionWalletAddress?: string | null
+  preConversionBalanceBlockNumber?: string | null
+  preConversionBnbBalance?: string | null
+  preConversionUsdtBalance?: string | null
+  preConversionBalanceObservedAt?: Date | string | null
+  providerFeeRate?: string | null
+  providerFeeUsd?: string | null
+  estimatedNetworkFeeUsd?: string | null
+  feeEvidenceGasMode?: string | null
+  feeEvidenceObservedAt?: Date | string | null
   state: string
   providerOrderId?: string | null
   responseFingerprint?: string | null
@@ -649,6 +889,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUpdateWithoutPlanInpu
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  preConversionWalletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceBlockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBnbBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionUsdtBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerFeeRate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estimatedNetworkFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceGasMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -667,6 +917,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedUpdateWithou
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  preConversionWalletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceBlockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBnbBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionUsdtBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerFeeRate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estimatedNetworkFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceGasMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -685,6 +945,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptCreateWithoutStatusOb
   freshMinimumUsdt: string
   freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
+  preConversionWalletAddress?: string | null
+  preConversionBalanceBlockNumber?: string | null
+  preConversionBnbBalance?: string | null
+  preConversionUsdtBalance?: string | null
+  preConversionBalanceObservedAt?: Date | string | null
+  providerFeeRate?: string | null
+  providerFeeUsd?: string | null
+  estimatedNetworkFeeUsd?: string | null
+  feeEvidenceGasMode?: string | null
+  feeEvidenceObservedAt?: Date | string | null
   state: string
   providerOrderId?: string | null
   responseFingerprint?: string | null
@@ -704,6 +974,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedCreateWithou
   freshMinimumUsdt: string
   freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
+  preConversionWalletAddress?: string | null
+  preConversionBalanceBlockNumber?: string | null
+  preConversionBnbBalance?: string | null
+  preConversionUsdtBalance?: string | null
+  preConversionBalanceObservedAt?: Date | string | null
+  providerFeeRate?: string | null
+  providerFeeUsd?: string | null
+  estimatedNetworkFeeUsd?: string | null
+  feeEvidenceGasMode?: string | null
+  feeEvidenceObservedAt?: Date | string | null
   state: string
   providerOrderId?: string | null
   responseFingerprint?: string | null
@@ -737,6 +1017,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUpdateWithoutStatusOb
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  preConversionWalletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceBlockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBnbBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionUsdtBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerFeeRate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estimatedNetworkFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceGasMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -756,6 +1046,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedUpdateWithou
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  preConversionWalletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceBlockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBnbBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionUsdtBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerFeeRate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estimatedNetworkFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceGasMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -773,6 +1073,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptCreateWithoutFinancia
   freshMinimumUsdt: string
   freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
+  preConversionWalletAddress?: string | null
+  preConversionBalanceBlockNumber?: string | null
+  preConversionBnbBalance?: string | null
+  preConversionUsdtBalance?: string | null
+  preConversionBalanceObservedAt?: Date | string | null
+  providerFeeRate?: string | null
+  providerFeeUsd?: string | null
+  estimatedNetworkFeeUsd?: string | null
+  feeEvidenceGasMode?: string | null
+  feeEvidenceObservedAt?: Date | string | null
   state: string
   providerOrderId?: string | null
   responseFingerprint?: string | null
@@ -792,6 +1102,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedCreateWithou
   freshMinimumUsdt: string
   freshMaximumSlippagePercent: string
   freshRemainingQuantityBnb: string
+  preConversionWalletAddress?: string | null
+  preConversionBalanceBlockNumber?: string | null
+  preConversionBnbBalance?: string | null
+  preConversionUsdtBalance?: string | null
+  preConversionBalanceObservedAt?: Date | string | null
+  providerFeeRate?: string | null
+  providerFeeUsd?: string | null
+  estimatedNetworkFeeUsd?: string | null
+  feeEvidenceGasMode?: string | null
+  feeEvidenceObservedAt?: Date | string | null
   state: string
   providerOrderId?: string | null
   responseFingerprint?: string | null
@@ -825,6 +1145,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUpdateWithoutFinancia
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  preConversionWalletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceBlockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBnbBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionUsdtBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerFeeRate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estimatedNetworkFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceGasMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -844,6 +1174,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptUncheckedUpdateWithou
   freshMinimumUsdt?: Prisma.StringFieldUpdateOperationsInput | string
   freshMaximumSlippagePercent?: Prisma.StringFieldUpdateOperationsInput | string
   freshRemainingQuantityBnb?: Prisma.StringFieldUpdateOperationsInput | string
+  preConversionWalletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceBlockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBnbBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionUsdtBalance?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preConversionBalanceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerFeeRate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  estimatedNetworkFeeUsd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceGasMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeEvidenceObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   state?: Prisma.StringFieldUpdateOperationsInput | string
   providerOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -893,6 +1233,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptSelect<ExtArgs extend
   freshMinimumUsdt?: boolean
   freshMaximumSlippagePercent?: boolean
   freshRemainingQuantityBnb?: boolean
+  preConversionWalletAddress?: boolean
+  preConversionBalanceBlockNumber?: boolean
+  preConversionBnbBalance?: boolean
+  preConversionUsdtBalance?: boolean
+  preConversionBalanceObservedAt?: boolean
+  providerFeeRate?: boolean
+  providerFeeUsd?: boolean
+  estimatedNetworkFeeUsd?: boolean
+  feeEvidenceGasMode?: boolean
+  feeEvidenceObservedAt?: boolean
   state?: boolean
   providerOrderId?: boolean
   responseFingerprint?: boolean
@@ -914,6 +1264,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptSelectCreateManyAndRe
   freshMinimumUsdt?: boolean
   freshMaximumSlippagePercent?: boolean
   freshRemainingQuantityBnb?: boolean
+  preConversionWalletAddress?: boolean
+  preConversionBalanceBlockNumber?: boolean
+  preConversionBnbBalance?: boolean
+  preConversionUsdtBalance?: boolean
+  preConversionBalanceObservedAt?: boolean
+  providerFeeRate?: boolean
+  providerFeeUsd?: boolean
+  estimatedNetworkFeeUsd?: boolean
+  feeEvidenceGasMode?: boolean
+  feeEvidenceObservedAt?: boolean
   state?: boolean
   providerOrderId?: boolean
   responseFingerprint?: boolean
@@ -932,6 +1292,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptSelectUpdateManyAndRe
   freshMinimumUsdt?: boolean
   freshMaximumSlippagePercent?: boolean
   freshRemainingQuantityBnb?: boolean
+  preConversionWalletAddress?: boolean
+  preConversionBalanceBlockNumber?: boolean
+  preConversionBnbBalance?: boolean
+  preConversionUsdtBalance?: boolean
+  preConversionBalanceObservedAt?: boolean
+  providerFeeRate?: boolean
+  providerFeeUsd?: boolean
+  estimatedNetworkFeeUsd?: boolean
+  feeEvidenceGasMode?: boolean
+  feeEvidenceObservedAt?: boolean
   state?: boolean
   providerOrderId?: boolean
   responseFingerprint?: boolean
@@ -950,6 +1320,16 @@ export type AgenticWalletFundingConversionSubmissionAttemptSelectScalar = {
   freshMinimumUsdt?: boolean
   freshMaximumSlippagePercent?: boolean
   freshRemainingQuantityBnb?: boolean
+  preConversionWalletAddress?: boolean
+  preConversionBalanceBlockNumber?: boolean
+  preConversionBnbBalance?: boolean
+  preConversionUsdtBalance?: boolean
+  preConversionBalanceObservedAt?: boolean
+  providerFeeRate?: boolean
+  providerFeeUsd?: boolean
+  estimatedNetworkFeeUsd?: boolean
+  feeEvidenceGasMode?: boolean
+  feeEvidenceObservedAt?: boolean
   state?: boolean
   providerOrderId?: boolean
   responseFingerprint?: boolean
@@ -958,7 +1338,7 @@ export type AgenticWalletFundingConversionSubmissionAttemptSelectScalar = {
   completedAt?: boolean
 }
 
-export type AgenticWalletFundingConversionSubmissionAttemptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planId" | "requestFingerprint" | "freshSourceQuantityBnb" | "freshExpectedUsdt" | "freshMinimumUsdt" | "freshMaximumSlippagePercent" | "freshRemainingQuantityBnb" | "state" | "providerOrderId" | "responseFingerprint" | "automaticRetryAllowed" | "startedAt" | "completedAt", ExtArgs["result"]["agenticWalletFundingConversionSubmissionAttempt"]>
+export type AgenticWalletFundingConversionSubmissionAttemptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planId" | "requestFingerprint" | "freshSourceQuantityBnb" | "freshExpectedUsdt" | "freshMinimumUsdt" | "freshMaximumSlippagePercent" | "freshRemainingQuantityBnb" | "preConversionWalletAddress" | "preConversionBalanceBlockNumber" | "preConversionBnbBalance" | "preConversionUsdtBalance" | "preConversionBalanceObservedAt" | "providerFeeRate" | "providerFeeUsd" | "estimatedNetworkFeeUsd" | "feeEvidenceGasMode" | "feeEvidenceObservedAt" | "state" | "providerOrderId" | "responseFingerprint" | "automaticRetryAllowed" | "startedAt" | "completedAt", ExtArgs["result"]["agenticWalletFundingConversionSubmissionAttempt"]>
 export type AgenticWalletFundingConversionSubmissionAttemptInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   plan?: boolean | Prisma.AgenticWalletFundingConversionPlanDefaultArgs<ExtArgs>
   statusObservations?: boolean | Prisma.AgenticWalletFundingConversionSubmissionAttempt$statusObservationsArgs<ExtArgs>
@@ -988,6 +1368,16 @@ export type $AgenticWalletFundingConversionSubmissionAttemptPayload<ExtArgs exte
     freshMinimumUsdt: string
     freshMaximumSlippagePercent: string
     freshRemainingQuantityBnb: string
+    preConversionWalletAddress: string | null
+    preConversionBalanceBlockNumber: string | null
+    preConversionBnbBalance: string | null
+    preConversionUsdtBalance: string | null
+    preConversionBalanceObservedAt: Date | null
+    providerFeeRate: string | null
+    providerFeeUsd: string | null
+    estimatedNetworkFeeUsd: string | null
+    feeEvidenceGasMode: string | null
+    feeEvidenceObservedAt: Date | null
     state: string
     providerOrderId: string | null
     responseFingerprint: string | null
@@ -1428,6 +1818,16 @@ export interface AgenticWalletFundingConversionSubmissionAttemptFieldRefs {
   readonly freshMinimumUsdt: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
   readonly freshMaximumSlippagePercent: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
   readonly freshRemainingQuantityBnb: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
+  readonly preConversionWalletAddress: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
+  readonly preConversionBalanceBlockNumber: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
+  readonly preConversionBnbBalance: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
+  readonly preConversionUsdtBalance: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
+  readonly preConversionBalanceObservedAt: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'DateTime'>
+  readonly providerFeeRate: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
+  readonly providerFeeUsd: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
+  readonly estimatedNetworkFeeUsd: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
+  readonly feeEvidenceGasMode: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
+  readonly feeEvidenceObservedAt: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'DateTime'>
   readonly state: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
   readonly providerOrderId: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>
   readonly responseFingerprint: Prisma.FieldRef<"AgenticWalletFundingConversionSubmissionAttempt", 'String'>

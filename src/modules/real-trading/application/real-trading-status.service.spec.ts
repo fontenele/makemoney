@@ -206,6 +206,7 @@ describe('RealTradingStatusService', () => {
       status: 'funds_observed',
       blockers: [],
       observedAt: new Date('2026-10-01T12:00:00.000Z'),
+      walletAddress: '0x1234567890abcdef1234567890abcdef12345678',
       assets: [
         {
           symbol: 'BNB',

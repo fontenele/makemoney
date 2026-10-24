@@ -118,6 +118,7 @@ export interface AgenticWalletFundingVerification {
   readonly status: 'funds_observed' | 'blocked';
   readonly blockers: readonly AgenticWalletFundingVerificationBlocker[];
   readonly observedAt: Date;
+  readonly walletAddress: string | null;
   readonly assets: readonly {
     readonly symbol: 'BNB' | 'USDT' | 'BTCB';
     readonly role:
@@ -397,6 +398,12 @@ export class RealTradingStatusService {
       status: blockers.length === 0 ? 'funds_observed' : 'blocked',
       blockers,
       observedAt,
+      walletAddress:
+        observation.addresses.filter((address) => address.chainId === '56')
+          .length === 1
+          ? observation.addresses.find((address) => address.chainId === '56')!
+              .address
+          : null,
       assets,
       unsupportedAssetCount,
       strategyQuoteAssetReported,

@@ -26,6 +26,7 @@ export interface AgenticWalletFundingConversionQuoteResult {
   readonly status: 'quote_available' | 'blocked';
   readonly blockers: readonly AgenticWalletFundingConversionQuoteBlocker[];
   readonly balanceObservedAt: Date;
+  readonly walletAddress: string | null;
   readonly walletBalanceBnb: string | null;
   readonly requestedQuantityBnb: string;
   readonly remainingQuantityBnb: string | null;
@@ -80,6 +81,7 @@ export class AgenticWalletFundingConversionQuoteService {
         status: 'blocked',
         blockers,
         balanceObservedAt: verification.observedAt,
+        walletAddress: verification.walletAddress,
         walletBalanceBnb,
         requestedQuantityBnb,
         remainingQuantityBnb,
@@ -107,6 +109,7 @@ export class AgenticWalletFundingConversionQuoteService {
       status: 'quote_available',
       blockers: [],
       balanceObservedAt: verification.observedAt,
+      walletAddress: verification.walletAddress,
       walletBalanceBnb,
       requestedQuantityBnb,
       remainingQuantityBnb,

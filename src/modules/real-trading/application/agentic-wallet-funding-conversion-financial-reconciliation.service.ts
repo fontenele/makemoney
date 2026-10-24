@@ -62,9 +62,17 @@ export class AgenticWalletFundingConversionFinancialReconciliationService {
       if (signal?.aborted)
         throw new FundingConversionFinancialReconciliationServiceCanceledError();
 
-      const evidence = await this.evidenceReader.load(attemptId, signal);
-      if (evidence === null)
-        return result('evidence_unavailable', [], null, false, true, true);
+      const read = await this.evidenceReader.load(attemptId, signal);
+      if (read.status === 'evidence_unavailable')
+        return result(
+          'evidence_unavailable',
+          [...read.blockers],
+          null,
+          false,
+          true,
+          true,
+        );
+      const evidence = read.evidence;
       if (!isValidFundingConversionFinancialReconciliationEvidence(evidence))
         return result(
           'evidence_invalid',

@@ -165,6 +165,47 @@ describe('Application (e2e)', () => {
     return request(server).get('/health').expect(200);
   });
 
+  it('/real-trading/funding-conversion-submission (POST) fails closed without operator authentication', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set('RISK_CONTROL_TOKEN_SHA256', '');
+    try {
+      await request(server)
+        .post('/real-trading/funding-conversion-submission')
+        .send(fundingConversionSubmissionRequest())
+        .expect(503);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/funding-conversion-submission (POST) blocks before provider access while runtime execution is disabled', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const token = 'e2e-funding-conversion-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/funding-conversion-submission')
+        .set('Authorization', `Bearer ${token}`)
+        .send(fundingConversionSubmissionRequest())
+        .expect(409)
+        .expect({
+          message:
+            'Funding conversion submission blocked: runtime_configuration_not_ready',
+          error: 'Conflict',
+          statusCode: 409,
+        });
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
   it('/new-listings/summary (GET) exposes aggregate detection coverage', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     await request(server)
@@ -1575,6 +1616,15 @@ function serializeSignal(signal: {
     ...signal,
     latestCandleCloseTime: signal.latestCandleCloseTime.toISOString(),
     evaluatedAt: signal.evaluatedAt.toISOString(),
+  };
+}
+
+function fundingConversionSubmissionRequest() {
+  return {
+    planId: '019a0db1-bfea-7000-8000-000000000001',
+    planFingerprint: 'a'.repeat(64),
+    confirmationPhrase: 'CONFIRM_BNB_TO_USDT test',
+    sourceQuantityBnb: '0.008',
   };
 }
 

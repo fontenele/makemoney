@@ -38,6 +38,16 @@ describe('AgenticWalletFundingConversionSubmissionService', () => {
       freshMinimumUsdt: '5.92025',
       freshMaximumSlippagePercent: '0.5',
       freshRemainingQuantityBnb: '0.00175323',
+      preConversionWalletAddress: '0x1234567890abcdef1234567890abcdef12345678',
+      preConversionBalanceBlockNumber: '0x123',
+      preConversionBnbBalance: '0.00975323',
+      preConversionUsdtBalance: '0',
+      preConversionBalanceObservedAt: new Date('2026-10-22T12:00:29.500Z'),
+      providerFeeRate: '0',
+      providerFeeUsd: '0',
+      estimatedNetworkFeeUsd: '0.003',
+      feeEvidenceGasMode: 'fast',
+      feeEvidenceObservedAt: new Date('2026-10-22T12:00:29.750Z'),
       startedAt: STARTED_AT,
     });
     expect(dependencies.run).toHaveBeenCalledTimes(1);
@@ -127,6 +137,57 @@ describe('AgenticWalletFundingConversionSubmissionService', () => {
     expect(dependencies.run).not.toHaveBeenCalled();
   });
 
+  it('blocks when the fixed-block BNB balance diverges from the fresh quote', async () => {
+    const dependencies = createDependencies();
+    dependencies.preBalance.mockResolvedValueOnce({
+      scope: 'agentic_wallet_funding_conversion_pre_balance_snapshot',
+      chainId: '56',
+      walletAddress: '0x1234567890abcdef1234567890abcdef12345678',
+      blockNumber: '0x123',
+      bnbBalance: '0.00975322',
+      usdtBalance: '0',
+      observedAt: new Date('2026-10-22T12:00:29.500Z'),
+    });
+    const service = createService(dependencies);
+
+    await expect(service.submit(request())).rejects.toMatchObject({
+      blocker: 'pre_conversion_balance_diverged_from_fresh_quote',
+    });
+    expect(dependencies.claim).not.toHaveBeenCalled();
+    expect(dependencies.run).not.toHaveBeenCalled();
+  });
+
+  it('blocks an unapproved nonzero live provider fee before claim', async () => {
+    const dependencies = createDependencies();
+    dependencies.feeEvidence.mockResolvedValueOnce({
+      ...(await dependencies.feeEvidence()),
+      providerFeeRate: '0.005',
+      providerFeeUsd: '0.03',
+    });
+    const service = createService(dependencies);
+
+    await expect(service.submit(request())).rejects.toMatchObject({
+      blocker: 'provider_fee_classification_not_approved',
+    });
+    expect(dependencies.claim).not.toHaveBeenCalled();
+    expect(dependencies.run).not.toHaveBeenCalled();
+  });
+
+  it('blocks fee evidence whose later quote falls below the fresh minimum', async () => {
+    const dependencies = createDependencies();
+    dependencies.feeEvidence.mockResolvedValueOnce({
+      ...(await dependencies.feeEvidence()),
+      expectedUsdt: '5.920249999999999999',
+    });
+    const service = createService(dependencies);
+
+    await expect(service.submit(request())).rejects.toMatchObject({
+      blocker: 'provider_fee_classification_not_approved',
+    });
+    expect(dependencies.claim).not.toHaveBeenCalled();
+    expect(dependencies.run).not.toHaveBeenCalled();
+  });
+
   it('rejects extra request fields before any dependency access', async () => {
     const dependencies = createDependencies();
     const service = createService(dependencies);
@@ -145,6 +206,33 @@ function createDependencies() {
       void request;
       return Promise.resolve(availableQuote());
     }),
+    preBalance: jest.fn(() =>
+      Promise.resolve({
+        scope:
+          'agentic_wallet_funding_conversion_pre_balance_snapshot' as const,
+        chainId: '56' as const,
+        walletAddress: '0x1234567890abcdef1234567890abcdef12345678',
+        blockNumber: '0x123',
+        bnbBalance: '0.00975323',
+        usdtBalance: '0',
+        observedAt: new Date('2026-10-22T12:00:29.500Z'),
+      }),
+    ),
+    feeEvidence: jest.fn(() =>
+      Promise.resolve({
+        scope: 'agentic_wallet_funding_conversion_fee_evidence' as const,
+        provider: 'agentic_wallet' as const,
+        chainId: '56' as const,
+        sourceQuantityBnb: '0.008',
+        expectedUsdt: '5.94',
+        maximumSlippagePercent: '0.5',
+        providerFeeRate: '0',
+        providerFeeUsd: '0',
+        estimatedNetworkFeeUsd: '0.003',
+        gasMode: 'fast',
+        observedAt: new Date('2026-10-22T12:00:29.750Z'),
+      }),
+    ),
     claim: jest.fn((claim: AgenticWalletFundingConversionSubmissionClaim) => {
       void claim;
       return Promise.resolve(claimedAttempt());
@@ -184,6 +272,8 @@ function createService(
       get: jest.fn((key: keyof typeof environment) => environment[key]),
     } as unknown as ConfigService,
     { isActive: () => emergencyActive },
+    { load: dependencies.preBalance },
+    { load: dependencies.feeEvidence },
     {
       claim: dependencies.claim,
     },
@@ -218,6 +308,16 @@ function claimedAttempt() {
       freshMinimumUsdt: '5.92025',
       freshMaximumSlippagePercent: '0.5',
       freshRemainingQuantityBnb: '0.00175323',
+      preConversionWalletAddress: '0x1234567890abcdef1234567890abcdef12345678',
+      preConversionBalanceBlockNumber: '0x123',
+      preConversionBnbBalance: '0.00975323',
+      preConversionUsdtBalance: '0',
+      preConversionBalanceObservedAt: new Date('2026-10-22T12:00:29.500Z'),
+      providerFeeRate: '0',
+      providerFeeUsd: '0',
+      estimatedNetworkFeeUsd: '0.003',
+      feeEvidenceGasMode: 'fast',
+      feeEvidenceObservedAt: new Date('2026-10-22T12:00:29.750Z'),
       state: 'submission_claimed' as const,
       automaticRetryAllowed: false as const,
       startedAt: STARTED_AT,
@@ -232,6 +332,7 @@ function availableQuote() {
     status: 'quote_available' as const,
     blockers: [],
     balanceObservedAt: new Date('2026-10-22T12:00:29.000Z'),
+    walletAddress: '0x1234567890abcdef1234567890abcdef12345678',
     walletBalanceBnb: '0.00975323',
     requestedQuantityBnb: '0.008',
     remainingQuantityBnb: '0.00175323',

@@ -26,6 +26,11 @@ import { RedisExecutionRateLimiterService } from './application/redis-execution-
       useExisting: RedisExecutionRateLimiterService,
     },
   ],
-  exports: [RISK_ENGINE, EXECUTION_RATE_LIMITER, EmergencyStopService],
+  exports: [
+    RISK_ENGINE,
+    EXECUTION_RATE_LIMITER,
+    EmergencyStopService,
+    RiskControlAuthGuard,
+  ],
 })
 export class RiskEngineModule {}
