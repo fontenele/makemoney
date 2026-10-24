@@ -30,6 +30,22 @@ import {
   FundingConversionSubmissionOutcomeConflictError,
 } from '../application/agentic-wallet-funding-conversion-submission-outcome.store';
 import { RiskControlAuthGuard } from '../../risk-engine/presentation/risk-control-auth.guard';
+import { AgenticWalletFundingConversionStatusService } from '../application/agentic-wallet-funding-conversion-status.service';
+import { FundingConversionStatusContextIdentityError } from '../application/agentic-wallet-funding-conversion-status-context.store';
+import {
+  FundingConversionStatusAttemptNotFoundError,
+  FundingConversionStatusObservationBlockedError,
+  FundingConversionStatusObservationConflictError,
+} from '../application/agentic-wallet-funding-conversion-status-observation.store';
+import {
+  AgenticWalletFundingConversionFinancialReconciliationService,
+  FundingConversionFinancialReconciliationServiceIdentityError,
+} from '../application/agentic-wallet-funding-conversion-financial-reconciliation.service';
+import {
+  FundingConversionFinancialReconciliationBlockedError,
+  FundingConversionFinancialReconciliationConflictError,
+  FundingConversionFinancialReconciliationContextNotFoundError,
+} from '../application/agentic-wallet-funding-conversion-financial-reconciliation.store';
 
 @Controller('real-trading')
 export class RealTradingController {
@@ -39,6 +55,8 @@ export class RealTradingController {
     private readonly fundingConversionQuote: AgenticWalletFundingConversionQuoteService,
     private readonly fundingConversionPlan: AgenticWalletFundingConversionPlanService,
     private readonly fundingConversionSubmission: AgenticWalletFundingConversionSubmissionService,
+    private readonly fundingConversionStatus: AgenticWalletFundingConversionStatusService,
+    private readonly fundingConversionReconciliation: AgenticWalletFundingConversionFinancialReconciliationService,
   ) {}
 
   @Get('status')
@@ -150,6 +168,65 @@ export class RealTradingController {
     }
   }
 
+  @Post('funding-conversion-status')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async reconcileFundingConversionStatus(@Body() body: unknown) {
+    try {
+      return await this.fundingConversionStatus.reconcileOnce(
+        fundingConversionAttemptId(body),
+      );
+    } catch (error) {
+      if (error instanceof FundingConversionStatusContextIdentityError) {
+        throw new BadRequestException(
+          'Invalid funding conversion status request',
+        );
+      }
+      if (
+        error instanceof FundingConversionStatusAttemptNotFoundError ||
+        error instanceof FundingConversionStatusObservationBlockedError ||
+        error instanceof FundingConversionStatusObservationConflictError
+      ) {
+        throw new ConflictException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet funding conversion status is unavailable',
+      );
+    }
+  }
+
+  @Post('funding-conversion-reconciliation')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async reconcileFundingConversionFinancials(@Body() body: unknown) {
+    try {
+      return await this.fundingConversionReconciliation.reconcileOnce(
+        fundingConversionAttemptId(body),
+      );
+    } catch (error) {
+      if (
+        error instanceof
+        FundingConversionFinancialReconciliationServiceIdentityError
+      ) {
+        throw new BadRequestException(
+          'Invalid funding conversion reconciliation request',
+        );
+      }
+      if (
+        error instanceof FundingConversionFinancialReconciliationBlockedError ||
+        error instanceof
+          FundingConversionFinancialReconciliationConflictError ||
+        error instanceof
+          FundingConversionFinancialReconciliationContextNotFoundError
+      ) {
+        throw new ConflictException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet funding conversion reconciliation is unavailable',
+      );
+    }
+  }
+
   @Get('wallet-authentication')
   getWalletAuthentication() {
     return this.authentication.getState();
@@ -166,4 +243,16 @@ export class RealTradingController {
       );
     }
   }
+}
+
+function fundingConversionAttemptId(body: unknown): string {
+  if (
+    typeof body !== 'object' ||
+    body === null ||
+    Array.isArray(body) ||
+    Object.keys(body).length !== 1 ||
+    typeof (body as Record<string, unknown>).attemptId !== 'string'
+  )
+    return '';
+  return (body as { attemptId: string }).attemptId;
 }

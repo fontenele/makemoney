@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-24 — Register guarded funding-conversion reconciliation actions
+
+- Added separate loopback-only Bearer-protected manual routes for one-shot funding-conversion status lookup and complete financial reconciliation by canonical submission-attempt UUID.
+- Registered the existing pinned status runner, monotonic status store, terminal evidence context, confirmed-receipt reader, later finalized-block balance reader, and immutable reconciliation store without adding polling or automatic retry.
+- Kept status lookup and receipt/balance reconciliation as distinct operator actions so one provider read cannot silently trigger the other.
+- Added strict single-field request parsing and sanitized 400/409/503 failure mapping; authentication and malformed-input E2E cases stop before provider access.
+- No accounting-ledger mutation, strategy authority, provider/RPC call during verification, conversion, or real order was added. Exact ledger synchronization remains next.
+- All 2,794 backend tests across 245 suites, 103 serial E2E tests across 9 suites, and 115 dashboard tests across 20 files pass with formatting, lint, backend/dashboard builds, Prisma validation/migration status, Compose validation, and whitespace checks.
+
 ## 2026-10-24 — Register guarded funding-conversion operator submission
 
 - Added loopback-only `POST /real-trading/funding-conversion-submission` after explicit user authorization to make this narrowly bounded financial path reachable.

@@ -1,5 +1,24 @@
 # Real Trading
 
+## M10.148 — Guarded funding-conversion reconciliation actions
+
+M10.148 registers two previously closed one-shot reconciliation boundaries as explicit operator actions. `POST /real-trading/funding-conversion-status` accepts only one canonical submission-attempt UUID, reloads its durable pending context, and performs at most one pinned read-only `market-order list` lookup. Only exactly correlated, chronologically valid `PENDING`, `FAILED`, or `FINISHED` evidence reaches the existing serializable monotonic store. Terminal evidence stops later status access, and no outcome permits automatic retry.
+
+`POST /real-trading/funding-conversion-reconciliation` independently accepts the same strict identity. It returns an existing immutable reconciliation before external access; otherwise it proceeds only from exact terminal `FINISHED` context. The registered evidence reader combines the pinned confirmed transaction receipt with a strictly later finalized-block BSC balance snapshot and requires exact BNB and USDT delta equations plus the durable zero provider fee before the existing authoritative store records completion.
+
+Both routes are loopback-only and reuse the timing-safe SHA-256 Bearer guard. Authentication failure and malformed bodies stop before provider or persistence-dependent evidence access. Calls are manual and one-shot: there is no poller, timer, scheduler, automatic retry, conversion submission, accounting-ledger mutation, or strategy authority. The current paper/disabled environment has no configured Bearer digest, and verification used only blocked/malformed HTTP requests and existing doubles; no live provider/RPC call or financial transaction occurred.
+
+### M10.148 acceptance criteria
+
+- Both routes require the configured risk-control Bearer token and a strict body containing only canonical `attemptId`.
+- One status request performs at most one pinned read-only provider lookup and persists only valid correlated monotonic evidence.
+- Failed and finished provider states are terminal and permanently non-retryable; finished remains pending financial reconciliation.
+- One financial-reconciliation request short-circuits an existing immutable record before evidence acquisition.
+- New completion requires exact terminal context, confirmed transaction receipt, later fixed-block balances, complete fee evidence, and both exact balance equations.
+- Malformed input returns 400, durable safety conflicts return 409, and unexpected dependency failures return sanitized 503 responses.
+- Focused service/evidence tests, route-level fail-closed E2E tests, lint, formatting, and builds pass.
+- No polling, automatic retry, resubmission, accounting-ledger mutation, strategy execution, or live transaction is added.
+
 ## M10.147 — Guarded funding-conversion operator submission
 
 M10.147 registers the previously unregistered one-shot BNB-to-USDT submission service after the user explicitly authorized crossing the documented reachability boundary. The new `POST /real-trading/funding-conversion-submission` route is available only on the loopback-bound API and uses the existing timing-safe SHA-256 Bearer guard. With no configured digest it fails with 503; invalid credentials fail with 401 before the request reaches the conversion service.

@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-24 - Keep conversion status and financial completion as separate manual actions
+
+M10.148 exposes the already validated status and financial-reconciliation services without combining them into a poller or a single implicit workflow. Status evidence and financial evidence have different provider boundaries, terminal conditions, and persistence authorities; separate explicit Bearer-protected calls keep each external read observable and prevent a status check from silently starting RPC balance reconciliation.
+
+Both actions key exclusively on the durable submission-attempt UUID. A status call can make at most one pinned read-only order lookup, and a financial call first short-circuits an existing reconciliation. New financial completion remains impossible until durable `FINISHED` evidence, a confirmed receipt, a later finalized block, zero provider fee, and both exact balance equations agree. Neither route retries automatically or mutates accounting. Exact ledger synchronization is therefore still a distinct next authority boundary.
+
 ## 2026-10-24 - Expose funding conversion only as an authenticated one-shot operator action
 
 M10.147 uses the user's `continue` after the documented authorization boundary solely to register the already bounded funding-conversion submission path. It does not authorize or perform a transaction in this development session. A first actual conversion still requires the operator to deliberately configure every independent runtime safeguard, prepare a fresh durable plan, and send the exact returned confirmation phrase within sixty seconds through the protected loopback route.

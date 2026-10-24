@@ -206,6 +206,53 @@ describe('Application (e2e)', () => {
     }
   });
 
+  it.each([
+    '/real-trading/funding-conversion-status',
+    '/real-trading/funding-conversion-reconciliation',
+  ])(
+    '%s (POST) fails closed without operator authentication',
+    async (route) => {
+      const server = app.getHttpServer() as Parameters<typeof request>[0];
+      const config = app.get(ConfigService);
+      const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+      config.set('RISK_CONTROL_TOKEN_SHA256', '');
+      try {
+        await request(server)
+          .post(route)
+          .send({ attemptId: '00000000-0000-4000-8000-000000000001' })
+          .expect(503);
+      } finally {
+        config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+      }
+    },
+  );
+
+  it.each([
+    '/real-trading/funding-conversion-status',
+    '/real-trading/funding-conversion-reconciliation',
+  ])(
+    '%s (POST) rejects malformed input before provider access',
+    async (route) => {
+      const server = app.getHttpServer() as Parameters<typeof request>[0];
+      const config = app.get(ConfigService);
+      const token = 'e2e-funding-conversion-control-token';
+      const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+      config.set(
+        'RISK_CONTROL_TOKEN_SHA256',
+        createHash('sha256').update(token).digest('hex'),
+      );
+      try {
+        await request(server)
+          .post(route)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ attemptId: 'not-a-canonical-uuid', extra: true })
+          .expect(400);
+      } finally {
+        config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+      }
+    },
+  );
+
   it('/new-listings/summary (GET) exposes aggregate detection coverage', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     await request(server)
