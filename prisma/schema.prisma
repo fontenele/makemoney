@@ -202,6 +202,7 @@ model AgenticWalletFundingConversionFinancialReconciliation {
   attempt                    AgenticWalletFundingConversionSubmissionAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict, map: "funding_conversion_financial_attempt_fkey")
   plan                       AgenticWalletFundingConversionPlan              @relation(fields: [planId], references: [id], onDelete: Restrict, map: "funding_conversion_financial_plan_fkey")
   statusObservation          AgenticWalletFundingConversionStatusObservation @relation(fields: [statusObservationId], references: [id], onDelete: Restrict, map: "funding_conversion_financial_status_fkey")
+  accountingSynchronization  AgenticWalletFundingConversionAccountingSync?
 
   @@index([recordedAt], map: "funding_conversion_financial_recorded_idx")
   @@map("agentic_wallet_funding_conversion_financial_reconciliations")
@@ -469,21 +470,43 @@ model RealExecutionAccountingBalance {
 }
 
 model RealExecutionAccountingBalanceInitialization {
-  id                      String                                        @id @db.Uuid
-  providerId              String                                        @map("provider_id") @db.VarChar(32)
-  chainId                 String                                        @map("chain_id") @db.VarChar(32)
-  acknowledgment          String                                        @db.VarChar(96)
-  balances                Json
-  walletObservedAt        DateTime                                      @map("wallet_observed_at")
-  maximumObservationAgeMs Int                                           @map("maximum_observation_age_ms")
-  preparedAt              DateTime                                      @map("prepared_at")
-  requestFingerprint      String                                        @map("request_fingerprint") @db.Char(64)
-  initializedAt           DateTime                                      @map("initialized_at")
-  ledgerReconciliations   RealExecutionAccountingLedgerReconciliation[]
+  id                                          String                                         @id @db.Uuid
+  providerId                                  String                                         @map("provider_id") @db.VarChar(32)
+  chainId                                     String                                         @map("chain_id") @db.VarChar(32)
+  acknowledgment                              String                                         @db.VarChar(96)
+  balances                                    Json
+  walletObservedAt                            DateTime                                       @map("wallet_observed_at")
+  maximumObservationAgeMs                     Int                                            @map("maximum_observation_age_ms")
+  preparedAt                                  DateTime                                       @map("prepared_at")
+  requestFingerprint                          String                                         @map("request_fingerprint") @db.Char(64)
+  initializedAt                               DateTime                                       @map("initialized_at")
+  ledgerReconciliations                       RealExecutionAccountingLedgerReconciliation[]
+  fundingConversionAccountingSynchronizations AgenticWalletFundingConversionAccountingSync[]
 
   @@unique([providerId, chainId], map: "real_exec_acct_init_provider_chain_key")
   @@index([initializedAt], map: "real_exec_acct_init_initialized_at_idx")
   @@map("real_execution_accounting_balance_initializations")
+}
+
+model AgenticWalletFundingConversionAccountingSync {
+  id                 String                                                @id @db.Uuid
+  initializationId   String                                                @map("initialization_id") @db.Uuid
+  reconciliationId   String                                                @unique(map: "funding_conversion_acct_sync_recon_key") @map("reconciliation_id") @db.Uuid
+  attemptId          String                                                @unique(map: "funding_conversion_acct_sync_attempt_key") @map("attempt_id") @db.Uuid
+  transactionHash    String                                                @unique(map: "funding_conversion_acct_sync_tx_key") @map("transaction_hash") @db.VarChar(66)
+  walletAddress      String                                                @map("wallet_address") @db.VarChar(42)
+  blockNumber        String                                                @map("block_number") @db.VarChar(66)
+  acknowledgment     String                                                @db.VarChar(112)
+  balances           Json
+  observedAt         DateTime                                              @map("observed_at")
+  preparedAt         DateTime                                              @map("prepared_at")
+  requestFingerprint String                                                @map("request_fingerprint") @db.Char(64)
+  appliedAt          DateTime                                              @map("applied_at")
+  initialization     RealExecutionAccountingBalanceInitialization          @relation(fields: [initializationId], references: [id], onDelete: Restrict, map: "funding_conversion_acct_sync_init_fkey")
+  reconciliation     AgenticWalletFundingConversionFinancialReconciliation @relation(fields: [reconciliationId], references: [id], onDelete: Restrict, map: "funding_conversion_acct_sync_recon_fkey")
+
+  @@index([initializationId, appliedAt], map: "funding_conversion_acct_sync_init_idx")
+  @@map("agentic_wallet_funding_conversion_accounting_syncs")
 }
 
 model RealExecutionAccountingLedgerReconciliation {

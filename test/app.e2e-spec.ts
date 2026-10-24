@@ -209,6 +209,7 @@ describe('Application (e2e)', () => {
   it.each([
     '/real-trading/funding-conversion-status',
     '/real-trading/funding-conversion-reconciliation',
+    '/real-trading/funding-conversion-accounting-sync',
   ])(
     '%s (POST) fails closed without operator authentication',
     async (route) => {
@@ -230,6 +231,7 @@ describe('Application (e2e)', () => {
   it.each([
     '/real-trading/funding-conversion-status',
     '/real-trading/funding-conversion-reconciliation',
+    '/real-trading/funding-conversion-accounting-sync',
   ])(
     '%s (POST) rejects malformed input before provider access',
     async (route) => {

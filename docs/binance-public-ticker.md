@@ -18,6 +18,8 @@ The ticker client has an independent connection and follows the NestJS module li
 
 Before application startup completes, the lifecycle also requests one credential-free `GET /api/v3/ticker/price?symbol=BTCUSDT` snapshot from `BINANCE_REST_BASE_URL`. This bounds the period before paper-wallet valuation has an initial price. The WebSocket starts first and remains the live source; if it publishes while the REST request is in flight, the snapshot does not replace that streaming value. A failed or invalid snapshot is logged and never fabricated.
 
+For automated local startup, the NestJS process must be launched on the Windows host with ordinary outbound network access. A process started inside a restricted command sandbox can still bind port 3000 and pass `/health` while both Binance sources remain unreachable. Runtime readiness therefore requires HTTP 200 from the direct `/paper-wallet/valuation` route and the dashboard's `/api/paper-wallet/valuation` proxy before handoff; the `BTC/USDT market price is not available yet` 503 is treated as an invalid launch, not as a ready application.
+
 ## Provider payload
 
 The boundary accepts the documented mini ticker fields:

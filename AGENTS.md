@@ -50,6 +50,13 @@
 - Add audit trails, idempotency, rate limits, retries, WebSocket reconnection, circuit breakers, and an emergency stop incrementally when their milestones require them.
 - Paper simulations must eventually account for fees, spread, slippage, precision, minimum order constraints, liquidity, and applicable network costs.
 
+## Local runtime startup
+
+- When Codex or other automation starts the local API, launch it as a Windows-host process with normal outbound network access, not inside a restricted command sandbox. The public Binance REST warm-up and WebSocket streams must be reachable from the API process.
+- Start the dashboard only after the API is listening. Do not report the local runtime as ready based only on open ports or `GET /health`.
+- Before handing the running application back to the user, require HTTP 200 from `GET http://127.0.0.1:3000/paper-wallet/valuation` and from the Vite proxy path `GET http://127.0.0.1:5173/api/paper-wallet/valuation`. A `503` with `BTC/USDT market price is not available yet` means the API was not started correctly and must be restarted with outbound network access.
+- Avoid duplicate dev servers. Before restarting, identify the exact listeners on ports 3000 and 5173 and stop only those project-owned processes.
+
 ## Verification
 
 - Run relevant tests, linting, formatting checks, builds, and Compose validation after changes.

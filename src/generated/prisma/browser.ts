@@ -133,6 +133,11 @@ export type RealExecutionAccountingBalance = Prisma.RealExecutionAccountingBalan
  */
 export type RealExecutionAccountingBalanceInitialization = Prisma.RealExecutionAccountingBalanceInitializationModel
 /**
+ * Model AgenticWalletFundingConversionAccountingSync
+ * 
+ */
+export type AgenticWalletFundingConversionAccountingSync = Prisma.AgenticWalletFundingConversionAccountingSyncModel
+/**
  * Model RealExecutionAccountingLedgerReconciliation
  * 
  */

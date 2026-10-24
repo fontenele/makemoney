@@ -1,5 +1,24 @@
 # Real Trading
 
+## M10.149 — Exact funding-conversion accounting synchronization
+
+M10.149 adds one explicit operator action after completed M10.148 financial reconciliation. `POST /real-trading/funding-conversion-accounting-sync` requires the configured Bearer token and a strict body containing the canonical submission-attempt UUID, canonical trusted accounting-initialization UUID, and the literal acknowledgment `reconciled_conversion_and_exact_wallet_balances_reviewed_for_local_ledger_synchronization`.
+
+An already applied attempt returns its immutable receipt before provider access. Otherwise the service loads the exact financial reconciliation and durable terminal context, then reads native BNB plus the approved USDT and BTCB contracts at one finalized BSC block. The block must be later than the conversion's pre-balance block. BNB must equal pre-balance minus submitted quantity and actual network fee; USDT must equal pre-balance plus actual receipt; BTCB must equal its unchanged local quantity. The current ledger must still contain the exact pre-conversion BNB/USDT and must not contain a balance update after financial reconciliation.
+
+The store shares the accounting mutation advisory lock and revalidates the reconciliation, trusted initialization, provider snapshot, complete three-asset ledger, identities, quantities, and chronology in a serializable transaction. Each row is updated conditionally from its exact prior quantity; one failure rolls back every balance and the receipt. A unique attempt/reconciliation/transaction receipt makes exact replay idempotent and divergent reuse conflicting. Completion still reports `strategyExecutionAuthorized: false`.
+
+### M10.149 acceptance criteria
+
+- Authentication and the exact three-field request are validated before provider access.
+- Existing synchronization returns before another RPC read or ledger mutation.
+- One bounded finalized-block snapshot contains exactly native BNB, approved USDT, and approved BTCB.
+- Durable terminal reconciliation, wallet, transaction, initialization, asset identities, and chronology are revalidated atomically.
+- BNB and USDT match the exact reconciled conversion equations; BTCB and the local pre-conversion ledger show no unexplained drift.
+- Three conditional balance replacements and one immutable receipt succeed or roll back together under the shared serializable accounting lock.
+- Exact replay is idempotent; divergent identity, stale ledger, concurrent change, or malformed persistence fails closed.
+- The action does not poll, retry automatically, submit a transaction, calculate PnL, or authorize strategy execution.
+
 ## M10.148 — Guarded funding-conversion reconciliation actions
 
 M10.148 registers two previously closed one-shot reconciliation boundaries as explicit operator actions. `POST /real-trading/funding-conversion-status` accepts only one canonical submission-attempt UUID, reloads its durable pending context, and performs at most one pinned read-only `market-order list` lookup. Only exactly correlated, chronologically valid `PENDING`, `FAILED`, or `FINISHED` evidence reaches the existing serializable monotonic store. Terminal evidence stops later status access, and no outcome permits automatic retry.

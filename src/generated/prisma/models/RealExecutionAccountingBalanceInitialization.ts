@@ -253,6 +253,7 @@ export type RealExecutionAccountingBalanceInitializationWhereInput = {
   requestFingerprint?: Prisma.StringFilter<"RealExecutionAccountingBalanceInitialization"> | string
   initializedAt?: Prisma.DateTimeFilter<"RealExecutionAccountingBalanceInitialization"> | Date | string
   ledgerReconciliations?: Prisma.RealExecutionAccountingLedgerReconciliationListRelationFilter
+  fundingConversionAccountingSynchronizations?: Prisma.AgenticWalletFundingConversionAccountingSyncListRelationFilter
 }
 
 export type RealExecutionAccountingBalanceInitializationOrderByWithRelationInput = {
@@ -267,6 +268,7 @@ export type RealExecutionAccountingBalanceInitializationOrderByWithRelationInput
   requestFingerprint?: Prisma.SortOrder
   initializedAt?: Prisma.SortOrder
   ledgerReconciliations?: Prisma.RealExecutionAccountingLedgerReconciliationOrderByRelationAggregateInput
+  fundingConversionAccountingSynchronizations?: Prisma.AgenticWalletFundingConversionAccountingSyncOrderByRelationAggregateInput
 }
 
 export type RealExecutionAccountingBalanceInitializationWhereUniqueInput = Prisma.AtLeast<{
@@ -285,6 +287,7 @@ export type RealExecutionAccountingBalanceInitializationWhereUniqueInput = Prism
   requestFingerprint?: Prisma.StringFilter<"RealExecutionAccountingBalanceInitialization"> | string
   initializedAt?: Prisma.DateTimeFilter<"RealExecutionAccountingBalanceInitialization"> | Date | string
   ledgerReconciliations?: Prisma.RealExecutionAccountingLedgerReconciliationListRelationFilter
+  fundingConversionAccountingSynchronizations?: Prisma.AgenticWalletFundingConversionAccountingSyncListRelationFilter
 }, "id" | "providerId_chainId">
 
 export type RealExecutionAccountingBalanceInitializationOrderByWithAggregationInput = {
@@ -333,6 +336,7 @@ export type RealExecutionAccountingBalanceInitializationCreateInput = {
   requestFingerprint: string
   initializedAt: Date | string
   ledgerReconciliations?: Prisma.RealExecutionAccountingLedgerReconciliationCreateNestedManyWithoutInitializationInput
+  fundingConversionAccountingSynchronizations?: Prisma.AgenticWalletFundingConversionAccountingSyncCreateNestedManyWithoutInitializationInput
 }
 
 export type RealExecutionAccountingBalanceInitializationUncheckedCreateInput = {
@@ -347,6 +351,7 @@ export type RealExecutionAccountingBalanceInitializationUncheckedCreateInput = {
   requestFingerprint: string
   initializedAt: Date | string
   ledgerReconciliations?: Prisma.RealExecutionAccountingLedgerReconciliationUncheckedCreateNestedManyWithoutInitializationInput
+  fundingConversionAccountingSynchronizations?: Prisma.AgenticWalletFundingConversionAccountingSyncUncheckedCreateNestedManyWithoutInitializationInput
 }
 
 export type RealExecutionAccountingBalanceInitializationUpdateInput = {
@@ -361,6 +366,7 @@ export type RealExecutionAccountingBalanceInitializationUpdateInput = {
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   initializedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ledgerReconciliations?: Prisma.RealExecutionAccountingLedgerReconciliationUpdateManyWithoutInitializationNestedInput
+  fundingConversionAccountingSynchronizations?: Prisma.AgenticWalletFundingConversionAccountingSyncUpdateManyWithoutInitializationNestedInput
 }
 
 export type RealExecutionAccountingBalanceInitializationUncheckedUpdateInput = {
@@ -375,6 +381,7 @@ export type RealExecutionAccountingBalanceInitializationUncheckedUpdateInput = {
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   initializedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ledgerReconciliations?: Prisma.RealExecutionAccountingLedgerReconciliationUncheckedUpdateManyWithoutInitializationNestedInput
+  fundingConversionAccountingSynchronizations?: Prisma.AgenticWalletFundingConversionAccountingSyncUncheckedUpdateManyWithoutInitializationNestedInput
 }
 
 export type RealExecutionAccountingBalanceInitializationCreateManyInput = {
@@ -471,6 +478,20 @@ export type RealExecutionAccountingBalanceInitializationScalarRelationFilter = {
   isNot?: Prisma.RealExecutionAccountingBalanceInitializationWhereInput
 }
 
+export type RealExecutionAccountingBalanceInitializationCreateNestedOneWithoutFundingConversionAccountingSynchronizationsInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionAccountingBalanceInitializationCreateWithoutFundingConversionAccountingSynchronizationsInput, Prisma.RealExecutionAccountingBalanceInitializationUncheckedCreateWithoutFundingConversionAccountingSynchronizationsInput>
+  connectOrCreate?: Prisma.RealExecutionAccountingBalanceInitializationCreateOrConnectWithoutFundingConversionAccountingSynchronizationsInput
+  connect?: Prisma.RealExecutionAccountingBalanceInitializationWhereUniqueInput
+}
+
+export type RealExecutionAccountingBalanceInitializationUpdateOneRequiredWithoutFundingConversionAccountingSynchronizationsNestedInput = {
+  create?: Prisma.XOR<Prisma.RealExecutionAccountingBalanceInitializationCreateWithoutFundingConversionAccountingSynchronizationsInput, Prisma.RealExecutionAccountingBalanceInitializationUncheckedCreateWithoutFundingConversionAccountingSynchronizationsInput>
+  connectOrCreate?: Prisma.RealExecutionAccountingBalanceInitializationCreateOrConnectWithoutFundingConversionAccountingSynchronizationsInput
+  upsert?: Prisma.RealExecutionAccountingBalanceInitializationUpsertWithoutFundingConversionAccountingSynchronizationsInput
+  connect?: Prisma.RealExecutionAccountingBalanceInitializationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionAccountingBalanceInitializationUpdateToOneWithWhereWithoutFundingConversionAccountingSynchronizationsInput, Prisma.RealExecutionAccountingBalanceInitializationUpdateWithoutFundingConversionAccountingSynchronizationsInput>, Prisma.RealExecutionAccountingBalanceInitializationUncheckedUpdateWithoutFundingConversionAccountingSynchronizationsInput>
+}
+
 export type RealExecutionAccountingBalanceInitializationCreateNestedOneWithoutLedgerReconciliationsInput = {
   create?: Prisma.XOR<Prisma.RealExecutionAccountingBalanceInitializationCreateWithoutLedgerReconciliationsInput, Prisma.RealExecutionAccountingBalanceInitializationUncheckedCreateWithoutLedgerReconciliationsInput>
   connectOrCreate?: Prisma.RealExecutionAccountingBalanceInitializationCreateOrConnectWithoutLedgerReconciliationsInput
@@ -485,6 +506,78 @@ export type RealExecutionAccountingBalanceInitializationUpdateOneRequiredWithout
   update?: Prisma.XOR<Prisma.XOR<Prisma.RealExecutionAccountingBalanceInitializationUpdateToOneWithWhereWithoutLedgerReconciliationsInput, Prisma.RealExecutionAccountingBalanceInitializationUpdateWithoutLedgerReconciliationsInput>, Prisma.RealExecutionAccountingBalanceInitializationUncheckedUpdateWithoutLedgerReconciliationsInput>
 }
 
+export type RealExecutionAccountingBalanceInitializationCreateWithoutFundingConversionAccountingSynchronizationsInput = {
+  id: string
+  providerId: string
+  chainId: string
+  acknowledgment: string
+  balances: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletObservedAt: Date | string
+  maximumObservationAgeMs: number
+  preparedAt: Date | string
+  requestFingerprint: string
+  initializedAt: Date | string
+  ledgerReconciliations?: Prisma.RealExecutionAccountingLedgerReconciliationCreateNestedManyWithoutInitializationInput
+}
+
+export type RealExecutionAccountingBalanceInitializationUncheckedCreateWithoutFundingConversionAccountingSynchronizationsInput = {
+  id: string
+  providerId: string
+  chainId: string
+  acknowledgment: string
+  balances: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletObservedAt: Date | string
+  maximumObservationAgeMs: number
+  preparedAt: Date | string
+  requestFingerprint: string
+  initializedAt: Date | string
+  ledgerReconciliations?: Prisma.RealExecutionAccountingLedgerReconciliationUncheckedCreateNestedManyWithoutInitializationInput
+}
+
+export type RealExecutionAccountingBalanceInitializationCreateOrConnectWithoutFundingConversionAccountingSynchronizationsInput = {
+  where: Prisma.RealExecutionAccountingBalanceInitializationWhereUniqueInput
+  create: Prisma.XOR<Prisma.RealExecutionAccountingBalanceInitializationCreateWithoutFundingConversionAccountingSynchronizationsInput, Prisma.RealExecutionAccountingBalanceInitializationUncheckedCreateWithoutFundingConversionAccountingSynchronizationsInput>
+}
+
+export type RealExecutionAccountingBalanceInitializationUpsertWithoutFundingConversionAccountingSynchronizationsInput = {
+  update: Prisma.XOR<Prisma.RealExecutionAccountingBalanceInitializationUpdateWithoutFundingConversionAccountingSynchronizationsInput, Prisma.RealExecutionAccountingBalanceInitializationUncheckedUpdateWithoutFundingConversionAccountingSynchronizationsInput>
+  create: Prisma.XOR<Prisma.RealExecutionAccountingBalanceInitializationCreateWithoutFundingConversionAccountingSynchronizationsInput, Prisma.RealExecutionAccountingBalanceInitializationUncheckedCreateWithoutFundingConversionAccountingSynchronizationsInput>
+  where?: Prisma.RealExecutionAccountingBalanceInitializationWhereInput
+}
+
+export type RealExecutionAccountingBalanceInitializationUpdateToOneWithWhereWithoutFundingConversionAccountingSynchronizationsInput = {
+  where?: Prisma.RealExecutionAccountingBalanceInitializationWhereInput
+  data: Prisma.XOR<Prisma.RealExecutionAccountingBalanceInitializationUpdateWithoutFundingConversionAccountingSynchronizationsInput, Prisma.RealExecutionAccountingBalanceInitializationUncheckedUpdateWithoutFundingConversionAccountingSynchronizationsInput>
+}
+
+export type RealExecutionAccountingBalanceInitializationUpdateWithoutFundingConversionAccountingSynchronizationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
+  balances?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maximumObservationAgeMs?: Prisma.IntFieldUpdateOperationsInput | number
+  preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  initializedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ledgerReconciliations?: Prisma.RealExecutionAccountingLedgerReconciliationUpdateManyWithoutInitializationNestedInput
+}
+
+export type RealExecutionAccountingBalanceInitializationUncheckedUpdateWithoutFundingConversionAccountingSynchronizationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.StringFieldUpdateOperationsInput | string
+  acknowledgment?: Prisma.StringFieldUpdateOperationsInput | string
+  balances?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maximumObservationAgeMs?: Prisma.IntFieldUpdateOperationsInput | number
+  preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  initializedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ledgerReconciliations?: Prisma.RealExecutionAccountingLedgerReconciliationUncheckedUpdateManyWithoutInitializationNestedInput
+}
+
 export type RealExecutionAccountingBalanceInitializationCreateWithoutLedgerReconciliationsInput = {
   id: string
   providerId: string
@@ -496,6 +589,7 @@ export type RealExecutionAccountingBalanceInitializationCreateWithoutLedgerRecon
   preparedAt: Date | string
   requestFingerprint: string
   initializedAt: Date | string
+  fundingConversionAccountingSynchronizations?: Prisma.AgenticWalletFundingConversionAccountingSyncCreateNestedManyWithoutInitializationInput
 }
 
 export type RealExecutionAccountingBalanceInitializationUncheckedCreateWithoutLedgerReconciliationsInput = {
@@ -509,6 +603,7 @@ export type RealExecutionAccountingBalanceInitializationUncheckedCreateWithoutLe
   preparedAt: Date | string
   requestFingerprint: string
   initializedAt: Date | string
+  fundingConversionAccountingSynchronizations?: Prisma.AgenticWalletFundingConversionAccountingSyncUncheckedCreateNestedManyWithoutInitializationInput
 }
 
 export type RealExecutionAccountingBalanceInitializationCreateOrConnectWithoutLedgerReconciliationsInput = {
@@ -538,6 +633,7 @@ export type RealExecutionAccountingBalanceInitializationUpdateWithoutLedgerRecon
   preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   initializedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fundingConversionAccountingSynchronizations?: Prisma.AgenticWalletFundingConversionAccountingSyncUpdateManyWithoutInitializationNestedInput
 }
 
 export type RealExecutionAccountingBalanceInitializationUncheckedUpdateWithoutLedgerReconciliationsInput = {
@@ -551,6 +647,7 @@ export type RealExecutionAccountingBalanceInitializationUncheckedUpdateWithoutLe
   preparedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   initializedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fundingConversionAccountingSynchronizations?: Prisma.AgenticWalletFundingConversionAccountingSyncUncheckedUpdateManyWithoutInitializationNestedInput
 }
 
 
@@ -560,10 +657,12 @@ export type RealExecutionAccountingBalanceInitializationUncheckedUpdateWithoutLe
 
 export type RealExecutionAccountingBalanceInitializationCountOutputType = {
   ledgerReconciliations: number
+  fundingConversionAccountingSynchronizations: number
 }
 
 export type RealExecutionAccountingBalanceInitializationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ledgerReconciliations?: boolean | RealExecutionAccountingBalanceInitializationCountOutputTypeCountLedgerReconciliationsArgs
+  fundingConversionAccountingSynchronizations?: boolean | RealExecutionAccountingBalanceInitializationCountOutputTypeCountFundingConversionAccountingSynchronizationsArgs
 }
 
 /**
@@ -583,6 +682,13 @@ export type RealExecutionAccountingBalanceInitializationCountOutputTypeCountLedg
   where?: Prisma.RealExecutionAccountingLedgerReconciliationWhereInput
 }
 
+/**
+ * RealExecutionAccountingBalanceInitializationCountOutputType without action
+ */
+export type RealExecutionAccountingBalanceInitializationCountOutputTypeCountFundingConversionAccountingSynchronizationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgenticWalletFundingConversionAccountingSyncWhereInput
+}
+
 
 export type RealExecutionAccountingBalanceInitializationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -596,6 +702,7 @@ export type RealExecutionAccountingBalanceInitializationSelect<ExtArgs extends r
   requestFingerprint?: boolean
   initializedAt?: boolean
   ledgerReconciliations?: boolean | Prisma.RealExecutionAccountingBalanceInitialization$ledgerReconciliationsArgs<ExtArgs>
+  fundingConversionAccountingSynchronizations?: boolean | Prisma.RealExecutionAccountingBalanceInitialization$fundingConversionAccountingSynchronizationsArgs<ExtArgs>
   _count?: boolean | Prisma.RealExecutionAccountingBalanceInitializationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["realExecutionAccountingBalanceInitialization"]>
 
@@ -641,6 +748,7 @@ export type RealExecutionAccountingBalanceInitializationSelectScalar = {
 export type RealExecutionAccountingBalanceInitializationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "providerId" | "chainId" | "acknowledgment" | "balances" | "walletObservedAt" | "maximumObservationAgeMs" | "preparedAt" | "requestFingerprint" | "initializedAt", ExtArgs["result"]["realExecutionAccountingBalanceInitialization"]>
 export type RealExecutionAccountingBalanceInitializationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ledgerReconciliations?: boolean | Prisma.RealExecutionAccountingBalanceInitialization$ledgerReconciliationsArgs<ExtArgs>
+  fundingConversionAccountingSynchronizations?: boolean | Prisma.RealExecutionAccountingBalanceInitialization$fundingConversionAccountingSynchronizationsArgs<ExtArgs>
   _count?: boolean | Prisma.RealExecutionAccountingBalanceInitializationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RealExecutionAccountingBalanceInitializationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -650,6 +758,7 @@ export type $RealExecutionAccountingBalanceInitializationPayload<ExtArgs extends
   name: "RealExecutionAccountingBalanceInitialization"
   objects: {
     ledgerReconciliations: Prisma.$RealExecutionAccountingLedgerReconciliationPayload<ExtArgs>[]
+    fundingConversionAccountingSynchronizations: Prisma.$AgenticWalletFundingConversionAccountingSyncPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1057,6 +1166,7 @@ readonly fields: RealExecutionAccountingBalanceInitializationFieldRefs;
 export interface Prisma__RealExecutionAccountingBalanceInitializationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   ledgerReconciliations<T extends Prisma.RealExecutionAccountingBalanceInitialization$ledgerReconciliationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionAccountingBalanceInitialization$ledgerReconciliationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RealExecutionAccountingLedgerReconciliationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  fundingConversionAccountingSynchronizations<T extends Prisma.RealExecutionAccountingBalanceInitialization$fundingConversionAccountingSynchronizationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RealExecutionAccountingBalanceInitialization$fundingConversionAccountingSynchronizationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgenticWalletFundingConversionAccountingSyncPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1510,6 +1620,30 @@ export type RealExecutionAccountingBalanceInitialization$ledgerReconciliationsAr
   take?: number
   skip?: number
   distinct?: Prisma.RealExecutionAccountingLedgerReconciliationScalarFieldEnum | Prisma.RealExecutionAccountingLedgerReconciliationScalarFieldEnum[]
+}
+
+/**
+ * RealExecutionAccountingBalanceInitialization.fundingConversionAccountingSynchronizations
+ */
+export type RealExecutionAccountingBalanceInitialization$fundingConversionAccountingSynchronizationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgenticWalletFundingConversionAccountingSync
+   */
+  select?: Prisma.AgenticWalletFundingConversionAccountingSyncSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgenticWalletFundingConversionAccountingSync
+   */
+  omit?: Prisma.AgenticWalletFundingConversionAccountingSyncOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgenticWalletFundingConversionAccountingSyncInclude<ExtArgs> | null
+  where?: Prisma.AgenticWalletFundingConversionAccountingSyncWhereInput
+  orderBy?: Prisma.AgenticWalletFundingConversionAccountingSyncOrderByWithRelationInput | Prisma.AgenticWalletFundingConversionAccountingSyncOrderByWithRelationInput[]
+  cursor?: Prisma.AgenticWalletFundingConversionAccountingSyncWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgenticWalletFundingConversionAccountingSyncScalarFieldEnum | Prisma.AgenticWalletFundingConversionAccountingSyncScalarFieldEnum[]
 }
 
 /**

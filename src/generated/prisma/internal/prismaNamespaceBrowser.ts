@@ -74,6 +74,7 @@ export const ModelName = {
   RealExecutionAccountingMutationAuthorization: 'RealExecutionAccountingMutationAuthorization',
   RealExecutionAccountingBalance: 'RealExecutionAccountingBalance',
   RealExecutionAccountingBalanceInitialization: 'RealExecutionAccountingBalanceInitialization',
+  AgenticWalletFundingConversionAccountingSync: 'AgenticWalletFundingConversionAccountingSync',
   RealExecutionAccountingLedgerReconciliation: 'RealExecutionAccountingLedgerReconciliation',
   RealExecutionAccountingMutationApplication: 'RealExecutionAccountingMutationApplication',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
@@ -534,6 +535,25 @@ export const RealExecutionAccountingBalanceInitializationScalarFieldEnum = {
 } as const
 
 export type RealExecutionAccountingBalanceInitializationScalarFieldEnum = (typeof RealExecutionAccountingBalanceInitializationScalarFieldEnum)[keyof typeof RealExecutionAccountingBalanceInitializationScalarFieldEnum]
+
+
+export const AgenticWalletFundingConversionAccountingSyncScalarFieldEnum = {
+  id: 'id',
+  initializationId: 'initializationId',
+  reconciliationId: 'reconciliationId',
+  attemptId: 'attemptId',
+  transactionHash: 'transactionHash',
+  walletAddress: 'walletAddress',
+  blockNumber: 'blockNumber',
+  acknowledgment: 'acknowledgment',
+  balances: 'balances',
+  observedAt: 'observedAt',
+  preparedAt: 'preparedAt',
+  requestFingerprint: 'requestFingerprint',
+  appliedAt: 'appliedAt'
+} as const
+
+export type AgenticWalletFundingConversionAccountingSyncScalarFieldEnum = (typeof AgenticWalletFundingConversionAccountingSyncScalarFieldEnum)[keyof typeof AgenticWalletFundingConversionAccountingSyncScalarFieldEnum]
 
 
 export const RealExecutionAccountingLedgerReconciliationScalarFieldEnum = {

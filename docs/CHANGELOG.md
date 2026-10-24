@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-10-24 — Make local runtime handoff require live valuation
+
+- Identified the recurring paper-valuation 503 as an operational launch error: the API had been started inside a restricted command sandbox even though the host could reach the public Binance ticker endpoint.
+- Required automated API launches to use a Windows-host process with normal outbound network access and prohibited declaring readiness from the port or health route alone.
+- Added mandatory direct and Vite-proxied paper-valuation HTTP 200 checks before handing the running API and dashboard back to the user.
+- Restarted only the project API and dashboard as host processes and confirmed HTTP 200 with the same fresh BTC/USDT valuation through both paths.
+
+## 2026-10-24 — Synchronize reconciled funding conversion into local accounting
+
+- Added an exact finalized-block BSC snapshot covering native BNB plus the approved USDT and BTCB contracts.
+- Added a Bearer-protected manual accounting synchronization action keyed by canonical conversion attempt and trusted initialization, with an exact operator-review acknowledgment.
+- Required immutable financial reconciliation, a later block, exact BNB/USDT conversion equations, BTCB continuity, unchanged pre-conversion local balances, and valid ledger chronology.
+- Added a serializable shared-lock store that conditionally replaces all three balances and records one uniquely correlated immutable receipt atomically; replay is idempotent and races or divergence fail closed.
+- Applied the additive accounting-synchronization migration locally. No live provider/RPC call, financial transaction, retry, PnL calculation, or strategy authorization was added.
+- All 2,804 backend tests across 248 suites, 105 serial E2E tests across 9 suites, and 115 dashboard tests across 20 files pass with formatting, lint, backend/dashboard builds, Prisma validation and migration status, all 45 migrations applied from scratch in E2E, Compose validation, and whitespace checks.
+
 ## 2026-10-24 — Register guarded funding-conversion reconciliation actions
 
 - Added separate loopback-only Bearer-protected manual routes for one-shot funding-conversion status lookup and complete financial reconciliation by canonical submission-attempt UUID.

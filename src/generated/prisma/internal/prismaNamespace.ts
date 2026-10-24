@@ -420,6 +420,7 @@ export const ModelName = {
   RealExecutionAccountingMutationAuthorization: 'RealExecutionAccountingMutationAuthorization',
   RealExecutionAccountingBalance: 'RealExecutionAccountingBalance',
   RealExecutionAccountingBalanceInitialization: 'RealExecutionAccountingBalanceInitialization',
+  AgenticWalletFundingConversionAccountingSync: 'AgenticWalletFundingConversionAccountingSync',
   RealExecutionAccountingLedgerReconciliation: 'RealExecutionAccountingLedgerReconciliation',
   RealExecutionAccountingMutationApplication: 'RealExecutionAccountingMutationApplication',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
@@ -440,7 +441,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "agenticWalletFundingConversionPlan" | "agenticWalletFundingConversionSubmissionAttempt" | "agenticWalletFundingConversionStatusObservation" | "agenticWalletFundingConversionFinancialReconciliation" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingBalanceInitialization" | "realExecutionAccountingLedgerReconciliation" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "agenticWalletFundingConversionPlan" | "agenticWalletFundingConversionSubmissionAttempt" | "agenticWalletFundingConversionStatusObservation" | "agenticWalletFundingConversionFinancialReconciliation" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingBalanceInitialization" | "agenticWalletFundingConversionAccountingSync" | "realExecutionAccountingLedgerReconciliation" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2146,6 +2147,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AgenticWalletFundingConversionAccountingSync: {
+      payload: Prisma.$AgenticWalletFundingConversionAccountingSyncPayload<ExtArgs>
+      fields: Prisma.AgenticWalletFundingConversionAccountingSyncFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionAccountingSyncPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionAccountingSyncPayload>
+        }
+        findFirst: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionAccountingSyncPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionAccountingSyncPayload>
+        }
+        findMany: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionAccountingSyncPayload>[]
+        }
+        create: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionAccountingSyncPayload>
+        }
+        createMany: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionAccountingSyncPayload>[]
+        }
+        delete: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionAccountingSyncPayload>
+        }
+        update: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionAccountingSyncPayload>
+        }
+        deleteMany: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionAccountingSyncPayload>[]
+        }
+        upsert: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgenticWalletFundingConversionAccountingSyncPayload>
+        }
+        aggregate: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgenticWalletFundingConversionAccountingSync>
+        }
+        groupBy: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgenticWalletFundingConversionAccountingSyncGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgenticWalletFundingConversionAccountingSyncCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgenticWalletFundingConversionAccountingSyncCountAggregateOutputType> | number
+        }
+      }
+    }
     RealExecutionAccountingLedgerReconciliation: {
       payload: Prisma.$RealExecutionAccountingLedgerReconciliationPayload<ExtArgs>
       fields: Prisma.RealExecutionAccountingLedgerReconciliationFieldRefs
@@ -2994,6 +3069,25 @@ export const RealExecutionAccountingBalanceInitializationScalarFieldEnum = {
 export type RealExecutionAccountingBalanceInitializationScalarFieldEnum = (typeof RealExecutionAccountingBalanceInitializationScalarFieldEnum)[keyof typeof RealExecutionAccountingBalanceInitializationScalarFieldEnum]
 
 
+export const AgenticWalletFundingConversionAccountingSyncScalarFieldEnum = {
+  id: 'id',
+  initializationId: 'initializationId',
+  reconciliationId: 'reconciliationId',
+  attemptId: 'attemptId',
+  transactionHash: 'transactionHash',
+  walletAddress: 'walletAddress',
+  blockNumber: 'blockNumber',
+  acknowledgment: 'acknowledgment',
+  balances: 'balances',
+  observedAt: 'observedAt',
+  preparedAt: 'preparedAt',
+  requestFingerprint: 'requestFingerprint',
+  appliedAt: 'appliedAt'
+} as const
+
+export type AgenticWalletFundingConversionAccountingSyncScalarFieldEnum = (typeof AgenticWalletFundingConversionAccountingSyncScalarFieldEnum)[keyof typeof AgenticWalletFundingConversionAccountingSyncScalarFieldEnum]
+
+
 export const RealExecutionAccountingLedgerReconciliationScalarFieldEnum = {
   id: 'id',
   initializationId: 'initializationId',
@@ -3415,6 +3509,7 @@ export type GlobalOmitConfig = {
   realExecutionAccountingMutationAuthorization?: Prisma.RealExecutionAccountingMutationAuthorizationOmit
   realExecutionAccountingBalance?: Prisma.RealExecutionAccountingBalanceOmit
   realExecutionAccountingBalanceInitialization?: Prisma.RealExecutionAccountingBalanceInitializationOmit
+  agenticWalletFundingConversionAccountingSync?: Prisma.AgenticWalletFundingConversionAccountingSyncOmit
   realExecutionAccountingLedgerReconciliation?: Prisma.RealExecutionAccountingLedgerReconciliationOmit
   realExecutionAccountingMutationApplication?: Prisma.RealExecutionAccountingMutationApplicationOmit
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit

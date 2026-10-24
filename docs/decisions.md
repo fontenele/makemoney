@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## 2026-10-24 - Synchronize funding conversion from one authoritative three-asset block
+
+M10.149 does not infer local post-conversion balances solely from deltas. It obtains native BNB, approved USDT, and approved BTCB at one finalized BSC block and requires the observed BNB/USDT quantities to equal the independently persisted financial-reconciliation equations. BTCB is included even though the conversion does not target it, so unexplained wallet drift cannot be hidden by updating only the two touched assets.
+
+The action is an explicit Bearer-protected accounting authority, separate from status and financial reconciliation. It requires the local ledger still to contain the exact pre-conversion BNB and USDT plus the observed BTCB, then conditionally replaces all three rows under the same advisory lock used by ordinary accounting applications. The receipt and balances commit together, and strategy authorization remains false. This makes funding synchronization auditable without letting it become an execution shortcut.
+
 ## 2026-10-24 - Keep conversion status and financial completion as separate manual actions
 
 M10.148 exposes the already validated status and financial-reconciliation services without combining them into a poller or a single implicit workflow. Status evidence and financial evidence have different provider boundaries, terminal conditions, and persistence authorities; separate explicit Bearer-protected calls keep each external read observable and prevent a status check from silently starting RPC balance reconciliation.

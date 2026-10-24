@@ -46,6 +46,15 @@ import {
   FundingConversionFinancialReconciliationConflictError,
   FundingConversionFinancialReconciliationContextNotFoundError,
 } from '../application/agentic-wallet-funding-conversion-financial-reconciliation.store';
+import {
+  AgenticWalletFundingConversionAccountingSyncService,
+  FundingConversionAccountingSyncRequestError,
+} from '../application/agentic-wallet-funding-conversion-accounting-sync.service';
+import {
+  FUNDING_CONVERSION_ACCOUNTING_SYNC_ACKNOWLEDGMENT,
+  FundingConversionAccountingSyncBlockedError,
+  FundingConversionAccountingSyncConflictError,
+} from '../application/agentic-wallet-funding-conversion-accounting-sync.store';
 
 @Controller('real-trading')
 export class RealTradingController {
@@ -57,6 +66,7 @@ export class RealTradingController {
     private readonly fundingConversionSubmission: AgenticWalletFundingConversionSubmissionService,
     private readonly fundingConversionStatus: AgenticWalletFundingConversionStatusService,
     private readonly fundingConversionReconciliation: AgenticWalletFundingConversionFinancialReconciliationService,
+    private readonly fundingConversionAccountingSync: AgenticWalletFundingConversionAccountingSyncService,
   ) {}
 
   @Get('status')
@@ -227,6 +237,32 @@ export class RealTradingController {
     }
   }
 
+  @Post('funding-conversion-accounting-sync')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async synchronizeFundingConversionAccounting(@Body() body: unknown) {
+    try {
+      return await this.fundingConversionAccountingSync.synchronize(
+        fundingConversionAccountingSyncCommand(body),
+      );
+    } catch (error) {
+      if (error instanceof FundingConversionAccountingSyncRequestError) {
+        throw new BadRequestException(
+          'Invalid funding conversion accounting synchronization request',
+        );
+      }
+      if (
+        error instanceof FundingConversionAccountingSyncBlockedError ||
+        error instanceof FundingConversionAccountingSyncConflictError
+      ) {
+        throw new ConflictException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet funding conversion accounting synchronization is unavailable',
+      );
+    }
+  }
+
   @Get('wallet-authentication')
   getWalletAuthentication() {
     return this.authentication.getState();
@@ -255,4 +291,29 @@ function fundingConversionAttemptId(body: unknown): string {
   )
     return '';
   return (body as { attemptId: string }).attemptId;
+}
+
+function fundingConversionAccountingSyncCommand(body: unknown) {
+  if (
+    typeof body !== 'object' ||
+    body === null ||
+    Array.isArray(body) ||
+    Object.keys(body).length !== 3
+  )
+    return {
+      attemptId: '',
+      initializationId: '',
+      acknowledgment:
+        '' as typeof FUNDING_CONVERSION_ACCOUNTING_SYNC_ACKNOWLEDGMENT,
+    };
+  const value = body as Record<string, unknown>;
+  return {
+    attemptId: typeof value.attemptId === 'string' ? value.attemptId : '',
+    initializationId:
+      typeof value.initializationId === 'string' ? value.initializationId : '',
+    acknowledgment:
+      typeof value.acknowledgment === 'string'
+        ? (value.acknowledgment as typeof FUNDING_CONVERSION_ACCOUNTING_SYNC_ACKNOWLEDGMENT)
+        : ('' as typeof FUNDING_CONVERSION_ACCOUNTING_SYNC_ACKNOWLEDGMENT),
+  };
 }
