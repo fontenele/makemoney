@@ -2,6 +2,12 @@
 
 ## 2026-10-24 - Require a third runtime gate and literal acknowledgment for manual submission
 
+## M10.155 — Treat balance changes as explicit evidence, never as an implicit accounting mutation
+
+M10.155 exposes the existing M10.85–M10.86 evidence store without collapsing it into the later mutation path. The manual caller must provide a complete canonical set of unique balance changes whose before/after/delta arithmetic is internally exact. The store then reloads durable financial completion and rechecks that the source, target, provider-fee, and BNB network-fee movements are sufficiently covered.
+
+This endpoint does not read the wallet or change the local ledger. Generic real execution still lacks a submission-bound fixed-block pre-balance snapshot suitable for automatic delta reconstruction, so external reviewed evidence remains explicit rather than inferred. Durable balance evidence is only an input to later commitment, authorization, and conditional accounting application boundaries.
+
 ## M10.154 — Persist only an explicit complete evidence package and revalidate durable terminal context
 
 M10.154 does not infer actual receipt or costs from provider terminal status. The manual caller must submit the complete canonical M10.81 package, including explicit receipt, target-balance-delta, provider-fee, and network-fee coverage. The HTTP boundary validates exact shape and canonical values before persistence, while the existing serializable M10.82 store remains authoritative by reloading the durable gate, receipt, and latest observation and reapplying all correlations inside the transaction.

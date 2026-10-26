@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-26 — M10.155 guarded real-execution accounting balance evidence
+
+- Added Bearer-protected `POST /real-trading/submission-accounting-evidence` for one strict complete canonical M10.85 balance-change package.
+- Registered the existing serializable M10.86 store, which reloads completed financial reconciliation and reapplies source, target, provider-fee, network-fee, identity, coverage, arithmetic, and chronology rules.
+- Preserved exact replay and divergent conflict behavior while leaving accounting mutation required and incomplete.
+- Added focused and E2E coverage for valid composition, strict nested input, missing authentication, malformed evidence, and absent financial completion.
+- Added no provider/RPC call, balance mutation, accounting application, PnL calculation, polling, scheduling, resubmission, automatic retry, dashboard action, or strategy bridge.
+
 ## 2026-10-26 — M10.154 guarded real-execution financial reconciliation
 
 - Added Bearer-protected `POST /real-trading/submission-reconciliation` for one strict complete canonical M10.81 evidence package.

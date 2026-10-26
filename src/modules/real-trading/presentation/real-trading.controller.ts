@@ -89,6 +89,15 @@ import {
   AgenticWalletMarketSwapFinancialReconciliationEvidenceBlockedError,
   AgenticWalletMarketSwapFinancialReconciliationEvidenceConflictError,
 } from '../infrastructure/agentic-wallet-market-swap-financial-reconciliation-evidence.store';
+import {
+  InvalidRealExecutionAccountingBalanceEvidenceRequestError,
+  RealExecutionAccountingBalanceEvidenceService,
+} from '../application/real-execution-accounting-balance-evidence.service';
+import {
+  AgenticWalletMarketSwapAccountingBalanceCompletionNotFoundError,
+  AgenticWalletMarketSwapAccountingBalanceEvidenceBlockedError,
+  AgenticWalletMarketSwapAccountingBalanceEvidenceConflictError,
+} from '../infrastructure/agentic-wallet-market-swap-accounting-balance-evidence.store';
 
 @Controller('real-trading')
 export class RealTradingController {
@@ -104,6 +113,7 @@ export class RealTradingController {
     private readonly realExecutionSubmission: RealExecutionOperatorSubmissionService,
     private readonly realExecutionStatus: AgenticWalletMarketSwapStatusReconciliationAttempt,
     private readonly realExecutionReconciliation: RealExecutionFinancialReconciliationService,
+    private readonly realExecutionAccountingEvidence: RealExecutionAccountingBalanceEvidenceService,
   ) {}
 
   @Get('status')
@@ -386,6 +396,37 @@ export class RealTradingController {
       }
       throw new ServiceUnavailableException(
         'Agentic Wallet real execution financial reconciliation is unavailable',
+      );
+    }
+  }
+
+  @Post('submission-accounting-evidence')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async recordRealExecutionAccountingEvidence(@Body() body: unknown) {
+    try {
+      return await this.realExecutionAccountingEvidence.record(body);
+    } catch (error) {
+      if (
+        error instanceof
+        InvalidRealExecutionAccountingBalanceEvidenceRequestError
+      ) {
+        throw new BadRequestException(
+          'Invalid real execution accounting balance evidence request',
+        );
+      }
+      if (
+        error instanceof
+          AgenticWalletMarketSwapAccountingBalanceCompletionNotFoundError ||
+        error instanceof
+          AgenticWalletMarketSwapAccountingBalanceEvidenceBlockedError ||
+        error instanceof
+          AgenticWalletMarketSwapAccountingBalanceEvidenceConflictError
+      ) {
+        throw new ConflictException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet real execution accounting balance evidence is unavailable',
       );
     }
   }

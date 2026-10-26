@@ -393,6 +393,74 @@ describe('Application (e2e)', () => {
     }
   });
 
+  it('/real-trading/submission-accounting-evidence (POST) fails closed without operator authentication', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set('RISK_CONTROL_TOKEN_SHA256', '');
+    try {
+      await request(server)
+        .post('/real-trading/submission-accounting-evidence')
+        .send(realExecutionAccountingBalanceEvidenceRequest())
+        .expect(503);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-accounting-evidence (POST) rejects malformed balance evidence before persistence access', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const prisma = app.get(PrismaService);
+    const token = 'e2e-real-execution-accounting-evidence-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    const before = await prisma.realExecutionAccountingBalanceEvidence.count();
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/submission-accounting-evidence')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          ...realExecutionAccountingBalanceEvidenceRequest(),
+          coverageComplete: false,
+        })
+        .expect(400);
+      await expect(
+        prisma.realExecutionAccountingBalanceEvidence.count(),
+      ).resolves.toBe(before);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-accounting-evidence (POST) stops without durable financial completion', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const token = 'e2e-real-execution-accounting-evidence-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/submission-accounting-evidence')
+        .set('Authorization', `Bearer ${token}`)
+        .send(realExecutionAccountingBalanceEvidenceRequest())
+        .expect(409)
+        .expect({
+          message: 'Completed financial reconciliation was not found',
+          error: 'Conflict',
+          statusCode: 409,
+        });
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
   it.each([
     '/real-trading/funding-conversion-status',
     '/real-trading/funding-conversion-reconciliation',
@@ -1893,6 +1961,43 @@ function realExecutionFinancialReconciliationRequest() {
     providerFeeCoverageComplete: true,
     networkFeeCoverageComplete: true,
     observedAt: '2026-10-26T18:00:00.000Z',
+  };
+}
+
+function realExecutionAccountingBalanceEvidenceRequest() {
+  return {
+    scope: 'agentic_wallet_market_swap_accounting_balance_evidence',
+    completionEvidenceId: '00000000-0000-4000-8000-000000000154',
+    gateId: '00000000-0000-4000-8000-000000000155',
+    transactionHash: `0x${'a'.repeat(64)}`,
+    balanceChanges: [
+      {
+        assetType: 'token',
+        assetAddress: '0x55d398326f99059ff775485246999027b3197955',
+        direction: 'debit',
+        beforeQuantity: '100',
+        afterQuantity: '95',
+        deltaQuantity: '5',
+      },
+      {
+        assetType: 'token',
+        assetAddress: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+        direction: 'credit',
+        beforeQuantity: '0',
+        afterQuantity: '0.000071',
+        deltaQuantity: '0.000071',
+      },
+      {
+        assetType: 'native',
+        assetSymbol: 'BNB',
+        direction: 'debit',
+        beforeQuantity: '1',
+        afterQuantity: '0.9997',
+        deltaQuantity: '0.0003',
+      },
+    ],
+    coverageComplete: true,
+    observedAt: '2026-10-26T18:00:01.000Z',
   };
 }
 
