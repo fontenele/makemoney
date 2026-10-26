@@ -63,6 +63,14 @@ import {
 import { prepareAgenticWalletAccountingReconciledBalanceSnapshot } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-reconciled-balance-snapshot';
 import { AgenticWalletAccountingLatestReconciledBalanceSnapshotService } from '../src/modules/real-trading/infrastructure/agentic-wallet-accounting-reconciled-balance-snapshot.service';
 import { PrismaRealExecutionSubmissionGateStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-gate.store';
+import { PrismaRealExecutionSubmissionAttemptStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-attempt.store';
+import { RealExecutionSubmissionAttemptConflictError } from '../src/modules/real-trading/application/real-execution-submission-attempt.store';
+import {
+  RealExecutionSubmissionAttemptNotFoundError,
+  RealExecutionSubmissionOutcomeConflictError,
+} from '../src/modules/real-trading/application/real-execution-submission-outcome.store';
+import { assessAgenticWalletMarketSwapSubmissionOutcome } from '../src/modules/real-trading/infrastructure/agentic-wallet-market-swap-submission-outcome';
+import { PrismaRealExecutionSubmissionOutcomeStore } from '../src/modules/real-trading/infrastructure/prisma-real-execution-submission-outcome.store';
 
 const NOW = new Date('2026-10-03T12:00:04.000Z');
 const USDT = '0x55d398326f99059ff775485246999027b3197955';
@@ -71,6 +79,8 @@ const BTCB = '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c';
 describe('Real execution submission gate persistence (e2e)', () => {
   let prisma: PrismaService;
   let store: PrismaRealExecutionSubmissionGateStore;
+  let submissionAttemptStore: PrismaRealExecutionSubmissionAttemptStore;
+  let submissionOutcomeStore: PrismaRealExecutionSubmissionOutcomeStore;
   let receiptStore: PrismaAgenticWalletMarketSwapSubmissionReceiptStore;
   let statusStore: PrismaAgenticWalletMarketSwapStatusObservationStore;
   let reconciliationStore: PrismaAgenticWalletMarketSwapReconciliationStateStore;
@@ -99,6 +109,13 @@ describe('Real execution submission gate persistence (e2e)', () => {
     prisma = new PrismaService(process.env.DATABASE_URL!);
     await prisma.onModuleInit();
     store = new PrismaRealExecutionSubmissionGateStore(prisma, () => NOW);
+    submissionAttemptStore = new PrismaRealExecutionSubmissionAttemptStore(
+      prisma,
+      () => new Date('2026-10-03T12:00:05.000Z'),
+    );
+    submissionOutcomeStore = new PrismaRealExecutionSubmissionOutcomeStore(
+      prisma,
+    );
     receiptStore = new PrismaAgenticWalletMarketSwapSubmissionReceiptStore(
       prisma,
       () => new Date('2026-10-03T12:00:05.000Z'),
@@ -228,6 +245,171 @@ describe('Real execution submission gate persistence (e2e)', () => {
     });
     expect(replay).toEqual({ gate: first.gate, replayed: true });
     await expect(prisma.realExecutionSubmissionGate.count()).resolves.toBe(1);
+  });
+
+  it('claims one gate once and replays without reopening mutable state', async () => {
+    await store.create(command(10));
+
+    const first = await submissionAttemptStore.claim({
+      id: uuid(30),
+      gateId: uuid(10),
+    });
+    const replay = await new PrismaRealExecutionSubmissionAttemptStore(
+      prisma,
+      () => new Date('2026-10-03T12:01:00.000Z'),
+    ).claim({ id: uuid(30), gateId: uuid(10) });
+
+    expect(first).toMatchObject({
+      replayed: false,
+      command: {
+        kind: 'agentic_wallet_claimed_market_swap',
+        attemptId: uuid(30),
+        gateId: uuid(10),
+        automaticRetryAllowed: false,
+      },
+      attempt: {
+        id: uuid(30),
+        gateId: uuid(10),
+        providerId: 'agentic_wallet',
+        chainId: '56',
+        state: 'submission_claimed',
+        automaticRetryAllowed: false,
+        providerSubmissionStarted: false,
+        submissionAuthorized: false,
+        claimedAt: new Date('2026-10-03T12:00:05.000Z'),
+      },
+    });
+    expect(replay).toEqual({
+      attempt: first.attempt,
+      replayed: true,
+      command: null,
+    });
+    await expect(prisma.realExecutionSubmissionAttempt.count()).resolves.toBe(
+      1,
+    );
+  });
+
+  it('serializes competing claims so only one can consume a gate', async () => {
+    await store.create(command(10));
+
+    const results = await Promise.allSettled([
+      submissionAttemptStore.claim({ id: uuid(30), gateId: uuid(10) }),
+      submissionAttemptStore.claim({ id: uuid(31), gateId: uuid(10) }),
+    ]);
+
+    expect(
+      results.filter((result) => result.status === 'fulfilled'),
+    ).toHaveLength(1);
+    const rejected = results.find((result) => result.status === 'rejected');
+    if (!rejected || rejected.status !== 'rejected') {
+      throw new Error('Expected one competing claim to be rejected');
+    }
+    expect(rejected.reason).toBeInstanceOf(
+      RealExecutionSubmissionAttemptConflictError,
+    );
+    await expect(prisma.realExecutionSubmissionAttempt.count()).resolves.toBe(
+      1,
+    );
+  });
+
+  it('atomically records an acknowledged claim outcome and its pending receipt', async () => {
+    await store.create(command(10));
+    await submissionAttemptStore.claim({ id: uuid(30), gateId: uuid(10) });
+    const outcome = assessAgenticWalletMarketSwapSubmissionOutcome(
+      uuid(30),
+      uuid(10),
+      { success: true, data: { orderId: 'real-order-151' } },
+    );
+    const completedAt = new Date('2026-10-03T12:00:06.000Z');
+
+    const first = await submissionOutcomeStore.record(outcome, completedAt);
+    const replay = await submissionOutcomeStore.record(outcome, completedAt);
+
+    expect(first).toMatchObject({
+      replayed: false,
+      outcome: {
+        status: 'submitted_pending_confirmation',
+        providerOrderId: 'real-order-151',
+        automaticRetryAllowed: false,
+      },
+    });
+    expect(replay).toEqual({ outcome: first.outcome, replayed: true });
+    await expect(
+      prisma.realExecutionSubmissionReceipt.findUnique({
+        where: { gateId: uuid(10) },
+      }),
+    ).resolves.toMatchObject({
+      providerOrderId: 'real-order-151',
+      lifecycleStatus: 'pending_confirmation',
+      executionSucceeded: false,
+      automaticRetryAllowed: false,
+    });
+  });
+
+  it('records an ambiguous claimed outcome without fabricating a receipt', async () => {
+    await store.create(command(10));
+    await submissionAttemptStore.claim({ id: uuid(30), gateId: uuid(10) });
+    const outcome = assessAgenticWalletMarketSwapSubmissionOutcome(
+      uuid(30),
+      uuid(10),
+      undefined,
+    );
+
+    await expect(
+      submissionOutcomeStore.record(
+        outcome,
+        new Date('2026-10-03T12:00:06.000Z'),
+      ),
+    ).resolves.toMatchObject({
+      replayed: false,
+      outcome: {
+        status: 'submission_outcome_unknown',
+        providerOrderId: null,
+        blockers: ['invalid_response_envelope'],
+        automaticRetryAllowed: false,
+      },
+    });
+    await expect(prisma.realExecutionSubmissionReceipt.count()).resolves.toBe(
+      0,
+    );
+  });
+
+  it('rejects a divergent outcome replay for the consumed claim', async () => {
+    await store.create(command(10));
+    await submissionAttemptStore.claim({ id: uuid(30), gateId: uuid(10) });
+    const completedAt = new Date('2026-10-03T12:00:06.000Z');
+    await submissionOutcomeStore.record(
+      assessAgenticWalletMarketSwapSubmissionOutcome(
+        uuid(30),
+        uuid(10),
+        undefined,
+      ),
+      completedAt,
+    );
+
+    await expect(
+      submissionOutcomeStore.record(
+        assessAgenticWalletMarketSwapSubmissionOutcome(uuid(30), uuid(10), {
+          success: false,
+          data: null,
+        }),
+        completedAt,
+      ),
+    ).rejects.toBeInstanceOf(RealExecutionSubmissionOutcomeConflictError);
+  });
+
+  it('rejects outcome persistence without the exact durable claim', async () => {
+    await store.create(command(10));
+    await expect(
+      submissionOutcomeStore.record(
+        assessAgenticWalletMarketSwapSubmissionOutcome(
+          uuid(30),
+          uuid(10),
+          undefined,
+        ),
+        new Date('2026-10-03T12:00:06.000Z'),
+      ),
+    ).rejects.toBeInstanceOf(RealExecutionSubmissionAttemptNotFoundError);
   });
 
   it('atomically initializes trusted accounting balances once and replays the receipt', async () => {
@@ -1241,7 +1423,9 @@ describe('Real execution submission gate persistence (e2e)', () => {
     await prisma.realExecutionAccountingBalanceEvidence.deleteMany();
     await prisma.realExecutionFinancialReconciliationEvidence.deleteMany();
     await prisma.realExecutionStatusObservation.deleteMany();
+    await prisma.realExecutionSubmissionOutcome.deleteMany();
     await prisma.realExecutionSubmissionReceipt.deleteMany();
+    await prisma.realExecutionSubmissionAttempt.deleteMany();
     await prisma.realExecutionSubmissionGate.deleteMany();
     await prisma.realExecutionFinalConfirmation.deleteMany();
     await prisma.realExecutionRiskApproval.deleteMany();

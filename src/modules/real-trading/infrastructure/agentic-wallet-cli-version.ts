@@ -14,6 +14,7 @@ export function validateAgenticWalletCliVersion(
   operation:
     | 'quote'
     | 'status lookup'
+    | 'real execution swap'
     | 'funding conversion swap'
     | 'funding conversion receipt',
 ): void {

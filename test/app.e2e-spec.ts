@@ -206,6 +206,127 @@ describe('Application (e2e)', () => {
     }
   });
 
+  it('/real-trading/submission (POST) fails closed without operator authentication', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set('RISK_CONTROL_TOKEN_SHA256', '');
+    try {
+      await request(server)
+        .post('/real-trading/submission')
+        .send(realExecutionSubmissionRequest())
+        .expect(503);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission (POST) blocks before claim or provider access while operator submission is disabled', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const prisma = app.get(PrismaService);
+    const token = 'e2e-real-execution-control-token';
+    const previousDigest = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    const previousOperatorGate = config.get<boolean>(
+      'REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED',
+    );
+    const attemptsBefore = await prisma.realExecutionSubmissionAttempt.count();
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    config.set('REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED', false);
+    try {
+      const response = await request(server)
+        .post('/real-trading/submission')
+        .set('Authorization', `Bearer ${token}`)
+        .send(realExecutionSubmissionRequest())
+        .expect(409);
+      expect((response.body as { message: string }).message).toContain(
+        'operator_submission_disabled',
+      );
+      await expect(prisma.realExecutionSubmissionAttempt.count()).resolves.toBe(
+        attemptsBefore,
+      );
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previousDigest);
+      config.set(
+        'REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED',
+        previousOperatorGate,
+      );
+    }
+  });
+
+  it('/real-trading/submission-status (POST) fails closed without operator authentication', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set('RISK_CONTROL_TOKEN_SHA256', '');
+    try {
+      await request(server)
+        .post('/real-trading/submission-status')
+        .send({ gateId: '00000000-0000-4000-8000-000000000034' })
+        .expect(503);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-status (POST) rejects malformed input before provider access', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const token = 'e2e-real-execution-status-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/submission-status')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ gateId: 'not-a-canonical-uuid', extra: true })
+        .expect(400);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-status (POST) stops before provider access when durable context is absent', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const token = 'e2e-real-execution-status-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/submission-status')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ gateId: '00000000-0000-4000-8000-000000000153' })
+        .expect(200)
+        .expect({
+          scope: 'agentic_wallet_market_swap_status_reconciliation_attempt',
+          status: 'blocked',
+          blockers: ['reconciliation_context_not_found'],
+          storedObservation: null,
+          observationReplayed: false,
+          evaluatedAt: null,
+          nextStatusLookupAt: null,
+          providerCallStarted: false,
+          providerCallCompleted: false,
+          statusLookupRequired: false,
+          financialReconciliationRequired: true,
+          financialReconciliationComplete: false,
+          submissionRetryAllowed: false,
+        });
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
   it.each([
     '/real-trading/funding-conversion-status',
     '/real-trading/funding-conversion-reconciliation',
@@ -1674,6 +1795,14 @@ function fundingConversionSubmissionRequest() {
     planFingerprint: 'a'.repeat(64),
     confirmationPhrase: 'CONFIRM_BNB_TO_USDT test',
     sourceQuantityBnb: '0.008',
+  };
+}
+
+function realExecutionSubmissionRequest() {
+  return {
+    attemptId: '00000000-0000-4000-8000-000000000152',
+    gateId: '00000000-0000-4000-8000-000000000034',
+    acknowledgment: 'approved_gate_and_immediate_provider_submission_reviewed',
   };
 }
 

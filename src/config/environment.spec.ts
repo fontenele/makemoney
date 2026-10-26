@@ -58,6 +58,7 @@ describe('validateEnvironment real execution', () => {
     expect(validateEnvironment(required)).toMatchObject({
       TRADING_MODE: 'paper',
       REAL_EXECUTION_ENABLED: false,
+      REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: false,
       REAL_EXECUTION_APPROVED_PROVIDER_ID: null,
       REAL_EXECUTION_APPROVED_CHAIN_ID: null,
       REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: null,
@@ -121,6 +122,7 @@ describe('validateEnvironment real execution', () => {
         ...required,
         TRADING_MODE: 'real',
         REAL_EXECUTION_ENABLED: 'true',
+        REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: 'true',
         REAL_EXECUTION_APPROVED_PROVIDER_ID: 'agentic_wallet',
         REAL_EXECUTION_APPROVED_CHAIN_ID: '56',
         REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: '0xsource',
@@ -130,6 +132,7 @@ describe('validateEnvironment real execution', () => {
     ).toMatchObject({
       TRADING_MODE: 'real',
       REAL_EXECUTION_ENABLED: true,
+      REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: true,
       REAL_EXECUTION_APPROVED_CHAIN_ID: '56',
       REAL_EXECUTION_CAPABILITY_MAX_AGE_MS: 5000,
     });
@@ -143,6 +146,17 @@ describe('validateEnvironment real execution', () => {
         REAL_EXECUTION_ENABLED: 'true',
       }),
     ).toThrow('real execution requires explicit provider');
+  });
+
+  it('requires both existing independent gates before operator submission can be enabled', () => {
+    expect(() =>
+      validateEnvironment({
+        ...required,
+        REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: 'true',
+      }),
+    ).toThrow(
+      'operator submission requires real trading mode and real execution enablement',
+    );
   });
 
   it('rejects equal approved token identities and ambiguous gates', () => {

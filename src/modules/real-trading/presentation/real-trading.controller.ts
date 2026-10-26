@@ -55,6 +55,31 @@ import {
   FundingConversionAccountingSyncBlockedError,
   FundingConversionAccountingSyncConflictError,
 } from '../application/agentic-wallet-funding-conversion-accounting-sync.store';
+import {
+  InvalidRealExecutionOperatorSubmissionRequestError,
+  RealExecutionOperatorSubmissionBlockedError,
+  RealExecutionOperatorSubmissionService,
+} from '../application/real-execution-operator-submission.service';
+import {
+  InvalidRealExecutionSubmissionRequestError,
+  RealExecutionSubmissionAlreadyClaimedError,
+} from '../application/real-execution-submission.service';
+import {
+  RealExecutionSubmissionAttemptBlockedError,
+  RealExecutionSubmissionAttemptConflictError,
+} from '../application/real-execution-submission-attempt.store';
+import {
+  RealExecutionSubmissionAttemptNotFoundError,
+  RealExecutionSubmissionOutcomeBlockedError,
+  RealExecutionSubmissionOutcomeConflictError,
+} from '../application/real-execution-submission-outcome.store';
+import { AgenticWalletMarketSwapStatusReconciliationAttempt } from '../infrastructure/agentic-wallet-market-swap-status-reconciliation-attempt';
+import { AgenticWalletMarketSwapStatusReconciliationContextIdentityError } from '../infrastructure/agentic-wallet-market-swap-status-reconciliation-context.store';
+import {
+  AgenticWalletMarketSwapStatusObservationBlockedError,
+  AgenticWalletMarketSwapStatusObservationReceiptMismatchError,
+  AgenticWalletMarketSwapStatusObservationReceiptNotFoundError,
+} from '../infrastructure/agentic-wallet-market-swap-status-observation.store';
 
 @Controller('real-trading')
 export class RealTradingController {
@@ -67,6 +92,8 @@ export class RealTradingController {
     private readonly fundingConversionStatus: AgenticWalletFundingConversionStatusService,
     private readonly fundingConversionReconciliation: AgenticWalletFundingConversionFinancialReconciliationService,
     private readonly fundingConversionAccountingSync: AgenticWalletFundingConversionAccountingSyncService,
+    private readonly realExecutionSubmission: RealExecutionOperatorSubmissionService,
+    private readonly realExecutionStatus: AgenticWalletMarketSwapStatusReconciliationAttempt,
   ) {}
 
   @Get('status')
@@ -263,6 +290,66 @@ export class RealTradingController {
     }
   }
 
+  @Post('submission')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async submitRealExecution(@Body() body: unknown) {
+    try {
+      return await this.realExecutionSubmission.submit(body);
+    } catch (error) {
+      if (
+        error instanceof InvalidRealExecutionOperatorSubmissionRequestError ||
+        error instanceof InvalidRealExecutionSubmissionRequestError
+      ) {
+        throw new BadRequestException(
+          'Invalid real execution submission request',
+        );
+      }
+      if (
+        error instanceof RealExecutionOperatorSubmissionBlockedError ||
+        error instanceof RealExecutionSubmissionAttemptBlockedError ||
+        error instanceof RealExecutionSubmissionAttemptConflictError ||
+        error instanceof RealExecutionSubmissionAlreadyClaimedError ||
+        error instanceof RealExecutionSubmissionAttemptNotFoundError ||
+        error instanceof RealExecutionSubmissionOutcomeBlockedError ||
+        error instanceof RealExecutionSubmissionOutcomeConflictError
+      ) {
+        throw new ConflictException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet real execution submission is unavailable',
+      );
+    }
+  }
+
+  @Post('submission-status')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async reconcileRealExecutionStatus(@Body() body: unknown) {
+    try {
+      return await this.realExecutionStatus.reconcileOnce(gateId(body));
+    } catch (error) {
+      if (
+        error instanceof
+        AgenticWalletMarketSwapStatusReconciliationContextIdentityError
+      ) {
+        throw new BadRequestException('Invalid real execution status request');
+      }
+      if (
+        error instanceof AgenticWalletMarketSwapStatusObservationBlockedError ||
+        error instanceof
+          AgenticWalletMarketSwapStatusObservationReceiptMismatchError ||
+        error instanceof
+          AgenticWalletMarketSwapStatusObservationReceiptNotFoundError
+      ) {
+        throw new ConflictException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet real execution status is unavailable',
+      );
+    }
+  }
+
   @Get('wallet-authentication')
   getWalletAuthentication() {
     return this.authentication.getState();
@@ -291,6 +378,18 @@ function fundingConversionAttemptId(body: unknown): string {
   )
     return '';
   return (body as { attemptId: string }).attemptId;
+}
+
+function gateId(body: unknown): string {
+  if (
+    typeof body !== 'object' ||
+    body === null ||
+    Array.isArray(body) ||
+    Object.keys(body).length !== 1 ||
+    typeof (body as Record<string, unknown>).gateId !== 'string'
+  )
+    return '';
+  return (body as { gateId: string }).gateId;
 }
 
 function fundingConversionAccountingSyncCommand(body: unknown) {

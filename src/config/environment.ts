@@ -34,6 +34,7 @@ interface Environment {
   STRATEGY_MA_LONG_PERIOD: number;
   TRADING_MODE: 'paper' | 'real';
   REAL_EXECUTION_ENABLED: boolean;
+  REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: boolean;
   REAL_EXECUTION_APPROVED_PROVIDER_ID: string | null;
   REAL_EXECUTION_APPROVED_CHAIN_ID: string | null;
   REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: string | null;
@@ -135,6 +136,7 @@ const environmentSchema = Joi.object<Environment>({
   STRATEGY_MA_LONG_PERIOD: Joi.number().integer().min(1).max(1000).default(5),
   TRADING_MODE: Joi.string().valid('paper', 'real').default('paper'),
   REAL_EXECUTION_ENABLED: Joi.boolean().default(false),
+  REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: Joi.boolean().default(false),
   REAL_EXECUTION_APPROVED_PROVIDER_ID: Joi.string()
     .pattern(/^[a-z][a-z0-9_-]{0,31}$/)
     .empty('')
@@ -213,6 +215,15 @@ const environmentSchema = Joi.object<Environment>({
           custom: 'real execution approved token addresses must be distinct',
         });
       }
+    }
+    if (
+      value.REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED &&
+      (value.TRADING_MODE !== 'real' || !value.REAL_EXECUTION_ENABLED)
+    ) {
+      return helpers.message({
+        custom:
+          'operator submission requires real trading mode and real execution enablement',
+      });
     }
     return value;
   }, 'moving-average period relationship')

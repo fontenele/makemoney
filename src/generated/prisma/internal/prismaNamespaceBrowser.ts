@@ -66,6 +66,8 @@ export const ModelName = {
   RealExecutionRiskApproval: 'RealExecutionRiskApproval',
   RealExecutionFinalConfirmation: 'RealExecutionFinalConfirmation',
   RealExecutionSubmissionGate: 'RealExecutionSubmissionGate',
+  RealExecutionSubmissionAttempt: 'RealExecutionSubmissionAttempt',
+  RealExecutionSubmissionOutcome: 'RealExecutionSubmissionOutcome',
   RealExecutionSubmissionReceipt: 'RealExecutionSubmissionReceipt',
   RealExecutionStatusObservation: 'RealExecutionStatusObservation',
   RealExecutionFinancialReconciliationEvidence: 'RealExecutionFinancialReconciliationEvidence',
@@ -403,6 +405,40 @@ export const RealExecutionSubmissionGateScalarFieldEnum = {
 } as const
 
 export type RealExecutionSubmissionGateScalarFieldEnum = (typeof RealExecutionSubmissionGateScalarFieldEnum)[keyof typeof RealExecutionSubmissionGateScalarFieldEnum]
+
+
+export const RealExecutionSubmissionAttemptScalarFieldEnum = {
+  id: 'id',
+  gateId: 'gateId',
+  requestFingerprint: 'requestFingerprint',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  payloadCommitmentVersion: 'payloadCommitmentVersion',
+  payloadCommitmentDigest: 'payloadCommitmentDigest',
+  emergencyStopChangeId: 'emergencyStopChangeId',
+  commandArgumentsFingerprint: 'commandArgumentsFingerprint',
+  state: 'state',
+  automaticRetryAllowed: 'automaticRetryAllowed',
+  claimedAt: 'claimedAt'
+} as const
+
+export type RealExecutionSubmissionAttemptScalarFieldEnum = (typeof RealExecutionSubmissionAttemptScalarFieldEnum)[keyof typeof RealExecutionSubmissionAttemptScalarFieldEnum]
+
+
+export const RealExecutionSubmissionOutcomeScalarFieldEnum = {
+  attemptId: 'attemptId',
+  gateId: 'gateId',
+  status: 'status',
+  providerOrderId: 'providerOrderId',
+  responseFingerprint: 'responseFingerprint',
+  blockers: 'blockers',
+  executionSucceeded: 'executionSucceeded',
+  reconciliationRequired: 'reconciliationRequired',
+  automaticRetryAllowed: 'automaticRetryAllowed',
+  completedAt: 'completedAt'
+} as const
+
+export type RealExecutionSubmissionOutcomeScalarFieldEnum = (typeof RealExecutionSubmissionOutcomeScalarFieldEnum)[keyof typeof RealExecutionSubmissionOutcomeScalarFieldEnum]
 
 
 export const RealExecutionSubmissionReceiptScalarFieldEnum = {

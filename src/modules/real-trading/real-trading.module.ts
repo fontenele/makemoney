@@ -56,6 +56,19 @@ import { AgenticWalletFundingConversionAccountingSyncStore } from './application
 import { AgenticWalletFundingConversionAccountingSyncService } from './application/agentic-wallet-funding-conversion-accounting-sync.service';
 import { BscFundingConversionAccountingSnapshotReader } from './infrastructure/bsc-funding-conversion-accounting-snapshot.reader';
 import { PrismaAgenticWalletFundingConversionAccountingSyncStore } from './infrastructure/prisma-agentic-wallet-funding-conversion-accounting-sync.store';
+import { RealExecutionSubmissionAttemptStore } from './application/real-execution-submission-attempt.store';
+import { PrismaRealExecutionSubmissionAttemptStore } from './infrastructure/prisma-real-execution-submission-attempt.store';
+import { RealExecutionSubmissionOutcomeStore } from './application/real-execution-submission-outcome.store';
+import { PrismaRealExecutionSubmissionOutcomeStore } from './infrastructure/prisma-real-execution-submission-outcome.store';
+import { RealExecutionSubmissionService } from './application/real-execution-submission.service';
+import { AgenticWalletMarketSwapCliProcessRunner } from './infrastructure/agentic-wallet-market-swap-command-runner';
+import {
+  RealExecutionOperatorEnvironment,
+  RealExecutionOperatorSubmissionService,
+} from './application/real-execution-operator-submission.service';
+import { AgenticWalletMarketSwapStatusReconciliationAttempt } from './infrastructure/agentic-wallet-market-swap-status-reconciliation-attempt';
+import { PrismaAgenticWalletMarketSwapStatusReconciliationContextStore } from './infrastructure/prisma-agentic-wallet-market-swap-status-reconciliation-context.store';
+import { PrismaAgenticWalletMarketSwapStatusObservationStore } from './infrastructure/prisma-agentic-wallet-market-swap-status-observation.store';
 
 @Module({
   imports: [RiskEngineModule],
@@ -266,6 +279,72 @@ import { PrismaAgenticWalletFundingConversionAccountingSyncStore } from './infra
           reconciliations,
           contexts,
           snapshots,
+        ),
+    },
+    {
+      provide: RealExecutionSubmissionAttemptStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaRealExecutionSubmissionAttemptStore(prisma),
+    },
+    {
+      provide: RealExecutionSubmissionOutcomeStore,
+      useClass: PrismaRealExecutionSubmissionOutcomeStore,
+    },
+    {
+      provide: RealExecutionSubmissionService,
+      inject: [
+        RealExecutionSubmissionAttemptStore,
+        RealExecutionSubmissionOutcomeStore,
+      ],
+      useFactory: (
+        attempts: RealExecutionSubmissionAttemptStore,
+        outcomes: RealExecutionSubmissionOutcomeStore,
+      ) =>
+        new RealExecutionSubmissionService(
+          attempts,
+          new AgenticWalletMarketSwapCliProcessRunner(30000),
+          outcomes,
+        ),
+    },
+    {
+      provide: RealExecutionOperatorSubmissionService,
+      inject: [ConfigService, RealExecutionSubmissionService],
+      useFactory: (
+        config: ConfigService<RealExecutionOperatorEnvironment, true>,
+        submissions: RealExecutionSubmissionService,
+      ) => new RealExecutionOperatorSubmissionService(config, submissions),
+    },
+    {
+      provide: PrismaAgenticWalletMarketSwapStatusReconciliationContextStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaAgenticWalletMarketSwapStatusReconciliationContextStore(
+          prisma,
+        ),
+    },
+    {
+      provide: PrismaAgenticWalletMarketSwapStatusObservationStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaAgenticWalletMarketSwapStatusObservationStore(prisma),
+    },
+    {
+      provide: AgenticWalletMarketSwapStatusReconciliationAttempt,
+      inject: [
+        PrismaAgenticWalletMarketSwapStatusReconciliationContextStore,
+        PrismaAgenticWalletMarketSwapStatusObservationStore,
+      ],
+      useFactory: (
+        contexts: PrismaAgenticWalletMarketSwapStatusReconciliationContextStore,
+        observations: PrismaAgenticWalletMarketSwapStatusObservationStore,
+      ) =>
+        new AgenticWalletMarketSwapStatusReconciliationAttempt(
+          contexts,
+          new AgenticWalletMarketSwapStatusLookupCliProcessRunner(10000),
+          observations,
+          () => new Date(),
+          1_000,
         ),
     },
   ],

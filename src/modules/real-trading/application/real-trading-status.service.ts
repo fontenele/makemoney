@@ -23,7 +23,8 @@ export interface RealTradingLocalStatus {
   readonly scope: 'real_trading_local_status';
   readonly tradingMode: 'paper' | 'real';
   readonly realExecutionEnabled: boolean;
-  readonly runtimeExecutionAvailable: false;
+  readonly operatorSubmissionEnabled: boolean;
+  readonly runtimeExecutionAvailable: boolean;
   readonly instrument: typeof APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT;
   readonly walletObservationMode: 'manual_and_dashboard_automatic_read_only';
   readonly localRiskLimits: RealExecutionLocalRiskLimitAssessment;
@@ -34,6 +35,7 @@ export interface RealTradingLocalStatus {
 interface RealTradingEnvironment {
   readonly TRADING_MODE: 'paper' | 'real';
   readonly REAL_EXECUTION_ENABLED: boolean;
+  readonly REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: boolean;
   readonly REAL_RISK_MAX_ORDER_NOTIONAL_USDT: string | null;
   readonly REAL_RISK_MAX_DAILY_SPEND_USDT: string | null;
   readonly REAL_RISK_MAX_BANKROLL_USDT: string | null;
@@ -175,13 +177,18 @@ export class RealTradingStatusService {
   ) {}
 
   getLocalStatus(): RealTradingLocalStatus {
+    const operatorSubmissionEnabled = this.config.get(
+      'REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED',
+      { infer: true },
+    );
     return {
       scope: 'real_trading_local_status',
       tradingMode: this.config.get('TRADING_MODE', { infer: true }),
       realExecutionEnabled: this.config.get('REAL_EXECUTION_ENABLED', {
         infer: true,
       }),
-      runtimeExecutionAvailable: false,
+      operatorSubmissionEnabled,
+      runtimeExecutionAvailable: operatorSubmissionEnabled,
       instrument: APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT,
       walletObservationMode: 'manual_and_dashboard_automatic_read_only',
       localRiskLimits: assessRealExecutionLocalRiskLimits({

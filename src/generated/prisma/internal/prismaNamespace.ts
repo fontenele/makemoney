@@ -412,6 +412,8 @@ export const ModelName = {
   RealExecutionRiskApproval: 'RealExecutionRiskApproval',
   RealExecutionFinalConfirmation: 'RealExecutionFinalConfirmation',
   RealExecutionSubmissionGate: 'RealExecutionSubmissionGate',
+  RealExecutionSubmissionAttempt: 'RealExecutionSubmissionAttempt',
+  RealExecutionSubmissionOutcome: 'RealExecutionSubmissionOutcome',
   RealExecutionSubmissionReceipt: 'RealExecutionSubmissionReceipt',
   RealExecutionStatusObservation: 'RealExecutionStatusObservation',
   RealExecutionFinancialReconciliationEvidence: 'RealExecutionFinancialReconciliationEvidence',
@@ -441,7 +443,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "agenticWalletFundingConversionPlan" | "agenticWalletFundingConversionSubmissionAttempt" | "agenticWalletFundingConversionStatusObservation" | "agenticWalletFundingConversionFinancialReconciliation" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingBalanceInitialization" | "agenticWalletFundingConversionAccountingSync" | "realExecutionAccountingLedgerReconciliation" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "agenticWalletFundingConversionPlan" | "agenticWalletFundingConversionSubmissionAttempt" | "agenticWalletFundingConversionStatusObservation" | "agenticWalletFundingConversionFinancialReconciliation" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionAttempt" | "realExecutionSubmissionOutcome" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingBalanceInitialization" | "agenticWalletFundingConversionAccountingSync" | "realExecutionAccountingLedgerReconciliation" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1552,6 +1554,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.RealExecutionSubmissionGateCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.RealExecutionSubmissionGateCountAggregateOutputType> | number
+        }
+      }
+    }
+    RealExecutionSubmissionAttempt: {
+      payload: Prisma.$RealExecutionSubmissionAttemptPayload<ExtArgs>
+      fields: Prisma.RealExecutionSubmissionAttemptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionSubmissionAttemptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionAttemptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionSubmissionAttemptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionAttemptPayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionSubmissionAttemptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionAttemptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionSubmissionAttemptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionAttemptPayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionSubmissionAttemptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionAttemptPayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionSubmissionAttemptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionAttemptPayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionSubmissionAttemptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionSubmissionAttemptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionAttemptPayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionSubmissionAttemptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionAttemptPayload>
+        }
+        update: {
+          args: Prisma.RealExecutionSubmissionAttemptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionAttemptPayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionSubmissionAttemptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionSubmissionAttemptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionSubmissionAttemptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionAttemptPayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionSubmissionAttemptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionAttemptPayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionSubmissionAttemptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionSubmissionAttempt>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionSubmissionAttemptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionSubmissionAttemptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionSubmissionAttemptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionSubmissionAttemptCountAggregateOutputType> | number
+        }
+      }
+    }
+    RealExecutionSubmissionOutcome: {
+      payload: Prisma.$RealExecutionSubmissionOutcomePayload<ExtArgs>
+      fields: Prisma.RealExecutionSubmissionOutcomeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealExecutionSubmissionOutcomeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionOutcomePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealExecutionSubmissionOutcomeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionOutcomePayload>
+        }
+        findFirst: {
+          args: Prisma.RealExecutionSubmissionOutcomeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionOutcomePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealExecutionSubmissionOutcomeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionOutcomePayload>
+        }
+        findMany: {
+          args: Prisma.RealExecutionSubmissionOutcomeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionOutcomePayload>[]
+        }
+        create: {
+          args: Prisma.RealExecutionSubmissionOutcomeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionOutcomePayload>
+        }
+        createMany: {
+          args: Prisma.RealExecutionSubmissionOutcomeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealExecutionSubmissionOutcomeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionOutcomePayload>[]
+        }
+        delete: {
+          args: Prisma.RealExecutionSubmissionOutcomeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionOutcomePayload>
+        }
+        update: {
+          args: Prisma.RealExecutionSubmissionOutcomeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionOutcomePayload>
+        }
+        deleteMany: {
+          args: Prisma.RealExecutionSubmissionOutcomeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealExecutionSubmissionOutcomeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealExecutionSubmissionOutcomeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionOutcomePayload>[]
+        }
+        upsert: {
+          args: Prisma.RealExecutionSubmissionOutcomeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealExecutionSubmissionOutcomePayload>
+        }
+        aggregate: {
+          args: Prisma.RealExecutionSubmissionOutcomeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealExecutionSubmissionOutcome>
+        }
+        groupBy: {
+          args: Prisma.RealExecutionSubmissionOutcomeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionSubmissionOutcomeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealExecutionSubmissionOutcomeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealExecutionSubmissionOutcomeCountAggregateOutputType> | number
         }
       }
     }
@@ -2937,6 +3087,40 @@ export const RealExecutionSubmissionGateScalarFieldEnum = {
 export type RealExecutionSubmissionGateScalarFieldEnum = (typeof RealExecutionSubmissionGateScalarFieldEnum)[keyof typeof RealExecutionSubmissionGateScalarFieldEnum]
 
 
+export const RealExecutionSubmissionAttemptScalarFieldEnum = {
+  id: 'id',
+  gateId: 'gateId',
+  requestFingerprint: 'requestFingerprint',
+  providerId: 'providerId',
+  chainId: 'chainId',
+  payloadCommitmentVersion: 'payloadCommitmentVersion',
+  payloadCommitmentDigest: 'payloadCommitmentDigest',
+  emergencyStopChangeId: 'emergencyStopChangeId',
+  commandArgumentsFingerprint: 'commandArgumentsFingerprint',
+  state: 'state',
+  automaticRetryAllowed: 'automaticRetryAllowed',
+  claimedAt: 'claimedAt'
+} as const
+
+export type RealExecutionSubmissionAttemptScalarFieldEnum = (typeof RealExecutionSubmissionAttemptScalarFieldEnum)[keyof typeof RealExecutionSubmissionAttemptScalarFieldEnum]
+
+
+export const RealExecutionSubmissionOutcomeScalarFieldEnum = {
+  attemptId: 'attemptId',
+  gateId: 'gateId',
+  status: 'status',
+  providerOrderId: 'providerOrderId',
+  responseFingerprint: 'responseFingerprint',
+  blockers: 'blockers',
+  executionSucceeded: 'executionSucceeded',
+  reconciliationRequired: 'reconciliationRequired',
+  automaticRetryAllowed: 'automaticRetryAllowed',
+  completedAt: 'completedAt'
+} as const
+
+export type RealExecutionSubmissionOutcomeScalarFieldEnum = (typeof RealExecutionSubmissionOutcomeScalarFieldEnum)[keyof typeof RealExecutionSubmissionOutcomeScalarFieldEnum]
+
+
 export const RealExecutionSubmissionReceiptScalarFieldEnum = {
   gateId: 'gateId',
   providerId: 'providerId',
@@ -3501,6 +3685,8 @@ export type GlobalOmitConfig = {
   realExecutionRiskApproval?: Prisma.RealExecutionRiskApprovalOmit
   realExecutionFinalConfirmation?: Prisma.RealExecutionFinalConfirmationOmit
   realExecutionSubmissionGate?: Prisma.RealExecutionSubmissionGateOmit
+  realExecutionSubmissionAttempt?: Prisma.RealExecutionSubmissionAttemptOmit
+  realExecutionSubmissionOutcome?: Prisma.RealExecutionSubmissionOutcomeOmit
   realExecutionSubmissionReceipt?: Prisma.RealExecutionSubmissionReceiptOmit
   realExecutionStatusObservation?: Prisma.RealExecutionStatusObservationOmit
   realExecutionFinancialReconciliationEvidence?: Prisma.RealExecutionFinancialReconciliationEvidenceOmit

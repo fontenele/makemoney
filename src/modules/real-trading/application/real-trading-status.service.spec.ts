@@ -28,6 +28,7 @@ describe('RealTradingStatusService', () => {
       scope: 'real_trading_local_status',
       tradingMode: 'paper',
       realExecutionEnabled: false,
+      operatorSubmissionEnabled: false,
       runtimeExecutionAvailable: false,
       instrument: {
         providerId: 'agentic_wallet',
@@ -56,6 +57,26 @@ describe('RealTradingStatusService', () => {
       submissionAuthorized: false,
     });
     expect(wallet.load).not.toHaveBeenCalled();
+  });
+
+  it('reports the independent operator-submission activation gate', () => {
+    const service = new RealTradingStatusService(
+      config({
+        TRADING_MODE: 'real',
+        REAL_EXECUTION_ENABLED: true,
+        REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: true,
+      }),
+      { load: jest.fn() } as unknown as AgenticWalletCapabilityAdapter,
+      fundingPrices(),
+    );
+
+    expect(service.getLocalStatus()).toMatchObject({
+      tradingMode: 'real',
+      realExecutionEnabled: true,
+      operatorSubmissionEnabled: true,
+      runtimeExecutionAvailable: true,
+      submissionAuthorized: false,
+    });
   });
 
   it('sanitizes the wallet read and coalesces concurrent observations', async () => {
@@ -344,6 +365,7 @@ describe('RealTradingStatusService', () => {
 function config(values: {
   TRADING_MODE: 'paper' | 'real';
   REAL_EXECUTION_ENABLED: boolean;
+  REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED?: boolean;
   REAL_RISK_MAX_ORDER_NOTIONAL_USDT?: string;
   REAL_RISK_MAX_DAILY_SPEND_USDT?: string;
   REAL_RISK_MAX_BANKROLL_USDT?: string;
@@ -352,6 +374,7 @@ function config(values: {
   REAL_RISK_MAX_SLIPPAGE_RATE?: string;
 }): ConfigService<Record<string, unknown>, true> {
   const completeValues = {
+    REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: false,
     REAL_RISK_MAX_ORDER_NOTIONAL_USDT: null,
     REAL_RISK_MAX_DAILY_SPEND_USDT: null,
     REAL_RISK_MAX_BANKROLL_USDT: null,

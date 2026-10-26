@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-10-26 — M10.153 guarded manual real-execution status reconciliation
+
+- Added loopback-only Bearer-protected `POST /real-trading/submission-status` with a strict canonical gate identity.
+- Registered the existing durable one-shot BTCB/USDT status context, cadence, pinned read-only lookup, response assessment, and monotonic observation store.
+- Kept terminal financial reconciliation incomplete and added no polling, scheduling, automatic retry, resubmission, accounting mutation, dashboard action, or strategy bridge.
+- Added E2E coverage for missing authentication, malformed input, and absent durable context without live provider access.
+
+## 2026-10-24 — Register a disabled-by-default manual real-execution boundary
+
+- Added `REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED=false` as a third independent runtime safeguard; startup rejects enabling it without real mode and general execution enablement.
+- Registered the M10.151 claim, runner, and outcome composition behind loopback-only Bearer-protected `POST /real-trading/submission`.
+- Required canonical attempt/gate UUIDs, the literal immediate-review acknowledgment, and the exact Agentic Wallet/BSC/BTCB/USDT allowlist before claim access.
+- Exposed the independent operator gate in the provider-free real-trading status while preserving false per-request submission authorization.
+- Added unit and E2E coverage proving malformed, unauthenticated, and disabled requests stop before claim or CLI access.
+- All 2,837 backend tests across 253 suites, 113 serial E2E tests across 9 suites, and 115 dashboard tests across 20 files pass with formatting, lint, builds, Prisma validation/migration status, all 47 migrations applied from scratch, Compose validation, and whitespace checks.
+- Kept the local environment paper-only with both execution flags false and no control token; verification made no live CLI call, provider request, swap, or financial transaction.
+
+## 2026-10-24 — Close one real-execution submission and preserve every outcome
+
+- Changed a fresh M10.150 claim to release its complete fingerprint-bound command exactly once while exact replay returns no command.
+- Added an unregistered pinned-version Agentic Wallet runner restricted to the approved BSC BTCB/USDT market-swap envelope.
+- Added one-shot orchestration that verifies claim correlation, performs at most one runner call, and converts failures or malformed responses to a non-retryable unknown outcome.
+- Added an immutable submission-outcome model and serializable store that atomically creates the existing pending receipt only for a safe acknowledged provider order identity.
+- Preserved safe stranding: a claim without an outcome is never resubmitted, outcome replay performs no provider access, and no state claims execution success before reconciliation.
+- Applied the migration locally. All 2,831 backend tests across 252 suites, 111 serial E2E tests across 9 suites, and 115 dashboard tests across 20 files pass with formatting, lint, backend/dashboard builds, Prisma validation and migration status, all 47 migrations applied from scratch in E2E, Compose validation, and whitespace checks.
+- Kept the entire path outside NestJS and unreachable; verification made no live CLI call, provider request, swap, financial transaction, or strategy execution.
+
+## 2026-10-24 — Claim each real-execution gate at most once
+
+- Added an immutable real-execution submission-attempt model and additive migration keyed one-to-one to the existing atomic BTCB/USDT gate.
+- Added an unregistered serializable claim store sharing the emergency-stop/gate advisory lock and revalidating gate structure, expiry, newest persisted inactive stop identity, and absence of a provider receipt.
+- Bound each claim to the durable payload commitment and SHA-256 fingerprint of the complete closed Agentic Wallet command arguments.
+- Made exact replay observable before mutable reads while changed identities, concurrent claims, uniqueness races, and serializable conflicts fail closed without automatic retry.
+- Kept provider submission unstarted and unauthorized; no NestJS registration, route, runner, provider call, strategy bridge, swap, or financial transaction was added.
+- Applied the migration locally. All 2,812 backend tests across 249 suites, 107 serial E2E tests across 9 suites, and 115 dashboard tests across 20 files pass with formatting, lint, backend/dashboard builds, Prisma validation and migration status, all 46 migrations applied from scratch in E2E, Compose validation, and whitespace checks.
+
 ## 2026-10-24 — Make local runtime handoff require live valuation
 
 - Identified the recurring paper-valuation 503 as an operational launch error: the API had been started inside a restricted command sandbox even though the host could reach the public Binance ticker endpoint.

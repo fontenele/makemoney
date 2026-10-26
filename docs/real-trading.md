@@ -1,5 +1,82 @@
 # Real Trading
 
+## M10.153 — Guarded manual real-execution status reconciliation
+
+M10.153 registers the existing durable BTCB/USDT status-reconciliation attempt behind `POST /real-trading/submission-status`. The application remains loopback-bound and the route reuses the timing-safe SHA-256 Bearer guard. Its strict body contains only one canonical `gateId` UUID; malformed input fails before persistence or provider access.
+
+Each explicit call reloads the exact durable gate, acknowledged submission receipt, and latest immutable status observation. Missing context blocks before the CLI. Terminal evidence stops further lookup, a prior `PENDING` observation enforces the existing one-second minimum cadence, and an eligible call can issue at most one pinned read-only order-status lookup and one monotonic observation write. Same-gate overlap remains suppressed in process.
+
+The route cannot submit or resubmit an order, mutate balances or accounting, poll, schedule work, or retry automatically. A terminal `FINISHED` observation still requires a separate financial-reconciliation increment before accounting can change. Runtime verification exercises authentication, malformed input, and absent context only, so it makes no live provider call or financial transaction.
+
+### M10.153 acceptance criteria
+
+- The route is loopback-only and protected by the existing timing-safe Bearer guard.
+- The body contains exactly one canonical gate UUID.
+- Durable gate, acknowledged receipt, and latest status evidence are reloaded on every call.
+- Missing, malformed, corrupt, terminal, overlapping, or not-yet-due work stops before provider access as appropriate.
+- One eligible explicit call can perform at most one pinned read-only lookup and one monotonic persistence attempt.
+- Terminal success remains financially unreconciled and non-retryable.
+- No polling, scheduling, automatic retry, resubmission, balance mutation, accounting mutation, dashboard action, or strategy bridge is added.
+- E2E coverage proves authentication, malformed-input, and absent-context failures without invoking the live provider.
+
+## M10.152 — Guarded manual real-execution submission boundary
+
+M10.152 registers the M10.151 coordinator only behind `POST /real-trading/submission`. The application remains loopback-bound and the route reuses the timing-safe SHA-256 Bearer guard. Its body has exactly three fields: canonical `attemptId` and `gateId` UUIDs plus the literal acknowledgment `approved_gate_and_immediate_provider_submission_reviewed`. Input is rejected before configuration access.
+
+Before claim or CLI access, the operator service requires `TRADING_MODE=real`, `REAL_EXECUTION_ENABLED=true`, the new independent `REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED=true`, provider `agentic_wallet`, chain `56`, and the approved USDT/BTCB token pair in either supported direction. Startup rejects enabling the operator flag unless both earlier activation gates are also enabled. The operator service repeats the exact allowlist at request time so process-local configuration mutation cannot bypass it.
+
+Passing this outer boundary does not replace any durable safeguard. The M10.150 claim still reloads the unexpired atomic gate under the shared emergency-stop lock, requires the newest persisted stop event to be the exact inactive event bound by approval and confirmation, rejects an existing receipt, and consumes the gate once. M10.151 still permits one fingerprint-bound runner call only for a fresh claim, records acknowledged or unknown outcomes, and forbids automatic retry. The status route now reports the independent operator flag without granting per-request authorization.
+
+The new flag defaults false, `.env.example` keeps paper mode and both execution flags disabled, and no control token is supplied. E2E configures authentication only long enough to prove that the disabled operator gate returns conflict without creating a claim. Tests never enable a complete live runtime or invoke the CLI.
+
+### M10.152 acceptance criteria
+
+- The manual endpoint is loopback-only and protected by the existing timing-safe Bearer guard.
+- Its strict request requires canonical attempt/gate identities and the exact immediate-review acknowledgment.
+- A new independent operator-submission flag defaults false and cannot be enabled at startup without real mode plus general execution enablement.
+- Exact provider, chain, and approved BTCB/USDT token identities are rechecked before claim access.
+- Every M10.150/M10.151 gate, one-shot, outcome, and no-retry guarantee remains authoritative after runtime composition.
+- Disabled or unauthenticated requests stop before claim, runner, or provider access.
+- No dashboard action, automatic invocation, strategy bridge, live provider call, swap, or financial transaction is added.
+
+## M10.151 — Closed submission runner and immutable outcome
+
+M10.151 completes the first unregistered provider-submission unit behind the M10.150 claim. A newly committed claim returns the exact M10.35 command arguments together with their persisted SHA-256 fingerprint. An exact replay returns `command: null`, so it cannot be reused as execution authority. The coordinator also verifies that the command's attempt, gate, and fingerprint exactly match the stored attempt before it reaches the runner.
+
+The closed runner accepts only canonical claim identities, the exact BSC BTCB/USDT direction in either approved side, canonical positive quantity and slippage, MEV protection, `MEDIUM` gas, JSON output, and a matching command fingerprint. It checks Agentic Wallet CLI 1.10.0 before the single swap invocation. The coordinator catches every runner failure and assesses the response as either `submitted_pending_confirmation` with one safe provider order identity or `submission_outcome_unknown`; neither state claims execution success and both permanently forbid automatic retry.
+
+The serializable outcome store takes the existing claim and receipt advisory locks, reloads the exact immutable attempt, enforces chronology and attempt/gate correlation, and records one immutable outcome. An acknowledged outcome and the existing pending submission receipt are inserted in the same transaction. Unknown outcomes never fabricate a receipt. Exact outcome replay is idempotent, divergence conflicts, and a replayed claim with no durable outcome remains stranded for operator investigation instead of invoking the provider again.
+
+M10.151 originally left the coordinator, runner, and stores outside NestJS dependency injection with no route. M10.152 subsequently registered them only behind the separately disabled guarded manual operator boundary. Tests continue to use doubles and synthetic responses, and verification does not invoke the live CLI. The paper-only default, strategy separation, and requirement for immediate user confirmation before a first real order remain unchanged.
+
+### M10.151 acceptance criteria
+
+- Only a newly created claim can carry a command; exact claim replay carries none.
+- Attempt, gate, complete arguments, and persisted command fingerprint must remain exactly correlated through the runner boundary.
+- The runner allowlists only the pinned BTCB/USDT BSC market-swap envelope and pinned CLI version, with no retry.
+- Every runner return or failure becomes an acknowledged-pending or unknown immutable outcome that never claims execution success.
+- Acknowledgment and the pending receipt commit atomically; unknown outcomes create no receipt.
+- Existing outcome replay performs no provider access, while a claimed attempt without an outcome blocks safely.
+- No NestJS registration, route, strategy bridge, live provider call, or financial transaction is introduced.
+
+## M10.150 — One-shot real-execution submission claim
+
+M10.150 adds the first executor-side durable boundary after the existing M10.34 atomic BTCB/USDT submission gate. The store accepts only a canonical attempt UUID and gate UUID. Inside a serializable transaction it takes the same advisory lock used by persisted emergency-stop changes and gate creation, checks exact replay first, reloads the gate, and reapplies the closed M10.35 command policy at the transaction clock.
+
+A new claim is admitted only while the exact gate is structurally valid and unexpired, no provider submission receipt exists, and the newest persisted emergency-stop event is inactive with the same change identity already bound through the Risk Engine approval and final confirmation. The row preserves the gate's provider, chain, payload commitment, emergency-stop identity, and a SHA-256 fingerprint of the complete closed command arguments. One gate can have only one claim. Exact replay returns the immutable attempt without rereading mutable state; a different attempt for the same gate, reused attempt identity, uniqueness race, or serializable write conflict becomes a non-retryable conflict.
+
+The claim deliberately burns the one-shot boundary before any provider process starts. Its persisted public artifact keeps `providerSubmissionStarted`, `submissionAuthorized`, and `automaticRetryAllowed` false. The store is not registered in NestJS and M10.150 itself added no route, strategy bridge, CLI runner, provider call, quote, swap, or financial transaction. M10.151 now consumes only the command returned with a newly created claim, records both acknowledged and ambiguous outcomes immutably, and never submits again from a replayed claim.
+
+### M10.150 acceptance criteria
+
+- Canonical attempt and gate identities are validated before persistence access.
+- Claiming shares the emergency-stop/gate advisory lock and serializable isolation.
+- The exact gate must remain valid and unexpired with no existing provider receipt.
+- The newest persisted emergency-stop event must remain inactive and retain the gate's exact change identity.
+- The complete closed provider arguments are derived from the durable gate and fingerprinted into the immutable attempt.
+- Exact replay short-circuits mutable reads; changed, concurrent, or divergent reuse fails closed without automatic retry.
+- The claim does not start or authorize provider submission and remains outside runtime dependency injection.
+
 ## M10.149 — Exact funding-conversion accounting synchronization
 
 M10.149 adds one explicit operator action after completed M10.148 financial reconciliation. `POST /real-trading/funding-conversion-accounting-sync` requires the configured Bearer token and a strict body containing the canonical submission-attempt UUID, canonical trusted accounting-initialization UUID, and the literal acknowledgment `reconciled_conversion_and_exact_wallet_balances_reviewed_for_local_ledger_synchronization`.

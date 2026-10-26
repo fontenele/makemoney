@@ -1,5 +1,33 @@
 # Technical Decisions
 
+## 2026-10-24 - Require a third runtime gate and literal acknowledgment for manual submission
+
+## M10.153 — Reuse the durable one-shot status boundary behind a manual guarded route
+
+M10.153 does not introduce another status model or a polling worker. The already tested M10.37–M10.75 boundary owns gate/receipt validation, durable cadence, response correlation, monotonic transitions, replay, and terminal stopping; the new runtime surface only authenticates one explicit canonical gate request and composes those existing parts.
+
+Status lookup remains read-only provider access and is permitted only for a durable acknowledged receipt. A `FINISHED` provider status is evidence that financial reconciliation is required, not permission to mutate accounting or declare execution financially complete. The endpoint therefore has no submission runner, automatic retry, timer, dashboard action, or strategy bridge.
+
+M10.152 makes the generic BTCB/USDT runner reachable only through an explicit operator request; it does not connect strategy signals, dashboard actions, schedules, or workers. Loopback binding and the existing timing-safe Bearer token establish the caller boundary, while a strict literal acknowledgment makes the request itself state that the approved gate and immediate provider submission were reviewed.
+
+The existing real mode and general execution flag remain necessary but are not sufficient. A new `REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED` flag defaults false, startup forbids it unless both earlier gates are active, and the request-time service additionally requires the exact Agentic Wallet provider, BSC chain, and approved BTCB/USDT token pair. This deliberately makes changing one environment variable insufficient and defends against process-local configuration drift.
+
+Runtime registration delegates to the already closed one-shot claim/runner/outcome sequence instead of creating another execution path. Consequently, gate expiry, emergency-stop identity, receipt absence, command fingerprint, safe stranding, ambiguous-outcome persistence, and permanent no-retry behavior remain unchanged. The current environment was not modified, so verification exercises only unauthenticated and disabled paths and cannot reach the live CLI.
+
+## 2026-10-24 - Persist ambiguous submissions and never retry a consumed claim
+
+M10.151 treats a committed M10.150 claim as consumed even if the provider process rejects, times out, emits invalid JSON, or returns a malformed envelope. Those cases are not evidence that no order exists, so they become an immutable `submission_outcome_unknown` with reconciliation required and automatic retry forbidden. If a process stops after claiming but before recording an outcome, later calls see the claim but receive no command and block for operator investigation.
+
+Only a newly created claim releases the complete fingerprint-bound command. The runner independently allowlists its exact BTCB/USDT BSC shape and pinned CLI version. A safe provider order ID produces `submitted_pending_confirmation`; the outcome store creates that durable outcome and the existing pending receipt atomically under the claim and receipt locks. This preserves the downstream status and financial-reconciliation model without inventing a parallel receipt lifecycle.
+
+M10.151 left the entire coordinator unregistered. M10.152 later supplied runtime registration, authentication, independent safety checks, and a literal immediate-review acknowledgment while retaining disabled defaults and every one-shot constraint.
+
+## 2026-10-24 - Claim the real-execution gate before adding a mutating runner
+
+The generic BTCB/USDT path already had a durable atomic gate and downstream receipt/reconciliation/accounting models, but it lacked a durable fact that a provider submission might be about to start. Calling the CLI directly from the gate would allow concurrent callers or a process restart after an ambiguous timeout to reuse the same consumed confirmation. M10.150 therefore adds a separate one-shot attempt before introducing any mutable runner.
+
+The claim shares the advisory lock used by gate creation and emergency-stop changes. It revalidates gate expiry, the exact latest inactive stop-change identity, absence of a provider receipt, and the closed command arguments in one serializable transaction. A committed claim is permanently non-retryable even when no provider call follows, preferring a safely stranded attempt over a possible duplicate financial transaction. Exact replay is observable but cannot be used as renewed submission authority. M10.151 subsequently added the separately verified, still-unregistered provider runner and acknowledged-or-unknown outcome persistence.
+
 ## 2026-10-24 - Synchronize funding conversion from one authoritative three-asset block
 
 M10.149 does not infer local post-conversion balances solely from deltas. It obtains native BNB, approved USDT, and approved BTCB at one finalized BSC block and requires the observed BNB/USDT quantities to equal the independently persisted financial-reconciliation equations. BTCB is included even though the conversion does not target it, so unexplained wallet drift cannot be hidden by updating only the two touched assets.

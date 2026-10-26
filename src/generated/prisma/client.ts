@@ -115,6 +115,16 @@ export type RealExecutionFinalConfirmation = Prisma.RealExecutionFinalConfirmati
  */
 export type RealExecutionSubmissionGate = Prisma.RealExecutionSubmissionGateModel
 /**
+ * Model RealExecutionSubmissionAttempt
+ * 
+ */
+export type RealExecutionSubmissionAttempt = Prisma.RealExecutionSubmissionAttemptModel
+/**
+ * Model RealExecutionSubmissionOutcome
+ * 
+ */
+export type RealExecutionSubmissionOutcome = Prisma.RealExecutionSubmissionOutcomeModel
+/**
  * Model RealExecutionSubmissionReceipt
  * 
  */
