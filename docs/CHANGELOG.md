@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-26 — M10.156 guarded real-execution accounting mutation commitment
+
+- Added Bearer-protected `POST /real-trading/submission-accounting-commitment` with strict canonical gate and mutation UUIDs.
+- Composed the existing revalidating M10.87 evidence reader, deterministic M10.88 plan, canonical M10.89 commitment, and serializable immutable M10.90 store.
+- Preserved exact replay while keeping accounting authorization/completion and submission retry false; malformed and absent-evidence E2E paths stop without provider access or ledger mutation.
+
 ## 2026-10-26 — M10.155 guarded real-execution accounting balance evidence
 
 - Added Bearer-protected `POST /real-trading/submission-accounting-evidence` for one strict complete canonical M10.85 balance-change package.

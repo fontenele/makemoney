@@ -1,5 +1,11 @@
 # Technical Decisions
 
+## M10.156 — Persist an inert commitment before requesting accounting authority
+
+A durable balance-evidence row identifies what was observed, but exposing the later authorization boundary directly would let one operator action both choose the mutation identity and grant ledger authority. M10.156 keeps those responsibilities separate. Its guarded request supplies only canonical gate and mutation UUIDs; the server reloads the durable evidence relation, regenerates the exact ordered plan and fingerprint at its own clock, and lets the existing serializable store revalidate the relation again before insertion.
+
+The resulting row is immutable and idempotent but explicitly non-authorizing. It starts no provider call, changes no balance, calculates no PnL, and cannot enable submission retry. A later independently reviewed request must cite this exact commitment and provide the M10.92 acknowledgment before authorization can become durable.
+
 ## 2026-10-24 - Require a third runtime gate and literal acknowledgment for manual submission
 
 ## M10.155 — Treat balance changes as explicit evidence, never as an implicit accounting mutation

@@ -73,6 +73,9 @@ import { PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore } fro
 import { RealExecutionFinancialReconciliationService } from './application/real-execution-financial-reconciliation.service';
 import { PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceStore } from './infrastructure/prisma-agentic-wallet-market-swap-accounting-balance-evidence.store';
 import { RealExecutionAccountingBalanceEvidenceService } from './application/real-execution-accounting-balance-evidence.service';
+import { PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore } from './infrastructure/prisma-agentic-wallet-market-swap-accounting-balance-evidence-read.store';
+import { PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore } from './infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-commitment.store';
+import { RealExecutionAccountingMutationCommitmentService } from './application/real-execution-accounting-mutation-commitment.service';
 
 @Module({
   imports: [RiskEngineModule],
@@ -381,6 +384,38 @@ import { RealExecutionAccountingBalanceEvidenceService } from './application/rea
       useFactory: (
         evidence: PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceStore,
       ) => new RealExecutionAccountingBalanceEvidenceService(evidence),
+    },
+    {
+      provide: PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore(
+          prisma,
+        ),
+    },
+    {
+      provide: PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore(
+          prisma,
+        ),
+    },
+    {
+      provide: RealExecutionAccountingMutationCommitmentService,
+      inject: [
+        PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore,
+        PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore,
+      ],
+      useFactory: (
+        evidence: PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore,
+        commitments: PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore,
+      ) =>
+        new RealExecutionAccountingMutationCommitmentService(
+          evidence,
+          commitments,
+          () => new Date(),
+        ),
     },
   ],
 })

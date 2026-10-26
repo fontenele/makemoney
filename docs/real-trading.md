@@ -1,5 +1,22 @@
 # Real Trading
 
+## M10.156 — Guarded real-execution accounting mutation commitment
+
+M10.156 registers a manual composition boundary over the existing M10.87–M10.90 artifacts at `POST /real-trading/submission-accounting-commitment`. The loopback-only route reuses the timing-safe SHA-256 Bearer guard and accepts exactly `{ "gateId": "<uuid>", "mutationId": "<uuid>" }`. Extra, missing, malformed, or noncanonical identities fail before persistence access.
+
+For a valid request, the service reads the immutable accounting balance evidence by gate through M10.87, which reconstructs and revalidates its complete financial relation. It derives the deterministic M10.88 transition plan, prepares the M10.89 canonical SHA-256 commitment using the server clock, and delegates to M10.90. That serializable store independently reloads the evidence relation, regenerates the plan and commitment, and admits only exact immutable persistence or replay.
+
+Success proves only which already-reconciled balance transitions are committed. `accountingMutationAuthorized` and `accountingMutationComplete` remain false, submission retry remains forbidden, and no provider/RPC call, ledger/PnL mutation, or financial transaction occurs. Authorization remains a distinct later operator boundary.
+
+### M10.156 acceptance criteria
+
+- The route is loopback-only and timing-safe Bearer-protected.
+- Only exact canonical gate/mutation UUID requests reach durable reads.
+- Durable balance evidence and its financial relation are revalidated before plan derivation and again inside serialized persistence.
+- Exact replay returns the immutable commitment; divergent reuse conflicts.
+- Responses explicitly keep provider access unstarted, accounting unauthorized/incomplete, and retry forbidden.
+- E2E verification covers missing authentication, malformed input, and absent evidence without invoking any financial side effect.
+
 ## M10.155 — Guarded real-execution accounting balance evidence
 
 M10.155 registers the existing M10.85–M10.86 balance-evidence boundary behind `POST /real-trading/submission-accounting-evidence`. The loopback-only route reuses the timing-safe SHA-256 Bearer guard and accepts exactly one complete canonical M10.85 object. The package identifies the immutable financial evidence, gate, and transaction and supplies one to twenty unique token/native balance changes with exact before, after, direction, and delta equations, an explicit complete-coverage assertion, and a canonical UTC observation time. Extra, missing, malformed, duplicated, arithmetically inconsistent, noncanonical, or incomplete facts fail before persistence access.

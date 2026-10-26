@@ -461,6 +461,75 @@ describe('Application (e2e)', () => {
     }
   });
 
+  it('/real-trading/submission-accounting-commitment (POST) fails closed without operator authentication', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set('RISK_CONTROL_TOKEN_SHA256', '');
+    try {
+      await request(server)
+        .post('/real-trading/submission-accounting-commitment')
+        .send(realExecutionAccountingMutationCommitmentRequest())
+        .expect(503);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-accounting-commitment (POST) rejects malformed identity before persistence access', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const prisma = app.get(PrismaService);
+    const token = 'e2e-real-execution-accounting-commitment-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    const before =
+      await prisma.realExecutionAccountingMutationCommitment.count();
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/submission-accounting-commitment')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          ...realExecutionAccountingMutationCommitmentRequest(),
+          mutationId: 'invalid',
+        })
+        .expect(400);
+      await expect(
+        prisma.realExecutionAccountingMutationCommitment.count(),
+      ).resolves.toBe(before);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-accounting-commitment (POST) stops without durable accounting evidence', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const token = 'e2e-real-execution-accounting-commitment-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/submission-accounting-commitment')
+        .set('Authorization', `Bearer ${token}`)
+        .send(realExecutionAccountingMutationCommitmentRequest())
+        .expect(409)
+        .expect({
+          message: 'Durable accounting balance evidence was not found',
+          error: 'Conflict',
+          statusCode: 409,
+        });
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
   it.each([
     '/real-trading/funding-conversion-status',
     '/real-trading/funding-conversion-reconciliation',
@@ -1998,6 +2067,13 @@ function realExecutionAccountingBalanceEvidenceRequest() {
     ],
     coverageComplete: true,
     observedAt: '2026-10-26T18:00:01.000Z',
+  };
+}
+
+function realExecutionAccountingMutationCommitmentRequest() {
+  return {
+    gateId: 'f1000000-0000-4000-8000-000000000001',
+    mutationId: 'f1000000-0000-4000-8000-000000000002',
   };
 }
 
