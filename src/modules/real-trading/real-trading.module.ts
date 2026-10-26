@@ -76,6 +76,12 @@ import { RealExecutionAccountingBalanceEvidenceService } from './application/rea
 import { PrismaAgenticWalletMarketSwapAccountingBalanceEvidenceReadStore } from './infrastructure/prisma-agentic-wallet-market-swap-accounting-balance-evidence-read.store';
 import { PrismaAgenticWalletMarketSwapAccountingMutationCommitmentStore } from './infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-commitment.store';
 import { RealExecutionAccountingMutationCommitmentService } from './application/real-execution-accounting-mutation-commitment.service';
+import { PrismaAgenticWalletMarketSwapAccountingMutationCommitmentReadStore } from './infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-commitment-read.store';
+import { PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationStore } from './infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-authorization.store';
+import { RealExecutionAccountingMutationAuthorizationService } from './application/real-execution-accounting-mutation-authorization.service';
+import { PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore } from './infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-authorization-read.store';
+import { PrismaAgenticWalletMarketSwapAccountingMutationApplicationStore } from './infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-application.store';
+import { RealExecutionAccountingMutationApplicationService } from './application/real-execution-accounting-mutation-application.service';
 
 @Module({
   imports: [RiskEngineModule],
@@ -414,6 +420,73 @@ import { RealExecutionAccountingMutationCommitmentService } from './application/
         new RealExecutionAccountingMutationCommitmentService(
           evidence,
           commitments,
+          () => new Date(),
+        ),
+    },
+    {
+      provide:
+        PrismaAgenticWalletMarketSwapAccountingMutationCommitmentReadStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaAgenticWalletMarketSwapAccountingMutationCommitmentReadStore(
+          prisma,
+        ),
+    },
+    {
+      provide:
+        PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationStore(
+          prisma,
+        ),
+    },
+    {
+      provide: RealExecutionAccountingMutationAuthorizationService,
+      inject: [
+        PrismaAgenticWalletMarketSwapAccountingMutationCommitmentReadStore,
+        PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationStore,
+      ],
+      useFactory: (
+        commitments: PrismaAgenticWalletMarketSwapAccountingMutationCommitmentReadStore,
+        authorizations: PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationStore,
+      ) =>
+        new RealExecutionAccountingMutationAuthorizationService(
+          commitments,
+          authorizations,
+          () => new Date(),
+        ),
+    },
+    {
+      provide:
+        PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore(
+          prisma,
+        ),
+    },
+    {
+      provide: PrismaAgenticWalletMarketSwapAccountingMutationApplicationStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaAgenticWalletMarketSwapAccountingMutationApplicationStore(
+          prisma,
+        ),
+    },
+    {
+      provide: RealExecutionAccountingMutationApplicationService,
+      inject: [
+        PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore,
+        PrismaAgenticWalletMarketSwapAccountingMutationApplicationStore,
+      ],
+      useFactory: (
+        authorizations: PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore,
+        applications: PrismaAgenticWalletMarketSwapAccountingMutationApplicationStore,
+      ) =>
+        new RealExecutionAccountingMutationApplicationService(
+          authorizations,
+          applications,
           () => new Date(),
         ),
     },

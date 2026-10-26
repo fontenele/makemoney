@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-26 — M10.158 guarded atomic real-execution accounting application
+
+- Added Bearer-protected `POST /real-trading/submission-accounting-application` for the exact M10.95 reviewed ledger snapshot and correlation package.
+- Composed the M10.94 authorization reader with M10.96 serializable conditional balance updates and immutable completion receipt.
+- E2E stops on authentication, malformed coverage, or absent authorization; verification performed no local balance mutation, provider call, or financial transaction.
+
+## 2026-10-26 — M10.157 guarded real-execution accounting mutation authorization
+
+- Added Bearer-protected `POST /real-trading/submission-accounting-authorization` with the complete canonical M10.92 correlation package and literal review acknowledgment.
+- Composed the revalidating M10.91 commitment reader, server-clock authorization boundary, and serializable immutable M10.93 store.
+- Kept accounting application and submission retry false; malformed and absent-commitment E2E paths stop without provider access or ledger mutation.
+
 ## 2026-10-26 — M10.156 guarded real-execution accounting mutation commitment
 
 - Added Bearer-protected `POST /real-trading/submission-accounting-commitment` with strict canonical gate and mutation UUIDs.

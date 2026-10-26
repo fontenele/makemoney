@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## M10.158 — Apply authorized accounting only through conditional all-or-nothing ledger updates
+
+Durable authorization is not enough to assume the local ledger still equals the reviewed pre-state. M10.158 requires the operator to present the complete current-balance snapshot and literal application acknowledgment, reloads the authorization chain, and then lets M10.96 independently compare the actual database balances under a serializable lock. Every update includes the authorized `beforeQuantity`; any missing, stale, or concurrently changed row rolls back the whole operation and receipt.
+
+This endpoint changes only the local accounting ledger for an already submitted, reconciled, evidenced, committed, and authorized provider transaction. It cannot submit an order, contact the provider, retry a submission, or change the real wallet. Tests deliberately use only pre-mutation failure paths.
+
+## M10.157 — Require complete explicit correlation before granting local accounting authority
+
+A commitment proves the exact reconciled transitions but deliberately grants no write authority. M10.157 exposes authorization as a separate guarded operator act. The request must repeat the commitment's mutation identity, plan fingerprint, gate, transaction hash, and the literal durable-evidence review acknowledgment, while the server supplies the authorization time. The revalidating reader and serializable store each reconstruct the durable chain rather than trusting caller content.
+
+The authorization row grants only authority for a later conditional local-ledger operation. It does not itself change a balance, calculate PnL, contact a provider, or enable retry. Atomic pre-state verification, ledger writes, and completion receipt remain isolated in the subsequent application boundary.
+
 ## M10.156 — Persist an inert commitment before requesting accounting authority
 
 A durable balance-evidence row identifies what was observed, but exposing the later authorization boundary directly would let one operator action both choose the mutation identity and grant ledger authority. M10.156 keeps those responsibilities separate. Its guarded request supplies only canonical gate and mutation UUIDs; the server reloads the durable evidence relation, regenerates the exact ordered plan and fingerprint at its own clock, and lets the existing serializable store revalidate the relation again before insertion.

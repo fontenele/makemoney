@@ -530,6 +530,144 @@ describe('Application (e2e)', () => {
     }
   });
 
+  it('/real-trading/submission-accounting-authorization (POST) fails closed without operator authentication', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set('RISK_CONTROL_TOKEN_SHA256', '');
+    try {
+      await request(server)
+        .post('/real-trading/submission-accounting-authorization')
+        .send(realExecutionAccountingMutationAuthorizationRequest())
+        .expect(503);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-accounting-authorization (POST) rejects malformed acknowledgment before persistence access', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const prisma = app.get(PrismaService);
+    const token = 'e2e-real-execution-accounting-authorization-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    const before =
+      await prisma.realExecutionAccountingMutationAuthorization.count();
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/submission-accounting-authorization')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          ...realExecutionAccountingMutationAuthorizationRequest(),
+          acknowledgment: 'reviewed',
+        })
+        .expect(400);
+      await expect(
+        prisma.realExecutionAccountingMutationAuthorization.count(),
+      ).resolves.toBe(before);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-accounting-authorization (POST) stops without a durable commitment', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const token = 'e2e-real-execution-accounting-authorization-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/submission-accounting-authorization')
+        .set('Authorization', `Bearer ${token}`)
+        .send(realExecutionAccountingMutationAuthorizationRequest())
+        .expect(409)
+        .expect({
+          message: 'Durable accounting mutation commitment was not found',
+          error: 'Conflict',
+          statusCode: 409,
+        });
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-accounting-application (POST) fails closed without operator authentication', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set('RISK_CONTROL_TOKEN_SHA256', '');
+    try {
+      await request(server)
+        .post('/real-trading/submission-accounting-application')
+        .send(realExecutionAccountingMutationApplicationRequest())
+        .expect(503);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-accounting-application (POST) rejects malformed balance coverage before persistence access', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const prisma = app.get(PrismaService);
+    const token = 'e2e-real-execution-accounting-application-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    const before =
+      await prisma.realExecutionAccountingMutationApplication.count();
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/submission-accounting-application')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          ...realExecutionAccountingMutationApplicationRequest(),
+          balanceCoverageComplete: false,
+        })
+        .expect(400);
+      await expect(
+        prisma.realExecutionAccountingMutationApplication.count(),
+      ).resolves.toBe(before);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-accounting-application (POST) stops without durable authorization', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const token = 'e2e-real-execution-accounting-application-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/submission-accounting-application')
+        .set('Authorization', `Bearer ${token}`)
+        .send(realExecutionAccountingMutationApplicationRequest())
+        .expect(409)
+        .expect({
+          message: 'Durable accounting mutation authorization was not found',
+          error: 'Conflict',
+          statusCode: 409,
+        });
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
   it.each([
     '/real-trading/funding-conversion-status',
     '/real-trading/funding-conversion-reconciliation',
@@ -2074,6 +2212,40 @@ function realExecutionAccountingMutationCommitmentRequest() {
   return {
     gateId: 'f1000000-0000-4000-8000-000000000001',
     mutationId: 'f1000000-0000-4000-8000-000000000002',
+  };
+}
+
+function realExecutionAccountingMutationAuthorizationRequest() {
+  return {
+    authorizationId: 'f2000000-0000-4000-8000-000000000001',
+    mutationId: 'f2000000-0000-4000-8000-000000000002',
+    planFingerprint: 'a'.repeat(64),
+    gateId: 'f2000000-0000-4000-8000-000000000003',
+    transactionHash: `0x${'b'.repeat(64)}`,
+    acknowledgment:
+      'durable_reconciliation_and_balance_evidence_reviewed_for_accounting_mutation',
+  };
+}
+
+function realExecutionAccountingMutationApplicationRequest() {
+  return {
+    applicationId: 'f3000000-0000-4000-8000-000000000001',
+    authorizationId: 'f3000000-0000-4000-8000-000000000002',
+    mutationId: 'f3000000-0000-4000-8000-000000000003',
+    planFingerprint: 'c'.repeat(64),
+    gateId: 'f3000000-0000-4000-8000-000000000004',
+    transactionHash: `0x${'d'.repeat(64)}`,
+    acknowledgment:
+      'authorized_transitions_and_current_ledger_balances_reviewed_for_atomic_application',
+    currentBalances: [
+      {
+        assetType: 'native',
+        assetSymbol: 'BNB',
+        currentQuantity: '0.00975323',
+      },
+    ],
+    balanceCoverageComplete: true,
+    balancesObservedAt: '2026-10-26T18:00:15.000Z',
   };
 }
 

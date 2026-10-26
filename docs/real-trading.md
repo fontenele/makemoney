@@ -1,5 +1,39 @@
 # Real Trading
 
+## M10.158 — Guarded atomic real-execution accounting application
+
+M10.158 registers M10.94–M10.96 at `POST /real-trading/submission-accounting-application`. The loopback-only timing-safe Bearer-protected request contains canonical application, authorization, mutation, gate, transaction, and plan-fingerprint identities; the literal `authorized_transitions_and_current_ledger_balances_reviewed_for_atomic_application`; a complete unique current-ledger balance snapshot; `balanceCoverageComplete: true`; and a canonical observation timestamp. The service supplies preparation time from its own clock.
+
+The authorization reader reconstructs the complete immutable evidence chain. M10.95 requires exact identity, asset coverage, pre-transition quantities, and chronology. Under a serializable lock, M10.96 reloads the authorization and actual local ledger, reruns the same preflight, conditionally changes every balance from its exact authorized before quantity to its after quantity, and inserts one immutable completion receipt in the same transaction. Exact replay performs no second mutation; divergence or a lost race rolls back.
+
+The endpoint never contacts Agentic Wallet and cannot create or retry an order. E2E covers only missing authentication, malformed coverage, and absent authorization, so verification does not mutate accounting. A real wallet operation still requires separately enabling the disabled runtime and obtaining immediate explicit user confirmation.
+
+### M10.158 acceptance criteria
+
+- Exact correlation, reviewed current balances, complete coverage, and literal acknowledgment are mandatory.
+- Authorization and its complete evidence chain are revalidated before application.
+- Actual ledger pre-state is checked inside the same serializable transaction as all updates and the receipt.
+- Replay is idempotent; stale, incomplete, divergent, or racing state fails atomically.
+- No provider call, order, resubmission, or automatic retry is possible from this route.
+- Verification reaches no mutation path without real durable authorization.
+
+## M10.157 — Guarded real-execution accounting mutation authorization
+
+M10.157 registers a manual composition boundary over M10.91–M10.93 at `POST /real-trading/submission-accounting-authorization`. The loopback-only route reuses the timing-safe SHA-256 Bearer guard. Its exact request supplies `authorizationId`, `mutationId`, `planFingerprint`, `gateId`, `transactionHash`, and acknowledgment `durable_reconciliation_and_balance_evidence_reviewed_for_accounting_mutation`. Extra, missing, malformed, noncanonical, or incomplete facts fail before persistence access.
+
+The service loads the immutable commitment by gate through M10.91, which reconstructs its complete accounting/financial evidence relation. M10.92 then requires every caller-supplied identity and fingerprint to match and uses the server clock for authorization chronology. M10.93 independently reloads the complete durable commitment under a serializable advisory lock before recording one immutable authorization. Exact replay is idempotent and divergent reuse conflicts.
+
+Success sets `accountingMutationAuthorized: true` but deliberately keeps `accountingMutationComplete: false` and `submissionRetryAllowed: false`. It performs no provider/RPC call, balance or PnL mutation, accounting application, or financial transaction. Atomic application remains a separate later operator boundary.
+
+### M10.157 acceptance criteria
+
+- The route is loopback-only and timing-safe Bearer-protected.
+- The exact correlation package and literal review acknowledgment are required before durable access.
+- Authorization time comes from the service clock and cannot predate the stored commitment.
+- The complete commitment/evidence relation is revalidated before authorization and again inside serialized persistence.
+- Exact replay returns the immutable authorization; divergent reuse conflicts.
+- E2E verification covers missing authentication, malformed acknowledgment, and absent commitment without applying accounting.
+
 ## M10.156 — Guarded real-execution accounting mutation commitment
 
 M10.156 registers a manual composition boundary over the existing M10.87–M10.90 artifacts at `POST /real-trading/submission-accounting-commitment`. The loopback-only route reuses the timing-safe SHA-256 Bearer guard and accepts exactly `{ "gateId": "<uuid>", "mutationId": "<uuid>" }`. Extra, missing, malformed, or noncanonical identities fail before persistence access.
