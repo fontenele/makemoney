@@ -69,6 +69,8 @@ import {
 import { AgenticWalletMarketSwapStatusReconciliationAttempt } from './infrastructure/agentic-wallet-market-swap-status-reconciliation-attempt';
 import { PrismaAgenticWalletMarketSwapStatusReconciliationContextStore } from './infrastructure/prisma-agentic-wallet-market-swap-status-reconciliation-context.store';
 import { PrismaAgenticWalletMarketSwapStatusObservationStore } from './infrastructure/prisma-agentic-wallet-market-swap-status-observation.store';
+import { PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore } from './infrastructure/prisma-agentic-wallet-market-swap-financial-reconciliation-evidence.store';
+import { RealExecutionFinancialReconciliationService } from './application/real-execution-financial-reconciliation.service';
 
 @Module({
   imports: [RiskEngineModule],
@@ -346,6 +348,24 @@ import { PrismaAgenticWalletMarketSwapStatusObservationStore } from './infrastru
           () => new Date(),
           1_000,
         ),
+    },
+    {
+      provide:
+        PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore(
+          prisma,
+        ),
+    },
+    {
+      provide: RealExecutionFinancialReconciliationService,
+      inject: [
+        PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore,
+      ],
+      useFactory: (
+        evidence: PrismaAgenticWalletMarketSwapFinancialReconciliationEvidenceStore,
+      ) => new RealExecutionFinancialReconciliationService(evidence),
     },
   ],
 })

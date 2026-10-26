@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-26 — M10.154 guarded real-execution financial reconciliation
+
+- Added Bearer-protected `POST /real-trading/submission-reconciliation` for one strict complete canonical M10.81 evidence package.
+- Registered the existing serializable M10.82 store, which reloads and revalidates durable terminal context before immutable insertion or exact replay.
+- Projected M10.83 financial completion while keeping accounting mutation required and incomplete.
+- Added focused and E2E coverage for valid composition, malformed input, missing authentication, and absent durable context.
+- Added no provider/RPC call, balance mutation, accounting application, PnL calculation, polling, scheduling, resubmission, automatic retry, dashboard action, or strategy bridge.
+
 ## 2026-10-26 — M10.153 guarded manual real-execution status reconciliation
 
 - Added loopback-only Bearer-protected `POST /real-trading/submission-status` with a strict canonical gate identity.

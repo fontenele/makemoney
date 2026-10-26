@@ -1,5 +1,25 @@
 # Real Trading
 
+## M10.154 — Guarded real-execution financial reconciliation
+
+M10.154 registers the existing M10.81–M10.83 financial-reconciliation boundary behind `POST /real-trading/submission-reconciliation`. The loopback-only route reuses the timing-safe SHA-256 Bearer guard and accepts exactly one complete canonical M10.81 evidence object. Its explicit facts include the gate, provider order, terminal observation, transaction, chain, token direction, submitted and actual quantities, complete provider-fee list, positive BNB network fee, receipt coverage, target-balance-delta coverage, and canonical UTC observation time. Extra, missing, malformed, noncanonical, or incomplete fields fail before persistence access.
+
+The action performs no evidence acquisition or provider call. It records evidence obtained and reviewed outside this boundary, while the authoritative serializable M10.82 store reloads the exact durable gate, acknowledged receipt, and latest status observation under its per-gate lock. Only terminal `FINISHED` evidence with exact transaction, identity, token, quantity, chronology, and completeness correlation can persist. Exact replay returns the immutable row; divergent reuse conflicts.
+
+After persistence, the pure M10.83 projection reports financial reconciliation complete while keeping accounting mutation required and incomplete. The endpoint cannot read a provider, mutate balances, apply accounting, calculate PnL, poll, resubmit, schedule work, or retry automatically. Exact post-transaction wallet balance-change evidence remains a separate future boundary.
+
+### M10.154 acceptance criteria
+
+- The route remains loopback-only and uses the existing timing-safe Bearer guard.
+- The request is the exact complete canonical M10.81 evidence shape with a canonical UTC millisecond timestamp.
+- Malformed or incomplete evidence fails before durable access.
+- The serializable store reloads and revalidates the exact gate, acknowledged receipt, and latest terminal observation before first persistence.
+- Only exact terminal transaction, identity, token, quantity, fee, coverage, and chronology correlation is accepted.
+- Exact replay is idempotent and divergent reuse conflicts.
+- Success projects financial reconciliation complete while accounting mutation remains required and incomplete.
+- No provider/RPC call, balance mutation, accounting application, PnL calculation, polling, scheduling, resubmission, automatic retry, dashboard action, or strategy bridge is added.
+- E2E coverage proves authentication, malformed-input, and absent-context paths without provider access or persistence.
+
 ## M10.153 — Guarded manual real-execution status reconciliation
 
 M10.153 registers the existing durable BTCB/USDT status-reconciliation attempt behind `POST /real-trading/submission-status`. The application remains loopback-bound and the route reuses the timing-safe SHA-256 Bearer guard. Its strict body contains only one canonical `gateId` UUID; malformed input fails before persistence or provider access.

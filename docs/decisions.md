@@ -2,6 +2,12 @@
 
 ## 2026-10-24 - Require a third runtime gate and literal acknowledgment for manual submission
 
+## M10.154 — Persist only an explicit complete evidence package and revalidate durable terminal context
+
+M10.154 does not infer actual receipt or costs from provider terminal status. The manual caller must submit the complete canonical M10.81 package, including explicit receipt, target-balance-delta, provider-fee, and network-fee coverage. The HTTP boundary validates exact shape and canonical values before persistence, while the existing serializable M10.82 store remains authoritative by reloading the durable gate, receipt, and latest observation and reapplying all correlations inside the transaction.
+
+The route intentionally performs no live evidence acquisition: current generic real-execution records do not contain an independently captured pre-transaction wallet snapshot from which complete deltas could be reconstructed. Treating operator-supplied evidence as an explicit reviewed artifact is safer than fabricating missing values. M10.83 may mark financial reconciliation complete only after immutable persistence; accounting mutation stays separately required and incomplete.
+
 ## M10.153 — Reuse the durable one-shot status boundary behind a manual guarded route
 
 M10.153 does not introduce another status model or a polling worker. The already tested M10.37–M10.75 boundary owns gate/receipt validation, durable cadence, response correlation, monotonic transitions, replay, and terminal stopping; the new runtime surface only authenticates one explicit canonical gate request and composes those existing parts.

@@ -80,6 +80,15 @@ import {
   AgenticWalletMarketSwapStatusObservationReceiptMismatchError,
   AgenticWalletMarketSwapStatusObservationReceiptNotFoundError,
 } from '../infrastructure/agentic-wallet-market-swap-status-observation.store';
+import {
+  InvalidRealExecutionFinancialReconciliationRequestError,
+  RealExecutionFinancialReconciliationService,
+} from '../application/real-execution-financial-reconciliation.service';
+import {
+  AgenticWalletMarketSwapFinancialReconciliationContextNotFoundError,
+  AgenticWalletMarketSwapFinancialReconciliationEvidenceBlockedError,
+  AgenticWalletMarketSwapFinancialReconciliationEvidenceConflictError,
+} from '../infrastructure/agentic-wallet-market-swap-financial-reconciliation-evidence.store';
 
 @Controller('real-trading')
 export class RealTradingController {
@@ -94,6 +103,7 @@ export class RealTradingController {
     private readonly fundingConversionAccountingSync: AgenticWalletFundingConversionAccountingSyncService,
     private readonly realExecutionSubmission: RealExecutionOperatorSubmissionService,
     private readonly realExecutionStatus: AgenticWalletMarketSwapStatusReconciliationAttempt,
+    private readonly realExecutionReconciliation: RealExecutionFinancialReconciliationService,
   ) {}
 
   @Get('status')
@@ -346,6 +356,36 @@ export class RealTradingController {
       }
       throw new ServiceUnavailableException(
         'Agentic Wallet real execution status is unavailable',
+      );
+    }
+  }
+
+  @Post('submission-reconciliation')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async reconcileRealExecutionFinancials(@Body() body: unknown) {
+    try {
+      return await this.realExecutionReconciliation.reconcile(body);
+    } catch (error) {
+      if (
+        error instanceof InvalidRealExecutionFinancialReconciliationRequestError
+      ) {
+        throw new BadRequestException(
+          'Invalid real execution financial reconciliation request',
+        );
+      }
+      if (
+        error instanceof
+          AgenticWalletMarketSwapFinancialReconciliationContextNotFoundError ||
+        error instanceof
+          AgenticWalletMarketSwapFinancialReconciliationEvidenceBlockedError ||
+        error instanceof
+          AgenticWalletMarketSwapFinancialReconciliationEvidenceConflictError
+      ) {
+        throw new ConflictException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet real execution financial reconciliation is unavailable',
       );
     }
   }

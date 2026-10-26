@@ -327,6 +327,72 @@ describe('Application (e2e)', () => {
     }
   });
 
+  it('/real-trading/submission-reconciliation (POST) fails closed without operator authentication', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set('RISK_CONTROL_TOKEN_SHA256', '');
+    try {
+      await request(server)
+        .post('/real-trading/submission-reconciliation')
+        .send(realExecutionFinancialReconciliationRequest())
+        .expect(503);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-reconciliation (POST) rejects malformed evidence before persistence access', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const token = 'e2e-real-execution-reconciliation-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    const prisma = app.get(PrismaService);
+    const before =
+      await prisma.realExecutionFinancialReconciliationEvidence.count();
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/submission-reconciliation')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ ...realExecutionFinancialReconciliationRequest(), extra: true })
+        .expect(400);
+      await expect(
+        prisma.realExecutionFinancialReconciliationEvidence.count(),
+      ).resolves.toBe(before);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/submission-reconciliation (POST) stops without a terminal durable context', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const token = 'e2e-real-execution-reconciliation-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/submission-reconciliation')
+        .set('Authorization', `Bearer ${token}`)
+        .send(realExecutionFinancialReconciliationRequest())
+        .expect(409)
+        .expect({
+          message: 'Financial reconciliation durable context was not found',
+          error: 'Conflict',
+          statusCode: 409,
+        });
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
   it.each([
     '/real-trading/funding-conversion-status',
     '/real-trading/funding-conversion-reconciliation',
@@ -1803,6 +1869,30 @@ function realExecutionSubmissionRequest() {
     attemptId: '00000000-0000-4000-8000-000000000152',
     gateId: '00000000-0000-4000-8000-000000000034',
     acknowledgment: 'approved_gate_and_immediate_provider_submission_reviewed',
+  };
+}
+
+function realExecutionFinancialReconciliationRequest() {
+  return {
+    scope: 'agentic_wallet_market_swap_financial_reconciliation_evidence',
+    providerId: 'agentic_wallet',
+    chainId: '56',
+    gateId: '00000000-0000-4000-8000-000000000154',
+    providerOrderId: '1234567890',
+    statusObservationId: '00000000-0000-4000-8000-000000000081',
+    transactionHash: `0x${'a'.repeat(64)}`,
+    sourceTokenAddress: '0x55d398326f99059ff775485246999027b3197955',
+    targetTokenAddress: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+    submittedSourceQuantity: '5',
+    actualTargetReceivedQuantity: '0.000071',
+    providerFeeComponents: [],
+    networkFeeAsset: 'BNB',
+    networkFeeQuantity: '0.0003',
+    transactionReceiptObserved: true,
+    targetBalanceDeltaObserved: true,
+    providerFeeCoverageComplete: true,
+    networkFeeCoverageComplete: true,
+    observedAt: '2026-10-26T18:00:00.000Z',
   };
 }
 
