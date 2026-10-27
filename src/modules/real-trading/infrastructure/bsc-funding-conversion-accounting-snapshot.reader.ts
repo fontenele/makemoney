@@ -10,7 +10,8 @@ import { APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT } from '../application
 const RPC_URL = 'https://bsc-dataseed.bnbchain.org';
 const TIMEOUT_MS = 10_000;
 const ADDRESS_PATTERN = /^0x[0-9a-fA-F]{40}$/;
-const QUANTITY_PATTERN = /^0x(?:0|[1-9a-f][0-9a-f]*)$/i;
+const BLOCK_QUANTITY_PATTERN = /^0x(?:0|[1-9a-f][0-9a-f]*)$/i;
+const DATA_WORD_PATTERN = /^0x[0-9a-f]{64}$/i;
 const ExactDecimal = Decimal.clone({
   precision: 80,
   toExpNeg: -80,
@@ -109,7 +110,7 @@ export class BscFundingConversionAccountingSnapshotReader extends AgenticWalletF
       },
       signal,
     );
-    return quantity(record(record(response).result).number);
+    return blockQuantity(record(record(response).result).number);
   }
 
   private async batch(
@@ -127,7 +128,12 @@ export class BscFundingConversionAccountingSnapshotReader extends AgenticWalletF
         result.has(value.id)
       )
         throw new Error('BSC accounting balance identity is invalid');
-      result.set(value.id, quantity(value.result));
+      result.set(
+        value.id,
+        value.id === 2
+          ? blockQuantity(value.result)
+          : tokenBalanceWord(value.result),
+      );
     }
     return result;
   }
@@ -169,8 +175,14 @@ function record(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-function quantity(value: unknown): string {
-  if (typeof value !== 'string' || !QUANTITY_PATTERN.test(value))
+function blockQuantity(value: unknown): string {
+  if (typeof value !== 'string' || !BLOCK_QUANTITY_PATTERN.test(value))
+    throw new Error('BSC accounting balance quantity is invalid');
+  return value.toLowerCase();
+}
+
+function tokenBalanceWord(value: unknown): string {
+  if (typeof value !== 'string' || !DATA_WORD_PATTERN.test(value))
     throw new Error('BSC accounting balance quantity is invalid');
   return value.toLowerCase();
 }

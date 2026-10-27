@@ -85,7 +85,9 @@ M10.165 Three-Minute Funding-Conversion Confirmation: DONE
 M10.166 Complete Agentic Wallet Dashboard Valuation: DONE
 M10.167 Classified Funding-Conversion Status Dependencies: DONE
 M10.168 Persist Terminal Funding-Conversion Status: DONE
-Next objective: use a separately explicit read-only status action to identify the failing dependency stage, then complete durable financial reconciliation and local-ledger synchronization before any strategy execution
+M10.169 Complete Funding-Conversion Financial Reconciliation: DONE
+M10.170 Fail-Closed Funding-Conversion Accounting Prerequisite: DONE
+Next objective: design and verify a truthful post-reconciliation accounting bootstrap for the conversion that had no pre-existing local ledger; do not backdate an initialization or enable strategy execution
 ```
 
 The detailed sections below preserve the original product plan. For current delivery status and exact increment boundaries, `docs/roadmap.md` and `docs/current-state.md` are authoritative.

@@ -8,6 +8,7 @@ import {
 } from './agentic-wallet-funding-conversion-accounting-sync.store';
 import { AgenticWalletFundingConversionFinancialEvidenceContextStore } from './agentic-wallet-funding-conversion-financial-evidence-context.store';
 import { AgenticWalletFundingConversionFinancialReconciliationAttemptReadStore } from './agentic-wallet-funding-conversion-financial-reconciliation.store';
+import { AgenticWalletAccountingBalanceInitializationReadStore } from '../infrastructure/agentic-wallet-accounting-balance-initialization.store';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -42,6 +43,7 @@ export class AgenticWalletFundingConversionAccountingSyncService {
     private readonly reconciliations: AgenticWalletFundingConversionFinancialReconciliationAttemptReadStore,
     private readonly contexts: AgenticWalletFundingConversionFinancialEvidenceContextStore,
     private readonly snapshots: AgenticWalletFundingConversionAccountingSnapshotReader,
+    private readonly initializations: AgenticWalletAccountingBalanceInitializationReadStore,
     private readonly now: () => Date = () => new Date(),
     private readonly newId: () => string = randomUUID,
   ) {}
@@ -67,6 +69,11 @@ export class AgenticWalletFundingConversionAccountingSyncService {
       const context = await this.contexts.getByAttemptId(command.attemptId);
       if (context === null)
         return result('blocked', ['terminal_conversion_context_absent']);
+      const initialization = await this.initializations.getByInitializationId(
+        command.initializationId,
+      );
+      if (initialization === null)
+        return result('blocked', ['accounting_initialization_absent']);
       if (signal?.aborted) throw signal.reason;
       const snapshot = await this.snapshots.load(context.walletAddress, signal);
       if (signal?.aborted) throw signal.reason;

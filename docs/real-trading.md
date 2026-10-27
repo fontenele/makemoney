@@ -1,5 +1,37 @@
 # Real Trading
 
+## M10.170 — Fail-closed funding-conversion accounting prerequisite
+
+The financially reconciled conversion cannot use the ordinary M10.149 ledger transition in this local database because no trusted accounting initialization or three-asset ledger existed before the conversion. The database contains zero initialization, balance, and funding-conversion synchronization rows. The synchronization coordinator now resolves the requested initialization before public-chain access and returns `accounting_initialization_absent` without starting an RPC read when it is missing. The serializable M10.149 mutation rules remain unchanged.
+
+The BSC accounting snapshot reader now distinguishes canonical JSON-RPC quantities from ERC-20 `eth_call` return data. Native balance and block number retain minimal hexadecimal quantity grammar; USDT and BTCB require exact 32-byte EVM words and therefore correctly accept padded values, including padded zero. A fresh finalized read observed `0.00573473587298894 BNB`, `2.955301453716908917 USDT`, and `0 BTCB`. The public endpoint could not serve the historical pre-conversion state and returned `missing trie node`, so it cannot independently recover the missing BTCB baseline.
+
+### M10.170 acceptance criteria
+
+- A nonexistent accounting initialization blocks before any provider read or mutation attempt.
+- Native JSON-RPC quantities and ERC-20 result words use distinct strict grammars.
+- Padded zero and positive 32-byte token balances parse with exact decimal arithmetic.
+- Existing M10.149 atomic pre-state, chronology, identity, and equation checks are not weakened.
+- No initialization is fabricated or backdated and no ledger row or synchronization receipt is written.
+- A post-reconciliation accounting bootstrap remains a separately designed and reviewed operation, with strategy execution still unauthorized.
+
+## M10.169 — Complete funding-conversion financial reconciliation
+
+The protected financial-reconciliation failure was caused by a receipt contract mismatch. Agentic Wallet CLI 1.10.0 returns a compact transaction summary for `wallet tx-history --tx`; it does not return the detailed movement and fee tree the original adapter assumed. The receipt boundary now obtains those financial facts from the public BSC chain and no longer depends on a live private wallet session.
+
+One bounded read loads the exact transaction, receipt, and finalized block. A second read loads the receipt's exact block by hash because transaction-receipt timestamp availability is RPC-implementation-specific. The adapter requires exact hash, chain 56, sender, destination, block number/hash, successful status, and finalized height correlation. It derives source BNB from the positive native transaction value, gas from positive `gasUsed × effectiveGasPrice`, transaction time from the correlated block, and actual output from exactly one USDT `Transfer` credit to the sender. The existing complete evidence reader separately enforces the exact pre/post BNB equation `source + gas` and exact USDT credit equation.
+
+Live read-only verification returned `0.004 BNB`, `2.955301453716908917 USDT`, `0.00001849412701106 BNB` gas, and `2026-10-27T03:21:53.000Z`. One protected call recorded immutable reconciliation `db55b7e4-6372-4185-98e3-f3420859ee2d` as `minimum_satisfied_below_expected`. Automatic retry remains forbidden, and no accounting synchronization was attempted.
+
+### M10.169 acceptance criteria
+
+- Receipt acquisition uses public chain evidence and requires no authenticated wallet session.
+- Transaction, successful receipt, exact block, and finalized head identities correlate before evidence is accepted.
+- Source value, target credit, network fee, and transaction time are derived with exact arithmetic and strict token/event validation.
+- Existing fixed-block balance deltas independently reconcile source plus gas and exact target receipt.
+- One immutable reconciliation exists for the terminal attempt and classifies output against its durable minimum and expected amounts.
+- Accounting synchronization remains a separate unexecuted operator action; no order, retry, wallet mutation, ledger mutation, or new financial transaction is introduced.
+
 ## M10.168 — Persisted terminal funding-conversion status
 
 The first real funding conversion's exact terminal observation now exists in the durable monotonic status ledger. The initial protected write correctly rolled back as a whole, but exposed a schema mismatch: the canonical state `provider_finished_pending_financial_reconciliation` is longer than the attempt table's original `VARCHAR(40)`. An additive migration widens only that column to `VARCHAR(64)`, matching the Prisma model and retaining every existing identity, uniqueness, chronology, and serializable-write rule.

@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-10-27 — M10.170 fail-closed funding-conversion accounting prerequisite
+
+- Added a durable accounting-initialization existence check before the synchronization path may read public BSC state.
+- Return `accounting_initialization_absent` with provider access unstarted when the requested initialization does not exist.
+- Split native/block JSON-RPC quantity validation from exact 32-byte ERC-20 result-word validation and covered padded positive and zero balances.
+- Confirmed read-only that the local database has no accounting initialization, balances, or funding-conversion sync and that the finalized chain post-state remains `0.00573473587298894 BNB`, `2.955301453716908917 USDT`, and `0 BTCB`.
+- Preserved the missing historical baseline as a blocker after the public endpoint returned `missing trie node`; no initialization was fabricated/backdated and no ledger mutation or financial transaction occurred.
+- Passed 2,898 backend tests, 135 PostgreSQL E2E tests with all 48 migrations applied from scratch, 117 dashboard tests, formatting, lint, builds, and Prisma/Compose validation.
+
+## 2026-10-27 — M10.169 complete funding-conversion financial reconciliation
+
+- Diagnosed the reconciliation 503 as a receipt-adapter contract mismatch: CLI 1.10.0 returns a compact transaction summary, not the assumed detailed movement envelope.
+- Replaced the private-session receipt dependency with strict public BSC transaction, successful-receipt, finalized-block, exact block-time, native-value, USDT-credit, and gas evidence.
+- Added focused rejection coverage for failed or unfinalized receipts, identity divergence, malformed block time, wrong or duplicated USDT credits, and zero gas.
+- Verified the existing transaction read-only and immutably recorded reconciliation `db55b7e4-6372-4185-98e3-f3420859ee2d` with actual receipt `2.955301453716908917 USDT`, network fee `0.00001849412701106 BNB`, and assessment `minimum_satisfied_below_expected`.
+- Kept automatic retry forbidden and left accounting synchronization completely separate and unexecuted.
+- Passed 2,896 backend tests, 135 PostgreSQL E2E tests with all 48 migrations applied from scratch, 117 dashboard tests, formatting, lint, builds, and Prisma/Compose validation.
+
 ## 2026-10-27 — M10.168 persist terminal funding-conversion status
 
 - Diagnosed the protected status write's `status_observation` failure as a complete transaction rollback caused by the canonical terminal attempt state exceeding `VARCHAR(40)`.

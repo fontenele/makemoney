@@ -80,6 +80,21 @@ describe('AgenticWalletFundingConversionAccountingSyncService', () => {
     });
   });
 
+  it('blocks an absent accounting initialization before provider access', async () => {
+    const harness = createHarness({ initializationPresent: false });
+
+    await expect(harness.service.synchronize(command())).resolves.toMatchObject(
+      {
+        status: 'blocked',
+        blockers: ['accounting_initialization_absent'],
+        providerReadStarted: false,
+      },
+    );
+    expect(harness.getInitialization).toHaveBeenCalledWith(INITIALIZATION_ID);
+    expect(harness.loadSnapshot).not.toHaveBeenCalled();
+    expect(harness.apply).not.toHaveBeenCalled();
+  });
+
   it('rejects malformed input before dependency access', async () => {
     const harness = createHarness();
     await expect(
@@ -117,6 +132,7 @@ function createHarness(options?: {
   existing?: AppliedFundingConversionAccountingSync | null;
   reconciliation?: StoredFundingConversionFinancialReconciliation | null;
   loadedSnapshot?: Promise<FundingConversionAccountingSnapshot>;
+  initializationPresent?: boolean;
 }) {
   const getExisting = jest.fn(() => Promise.resolve(options?.existing ?? null));
   const getReconciliation = jest.fn(() =>
@@ -130,6 +146,11 @@ function createHarness(options?: {
   const loadSnapshot = jest.fn(
     () => options?.loadedSnapshot ?? Promise.resolve(snapshot()),
   );
+  const getInitialization = jest.fn(() =>
+    Promise.resolve(
+      options?.initializationPresent === false ? null : ({} as never),
+    ),
+  );
   const apply = jest.fn(() =>
     Promise.resolve({ synchronized: applied(), replayed: false }),
   );
@@ -137,6 +158,7 @@ function createHarness(options?: {
     getExisting,
     getReconciliation,
     getContext,
+    getInitialization,
     loadSnapshot,
     apply,
     service: new AgenticWalletFundingConversionAccountingSyncService(
@@ -144,6 +166,7 @@ function createHarness(options?: {
       { getByAttemptId: getReconciliation },
       { getByAttemptId: getContext },
       { load: loadSnapshot },
+      { getByInitializationId: getInitialization },
       () => PREPARED_AT,
       () => SYNC_ID,
     ),

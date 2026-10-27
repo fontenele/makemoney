@@ -1,6 +1,5 @@
 import { jest } from '@jest/globals';
 
-import { AgenticWalletCliJsonProcess } from './agentic-wallet-cli-json-process';
 import { AgenticWalletFundingConversionTransactionReceiptAdapter } from './agentic-wallet-funding-conversion-transaction-receipt.adapter';
 import {
   BSC_NATIVE_BNB_ADDRESS,
@@ -9,14 +8,13 @@ import {
 
 const HASH = `0x${'a'.repeat(64)}`;
 const WALLET = '0x1111111111111111111111111111111111111111';
+const ROUTER = '0x2222222222222222222222222222222222222222';
+const BLOCK_HASH = `0x${'b'.repeat(64)}`;
 
 describe('AgenticWalletFundingConversionTransactionReceiptAdapter', () => {
-  it('reads one confirmed BNB-to-USDT receipt from the pinned CLI', async () => {
-    const run = jest
-      .fn<(args: readonly string[]) => Promise<unknown>>()
-      .mockResolvedValueOnce(version())
-      .mockResolvedValueOnce(receipt());
-    const reader = createReader(run);
+  it('reads one finalized successful BSC receipt', async () => {
+    const http = httpResponses(receipt(), block());
+    const reader = createReader(http);
 
     await expect(reader.load(HASH)).resolves.toEqual({
       scope: 'agentic_wallet_funding_conversion_transaction_receipt',
@@ -31,185 +29,138 @@ describe('AgenticWalletFundingConversionTransactionReceiptAdapter', () => {
       transactionTime: new Date('2026-10-24T11:59:00.000Z'),
       observedAt: new Date('2026-10-24T12:00:00.000Z'),
     });
-    expect(run).toHaveBeenLastCalledWith(
-      [
-        'wallet',
-        'tx-history',
-        '--tx',
-        HASH,
-        '--binanceChainId',
-        '56',
-        '--json',
-      ],
-      undefined,
-    );
+    expect(http).toHaveBeenCalledTimes(2);
   });
 
-  it('rejects an invalid hash before invoking the CLI', async () => {
-    const run = jest.fn<(args: readonly string[]) => Promise<unknown>>();
-    await expect(createReader(run).load('invalid')).rejects.toThrow(
+  it('rejects an invalid hash before invoking the RPC', async () => {
+    const http = jest.fn<typeof fetch>();
+    await expect(createReader(http).load('invalid')).rejects.toThrow(
       'hash is invalid',
     );
-    expect(run).not.toHaveBeenCalled();
+    expect(http).not.toHaveBeenCalled();
   });
 
   it.each([
+    ['failed receipt', () => set(receipt(), [1, 'result', 'status'], '0x0')],
     [
-      'pending transaction',
-      () => set(receipt(), ['data', 'transactions', 0, 'status'], 'pending'),
+      'unfinalized receipt',
+      () => set(receipt(), [2, 'result', 'number'], '0xf'),
     ],
     [
-      'wrong hash',
+      'wrong transaction sender',
       () =>
         set(
           receipt(),
-          ['data', 'transactions', 0, 'txHash'],
-          `0x${'b'.repeat(64)}`,
+          [0, 'result', 'from'],
+          '0x3333333333333333333333333333333333333333',
         ),
     ],
     [
-      'zero fee',
-      () =>
-        set(
-          receipt(),
-          [
-            'data',
-            'transactions',
-            0,
-            'txHashList',
-            0,
-            'networkFee',
-            'feeValue',
-          ],
-          '0',
-        ),
+      'invalid chain timestamp',
+      () => ({
+        receipt: receipt(),
+        block: set(block(), ['result', 'timestamp'], 'invalid'),
+      }),
     ],
     [
       'wrong receive token',
       () =>
         set(
           receipt(),
-          [
-            'data',
-            'transactions',
-            0,
-            'txHashList',
-            0,
-            'instructions',
-            'receive',
-            0,
-            'tokenInfo',
-            'contractAddress',
-          ],
+          [1, 'result', 'logs', 0, 'address'],
           BSC_NATIVE_BNB_ADDRESS,
         ),
     ],
     [
-      'different wallet',
-      () =>
-        set(
-          receipt(),
-          [
-            'data',
-            'transactions',
-            0,
-            'txHashList',
-            0,
-            'instructions',
-            'receive',
-            0,
-            'addressInfo',
-            'address',
-          ],
-          '0x2222222222222222222222222222222222222222',
-        ),
-    ],
-    [
-      'multiple sends',
+      'multiple target credits',
       () => {
         const value = receipt();
-        const send = value.data.transactions[0].txHashList[0].instructions.send;
-        send.push(structuredClone(send[0]));
+        value[1].result.logs.push(structuredClone(value[1].result.logs[0]));
         return value;
       },
     ],
+    ['zero gas', () => set(receipt(), [1, 'result', 'gasUsed'], '0x0')],
   ])('rejects %s', async (_label, change) => {
-    const run = jest
-      .fn<(args: readonly string[]) => Promise<unknown>>()
-      .mockResolvedValueOnce(version())
-      .mockResolvedValueOnce(change());
-    await expect(createReader(run).load(HASH)).rejects.toThrow(
+    const changed = change();
+    const changedReceipt = 'receipt' in changed ? changed.receipt : changed;
+    const changedBlock = 'block' in changed ? changed.block : block();
+    const http = httpResponses(changedReceipt, changedBlock);
+    await expect(createReader(http).load(HASH)).rejects.toThrow(
       'receipt is invalid',
     );
   });
 });
 
-function createReader(
-  run: jest.Mock<(args: readonly string[]) => Promise<unknown>>,
-) {
+function createReader(http: jest.MockedFunction<typeof fetch>) {
   return new AgenticWalletFundingConversionTransactionReceiptAdapter(
-    { run } as unknown as AgenticWalletCliJsonProcess,
+    http,
     () => new Date('2026-10-24T12:00:00.000Z'),
   );
 }
 
-function version() {
-  return {
-    success: true,
-    data: { currentCliVersion: '1.10.0', needUpdateCli: false },
-  };
+function httpResponses(receiptResponse: unknown, blockResponse: unknown) {
+  return jest
+    .fn<typeof fetch>()
+    .mockResolvedValueOnce(
+      new Response(JSON.stringify(receiptResponse), { status: 200 }),
+    )
+    .mockResolvedValueOnce(
+      new Response(JSON.stringify(blockResponse), { status: 200 }),
+    );
 }
 
 function receipt() {
-  return {
-    success: true,
-    data: {
-      transactions: [
-        {
-          txType: 'swap',
-          txHash: HASH,
-          txTime: '2026-10-24T11:59:00.000Z',
-          binanceChainId: '56',
-          status: 'confirmed',
-          txHashList: [
-            {
-              binanceChainId: '56',
-              txHash: HASH,
-              status: 'confirmed',
-              networkFee: {
-                binanceChainId: '56',
-                feeTokenAddress: BSC_NATIVE_BNB_ADDRESS,
-                feeTokenSymbol: 'BNB',
-                feeValue: '10000000000000',
-                feeTokenDecimals: 18,
-              },
-              instructions: {
-                send: [
-                  movement('8000000000000000', BSC_NATIVE_BNB_ADDRESS, 'BNB'),
-                ],
-                receive: [
-                  movement('5900000000000000000', BSC_USDT_ADDRESS, 'USDT'),
-                ],
-              },
-            },
-          ],
-        },
-      ],
+  return [
+    {
+      jsonrpc: '2.0',
+      id: 1,
+      result: {
+        hash: HASH,
+        chainId: '0x38',
+        from: WALLET,
+        to: ROUTER,
+        value: '0x1c6bf526340000',
+        blockNumber: '0x10',
+        blockHash: BLOCK_HASH,
+      },
     },
-  };
+    {
+      jsonrpc: '2.0',
+      id: 2,
+      result: {
+        transactionHash: HASH,
+        from: WALLET,
+        to: ROUTER,
+        status: '0x1',
+        blockNumber: '0x10',
+        blockHash: BLOCK_HASH,
+        gasUsed: '0x2710',
+        effectiveGasPrice: '0x3b9aca00',
+        logs: [
+          {
+            address: BSC_USDT_ADDRESS,
+            topics: [
+              '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+              `0x${ROUTER.slice(2).padStart(64, '0')}`,
+              `0x${WALLET.slice(2).padStart(64, '0')}`,
+            ],
+            data: '0x51e102bd8ece0000',
+          },
+        ],
+      },
+    },
+    { jsonrpc: '2.0', id: 3, result: { number: '0x11' } },
+  ];
 }
 
-function movement(amount: string, contractAddress: string, symbol: string) {
+function block() {
   return {
-    binanceChainId: '56',
-    amount,
-    addressInfo: { address: WALLET },
-    tokenInfo: {
-      binanceChainId: '56',
-      contractAddress,
-      symbol,
-      tokenId: null,
-      decimals: 18,
+    jsonrpc: '2.0',
+    id: 4,
+    result: {
+      hash: BLOCK_HASH,
+      number: '0x10',
+      timestamp: '0x6adc9d84',
     },
   };
 }

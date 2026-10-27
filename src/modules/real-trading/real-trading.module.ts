@@ -56,6 +56,7 @@ import { AgenticWalletFundingConversionAccountingSyncStore } from './application
 import { AgenticWalletFundingConversionAccountingSyncService } from './application/agentic-wallet-funding-conversion-accounting-sync.service';
 import { BscFundingConversionAccountingSnapshotReader } from './infrastructure/bsc-funding-conversion-accounting-snapshot.reader';
 import { PrismaAgenticWalletFundingConversionAccountingSyncStore } from './infrastructure/prisma-agentic-wallet-funding-conversion-accounting-sync.store';
+import { PrismaAgenticWalletAccountingBalanceInitializationReadStore } from './infrastructure/prisma-agentic-wallet-accounting-balance-initialization-read.store';
 import { RealExecutionSubmissionAttemptStore } from './application/real-execution-submission-attempt.store';
 import { PrismaRealExecutionSubmissionAttemptStore } from './infrastructure/prisma-real-execution-submission-attempt.store';
 import { RealExecutionSubmissionOutcomeStore } from './application/real-execution-submission-outcome.store';
@@ -268,6 +269,12 @@ import { RealExecutionAccountingMutationApplicationService } from './application
       useClass: BscFundingConversionAccountingSnapshotReader,
     },
     {
+      provide: PrismaAgenticWalletAccountingBalanceInitializationReadStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaAgenticWalletAccountingBalanceInitializationReadStore(prisma),
+    },
+    {
       provide: AgenticWalletFundingConversionAccountingSyncStore,
       inject: [PrismaService],
       useFactory: (prisma: PrismaService) =>
@@ -280,18 +287,21 @@ import { RealExecutionAccountingMutationApplicationService } from './application
         PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore,
         AgenticWalletFundingConversionFinancialEvidenceContextStore,
         AgenticWalletFundingConversionAccountingSnapshotReader,
+        PrismaAgenticWalletAccountingBalanceInitializationReadStore,
       ],
       useFactory: (
         store: AgenticWalletFundingConversionAccountingSyncStore,
         reconciliations: PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore,
         contexts: AgenticWalletFundingConversionFinancialEvidenceContextStore,
         snapshots: AgenticWalletFundingConversionAccountingSnapshotReader,
+        initializations: PrismaAgenticWalletAccountingBalanceInitializationReadStore,
       ) =>
         new AgenticWalletFundingConversionAccountingSyncService(
           store,
           reconciliations,
           contexts,
           snapshots,
+          initializations,
         ),
     },
     {

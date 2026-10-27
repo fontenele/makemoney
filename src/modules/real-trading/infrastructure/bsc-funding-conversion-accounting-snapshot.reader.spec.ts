@@ -14,9 +14,19 @@ describe('BscFundingConversionAccountingSnapshotReader', () => {
       )
       .mockResolvedValueOnce(
         response([
-          { jsonrpc: '2.0', id: 4, result: '0x0' },
+          {
+            jsonrpc: '2.0',
+            id: 4,
+            result:
+              '0x0000000000000000000000000000000000000000000000000000000000000000',
+          },
           { jsonrpc: '2.0', id: 2, result: '0xde0b6b3a7640000' },
-          { jsonrpc: '2.0', id: 3, result: '0x4563918244f40000' },
+          {
+            jsonrpc: '2.0',
+            id: 3,
+            result:
+              '0x0000000000000000000000000000000000000000000000004563918244f40000',
+          },
         ]),
       );
     const reader = new BscFundingConversionAccountingSnapshotReader(
@@ -89,6 +99,30 @@ describe('BscFundingConversionAccountingSnapshotReader', () => {
     await expect(
       new BscFundingConversionAccountingSnapshotReader(http).load(WALLET),
     ).rejects.toThrow('response is invalid');
+  });
+
+  it('rejects non-word ERC-20 balance results', async () => {
+    const http = jest
+      .fn<(input: string, init?: RequestInit) => Promise<Response>>()
+      .mockResolvedValueOnce(
+        response({ jsonrpc: '2.0', id: 1, result: { number: '0x20' } }),
+      )
+      .mockResolvedValueOnce(
+        response([
+          { jsonrpc: '2.0', id: 2, result: '0x0' },
+          { jsonrpc: '2.0', id: 3, result: '0x0' },
+          {
+            jsonrpc: '2.0',
+            id: 4,
+            result:
+              '0x0000000000000000000000000000000000000000000000000000000000000000',
+          },
+        ]),
+      );
+
+    await expect(
+      new BscFundingConversionAccountingSnapshotReader(http).load(WALLET),
+    ).rejects.toThrow('quantity is invalid');
   });
 });
 
