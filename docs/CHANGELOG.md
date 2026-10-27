@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-10-26 — M10.161 safe conversion dependency diagnostics
+
+- Classified thrown pre-claim failures at preliminary quote, finalized balance, fee evidence, and final quote boundaries with a closed safe vocabulary.
+- The protected submission route now returns a stage-specific 503 without exposing raw CLI, RPC, provider, wallet, or process details.
+- Added regression coverage for all four stages and proved each stops before claim and runner access.
+- Twenty-seven focused tests, lint, formatting, backend/dashboard builds, Compose validation, and whitespace checks pass; no plan or transaction was created.
+
+## 2026-10-26 — M10.160 zero-padded BSC balance evidence
+
+- Audited the second confirmed conversion call and proved it stopped before claim: the fresh plan was stored, but no submission attempt or provider order exists.
+- Corrected the BSC balance reader to accept standard zero-padded EVM data words such as a 32-byte zero USDT balance while keeping block quantities canonical.
+- Added a regression test matching the live RPC shape; 23 focused tests, lint, and the backend build pass.
+- Live read-only diagnostics now return `0.00975323 BNB`, `0 USDT`, a finalized block, and zero provider fee without error. No financial transaction occurred.
+
+## 2026-10-26 — M10.159 funding-conversion final re-quote
+
+- Diagnosed the first confirmed conversion call as a pre-claim quote-expiry failure: evidence collection exceeded the five-second quote TTL, no submission attempt was stored, the swap runner was not reached, and the wallet remained `0.00975323 BNB`.
+- Added a second quote immediately before the durable one-shot claim and revalidated its wallet balance, slippage, zero-fee evidence, output floor, and expiry.
+- Added regression coverage for slow evidence collection and final balance divergence; 22 focused tests, lint, and both builds pass.
+- The expired plan cannot be reused. A fresh plan and renewed immediate explicit confirmation remain required before any real transaction.
+
+## 2026-10-26 — First real funding-conversion readiness prepared
+
+- Read-only checks confirmed connected Agentic Wallet CLI 1.10.0, restrictive posture, `0.00975323 BNB`, no USDT/BTCB, and no additional funding requirement.
+- A non-executable `0.004 BNB` quote expected about `2.976316 USDT`, minimum `2.961435 USDT`, and `0.00575323 BNB` remaining before network cost.
+- Prepared the local real-mode/general-execution BSC BNB→USDT allowlist while retaining independent safeguards: generic operator submission remains false and the Bearer digest remains blank. No plan, submission, wallet mutation, or financial transaction occurred.
+
 ## 2026-10-26 — M10.158 guarded atomic real-execution accounting application
 
 - Added Bearer-protected `POST /real-trading/submission-accounting-application` for the exact M10.95 reviewed ledger snapshot and correlation package.

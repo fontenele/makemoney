@@ -19,6 +19,7 @@ import { AgenticWalletFundingConversionPlanService } from '../application/agenti
 import {
   AgenticWalletFundingConversionSubmissionService,
   FundingConversionSubmissionBlockedError,
+  FundingConversionSubmissionDependencyUnavailableError,
   InvalidFundingConversionSubmissionRequestError,
 } from '../application/agentic-wallet-funding-conversion-submission.service';
 import {
@@ -252,6 +253,11 @@ export class RealTradingController {
         error instanceof FundingConversionSubmissionOutcomeConflictError
       ) {
         throw new ConflictException(error.message);
+      }
+      if (
+        error instanceof FundingConversionSubmissionDependencyUnavailableError
+      ) {
+        throw new ServiceUnavailableException(error.message);
       }
       throw new ServiceUnavailableException(
         'Agentic Wallet funding conversion submission is unavailable',

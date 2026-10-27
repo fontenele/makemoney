@@ -60,6 +60,31 @@ describe('BscFundingConversionPreBalanceReader', () => {
     expect(http).not.toHaveBeenCalled();
   });
 
+  it('accepts the zero-padded EVM word returned for a zero token balance', async () => {
+    const http = jest
+      .fn<(input: string, init?: RequestInit) => Promise<Response>>()
+      .mockResolvedValueOnce(
+        response({ jsonrpc: '2.0', id: 1, result: { number: '0x10' } }),
+      )
+      .mockResolvedValueOnce(
+        response([
+          { jsonrpc: '2.0', id: 2, result: '0x1' },
+          {
+            jsonrpc: '2.0',
+            id: 3,
+            result: `0x${'0'.repeat(64)}`,
+          },
+        ]),
+      );
+
+    await expect(
+      new BscFundingConversionPreBalanceReader(http).load(WALLET),
+    ).resolves.toMatchObject({
+      bnbBalance: '0.000000000000000001',
+      usdtBalance: '0',
+    });
+  });
+
   it.each([
     [{ jsonrpc: '2.0', id: 1, result: { number: '10' } }],
     [{ jsonrpc: '2.0', id: 1, result: { number: '0x01' } }],

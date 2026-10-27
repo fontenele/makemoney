@@ -47,6 +47,16 @@ export class FundingConversionSubmissionBlockedError extends Error {
     super(`Funding conversion submission blocked: ${blocker}`);
   }
 }
+export type FundingConversionSubmissionDependencyStage =
+  | 'preliminary_quote'
+  | 'pre_conversion_balance'
+  | 'fee_evidence'
+  | 'final_quote';
+export class FundingConversionSubmissionDependencyUnavailableError extends Error {
+  constructor(readonly stage: FundingConversionSubmissionDependencyStage) {
+    super(`Funding conversion submission dependency unavailable: ${stage}`);
+  }
+}
 
 export class AgenticWalletFundingConversionSubmissionService {
   constructor(
@@ -70,9 +80,59 @@ export class AgenticWalletFundingConversionSubmissionService {
     this.assertRuntimeReady();
     this.assertEmergencyStopInactive();
 
-    const quote = await this.quotes.load({
-      sourceQuantityBnb: input.sourceQuantityBnb,
-    });
+    const preliminaryQuote = await this.loadDependency(
+      'preliminary_quote',
+      () =>
+        this.quotes.load({
+          sourceQuantityBnb: input.sourceQuantityBnb,
+        }),
+    );
+    if (
+      preliminaryQuote.status !== 'quote_available' ||
+      preliminaryQuote.quote === null ||
+      preliminaryQuote.remainingQuantityBnb === null ||
+      preliminaryQuote.walletAddress === null
+    ) {
+      throw new FundingConversionSubmissionBlockedError(
+        'fresh_quote_unavailable',
+      );
+    }
+    const preliminaryWalletAddress = preliminaryQuote.walletAddress;
+    const preliminaryProviderQuote = preliminaryQuote.quote;
+
+    const preBalance = await this.loadDependency('pre_conversion_balance', () =>
+      this.preBalances.load(preliminaryWalletAddress),
+    );
+    if (
+      preBalance.walletAddress !== preliminaryWalletAddress.toLowerCase() ||
+      !new Decimal(preBalance.bnbBalance).equals(
+        preliminaryQuote.walletBalanceBnb ?? '-1',
+      )
+    ) {
+      throw new FundingConversionSubmissionBlockedError(
+        'pre_conversion_balance_diverged_from_fresh_quote',
+      );
+    }
+    const maximumSlippagePercent = new Decimal(
+      preliminaryProviderQuote.maximumSlippageRate,
+    )
+      .times(100)
+      .toFixed();
+    const fees = await this.loadDependency('fee_evidence', () =>
+      this.feeEvidence.load({
+        sourceQuantityBnb: preliminaryProviderQuote.sourceQuantityBnb,
+        maximumSlippagePercent,
+      }),
+    );
+
+    // Network and CLI evidence collection can legitimately outlive the
+    // provider quote TTL. Re-quote immediately before the durable claim so
+    // the claimed execution bounds are current when provider access begins.
+    const quote = await this.loadDependency('final_quote', () =>
+      this.quotes.load({
+        sourceQuantityBnb: input.sourceQuantityBnb,
+      }),
+    );
     if (
       quote.status !== 'quote_available' ||
       quote.quote === null ||
@@ -83,23 +143,19 @@ export class AgenticWalletFundingConversionSubmissionService {
         'fresh_quote_unavailable',
       );
     }
-
-    const preBalance = await this.preBalances.load(quote.walletAddress);
+    const freshMaximumSlippagePercent = new Decimal(
+      quote.quote.maximumSlippageRate,
+    )
+      .times(100)
+      .toFixed();
     if (
-      preBalance.walletAddress !== quote.walletAddress.toLowerCase() ||
-      !new Decimal(preBalance.bnbBalance).equals(quote.walletBalanceBnb ?? '-1')
+      quote.walletAddress.toLowerCase() !== preBalance.walletAddress ||
+      !new Decimal(quote.walletBalanceBnb ?? '-1').equals(preBalance.bnbBalance)
     ) {
       throw new FundingConversionSubmissionBlockedError(
         'pre_conversion_balance_diverged_from_fresh_quote',
       );
     }
-    const maximumSlippagePercent = new Decimal(quote.quote.maximumSlippageRate)
-      .times(100)
-      .toFixed();
-    const fees = await this.feeEvidence.load({
-      sourceQuantityBnb: quote.quote.sourceQuantityBnb,
-      maximumSlippagePercent,
-    });
     if (
       fees.scope !== 'agentic_wallet_funding_conversion_fee_evidence' ||
       fees.provider !== 'agentic_wallet' ||
@@ -107,7 +163,7 @@ export class AgenticWalletFundingConversionSubmissionService {
       fees.providerFeeRate !== '0' ||
       fees.providerFeeUsd !== '0' ||
       fees.sourceQuantityBnb !== quote.quote.sourceQuantityBnb ||
-      fees.maximumSlippagePercent !== maximumSlippagePercent ||
+      fees.maximumSlippagePercent !== freshMaximumSlippagePercent ||
       !new Decimal(fees.expectedUsdt).greaterThanOrEqualTo(
         quote.quote.minimumUsdt,
       )
@@ -130,7 +186,7 @@ export class AgenticWalletFundingConversionSubmissionService {
       freshSourceQuantityBnb: quote.quote.sourceQuantityBnb,
       freshExpectedUsdt: quote.quote.expectedUsdt,
       freshMinimumUsdt: quote.quote.minimumUsdt,
-      freshMaximumSlippagePercent: maximumSlippagePercent,
+      freshMaximumSlippagePercent,
       freshRemainingQuantityBnb: quote.remainingQuantityBnb,
       preConversionWalletAddress: preBalance.walletAddress,
       preConversionBalanceBlockNumber: preBalance.blockNumber,
@@ -207,6 +263,17 @@ export class AgenticWalletFundingConversionSubmissionService {
       throw new FundingConversionSubmissionBlockedError(
         'emergency_stop_active',
       );
+    }
+  }
+
+  private async loadDependency<T>(
+    stage: FundingConversionSubmissionDependencyStage,
+    load: () => Promise<T>,
+  ): Promise<T> {
+    try {
+      return await load();
+    } catch {
+      throw new FundingConversionSubmissionDependencyUnavailableError(stage);
     }
   }
 }

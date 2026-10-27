@@ -9,6 +9,7 @@ import {
 } from './agentic-wallet-funding-conversion-submission-outcome.store';
 import {
   AgenticWalletFundingConversionSubmissionService,
+  FundingConversionSubmissionDependencyUnavailableError,
   InvalidFundingConversionSubmissionRequestError,
 } from './agentic-wallet-funding-conversion-submission.service';
 import {
@@ -28,7 +29,11 @@ describe('AgenticWalletFundingConversionSubmissionService', () => {
 
     const result = await service.submit(request());
 
-    expect(dependencies.quote).toHaveBeenCalledWith({
+    expect(dependencies.quote).toHaveBeenCalledTimes(2);
+    expect(dependencies.quote).toHaveBeenNthCalledWith(1, {
+      sourceQuantityBnb: '0.008',
+    });
+    expect(dependencies.quote).toHaveBeenNthCalledWith(2, {
       sourceQuantityBnb: '0.008',
     });
     expect(dependencies.claim.mock.calls[0]?.[0]).toMatchObject({
@@ -187,6 +192,75 @@ describe('AgenticWalletFundingConversionSubmissionService', () => {
     expect(dependencies.claim).not.toHaveBeenCalled();
     expect(dependencies.run).not.toHaveBeenCalled();
   });
+
+  it('uses a second quote after slow evidence collection', async () => {
+    const dependencies = createDependencies();
+    dependencies.quote
+      .mockResolvedValueOnce({
+        ...availableQuote(),
+        quote: {
+          ...availableQuote().quote,
+          expiresAt: new Date('2026-10-22T12:00:29.100Z'),
+        },
+      })
+      .mockResolvedValueOnce(availableQuote());
+    const service = createService(dependencies);
+
+    await expect(service.submit(request())).resolves.toEqual({
+      persisted: true,
+    });
+    expect(dependencies.claim).toHaveBeenCalledTimes(1);
+    expect(dependencies.run).toHaveBeenCalledTimes(1);
+  });
+
+  it('blocks when the balance changes before the final quote', async () => {
+    const dependencies = createDependencies();
+    dependencies.quote
+      .mockResolvedValueOnce(availableQuote())
+      .mockResolvedValueOnce({
+        ...availableQuote(),
+        walletBalanceBnb: '0.00975322',
+        remainingQuantityBnb: '0.00175322',
+      });
+    const service = createService(dependencies);
+
+    await expect(service.submit(request())).rejects.toMatchObject({
+      blocker: 'pre_conversion_balance_diverged_from_fresh_quote',
+    });
+    expect(dependencies.claim).not.toHaveBeenCalled();
+    expect(dependencies.run).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['preliminary_quote', 'quote', 1],
+    ['pre_conversion_balance', 'preBalance', 1],
+    ['fee_evidence', 'feeEvidence', 1],
+    ['final_quote', 'quote', 2],
+  ] as const)(
+    'classifies an unavailable %s dependency before claim',
+    async (stage, dependency, invocation) => {
+      const dependencies = createDependencies();
+      const failure = new Error('raw provider detail');
+      if (dependency === 'quote' && invocation === 2)
+        dependencies.quote
+          .mockResolvedValueOnce(availableQuote())
+          .mockRejectedValueOnce(failure);
+      else if (dependency === 'quote')
+        dependencies.quote.mockRejectedValueOnce(failure);
+      else if (dependency === 'preBalance')
+        dependencies.preBalance.mockRejectedValueOnce(failure);
+      else dependencies.feeEvidence.mockRejectedValueOnce(failure);
+      const service = createService(dependencies);
+
+      await expect(service.submit(request())).rejects.toEqual(
+        expect.objectContaining<FundingConversionSubmissionDependencyUnavailableError>(
+          { stage },
+        ),
+      );
+      expect(dependencies.claim).not.toHaveBeenCalled();
+      expect(dependencies.run).not.toHaveBeenCalled();
+    },
+  );
 
   it('rejects extra request fields before any dependency access', async () => {
     const dependencies = createDependencies();

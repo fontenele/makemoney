@@ -2819,3 +2819,9 @@ The composition remains unregistered, read-only, and non-authorizing. It adds no
 - Focused tests cover success, absence, stale evidence, pre-delegation validation, date isolation, malformed evidence, and failure propagation.
 - PostgreSQL E2E composes durable latest selection, freshness, and latest balance projection.
 - No schema, route, runtime registration, provider call, accounting mutation, valuation, PnL, funding, quote/submission authorization, executor, or real order is added.
+
+## M10.161 — Safe funding-conversion dependency diagnostics
+
+The guarded funding-conversion submission coordinator classifies thrown failures at four read-only boundaries: preliminary quote, finalized pre-conversion balance, fee evidence, and final quote. The loopback-only protected route returns only this closed stage in an HTTP 503 response. Raw CLI, RPC, provider, wallet, and process output remains private.
+
+Business-rule divergence still uses the existing explicit 409 blockers. Dependency failures always occur before the serializable submission claim and mutable swap runner, never trigger automatic retry, and add no new route, schema, authority, plan, or financial transaction.

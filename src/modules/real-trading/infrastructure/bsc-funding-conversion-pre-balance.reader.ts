@@ -9,7 +9,8 @@ import { BSC_USDT_ADDRESS } from './agentic-wallet-funding-conversion-quote.adap
 const RPC_URL = 'https://bsc-dataseed.bnbchain.org';
 const TIMEOUT_MS = 10_000;
 const ADDRESS_PATTERN = /^0x[0-9a-fA-F]{40}$/;
-const QUANTITY_PATTERN = /^0x(?:0|[1-9a-f][0-9a-f]*)$/i;
+const BLOCK_QUANTITY_PATTERN = /^0x(?:0|[1-9a-f][0-9a-f]*)$/i;
+const DATA_QUANTITY_PATTERN = /^0x[0-9a-f]+$/i;
 const ExactDecimal = Decimal.clone({
   precision: 80,
   toExpNeg: -80,
@@ -81,7 +82,7 @@ export class BscFundingConversionPreBalanceReader extends AgenticWalletFundingCo
     signal?: AbortSignal,
   ): Promise<string> {
     const response = await this.post(body, signal);
-    return quantity(record(record(response).result).number);
+    return blockQuantity(record(record(response).result).number);
   }
 
   private async requestBatch(
@@ -96,7 +97,7 @@ export class BscFundingConversionPreBalanceReader extends AgenticWalletFundingCo
       const value = record(item);
       if ((value.id !== 2 && value.id !== 3) || result.has(value.id))
         throw new Error('BSC balance response identity is invalid');
-      result.set(value.id, quantity(value.result));
+      result.set(value.id, dataQuantity(value.result));
     }
     return result;
   }
@@ -121,8 +122,14 @@ function record(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-function quantity(value: unknown): string {
-  if (typeof value !== 'string' || !QUANTITY_PATTERN.test(value))
+function blockQuantity(value: unknown): string {
+  if (typeof value !== 'string' || !BLOCK_QUANTITY_PATTERN.test(value))
+    throw new Error('BSC balance quantity is invalid');
+  return value.toLowerCase();
+}
+
+function dataQuantity(value: unknown): string {
+  if (typeof value !== 'string' || !DATA_QUANTITY_PATTERN.test(value))
     throw new Error('BSC balance quantity is invalid');
   return value.toLowerCase();
 }
