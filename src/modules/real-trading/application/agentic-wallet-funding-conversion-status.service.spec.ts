@@ -1,7 +1,11 @@
 import { jest } from '@jest/globals';
 
 import { FundingConversionStatusContextIdentityError } from './agentic-wallet-funding-conversion-status-context.store';
-import { AgenticWalletFundingConversionStatusService } from './agentic-wallet-funding-conversion-status.service';
+import { FundingConversionStatusObservationBlockedError } from './agentic-wallet-funding-conversion-status-observation.store';
+import {
+  AgenticWalletFundingConversionStatusService,
+  FundingConversionStatusDependencyUnavailableError,
+} from './agentic-wallet-funding-conversion-status.service';
 import {
   BSC_NATIVE_BNB_ADDRESS,
   BSC_USDT_ADDRESS,
@@ -80,20 +84,62 @@ describe('AgenticWalletFundingConversionStatusService', () => {
     expect(harness.record).not.toHaveBeenCalled();
   });
 
-  it('forwards cancellation and propagates provider failure without retry', async () => {
+  it('forwards cancellation and classifies provider failure without retry', async () => {
     const failure = new Error('lookup unavailable');
     const harness = createHarness({ response: Promise.reject(failure) });
     const controller = new AbortController();
 
     await expect(
       harness.service.reconcileOnce(ATTEMPT_ID, controller.signal),
-    ).rejects.toBe(failure);
+    ).rejects.toMatchObject({
+      stage: 'provider_status',
+      message:
+        'Funding conversion status dependency unavailable: provider_status',
+    });
     expect(harness.run).toHaveBeenCalledTimes(1);
     expect(harness.run).toHaveBeenCalledWith(
       { kind: 'market_order_status_lookup', providerOrderId: 'order_123' },
       controller.signal,
     );
     expect(harness.record).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['status_context', 'context'],
+    ['status_observation', 'record'],
+  ] as const)(
+    'classifies %s dependency failure without repeating work',
+    async (stage, dependency) => {
+      const harness = createHarness({
+        ...(dependency === 'context'
+          ? { contextError: new Error('sensitive dependency error') }
+          : { recordError: new Error('sensitive dependency error') }),
+      });
+
+      await expect(harness.service.reconcileOnce(ATTEMPT_ID)).rejects.toEqual(
+        expect.objectContaining<FundingConversionStatusDependencyUnavailableError>(
+          { stage },
+        ),
+      );
+      expect(harness.getByAttemptId).toHaveBeenCalledTimes(1);
+      expect(harness.run).toHaveBeenCalledTimes(
+        stage === 'status_context' ? 0 : 1,
+      );
+      expect(harness.record).toHaveBeenCalledTimes(
+        stage === 'status_observation' ? 1 : 0,
+      );
+    },
+  );
+
+  it('preserves typed observation conflicts for the controller 409 path', async () => {
+    const conflict = new FundingConversionStatusObservationBlockedError();
+    const harness = createHarness({ recordError: conflict });
+
+    await expect(harness.service.reconcileOnce(ATTEMPT_ID)).rejects.toBe(
+      conflict,
+    );
+    expect(harness.run).toHaveBeenCalledTimes(1);
+    expect(harness.record).toHaveBeenCalledTimes(1);
   });
 
   it('does not call the provider for absent or terminal context', async () => {
@@ -170,22 +216,29 @@ function createHarness(
   options: {
     context?: ReturnType<typeof context> | null;
     response?: unknown;
+    contextError?: Error;
+    recordError?: Error;
     recordedAt?: Date;
   } = {},
 ) {
   const loadedContext = Object.prototype.hasOwnProperty.call(options, 'context')
     ? (options.context ?? null)
     : context();
-  const getByAttemptId = jest.fn(() => Promise.resolve(loadedContext));
+  const getByAttemptId = jest.fn(() =>
+    options.contextError
+      ? Promise.reject(options.contextError)
+      : Promise.resolve(loadedContext),
+  );
   const run = jest.fn(() =>
     Promise.resolve(options.response ?? providerResponse()),
   );
-  const record = jest.fn((id, observation, recordedAt) =>
-    Promise.resolve({
+  const record = jest.fn((id, observation, recordedAt) => {
+    if (options.recordError) return Promise.reject(options.recordError);
+    return Promise.resolve({
       stored: { id, observation, recordedAt },
       replayed: false,
-    }),
-  );
+    });
+  });
   return {
     getByAttemptId,
     run,

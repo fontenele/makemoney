@@ -35,7 +35,10 @@ import {
   FundingConversionSubmissionOutcomeConflictError,
 } from '../application/agentic-wallet-funding-conversion-submission-outcome.store';
 import { RiskControlAuthGuard } from '../../risk-engine/presentation/risk-control-auth.guard';
-import { AgenticWalletFundingConversionStatusService } from '../application/agentic-wallet-funding-conversion-status.service';
+import {
+  AgenticWalletFundingConversionStatusService,
+  FundingConversionStatusDependencyUnavailableError,
+} from '../application/agentic-wallet-funding-conversion-status.service';
 import { FundingConversionStatusContextIdentityError } from '../application/agentic-wallet-funding-conversion-status-context.store';
 import {
   FundingConversionStatusAttemptNotFoundError,
@@ -316,6 +319,9 @@ export class RealTradingController {
         error instanceof FundingConversionStatusObservationConflictError
       ) {
         throw new ConflictException(error.message);
+      }
+      if (error instanceof FundingConversionStatusDependencyUnavailableError) {
+        throw new ServiceUnavailableException(error.message);
       }
       throw new ServiceUnavailableException(
         'Agentic Wallet funding conversion status is unavailable',

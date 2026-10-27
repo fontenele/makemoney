@@ -1,11 +1,20 @@
 # Changelog
 
+## 2026-10-27 — M10.167 classify funding-conversion status dependencies
+
+- Classified unexpected protected status-action failures as the sanitized stages `status_context`, `provider_status`, or `status_observation`.
+- Kept raw CLI, process, provider, wallet, and database diagnostics out of HTTP responses while preserving typed persistence conflicts as 409 responses.
+- Proved with focused doubles that each failure path loads, looks up, or records at most once and never retries automatically.
+- Made no new live provider lookup, order submission, wallet mutation, accounting mutation, or financial transaction during verification.
+
 ## 2026-10-27 — M10.166 complete Agentic Wallet dashboard valuation
 
 - Extended the existing read-only funding valuation with the approved USDT holding and exact combined USDT/BRL wallet totals.
 - Updated the Agentic Wallet card to distinguish native BNB, reported USDT, BNB equivalents, and total wallet value.
 - Preserved missing USDT as unavailable rather than treating absent provider evidence as zero.
-- Recorded the first confirmed one-shot live conversion: `0.004 BNB` submitted with a `2.93 USDT` floor and `2.955301453716908917 USDT` independently observed afterward; the failed status lookup was not retried and durable reconciliation remains pending.
+- Recorded the first confirmed one-shot live conversion: `0.004 BNB` submitted with a `2.93 USDT` floor and `2.955301453716908917 USDT` independently observed afterward.
+- Later read-only diagnostics independently matched official `FINISHED` Agentic Wallet history to successful BSC transaction `0xf02596e695ab8f8682a932ba677b010681a56912c1781c3e8b3a3dd2d96b6323`, the exact USDT credit, and `0.00001849412701106 BNB` gas.
+- Kept durable reconciliation explicitly pending because the protected status route still returns a sanitized 503 and has recorded no observation; no submission or financial transaction was retried.
 
 ## 2026-10-27 — M10.165 three-minute conversion confirmation
 

@@ -1,5 +1,19 @@
 # Real Trading
 
+## M10.167 — Classified funding-conversion status dependencies
+
+The loopback-only protected funding-conversion status action now converts unexpected failures at its three external boundaries into the sanitized stages `status_context`, `provider_status`, and `status_observation`. The HTTP response does not expose raw CLI, process, provider, wallet, or database output. Typed observation not-found, blocked, and conflict failures retain the existing conflict response instead of being mislabeled as dependency outages.
+
+The one-shot safety shape is unchanged: one explicit call can load context once, issue at most one eligible pinned read-only lookup, and attempt one monotonic write. There is no internal retry, polling, scheduling, resubmission, accounting mutation, or financial-transaction authority. Verification uses doubles and does not invoke the live provider.
+
+### M10.167 acceptance criteria
+
+- Unexpected context, provider-status, and observation-store failures expose only their bounded stage.
+- Sensitive dependency error messages never cross the HTTP boundary.
+- Typed durable conflicts keep their existing 409 semantics.
+- Every dependency is invoked at most once per explicit call, and no automatic retry is introduced.
+- Focused tests, build, lint, and formatting pass without a live lookup or financial mutation.
+
 ## M10.166 — Complete Agentic Wallet dashboard valuation
 
 The existing read-only funding valuation now carries the approved USDT holding from the same sanitized wallet observation used for BNB. Exact-decimal backend arithmetic values BNB through public BNB/USDT and USDT/BRL prices, exposes the reported USDT quantity, and returns combined wallet totals only when that quantity is actually reported. Missing USDT remains `null` rather than being invented as zero.

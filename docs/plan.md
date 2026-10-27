@@ -6,7 +6,7 @@
 >
 > O projeto deve evoluir incrementalmente. Não implemente milestones futuras antecipadamente.
 
-## Status verified on 2026-09-12
+## Status verified on 2026-10-27
 
 ```text
 M0 Bootstrap:             DONE
@@ -78,7 +78,13 @@ M10.144 Financial-Evidence Capability Review and Exact Pre-Balance Snapshot: DON
 M10.145 Funding-Conversion Provider-Fee Evidence: DONE
 M10.146 Complete Funding-Conversion Financial Evidence: DONE
 M10.147 Guarded Funding-Conversion Operator Submission: DONE
-Next objective: register explicit funding-conversion status and financial reconciliation, then synchronize the local ledger before any strategy execution
+M10.148 Guarded Funding-Conversion Status and Financial Reconciliation: DONE
+M10.149 Guarded Funding-Conversion Accounting Synchronization: DONE
+M10.159 Final Fresh Funding-Conversion Quote: DONE
+M10.165 Three-Minute Funding-Conversion Confirmation: DONE
+M10.166 Complete Agentic Wallet Dashboard Valuation: DONE
+M10.167 Classified Funding-Conversion Status Dependencies: DONE
+Next objective: use a separately explicit read-only status action to identify the failing dependency stage, then complete durable financial reconciliation and local-ledger synchronization before any strategy execution
 ```
 
 The detailed sections below preserve the original product plan. For current delivery status and exact increment boundaries, `docs/roadmap.md` and `docs/current-state.md` are authoritative.

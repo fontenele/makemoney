@@ -4,6 +4,9 @@ import {
 } from './agentic-wallet-funding-conversion-status-context.store';
 import {
   AgenticWalletFundingConversionStatusObservationStore,
+  FundingConversionStatusAttemptNotFoundError,
+  FundingConversionStatusObservationBlockedError,
+  FundingConversionStatusObservationConflictError,
   StoredFundingConversionStatusObservation,
 } from './agentic-wallet-funding-conversion-status-observation.store';
 import { AgenticWalletMarketSwapStatusLookupRunner } from '../infrastructure/agentic-wallet-market-swap-status-lookup-runner';
@@ -30,6 +33,15 @@ export interface FundingConversionStatusReconciliationResult {
   readonly automaticRetryAllowed: false;
 }
 
+export type FundingConversionStatusDependencyStage =
+  'status_context' | 'provider_status' | 'status_observation';
+
+export class FundingConversionStatusDependencyUnavailableError extends Error {
+  constructor(readonly stage: FundingConversionStatusDependencyStage) {
+    super(`Funding conversion status dependency unavailable: ${stage}`);
+  }
+}
+
 export class AgenticWalletFundingConversionStatusService {
   private readonly activeAttemptIds = new Set<string>();
 
@@ -52,23 +64,28 @@ export class AgenticWalletFundingConversionStatusService {
 
     this.activeAttemptIds.add(attemptId);
     try {
-      const context = await this.contextStore.getByAttemptId(attemptId);
+      const context = await this.loadDependency('status_context', () =>
+        this.contextStore.getByAttemptId(attemptId),
+      );
       if (context === null)
         return result('blocked', ['status_context_not_found']);
       if (!context.statusLookupRequired)
         return result('status_lookup_not_required', [], false);
-      if (context.statusContext === null)
+      const statusContext = context.statusContext;
+      if (statusContext === null)
         return result('blocked', ['invalid_status_context']);
 
-      const response = await this.lookupRunner.run(
-        {
-          kind: 'market_order_status_lookup',
-          providerOrderId: context.statusContext.providerOrderId,
-        },
-        signal,
+      const response = await this.loadDependency('provider_status', () =>
+        this.lookupRunner.run(
+          {
+            kind: 'market_order_status_lookup',
+            providerOrderId: statusContext.providerOrderId,
+          },
+          signal,
+        ),
       );
       const assessment = assessAgenticWalletFundingConversionStatusResponse(
-        context.statusContext,
+        statusContext,
         response,
       );
       if (assessment.observation === null)
@@ -97,7 +114,7 @@ export class AgenticWalletFundingConversionStatusService {
           true,
         );
 
-      const recorded = await this.observationStore.record(
+      const recorded = await this.recordObservation(
         observationId,
         assessment.observation,
         new Date(recordedAt),
@@ -113,6 +130,47 @@ export class AgenticWalletFundingConversionStatusService {
       );
     } finally {
       this.activeAttemptIds.delete(attemptId);
+    }
+  }
+
+  private async loadDependency<T>(
+    stage: Exclude<
+      FundingConversionStatusDependencyStage,
+      'status_observation'
+    >,
+    load: () => Promise<T>,
+  ): Promise<T> {
+    try {
+      return await load();
+    } catch {
+      throw new FundingConversionStatusDependencyUnavailableError(stage);
+    }
+  }
+
+  private async recordObservation(
+    observationId: string,
+    observation: Parameters<
+      AgenticWalletFundingConversionStatusObservationStore['record']
+    >[1],
+    recordedAt: Date,
+  ) {
+    try {
+      return await this.observationStore.record(
+        observationId,
+        observation,
+        recordedAt,
+      );
+    } catch (error) {
+      if (
+        error instanceof FundingConversionStatusAttemptNotFoundError ||
+        error instanceof FundingConversionStatusObservationBlockedError ||
+        error instanceof FundingConversionStatusObservationConflictError
+      ) {
+        throw error;
+      }
+      throw new FundingConversionStatusDependencyUnavailableError(
+        'status_observation',
+      );
     }
   }
 }
