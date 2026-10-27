@@ -1,5 +1,36 @@
 # Real Trading
 
+## M10.172 — Durable atomic post-reconciliation accounting bootstrap
+
+M10.172 adds an unregistered serializable store for the exact M10.171 bootstrap plan. It uses the same advisory lock as ordinary accounting initialization, checks exact replay before mutable reads, reloads the fingerprint-validated financial reconciliation and durable submission attempt, and compares wallet, pre-balances, accepted quote quantities, fee evidence, terminal state, and no-retry policy with the supplied context. Initialization, balance, and ordinary funding-conversion synchronization tables must still all be empty, and the finalized snapshot must remain within its bounded age at the transaction clock.
+
+One successful transaction creates three inseparable artifacts: an ordinary-compatible `agentic_wallet`/chain-56 accounting initialization, exactly three current balance rows for native BNB and the approved USDT/BTCB contracts, and a separate immutable bootstrap receipt linked uniquely to reconciliation, attempt, transaction, and initialization. The receipt preserves the exceptional reason and keeps historical-ledger and historical-BTCB continuity false in both application output and database constraints. Exact replay is idempotent; changed correlation, malformed persistence, stale evidence, nonempty accounting state, or a partial write fails closed.
+
+### M10.172 acceptance criteria
+
+- Store input must regenerate the exact M10.171 plan before transaction access.
+- Durable reconciliation and submission-attempt context are independently reloaded and compared.
+- The shared accounting lock serializes ordinary initialization and exceptional bootstrap.
+- Initialization, all three balances, and the immutable origin receipt commit or roll back together.
+- Exact replay returns the original receipt; divergent identity or fingerprint reuse conflicts or blocks.
+- Database constraints preserve literal acknowledgment/reason, chronology, bounded age, canonical wallet/block/fingerprint, and false historical-continuity claims.
+- The store remains unregistered and performs no live local application, provider call, route, strategy activation, order, or financial transaction.
+
+## M10.171 — Truthful post-reconciliation accounting bootstrap plan
+
+M10.171 introduces an unregistered pure preparation boundary for the exceptional case established by M10.170: the conversion is financially reconciled, but no local accounting initialization or ledger existed before it. The assessment accepts only the exact completed reconciliation, its durable wallet and pre-balance context, one fresh finalized current BNB/USDT/BTCB snapshot, explicit absence counts for initialization/balance/synchronization state, and the literal acknowledgment `reconciled_conversion_and_current_wallet_balances_reviewed_for_accounting_bootstrap`.
+
+Preparation independently correlates attempt, plan, provider order, chain, wallet, and block chronology. It recomputes current BNB as pre-balance minus submitted source and network fee and current USDT as pre-balance plus actual receipt. BTCB is bound as the current baseline quantity, while both `historicalLedgerContinuityClaimed` and `historicalBtcbContinuityClaimed` remain false. The resulting object is only a plan: accounting balances remain uninitialized, conversion synchronization remains incomplete, strategy execution remains unauthorized, and automatic retry remains forbidden.
+
+### M10.171 acceptance criteria
+
+- All three local accounting surfaces must be explicitly empty before bootstrap preparation.
+- The current snapshot must be complete, fresh, later than pre-conversion evidence, and use the exact approved identities.
+- Durable conversion identities and exact BNB/USDT financial equations must agree.
+- The plan binds current BTCB but makes no historical-continuity claim.
+- Missing acknowledgment, stale/future evidence, identity divergence, nonempty state, or equation drift blocks preparation.
+- The boundary remains unregistered and performs no provider access, persistence, ledger mutation, synchronization, strategy activation, order, or financial transaction.
+
 ## M10.170 — Fail-closed funding-conversion accounting prerequisite
 
 The financially reconciled conversion cannot use the ordinary M10.149 ledger transition in this local database because no trusted accounting initialization or three-asset ledger existed before the conversion. The database contains zero initialization, balance, and funding-conversion synchronization rows. The synchronization coordinator now resolves the requested initialization before public-chain access and returns `accounting_initialization_absent` without starting an RPC read when it is missing. The serializable M10.149 mutation rules remain unchanged.

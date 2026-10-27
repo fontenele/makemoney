@@ -148,6 +148,11 @@ export type RealExecutionAccountingBalanceInitialization = Prisma.RealExecutionA
  */
 export type AgenticWalletFundingConversionAccountingSync = Prisma.AgenticWalletFundingConversionAccountingSyncModel
 /**
+ * Model AgenticWalletFundingConversionAccountingBootstrap
+ * 
+ */
+export type AgenticWalletFundingConversionAccountingBootstrap = Prisma.AgenticWalletFundingConversionAccountingBootstrapModel
+/**
  * Model RealExecutionAccountingLedgerReconciliation
  * 
  */

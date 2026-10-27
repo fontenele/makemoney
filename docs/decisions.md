@@ -1,5 +1,17 @@
 # Technical Decisions
 
+## M10.172 — Persist exceptional origin beside an ordinary-compatible initialization
+
+Existing accounting consumers require a `RealExecutionAccountingBalanceInitialization`, but changing that model's meaning or acknowledgment would weaken every established reader. M10.172 therefore creates a normal current-balance initialization and a separate one-to-one exceptional-origin receipt in the same serializable transaction. The initialization remains structurally compatible; the linked receipt explains that it arose after a reconciled conversion with no pre-existing ledger and permanently preserves both historical-continuity claims as false.
+
+The operation shares the existing initialization advisory lock and admits only a completely empty accounting state. It revalidates the durable financial and submission context and application-time freshness before writing the initialization, three balances, and receipt atomically. This local accounting bootstrap does not imply an ordinary conversion synchronization occurred and grants no strategy, retry, provider, or order authority.
+
+## M10.171 — Bootstrap current truth without inventing historical continuity
+
+The first funding conversion completed before any local real-execution accounting baseline existed. Backdating an ordinary initialization or pretending that the ledger transitioned from a state it never stored would make later audit claims false. M10.171 therefore defines a distinct post-reconciliation bootstrap plan: it rechecks the durable conversion and current finalized wallet equations, requires every accounting surface to be empty, and records the intended current three-asset baseline as an exceptional origin.
+
+BTCB's historical pre-conversion value cannot be recovered from the configured public RPC, so the plan binds only its observed current quantity and permanently keeps historical ledger and BTCB continuity claims false. This distinction must survive any later persistence model. Preparation itself grants no write, synchronization, strategy, retry, or execution authority.
+
 ## M10.158 — Apply authorized accounting only through conditional all-or-nothing ledger updates
 
 Durable authorization is not enough to assume the local ledger still equals the reviewed pre-state. M10.158 requires the operator to present the complete current-balance snapshot and literal application acknowledgment, reloads the authorization chain, and then lets M10.96 independently compare the actual database balances under a serializable lock. Every update includes the authorized `beforeQuantity`; any missing, stale, or concurrently changed row rolls back the whole operation and receipt.

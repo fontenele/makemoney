@@ -203,6 +203,7 @@ model AgenticWalletFundingConversionFinancialReconciliation {
   plan                       AgenticWalletFundingConversionPlan              @relation(fields: [planId], references: [id], onDelete: Restrict, map: "funding_conversion_financial_plan_fkey")
   statusObservation          AgenticWalletFundingConversionStatusObservation @relation(fields: [statusObservationId], references: [id], onDelete: Restrict, map: "funding_conversion_financial_status_fkey")
   accountingSynchronization  AgenticWalletFundingConversionAccountingSync?
+  accountingBootstrap        AgenticWalletFundingConversionAccountingBootstrap?
 
   @@index([recordedAt], map: "funding_conversion_financial_recorded_idx")
   @@map("agentic_wallet_funding_conversion_financial_reconciliations")
@@ -520,6 +521,7 @@ model RealExecutionAccountingBalanceInitialization {
   initializedAt                               DateTime                                       @map("initialized_at")
   ledgerReconciliations                       RealExecutionAccountingLedgerReconciliation[]
   fundingConversionAccountingSynchronizations AgenticWalletFundingConversionAccountingSync[]
+  fundingConversionAccountingBootstrap        AgenticWalletFundingConversionAccountingBootstrap?
 
   @@unique([providerId, chainId], map: "real_exec_acct_init_provider_chain_key")
   @@index([initializedAt], map: "real_exec_acct_init_initialized_at_idx")
@@ -545,6 +547,32 @@ model AgenticWalletFundingConversionAccountingSync {
 
   @@index([initializationId, appliedAt], map: "funding_conversion_acct_sync_init_idx")
   @@map("agentic_wallet_funding_conversion_accounting_syncs")
+}
+
+model AgenticWalletFundingConversionAccountingBootstrap {
+  id                                String                                                @id @db.Uuid
+  initializationId                  String                                                @unique(map: "funding_conversion_acct_bootstrap_init_key") @map("initialization_id") @db.Uuid
+  reconciliationId                  String                                                @unique(map: "funding_conversion_acct_bootstrap_recon_key") @map("reconciliation_id") @db.Uuid
+  attemptId                         String                                                @unique(map: "funding_conversion_acct_bootstrap_attempt_key") @map("attempt_id") @db.Uuid
+  transactionHash                   String                                                @unique(map: "funding_conversion_acct_bootstrap_tx_key") @map("transaction_hash") @db.VarChar(66)
+  walletAddress                     String                                                @map("wallet_address") @db.VarChar(42)
+  blockNumber                       String                                                @map("block_number") @db.VarChar(66)
+  acknowledgment                    String                                                @db.VarChar(96)
+  reason                            String                                                @db.VarChar(64)
+  balances                          Json
+  walletObservedAt                  DateTime                                              @map("wallet_observed_at")
+  accountingStateInspectedAt        DateTime                                              @map("accounting_state_inspected_at")
+  maximumSnapshotAgeMs              Int                                                   @map("maximum_snapshot_age_ms")
+  preparedAt                        DateTime                                              @map("prepared_at")
+  historicalLedgerContinuityClaimed Boolean                                               @map("historical_ledger_continuity_claimed")
+  historicalBtcbContinuityClaimed   Boolean                                               @map("historical_btcb_continuity_claimed")
+  requestFingerprint                String                                                @map("request_fingerprint") @db.Char(64)
+  appliedAt                         DateTime                                              @map("applied_at")
+  initialization                    RealExecutionAccountingBalanceInitialization          @relation(fields: [initializationId], references: [id], onDelete: Restrict, map: "funding_conversion_acct_bootstrap_init_fkey")
+  reconciliation                    AgenticWalletFundingConversionFinancialReconciliation @relation(fields: [reconciliationId], references: [id], onDelete: Restrict, map: "funding_conversion_acct_bootstrap_recon_fkey")
+
+  @@index([appliedAt], map: "funding_conversion_acct_bootstrap_applied_idx")
+  @@map("agentic_wallet_funding_conversion_accounting_bootstraps")
 }
 
 model RealExecutionAccountingLedgerReconciliation {

@@ -87,7 +87,9 @@ M10.167 Classified Funding-Conversion Status Dependencies: DONE
 M10.168 Persist Terminal Funding-Conversion Status: DONE
 M10.169 Complete Funding-Conversion Financial Reconciliation: DONE
 M10.170 Fail-Closed Funding-Conversion Accounting Prerequisite: DONE
-Next objective: design and verify a truthful post-reconciliation accounting bootstrap for the conversion that had no pre-existing local ledger; do not backdate an initialization or enable strategy execution
+M10.171 Truthful Post-Reconciliation Accounting Bootstrap Plan: DONE
+M10.172 Durable Atomic Post-Reconciliation Accounting Bootstrap: DONE
+Next objective: compose a one-shot guarded bootstrap coordinator that obtains fresh finalized evidence and invokes M10.172 only after a new explicit operator action; keep it unregistered until its dependency and failure boundaries are verified
 ```
 
 The detailed sections below preserve the original product plan. For current delivery status and exact increment boundaries, `docs/roadmap.md` and `docs/current-state.md` are authoritative.

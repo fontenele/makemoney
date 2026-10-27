@@ -77,6 +77,7 @@ export const ModelName = {
   RealExecutionAccountingBalance: 'RealExecutionAccountingBalance',
   RealExecutionAccountingBalanceInitialization: 'RealExecutionAccountingBalanceInitialization',
   AgenticWalletFundingConversionAccountingSync: 'AgenticWalletFundingConversionAccountingSync',
+  AgenticWalletFundingConversionAccountingBootstrap: 'AgenticWalletFundingConversionAccountingBootstrap',
   RealExecutionAccountingLedgerReconciliation: 'RealExecutionAccountingLedgerReconciliation',
   RealExecutionAccountingMutationApplication: 'RealExecutionAccountingMutationApplication',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
@@ -590,6 +591,30 @@ export const AgenticWalletFundingConversionAccountingSyncScalarFieldEnum = {
 } as const
 
 export type AgenticWalletFundingConversionAccountingSyncScalarFieldEnum = (typeof AgenticWalletFundingConversionAccountingSyncScalarFieldEnum)[keyof typeof AgenticWalletFundingConversionAccountingSyncScalarFieldEnum]
+
+
+export const AgenticWalletFundingConversionAccountingBootstrapScalarFieldEnum = {
+  id: 'id',
+  initializationId: 'initializationId',
+  reconciliationId: 'reconciliationId',
+  attemptId: 'attemptId',
+  transactionHash: 'transactionHash',
+  walletAddress: 'walletAddress',
+  blockNumber: 'blockNumber',
+  acknowledgment: 'acknowledgment',
+  reason: 'reason',
+  balances: 'balances',
+  walletObservedAt: 'walletObservedAt',
+  accountingStateInspectedAt: 'accountingStateInspectedAt',
+  maximumSnapshotAgeMs: 'maximumSnapshotAgeMs',
+  preparedAt: 'preparedAt',
+  historicalLedgerContinuityClaimed: 'historicalLedgerContinuityClaimed',
+  historicalBtcbContinuityClaimed: 'historicalBtcbContinuityClaimed',
+  requestFingerprint: 'requestFingerprint',
+  appliedAt: 'appliedAt'
+} as const
+
+export type AgenticWalletFundingConversionAccountingBootstrapScalarFieldEnum = (typeof AgenticWalletFundingConversionAccountingBootstrapScalarFieldEnum)[keyof typeof AgenticWalletFundingConversionAccountingBootstrapScalarFieldEnum]
 
 
 export const RealExecutionAccountingLedgerReconciliationScalarFieldEnum = {

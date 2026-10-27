@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-10-27 — M10.172 durable atomic post-reconciliation accounting bootstrap
+
+- Added a dedicated immutable bootstrap model and migration with unique initialization, reconciliation, attempt, and transaction correlation.
+- Added an unregistered serializable store that regenerates M10.171, reloads durable conversion context, shares the accounting initialization lock, and rechecks empty state plus application-time freshness.
+- Atomically creates an ordinary-compatible initialization, exact BNB/USDT/BTCB balances, and the exceptional-origin receipt; replay is idempotent and divergence or partial state fails closed.
+- Enforced acknowledgment, reason, chronology, age, canonical identity/fingerprint, and false historical-continuity claims in PostgreSQL.
+- Kept the store outside runtime composition and made no local accounting application, provider call, strategy activation, order, or financial transaction.
+- Applied the additive migration locally and confirmed initialization, balance, ordinary conversion-sync, and exceptional-bootstrap tables all remain empty.
+- Passed 2,908 backend tests across 260 suites, 135 PostgreSQL E2E tests with all 49 migrations applied from scratch, 117 dashboard tests, formatting, lint, builds, and Prisma/Compose validation.
+
+## 2026-10-27 — M10.171 truthful post-reconciliation accounting bootstrap plan
+
+- Added an unregistered pure assessment for establishing a current accounting baseline after a financially reconciled conversion that had no pre-existing local ledger.
+- Required empty initialization, balance, and conversion-sync state plus exact reconciliation/context/snapshot identities, chronology, freshness, and BNB/USDT equations.
+- Bound the complete current BNB, approved USDT, and approved BTCB quantities while explicitly refusing to claim historical ledger or BTCB continuity.
+- Kept accounting initialization, synchronization, strategy execution, and automatic retry false; added no route, schema, provider call, persistence, ledger mutation, order, or financial transaction.
+- Passed 2,903 backend tests across 259 suites, 135 PostgreSQL E2E tests with all 48 migrations applied from scratch, 117 dashboard tests, formatting, lint, builds, and Prisma/Compose validation.
+
 ## 2026-10-27 — M10.170 fail-closed funding-conversion accounting prerequisite
 
 - Added a durable accounting-initialization existence check before the synchronization path may read public BSC state.
