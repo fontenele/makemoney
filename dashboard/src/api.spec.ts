@@ -6,6 +6,7 @@ import {
   observeAgenticWallet,
   prepareAgenticWalletFunding,
   prepareAgenticWalletFundingConversion,
+  preflightAgenticWalletFundingConversionSubmission,
   quoteAgenticWalletFundingConversion,
   verifyAgenticWalletFunding,
   loadAgenticWalletAuthentication,
@@ -83,8 +84,12 @@ describe('loadAgenticWalletFundingValuation', () => {
           pricesObservedAt: '2026-10-22T03:00:01.000Z',
           balance: {
             quantityBnb: '0.00975323',
+            quantityUsdt: '2.955301453716908917',
             valueUsdt: '7.2387497737',
             valueBrl: '36.51587323342965',
+            usdtValueBrl: '14.908018183274947032',
+            totalValueUsdt: '10.194051227416908917',
+            totalValueBrl: '51.423891416704597032',
           },
           prices: {
             provider: 'binance',
@@ -106,7 +111,11 @@ describe('loadAgenticWalletFundingValuation', () => {
       status: 'available',
       data: {
         status: 'available',
-        balance: { quantityBnb: '0.00975323' },
+        balance: {
+          quantityBnb: '0.00975323',
+          quantityUsdt: '2.955301453716908917',
+          totalValueUsdt: '10.194051227416908917',
+        },
       },
     });
     expect(request).toHaveBeenCalledWith(
@@ -170,8 +179,12 @@ describe('loadDashboard', () => {
                             pricesObservedAt: '2026-10-22T03:00:01.000Z',
                             balance: {
                               quantityBnb: '0.00975323',
+                              quantityUsdt: null,
                               valueUsdt: '7.2387497737',
                               valueBrl: '36.51587323342965',
+                              usdtValueBrl: null,
+                              totalValueUsdt: null,
+                              totalValueBrl: null,
                             },
                             prices: {
                               provider: 'binance',
@@ -875,7 +888,7 @@ describe('Agentic Wallet funding conversion plan', () => {
     const request = vi.fn(() => Promise.resolve(Response.json(plan)));
 
     await expect(
-      prepareAgenticWalletFundingConversion('0.008', request),
+      prepareAgenticWalletFundingConversion('0.008', '5.8', request),
     ).resolves.toEqual({ status: 'available', data: plan });
     expect(request).toHaveBeenCalledWith(
       '/api/real-trading/funding-conversion-plan',
@@ -885,9 +898,76 @@ describe('Agentic Wallet funding conversion plan', () => {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ sourceQuantityBnb: '0.008' }),
+        body: JSON.stringify({
+          sourceQuantityBnb: '0.008',
+          minimumUsdt: '5.8',
+        }),
       },
     );
+  });
+});
+
+describe('Agentic Wallet funding conversion submission preflight', () => {
+  it('runs the manual read-only pre-claim evidence check', async () => {
+    const preflight = {
+      scope: 'agentic_wallet_funding_conversion_submission_preflight',
+      status: 'submission_preflight_ready',
+      sourceQuantityBnb: '0.004',
+      expectedUsdt: '2.980119873972886583',
+      minimumUsdt: '2.965219274603022150085',
+      maximumSlippagePercent: '0.5',
+      remainingQuantityBnb: '0.00575323',
+      preConversionBalanceBlockNumber: '0x7bfafb0',
+      preConversionBnbBalance: '0.00975323',
+      preConversionUsdtBalance: '0',
+      providerFeeRate: '0',
+      providerFeeUsd: '0',
+      estimatedNetworkFeeUsd: '0',
+      feeEvidenceGasMode: 'medium',
+      quoteExpiresAt: '2026-10-26T18:00:05.000Z',
+      checkedAt: '2026-10-26T18:00:01.000Z',
+      costCoverage: 'partial',
+      durablePlanRequired: true,
+      immediateConfirmationRequired: true,
+      automaticRetryAllowed: false,
+      providerSubmissionStarted: false,
+      submissionAuthorized: false,
+    };
+    const request = vi.fn(() => Promise.resolve(Response.json(preflight)));
+
+    await expect(
+      preflightAgenticWalletFundingConversionSubmission('0.004', request),
+    ).resolves.toEqual({ status: 'available', data: preflight });
+    expect(request).toHaveBeenCalledWith(
+      '/api/real-trading/funding-conversion-submission-preflight',
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sourceQuantityBnb: '0.004' }),
+      },
+    );
+  });
+
+  it('preserves a blocked dependency stage without retrying', async () => {
+    const request = vi.fn(() =>
+      Promise.resolve(
+        Response.json(
+          { message: 'Funding conversion preflight failed at final_quote' },
+          { status: 503 },
+        ),
+      ),
+    );
+
+    await expect(
+      preflightAgenticWalletFundingConversionSubmission('0.004', request),
+    ).resolves.toEqual({
+      status: 'unavailable',
+      message: 'Funding conversion preflight failed at final_quote',
+    });
+    expect(request).toHaveBeenCalledTimes(1);
   });
 });
 

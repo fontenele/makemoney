@@ -14,6 +14,15 @@ import { AgenticWalletFundingConversionPlanStore } from './agentic-wallet-fundin
 
 const PROVIDER_ID = 'agentic_wallet';
 const CHAIN_ID = '56';
+const CONFIRMATION_WINDOW_MS = 180_000;
+const POSITIVE_DECIMAL_PATTERN = /^(?:[1-9]\d*(?:\.\d+)?|0\.\d*[1-9]\d*)$/;
+const ExactDecimal = Decimal.clone({
+  precision: 80,
+  toExpNeg: -80,
+  toExpPos: 80,
+});
+
+export class InvalidFundingConversionPlanRequestError extends Error {}
 
 interface FundingConversionEnvironment {
   readonly TRADING_MODE: 'paper' | 'real';
@@ -33,7 +42,8 @@ export type AgenticWalletFundingConversionActivationBlocker =
   | 'source_token_not_approved'
   | 'target_token_not_approved'
   | 'minimum_gas_reserve_unconfigured'
-  | 'remaining_bnb_below_minimum_gas_reserve';
+  | 'remaining_bnb_below_minimum_gas_reserve'
+  | 'operator_minimum_above_quote_minimum';
 
 export interface AgenticWalletFundingConversionPlan {
   readonly id: string;
@@ -91,7 +101,10 @@ export class AgenticWalletFundingConversionPlanService {
   async prepare(
     request: unknown,
   ): Promise<AgenticWalletFundingConversionPlanResult> {
-    const quote = await this.quotes.load(request);
+    const input = parsePlanRequest(request);
+    const quote = await this.quotes.load({
+      sourceQuantityBnb: input.sourceQuantityBnb,
+    });
     let activationBlockers = this.activationBlockers();
     if (
       quote.status !== 'quote_available' ||
@@ -99,6 +112,18 @@ export class AgenticWalletFundingConversionPlanService {
       quote.remainingQuantityBnb === null
     ) {
       return result(quote, activationBlockers, null);
+    }
+    if (
+      new ExactDecimal(input.minimumUsdt).greaterThan(quote.quote.minimumUsdt)
+    ) {
+      return result(
+        quote,
+        appendBlocker(
+          activationBlockers,
+          'operator_minimum_above_quote_minimum',
+        ),
+        null,
+      );
     }
 
     const id = randomUUID();
@@ -125,7 +150,9 @@ export class AgenticWalletFundingConversionPlanService {
         'remaining_bnb_below_minimum_gas_reserve',
       );
     }
-    const confirmationExpiresAt = new Date(preparedAt.getTime() + 60_000);
+    const confirmationExpiresAt = new Date(
+      preparedAt.getTime() + CONFIRMATION_WINDOW_MS,
+    );
     const maximumSlippagePercent = decimalRateToPercent(
       quote.quote.maximumSlippageRate,
     );
@@ -133,7 +160,7 @@ export class AgenticWalletFundingConversionPlanService {
       id,
       sourceQuantityBnb: quote.quote.sourceQuantityBnb,
       expectedUsdt: quote.quote.expectedUsdt,
-      minimumUsdt: quote.quote.minimumUsdt,
+      minimumUsdt: input.minimumUsdt,
       maximumSlippagePercent,
       remainingQuantityBnb: quote.remainingQuantityBnb,
       minimumGasReserveBnb,
@@ -145,7 +172,7 @@ export class AgenticWalletFundingConversionPlanService {
       'CONFIRM_BNB_TO_USDT',
       id,
       quote.quote.sourceQuantityBnb,
-      quote.quote.minimumUsdt,
+      input.minimumUsdt,
       fingerprint,
     ].join(' ');
     const commandArguments = [
@@ -177,7 +204,7 @@ export class AgenticWalletFundingConversionPlanService {
       targetTokenAddress: BSC_USDT_ADDRESS,
       sourceQuantityBnb: quote.quote.sourceQuantityBnb,
       expectedUsdt: quote.quote.expectedUsdt,
-      minimumUsdt: quote.quote.minimumUsdt,
+      minimumUsdt: input.minimumUsdt,
       maximumSlippagePercent,
       remainingQuantityBnb: quote.remainingQuantityBnb,
       minimumGasReserveBnb,
@@ -292,7 +319,7 @@ function createFingerprint(input: {
   return createHash('sha256')
     .update(
       JSON.stringify({
-        version: 'agentic_wallet_funding_conversion_plan_v2',
+        version: 'agentic_wallet_funding_conversion_plan_v4',
         id: input.id,
         provider: PROVIDER_ID,
         chainId: CHAIN_ID,
@@ -312,6 +339,32 @@ function createFingerprint(input: {
       }),
     )
     .digest('hex');
+}
+
+function parsePlanRequest(value: unknown): {
+  sourceQuantityBnb: string;
+  minimumUsdt: string;
+} {
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    Array.isArray(value) ||
+    Object.keys(value).length !== 2 ||
+    !('sourceQuantityBnb' in value) ||
+    !('minimumUsdt' in value) ||
+    typeof value.sourceQuantityBnb !== 'string' ||
+    typeof value.minimumUsdt !== 'string' ||
+    !POSITIVE_DECIMAL_PATTERN.test(value.sourceQuantityBnb) ||
+    !POSITIVE_DECIMAL_PATTERN.test(value.minimumUsdt)
+  ) {
+    throw new InvalidFundingConversionPlanRequestError(
+      'sourceQuantityBnb and minimumUsdt must be canonical positive decimal strings',
+    );
+  }
+  return {
+    sourceQuantityBnb: new ExactDecimal(value.sourceQuantityBnb).toFixed(),
+    minimumUsdt: new ExactDecimal(value.minimumUsdt).toFixed(),
+  };
 }
 
 function decimalRateToPercent(rate: string): string {

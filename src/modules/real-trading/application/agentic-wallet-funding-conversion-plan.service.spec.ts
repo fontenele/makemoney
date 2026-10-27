@@ -24,7 +24,7 @@ describe('AgenticWalletFundingConversionPlanService', () => {
     );
     const service = createService(load, enabledEnvironment(), create);
 
-    const result = await service.prepare({ sourceQuantityBnb: '0.008' });
+    const result = await service.prepare(planRequest());
 
     expect(load).toHaveBeenCalledWith({ sourceQuantityBnb: '0.008' });
     expect(result).toMatchObject({
@@ -43,7 +43,7 @@ describe('AgenticWalletFundingConversionPlanService', () => {
         targetTokenAddress: BSC_USDT_ADDRESS,
         sourceQuantityBnb: '0.008',
         expectedUsdt: '5.92',
-        minimumUsdt: '5.8904',
+        minimumUsdt: '5.8',
         maximumSlippagePercent: '0.5',
         remainingQuantityBnb: '0.00175323',
         mevProtection: true,
@@ -65,7 +65,7 @@ describe('AgenticWalletFundingConversionPlanService', () => {
         'CONFIRM_BNB_TO_USDT',
         result.plan?.id,
         '0.008',
-        '5.8904',
+        '5.8',
         result.plan?.fingerprint,
       ].join(' '),
     );
@@ -117,9 +117,7 @@ describe('AgenticWalletFundingConversionPlanService', () => {
       jest.fn((record) => Promise.resolve({ ...record, stored: true })),
     );
 
-    await expect(
-      service.prepare({ sourceQuantityBnb: '0.008' }),
-    ).resolves.toMatchObject({
+    await expect(service.prepare(planRequest())).resolves.toMatchObject({
       status: 'plan_ready',
       activationBlockers: [
         'trading_mode_not_real',
@@ -150,9 +148,7 @@ describe('AgenticWalletFundingConversionPlanService', () => {
       jest.fn((record) => Promise.resolve({ ...record, stored: true })),
     );
 
-    await expect(
-      service.prepare({ sourceQuantityBnb: '0.008' }),
-    ).resolves.toMatchObject({
+    await expect(service.prepare(planRequest())).resolves.toMatchObject({
       status: 'blocked',
       plan: null,
       providerSubmissionStarted: false,
@@ -170,15 +166,13 @@ describe('AgenticWalletFundingConversionPlanService', () => {
       jest.fn((record) => Promise.resolve({ ...record, stored: true })),
     );
 
-    await expect(
-      service.prepare({ sourceQuantityBnb: '0.008' }),
-    ).resolves.toMatchObject({
+    await expect(service.prepare(planRequest())).resolves.toMatchObject({
       status: 'plan_ready',
       activationBlockers: ['remaining_bnb_below_minimum_gas_reserve'],
       executionConfigurationReady: false,
       plan: {
         minimumGasReserveBnb: '0.002',
-        confirmationExpiresAt: new Date('2026-10-22T12:01:02.000Z'),
+        confirmationExpiresAt: new Date('2026-10-22T12:03:02.000Z'),
       },
     });
   });
@@ -190,23 +184,73 @@ describe('AgenticWalletFundingConversionPlanService', () => {
       enabledEnvironment(),
       jest.fn(() => Promise.reject(failure)),
     );
-    await expect(service.prepare({ sourceQuantityBnb: '0.008' })).rejects.toBe(
-      failure,
-    );
+    await expect(service.prepare(planRequest())).rejects.toBe(failure);
   });
 
   it('propagates request rejection before constructing a plan', async () => {
-    const failure = new Error('invalid request');
+    const load = jest.fn(() => Promise.resolve(availableQuote()));
     const service = createService(
-      jest.fn(() => Promise.reject(failure)),
+      load,
       enabledEnvironment(),
       jest.fn((record) => Promise.resolve({ ...record, stored: true })),
     );
-    await expect(service.prepare({ sourceQuantityBnb: '0' })).rejects.toBe(
-      failure,
+    await expect(
+      service.prepare({ sourceQuantityBnb: '0', minimumUsdt: '5.8' }),
+    ).rejects.toThrow(
+      'sourceQuantityBnb and minimumUsdt must be canonical positive decimal strings',
     );
+    expect(load).not.toHaveBeenCalled();
+  });
+
+  it('does not persist a plan when the operator floor exceeds the quoted minimum', async () => {
+    const create = jest.fn((record) =>
+      Promise.resolve({ ...record, stored: true }),
+    );
+    const service = createService(
+      jest.fn(() => Promise.resolve(availableQuote())),
+      enabledEnvironment(),
+      create,
+    );
+
+    await expect(
+      service.prepare({
+        sourceQuantityBnb: '0.008',
+        minimumUsdt: '5.9',
+      }),
+    ).resolves.toMatchObject({
+      status: 'blocked',
+      activationBlockers: ['operator_minimum_above_quote_minimum'],
+      executionConfigurationReady: false,
+      plan: null,
+      providerSubmissionStarted: false,
+      conversionAuthorized: false,
+      submissionAuthorized: false,
+    });
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { sourceQuantityBnb: '0.008' },
+    { sourceQuantityBnb: '0.008', minimumUsdt: '0' },
+    { sourceQuantityBnb: '0.008', minimumUsdt: '5.8', execute: false },
+  ])('rejects a malformed strict plan request %#', async (request) => {
+    const load = jest.fn(() => Promise.resolve(availableQuote()));
+    const service = createService(
+      load,
+      enabledEnvironment(),
+      jest.fn((record) => Promise.resolve({ ...record, stored: true })),
+    );
+
+    await expect(service.prepare(request)).rejects.toThrow(
+      'sourceQuantityBnb and minimumUsdt must be canonical positive decimal strings',
+    );
+    expect(load).not.toHaveBeenCalled();
   });
 });
+
+function planRequest() {
+  return { sourceQuantityBnb: '0.008', minimumUsdt: '5.8' };
+}
 
 function createService(
   load: jest.Mock,

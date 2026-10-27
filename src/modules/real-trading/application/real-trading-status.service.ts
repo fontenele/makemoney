@@ -147,8 +147,12 @@ export interface AgenticWalletFundingValuation {
   readonly pricesObservedAt: Date | null;
   readonly balance: {
     readonly quantityBnb: string;
+    readonly quantityUsdt: string | null;
     readonly valueUsdt: string;
     readonly valueBrl: string;
+    readonly usdtValueBrl: string | null;
+    readonly totalValueUsdt: string | null;
+    readonly totalValueBrl: string | null;
   } | null;
   readonly prices: {
     readonly provider: 'binance';
@@ -426,6 +430,7 @@ export class RealTradingStatusService {
   async loadFundingValuation(): Promise<AgenticWalletFundingValuation> {
     const verification = await this.verifyFunding();
     const bnb = verification.assets.find((asset) => asset.symbol === 'BNB');
+    const usdt = verification.assets.find((asset) => asset.symbol === 'USDT');
     const blockers: Array<
       AgenticWalletFundingVerificationBlocker | 'bnb_not_reported'
     > = [...verification.blockers];
@@ -440,6 +445,7 @@ export class RealTradingStatusService {
     return availableFundingValuation(
       verification.observedAt,
       bnb.quantity,
+      usdt?.quantity ?? null,
       prices,
     );
   }
@@ -541,10 +547,16 @@ function blockedFundingValuation(
 function availableFundingValuation(
   balanceObservedAt: Date,
   quantityBnb: string,
+  quantityUsdt: string | null,
   prices: BinanceFundingValuationPrices,
 ): AgenticWalletFundingValuation {
   const valueUsdt = new ExactDecimal(quantityBnb).times(prices.bnbUsdtPrice);
   const valueBrl = valueUsdt.times(prices.usdtBrlPrice);
+  const reportedUsdt =
+    quantityUsdt === null ? null : new ExactDecimal(quantityUsdt);
+  const usdtValueBrl = reportedUsdt?.times(prices.usdtBrlPrice) ?? null;
+  const totalValueUsdt = reportedUsdt?.plus(valueUsdt) ?? null;
+  const totalValueBrl = totalValueUsdt?.times(prices.usdtBrlPrice) ?? null;
   return {
     scope: 'agentic_wallet_funding_valuation',
     status: 'available',
@@ -553,8 +565,12 @@ function availableFundingValuation(
     pricesObservedAt: new Date(prices.observedAt),
     balance: {
       quantityBnb,
+      quantityUsdt,
       valueUsdt: valueUsdt.toFixed(),
       valueBrl: valueBrl.toFixed(),
+      usdtValueBrl: usdtValueBrl?.toFixed() ?? null,
+      totalValueUsdt: totalValueUsdt?.toFixed() ?? null,
+      totalValueBrl: totalValueBrl?.toFixed() ?? null,
     },
     prices: {
       provider: 'binance',

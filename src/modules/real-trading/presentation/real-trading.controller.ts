@@ -15,11 +15,15 @@ import {
   AgenticWalletFundingConversionQuoteService,
   InvalidFundingConversionQuoteRequestError,
 } from '../application/agentic-wallet-funding-conversion-quote.service';
-import { AgenticWalletFundingConversionPlanService } from '../application/agentic-wallet-funding-conversion-plan.service';
+import {
+  AgenticWalletFundingConversionPlanService,
+  InvalidFundingConversionPlanRequestError,
+} from '../application/agentic-wallet-funding-conversion-plan.service';
 import {
   AgenticWalletFundingConversionSubmissionService,
   FundingConversionSubmissionBlockedError,
   FundingConversionSubmissionDependencyUnavailableError,
+  InvalidFundingConversionSubmissionPreflightRequestError,
   InvalidFundingConversionSubmissionRequestError,
 } from '../application/agentic-wallet-funding-conversion-submission.service';
 import {
@@ -224,7 +228,7 @@ export class RealTradingController {
     try {
       return await this.fundingConversionPlan.prepare(body);
     } catch (error) {
-      if (error instanceof InvalidFundingConversionQuoteRequestError) {
+      if (error instanceof InvalidFundingConversionPlanRequestError) {
         throw new BadRequestException(error.message);
       }
       throw new ServiceUnavailableException(
@@ -261,6 +265,33 @@ export class RealTradingController {
       }
       throw new ServiceUnavailableException(
         'Agentic Wallet funding conversion submission is unavailable',
+      );
+    }
+  }
+
+  @Post('funding-conversion-submission-preflight')
+  @HttpCode(200)
+  async preflightFundingConversionSubmission(@Body() body: unknown) {
+    try {
+      return await this.fundingConversionSubmission.preflight(body);
+    } catch (error) {
+      if (
+        error instanceof InvalidFundingConversionSubmissionPreflightRequestError
+      ) {
+        throw new BadRequestException(
+          'Invalid funding conversion submission preflight request',
+        );
+      }
+      if (error instanceof FundingConversionSubmissionBlockedError) {
+        throw new ConflictException(error.message);
+      }
+      if (
+        error instanceof FundingConversionSubmissionDependencyUnavailableError
+      ) {
+        throw new ServiceUnavailableException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet funding conversion submission preflight is unavailable',
       );
     }
   }

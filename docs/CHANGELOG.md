@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-10-27 — M10.166 complete Agentic Wallet dashboard valuation
+
+- Extended the existing read-only funding valuation with the approved USDT holding and exact combined USDT/BRL wallet totals.
+- Updated the Agentic Wallet card to distinguish native BNB, reported USDT, BNB equivalents, and total wallet value.
+- Preserved missing USDT as unavailable rather than treating absent provider evidence as zero.
+- Recorded the first confirmed one-shot live conversion: `0.004 BNB` submitted with a `2.93 USDT` floor and `2.955301453716908917 USDT` independently observed afterward; the failed status lookup was not retried and durable reconciliation remains pending.
+
+## 2026-10-27 — M10.165 three-minute conversion confirmation
+
+- Extended the durable funding-conversion confirmation lifetime from one minute to three minutes.
+- Kept the provider quote lifetime at five seconds and retained the mandatory final re-quote, explicit operator floor, gas/balance/fee checks, atomic single-use claim, and no-retry policy.
+- Advanced the versioned plan fingerprint so the exact three-minute expiry remains cryptographically bound.
+- Added regression coverage for the exact new deadline; no schema, order, provider call, or wallet mutation was added.
+
+## 2026-10-26 — M10.164 explicit operator conversion floor
+
+- Changed durable funding-conversion plan input to strict `{ sourceQuantityBnb, minimumUsdt }`.
+- Required the initial provider quote to satisfy the operator floor before persistence.
+- Bound the exact operator floor into the durable plan, fingerprint, and confirmation phrase; the existing atomic claim enforces the same floor against its final re-quote.
+- Added a separate dashboard floor input and cleared stale plan evidence when it changes.
+- Added focused backend, HTTP, and typed dashboard coverage; no schema migration was required.
+- The preceding confirmed live request stopped safely with `fresh_minimum_below_plan_minimum` before claim/runner access, leaving `0.00975323 BNB`, no USDT, and no transaction.
+- Post-restart live validation correctly withheld a plan because the current `2.9419153755308624412 USDT` provider minimum was below the explicit `2.947 USDT` operator floor.
+
+## 2026-10-26 — M10.163 dashboard submission preflight
+
+- Added a manual dashboard control for the read-only funding-conversion submission preflight.
+- Displayed sanitized final quote bounds, fixed-block balances, fee evidence, and timing without an address or execution control.
+- Kept preflight out of automatic refresh and clear its browser-local result whenever the entered BNB quantity changes.
+- Explicitly retained durable-plan and renewed immediate-confirmation requirements; no plan, claim, order, or wallet mutation was added.
+- Post-build live preflight returned a `2.94968410226673597324 USDT` minimum for `0.004 BNB`, below the operator's `2.95 USDT` floor, so the flow stopped without creating a plan or submission.
+
+## 2026-10-26 — M10.162 read-only submission preflight
+
+- Added manual `POST /real-trading/funding-conversion-submission-preflight` with strict `{ sourceQuantityBnb }` input.
+- Reused the exact submission pre-claim chain for preliminary/final quotes, finalized balances, and zero-fee evidence instead of creating a second policy.
+- Returned sanitized evidence without wallet address and with plan/confirmation required, submission unauthorized, provider submission unstarted, and automatic retry false.
+- Focused tests prove no claim, runner, or outcome write; E2E proves malformed and disabled-runtime requests stop before provider access.
+- Live `0.004 BNB` preflight completed with minimum `2.965219274603022150085 USDT`, fixed-block balances `0.00975323 BNB`/`0 USDT`, zero reported provider/network fees, and no plan or submission.
+
 ## 2026-10-26 — M10.161 safe conversion dependency diagnostics
 
 - Classified thrown pre-claim failures at preliminary quote, finalized balance, fee evidence, and final quote boundaries with a closed safe vocabulary.

@@ -54,6 +54,44 @@ describe('PrismaAgenticWalletFundingConversionSubmissionAttemptStore', () => {
     );
   });
 
+  it('accepts a final provider minimum below the initial quote minimum when it remains above the durable operator floor', async () => {
+    const input = {
+      ...claim(),
+      freshExpectedUsdt: '5.87',
+      freshMinimumUsdt: '5.85',
+    };
+    const create = jest.fn((value: { data: Record<string, unknown> }) =>
+      Promise.resolve({
+        ...value.data,
+        providerOrderId: null,
+        responseFingerprint: null,
+        completedAt: null,
+      }),
+    );
+    const tx = {
+      $executeRaw: jest.fn(() => Promise.resolve(0)),
+      agenticWalletFundingConversionSubmissionAttempt: {
+        findUnique: jest.fn(() => Promise.resolve(null)),
+        create,
+      },
+      agenticWalletFundingConversionPlan: {
+        findUnique: jest.fn(() => Promise.resolve(plan(input, '5.8'))),
+      },
+    };
+    const store =
+      new PrismaAgenticWalletFundingConversionSubmissionAttemptStore({
+        $transaction: jest.fn((work: (client: typeof tx) => Promise<unknown>) =>
+          work(tx),
+        ),
+      } as unknown as PrismaService);
+
+    await expect(store.claim(input)).resolves.toMatchObject({
+      replayed: false,
+      attempt: { freshMinimumUsdt: '5.85' },
+    });
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
   it.each([
     ['confirmation phrase', { confirmationPhrase: 'wrong phrase' }],
     ['source quantity', { freshSourceQuantityBnb: '0.007' }],
@@ -170,7 +208,10 @@ function claim(): AgenticWalletFundingConversionSubmissionClaim {
   };
 }
 
-function plan(input: AgenticWalletFundingConversionSubmissionClaim) {
+function plan(
+  input: AgenticWalletFundingConversionSubmissionClaim,
+  minimumUsdt = '5.8904',
+) {
   return {
     id: input.planId,
     fingerprint: input.planFingerprint,
@@ -179,7 +220,7 @@ function plan(input: AgenticWalletFundingConversionSubmissionClaim) {
       .digest('hex'),
     executionConfigurationReady: true,
     sourceQuantityBnb: '0.008',
-    minimumUsdt: '5.8904',
+    minimumUsdt,
     maximumSlippagePercent: '0.5',
     minimumGasReserveBnb: '0.001',
     confirmationExpiresAt: new Date('2026-10-22T12:01:02.000Z'),

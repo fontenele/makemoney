@@ -200,7 +200,7 @@ A provider timeout after a mutable command cannot safely distinguish “not sent
 
 ## 2026-10-22 - Separate price expiry from confirmation and require a gas floor
 
-A five-second quote is too short for meaningful operator review, while extending that quote locally would fabricate price validity. M10.126 keeps the provider quote expiry unchanged, gives the confirmation plan a separate sixty-second lifetime, and requires any later submission to re-quote against the already accepted minimum output. A separately configured minimum BNB remainder is required as a conservative gas floor, but it does not assert knowledge of the eventual network fee.
+A five-second quote is too short for meaningful operator review, while extending that quote locally would fabricate price validity. M10.126 kept the provider quote expiry unchanged and separated confirmation lifetime; M10.165 extends only that operator lifetime from one to three minutes after live interaction plus controlled API restart repeatedly exceeded one minute. Any later submission must still re-quote against the accepted explicit minimum output. A separately configured minimum BNB remainder remains a conservative gas floor, but it does not assert knowledge of the eventual network fee.
 
 ## 2026-10-22 - Persist confirmation plans without storing the confirmation secret
 
@@ -226,7 +226,7 @@ M10.121 therefore uses a dedicated BNB→USDT quote adapter and the official nat
 
 The operator wants the funded balance continuously visible in BNB, USDT, and BRL and wants monetary values to expose conversions without an extra verification action. Reusing an executable swap quote would unnecessarily cross the current financial safety boundary, while browser floating-point conversion could introduce monetary drift.
 
-M10.120 therefore adds one read-only valuation route that combines the existing bounded approved-wallet observation with Binance public BNB/USDT and USDT/BRL last prices. The backend performs the wallet valuation with exact decimals; dashboard tooltips also use `decimal.js` and appear only when all required price evidence exists. The 15-second refresh runs only while the dashboard is visible. Last prices are explicitly indicative rather than executable, and all funding, quote, signature, submission, and execution authorization remains false.
+M10.120 therefore adds one read-only valuation route that combines the existing bounded approved-wallet observation with Binance public BNB/USDT and USDT/BRL last prices. M10.166 extends that same observation to expose reported approved USDT and exact combined totals; missing USDT never becomes an assumed zero. The backend performs wallet arithmetic with exact decimals; dashboard tooltips also use `decimal.js` and appear only when all required price evidence exists. Wallet valuation remains initial/manual refresh only rather than joining the ordinary 15-second dashboard cycle. Last prices are explicitly indicative rather than executable, and all funding, quote, signature, submission, and execution authorization remains false.
 
 ## 2026-10-21 — Verify the funded wallet without assuming omitted balances are zero
 

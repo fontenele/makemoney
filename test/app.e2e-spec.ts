@@ -180,6 +180,56 @@ describe('Application (e2e)', () => {
     }
   });
 
+  it('/real-trading/funding-conversion-plan (POST) requires an explicit operator minimum', () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+
+    return request(server)
+      .post('/real-trading/funding-conversion-plan')
+      .send({ sourceQuantityBnb: '0.004' })
+      .expect(400)
+      .expect({
+        message:
+          'sourceQuantityBnb and minimumUsdt must be canonical positive decimal strings',
+        error: 'Bad Request',
+        statusCode: 400,
+      });
+  });
+
+  it('/real-trading/funding-conversion-submission-preflight (POST) rejects extra fields before provider access', () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+
+    return request(server)
+      .post('/real-trading/funding-conversion-submission-preflight')
+      .send({ sourceQuantityBnb: '0.004', execute: false })
+      .expect(400)
+      .expect({
+        message: 'Invalid funding conversion submission preflight request',
+        error: 'Bad Request',
+        statusCode: 400,
+      });
+  });
+
+  it('/real-trading/funding-conversion-submission-preflight (POST) blocks before provider access while runtime execution is disabled', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const previous = config.get<string>('TRADING_MODE');
+    config.set('TRADING_MODE', 'paper');
+    try {
+      await request(server)
+        .post('/real-trading/funding-conversion-submission-preflight')
+        .send({ sourceQuantityBnb: '0.004' })
+        .expect(409)
+        .expect({
+          message:
+            'Funding conversion submission blocked: runtime_configuration_not_ready',
+          error: 'Conflict',
+          statusCode: 409,
+        });
+    } finally {
+      config.set('TRADING_MODE', previous);
+    }
+  });
+
   it('/real-trading/funding-conversion-submission (POST) blocks before provider access while runtime execution is disabled', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     const config = app.get(ConfigService);

@@ -7,6 +7,7 @@ import {
   observeAgenticWallet,
   prepareAgenticWalletFunding,
   prepareAgenticWalletFundingConversion,
+  preflightAgenticWalletFundingConversionSubmission,
   quoteAgenticWalletFundingConversion,
   startAgenticWalletAuthentication,
   loadListingPerformance,
@@ -22,6 +23,7 @@ import {
   type AgenticWalletFundingReadiness,
   type AgenticWalletFundingConversionQuote,
   type AgenticWalletFundingConversionPlan,
+  type AgenticWalletFundingConversionSubmissionPreflight,
   type AgenticWalletFundingValuation,
   type AgenticWalletAuthenticationState,
   type DetectedSpotSymbol,
@@ -100,12 +102,16 @@ const agenticWalletFundingReadiness =
   ref<Resource<AgenticWalletFundingReadiness> | null>(null);
 const agenticWalletFundingReadinessLoading = ref(false);
 const agenticWalletFundingConversionQuantity = ref('');
+const agenticWalletFundingConversionMinimumUsdt = ref('');
 const agenticWalletFundingConversionQuote =
   ref<Resource<AgenticWalletFundingConversionQuote> | null>(null);
 const agenticWalletFundingConversionQuoteLoading = ref(false);
 const agenticWalletFundingConversionPlan =
   ref<Resource<AgenticWalletFundingConversionPlan> | null>(null);
 const agenticWalletFundingConversionPlanLoading = ref(false);
+const agenticWalletFundingConversionSubmissionPreflight =
+  ref<Resource<AgenticWalletFundingConversionSubmissionPreflight> | null>(null);
+const agenticWalletFundingConversionSubmissionPreflightLoading = ref(false);
 const agenticWalletFundingQrCode = ref<string | null>(null);
 const agenticWalletFundingQrCodeError = ref(false);
 const agenticWalletAuthentication =
@@ -570,9 +576,23 @@ async function prepareFundingConversionPlan(): Promise<void> {
     agenticWalletFundingConversionPlan.value =
       await prepareAgenticWalletFundingConversion(
         agenticWalletFundingConversionQuantity.value.trim(),
+        agenticWalletFundingConversionMinimumUsdt.value.trim(),
       );
   } finally {
     agenticWalletFundingConversionPlanLoading.value = false;
+  }
+}
+
+async function validateFundingConversionSubmissionPreflight(): Promise<void> {
+  if (agenticWalletFundingConversionSubmissionPreflightLoading.value) return;
+  agenticWalletFundingConversionSubmissionPreflightLoading.value = true;
+  try {
+    agenticWalletFundingConversionSubmissionPreflight.value =
+      await preflightAgenticWalletFundingConversionSubmission(
+        agenticWalletFundingConversionQuantity.value.trim(),
+      );
+  } finally {
+    agenticWalletFundingConversionSubmissionPreflightLoading.value = false;
   }
 }
 
@@ -1036,7 +1056,7 @@ onUnmounted(() => {
                     </dd>
                   </div>
                   <div>
-                    <dt>Equivalent in USDT</dt>
+                    <dt>BNB equivalent in USDT</dt>
                     <dd
                       v-money-tooltip="
                         moneyTooltip(
@@ -1050,7 +1070,7 @@ onUnmounted(() => {
                     </dd>
                   </div>
                   <div>
-                    <dt>Equivalent in BRL</dt>
+                    <dt>BNB equivalent in BRL</dt>
                     <dd
                       v-money-tooltip="
                         moneyTooltip(
@@ -1061,6 +1081,58 @@ onUnmounted(() => {
                     >
                       {{ brl(fundingValuation.data.balance.valueBrl) }}
                     </dd>
+                  </div>
+                  <div>
+                    <dt>USDT</dt>
+                    <dd
+                      v-if="fundingValuation.data.balance.quantityUsdt !== null"
+                      v-money-tooltip="
+                        moneyTooltip(
+                          fundingValuation.data.balance.quantityUsdt,
+                          'USDT',
+                        )
+                      "
+                    >
+                      {{ fundingValuation.data.balance.quantityUsdt }}
+                    </dd>
+                    <dd v-else>Not reported</dd>
+                  </div>
+                  <div>
+                    <dt>Total wallet value</dt>
+                    <dd
+                      v-if="
+                        fundingValuation.data.balance.totalValueUsdt !== null
+                      "
+                      v-money-tooltip="
+                        moneyTooltip(
+                          fundingValuation.data.balance.totalValueUsdt,
+                          'USDT',
+                        )
+                      "
+                    >
+                      {{
+                        decimal(fundingValuation.data.balance.totalValueUsdt, 2)
+                      }}
+                      USDT
+                    </dd>
+                    <dd v-else>Unavailable until USDT is reported</dd>
+                  </div>
+                  <div>
+                    <dt>Total wallet value in BRL</dt>
+                    <dd
+                      v-if="
+                        fundingValuation.data.balance.totalValueBrl !== null
+                      "
+                      v-money-tooltip="
+                        moneyTooltip(
+                          fundingValuation.data.balance.totalValueBrl,
+                          'BRL',
+                        )
+                      "
+                    >
+                      {{ brl(fundingValuation.data.balance.totalValueBrl) }}
+                    </dd>
+                    <dd v-else>Unavailable until USDT is reported</dd>
                   </div>
                 </dl>
                 <p class="wallet-policy-note">
@@ -1125,7 +1197,9 @@ onUnmounted(() => {
                   Enter the BNB quantity yourself. This performs one manual,
                   non-executable quote and never converts funds. The quantity
                   must be below the wallet balance so some BNB remains, but gas
-                  sufficiency is still unverified.
+                  sufficiency is still unverified. The separate minimum USDT
+                  field is the operator floor persisted only when preparing a
+                  durable plan.
                 </p>
               </div>
               <label>
@@ -1139,7 +1213,19 @@ onUnmounted(() => {
                   @input="
                     agenticWalletFundingConversionQuote = null;
                     agenticWalletFundingConversionPlan = null;
+                    agenticWalletFundingConversionSubmissionPreflight = null;
                   "
+                />
+              </label>
+              <label>
+                <span>Minimum USDT for durable plan</span>
+                <input
+                  v-model="agenticWalletFundingConversionMinimumUsdt"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Example: 2.947"
+                  aria-label="Minimum USDT accepted for conversion plan"
+                  @input="agenticWalletFundingConversionPlan = null"
                 />
               </label>
               <button
@@ -1159,7 +1245,8 @@ onUnmounted(() => {
                 type="button"
                 :disabled="
                   agenticWalletFundingConversionPlanLoading ||
-                  agenticWalletFundingConversionQuantity.trim().length === 0
+                  agenticWalletFundingConversionQuantity.trim().length === 0 ||
+                  agenticWalletFundingConversionMinimumUsdt.trim().length === 0
                 "
                 @click="prepareFundingConversionPlan"
               >
@@ -1167,6 +1254,20 @@ onUnmounted(() => {
                   agenticWalletFundingConversionPlanLoading
                     ? 'Preparing plan...'
                     : 'Prepare conversion - do not execute'
+                }}
+              </button>
+              <button
+                type="button"
+                :disabled="
+                  agenticWalletFundingConversionSubmissionPreflightLoading ||
+                  agenticWalletFundingConversionQuantity.trim().length === 0
+                "
+                @click="validateFundingConversionSubmissionPreflight"
+              >
+                {{
+                  agenticWalletFundingConversionSubmissionPreflightLoading
+                    ? 'Validating preflight...'
+                    : 'Validate submission preflight - do not execute'
                 }}
               </button>
             </form>
@@ -1405,13 +1506,162 @@ onUnmounted(() => {
               >
                 Conversion plan blocked:
                 {{
-                  agenticWalletFundingConversionPlan.data.quote.blockers.join(
-                    ', ',
-                  )
+                  [
+                    ...agenticWalletFundingConversionPlan.data
+                      .activationBlockers,
+                    ...agenticWalletFundingConversionPlan.data.quote.blockers,
+                  ].join(', ')
                 }}
               </p>
               <p v-else class="wallet-policy-warning">
                 {{ agenticWalletFundingConversionPlan.message }}
+              </p>
+            </div>
+
+            <div
+              v-if="agenticWalletFundingConversionSubmissionPreflight"
+              class="wallet-funding-instructions"
+              aria-live="polite"
+            >
+              <template
+                v-if="
+                  agenticWalletFundingConversionSubmissionPreflight.status ===
+                  'available'
+                "
+              >
+                <strong
+                  >Submission preflight ready - no order authorized</strong
+                >
+                <dl class="wallet-status-grid">
+                  <div>
+                    <dt>Exact spend</dt>
+                    <dd>
+                      {{
+                        agenticWalletFundingConversionSubmissionPreflight.data
+                          .sourceQuantityBnb
+                      }}
+                      BNB
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Expected</dt>
+                    <dd>
+                      {{
+                        decimal(
+                          agenticWalletFundingConversionSubmissionPreflight.data
+                            .expectedUsdt,
+                          6,
+                        )
+                      }}
+                      USDT
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Minimum after slippage</dt>
+                    <dd>
+                      {{
+                        decimal(
+                          agenticWalletFundingConversionSubmissionPreflight.data
+                            .minimumUsdt,
+                          6,
+                        )
+                      }}
+                      USDT
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>BNB left</dt>
+                    <dd>
+                      {{
+                        agenticWalletFundingConversionSubmissionPreflight.data
+                          .remainingQuantityBnb
+                      }}
+                      BNB
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Finalized balance block</dt>
+                    <dd class="wallet-address">
+                      {{
+                        agenticWalletFundingConversionSubmissionPreflight.data
+                          .preConversionBalanceBlockNumber
+                      }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Balance at fixed block</dt>
+                    <dd>
+                      {{
+                        agenticWalletFundingConversionSubmissionPreflight.data
+                          .preConversionBnbBalance
+                      }}
+                      BNB /
+                      {{
+                        agenticWalletFundingConversionSubmissionPreflight.data
+                          .preConversionUsdtBalance
+                      }}
+                      USDT
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Provider fee</dt>
+                    <dd>
+                      {{
+                        agenticWalletFundingConversionSubmissionPreflight.data
+                          .providerFeeUsd
+                      }}
+                      USD (rate
+                      {{
+                        agenticWalletFundingConversionSubmissionPreflight.data
+                          .providerFeeRate
+                      }})
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Estimated network fee</dt>
+                    <dd>
+                      {{
+                        agenticWalletFundingConversionSubmissionPreflight.data
+                          .estimatedNetworkFeeUsd
+                      }}
+                      USD ({{
+                        agenticWalletFundingConversionSubmissionPreflight.data
+                          .feeEvidenceGasMode
+                      }})
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Checked</dt>
+                    <dd>
+                      {{
+                        timestamp(
+                          agenticWalletFundingConversionSubmissionPreflight.data
+                            .checkedAt,
+                        )
+                      }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Quote expires</dt>
+                    <dd>
+                      {{
+                        timestamp(
+                          agenticWalletFundingConversionSubmissionPreflight.data
+                            .quoteExpiresAt,
+                        )
+                      }}
+                    </dd>
+                  </div>
+                </dl>
+                <p class="wallet-policy-warning">
+                  This manual check created no plan, claim, or order. Cost
+                  coverage remains partial. A fresh durable plan and a new
+                  immediate confirmation are still required before any real
+                  submission; this result cannot be reused as authorization.
+                </p>
+              </template>
+              <p v-else class="wallet-policy-warning">
+                {{ agenticWalletFundingConversionSubmissionPreflight.message }}
               </p>
             </div>
 

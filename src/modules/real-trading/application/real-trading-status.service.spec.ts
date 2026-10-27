@@ -298,6 +298,12 @@ describe('RealTradingStatusService', () => {
         symbol: 'BNB',
         quantity: '0.00975323',
       },
+      {
+        chainId: '56',
+        tokenAddress: '0x55d398326f99059ff775485246999027b3197955',
+        symbol: 'USDT',
+        quantity: '2.955301453716908917',
+      },
     ];
     const wallet = { load: jest.fn(() => Promise.resolve(observation)) };
     const { client: prices, load: loadPrices } = fundingPricesMock();
@@ -315,8 +321,12 @@ describe('RealTradingStatusService', () => {
       pricesObservedAt: new Date('2026-10-01T12:00:00.000Z'),
       balance: {
         quantityBnb: '0.00975323',
+        quantityUsdt: '2.955301453716908917',
         valueUsdt: '7.2387497737',
         valueBrl: '36.51587323342965',
+        usdtValueBrl: '14.9080181832749470318065',
+        totalValueUsdt: '10.194051227416908917',
+        totalValueBrl: '51.4238914167045970318065',
       },
       prices: {
         provider: 'binance',

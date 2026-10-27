@@ -1,5 +1,18 @@
 # Real Trading
 
+## M10.166 — Complete Agentic Wallet dashboard valuation
+
+The existing read-only funding valuation now carries the approved USDT holding from the same sanitized wallet observation used for BNB. Exact-decimal backend arithmetic values BNB through public BNB/USDT and USDT/BRL prices, exposes the reported USDT quantity, and returns combined wallet totals only when that quantity is actually reported. Missing USDT remains `null` rather than being invented as zero.
+
+The route remains an on-demand observation with no wallet address, funding, quote, signature, submission, accounting mutation, or durable transaction-reconciliation authority.
+
+### M10.166 acceptance criteria
+
+- The dashboard visibly distinguishes native BNB, reported USDT, BNB equivalents, and combined totals.
+- All multiplication and addition remain exact-decimal backend operations.
+- Missing USDT makes combined totals unavailable rather than fabricating a zero balance.
+- Tests and live direct/proxied reads verify the same projection without any financial mutation.
+
 ## M10.158 — Guarded atomic real-execution accounting application
 
 M10.158 registers M10.94–M10.96 at `POST /real-trading/submission-accounting-application`. The loopback-only timing-safe Bearer-protected request contains canonical application, authorization, mutation, gate, transaction, and plan-fingerprint identities; the literal `authorized_transitions_and_current_ledger_balances_reviewed_for_atomic_application`; a complete unique current-ledger balance snapshot; `balanceCoverageComplete: true`; and a canonical observation timestamp. The service supplies preparation time from its own clock.
@@ -210,7 +223,7 @@ Both routes are loopback-only and reuse the timing-safe SHA-256 Bearer guard. Au
 
 M10.147 registers the previously unregistered one-shot BNB-to-USDT submission service after the user explicitly authorized crossing the documented reachability boundary. The new `POST /real-trading/funding-conversion-submission` route is available only on the loopback-bound API and uses the existing timing-safe SHA-256 Bearer guard. With no configured digest it fails with 503; invalid credentials fail with 401 before the request reaches the conversion service.
 
-Authentication alone cannot submit. The service requires real trading mode, independent real-execution enablement, exact Agentic Wallet/BSC/native-BNB/approved-USDT allowlist, configured minimum BNB gas reserve, and inactive emergency stop. It then obtains new verified holdings and a new quote, captures an exact finalized-block pre-balance, captures the current provider fee, and rechecks all gates immediately before a serializable one-shot claim. The claim reloads the durable plan and verifies its fingerprint, confirmation-phrase digest, sixty-second confirmation expiry, quantity, slippage, minimum output, and gas-reserved remainder before the pinned CLI swap runner becomes reachable.
+Authentication alone cannot submit. The service requires real trading mode, independent real-execution enablement, exact Agentic Wallet/BSC/native-BNB/approved-USDT allowlist, configured minimum BNB gas reserve, and inactive emergency stop. It then obtains new verified holdings and a new quote, captures an exact finalized-block pre-balance, captures the current provider fee, and rechecks all gates immediately before a serializable one-shot claim. The claim reloads the durable plan and verifies its fingerprint, confirmation-phrase digest, three-minute confirmation expiry, quantity, slippage, minimum output, and gas-reserved remainder before the pinned CLI swap runner becomes reachable.
 
 The durable claim occurs before submission. A provider error or malformed response is recorded as an unknown outcome with status lookup required and automatic retry forbidden; the same plan cannot be consumed again. The current local environment remains paper-only, execution-disabled, and without the Bearer digest, and verification exercises only pre-provider failure paths. No live quote, balance read, swap, conversion, or real order was issued.
 
@@ -567,7 +580,7 @@ One submission-attempt row may exist per plan. The row contains only the confirm
 
 ## M10.126 — Funding-conversion confirmation and gas-reserve policy
 
-M10.126 separates price evidence lifetime from operator-review lifetime. The existing provider quote remains valid for five seconds, while a successfully persisted plan receives a separate sixty-second confirmation deadline. Fingerprint version 2 binds both timestamps, so neither can be extended or replaced without producing a different plan.
+M10.126 originally separated price evidence lifetime from operator-review lifetime. The provider quote remains valid for five seconds; M10.165 supersedes the original sixty-second confirmation deadline with three minutes. Fingerprint version 4 binds the current timestamps, so neither can be extended or replaced without producing a different plan.
 
 The new optional `FUNDING_CONVERSION_MIN_GAS_RESERVE_BNB` startup setting accepts only a canonical positive decimal and is blank by default. A successful quote compares its exact remaining BNB against that policy. Missing policy and insufficient remainder are distinct activation blockers. Meeting the threshold is only a conservative local safeguard; provider cost coverage and actual gas sufficiency remain explicitly unverified.
 
@@ -597,6 +610,20 @@ The PostgreSQL row preserves the complete exact provider/financial envelope and 
 - Persistence failure withholds the plan and propagates as route unavailability.
 - The M10.124 runner remains unregistered and no signature, submission, retry, or conversion occurs.
 
+## M10.164 — Explicit operator funding-conversion floor
+
+`POST /real-trading/funding-conversion-plan` now accepts exactly two canonical positive decimal strings: `sourceQuantityBnb` and `minimumUsdt`. The service projects only the source quantity into the existing strict quote boundary, then requires the returned provider minimum to equal or exceed the operator floor before it can create a plan.
+
+For an accepted plan, `minimumUsdt` is the operator floor rather than a copy of the initial quote minimum. The initial provider minimum remains visible inside the quote context. The versioned fingerprint, confirmation phrase, and durable row all bind the exact operator value. At submission, the existing serializable claim compares the final post-evidence provider minimum with that durable floor. A final quote may therefore move below the initial quote while remaining acceptable, but it can never fall below the amount the operator explicitly approved.
+
+The dashboard adds no default: the operator must type the floor separately. Changing it clears stale plan evidence. Quote preview and read-only submission preflight remain quantity-only actions. This change adds no migration, retry, scheduling, broader token/provider scope, weaker slippage or gas rule, submission authority, or transaction by itself.
+
+## M10.165 — Three-minute funding-conversion confirmation window
+
+A persisted funding-conversion plan now allows three minutes for the operator to return its exact confirmation phrase. This replaces the former one-minute operator window because the real workflow includes human review plus a controlled host-API restart for an in-memory Bearer token. The exact expiry remains durable and is covered by fingerprint version 4.
+
+The longer plan lifetime does not extend or reuse the provider quote. Submission still performs the complete preliminary quote, finalized balance, fee evidence, and final quote chain immediately before the atomic claim. The final provider minimum must remain at or above the explicit operator floor, the confirmation phrase and fingerprint must match, gas and configuration gates must still pass, and any blocked or uncertain result remains non-retriable.
+
 ## M10.124 — Closed unregistered funding-conversion swap runner
 
 M10.124 adds the first mutable provider primitive for funding conversion, but leaves it structurally unreachable from the running application. `AgenticWalletFundingConversionSwapCliProcessRunner` validates an exact typed envelope and builds only `market-order swap` from native BNB to approved USDT on BSC chain 56, with explicit slippage, MEV enabled, medium gas, and JSON output. It validates CLI 1.10.0 immediately before the future swap command.
@@ -614,7 +641,7 @@ The runner is not registered in NestJS and has no application service, route, da
 
 ## M10.123 — Inert BNB-to-USDT funding-conversion plan
 
-`POST /real-trading/funding-conversion-plan` accepts the same strict quantity body as M10.121 and deliberately obtains a new fresh wallet verification and provider quote. A successful result assigns a unique plan UUID and hashes the complete financial and provider command envelope: official BSC native BNB and USDT identities, chain 56, exact input, expected and minimum output, remaining BNB, maximum slippage, MEV protection, medium gas level, quote time, and expiry.
+`POST /real-trading/funding-conversion-plan` originally accepted the same strict quantity body as M10.121; M10.164 supersedes that public request with an explicit operator minimum. It deliberately obtains a new fresh wallet verification and provider quote. A successful result assigns a unique plan UUID and hashes the complete financial and provider command envelope: official BSC native BNB and USDT identities, chain 56, exact input, expected output, accepted minimum output, remaining BNB, maximum slippage, MEV protection, medium gas level, quote time, and expiry.
 
 The result exposes environment activation blockers independently for trading mode, execution enablement, provider, chain, source token, and target token. Clearing those blockers would still not authorize submission: the command remains a preview with `executable: false`, final confirmation remains required, and conversion/submission flags remain false.
 
@@ -2825,3 +2852,9 @@ The composition remains unregistered, read-only, and non-authorizing. It adds no
 The guarded funding-conversion submission coordinator classifies thrown failures at four read-only boundaries: preliminary quote, finalized pre-conversion balance, fee evidence, and final quote. The loopback-only protected route returns only this closed stage in an HTTP 503 response. Raw CLI, RPC, provider, wallet, and process output remains private.
 
 Business-rule divergence still uses the existing explicit 409 blockers. Dependency failures always occur before the serializable submission claim and mutable swap runner, never trigger automatic retry, and add no new route, schema, authority, plan, or financial transaction.
+
+## M10.162 — Read-only funding-conversion submission preflight
+
+The manual submission preflight accepts exactly one canonical positive BNB quantity and invokes the same private evidence collector used by the guarded submission path. It verifies preliminary and final provider quotes around one exact finalized BSC balance snapshot and current zero-fee evidence, applying the same identity, balance, slippage, output, fee, configuration, emergency-stop, and quote-freshness rules.
+
+The response omits the wallet address and includes only sanitized bounds, fixed-block balances, fee/cost evidence, timing, and explicit non-authority flags. It creates no plan or attempt, does not invoke the mutable runner or outcome store, and cannot replace the later durable plan plus immediate operator confirmation.

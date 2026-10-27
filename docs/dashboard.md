@@ -1,5 +1,27 @@
 # Dashboard
 
+## M10.166 complete Agentic Wallet valuation
+
+The real-wallet card now shows the approved USDT balance returned by the same wallet observation as BNB. Exact-decimal backend fields retain the BNB-only USDT/BRL equivalents and add combined wallet totals in USDT and BRL. A combined total is withheld when USDT is not reported rather than treating missing provider evidence as zero.
+
+This remains an initial/manual-only read. It adds no polling, execution control, accounting mutation, transaction-status claim, or reconciliation claim.
+
+## M10.165 three-minute plan confirmation
+
+The plan panel displays the backend-provided confirmation deadline, now three minutes after durable preparation. This is an operator-response lifetime rather than quote validity: the provider quote still expires after five seconds and any real submission must obtain a final fresh quote that satisfies the explicit floor. The dashboard adds no countdown-triggered request, automatic submission, retry, or execution control.
+
+## M10.164 explicit operator conversion floor
+
+The funding-conversion form separates the BNB source quantity from the minimum USDT the operator is willing to receive. Quote preview and submission preflight still need only the quantity; durable plan preparation requires both fields and sends them as exact decimal strings. Editing either field clears the plan so an old confirmation artifact cannot appear beside a new economic boundary.
+
+The backend rejects a floor above the fresh plan quote's provider minimum. An accepted plan displays and fingerprints the operator floor, and a later submission must obtain a final provider minimum at or above that exact amount. This does not add a dashboard execution control, automatic quote retry, default floor, or implicit authorization.
+
+## M10.163 manual funding-conversion submission preflight
+
+The Agentic Wallet panel provides an explicit **Validate submission preflight — do not execute** action for the BNB quantity entered by the operator. It calls the existing read-only M10.162 route only on click and displays the sanitized final quote bounds, remaining BNB, finalized block and BNB/USDT balances, provider/network fee evidence, gas mode, and check/expiry times.
+
+The action is not part of page load or the visibility-aware automatic refresh. Editing the quantity clears the browser-local preflight result so evidence for one amount cannot appear beside another. The panel exposes no submission control and states that preflight creates no plan, claim, or order; a fresh durable plan and a new immediate confirmation are still required before any real provider submission.
+
 ## M10.126 funding-conversion confirmation and gas policy
 
 The inert plan panel shows the explicit minimum BNB gas reserve or “Not configured” and the separate final-confirmation deadline. The provider quote may expire earlier; this longer window is only for operator review, and any future submission must obtain a new quote without accepting a lower minimum output. The reserve is a local safeguard and is never labeled as proof of the final network fee.
@@ -20,7 +42,7 @@ The real-wallet panel includes a blank manual BNB quantity field and a “Previe
 
 The real-wallet card loads its authenticated valuation once when the page opens. Later ordinary 15-second dashboard refreshes do not call the wallet endpoint; the operator must select the adjacent Reload action. The general dashboard remains independent from the slower Agentic Wallet CLI sequence, the last valuation stays visible while a manual reload is in flight, and overlapping initial/manual requests are suppressed.
 
-The card displays exact reported BNB and indicative USDT/BRL equivalents. Monetary values expose dashboard-native tooltips backed by available Binance conversion evidence; missing evidence leaves the value visible without inventing a conversion. Tooltip calculations use `decimal.js`, while display formatting is presentational.
+The card displays exact reported BNB and USDT, indicative BNB equivalents, and exact combined totals when both holdings are reported. Monetary values expose dashboard-native tooltips backed by available Binance conversion evidence; missing evidence leaves the value visible without inventing a conversion. Tooltip calculations use `decimal.js`, while display formatting is presentational.
 
 ## Visualization standard
 

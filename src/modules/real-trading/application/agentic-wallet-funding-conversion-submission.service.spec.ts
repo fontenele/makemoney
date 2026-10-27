@@ -10,6 +10,7 @@ import {
 import {
   AgenticWalletFundingConversionSubmissionService,
   FundingConversionSubmissionDependencyUnavailableError,
+  InvalidFundingConversionSubmissionPreflightRequestError,
   InvalidFundingConversionSubmissionRequestError,
 } from './agentic-wallet-funding-conversion-submission.service';
 import {
@@ -23,6 +24,55 @@ const STARTED_AT = new Date('2026-10-22T12:00:30.000Z');
 const COMPLETED_AT = new Date('2026-10-22T12:00:31.000Z');
 
 describe('AgenticWalletFundingConversionSubmissionService', () => {
+  it('returns sanitized pre-claim evidence without claiming or running', async () => {
+    const dependencies = createDependencies();
+    const service = createService(dependencies);
+
+    await expect(
+      service.preflight({ sourceQuantityBnb: '0.008' }),
+    ).resolves.toEqual({
+      scope: 'agentic_wallet_funding_conversion_submission_preflight',
+      status: 'submission_preflight_ready',
+      sourceQuantityBnb: '0.008',
+      expectedUsdt: '5.95',
+      minimumUsdt: '5.92025',
+      maximumSlippagePercent: '0.5',
+      remainingQuantityBnb: '0.00175323',
+      preConversionBalanceBlockNumber: '0x123',
+      preConversionBnbBalance: '0.00975323',
+      preConversionUsdtBalance: '0',
+      providerFeeRate: '0',
+      providerFeeUsd: '0',
+      estimatedNetworkFeeUsd: '0.003',
+      feeEvidenceGasMode: 'fast',
+      quoteExpiresAt: new Date('2026-10-22T12:00:34.000Z'),
+      checkedAt: STARTED_AT,
+      costCoverage: 'partial',
+      durablePlanRequired: true,
+      immediateConfirmationRequired: true,
+      automaticRetryAllowed: false,
+      providerSubmissionStarted: false,
+      submissionAuthorized: false,
+    });
+    expect(dependencies.quote).toHaveBeenCalledTimes(2);
+    expect(dependencies.claim).not.toHaveBeenCalled();
+    expect(dependencies.run).not.toHaveBeenCalled();
+    expect(dependencies.record).not.toHaveBeenCalled();
+  });
+
+  it('rejects extra preflight fields before dependency access', async () => {
+    const dependencies = createDependencies();
+    const service = createService(dependencies);
+
+    await expect(
+      service.preflight({ sourceQuantityBnb: '0.008', execute: false }),
+    ).rejects.toBeInstanceOf(
+      InvalidFundingConversionSubmissionPreflightRequestError,
+    );
+    expect(dependencies.quote).not.toHaveBeenCalled();
+    expect(dependencies.run).not.toHaveBeenCalled();
+  });
+
   it('re-quotes, claims once, invokes once, and stores only a pending outcome', async () => {
     const dependencies = createDependencies();
     const service = createService(dependencies);

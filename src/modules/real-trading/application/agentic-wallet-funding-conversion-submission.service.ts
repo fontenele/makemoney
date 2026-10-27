@@ -42,6 +42,7 @@ export interface FundingConversionSubmissionRequest {
 }
 
 export class InvalidFundingConversionSubmissionRequestError extends Error {}
+export class InvalidFundingConversionSubmissionPreflightRequestError extends Error {}
 export class FundingConversionSubmissionBlockedError extends Error {
   constructor(readonly blocker: string) {
     super(`Funding conversion submission blocked: ${blocker}`);
@@ -75,104 +76,57 @@ export class AgenticWalletFundingConversionSubmissionService {
     private readonly newId: () => string = randomUUID,
   ) {}
 
+  async preflight(request: unknown) {
+    const sourceQuantityBnb = parsePreflightRequest(request);
+    this.assertRuntimeReady();
+    this.assertEmergencyStopInactive();
+    const evidence = await this.loadPreClaimEvidence(sourceQuantityBnb);
+    const checkedAt = this.now();
+    if (checkedAt.getTime() >= evidence.providerQuote.expiresAt.getTime()) {
+      throw new FundingConversionSubmissionBlockedError('fresh_quote_expired');
+    }
+    this.assertRuntimeReady();
+    this.assertEmergencyStopInactive();
+    return {
+      scope: 'agentic_wallet_funding_conversion_submission_preflight' as const,
+      status: 'submission_preflight_ready' as const,
+      sourceQuantityBnb: evidence.providerQuote.sourceQuantityBnb,
+      expectedUsdt: evidence.providerQuote.expectedUsdt,
+      minimumUsdt: evidence.providerQuote.minimumUsdt,
+      maximumSlippagePercent: evidence.freshMaximumSlippagePercent,
+      remainingQuantityBnb: evidence.remainingQuantityBnb,
+      preConversionBalanceBlockNumber: evidence.preBalance.blockNumber,
+      preConversionBnbBalance: evidence.preBalance.bnbBalance,
+      preConversionUsdtBalance: evidence.preBalance.usdtBalance,
+      providerFeeRate: evidence.fees.providerFeeRate,
+      providerFeeUsd: evidence.fees.providerFeeUsd,
+      estimatedNetworkFeeUsd: evidence.fees.estimatedNetworkFeeUsd,
+      feeEvidenceGasMode: evidence.fees.gasMode,
+      quoteExpiresAt: new Date(evidence.providerQuote.expiresAt),
+      checkedAt: new Date(checkedAt),
+      costCoverage: 'partial' as const,
+      durablePlanRequired: true as const,
+      immediateConfirmationRequired: true as const,
+      automaticRetryAllowed: false as const,
+      providerSubmissionStarted: false as const,
+      submissionAuthorized: false as const,
+    };
+  }
+
   async submit(request: unknown) {
     const input = parseRequest(request);
     this.assertRuntimeReady();
     this.assertEmergencyStopInactive();
-
-    const preliminaryQuote = await this.loadDependency(
-      'preliminary_quote',
-      () =>
-        this.quotes.load({
-          sourceQuantityBnb: input.sourceQuantityBnb,
-        }),
-    );
-    if (
-      preliminaryQuote.status !== 'quote_available' ||
-      preliminaryQuote.quote === null ||
-      preliminaryQuote.remainingQuantityBnb === null ||
-      preliminaryQuote.walletAddress === null
-    ) {
-      throw new FundingConversionSubmissionBlockedError(
-        'fresh_quote_unavailable',
-      );
-    }
-    const preliminaryWalletAddress = preliminaryQuote.walletAddress;
-    const preliminaryProviderQuote = preliminaryQuote.quote;
-
-    const preBalance = await this.loadDependency('pre_conversion_balance', () =>
-      this.preBalances.load(preliminaryWalletAddress),
-    );
-    if (
-      preBalance.walletAddress !== preliminaryWalletAddress.toLowerCase() ||
-      !new Decimal(preBalance.bnbBalance).equals(
-        preliminaryQuote.walletBalanceBnb ?? '-1',
-      )
-    ) {
-      throw new FundingConversionSubmissionBlockedError(
-        'pre_conversion_balance_diverged_from_fresh_quote',
-      );
-    }
-    const maximumSlippagePercent = new Decimal(
-      preliminaryProviderQuote.maximumSlippageRate,
-    )
-      .times(100)
-      .toFixed();
-    const fees = await this.loadDependency('fee_evidence', () =>
-      this.feeEvidence.load({
-        sourceQuantityBnb: preliminaryProviderQuote.sourceQuantityBnb,
-        maximumSlippagePercent,
-      }),
-    );
-
-    // Network and CLI evidence collection can legitimately outlive the
-    // provider quote TTL. Re-quote immediately before the durable claim so
-    // the claimed execution bounds are current when provider access begins.
-    const quote = await this.loadDependency('final_quote', () =>
-      this.quotes.load({
-        sourceQuantityBnb: input.sourceQuantityBnb,
-      }),
-    );
-    if (
-      quote.status !== 'quote_available' ||
-      quote.quote === null ||
-      quote.remainingQuantityBnb === null ||
-      quote.walletAddress === null
-    ) {
-      throw new FundingConversionSubmissionBlockedError(
-        'fresh_quote_unavailable',
-      );
-    }
-    const freshMaximumSlippagePercent = new Decimal(
-      quote.quote.maximumSlippageRate,
-    )
-      .times(100)
-      .toFixed();
-    if (
-      quote.walletAddress.toLowerCase() !== preBalance.walletAddress ||
-      !new Decimal(quote.walletBalanceBnb ?? '-1').equals(preBalance.bnbBalance)
-    ) {
-      throw new FundingConversionSubmissionBlockedError(
-        'pre_conversion_balance_diverged_from_fresh_quote',
-      );
-    }
-    if (
-      fees.scope !== 'agentic_wallet_funding_conversion_fee_evidence' ||
-      fees.provider !== 'agentic_wallet' ||
-      fees.chainId !== '56' ||
-      fees.providerFeeRate !== '0' ||
-      fees.providerFeeUsd !== '0' ||
-      fees.sourceQuantityBnb !== quote.quote.sourceQuantityBnb ||
-      fees.maximumSlippagePercent !== freshMaximumSlippagePercent ||
-      !new Decimal(fees.expectedUsdt).greaterThanOrEqualTo(
-        quote.quote.minimumUsdt,
-      )
-    )
-      throw new FundingConversionSubmissionBlockedError(
-        'provider_fee_classification_not_approved',
-      );
+    const evidence = await this.loadPreClaimEvidence(input.sourceQuantityBnb);
+    const {
+      providerQuote,
+      remainingQuantityBnb,
+      preBalance,
+      fees,
+      freshMaximumSlippagePercent,
+    } = evidence;
     const startedAt = this.now();
-    if (startedAt.getTime() >= quote.quote.expiresAt.getTime()) {
+    if (startedAt.getTime() >= providerQuote.expiresAt.getTime()) {
       throw new FundingConversionSubmissionBlockedError('fresh_quote_expired');
     }
     this.assertRuntimeReady();
@@ -183,11 +137,11 @@ export class AgenticWalletFundingConversionSubmissionService {
       planId: input.planId,
       planFingerprint: input.planFingerprint,
       confirmationPhrase: input.confirmationPhrase,
-      freshSourceQuantityBnb: quote.quote.sourceQuantityBnb,
-      freshExpectedUsdt: quote.quote.expectedUsdt,
-      freshMinimumUsdt: quote.quote.minimumUsdt,
+      freshSourceQuantityBnb: providerQuote.sourceQuantityBnb,
+      freshExpectedUsdt: providerQuote.expectedUsdt,
+      freshMinimumUsdt: providerQuote.minimumUsdt,
       freshMaximumSlippagePercent,
-      freshRemainingQuantityBnb: quote.remainingQuantityBnb,
+      freshRemainingQuantityBnb: remainingQuantityBnb,
       preConversionWalletAddress: preBalance.walletAddress,
       preConversionBalanceBlockNumber: preBalance.blockNumber,
       preConversionBnbBalance: preBalance.bnbBalance,
@@ -258,6 +212,102 @@ export class AgenticWalletFundingConversionSubmissionService {
     }
   }
 
+  private async loadPreClaimEvidence(sourceQuantityBnb: string) {
+    const preliminaryQuote = await this.loadDependency(
+      'preliminary_quote',
+      () => this.quotes.load({ sourceQuantityBnb }),
+    );
+    if (
+      preliminaryQuote.status !== 'quote_available' ||
+      preliminaryQuote.quote === null ||
+      preliminaryQuote.remainingQuantityBnb === null ||
+      preliminaryQuote.walletAddress === null
+    ) {
+      throw new FundingConversionSubmissionBlockedError(
+        'fresh_quote_unavailable',
+      );
+    }
+    const preliminaryWalletAddress = preliminaryQuote.walletAddress;
+    const preliminaryProviderQuote = preliminaryQuote.quote;
+    const preBalance = await this.loadDependency('pre_conversion_balance', () =>
+      this.preBalances.load(preliminaryWalletAddress),
+    );
+    if (
+      preBalance.walletAddress !== preliminaryWalletAddress.toLowerCase() ||
+      !new Decimal(preBalance.bnbBalance).equals(
+        preliminaryQuote.walletBalanceBnb ?? '-1',
+      )
+    ) {
+      throw new FundingConversionSubmissionBlockedError(
+        'pre_conversion_balance_diverged_from_fresh_quote',
+      );
+    }
+    const maximumSlippagePercent = new Decimal(
+      preliminaryProviderQuote.maximumSlippageRate,
+    )
+      .times(100)
+      .toFixed();
+    const fees = await this.loadDependency('fee_evidence', () =>
+      this.feeEvidence.load({
+        sourceQuantityBnb: preliminaryProviderQuote.sourceQuantityBnb,
+        maximumSlippagePercent,
+      }),
+    );
+
+    // Evidence collection can outlive the preliminary quote. Only the final
+    // quote is allowed to bind a future durable claim.
+    const quote = await this.loadDependency('final_quote', () =>
+      this.quotes.load({ sourceQuantityBnb }),
+    );
+    if (
+      quote.status !== 'quote_available' ||
+      quote.quote === null ||
+      quote.remainingQuantityBnb === null ||
+      quote.walletAddress === null
+    ) {
+      throw new FundingConversionSubmissionBlockedError(
+        'fresh_quote_unavailable',
+      );
+    }
+    const providerQuote = quote.quote;
+    const freshMaximumSlippagePercent = new Decimal(
+      providerQuote.maximumSlippageRate,
+    )
+      .times(100)
+      .toFixed();
+    if (
+      quote.walletAddress.toLowerCase() !== preBalance.walletAddress ||
+      !new Decimal(quote.walletBalanceBnb ?? '-1').equals(preBalance.bnbBalance)
+    ) {
+      throw new FundingConversionSubmissionBlockedError(
+        'pre_conversion_balance_diverged_from_fresh_quote',
+      );
+    }
+    if (
+      fees.scope !== 'agentic_wallet_funding_conversion_fee_evidence' ||
+      fees.provider !== 'agentic_wallet' ||
+      fees.chainId !== '56' ||
+      fees.providerFeeRate !== '0' ||
+      fees.providerFeeUsd !== '0' ||
+      fees.sourceQuantityBnb !== providerQuote.sourceQuantityBnb ||
+      fees.maximumSlippagePercent !== freshMaximumSlippagePercent ||
+      !new Decimal(fees.expectedUsdt).greaterThanOrEqualTo(
+        providerQuote.minimumUsdt,
+      )
+    ) {
+      throw new FundingConversionSubmissionBlockedError(
+        'provider_fee_classification_not_approved',
+      );
+    }
+    return {
+      providerQuote,
+      remainingQuantityBnb: quote.remainingQuantityBnb,
+      preBalance,
+      fees,
+      freshMaximumSlippagePercent,
+    };
+  }
+
   private assertEmergencyStopInactive(): void {
     if (this.emergencyStop.isActive()) {
       throw new FundingConversionSubmissionBlockedError(
@@ -307,6 +357,21 @@ function parseRequest(value: unknown): FundingConversionSubmissionRequest {
     confirmationPhrase: value.confirmationPhrase,
     sourceQuantityBnb: new Decimal(value.sourceQuantityBnb).toFixed(),
   };
+}
+
+function parsePreflightRequest(value: unknown): string {
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    Array.isArray(value) ||
+    Object.keys(value).length !== 1 ||
+    !('sourceQuantityBnb' in value) ||
+    typeof value.sourceQuantityBnb !== 'string' ||
+    !POSITIVE_DECIMAL_PATTERN.test(value.sourceQuantityBnb)
+  ) {
+    throw new InvalidFundingConversionSubmissionPreflightRequestError();
+  }
+  return new Decimal(value.sourceQuantityBnb).toFixed();
 }
 
 function lower(value: string | null): string | null {

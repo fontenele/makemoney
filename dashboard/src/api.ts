@@ -625,8 +625,12 @@ export interface AgenticWalletFundingValuation {
   pricesObservedAt: string | null;
   balance: {
     quantityBnb: string;
+    quantityUsdt: string | null;
     valueUsdt: string;
     valueBrl: string;
+    usdtValueBrl: string | null;
+    totalValueUsdt: string | null;
+    totalValueBrl: string | null;
   } | null;
   prices: {
     provider: 'binance';
@@ -707,6 +711,31 @@ export interface AgenticWalletFundingConversionPlan {
   } | null;
   providerSubmissionStarted: false;
   conversionAuthorized: false;
+  submissionAuthorized: false;
+}
+
+export interface AgenticWalletFundingConversionSubmissionPreflight {
+  scope: 'agentic_wallet_funding_conversion_submission_preflight';
+  status: 'submission_preflight_ready';
+  sourceQuantityBnb: string;
+  expectedUsdt: string;
+  minimumUsdt: string;
+  maximumSlippagePercent: string;
+  remainingQuantityBnb: string;
+  preConversionBalanceBlockNumber: string;
+  preConversionBnbBalance: string;
+  preConversionUsdtBalance: string;
+  providerFeeRate: string;
+  providerFeeUsd: string;
+  estimatedNetworkFeeUsd: string;
+  feeEvidenceGasMode: string;
+  quoteExpiresAt: string;
+  checkedAt: string;
+  costCoverage: 'partial';
+  durablePlanRequired: true;
+  immediateConfirmationRequired: true;
+  automaticRetryAllowed: false;
+  providerSubmissionStarted: false;
   submissionAuthorized: false;
 }
 
@@ -969,11 +998,45 @@ export async function quoteAgenticWalletFundingConversion(
 
 export async function prepareAgenticWalletFundingConversion(
   sourceQuantityBnb: string,
+  minimumUsdt: string,
   request: FetchLike = fetch,
 ): Promise<Resource<AgenticWalletFundingConversionPlan>> {
   try {
     const response = await request(
       dashboardApiPath('/real-trading/funding-conversion-plan'),
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sourceQuantityBnb, minimumUsdt }),
+      },
+    );
+    if (!response.ok) {
+      return {
+        status: 'unavailable',
+        message:
+          (await readProviderErrorMessage(response)) ??
+          `Unavailable (${response.status})`,
+      };
+    }
+    return {
+      status: 'available',
+      data: (await response.json()) as AgenticWalletFundingConversionPlan,
+    };
+  } catch {
+    return { status: 'unavailable', message: 'Local API is unreachable' };
+  }
+}
+
+export async function preflightAgenticWalletFundingConversionSubmission(
+  sourceQuantityBnb: string,
+  request: FetchLike = fetch,
+): Promise<Resource<AgenticWalletFundingConversionSubmissionPreflight>> {
+  try {
+    const response = await request(
+      dashboardApiPath('/real-trading/funding-conversion-submission-preflight'),
       {
         method: 'POST',
         headers: {
@@ -993,7 +1056,7 @@ export async function prepareAgenticWalletFundingConversion(
     }
     return {
       status: 'available',
-      data: (await response.json()) as AgenticWalletFundingConversionPlan,
+      data: (await response.json()) as AgenticWalletFundingConversionSubmissionPreflight,
     };
   } catch {
     return { status: 'unavailable', message: 'Local API is unreachable' };
