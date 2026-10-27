@@ -234,7 +234,9 @@ describe('Application (e2e)', () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     const config = app.get(ConfigService);
     const token = 'e2e-funding-conversion-control-token';
-    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    const previousTokenDigest = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    const previousTradingMode = config.get<string>('TRADING_MODE');
+    config.set('TRADING_MODE', 'paper');
     config.set(
       'RISK_CONTROL_TOKEN_SHA256',
       createHash('sha256').update(token).digest('hex'),
@@ -252,7 +254,8 @@ describe('Application (e2e)', () => {
           statusCode: 409,
         });
     } finally {
-      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+      config.set('RISK_CONTROL_TOKEN_SHA256', previousTokenDigest);
+      config.set('TRADING_MODE', previousTradingMode);
     }
   });
 

@@ -1,5 +1,20 @@
 # Real Trading
 
+## M10.168 — Persisted terminal funding-conversion status
+
+The first real funding conversion's exact terminal observation now exists in the durable monotonic status ledger. The initial protected write correctly rolled back as a whole, but exposed a schema mismatch: the canonical state `provider_finished_pending_financial_reconciliation` is longer than the attempt table's original `VARCHAR(40)`. An additive migration widens only that column to `VARCHAR(64)`, matching the Prisma model and retaining every existing identity, uniqueness, chronology, and serializable-write rule.
+
+After migration, one explicit protected read-only lookup recorded the existing provider order as `FINISHED` with its exact transaction hash and advanced the attempt to the complete pending-reconciliation state. No order was submitted or retried. The separate financial-reconciliation call remains incomplete after a sanitized 503, and local accounting synchronization must not run until immutable reconciliation exists.
+
+### M10.168 acceptance criteria
+
+- The complete canonical terminal attempt state fits both a freshly migrated schema and the local application schema.
+- PostgreSQL E2E verifies the column capacity from all migrations applied from scratch.
+- The status write remains atomic: the earlier width failure left neither a partial observation nor a changed attempt.
+- One protected lookup records exact correlated terminal evidence and makes later status lookup unnecessary.
+- Financial reconciliation and accounting synchronization remain separate, incomplete, and non-authorizing.
+- No submission, resubmission, automatic retry, wallet mutation, or financial transaction is introduced.
+
 ## M10.167 — Classified funding-conversion status dependencies
 
 The loopback-only protected funding-conversion status action now converts unexpected failures at its three external boundaries into the sanitized stages `status_context`, `provider_status`, and `status_observation`. The HTTP response does not expose raw CLI, process, provider, wallet, or database output. Typed observation not-found, blocked, and conflict failures retain the existing conflict response instead of being mislabeled as dependency outages.

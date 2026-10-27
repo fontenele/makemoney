@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, and M10 is in progress through M10.166 complete Agentic Wallet dashboard valuation. The dedicated BSC BTCB/USDT Agentic Wallet path remains disabled by default: submission, status, reconciliation, evidence, commitment, authorization, and conditional local-ledger application are separate loopback-only Bearer-protected actions. Automatic and strategy execution remain unavailable.
+Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, and M10 is in progress through M10.168 persisted terminal funding-conversion status. The dedicated BSC BTCB/USDT Agentic Wallet path remains disabled by default: submission, status, reconciliation, evidence, commitment, authorization, and conditional local-ledger application are separate loopback-only Bearer-protected actions. Automatic and strategy execution remain unavailable.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 
@@ -9,7 +9,7 @@ Project context, current state, roadmap, and change history are indexed in [`doc
 
 - No futures, margin, leverage, or automated withdrawals.
 - No secrets or wallet credentials belong in this repository.
-- The narrow funding-conversion submission path is implemented but disabled by default. Any first real transaction requires explicit immediate confirmation plus independent configuration, provider, quote, audit, emergency-stop, status, and reconciliation safeguards; strategy execution remains unavailable.
+- The narrow funding-conversion submission path is implemented but disabled by default. Any future real transaction requires explicit immediate confirmation plus independent configuration, provider, quote, audit, emergency-stop, status, and reconciliation safeguards; strategy execution remains unavailable.
 
 ## Requirements
 

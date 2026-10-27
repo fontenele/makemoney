@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-27 — M10.168 persist terminal funding-conversion status
+
+- Diagnosed the protected status write's `status_observation` failure as a complete transaction rollback caused by the canonical terminal attempt state exceeding `VARCHAR(40)`.
+- Widened only the funding-conversion submission-attempt state column to `VARCHAR(64)` through an additive migration and synchronized the Prisma schema.
+- Added PostgreSQL E2E coverage proving all migrations from scratch can store the complete terminal pending-reconciliation state.
+- Persisted the exact `FINISHED` provider order and transaction observation through one protected read-only lookup; the existing attempt now durably awaits financial reconciliation.
+- Kept the following failed reconciliation isolated: its sanitized 503 inserted no reconciliation and no accounting synchronization was attempted.
+- Made the disabled-runtime funding-conversion E2E explicitly force paper mode instead of inheriting the operator's local environment.
+- Passed 2,895 backend tests, 135 PostgreSQL E2E tests with all 48 migrations applied from scratch, 117 dashboard tests, formatting, lint, builds, Prisma/Compose validation, migration status, and direct/proxied live valuation checks.
+- Made no submission, resubmission, wallet mutation, accounting mutation, or financial transaction.
+
 ## 2026-10-27 — M10.167 classify funding-conversion status dependencies
 
 - Classified unexpected protected status-action failures as the sanitized stages `status_context`, `provider_status`, or `status_observation`.

@@ -147,7 +147,7 @@ model AgenticWalletFundingConversionSubmissionAttempt {
   estimatedNetworkFeeUsd          String?                                                @map("estimated_network_fee_usd") @db.VarChar(80)
   feeEvidenceGasMode              String?                                                @map("fee_evidence_gas_mode") @db.VarChar(16)
   feeEvidenceObservedAt           DateTime?                                              @map("fee_evidence_observed_at")
-  state                           String                                                 @db.VarChar(40)
+  state                           String                                                 @db.VarChar(64)
   providerOrderId                 String?                                                @unique @map("provider_order_id") @db.VarChar(256)
   responseFingerprint             String?                                                @map("response_fingerprint") @db.Char(64)
   automaticRetryAllowed           Boolean                                                @map("automatic_retry_allowed")
