@@ -47,8 +47,20 @@ describe('Real execution reservation persistence (e2e)', () => {
       sourceQuantity: '5.005',
       nativeGasQuantity: '0.0002',
       providerQuotaUsd: '5.2',
+      accountingReconciliationId: '44444444-4444-4444-8444-444444444444',
+      accountingReconciliationFingerprint: 'd'.repeat(64),
+      providerObservedAt: new Date('2026-10-01T14:00:00.000Z'),
+      requirementValuationBasis: 'explicit_external_usd_value',
+      requirementValuedAt: new Date('2026-10-01T14:00:01.000Z'),
     });
     expect(first.reservation.payloadCommitmentDigest).toMatch(/^[a-f0-9]{64}$/);
+    expect(first.reservation.provenance).toEqual({
+      accountingReconciliationId: '44444444-4444-4444-8444-444444444444',
+      accountingReconciliationFingerprint: 'd'.repeat(64),
+      providerObservedAt: new Date('2026-10-01T14:00:00.000Z'),
+      requirementValuationBasis: 'explicit_external_usd_value',
+      requirementValuedAt: new Date('2026-10-01T14:00:01.000Z'),
+    });
   });
 
   it('allows at most one concurrent request to consume the same zero-reservation snapshot', async () => {
@@ -163,6 +175,13 @@ function command(seed: number): RealExecutionReservationCommand {
       quotaSnapshotMaxAgeMs: 5000,
       requirementValuationMaxAgeMs: 5000,
       reservationSnapshotMaxAgeMs: 5000,
+    },
+    provenance: {
+      accountingReconciliationId: '44444444-4444-4444-8444-444444444444',
+      accountingReconciliationFingerprint: 'd'.repeat(64),
+      providerObservedAt: new Date('2026-10-01T14:00:00.000Z'),
+      requirementValuationBasis: 'explicit_external_usd_value',
+      requirementValuedAt: new Date('2026-10-01T14:00:01.000Z'),
     },
   };
 }

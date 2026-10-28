@@ -1,5 +1,21 @@
 # Real Trading
 
+## M10.187 — Durable reservation provenance binding
+
+M10.187 closes the audit gap deliberately left by M10.186 before the authenticated workflow is allowed to invoke M10.18. Every ready authenticated command now carries a separate immutable provenance object containing the exact durable accounting-reconciliation ID and fingerprint, provider observation time, explicit external-USD valuation basis, and valuation time that produced its resource and quota facts.
+
+The existing Prisma store accepts provenance without weakening its generic legacy contract. When supplied, provenance is validated before transaction entry, must use canonical reconciliation identity/fingerprint, and must exactly equal the quota snapshot's observation time, valuation basis, and valuation time. It participates in the canonical request fingerprint, so an idempotency replay cannot silently substitute evidence.
+
+Five nullable columns preserve existing reservations truthfully. A database constraint permits either a complete provenance tuple or no provenance at all, and the read model exposes legacy absence as `null`; partial rows fail closed. M10.186 always supplies the complete tuple, but it remains pure and has no store dependency. Runtime composition and the first authenticated reservation attempt remain a later separately reviewed increment.
+
+### M10.187 acceptance criteria
+
+- A ready M10.186 command copies reconciliation identity/fingerprint and exact provider-observation/external-valuation provenance.
+- Malformed, partial, or quota-divergent supplied provenance cannot reach the serializable reservation transaction.
+- Provenance participates in idempotency and is stored and returned as one immutable all-or-none tuple.
+- Legacy rows remain readable only as explicitly unprovenanced; no historical evidence is fabricated.
+- No authenticated service invokes the store, and no route, provider access, Risk Engine approval, funding, quote, submission, order, accounting mutation, or financial authority is added.
+
 ## M10.186 — Authenticated durable reservation command preparation
 
 M10.186 adds a pure boundary immediately before the existing M10.18 durable store. It accepts the complete M10.185 evidence package and prepares the exact `RealExecutionReservationCommand` only after M10.180 resource projection, M10.182 quota projection, and M10.17 capacity evaluation all pass.

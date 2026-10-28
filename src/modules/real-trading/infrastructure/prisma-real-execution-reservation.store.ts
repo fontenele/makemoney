@@ -14,6 +14,7 @@ import {
   RealExecutionReservationIdempotencyConflictError,
   RealExecutionReservationIdentityConflictError,
   RealExecutionReservationPayloadCommitmentError,
+  RealExecutionReservationProvenanceError,
   RealExecutionReservationStore,
   StoredRealExecutionReservation,
 } from '../application/real-execution-reservation-store';
@@ -30,6 +31,9 @@ export class PrismaRealExecutionReservationStore implements RealExecutionReserva
     reservation: StoredRealExecutionReservation;
     replayed: boolean;
   }> {
+    if (!validProvenance(command)) {
+      throw new RealExecutionReservationProvenanceError();
+    }
     const requestFingerprint = fingerprint(command);
     return this.prisma.$transaction(
       async (tx) => {
@@ -147,6 +151,18 @@ export class PrismaRealExecutionReservationStore implements RealExecutionReserva
             nativeGasSymbol: planned.nativeGasSymbol,
             nativeGasQuantity: planned.nativeGasQuantity,
             providerQuotaUsd: planned.providerQuotaUsd,
+            ...(command.provenance === undefined
+              ? {}
+              : {
+                  accountingReconciliationId:
+                    command.provenance.accountingReconciliationId,
+                  accountingReconciliationFingerprint:
+                    command.provenance.accountingReconciliationFingerprint,
+                  providerObservedAt: command.provenance.providerObservedAt,
+                  requirementValuationBasis:
+                    command.provenance.requirementValuationBasis,
+                  requirementValuedAt: command.provenance.requirementValuedAt,
+                }),
             expiresAt: planned.expiresAt,
           },
         });
@@ -155,6 +171,27 @@ export class PrismaRealExecutionReservationStore implements RealExecutionReserva
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
   }
+}
+
+function validProvenance(command: RealExecutionReservationCommand): boolean {
+  const provenance = command.provenance;
+  if (provenance === undefined) return true;
+  return (
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(
+      provenance.accountingReconciliationId,
+    ) &&
+    /^[a-f0-9]{64}$/.test(provenance.accountingReconciliationFingerprint) &&
+    provenance.providerObservedAt instanceof Date &&
+    Number.isFinite(provenance.providerObservedAt.getTime()) &&
+    provenance.providerObservedAt.getTime() ===
+      command.quotaSnapshot.quotaObservedAt.getTime() &&
+    provenance.requirementValuationBasis ===
+      command.quotaSnapshot.requirementValuationBasis &&
+    provenance.requirementValuedAt instanceof Date &&
+    Number.isFinite(provenance.requirementValuedAt.getTime()) &&
+    provenance.requirementValuedAt.getTime() ===
+      command.quotaSnapshot.requirementValuedAt.getTime()
+  );
 }
 
 function fingerprint(command: RealExecutionReservationCommand): string {
@@ -197,6 +234,11 @@ function mapReservation(row: {
   nativeGasSymbol: string;
   nativeGasQuantity: string;
   providerQuotaUsd: string;
+  accountingReconciliationId: string | null;
+  accountingReconciliationFingerprint: string | null;
+  providerObservedAt: Date | null;
+  requirementValuationBasis: string | null;
+  requirementValuedAt: Date | null;
   expiresAt: Date;
   createdAt: Date;
 }): StoredRealExecutionReservation {
@@ -210,6 +252,37 @@ function mapReservation(row: {
   ) {
     throw new Error(
       'Persisted real execution reservation has invalid payload commitment',
+    );
+  }
+  const provenanceValues = [
+    row.accountingReconciliationId,
+    row.accountingReconciliationFingerprint,
+    row.providerObservedAt,
+    row.requirementValuationBasis,
+    row.requirementValuedAt,
+  ];
+  const provenancePresent = provenanceValues.every((value) => value !== null);
+  if (provenanceValues.some((value) => value !== null) && !provenancePresent) {
+    throw new Error(
+      'Persisted real execution reservation has partial provenance',
+    );
+  }
+  if (
+    provenancePresent &&
+    (row.accountingReconciliationId === null ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(
+        row.accountingReconciliationId,
+      ) ||
+      row.accountingReconciliationFingerprint === null ||
+      !/^[a-f0-9]{64}$/.test(row.accountingReconciliationFingerprint) ||
+      !(row.providerObservedAt instanceof Date) ||
+      !Number.isFinite(row.providerObservedAt.getTime()) ||
+      row.requirementValuationBasis !== 'explicit_external_usd_value' ||
+      !(row.requirementValuedAt instanceof Date) ||
+      !Number.isFinite(row.requirementValuedAt.getTime()))
+  ) {
+    throw new Error(
+      'Persisted real execution reservation has invalid provenance',
     );
   }
   return {
@@ -229,6 +302,16 @@ function mapReservation(row: {
     nativeGasSymbol: 'BNB',
     nativeGasQuantity: row.nativeGasQuantity,
     providerQuotaUsd: row.providerQuotaUsd,
+    provenance: provenancePresent
+      ? {
+          accountingReconciliationId: row.accountingReconciliationId!,
+          accountingReconciliationFingerprint:
+            row.accountingReconciliationFingerprint!,
+          providerObservedAt: new Date(row.providerObservedAt!),
+          requirementValuationBasis: 'explicit_external_usd_value',
+          requirementValuedAt: new Date(row.requirementValuedAt!),
+        }
+      : null,
     expiresAt: new Date(row.expiresAt),
     createdAt: new Date(row.createdAt),
   };

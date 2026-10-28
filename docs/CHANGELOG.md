@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-28 — M10.187 durable reservation provenance binding
+
+- Extended ready authenticated reservation commands with the exact accounting-reconciliation ID/fingerprint, provider observation time, explicit external-USD valuation basis, and valuation time.
+- Rejected malformed or quota-divergent supplied provenance before the serializable store transaction and included valid provenance in the canonical idempotency fingerprint.
+- Added nullable provenance columns with a PostgreSQL all-or-none constraint, preserving legacy rows as explicitly unprovenanced rather than inventing history.
+- Persisted and returned the complete immutable provenance tuple when present, with focused unit and PostgreSQL E2E coverage.
+- Kept M10.186 pure and unregistered: it still cannot call the store, start a reservation attempt, reach a provider, approve risk, submit an order, mutate accounting, or authorize a financial transaction.
+
 ## 2026-10-28 — M10.186 authenticated durable reservation command preparation
 
 ### Added

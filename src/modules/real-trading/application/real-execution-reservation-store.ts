@@ -20,6 +20,15 @@ export interface RealExecutionReservationCommand {
   readonly resourceSnapshot: RealExecutionResourceSnapshot;
   readonly quotaSnapshot: RealExecutionProviderQuotaSnapshot;
   readonly freshness: RealExecutionReservationCapacityFreshnessPolicy;
+  readonly provenance?: RealExecutionReservationProvenance;
+}
+
+export interface RealExecutionReservationProvenance {
+  readonly accountingReconciliationId: string;
+  readonly accountingReconciliationFingerprint: string;
+  readonly providerObservedAt: Date;
+  readonly requirementValuationBasis: 'explicit_external_usd_value';
+  readonly requirementValuedAt: Date;
 }
 
 export interface StoredRealExecutionReservation {
@@ -39,6 +48,7 @@ export interface StoredRealExecutionReservation {
   readonly nativeGasSymbol: 'BNB';
   readonly nativeGasQuantity: string;
   readonly providerQuotaUsd: string;
+  readonly provenance?: RealExecutionReservationProvenance | null;
   readonly expiresAt: Date;
   readonly createdAt: Date;
 }
@@ -79,5 +89,12 @@ export class RealExecutionReservationPayloadCommitmentError extends Error {
   ) {
     super('Real execution reservation payload commitment is blocked');
     this.name = RealExecutionReservationPayloadCommitmentError.name;
+  }
+}
+
+export class RealExecutionReservationProvenanceError extends Error {
+  constructor() {
+    super('Real execution reservation provenance is invalid or divergent');
+    this.name = RealExecutionReservationProvenanceError.name;
   }
 }

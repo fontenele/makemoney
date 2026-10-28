@@ -309,6 +309,11 @@ export const RealExecutionReservationScalarFieldEnum = {
   nativeGasSymbol: 'nativeGasSymbol',
   nativeGasQuantity: 'nativeGasQuantity',
   providerQuotaUsd: 'providerQuotaUsd',
+  accountingReconciliationId: 'accountingReconciliationId',
+  accountingReconciliationFingerprint: 'accountingReconciliationFingerprint',
+  providerObservedAt: 'providerObservedAt',
+  requirementValuationBasis: 'requirementValuationBasis',
+  requirementValuedAt: 'requirementValuedAt',
   expiresAt: 'expiresAt',
   createdAt: 'createdAt'
 } as const

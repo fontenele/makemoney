@@ -109,6 +109,12 @@ export function prepareAgenticWalletAccountingReconciledReservationCommand(
       'reservation_capacity_blocked',
     ]);
   }
+  if (
+    resourceProjection.reconciliationId === null ||
+    resourceProjection.reconciliationFingerprint === null
+  ) {
+    throw new Error('Ready resource projection is missing reconciliation');
+  }
 
   const commandIntent = cloneIntent(intent);
   return assessment(
@@ -137,6 +143,19 @@ export function prepareAgenticWalletAccountingReconciledReservationCommand(
         ),
       },
       freshness: { ...freshness },
+      provenance: {
+        accountingReconciliationId: resourceProjection.reconciliationId,
+        accountingReconciliationFingerprint:
+          resourceProjection.reconciliationFingerprint,
+        providerObservedAt: new Date(
+          quotaProjection.quotaSnapshot.quotaObservedAt,
+        ),
+        requirementValuationBasis:
+          quotaProjection.quotaSnapshot.requirementValuationBasis,
+        requirementValuedAt: new Date(
+          quotaProjection.quotaSnapshot.requirementValuedAt,
+        ),
+      },
     },
     [],
   );

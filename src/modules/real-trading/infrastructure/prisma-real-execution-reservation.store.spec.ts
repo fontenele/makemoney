@@ -6,6 +6,7 @@ import {
   RealExecutionReservationCommand,
   RealExecutionReservationIdempotencyConflictError,
   RealExecutionReservationIdentityConflictError,
+  RealExecutionReservationProvenanceError,
 } from '../application/real-execution-reservation-store';
 import { PrismaRealExecutionReservationStore } from './prisma-real-execution-reservation.store';
 
@@ -79,6 +80,52 @@ describe('PrismaRealExecutionReservationStore', () => {
       replayed: true,
     });
     expect(harness.tx.realExecutionReservation.create).toHaveBeenCalledTimes(1);
+  });
+
+  it('persists and returns complete authenticated provenance when supplied', async () => {
+    const harness = repositoryHarness();
+    harness.tx.realExecutionReservation.create.mockImplementation(
+      ({ data }: { data: Record<string, unknown> }) =>
+        Promise.resolve(row(data)),
+    );
+    const provenance = {
+      accountingReconciliationId: '44444444-4444-4444-8444-444444444444',
+      accountingReconciliationFingerprint: 'd'.repeat(64),
+      providerObservedAt: new Date('2026-10-01T14:00:00.000Z'),
+      requirementValuationBasis: 'explicit_external_usd_value' as const,
+      requirementValuedAt: new Date('2026-10-01T14:00:01.000Z'),
+    };
+
+    await expect(
+      harness.store.reserve(command({ provenance })),
+    ).resolves.toMatchObject({
+      reservation: { provenance },
+      replayed: false,
+    });
+    expect(harness.create.mock.calls[0][0].data).toMatchObject({
+      accountingReconciliationId: provenance.accountingReconciliationId,
+      accountingReconciliationFingerprint:
+        provenance.accountingReconciliationFingerprint,
+      providerObservedAt: provenance.providerObservedAt,
+      requirementValuationBasis: provenance.requirementValuationBasis,
+      requirementValuedAt: provenance.requirementValuedAt,
+    });
+  });
+
+  it('rejects malformed or quota-divergent provenance before persistence', async () => {
+    const harness = repositoryHarness();
+    const provenance = {
+      accountingReconciliationId: '44444444-4444-4444-8444-444444444444',
+      accountingReconciliationFingerprint: 'd'.repeat(64),
+      providerObservedAt: new Date('2026-10-01T14:00:00.001Z'),
+      requirementValuationBasis: 'explicit_external_usd_value' as const,
+      requirementValuedAt: new Date('2026-10-01T14:00:01.000Z'),
+    };
+
+    await expect(
+      harness.store.reserve(command({ provenance })),
+    ).rejects.toBeInstanceOf(RealExecutionReservationProvenanceError);
+    expect(harness.prismaTransaction).not.toHaveBeenCalled();
   });
 
   it('uses property-order-independent canonical request fingerprints', async () => {
@@ -350,6 +397,11 @@ function row(overrides: Record<string, unknown> = {}) {
     nativeGasSymbol: 'BNB',
     nativeGasQuantity: '0.0002',
     providerQuotaUsd: '5.2',
+    accountingReconciliationId: null,
+    accountingReconciliationFingerprint: null,
+    providerObservedAt: null,
+    requirementValuationBasis: null,
+    requirementValuedAt: null,
     expiresAt: new Date('2026-10-01T14:00:06.000Z'),
     createdAt: CREATED_AT,
     ...overrides,
@@ -377,6 +429,7 @@ function publicReservation() {
     nativeGasSymbol: 'BNB',
     nativeGasQuantity: '0.0002',
     providerQuotaUsd: '5.2',
+    provenance: null,
     expiresAt: new Date('2026-10-01T14:00:06.000Z'),
     createdAt: CREATED_AT,
   };

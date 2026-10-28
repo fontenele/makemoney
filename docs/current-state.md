@@ -1,5 +1,11 @@
 # Current State
 
+M10.187 is complete. Ready authenticated reservation commands now carry the exact accounting-reconciliation ID/fingerprint and provider-observation/external-valuation facts that justified their resource and quota snapshots. The existing M10.18 store validates canonical provenance and exact quota correlation before transaction entry, includes it in the idempotency fingerprint, and can persist and return it atomically.
+
+The additive reservation columns are constrained to complete presence or complete absence. Existing generic/legacy rows remain readable with explicit null provenance rather than fabricated history. The M10.186 boundary is still pure, unregistered, and unable to call the store; no authenticated reservation attempt, route, provider access, Risk Engine approval, funding, quote, submission, strategy, order, accounting mutation, or financial transaction authority exists.
+
+Post-M10.187 validation passes all 3,005 backend tests across 273 suites, all 150 PostgreSQL E2E tests across 10 suites with all 51 migrations applied from scratch, all 117 dashboard tests across 20 files, formatting, lint, backend/dashboard builds, Prisma and Compose validation, and `git diff --check`. Compose emitted only the existing inaccessible user Docker-config warning.
+
 M10.186 is complete. A new pure, unregistered preparation boundary emits the exact existing M10.18 reservation-store command only after authenticated M10.180 resource projection, authenticated M10.182 provider-quota projection, and M10.17 capacity availability. Resource, quota, and capacity blockers stop before any command exists.
 
 The prepared artifact independently copies intent, embedded quote, costs, assets, dates, limits, budget, resource, quota, and freshness facts. Reconciliation identity/fingerprint and provider-observation/external-valuation provenance remain attached to the surrounding assessment without claiming the current M10.18 row persists them. No store is injected or invoked, no transaction or row is created, and provider access, quota consumption, durable reservation, atomic enforcement, Risk Engine approval, funding, quote, submission, strategy, order, accounting mutation, and transaction authority remain false.

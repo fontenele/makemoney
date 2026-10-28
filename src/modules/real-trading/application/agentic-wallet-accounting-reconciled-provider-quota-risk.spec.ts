@@ -379,6 +379,12 @@ describe('Agentic Wallet reconciled reservation command', () => {
           remainingUsd: '900',
           requiredUsd: '5.2',
         },
+        provenance: {
+          accountingReconciliationId: RECONCILIATION_ID,
+          providerObservedAt: new Date('2026-10-16T12:01:28.000Z'),
+          requirementValuationBasis: 'explicit_external_usd_value',
+          requirementValuedAt: new Date('2026-10-16T12:01:29.000Z'),
+        },
         freshness: { reservationSnapshotMaxAgeMs: 60_000 },
       },
       reconciliationId: RECONCILIATION_ID,

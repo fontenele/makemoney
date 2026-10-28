@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## M10.187 — Bind authenticated provenance before allowing durable mutation
+
+M10.186 intentionally stopped with reconciliation and provider/valuation provenance outside the M10.18 command because the existing reservation row had nowhere truthful to store it. Calling the store at that point would create an economically correct row whose authenticated evidence chain could be recovered only from an opaque request fingerprint. M10.187 therefore extends the contract and row before any authenticated coordinator is introduced.
+
+The provenance tuple stores the durable accounting-reconciliation ID and fingerprint plus the exact provider observation time, explicit external-USD valuation basis, and valuation time already validated by M10.180/M10.182. The store compares the provider/valuation facts with the quota snapshot before opening a transaction and includes the tuple in its canonical idempotency fingerprint. PostgreSQL enforces complete presence or complete absence.
+
+Absence remains allowed only for backward compatibility with generic M10.18 callers and pre-M10.187 rows; it is returned explicitly as no provenance rather than being inferred. M10.186 always emits the complete tuple. This milestone changes durable audit capability but still adds no authenticated store invocation, runtime registration, route, provider call, reservation attempt, approval, order, mutation, or financial authority.
+
 ## M10.186 — Prepare the durable command separately from durable mutation
 
 The M10.18 store is already serializable and authoritative over active durable rows, but invoking it is the first local mutation in the generic real-execution chain. M10.186 introduces a pure review boundary first. It repeats the authenticated resource/quota projection order, requires M10.17 capacity to be available against an explicit bounded snapshot, and only then creates the exact `RealExecutionReservationCommand` shape consumed by M10.18.

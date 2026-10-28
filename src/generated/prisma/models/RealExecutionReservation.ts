@@ -42,6 +42,11 @@ export type RealExecutionReservationMinAggregateOutputType = {
   nativeGasSymbol: string | null
   nativeGasQuantity: string | null
   providerQuotaUsd: string | null
+  accountingReconciliationId: string | null
+  accountingReconciliationFingerprint: string | null
+  providerObservedAt: Date | null
+  requirementValuationBasis: string | null
+  requirementValuedAt: Date | null
   expiresAt: Date | null
   createdAt: Date | null
 }
@@ -64,6 +69,11 @@ export type RealExecutionReservationMaxAggregateOutputType = {
   nativeGasSymbol: string | null
   nativeGasQuantity: string | null
   providerQuotaUsd: string | null
+  accountingReconciliationId: string | null
+  accountingReconciliationFingerprint: string | null
+  providerObservedAt: Date | null
+  requirementValuationBasis: string | null
+  requirementValuedAt: Date | null
   expiresAt: Date | null
   createdAt: Date | null
 }
@@ -86,6 +96,11 @@ export type RealExecutionReservationCountAggregateOutputType = {
   nativeGasSymbol: number
   nativeGasQuantity: number
   providerQuotaUsd: number
+  accountingReconciliationId: number
+  accountingReconciliationFingerprint: number
+  providerObservedAt: number
+  requirementValuationBasis: number
+  requirementValuedAt: number
   expiresAt: number
   createdAt: number
   _all: number
@@ -110,6 +125,11 @@ export type RealExecutionReservationMinAggregateInputType = {
   nativeGasSymbol?: true
   nativeGasQuantity?: true
   providerQuotaUsd?: true
+  accountingReconciliationId?: true
+  accountingReconciliationFingerprint?: true
+  providerObservedAt?: true
+  requirementValuationBasis?: true
+  requirementValuedAt?: true
   expiresAt?: true
   createdAt?: true
 }
@@ -132,6 +152,11 @@ export type RealExecutionReservationMaxAggregateInputType = {
   nativeGasSymbol?: true
   nativeGasQuantity?: true
   providerQuotaUsd?: true
+  accountingReconciliationId?: true
+  accountingReconciliationFingerprint?: true
+  providerObservedAt?: true
+  requirementValuationBasis?: true
+  requirementValuedAt?: true
   expiresAt?: true
   createdAt?: true
 }
@@ -154,6 +179,11 @@ export type RealExecutionReservationCountAggregateInputType = {
   nativeGasSymbol?: true
   nativeGasQuantity?: true
   providerQuotaUsd?: true
+  accountingReconciliationId?: true
+  accountingReconciliationFingerprint?: true
+  providerObservedAt?: true
+  requirementValuationBasis?: true
+  requirementValuedAt?: true
   expiresAt?: true
   createdAt?: true
   _all?: true
@@ -249,6 +279,11 @@ export type RealExecutionReservationGroupByOutputType = {
   nativeGasSymbol: string
   nativeGasQuantity: string
   providerQuotaUsd: string
+  accountingReconciliationId: string | null
+  accountingReconciliationFingerprint: string | null
+  providerObservedAt: Date | null
+  requirementValuationBasis: string | null
+  requirementValuedAt: Date | null
   expiresAt: Date
   createdAt: Date
   _count: RealExecutionReservationCountAggregateOutputType | null
@@ -292,6 +327,11 @@ export type RealExecutionReservationWhereInput = {
   nativeGasSymbol?: Prisma.StringFilter<"RealExecutionReservation"> | string
   nativeGasQuantity?: Prisma.StringFilter<"RealExecutionReservation"> | string
   providerQuotaUsd?: Prisma.StringFilter<"RealExecutionReservation"> | string
+  accountingReconciliationId?: Prisma.UuidNullableFilter<"RealExecutionReservation"> | string | null
+  accountingReconciliationFingerprint?: Prisma.StringNullableFilter<"RealExecutionReservation"> | string | null
+  providerObservedAt?: Prisma.DateTimeNullableFilter<"RealExecutionReservation"> | Date | string | null
+  requirementValuationBasis?: Prisma.StringNullableFilter<"RealExecutionReservation"> | string | null
+  requirementValuedAt?: Prisma.DateTimeNullableFilter<"RealExecutionReservation"> | Date | string | null
   expiresAt?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
   arm?: Prisma.XOR<Prisma.RealExecutionArmNullableScalarRelationFilter, Prisma.RealExecutionArmWhereInput> | null
@@ -316,6 +356,11 @@ export type RealExecutionReservationOrderByWithRelationInput = {
   nativeGasSymbol?: Prisma.SortOrder
   nativeGasQuantity?: Prisma.SortOrder
   providerQuotaUsd?: Prisma.SortOrder
+  accountingReconciliationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountingReconciliationFingerprint?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerObservedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  requirementValuationBasis?: Prisma.SortOrderInput | Prisma.SortOrder
+  requirementValuedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   arm?: Prisma.RealExecutionArmOrderByWithRelationInput
@@ -343,6 +388,11 @@ export type RealExecutionReservationWhereUniqueInput = Prisma.AtLeast<{
   nativeGasSymbol?: Prisma.StringFilter<"RealExecutionReservation"> | string
   nativeGasQuantity?: Prisma.StringFilter<"RealExecutionReservation"> | string
   providerQuotaUsd?: Prisma.StringFilter<"RealExecutionReservation"> | string
+  accountingReconciliationId?: Prisma.UuidNullableFilter<"RealExecutionReservation"> | string | null
+  accountingReconciliationFingerprint?: Prisma.StringNullableFilter<"RealExecutionReservation"> | string | null
+  providerObservedAt?: Prisma.DateTimeNullableFilter<"RealExecutionReservation"> | Date | string | null
+  requirementValuationBasis?: Prisma.StringNullableFilter<"RealExecutionReservation"> | string | null
+  requirementValuedAt?: Prisma.DateTimeNullableFilter<"RealExecutionReservation"> | Date | string | null
   expiresAt?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"RealExecutionReservation"> | Date | string
   arm?: Prisma.XOR<Prisma.RealExecutionArmNullableScalarRelationFilter, Prisma.RealExecutionArmWhereInput> | null
@@ -367,6 +417,11 @@ export type RealExecutionReservationOrderByWithAggregationInput = {
   nativeGasSymbol?: Prisma.SortOrder
   nativeGasQuantity?: Prisma.SortOrder
   providerQuotaUsd?: Prisma.SortOrder
+  accountingReconciliationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountingReconciliationFingerprint?: Prisma.SortOrderInput | Prisma.SortOrder
+  providerObservedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  requirementValuationBasis?: Prisma.SortOrderInput | Prisma.SortOrder
+  requirementValuedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.RealExecutionReservationCountOrderByAggregateInput
@@ -395,6 +450,11 @@ export type RealExecutionReservationScalarWhereWithAggregatesInput = {
   nativeGasSymbol?: Prisma.StringWithAggregatesFilter<"RealExecutionReservation"> | string
   nativeGasQuantity?: Prisma.StringWithAggregatesFilter<"RealExecutionReservation"> | string
   providerQuotaUsd?: Prisma.StringWithAggregatesFilter<"RealExecutionReservation"> | string
+  accountingReconciliationId?: Prisma.UuidNullableWithAggregatesFilter<"RealExecutionReservation"> | string | null
+  accountingReconciliationFingerprint?: Prisma.StringNullableWithAggregatesFilter<"RealExecutionReservation"> | string | null
+  providerObservedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"RealExecutionReservation"> | Date | string | null
+  requirementValuationBasis?: Prisma.StringNullableWithAggregatesFilter<"RealExecutionReservation"> | string | null
+  requirementValuedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"RealExecutionReservation"> | Date | string | null
   expiresAt?: Prisma.DateTimeWithAggregatesFilter<"RealExecutionReservation"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"RealExecutionReservation"> | Date | string
 }
@@ -417,6 +477,11 @@ export type RealExecutionReservationCreateInput = {
   nativeGasSymbol: string
   nativeGasQuantity: string
   providerQuotaUsd: string
+  accountingReconciliationId?: string | null
+  accountingReconciliationFingerprint?: string | null
+  providerObservedAt?: Date | string | null
+  requirementValuationBasis?: string | null
+  requirementValuedAt?: Date | string | null
   expiresAt: Date | string
   createdAt?: Date | string
   arm?: Prisma.RealExecutionArmCreateNestedOneWithoutReservationInput
@@ -441,6 +506,11 @@ export type RealExecutionReservationUncheckedCreateInput = {
   nativeGasSymbol: string
   nativeGasQuantity: string
   providerQuotaUsd: string
+  accountingReconciliationId?: string | null
+  accountingReconciliationFingerprint?: string | null
+  providerObservedAt?: Date | string | null
+  requirementValuationBasis?: string | null
+  requirementValuedAt?: Date | string | null
   expiresAt: Date | string
   createdAt?: Date | string
   arm?: Prisma.RealExecutionArmUncheckedCreateNestedOneWithoutReservationInput
@@ -465,6 +535,11 @@ export type RealExecutionReservationUpdateInput = {
   nativeGasSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   nativeGasQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
+  accountingReconciliationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountingReconciliationFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  requirementValuationBasis?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requirementValuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   arm?: Prisma.RealExecutionArmUpdateOneWithoutReservationNestedInput
@@ -489,6 +564,11 @@ export type RealExecutionReservationUncheckedUpdateInput = {
   nativeGasSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   nativeGasQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
+  accountingReconciliationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountingReconciliationFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  requirementValuationBasis?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requirementValuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   arm?: Prisma.RealExecutionArmUncheckedUpdateOneWithoutReservationNestedInput
@@ -513,6 +593,11 @@ export type RealExecutionReservationCreateManyInput = {
   nativeGasSymbol: string
   nativeGasQuantity: string
   providerQuotaUsd: string
+  accountingReconciliationId?: string | null
+  accountingReconciliationFingerprint?: string | null
+  providerObservedAt?: Date | string | null
+  requirementValuationBasis?: string | null
+  requirementValuedAt?: Date | string | null
   expiresAt: Date | string
   createdAt?: Date | string
 }
@@ -535,6 +620,11 @@ export type RealExecutionReservationUpdateManyMutationInput = {
   nativeGasSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   nativeGasQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
+  accountingReconciliationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountingReconciliationFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  requirementValuationBasis?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requirementValuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -557,6 +647,11 @@ export type RealExecutionReservationUncheckedUpdateManyInput = {
   nativeGasSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   nativeGasQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
+  accountingReconciliationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountingReconciliationFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  requirementValuationBasis?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requirementValuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -579,6 +674,11 @@ export type RealExecutionReservationCountOrderByAggregateInput = {
   nativeGasSymbol?: Prisma.SortOrder
   nativeGasQuantity?: Prisma.SortOrder
   providerQuotaUsd?: Prisma.SortOrder
+  accountingReconciliationId?: Prisma.SortOrder
+  accountingReconciliationFingerprint?: Prisma.SortOrder
+  providerObservedAt?: Prisma.SortOrder
+  requirementValuationBasis?: Prisma.SortOrder
+  requirementValuedAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -601,6 +701,11 @@ export type RealExecutionReservationMaxOrderByAggregateInput = {
   nativeGasSymbol?: Prisma.SortOrder
   nativeGasQuantity?: Prisma.SortOrder
   providerQuotaUsd?: Prisma.SortOrder
+  accountingReconciliationId?: Prisma.SortOrder
+  accountingReconciliationFingerprint?: Prisma.SortOrder
+  providerObservedAt?: Prisma.SortOrder
+  requirementValuationBasis?: Prisma.SortOrder
+  requirementValuedAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -623,6 +728,11 @@ export type RealExecutionReservationMinOrderByAggregateInput = {
   nativeGasSymbol?: Prisma.SortOrder
   nativeGasQuantity?: Prisma.SortOrder
   providerQuotaUsd?: Prisma.SortOrder
+  accountingReconciliationId?: Prisma.SortOrder
+  accountingReconciliationFingerprint?: Prisma.SortOrder
+  providerObservedAt?: Prisma.SortOrder
+  requirementValuationBasis?: Prisma.SortOrder
+  requirementValuedAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -678,6 +788,11 @@ export type RealExecutionReservationCreateWithoutArmInput = {
   nativeGasSymbol: string
   nativeGasQuantity: string
   providerQuotaUsd: string
+  accountingReconciliationId?: string | null
+  accountingReconciliationFingerprint?: string | null
+  providerObservedAt?: Date | string | null
+  requirementValuationBasis?: string | null
+  requirementValuedAt?: Date | string | null
   expiresAt: Date | string
   createdAt?: Date | string
   riskApproval?: Prisma.RealExecutionRiskApprovalCreateNestedOneWithoutReservationInput
@@ -701,6 +816,11 @@ export type RealExecutionReservationUncheckedCreateWithoutArmInput = {
   nativeGasSymbol: string
   nativeGasQuantity: string
   providerQuotaUsd: string
+  accountingReconciliationId?: string | null
+  accountingReconciliationFingerprint?: string | null
+  providerObservedAt?: Date | string | null
+  requirementValuationBasis?: string | null
+  requirementValuedAt?: Date | string | null
   expiresAt: Date | string
   createdAt?: Date | string
   riskApproval?: Prisma.RealExecutionRiskApprovalUncheckedCreateNestedOneWithoutReservationInput
@@ -740,6 +860,11 @@ export type RealExecutionReservationUpdateWithoutArmInput = {
   nativeGasSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   nativeGasQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
+  accountingReconciliationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountingReconciliationFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  requirementValuationBasis?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requirementValuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   riskApproval?: Prisma.RealExecutionRiskApprovalUpdateOneWithoutReservationNestedInput
@@ -763,6 +888,11 @@ export type RealExecutionReservationUncheckedUpdateWithoutArmInput = {
   nativeGasSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   nativeGasQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
+  accountingReconciliationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountingReconciliationFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  requirementValuationBasis?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requirementValuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   riskApproval?: Prisma.RealExecutionRiskApprovalUncheckedUpdateOneWithoutReservationNestedInput
@@ -786,6 +916,11 @@ export type RealExecutionReservationCreateWithoutRiskApprovalInput = {
   nativeGasSymbol: string
   nativeGasQuantity: string
   providerQuotaUsd: string
+  accountingReconciliationId?: string | null
+  accountingReconciliationFingerprint?: string | null
+  providerObservedAt?: Date | string | null
+  requirementValuationBasis?: string | null
+  requirementValuedAt?: Date | string | null
   expiresAt: Date | string
   createdAt?: Date | string
   arm?: Prisma.RealExecutionArmCreateNestedOneWithoutReservationInput
@@ -809,6 +944,11 @@ export type RealExecutionReservationUncheckedCreateWithoutRiskApprovalInput = {
   nativeGasSymbol: string
   nativeGasQuantity: string
   providerQuotaUsd: string
+  accountingReconciliationId?: string | null
+  accountingReconciliationFingerprint?: string | null
+  providerObservedAt?: Date | string | null
+  requirementValuationBasis?: string | null
+  requirementValuedAt?: Date | string | null
   expiresAt: Date | string
   createdAt?: Date | string
   arm?: Prisma.RealExecutionArmUncheckedCreateNestedOneWithoutReservationInput
@@ -848,6 +988,11 @@ export type RealExecutionReservationUpdateWithoutRiskApprovalInput = {
   nativeGasSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   nativeGasQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
+  accountingReconciliationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountingReconciliationFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  requirementValuationBasis?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requirementValuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   arm?: Prisma.RealExecutionArmUpdateOneWithoutReservationNestedInput
@@ -871,6 +1016,11 @@ export type RealExecutionReservationUncheckedUpdateWithoutRiskApprovalInput = {
   nativeGasSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   nativeGasQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   providerQuotaUsd?: Prisma.StringFieldUpdateOperationsInput | string
+  accountingReconciliationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountingReconciliationFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerObservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  requirementValuationBasis?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requirementValuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   arm?: Prisma.RealExecutionArmUncheckedUpdateOneWithoutReservationNestedInput
@@ -896,6 +1046,11 @@ export type RealExecutionReservationSelect<ExtArgs extends runtime.Types.Extensi
   nativeGasSymbol?: boolean
   nativeGasQuantity?: boolean
   providerQuotaUsd?: boolean
+  accountingReconciliationId?: boolean
+  accountingReconciliationFingerprint?: boolean
+  providerObservedAt?: boolean
+  requirementValuationBasis?: boolean
+  requirementValuedAt?: boolean
   expiresAt?: boolean
   createdAt?: boolean
   arm?: boolean | Prisma.RealExecutionReservation$armArgs<ExtArgs>
@@ -920,6 +1075,11 @@ export type RealExecutionReservationSelectCreateManyAndReturn<ExtArgs extends ru
   nativeGasSymbol?: boolean
   nativeGasQuantity?: boolean
   providerQuotaUsd?: boolean
+  accountingReconciliationId?: boolean
+  accountingReconciliationFingerprint?: boolean
+  providerObservedAt?: boolean
+  requirementValuationBasis?: boolean
+  requirementValuedAt?: boolean
   expiresAt?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["realExecutionReservation"]>
@@ -942,6 +1102,11 @@ export type RealExecutionReservationSelectUpdateManyAndReturn<ExtArgs extends ru
   nativeGasSymbol?: boolean
   nativeGasQuantity?: boolean
   providerQuotaUsd?: boolean
+  accountingReconciliationId?: boolean
+  accountingReconciliationFingerprint?: boolean
+  providerObservedAt?: boolean
+  requirementValuationBasis?: boolean
+  requirementValuedAt?: boolean
   expiresAt?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["realExecutionReservation"]>
@@ -964,11 +1129,16 @@ export type RealExecutionReservationSelectScalar = {
   nativeGasSymbol?: boolean
   nativeGasQuantity?: boolean
   providerQuotaUsd?: boolean
+  accountingReconciliationId?: boolean
+  accountingReconciliationFingerprint?: boolean
+  providerObservedAt?: boolean
+  requirementValuationBasis?: boolean
+  requirementValuedAt?: boolean
   expiresAt?: boolean
   createdAt?: boolean
 }
 
-export type RealExecutionReservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "providerId" | "chainId" | "intentId" | "quoteId" | "idempotencyKey" | "requestFingerprint" | "payloadCommitmentVersion" | "payloadCommitmentDigest" | "utcDay" | "budgetChargeUsdt" | "sourceTokenAddress" | "sourceSymbol" | "sourceQuantity" | "nativeGasSymbol" | "nativeGasQuantity" | "providerQuotaUsd" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionReservation"]>
+export type RealExecutionReservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "providerId" | "chainId" | "intentId" | "quoteId" | "idempotencyKey" | "requestFingerprint" | "payloadCommitmentVersion" | "payloadCommitmentDigest" | "utcDay" | "budgetChargeUsdt" | "sourceTokenAddress" | "sourceSymbol" | "sourceQuantity" | "nativeGasSymbol" | "nativeGasQuantity" | "providerQuotaUsd" | "accountingReconciliationId" | "accountingReconciliationFingerprint" | "providerObservedAt" | "requirementValuationBasis" | "requirementValuedAt" | "expiresAt" | "createdAt", ExtArgs["result"]["realExecutionReservation"]>
 export type RealExecutionReservationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   arm?: boolean | Prisma.RealExecutionReservation$armArgs<ExtArgs>
   riskApproval?: boolean | Prisma.RealExecutionReservation$riskApprovalArgs<ExtArgs>
@@ -1000,6 +1170,11 @@ export type $RealExecutionReservationPayload<ExtArgs extends runtime.Types.Exten
     nativeGasSymbol: string
     nativeGasQuantity: string
     providerQuotaUsd: string
+    accountingReconciliationId: string | null
+    accountingReconciliationFingerprint: string | null
+    providerObservedAt: Date | null
+    requirementValuationBasis: string | null
+    requirementValuedAt: Date | null
     expiresAt: Date
     createdAt: Date
   }, ExtArgs["result"]["realExecutionReservation"]>
@@ -1444,6 +1619,11 @@ export interface RealExecutionReservationFieldRefs {
   readonly nativeGasSymbol: Prisma.FieldRef<"RealExecutionReservation", 'String'>
   readonly nativeGasQuantity: Prisma.FieldRef<"RealExecutionReservation", 'String'>
   readonly providerQuotaUsd: Prisma.FieldRef<"RealExecutionReservation", 'String'>
+  readonly accountingReconciliationId: Prisma.FieldRef<"RealExecutionReservation", 'String'>
+  readonly accountingReconciliationFingerprint: Prisma.FieldRef<"RealExecutionReservation", 'String'>
+  readonly providerObservedAt: Prisma.FieldRef<"RealExecutionReservation", 'DateTime'>
+  readonly requirementValuationBasis: Prisma.FieldRef<"RealExecutionReservation", 'String'>
+  readonly requirementValuedAt: Prisma.FieldRef<"RealExecutionReservation", 'DateTime'>
   readonly expiresAt: Prisma.FieldRef<"RealExecutionReservation", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"RealExecutionReservation", 'DateTime'>
 }
