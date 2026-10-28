@@ -701,3 +701,9 @@ The canonical T+0/T+5s/T+10s/T+30s/T+1m/T+5m/T+15m/T+1h/T+24h schedule is theref
 `GET /new-listings/checkpoint-latency` accepts the established optional `provider=binance` and `limit=1..100` parameters. It selects a bounded recent cohort with completed T+0, reads only persisted completed checkpoints, and returns every canonical schedule point with its independent sample size plus minimum, arithmetic median, nearest-rank p95, and maximum target-to-durable-completion lag in milliseconds.
 
 An existing cohort keeps later unobserved checkpoints visible with zero samples and null statistics; a completely empty eligible cohort returns `provider: null`, zero detections, and no checkpoints. The first live response contains five samples through T+15m, with T+0 median/p95 `1119/1795` ms and T+5s median/p95 `4126/4792` ms; T+1h and T+24h remain unavailable. The route performs no provider request and cannot start or alter collection.
+
+## M7.117 durable checkpoint latency decomposition
+
+The same `GET /new-listings/checkpoint-latency` response now decomposes every completed sample into target-to-claim queue delay and claim-to-completion processing duration while preserving the existing target-to-completion fields. Each component reports minimum, arithmetic median, nearest-rank p95, and maximum milliseconds over the checkpoint's independent sample.
+
+The calculation requires the persisted chronology `targetAt <= claimedAt <= completedAt` and verifies that queue delay plus processing duration equals total completion lag for every row. Invalid or incomplete durable evidence fails closed instead of being omitted. The cohort selection, canonical schedule, batch size, sequential worker, provider requests, and collection cadence are unchanged; the read path remains PostgreSQL-only and cannot collect a checkpoint, create a signal, or submit an order.

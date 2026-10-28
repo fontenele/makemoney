@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-28 — M7.117 checkpoint latency decomposition
+
+### Changed
+
+- Extended each durable checkpoint-latency result with target-to-claim queue-delay and claim-to-completion processing-duration minimum, median, nearest-rank p95, and maximum statistics.
+- Preserved the existing target-to-completion fields and bounded cohort selection.
+- Added fail-closed validation for `targetAt <= claimedAt <= completedAt` and exact component-to-total reconciliation.
+
+### Safety
+
+- Reused the existing persisted `claimed_at` evidence with no migration or provider access.
+- Did not change checkpoint cadence, batch size, concurrency, worker sequencing, provider-request policy, signal behavior, or order authority.
+- Passed 2,972 backend tests, 150 PostgreSQL E2E tests with all 50 migrations from scratch, 117 dashboard tests, formatting, lint, backend/dashboard builds, Compose validation, and whitespace checks.
+
 ## 2026-10-28 — M10.179 provider-free reconciliation readiness
 
 ### Added

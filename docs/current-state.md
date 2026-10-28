@@ -1,5 +1,11 @@
 # Current State
 
+M7.117 is complete. `GET /new-listings/checkpoint-latency` preserves the existing target-to-completion distribution and now exposes the same minimum, arithmetic median, nearest-rank p95, and maximum statistics for persisted target-to-claim queue delay and claim-to-completion processing duration. The calculator rejects missing or regressed claim chronology and requires the two components to reconcile exactly to total lag for every completed sample.
+
+The endpoint still uses the bounded recent T+0-eligible PostgreSQL cohort. No schema, provider call, collection behavior, schedule, batch size, concurrency, retry, signal, recommendation, order, or financial transaction changed.
+
+Post-M7.117 validation passes all 2,972 backend tests across 269 suites, all 150 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, all 117 dashboard tests across 20 files, formatting, lint, backend/dashboard builds, Compose validation, and `git diff --check`.
+
 M10.179 is complete. `POST /real-trading/accounting-ledger-reconciliation-readiness` now composes the existing M10.112–M10.116 latest durable reconciliation, freshness, and exact balance-projection chain behind the loopback-only timing-safe Bearer guard. Its strict body accepts only a canonical initialization UUID and an explicit 1–60,000 ms maximum evidence age; evaluation time is server-owned.
 
 The route performs no provider read. It selects and fully revalidates the newest reconciliation, measures freshness from the authenticated wallet observation, and reports only sanitized identity, fingerprint, evidence age, timestamps, coverage, blockers, and false authority flags. It never exposes wallet address or quantities. Missing, stale, future, corrupt, or mismatched evidence fails closed, and a blocked result cannot trigger M10.178 automatically. Quote, submission, strategy execution, automatic retry, order, mutation, and financial transaction authority remain false.

@@ -1,13 +1,13 @@
 import { isCanonicalBinanceSymbol } from '../domain/binance-spot-identity';
 import { ListingObservationCheckpointLatencyCohort } from '../domain/listing-observation-checkpoint-latency-cohort';
 import {
-  CompletedListingObservationCheckpoint,
+  ClaimedCompletedListingObservationCheckpoint,
   LISTING_OBSERVATION_CHECKPOINTS,
 } from '../domain/listing-observation-schedule';
 
 export class ListingObservationCheckpointLatencyCohortCalculator {
   calculate(
-    timelines: readonly (readonly CompletedListingObservationCheckpoint[])[],
+    timelines: readonly (readonly ClaimedCompletedListingObservationCheckpoint[])[],
   ): ListingObservationCheckpointLatencyCohort {
     if (timelines.length === 0) {
       return { provider: null, detectionCount: 0, checkpoints: [] };
@@ -15,6 +15,8 @@ export class ListingObservationCheckpointLatencyCohortCalculator {
 
     const symbols = new Set<string>();
     const lagsByLabel = new Map<string, number[]>();
+    const queueDelaysByLabel = new Map<string, number[]>();
+    const processingDurationsByLabel = new Map<string, number[]>();
     for (const timeline of timelines) {
       if (timeline.length === 0) {
         throw new Error('Listing checkpoint latency timeline is empty');
@@ -43,14 +45,33 @@ export class ListingObservationCheckpointLatencyCohortCalculator {
         }
         labels.add(checkpoint.label);
 
-        const lagMs =
-          checkpoint.completedAt.getTime() - checkpoint.targetAt.getTime();
-        if (!Number.isSafeInteger(lagMs) || lagMs < 0) {
+        const targetAtMs = checkpoint.targetAt.getTime();
+        const claimedAtMs = checkpoint.claimedAt.getTime();
+        const completedAtMs = checkpoint.completedAt.getTime();
+        const lagMs = completedAtMs - targetAtMs;
+        const queueDelayMs = claimedAtMs - targetAtMs;
+        const processingDurationMs = completedAtMs - claimedAtMs;
+        if (
+          !Number.isSafeInteger(lagMs) ||
+          !Number.isSafeInteger(queueDelayMs) ||
+          !Number.isSafeInteger(processingDurationMs) ||
+          lagMs < 0 ||
+          queueDelayMs < 0 ||
+          processingDurationMs < 0 ||
+          queueDelayMs + processingDurationMs !== lagMs
+        ) {
           throw new Error('Listing checkpoint completion lag is invalid');
         }
         const lags = lagsByLabel.get(checkpoint.label) ?? [];
         lags.push(lagMs);
         lagsByLabel.set(checkpoint.label, lags);
+        const queueDelays = queueDelaysByLabel.get(checkpoint.label) ?? [];
+        queueDelays.push(queueDelayMs);
+        queueDelaysByLabel.set(checkpoint.label, queueDelays);
+        const processingDurations =
+          processingDurationsByLabel.get(checkpoint.label) ?? [];
+        processingDurations.push(processingDurationMs);
+        processingDurationsByLabel.set(checkpoint.label, processingDurations);
       }
     }
 
@@ -62,6 +83,12 @@ export class ListingObservationCheckpointLatencyCohortCalculator {
           const ordered = [...(lagsByLabel.get(label) ?? [])].sort(
             (left, right) => left - right,
           );
+          const orderedQueueDelays = [
+            ...(queueDelaysByLabel.get(label) ?? []),
+          ].sort((left, right) => left - right);
+          const orderedProcessingDurations = [
+            ...(processingDurationsByLabel.get(label) ?? []),
+          ].sort((left, right) => left - right);
           return {
             label,
             offsetMs,
@@ -70,6 +97,17 @@ export class ListingObservationCheckpointLatencyCohortCalculator {
             medianLagMs: median(ordered),
             percentile95LagMs: percentile95(ordered),
             maximumLagMs: ordered.at(-1) ?? null,
+            minimumQueueDelayMs: orderedQueueDelays[0] ?? null,
+            medianQueueDelayMs: median(orderedQueueDelays),
+            percentile95QueueDelayMs: percentile95(orderedQueueDelays),
+            maximumQueueDelayMs: orderedQueueDelays.at(-1) ?? null,
+            minimumProcessingDurationMs: orderedProcessingDurations[0] ?? null,
+            medianProcessingDurationMs: median(orderedProcessingDurations),
+            percentile95ProcessingDurationMs: percentile95(
+              orderedProcessingDurations,
+            ),
+            maximumProcessingDurationMs:
+              orderedProcessingDurations.at(-1) ?? null,
           };
         },
       ),

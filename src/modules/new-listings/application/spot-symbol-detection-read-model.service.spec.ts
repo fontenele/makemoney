@@ -37,6 +37,14 @@ describe('SpotSymbolDetectionReadModelService', () => {
       medianLagMs: 2_000,
       percentile95LagMs: 3_000,
       maximumLagMs: 3_000,
+      minimumQueueDelayMs: 500,
+      medianQueueDelayMs: 500,
+      percentile95QueueDelayMs: 500,
+      maximumQueueDelayMs: 500,
+      minimumProcessingDurationMs: 500,
+      medianProcessingDurationMs: 1_500,
+      percentile95ProcessingDurationMs: 2_500,
+      maximumProcessingDurationMs: 2_500,
     });
     expect(listCompletedObservationCohort).toHaveBeenCalledWith('binance', 25);
   });
@@ -2118,6 +2126,7 @@ function baseCompletedObservation() {
     label: 'T+0' as const,
     offsetMs: 0,
     targetAt: new Date('2026-09-14T02:00:00.000Z'),
+    claimedAt: new Date('2026-09-14T02:00:00.500Z'),
     completedAt: new Date('2026-09-14T02:00:01.000Z'),
     lastPrice: '100',
     baseVolume: '1000',

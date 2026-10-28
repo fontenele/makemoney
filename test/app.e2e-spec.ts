@@ -184,10 +184,13 @@ describe('Application (e2e)', () => {
     return request(server).get('/health').expect(200);
   });
 
-  it('/new-listings/checkpoint-latency (GET) returns an empty durable cohort', () => {
+  it('/new-listings/checkpoint-latency (GET) returns an empty durable cohort', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const prisma = app.get(PrismaService);
+    await prisma.listingObservationCheckpoint.deleteMany();
+    await prisma.observedSpotSymbol.deleteMany();
 
-    return request(server)
+    await request(server)
       .get('/new-listings/checkpoint-latency')
       .expect(200)
       .expect({ provider: null, detectionCount: 0, checkpoints: [] });

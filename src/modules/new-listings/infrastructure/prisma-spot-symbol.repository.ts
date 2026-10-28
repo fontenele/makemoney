@@ -12,6 +12,7 @@ import {
 } from '../domain/spot-symbol-catalog';
 import {
   buildListingObservationSchedule,
+  ClaimedCompletedListingObservationCheckpoint,
   ClaimedListingObservationCheckpoint,
   CompletedListingObservationCheckpoint,
   DueListingObservationCheckpoint,
@@ -281,7 +282,7 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
   async listCompletedObservationCohort(
     provider: SpotSymbol['provider'],
     limit: number,
-  ): Promise<CompletedListingObservationCheckpoint[][]> {
+  ): Promise<ClaimedCompletedListingObservationCheckpoint[][]> {
     const detections = await this.prisma.observedSpotSymbol.findMany({
       where: {
         provider,
@@ -300,7 +301,7 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
       },
     });
     return detections.map(({ observationCheckpoints }) =>
-      observationCheckpoints.map(toCompletedObservation),
+      observationCheckpoints.map(toClaimedCompletedObservation),
     );
   }
 
@@ -523,12 +524,13 @@ function toDetectedSpotSymbol(row: {
   };
 }
 
-function toCompletedObservation(row: {
+type CompletedObservationRow = {
   provider: string;
   symbol: string;
   label: string;
   offsetMs: number;
   targetAt: Date;
+  claimedAt: Date | null;
   completedAt: Date | null;
   lastPrice: Prisma.Decimal | null;
   baseVolume: Prisma.Decimal | null;
@@ -537,7 +539,11 @@ function toCompletedObservation(row: {
   windowOpenTime: Date | null;
   windowCloseTime: Date | null;
   receivedAt: Date | null;
-}): CompletedListingObservationCheckpoint {
+};
+
+function toCompletedObservation(
+  row: CompletedObservationRow,
+): CompletedListingObservationCheckpoint {
   if (
     !row.completedAt ||
     !row.lastPrice ||
@@ -569,4 +575,13 @@ function toCompletedObservation(row: {
     completedAt: row.completedAt,
     ...observation,
   };
+}
+
+function toClaimedCompletedObservation(
+  row: CompletedObservationRow,
+): ClaimedCompletedListingObservationCheckpoint {
+  if (!row.claimedAt) {
+    throw new Error('Completed listing observation claim is incomplete');
+  }
+  return { ...toCompletedObservation(row), claimedAt: row.claimedAt };
 }

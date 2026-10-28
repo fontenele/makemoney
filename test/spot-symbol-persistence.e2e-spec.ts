@@ -495,6 +495,16 @@ describe('Spot symbol observation persistence (e2e)', () => {
       },
     ]);
 
+    const completedCohort = await repository.listCompletedObservationCohort(
+      'binance',
+      100,
+    );
+    expect(
+      completedCohort
+        .flat()
+        .find((checkpoint) => checkpoint.symbol === 'LEASEUSDT'),
+    ).toMatchObject({ claimedAt: reclaimedAt, completedAt });
+
     const uncompletedRow =
       await prisma.listingObservationCheckpoint.findUniqueOrThrow({
         where: {

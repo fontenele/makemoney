@@ -37,6 +37,10 @@ export interface CompletedListingObservationCheckpoint
   completedAt: Date;
 }
 
+export interface ClaimedCompletedListingObservationCheckpoint extends CompletedListingObservationCheckpoint {
+  claimedAt: Date;
+}
+
 export function buildListingObservationSchedule(
   detectedAt: Date,
 ): ListingObservationCheckpoint[] {

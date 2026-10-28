@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## M7.117 — Decompose persisted latency without changing collection policy
+
+Total target-to-completion lag cannot distinguish time spent waiting for the sequential worker from time spent performing the ticker and top-of-book reads plus durable completion. M7.117 therefore uses the already persisted `claimedAt` boundary to calculate queue delay as `claimedAt - targetAt` and processing duration as `completedAt - claimedAt`, alongside the unchanged total.
+
+All three distributions use the same bounded durable cohort and the same minimum, arithmetic median, nearest-rank p95, and maximum definitions. Every sample must have canonical checkpoint identity, safe non-negative durations, ordered timestamps, and exact component reconciliation to the total. No new table, provider call, runtime telemetry, or alternate selection rule is introduced.
+
+This increment makes the bottleneck observable but deliberately does not infer a scheduling remedy from the five-detection sample. Batch size, concurrency, checkpoint density, provider-request policy, and the sequential worker remain unchanged, and the endpoint retains no collection, signal, recommendation, or order authority.
+
 ## M10.179 — Publish reconciliation readiness, not reconciled quantities
 
 M10.116 intentionally produces an internal exact balance snapshot for future resource-risk consumers, but an operator readiness route does not need to duplicate the holdings surfaces already available elsewhere. M10.179 therefore registers the full latest-selection and freshness chain while sanitizing its public projection to reconciliation identity, fingerprint, timing, coverage, blockers, and authority flags. Wallet address and BNB/USDT/BTCB quantities remain internal.

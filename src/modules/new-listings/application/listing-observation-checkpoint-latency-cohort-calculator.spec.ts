@@ -1,4 +1,4 @@
-import { CompletedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
+import { ClaimedCompletedListingObservationCheckpoint } from '../domain/listing-observation-schedule';
 import { ListingObservationCheckpointLatencyCohortCalculator } from './listing-observation-checkpoint-latency-cohort-calculator';
 
 describe('ListingObservationCheckpointLatencyCohortCalculator', () => {
@@ -7,15 +7,15 @@ describe('ListingObservationCheckpointLatencyCohortCalculator', () => {
   it('reports independent canonical checkpoint latency distributions', () => {
     const result = calculator.calculate([
       [
-        checkpoint('AUSDT', 'T+0', 0, 100),
-        checkpoint('AUSDT', 'T+5s', 5_000, 900),
+        checkpoint('AUSDT', 'T+0', 0, 100, 25),
+        checkpoint('AUSDT', 'T+5s', 5_000, 900, 700),
       ],
       [
-        checkpoint('BUSDT', 'T+0', 0, 200),
-        checkpoint('BUSDT', 'T+5s', 5_000, 300),
+        checkpoint('BUSDT', 'T+0', 0, 200, 100),
+        checkpoint('BUSDT', 'T+5s', 5_000, 300, 100),
       ],
-      [checkpoint('CUSDT', 'T+0', 0, 400)],
-      [checkpoint('DUSDT', 'T+0', 0, 800)],
+      [checkpoint('CUSDT', 'T+0', 0, 400, 150)],
+      [checkpoint('DUSDT', 'T+0', 0, 800, 300)],
     ]);
 
     expect(result.provider).toBe('binance');
@@ -29,6 +29,14 @@ describe('ListingObservationCheckpointLatencyCohortCalculator', () => {
       medianLagMs: 300,
       percentile95LagMs: 800,
       maximumLagMs: 800,
+      minimumQueueDelayMs: 25,
+      medianQueueDelayMs: 125,
+      percentile95QueueDelayMs: 300,
+      maximumQueueDelayMs: 300,
+      minimumProcessingDurationMs: 75,
+      medianProcessingDurationMs: 175,
+      percentile95ProcessingDurationMs: 500,
+      maximumProcessingDurationMs: 500,
     });
     expect(result.checkpoints[1]).toEqual({
       label: 'T+5s',
@@ -38,6 +46,14 @@ describe('ListingObservationCheckpointLatencyCohortCalculator', () => {
       medianLagMs: 600,
       percentile95LagMs: 900,
       maximumLagMs: 900,
+      minimumQueueDelayMs: 100,
+      medianQueueDelayMs: 400,
+      percentile95QueueDelayMs: 700,
+      maximumQueueDelayMs: 700,
+      minimumProcessingDurationMs: 200,
+      medianProcessingDurationMs: 200,
+      percentile95ProcessingDurationMs: 200,
+      maximumProcessingDurationMs: 200,
     });
     expect(result.checkpoints[8]).toEqual({
       label: 'T+24h',
@@ -47,6 +63,14 @@ describe('ListingObservationCheckpointLatencyCohortCalculator', () => {
       medianLagMs: null,
       percentile95LagMs: null,
       maximumLagMs: null,
+      minimumQueueDelayMs: null,
+      medianQueueDelayMs: null,
+      percentile95QueueDelayMs: null,
+      maximumQueueDelayMs: null,
+      minimumProcessingDurationMs: null,
+      medianProcessingDurationMs: null,
+      percentile95ProcessingDurationMs: null,
+      maximumProcessingDurationMs: null,
     });
   });
 
@@ -61,6 +85,8 @@ describe('ListingObservationCheckpointLatencyCohortCalculator', () => {
   it.each([
     [[checkpoint('AUSDT', 'T+0', 1, 100)]],
     [[checkpoint('AUSDT', 'T+0', 0, -1)]],
+    [[checkpoint('AUSDT', 'T+0', 0, 100, -1)]],
+    [[checkpoint('AUSDT', 'T+0', 0, 100, 101)]],
     [[checkpoint('AUSDT', 'T+0', 0, 100), checkpoint('AUSDT', 'T+0', 0, 200)]],
     [
       [checkpoint('AUSDT', 'T+0', 0, 100)],
@@ -76,7 +102,8 @@ function checkpoint(
   label: 'T+0' | 'T+5s',
   offsetMs: number,
   lagMs: number,
-): CompletedListingObservationCheckpoint {
+  queueDelayMs = 0,
+): ClaimedCompletedListingObservationCheckpoint {
   const targetAt = new Date(1_800_000_000_000 + offsetMs);
   return {
     provider: 'binance',
@@ -84,6 +111,7 @@ function checkpoint(
     label,
     offsetMs,
     targetAt,
+    claimedAt: new Date(targetAt.getTime() + queueDelayMs),
     completedAt: new Date(targetAt.getTime() + lagMs),
     lastPrice: '1',
     baseVolume: '1',
