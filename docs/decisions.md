@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## M10.180 — Bridge reconciled balances into resource evidence without authorization
+
+M10.14 deliberately accepted caller-supplied resource facts because no trustworthy balance bridge existed. M10.178–M10.179 now establish authenticated, durable, fresh equality between the Agentic Wallet and the complete local BNB/USDT/BTCB ledger. M10.180 consumes only the internal fully revalidated M10.115 snapshot rather than a public readiness response or a new provider observation.
+
+The bridge correlates the exact validated intent and non-executable quote, restricts direction to the approved BSC BTCB/USDT pair, selects the intent's source-token balance and native BNB balance, and requires the caller to state a positive gas requirement without deriving or valuing it. Authenticated observation time remains the resource freshness boundary; later projection time cannot renew it. Reconciliation identity and fingerprint remain attached to the assessment for provenance.
+
+The output is merely the existing M10.14 input shape. It creates no budget evidence, quota evidence, reservation, Risk Engine approval, provider call, route, or execution authority. Runtime composition and any aggregate risk workflow remain separately reviewable.
+
 ## M7.117 — Decompose persisted latency without changing collection policy
 
 Total target-to-completion lag cannot distinguish time spent waiting for the sequential worker from time spent performing the ticker and top-of-book reads plus durable completion. M7.117 therefore uses the already persisted `claimedAt` boundary to calculate queue delay as `claimedAt - targetAt` and processing duration as `completedAt - claimedAt`, alongside the unchanged total.

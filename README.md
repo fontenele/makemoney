@@ -1,6 +1,6 @@
 # Crypto Trader
 
-Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, M7 is extended through M7.117 durable checkpoint-latency decomposition, and M10 is in progress through M10.179 provider-free latest reconciliation readiness. The dedicated BSC BTCB/USDT Agentic Wallet path remains disabled by default: submission, status, reconciliation, evidence, commitment, authorization, and conditional local-ledger application are separate loopback-only Bearer-protected actions. Automatic and strategy execution remain unavailable.
+Local, personal platform for crypto and prediction-market research, realistic paper trading, and strategy validation. M0 through M9 are complete, M7 is extended through M7.117 durable checkpoint-latency decomposition, and M10 is in progress through M10.180 reconciled resource projection. The dedicated BSC BTCB/USDT Agentic Wallet path remains disabled by default: submission, status, reconciliation, evidence, commitment, authorization, and conditional local-ledger application are separate loopback-only Bearer-protected actions. Automatic and strategy execution remain unavailable.
 
 Project context, current state, roadmap, and change history are indexed in [`docs/README.md`](docs/README.md).
 

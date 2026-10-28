@@ -2468,5 +2468,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7 is complete through M7.116. A bounded local route now exposes durable target-to-completion latency distributions for every canonical checkpoint without triggering collection. M7.117 is next: separate durable queue delay from processing duration before reconsidering batching or concurrency. M10 remains complete through M10.177. Real trading remains disabled.
+M7 is complete through M7.117. M10 is complete through M10.180: fresh reconciled accounting balances can now be projected purely into the existing non-authorizing resource-risk input for an exact approved intent and quote. Runtime risk composition, reservations, and real trading remain disabled and require separately reviewed increments.
 ```

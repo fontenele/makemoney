@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-28 — M10.180 reconciled resource snapshot projection
+
+### Added
+
+- Pure projection from a fully validated fresh accounting reconciliation into the existing source-token/native-BNB resource snapshot used by M10.14.
+- Exact correlation for the Agentic Wallet provider, BSC chain, approved BTCB/USDT direction, intent, quote, source balance, and explicit positive BNB gas requirement.
+- Focused coverage for both approved directions plus tampered evidence, provider/intent/instrument divergence, absent source balance, and invalid gas input.
+
+### Safety
+
+- Preserves authenticated wallet observation time and reconciliation provenance without refreshing evidence or calling a provider.
+- Remains unregistered and creates no route, reservation, Risk Engine approval, quote/submission authority, order, mutation, or financial transaction.
+- Passed 2,976 backend tests, 150 PostgreSQL E2E tests with all 50 migrations from scratch, 117 dashboard tests, formatting, lint, backend/dashboard builds, Compose validation, and whitespace checks.
+
 ## 2026-10-28 — M7.117 checkpoint latency decomposition
 
 ### Changed

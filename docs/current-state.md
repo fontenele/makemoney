@@ -1,5 +1,11 @@
 # Current State
 
+M10.180 is complete. A new pure, unregistered projection validates the complete fresh reconciled balance artifact from M10.115, the exact non-executable quote and its embedded intent, the approved Agentic Wallet/BSC/BTCB-USDT direction, and an explicit positive native-BNB requirement before producing the existing M10.14 resource snapshot.
+
+The projection carries only the approved source-token quantity and native BNB quantity, marks both coverages complete, preserves the authenticated wallet observation time plus reconciliation identity/fingerprint, and remains non-authorizing. Tampered reconciliation evidence, another quote provider, intent/quote divergence, unsupported instruments, absent source/gas balances, or invalid gas input fails closed. There is no module registration, route, provider read, reservation, Risk Engine approval, quote/submission authority, strategy bridge, order, balance mutation, or financial transaction.
+
+Post-M10.180 validation passes all 2,976 backend tests across 270 suites, all 150 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, all 117 dashboard tests across 20 files, formatting, lint, backend/dashboard builds, Compose validation, and `git diff --check`.
+
 M7.117 is complete. `GET /new-listings/checkpoint-latency` preserves the existing target-to-completion distribution and now exposes the same minimum, arithmetic median, nearest-rank p95, and maximum statistics for persisted target-to-claim queue delay and claim-to-completion processing duration. The calculator rejects missing or regressed claim chronology and requires the two components to reconcile exactly to total lag for every completed sample.
 
 The endpoint still uses the bounded recent T+0-eligible PostgreSQL cohort. No schema, provider call, collection behavior, schedule, batch size, concurrency, retry, signal, recommendation, order, or financial transaction changed.

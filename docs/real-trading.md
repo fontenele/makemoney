@@ -1,5 +1,23 @@
 # Real Trading
 
+## M10.180 — Reconciled resource snapshot projection
+
+M10.180 adds the first pure bridge from the fresh, authenticated accounting evidence composed in M10.115–M10.116 to the resource shape already evaluated by M10.14. It accepts one complete reconciled BNB/USDT/BTCB snapshot, one validated intent, its exact correlated non-executable quote, and one explicit positive native-BNB gas requirement.
+
+Only the approved Agentic Wallet provider, BSC chain 56, and BTCB/USDT direction are admitted. The projection selects the intent's exact source-token balance and native BNB balance, marks their coverage complete, preserves the authenticated wallet observation time, and retains reconciliation identity and fingerprint in the surrounding assessment. It never derives a gas requirement, assumes a valuation, or treats later projection time as renewed balance evidence.
+
+Tampered reconciliation evidence, malformed intent or quote, quote/intent/provider divergence, an unsupported instrument, a missing source or BNB balance, or an invalid gas requirement blocks without producing a resource snapshot. The boundary is not registered in NestJS and cannot read a provider, create a reservation, approve risk, authorize a quote or submission, mutate accounting, or place an order.
+
+### M10.180 acceptance criteria
+
+- Complete fresh reconciled evidence is independently revalidated before any quantity is projected.
+- Intent, embedded quote intent, provider, chain, and approved BTCB/USDT direction correlate exactly.
+- The exact approved source-token and native-BNB quantities retain authenticated observation time and complete coverage.
+- The positive BNB gas requirement remains explicit and separately denominated.
+- Reconciliation identity and fingerprint remain available as provenance without entering the M10.14 resource shape.
+- Invalid evidence or divergence fails closed without a partial snapshot.
+- No route, runtime registration, provider call, reservation, Risk Engine approval, financial authorization, mutation, order, or transaction is added.
+
 ## M10.179 — Provider-free latest reconciliation readiness
 
 M10.178 can create immutable authenticated wallet/ledger equality evidence, but consumers still need a safe way to distinguish a fresh latest reconciliation from an absent or stale historical row. M10.179 composes the already reviewed M10.112–M10.116 chain behind `POST /real-trading/accounting-ledger-reconciliation-readiness`. The loopback-only, Bearer-protected route accepts exactly one canonical `initializationId` and an explicit `maximumAgeMs` from 1 through 60,000; evaluation time is always captured by the server.
