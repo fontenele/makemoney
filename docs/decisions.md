@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## M10.183 — Require both authenticated projections before provider-quota risk
+
+M10.180 and M10.182 independently close the two caller-supplied evidence gaps beneath M10.15: current spendable token/native-gas balances now come from a fresh durable wallet/ledger reconciliation, while provider quota comes from one normalized pinned-CLI capability observation. M10.183 composes those exact bridges in fail-closed order and delegates the complete nested resource-and-quota decision unchanged to M10.15 rather than recreating financial rules.
+
+Resource projection runs first because invalid accounting reconciliation makes the operation ineligible regardless of provider quota. Quota projection is explicitly `not_evaluated` on that path. A valid resource projection followed by invalid capability, settings, quota, identity, instrument, or external valuation evidence stops before M10.15. Only two complete projections reach the existing policy, which retains independent budget, balance, gas, coverage, freshness, UTC-day, quota arithmetic, and sufficiency checks.
+
+The aggregate retains reconciliation identity/fingerprint and the authenticated/externally-valued quota provenance beside the nested result. Even `provider_quota_sufficient` is descriptive: no resource or quota reservation, provider call, runtime registration, Risk Engine approval, funding, quote, submission, strategy, order, accounting mutation, or transaction authority is created.
+
 ## M10.182 — Project provider quota facts without inventing USD valuation
 
 The pinned Agentic Wallet settings response already reports a daily USD limit, used quota, remaining quota, and quota day in one normalized observation. Leaving M10.15 entirely caller-supplied after that read boundary would permit identity and chronology to be assembled independently. M10.182 therefore projects those exact provider facts into the existing generic snapshot only after validating the pinned capability shape, approved chain, quota-read availability, settings/quota data, and exact intent/quote correlation.

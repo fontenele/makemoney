@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-28 — M10.183 reconciled provider quota risk composition
+
+### Added
+
+- Pure fail-closed composition of the M10.180 authenticated resource projection, M10.182 provider-quota projection, and established M10.15 nested risk policy.
+- Reconciliation identity/fingerprint plus authenticated provider-observation and explicit external-USD valuation provenance on successful and downstream-blocked results.
+- Focused coverage for complete sufficiency, invalid reconciled evidence, absent provider quota, insufficient quota, and nested budget failure.
+
+### Safety
+
+- Resource failure stops before quota projection, and quota projection failure stops before M10.15; neither path creates partial risk facts.
+- Remains unregistered and adds no parity assumption, provider-limit acceptance, provider call, reservation, Risk Engine approval, funding, quote/submission authority, mutation, order, or financial transaction.
+- Passed 2,990 backend tests, 150 PostgreSQL E2E tests with all 50 migrations from scratch, 117 dashboard tests, formatting, lint, Prisma and Compose validation, backend/dashboard builds, and whitespace checks.
+
 ## 2026-10-28 — M10.182 authenticated provider quota snapshot projection
 
 ### Added

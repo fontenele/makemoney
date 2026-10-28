@@ -1,5 +1,11 @@
 # Current State
 
+M10.183 is complete. A new pure, unregistered aggregate requires a valid M10.180 reconciled resource projection and a valid M10.182 authenticated provider-quota projection before invoking the established M10.15 nested resource/quota risk policy. Invalid accounting evidence stops before quota projection; invalid provider or external valuation evidence stops before risk evaluation.
+
+Successful and downstream-blocked assessments retain reconciliation identity/fingerprint, authenticated provider-observation state, explicit external-USD valuation state, and the unchanged M10.15 result. Even `provider_quota_sufficient` remains descriptive: USDT/USD parity is never assumed, the provider limit is not a project limit, no durable resource/quota reservation exists, and Risk Engine approval, provider access, funding, quote, submission, strategy, order, accounting mutation, and transaction authority remain false.
+
+Post-M10.183 validation passes all 2,990 backend tests across 273 suites, all 150 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, all 117 dashboard tests across 20 files, formatting, lint, backend/dashboard builds, Prisma and Compose validation, and `git diff --check`.
+
 M10.182 is complete. A new pure, unregistered projection maps one validated pinned-CLI Agentic Wallet capability observation into the existing M10.15 provider-quota snapshot for an exact approved BSC BTCB/USDT intent and quote. Daily limit, used/remaining quota, UTC day, and observation time come from the provider observation; the positive required USD amount and valuation time remain separately explicit external facts.
 
 Unavailable or malformed settings/quota, disconnected or wrong-chain capability evidence, intent/quote/provider/instrument divergence, and invalid valuation input fail closed without a snapshot. The bridge assumes no USDT/USD parity, does not accept the provider limit as a project risk limit, and performs no M10.15 sufficiency decision. Provider access, durable reservation, Risk Engine approval, funding, quote, submission, strategy, order, accounting mutation, and transaction authority remain false.

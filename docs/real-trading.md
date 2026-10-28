@@ -1,5 +1,23 @@
 # Real Trading
 
+## M10.183 — Reconciled provider quota risk composition
+
+M10.183 composes both authenticated evidence bridges with the existing M10.15 provider-quota risk policy. It accepts one fresh durable M10.115 reconciled balance snapshot, one normalized pinned-CLI capability observation, the exact approved intent and non-executable quote, explicit native-BNB and external-USD requirements, local limits, complete budget facts, freshness bounds, and evaluation time.
+
+The M10.180 resource projection runs first. Invalid or tampered reconciliation evidence, intent/quote divergence, unsupported instruments, missing balances, or invalid gas input stops immediately and reports quota projection as `not_evaluated`. Only a complete resource projection reaches M10.182. Invalid capability/settings/quota evidence or external USD valuation then stops before risk evaluation. Only both complete snapshots reach M10.15, which continues to own all nested resource and provider-quota identity, coverage, chronology, freshness, arithmetic, and sufficiency rules.
+
+The aggregate retains reconciliation identity and fingerprint plus authenticated provider-observation and explicit external-valuation provenance. A successful `provider_quota_sufficient` result remains descriptive evidence only. The boundary is pure and unregistered and creates no reservation, operational Risk Engine approval, provider call, funding, quote, submission, strategy, order, mutation, or financial transaction authority.
+
+### M10.183 acceptance criteria
+
+- Reconciled resource projection must succeed before provider-quota projection is evaluated.
+- Both projections must succeed before the existing M10.15 policy is called.
+- Projection blockers remain explicit and never produce a partial downstream risk assessment.
+- Reconciliation identity/fingerprint and quota-observation/valuation provenance survive successful and downstream-blocked results.
+- M10.15 remains the single policy for budget, resource, quota, identity, coverage, freshness, arithmetic, and sufficiency checks.
+- No USDT/USD parity or provider-limit-as-project-limit assumption is introduced.
+- No runtime registration, route, provider call, reservation, Risk Engine approval, authorization, mutation, order, or financial transaction is added.
+
 ## M10.182 — Authenticated provider quota snapshot projection
 
 M10.182 adds the pure Agentic Wallet bridge into the provider-neutral M10.15 quota-snapshot shape. It accepts one already normalized pinned-CLI capability observation, one validated approved BSC BTCB/USDT intent and its exact correlated non-executable quote, plus an explicit positive external USD requirement and its valuation time.
