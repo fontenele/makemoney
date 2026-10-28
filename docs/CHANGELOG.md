@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-28 — M10.186 authenticated durable reservation command preparation
+
+### Added
+
+- Pure fail-closed preparation of the exact M10.18 store command from authenticated resource/quota projections and available M10.17 capacity.
+- Independent copies of validated intent, quote, costs, assets, dates, limits, budget, resource, quota, and freshness inputs.
+- Focused coverage for command readiness, invalid reconciled evidence, absent provider quota, and blocked reservation capacity.
+
+### Safety
+
+- The boundary has no store dependency and cannot start a transaction or insert a durable reservation.
+- Reconciliation and provider/valuation provenance remain visible without claiming the existing M10.18 schema persists them; provider access, quota consumption, Risk Engine approval, funding, quote/submission authority, order, mutation, and financial transaction remain absent.
+- Passed 3,003 backend tests, 150 PostgreSQL E2E tests with all 50 migrations from scratch, 117 dashboard tests, formatting, lint, Prisma and Compose validation, backend/dashboard builds, and whitespace checks.
+
 ## 2026-10-28 — M10.185 authenticated reconciled reservation capacity
 
 ### Added

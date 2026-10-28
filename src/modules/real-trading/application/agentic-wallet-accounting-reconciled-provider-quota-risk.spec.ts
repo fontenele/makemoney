@@ -9,6 +9,7 @@ import { assessAgenticWalletAccountingLedgerReconciliationFreshness } from '../i
 import { prepareAgenticWalletAccountingReconciledBalanceSnapshot } from '../infrastructure/agentic-wallet-accounting-reconciled-balance-snapshot';
 import { assessAgenticWalletAccountingReconciledProviderQuotaRisk } from './agentic-wallet-accounting-reconciled-provider-quota-risk';
 import { assessAgenticWalletAccountingReconciledReservationCapacity } from './agentic-wallet-accounting-reconciled-reservation-capacity';
+import { prepareAgenticWalletAccountingReconciledReservationCommand } from './agentic-wallet-accounting-reconciled-reservation-command';
 import { planAgenticWalletAccountingReconciledReservation } from './agentic-wallet-accounting-reconciled-reservation-plan';
 import { RealExecutionBudgetSnapshot } from './real-execution-budget-risk';
 import { APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT } from './real-execution-instrument-approval';
@@ -343,6 +344,106 @@ describe('Agentic Wallet reconciled reservation capacity', () => {
   });
 });
 
+describe('Agentic Wallet reconciled reservation command', () => {
+  it('prepares the exact durable-store command without invoking persistence', () => {
+    const result = commandAssessment();
+
+    expect(result.reconciliationFingerprint).toMatch(/^[0-9a-f]{64}$/);
+    expect(result).toMatchObject({
+      scope:
+        'agentic_wallet_accounting_reconciled_reservation_command_assessment',
+      status: 'reservation_command_ready',
+      blockers: [],
+      resourceSnapshotStatus: 'resource_snapshot_ready',
+      providerQuotaSnapshotStatus: 'provider_quota_snapshot_ready',
+      reservationCapacity: {
+        status: 'reservation_capacity_available',
+        activeReservationCount: 1,
+      },
+      command: {
+        intent: {
+          id: INTENT_ID,
+          idempotencyKey: 'reconciled-provider-quota-risk-1',
+        },
+        quote: { id: QUOTE_ID, providerId: 'agentic_wallet' },
+        budgetSnapshot: { reservedSpendUsdt: '1' },
+        resourceSnapshot: {
+          sourceTokenAddress: usdt.tokenAddress,
+          sourceAvailableQuantity: '900',
+          nativeGasAvailableQuantity: '1.9',
+          nativeGasRequiredQuantity: '0.0002',
+        },
+        quotaSnapshot: {
+          dailyLimitUsd: '1000',
+          usedUsd: '100',
+          remainingUsd: '900',
+          requiredUsd: '5.2',
+        },
+        freshness: { reservationSnapshotMaxAgeMs: 60_000 },
+      },
+      reconciliationId: RECONCILIATION_ID,
+      providerObservationValidated: true,
+      requirementValuationExternallySupplied: true,
+      durableReservationCommandPrepared: true,
+      durableReservationCreated: false,
+      atomicEnforcement: false,
+      riskApproved: false,
+      submissionAuthorized: false,
+    });
+  });
+
+  it('does not prepare a command from invalid reconciled evidence', () => {
+    const balances = balanceSnapshot();
+    const result = commandAssessment({
+      balances: { ...balances, quoteAuthorized: true } as typeof balances,
+    });
+
+    expect(result).toMatchObject({
+      status: 'blocked',
+      blockers: ['resource_snapshot_projection_blocked'],
+      providerQuotaSnapshotStatus: 'not_evaluated',
+      reservationCapacity: null,
+      command: null,
+      durableReservationCommandPrepared: false,
+    });
+  });
+
+  it('does not prepare a command without authenticated quota evidence', () => {
+    const result = commandAssessment({
+      observation: observation({ quota: null }),
+    });
+
+    expect(result).toMatchObject({
+      status: 'blocked',
+      blockers: ['provider_quota_snapshot_projection_blocked'],
+      providerQuotaSnapshotBlockers: ['provider_quota_unavailable'],
+      reservationCapacity: null,
+      command: null,
+      durableReservationCreated: false,
+    });
+  });
+
+  it('does not prepare a command when aggregate capacity is blocked', () => {
+    const result = commandAssessment({
+      reservationSnapshot: reservationSnapshot({ coverage: 'partial' }),
+    });
+
+    expect(result).toMatchObject({
+      status: 'blocked',
+      blockers: ['reservation_capacity_blocked'],
+      reservationCapacity: {
+        status: 'blocked',
+        blockers: ['reservation_coverage_incomplete'],
+      },
+      command: null,
+      reconciliationId: RECONCILIATION_ID,
+      providerObservationValidated: true,
+      durableReservationCommandPrepared: false,
+      atomicEnforcement: false,
+    });
+  });
+});
+
 function assess(
   overrides: {
     balances?: ReturnType<typeof balanceSnapshot>;
@@ -421,6 +522,41 @@ function capacityAssessment(
   const valueIntent = overrides.intent ?? intent();
   const valueQuote = overrides.quote ?? quote({ intent: valueIntent });
   return assessAgenticWalletAccountingReconciledReservationCapacity(
+    overrides.balances ?? balanceSnapshot(),
+    overrides.observation ?? observation(),
+    valueIntent,
+    valueQuote,
+    '0.0002',
+    overrides.requiredUsd ?? '5.2',
+    new Date('2026-10-16T12:01:29.000Z'),
+    limits(),
+    overrides.budgetSnapshot ?? budgetSnapshot(),
+    overrides.reservationSnapshot ?? reservationSnapshot(),
+    {
+      budgetSnapshotMaxAgeMs: 60_000,
+      resourceSnapshotMaxAgeMs: 60_000,
+      quotaSnapshotMaxAgeMs: 60_000,
+      requirementValuationMaxAgeMs: 60_000,
+      reservationSnapshotMaxAgeMs: 60_000,
+    },
+    EVALUATED_AT,
+  );
+}
+
+function commandAssessment(
+  overrides: {
+    balances?: ReturnType<typeof balanceSnapshot>;
+    observation?: AgenticWalletCapabilityObservation;
+    intent?: RealExecutionIntent;
+    quote?: RealExecutionQuote;
+    requiredUsd?: string;
+    budgetSnapshot?: RealExecutionBudgetSnapshot;
+    reservationSnapshot?: ReturnType<typeof reservationSnapshot>;
+  } = {},
+) {
+  const valueIntent = overrides.intent ?? intent();
+  const valueQuote = overrides.quote ?? quote({ intent: valueIntent });
+  return prepareAgenticWalletAccountingReconciledReservationCommand(
     overrides.balances ?? balanceSnapshot(),
     overrides.observation ?? observation(),
     valueIntent,

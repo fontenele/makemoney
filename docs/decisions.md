@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## M10.186 — Prepare the durable command separately from durable mutation
+
+The M10.18 store is already serializable and authoritative over active durable rows, but invoking it is the first local mutation in the generic real-execution chain. M10.186 introduces a pure review boundary first. It repeats the authenticated resource/quota projection order, requires M10.17 capacity to be available against an explicit bounded snapshot, and only then creates the exact `RealExecutionReservationCommand` shape consumed by M10.18.
+
+The command copies the validated intent, embedded quote, costs, limits, budget, resource, quota, freshness, and all dates instead of retaining caller-owned mutable references. Resource and quota snapshots come only from M10.180 and M10.182. Reconciliation identity/fingerprint and provider-observation/external-valuation provenance remain on the surrounding assessment because the existing M10.18 command and row do not yet durably model that provenance; this increment does not silently change their schema or claim it was persisted.
+
+Command readiness is deliberately not reservation authority. The boundary has no store dependency and cannot acquire the advisory lock, rebuild durable rows, insert anything, consume provider quota, or reach Agentic Wallet. Durable provenance binding and any later invocation of M10.18 remain separately reviewable.
+
 ## M10.185 — Use authenticated capacity inputs without weakening reservation accounting
 
 M10.17 already owns the complete bounded active-reservation policy, including expiry, unique intent/quote identities, current-day and freshness checks, reconciliation of active USDT reservations with the budget snapshot, and independent source-token, BNB, and provider-quota USD totals. M10.185 therefore changes only the provenance of current resource and quota capacity: those facts must come through M10.180 and M10.182 rather than being assembled directly by a caller.

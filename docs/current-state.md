@@ -1,5 +1,11 @@
 # Current State
 
+M10.186 is complete. A new pure, unregistered preparation boundary emits the exact existing M10.18 reservation-store command only after authenticated M10.180 resource projection, authenticated M10.182 provider-quota projection, and M10.17 capacity availability. Resource, quota, and capacity blockers stop before any command exists.
+
+The prepared artifact independently copies intent, embedded quote, costs, assets, dates, limits, budget, resource, quota, and freshness facts. Reconciliation identity/fingerprint and provider-observation/external-valuation provenance remain attached to the surrounding assessment without claiming the current M10.18 row persists them. No store is injected or invoked, no transaction or row is created, and provider access, quota consumption, durable reservation, atomic enforcement, Risk Engine approval, funding, quote, submission, strategy, order, accounting mutation, and transaction authority remain false.
+
+Post-M10.186 validation passes all 3,003 backend tests across 273 suites, all 150 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, all 117 dashboard tests across 20 files, formatting, lint, backend/dashboard builds, Prisma and Compose validation, and `git diff --check`.
+
 M10.185 is complete. A new pure, unregistered aggregate requires the authenticated M10.180 reconciled-resource and M10.182 provider-quota projections before invoking the established M10.17 reservation-capacity policy. Invalid accounting evidence stops before quota projection; invalid provider or external valuation evidence stops before capacity evaluation.
 
 The existing policy alone validates the bounded reservation snapshot, excludes expired rows, rejects duplicate active identities, reconciles active USDT budget, and independently evaluates aggregate source-token, native-BNB, and provider-quota USD capacity. Available and blocked results retain reconciliation and provider/valuation provenance. No durable reservation, atomic enforcement, provider quota consumption, Risk Engine approval, provider access, funding, quote, submission, strategy, order, accounting mutation, or transaction authority exists.

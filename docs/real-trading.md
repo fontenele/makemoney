@@ -1,5 +1,21 @@
 # Real Trading
 
+## M10.186 — Authenticated durable reservation command preparation
+
+M10.186 adds a pure boundary immediately before the existing M10.18 durable store. It accepts the complete M10.185 evidence package and prepares the exact `RealExecutionReservationCommand` only after M10.180 resource projection, M10.182 quota projection, and M10.17 capacity evaluation all pass.
+
+The command contains independent copies of the validated intent, non-executable quote and costs, local limits, budget snapshot, authenticated resource snapshot, authenticated provider-quota snapshot, and freshness bounds. All nested assets and dates are copied so later caller mutation cannot rewrite the prepared artifact. Reconciliation identity/fingerprint and provider-observation/external-valuation provenance remain explicit on the surrounding assessment; they are not falsely claimed as part of the existing M10.18 durable row.
+
+Invalid accounting evidence stops before quota projection, invalid provider/valuation evidence stops before capacity, and blocked capacity produces no command. A ready command remains inert. The boundary is unregistered, has no store dependency, never starts a transaction or inserts a row, and cannot access the provider, reserve funds/quota, approve risk, or authorize an order.
+
+### M10.186 acceptance criteria
+
+- M10.180 and M10.182 must succeed and M10.17 must report capacity available before a command exists.
+- The command uses only projected resource/quota facts and copies every nested asset and date.
+- Reconciliation and provider/valuation provenance remain visible without claiming M10.18 persists them.
+- Projection or capacity failure produces no partial command.
+- No Prisma dependency, transaction, row, runtime registration, route, provider call, reservation, Risk Engine approval, authorization, mutation, order, or financial transaction is added.
+
 ## M10.185 — Authenticated reconciled reservation capacity
 
 M10.185 carries authenticated reconciled resources and provider quota into the existing M10.17 aggregate reservation-capacity policy. In addition to the M10.184 inputs, it accepts one explicit bounded active-reservation snapshot and the existing reservation freshness bound.
