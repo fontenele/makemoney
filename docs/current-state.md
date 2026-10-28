@@ -1,5 +1,11 @@
 # Current State
 
+M10.182 is complete. A new pure, unregistered projection maps one validated pinned-CLI Agentic Wallet capability observation into the existing M10.15 provider-quota snapshot for an exact approved BSC BTCB/USDT intent and quote. Daily limit, used/remaining quota, UTC day, and observation time come from the provider observation; the positive required USD amount and valuation time remain separately explicit external facts.
+
+Unavailable or malformed settings/quota, disconnected or wrong-chain capability evidence, intent/quote/provider/instrument divergence, and invalid valuation input fail closed without a snapshot. The bridge assumes no USDT/USD parity, does not accept the provider limit as a project risk limit, and performs no M10.15 sufficiency decision. Provider access, durable reservation, Risk Engine approval, funding, quote, submission, strategy, order, accounting mutation, and transaction authority remain false.
+
+Post-M10.182 validation passes all 2,985 backend tests across 272 suites, all 150 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, all 117 dashboard tests across 20 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, and `git diff --check`.
+
 M10.181 is complete. A new pure, unregistered aggregate passes only a successful M10.180 reconciled resource projection into the established M10.14 resource-risk policy. Invalid or tampered reconciliation evidence stops before downstream evaluation, while valid evidence retains its reconciliation identity and fingerprint beside the exact quote, budget, source-token, native-BNB, coverage, identity, and freshness result.
 
 Budget failure and insufficient reconciled balances remain explicit blockers. Even `resources_sufficient` is descriptive only: provider quota is unevaluated, no durable reservation exists, and Risk Engine approval, funding, quote, submission, strategy, order, balance mutation, and transaction authority remain false.

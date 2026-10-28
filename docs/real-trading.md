@@ -1,5 +1,25 @@
 # Real Trading
 
+## M10.182 — Authenticated provider quota snapshot projection
+
+M10.182 adds the pure Agentic Wallet bridge into the provider-neutral M10.15 quota-snapshot shape. It accepts one already normalized pinned-CLI capability observation, one validated approved BSC BTCB/USDT intent and its exact correlated non-executable quote, plus an explicit positive external USD requirement and its valuation time.
+
+The projection takes the provider daily limit from security settings and used quota, remaining quota, UTC day, and observation time from the same capability observation. It marks provider quota and external requirement coverage complete only when the observation is connected, includes chain 56, exposes quota reading, and contains valid settings and quota facts. M10.15 remains responsible for later freshness, current-day, total-reconciliation, and sufficiency decisions; the projection does not duplicate those policies.
+
+Required USD is never derived from USDT, a quote, a wallet balance, or the provider daily limit. The caller must supply an independently valued positive USD requirement and timestamp. The provider limit remains explicitly rejected as a project risk limit.
+
+The boundary is pure and unregistered. It makes no provider call and cannot evaluate quota sufficiency, reserve quota, approve risk, authorize funding/quote/submission, mutate accounting, or place an order.
+
+### M10.182 acceptance criteria
+
+- Only the pinned CLI/provider capability shape, connected approved chain, and available quota read may produce provider facts.
+- Daily limit, used quota, remaining quota, UTC day, and observation time come from one validated observation.
+- Intent, embedded quote intent, provider, chain, and approved BTCB/USDT direction correlate exactly.
+- Positive required USD and a finite valuation time remain explicit external inputs with complete declared coverage.
+- No USDT/USD parity, implicit valuation, or acceptance of the provider limit as a project limit is introduced.
+- Invalid or absent evidence fails closed without a partial snapshot.
+- No quota evaluation, reservation, Risk Engine approval, runtime registration, route, provider call, authorization, mutation, order, or financial transaction is added.
+
 ## M10.181 — Reconciled resource risk composition
 
 M10.181 composes the authenticated M10.180 resource projection with the existing M10.14 budget-and-resource risk policy. It accepts one M10.115 reconciled balance snapshot plus the exact intent, non-executable quote, explicit native-BNB requirement, local limits, complete budget facts, freshness policy, and evaluation time.

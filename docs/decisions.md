@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## M10.182 — Project provider quota facts without inventing USD valuation
+
+The pinned Agentic Wallet settings response already reports a daily USD limit, used quota, remaining quota, and quota day in one normalized observation. Leaving M10.15 entirely caller-supplied after that read boundary would permit identity and chronology to be assembled independently. M10.182 therefore projects those exact provider facts into the existing generic snapshot only after validating the pinned capability shape, approved chain, quota-read availability, settings/quota data, and exact intent/quote correlation.
+
+The provider response does not establish the independent USD value of the proposed operation. The bridge consequently requires a positive external `requiredUsd` and its own valuation timestamp, labels that basis explicitly, and never assumes USDT/USD parity. M10.15 retains all decisions about freshness, current UTC day, used-plus-remaining reconciliation, and sufficiency, avoiding a second quota policy.
+
+Projection remains non-authorizing and unregistered. The provider daily limit is not a project risk limit, and no read, reservation, approval, or execution follows from a ready snapshot.
+
 ## M10.181 — Reuse the established resource-risk policy for reconciled balances
 
 M10.180 deliberately ends at the existing resource-snapshot shape. Reimplementing source sufficiency, gas sufficiency, budget composition, or freshness beside that bridge would create a second financial policy. M10.181 therefore treats successful M10.180 projection as the only adapter step and delegates the complete decision unchanged to M10.14.

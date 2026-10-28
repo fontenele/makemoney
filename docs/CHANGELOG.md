@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-28 — M10.182 authenticated provider quota snapshot projection
+
+### Added
+
+- Pure projection from one validated pinned-CLI Agentic Wallet capability observation into the existing M10.15 provider-quota snapshot.
+- Exact intent/quote/provider/chain/instrument correlation and explicit independently valued USD requirement facts.
+- Focused coverage for both approved directions, absent or malformed quota, disabled quota reads, divergent identities, invalid valuation, and tampered CLI evidence.
+
+### Safety
+
+- Introduces no USDT/USD parity assumption and never treats the provider daily limit as a project Risk Engine limit.
+- Remains unregistered and adds no quota sufficiency decision, provider call, reservation, Risk Engine approval, quote/submission authority, mutation, order, or financial transaction.
+- Passed 2,985 backend tests, 150 PostgreSQL E2E tests with all 50 migrations from scratch, 117 dashboard tests, formatting, lint, Prisma and Compose validation, backend/dashboard builds, and whitespace checks.
+
 ## 2026-10-28 — M10.181 reconciled resource risk composition
 
 ### Added
