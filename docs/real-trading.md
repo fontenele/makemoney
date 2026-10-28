@@ -1,5 +1,23 @@
 # Real Trading
 
+## M10.179 — Provider-free latest reconciliation readiness
+
+M10.178 can create immutable authenticated wallet/ledger equality evidence, but consumers still need a safe way to distinguish a fresh latest reconciliation from an absent or stale historical row. M10.179 composes the already reviewed M10.112–M10.116 chain behind `POST /real-trading/accounting-ledger-reconciliation-readiness`. The loopback-only, Bearer-protected route accepts exactly one canonical `initializationId` and an explicit `maximumAgeMs` from 1 through 60,000; evaluation time is always captured by the server.
+
+The action performs no Agentic Wallet read. It selects the newest immutable reconciliation by recording time and UUID, reconstructs it through the authoritative persisted mapper, measures age from the authenticated wallet observation rather than later persistence timestamps, and reaches the exact three-asset balance projection only while the evidence remains fresh. The public response then removes those quantities and returns only initialization/reconciliation identity, fingerprint, evidence age, observation/evaluation times, coverage, freshness state, blockers, and explicit false authority flags.
+
+Absence and staleness remain ordinary blocked results. Corrupt newest evidence fails closed without falling back to an older row, and unexpected persistence or projection failures are sanitized as 503. A ready result is evidence readiness only: it performs no provider call, balance mutation, valuation, reservation, quote, submission, strategy bridge, automatic retry, order, or financial transaction.
+
+### M10.179 acceptance criteria
+
+- Authentication and strict request validation stop unauthorized or malformed requests before persistence access.
+- Evaluation time comes from the server and maximum evidence age is bounded to 1–60,000 ms.
+- The newest reconciliation is selected deterministically and revalidated without older-row fallback.
+- Freshness is measured from authenticated wallet observation time.
+- Absence, stale/future evidence, corruption, or identity mismatch fails closed.
+- The response exposes no wallet address or balance quantities and performs no provider read.
+- Quote, submission, strategy execution, automatic retry, order, mutation, and financial transaction authority remain false.
+
 ## M10.178 — Guarded current accounting ledger reconciliation
 
 The exceptional M10.176 origin created an ordinary-compatible accounting initialization and exact current BNB/USDT/BTCB rows, but current wallet equality still needed an operational evidence path. M10.178 composes the already reviewed M10.101–M10.108 boundaries behind `POST /real-trading/accounting-ledger-reconciliation`. The loopback-only, Bearer-protected route accepts exactly one canonical `initializationId` and an explicit `maximumObservationAgeMs` from 1 through 60,000.

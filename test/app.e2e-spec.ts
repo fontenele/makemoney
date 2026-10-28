@@ -756,6 +756,7 @@ describe('Application (e2e)', () => {
     '/real-trading/funding-conversion-accounting-bootstrap-readiness',
     '/real-trading/funding-conversion-accounting-bootstrap',
     '/real-trading/accounting-ledger-reconciliation',
+    '/real-trading/accounting-ledger-reconciliation-readiness',
   ])(
     '%s (POST) fails closed without operator authentication',
     async (route) => {
@@ -781,6 +782,7 @@ describe('Application (e2e)', () => {
     '/real-trading/funding-conversion-accounting-bootstrap-readiness',
     '/real-trading/funding-conversion-accounting-bootstrap',
     '/real-trading/accounting-ledger-reconciliation',
+    '/real-trading/accounting-ledger-reconciliation-readiness',
   ])(
     '%s (POST) rejects malformed input before provider access',
     async (route) => {

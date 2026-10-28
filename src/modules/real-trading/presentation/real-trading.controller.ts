@@ -160,6 +160,10 @@ import {
   AgenticWalletAccountingLedgerReconciliationCommitmentConflictError,
   AgenticWalletAccountingLedgerReconciliationInitializationNotFoundError,
 } from '../infrastructure/agentic-wallet-accounting-ledger-reconciliation-commitment.store';
+import {
+  AgenticWalletAccountingLedgerReconciliationReadinessRequestError,
+  AgenticWalletAccountingLedgerReconciliationReadinessService,
+} from '../application/agentic-wallet-accounting-ledger-reconciliation-readiness.service';
 
 @Controller('real-trading')
 export class RealTradingController {
@@ -175,6 +179,7 @@ export class RealTradingController {
     private readonly fundingConversionAccountingBootstrapReadiness: AgenticWalletFundingConversionAccountingBootstrapReadinessService,
     private readonly fundingConversionAccountingBootstrap: AgenticWalletFundingConversionAccountingBootstrapService,
     private readonly accountingLedgerReconciliation: AgenticWalletAccountingLedgerReconciliationRecordingService,
+    private readonly accountingLedgerReconciliationReadiness: AgenticWalletAccountingLedgerReconciliationReadinessService,
     private readonly realExecutionSubmission: RealExecutionOperatorSubmissionService,
     private readonly realExecutionStatus: AgenticWalletMarketSwapStatusReconciliationAttempt,
     private readonly realExecutionReconciliation: RealExecutionFinancialReconciliationService,
@@ -491,6 +496,26 @@ export class RealTradingController {
         throw new ConflictException(error.message);
       throw new ServiceUnavailableException(
         'Agentic Wallet accounting ledger reconciliation is unavailable',
+      );
+    }
+  }
+
+  @Post('accounting-ledger-reconciliation-readiness')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async assessAccountingLedgerReconciliationReadiness(@Body() body: unknown) {
+    try {
+      return await this.accountingLedgerReconciliationReadiness.assess(body);
+    } catch (error) {
+      if (
+        error instanceof
+        AgenticWalletAccountingLedgerReconciliationReadinessRequestError
+      )
+        throw new BadRequestException(
+          'Invalid accounting ledger reconciliation readiness request',
+        );
+      throw new ServiceUnavailableException(
+        'Agentic Wallet accounting ledger reconciliation readiness is unavailable',
       );
     }
   }

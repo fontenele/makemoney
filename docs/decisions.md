@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## M10.179 — Publish reconciliation readiness, not reconciled quantities
+
+M10.116 intentionally produces an internal exact balance snapshot for future resource-risk consumers, but an operator readiness route does not need to duplicate the holdings surfaces already available elsewhere. M10.179 therefore registers the full latest-selection and freshness chain while sanitizing its public projection to reconciliation identity, fingerprint, timing, coverage, blockers, and authority flags. Wallet address and BNB/USDT/BTCB quantities remain internal.
+
+The request chooses only the initialization identity and a bounded maximum age. Server time is authoritative, and age is measured from the authenticated wallet observation rather than reconciliation preparation or database recording. The newest row is selected deterministically; corruption cannot silently fall back to older evidence. A stale result tells the operator that a separate M10.178 provider read is required, but cannot invoke it automatically.
+
+This provider-free boundary makes durable equality evidence consumable without conflating visibility with financial authority. Readiness remains insufficient for reservation, Risk Engine approval, quote, submission, strategy execution, ledger mutation, or retry.
+
 ## M10.178 — Reconcile current wallet truth before using bootstrapped accounting
 
 The M10.176 exceptional origin is truthful about the point-in-time ledger it created, but it is not perpetual evidence that the external wallet still equals local accounting. Activation work must not consume that ledger merely because three rows exist. M10.178 therefore makes the existing authenticated wallet/ledger reconciliation chain operational before any Risk Engine bridge or strategy execution authority is considered.

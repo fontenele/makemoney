@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-28 — M10.179 provider-free reconciliation readiness
+
+### Added
+
+- Bearer-protected `POST /real-trading/accounting-ledger-reconciliation-readiness` with canonical initialization identity and bounded maximum evidence age.
+- Runtime composition of deterministic latest reconciliation selection, authenticated-observation freshness, and exact reconciled-balance projection.
+- Focused coverage for fresh, absent, malformed-request, and malformed-dependency behavior plus HTTP authentication and pre-access validation.
+
+### Safety
+
+- The readiness action reads PostgreSQL only and cannot call Agentic Wallet or trigger M10.178.
+- Public output omits wallet address and every BNB/USDT/BTCB quantity.
+- No quote, reservation, submission, strategy authority, retry, order, accounting mutation, or financial transaction was added.
+- Passed 2,970 backend tests, 150 PostgreSQL E2E tests with all 50 migrations from scratch, 117 dashboard tests, formatting, lint, backend/dashboard builds, Compose validation, and whitespace checks.
+
 ## 2026-10-28 — M10.178 guarded current-ledger reconciliation
 
 ### Added
