@@ -146,140 +146,158 @@ describe('loadDashboard', () => {
                       quantity: '0.001',
                     },
                   ]
-                : path.includes('/new-listings')
-                  ? [
-                      {
-                        provider: 'binance',
-                        symbol: 'NEWUSDT',
-                        detectedAt: '2026-09-26T12:00:00.000Z',
+                : path.endsWith('/new-listings/scanner-status')
+                  ? {
+                      state: 'waiting_for_activation',
+                      monitoredSymbolCount: 770,
+                      configuredPollIntervalMs: 1000,
+                      effectivePollIntervalMs: 1000,
+                      lastAttemptAt: '2026-10-27T12:00:00.000Z',
+                      lastSuccessfulObservationAt: '2026-10-27T12:00:04.000Z',
+                      nextAttemptAt: '2026-10-27T12:00:05.000Z',
+                      consecutiveFailures: 0,
+                      lastFailureCode: null,
+                      requestWeight: {
+                        usedWeight: 20,
+                        limit: 6000,
+                        intervalMs: 60000,
+                        observedAt: '2026-10-27T12:00:04.000Z',
                       },
-                    ]
-                  : path.includes('/backtesting/runs')
+                    }
+                  : path.includes('/new-listings')
                     ? [
                         {
-                          id: 'run-1',
-                          createdAt: '2026-09-26T12:00:00.000Z',
+                          provider: 'binance',
+                          symbol: 'NEWUSDT',
+                          detectedAt: '2026-09-26T12:00:00.000Z',
                         },
                       ]
-                    : path.endsWith('/real-trading/status')
-                      ? {
-                          scope: 'real_trading_local_status',
-                          tradingMode: 'paper',
-                          realExecutionEnabled: false,
-                          runtimeExecutionAvailable: false,
-                          quoteAuthorized: false,
-                          submissionAuthorized: false,
-                        }
-                      : path.endsWith('/real-trading/funding-valuation')
+                    : path.includes('/backtesting/runs')
+                      ? [
+                          {
+                            id: 'run-1',
+                            createdAt: '2026-09-26T12:00:00.000Z',
+                          },
+                        ]
+                      : path.endsWith('/real-trading/status')
                         ? {
-                            scope: 'agentic_wallet_funding_valuation',
-                            status: 'available',
-                            blockers: [],
-                            balanceObservedAt: '2026-10-22T03:00:00.000Z',
-                            pricesObservedAt: '2026-10-22T03:00:01.000Z',
-                            balance: {
-                              quantityBnb: '0.00975323',
-                              quantityUsdt: null,
-                              valueUsdt: '7.2387497737',
-                              valueBrl: '36.51587323342965',
-                              usdtValueBrl: null,
-                              totalValueUsdt: null,
-                              totalValueBrl: null,
-                            },
-                            prices: {
-                              provider: 'binance',
-                              bnbUsdt: '742.19',
-                              usdtBrl: '5.0445',
-                            },
-                            refreshMode: 'initial_and_manual',
-                            valuationOnly: true,
-                            fundingAuthorized: false,
+                            scope: 'real_trading_local_status',
+                            tradingMode: 'paper',
+                            realExecutionEnabled: false,
+                            runtimeExecutionAvailable: false,
                             quoteAuthorized: false,
                             submissionAuthorized: false,
                           }
-                        : path.endsWith('/polymarket/settings')
+                        : path.endsWith('/real-trading/funding-valuation')
                           ? {
-                              enabled: true,
-                              startupDefault: false,
-                              source: 'startup',
-                              changedAt: null,
+                              scope: 'agentic_wallet_funding_valuation',
+                              status: 'available',
+                              blockers: [],
+                              balanceObservedAt: '2026-10-22T03:00:00.000Z',
+                              pricesObservedAt: '2026-10-22T03:00:01.000Z',
+                              balance: {
+                                quantityBnb: '0.00975323',
+                                quantityUsdt: null,
+                                valueUsdt: '7.2387497737',
+                                valueBrl: '36.51587323342965',
+                                usdtValueBrl: null,
+                                totalValueUsdt: null,
+                                totalValueBrl: null,
+                              },
+                              prices: {
+                                provider: 'binance',
+                                bnbUsdt: '742.19',
+                                usdtBrl: '5.0445',
+                              },
+                              refreshMode: 'initial_and_manual',
+                              valuationOnly: true,
+                              fundingAuthorized: false,
+                              quoteAuthorized: false,
+                              submissionAuthorized: false,
                             }
-                          : path.endsWith('/polymarket/open-interest')
+                          : path.endsWith('/polymarket/settings')
                             ? {
-                                provider: 'polymarket',
-                                openInterestUsdc: '1234567.89',
-                                source: 'data-api-open-interest',
-                                receivedAt: '2026-09-29T18:00:01.000Z',
-                                executable: false,
+                                enabled: true,
+                                startupDefault: false,
+                                source: 'startup',
+                                changedAt: null,
                               }
-                            : path.includes('/polymarket/events')
+                            : path.endsWith('/polymarket/open-interest')
                               ? {
-                                  events: [
-                                    {
-                                      provider: 'polymarket',
-                                      id: '84',
-                                      title: '2028 Democratic nominee',
-                                      active: true,
-                                      closed: false,
-                                      archived: false,
-                                      restricted: false,
-                                    },
-                                  ],
-                                  nextCursor: null,
+                                  provider: 'polymarket',
+                                  openInterestUsdc: '1234567.89',
+                                  source: 'data-api-open-interest',
                                   receivedAt: '2026-09-29T18:00:01.000Z',
+                                  executable: false,
                                 }
-                              : path.includes('/polymarket/markets')
+                              : path.includes('/polymarket/events')
                                 ? {
-                                    markets: [
+                                    events: [
                                       {
                                         provider: 'polymarket',
-                                        id: '42',
-                                        question:
-                                          'Will this market resolve YES?',
+                                        id: '84',
+                                        title: '2028 Democratic nominee',
+                                        active: true,
                                         closed: false,
+                                        archived: false,
+                                        restricted: false,
                                       },
                                     ],
                                     nextCursor: null,
+                                    receivedAt: '2026-09-29T18:00:01.000Z',
                                   }
-                                : path.endsWith('/polymarket/data-freshness')
+                                : path.includes('/polymarket/markets')
                                   ? {
-                                      provider: 'polymarket',
-                                      snapshotAgeSeconds: 3,
-                                      computedAt: '2026-09-29T18:00:00.000Z',
-                                      ingestion: {
-                                        chainId: 137,
-                                        cursorCount: 4,
-                                        lagging: [],
-                                        maxSyncedBlock: 100,
-                                        minSyncedBlock: 98,
-                                        mostLagged: {
-                                          behindMax: 2,
-                                          block: 98,
-                                          source: 'positions',
+                                      markets: [
+                                        {
+                                          provider: 'polymarket',
+                                          id: '42',
+                                          question:
+                                            'Will this market resolve YES?',
+                                          closed: false,
                                         },
-                                        network: 'polygon',
-                                      },
-                                      serving: {
-                                        mechanisms: [],
-                                        lagSeconds: 5,
-                                        worst: 'trades',
-                                      },
-                                      source: 'data-api-status',
-                                      receivedAt: '2026-09-29T18:00:01.000Z',
+                                      ],
+                                      nextCursor: null,
                                     }
-                                  : [
-                                      {
-                                        strategy: 'moving_average_crossover',
-                                        symbol: 'BTC/USDT',
-                                        action: 'hold',
-                                      },
-                                    ];
+                                  : path.endsWith('/polymarket/data-freshness')
+                                    ? {
+                                        provider: 'polymarket',
+                                        snapshotAgeSeconds: 3,
+                                        computedAt: '2026-09-29T18:00:00.000Z',
+                                        ingestion: {
+                                          chainId: 137,
+                                          cursorCount: 4,
+                                          lagging: [],
+                                          maxSyncedBlock: 100,
+                                          minSyncedBlock: 98,
+                                          mostLagged: {
+                                            behindMax: 2,
+                                            block: 98,
+                                            source: 'positions',
+                                          },
+                                          network: 'polygon',
+                                        },
+                                        serving: {
+                                          mechanisms: [],
+                                          lagSeconds: 5,
+                                          worst: 'trades',
+                                        },
+                                        source: 'data-api-status',
+                                        receivedAt: '2026-09-29T18:00:01.000Z',
+                                      }
+                                    : [
+                                        {
+                                          strategy: 'moving_average_crossover',
+                                          symbol: 'BTC/USDT',
+                                          action: 'hold',
+                                        },
+                                      ];
       return Promise.resolve(Response.json(body));
     });
 
     const snapshot = await loadDashboard(request);
 
-    expect(request).toHaveBeenCalledTimes(14);
+    expect(request).toHaveBeenCalledTimes(15);
     expect(
       request.mock.calls.some(([input]) =>
         input.toString().endsWith('/real-trading/funding-valuation'),
@@ -299,6 +317,14 @@ describe('loadDashboard', () => {
     expect(snapshot.newListings).toMatchObject({
       status: 'available',
       data: [{ provider: 'binance', symbol: 'NEWUSDT' }],
+    });
+    expect(snapshot.newListingsScanner).toMatchObject({
+      status: 'available',
+      data: {
+        state: 'waiting_for_activation',
+        monitoredSymbolCount: 770,
+        requestWeight: { usedWeight: 20, limit: 6000 },
+      },
     });
     expect(snapshot.strategySignals).toMatchObject({
       status: 'available',
@@ -371,7 +397,7 @@ describe('loadDashboard', () => {
 
     const snapshot = await loadDashboard(request);
 
-    expect(request).toHaveBeenCalledTimes(10);
+    expect(request).toHaveBeenCalledTimes(11);
     expect(
       request.mock.calls.some(([input]) =>
         input.toString().includes('/polymarket/open-interest'),

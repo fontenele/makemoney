@@ -805,6 +805,53 @@ h1 em {
   scroll-margin-top: 24px;
 }
 
+.listing-scanner-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--panel) 88%, var(--accent));
+}
+
+.listing-scanner-status.degraded {
+  border-color: var(--warning);
+}
+
+.listing-scanner-status > div {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.listing-scanner-status dl {
+  display: flex;
+  gap: 1.25rem;
+  margin: 0;
+}
+
+.listing-scanner-status dl div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.listing-scanner-status dt,
+.listing-scanner-status small {
+  color: var(--muted);
+}
+
+.listing-scanner-status dd {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .listing-scanner-status,
+  .listing-scanner-status dl {
+    flex-direction: column;
+  }
+}
+
 .polymarket-panel {
   min-height: 0;
   margin-bottom: 20px;

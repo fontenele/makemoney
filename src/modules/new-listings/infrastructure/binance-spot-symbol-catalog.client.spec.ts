@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { SpotSymbolCatalogRateLimitError } from '../domain/spot-symbol-catalog';
 import { BinanceSpotSymbolCatalogClient } from './binance-spot-symbol-catalog.client';
 
 describe('BinanceSpotSymbolCatalogClient', () => {
@@ -93,13 +94,80 @@ describe('BinanceSpotSymbolCatalogClient', () => {
     expect(http.mock.calls[0]?.[1]?.signal).toBeInstanceOf(AbortSignal);
   });
 
+  it('records the current minute request weight and published limit', async () => {
+    const http = jest
+      .fn<(input: string, init?: RequestInit) => Promise<Response>>()
+      .mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            rateLimits: [
+              {
+                rateLimitType: 'REQUEST_WEIGHT',
+                interval: 'MINUTE',
+                intervalNum: 1,
+                limit: 6000,
+              },
+            ],
+            symbols: [symbol('BTCUSDT', 'BTC')],
+          }),
+          { headers: { 'x-mbx-used-weight-1m': '42' } },
+        ),
+      );
+
+    await expect(
+      new BinanceSpotSymbolCatalogClient(
+        'https://example.com',
+        http,
+        () => receivedAt,
+      ).load(),
+    ).resolves.toMatchObject({
+      requestWeight: {
+        usedWeight: 42,
+        limit: 6000,
+        intervalMs: 60_000,
+        observedAt: receivedAt,
+      },
+    });
+  });
+
+  it('preserves used request weight when the provider omits its limit', async () => {
+    const http = jest
+      .fn<(input: string, init?: RequestInit) => Promise<Response>>()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ symbols: [] }), {
+          headers: { 'x-mbx-used-weight-1m': '7' },
+        }),
+      );
+
+    await expect(
+      new BinanceSpotSymbolCatalogClient('https://example.com', http).load(),
+    ).resolves.toMatchObject({
+      requestWeight: { usedWeight: 7, limit: null, intervalMs: null },
+    });
+  });
+
+  it('reports provider throttling with Retry-After', async () => {
+    const http = jest
+      .fn<(input: string, init?: RequestInit) => Promise<Response>>()
+      .mockResolvedValue(
+        new Response(null, {
+          status: 429,
+          headers: { 'retry-after': '12' },
+        }),
+      );
+
+    await expect(
+      new BinanceSpotSymbolCatalogClient('https://example.com', http).load(),
+    ).rejects.toEqual(new SpotSymbolCatalogRateLimitError(429, 12_000));
+  });
+
   it('rejects non-success responses', async () => {
     const http = jest
       .fn<(input: string, init?: RequestInit) => Promise<Response>>()
       .mockResolvedValue(new Response(null, { status: 429 }));
     await expect(
       new BinanceSpotSymbolCatalogClient('https://example.com', http).load(),
-    ).rejects.toThrow('429');
+    ).rejects.toBeInstanceOf(SpotSymbolCatalogRateLimitError);
   });
 });
 

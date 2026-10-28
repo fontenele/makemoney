@@ -10,6 +10,7 @@ import {
 import { BinanceSpotSymbolCatalogClient } from './infrastructure/binance-spot-symbol-catalog.client';
 import { PrismaSpotSymbolRepository } from './infrastructure/prisma-spot-symbol.repository';
 import { NewListingsController } from './presentation/new-listings.controller';
+import { NewListingsScannerController } from './presentation/new-listings-scanner.controller';
 import { DueListingObservationCheckpointService } from './application/due-listing-observation-checkpoint.service';
 import {
   LISTING_OBSERVATION_CHECKPOINT_WORKER_OPTIONS,
@@ -34,7 +35,7 @@ import { LISTING_TOP_OF_BOOK_OBSERVATION_REPOSITORY } from './domain/listing-top
 import { PrismaListingTopOfBookObservationRepository } from './infrastructure/prisma-listing-top-of-book-observation.repository';
 
 @Module({
-  controllers: [NewListingsController],
+  controllers: [NewListingsController, NewListingsScannerController],
   providers: [
     {
       provide: SPOT_SYMBOL_CATALOG_PROVIDER,

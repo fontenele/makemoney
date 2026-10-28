@@ -41,10 +41,12 @@ export class ListingObservationCheckpointWorker
   private async runCycle(): Promise<void> {
     try {
       const result = await this.cycle.runOnce(this.processor);
-      this.logger.log({
-        event: 'new_listings.checkpoint_cycle_completed',
-        ...result,
-      });
+      if (result.claimed > 0) {
+        this.logger.log({
+          event: 'new_listings.checkpoint_cycle_completed',
+          ...result,
+        });
+      }
     } catch (error: unknown) {
       this.logger.error(
         'Failed to run new-listing observation checkpoint cycle',

@@ -83,6 +83,24 @@ export interface DetectedSpotSymbol {
   lastObservedAt: string;
 }
 
+export interface NewListingsScannerStatus {
+  state: 'starting' | 'waiting_for_activation' | 'degraded';
+  monitoredSymbolCount: number;
+  configuredPollIntervalMs: number;
+  effectivePollIntervalMs: number | null;
+  lastAttemptAt: string | null;
+  lastSuccessfulObservationAt: string | null;
+  nextAttemptAt: string | null;
+  consecutiveFailures: number;
+  lastFailureCode: 'provider_rate_limited' | 'catalog_load_failed' | null;
+  requestWeight: {
+    usedWeight: number;
+    limit: number | null;
+    intervalMs: number | null;
+    observedAt: string;
+  } | null;
+}
+
 export interface ListingPerformancePoint {
   label: string;
   offsetMs: number;
@@ -763,6 +781,7 @@ export interface DashboardSnapshot {
   performance: Resource<PaperTradingPerformance>;
   executions: Resource<PaperExecution[]>;
   newListings: Resource<DetectedSpotSymbol[]>;
+  newListingsScanner: Resource<NewListingsScannerStatus>;
   strategySignals: Resource<StrategySignal[]>;
   backtestRuns: Resource<StoredBacktestRun[]>;
   realTradingStatus: Resource<RealTradingStatus>;
@@ -814,6 +833,7 @@ export async function loadDashboard(
     performance,
     executions,
     newListings,
+    newListingsScanner,
     strategySignals,
     backtestRuns,
     realTradingStatus,
@@ -837,6 +857,10 @@ export async function loadDashboard(
     ),
     loadResource<DetectedSpotSymbol[]>(
       dashboardApiPath('/new-listings?limit=8'),
+      request,
+    ),
+    loadResource<NewListingsScannerStatus>(
+      dashboardApiPath('/new-listings/scanner-status'),
       request,
     ),
     loadResource<StrategySignal[]>(
@@ -870,6 +894,7 @@ export async function loadDashboard(
     performance,
     executions,
     newListings,
+    newListingsScanner,
     strategySignals,
     backtestRuns,
     realTradingStatus,

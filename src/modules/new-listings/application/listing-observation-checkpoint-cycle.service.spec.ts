@@ -39,6 +39,8 @@ describe('ListingObservationCheckpointCycleService', () => {
       completed: 2,
       failed: 0,
       lostLease: 0,
+      maximumClaimLagMs: 0,
+      maximumCompletionLagMs: 0,
     });
     expect(claimDue).toHaveBeenCalledWith({
       dueAt: claimedAt,
@@ -100,6 +102,8 @@ describe('ListingObservationCheckpointCycleService', () => {
       completed: 1,
       failed: 1,
       lostLease: 1,
+      maximumClaimLagMs: 0,
+      maximumCompletionLagMs: 0,
     });
     expect(completeClaimedWithTopOfBook).toHaveBeenCalledTimes(2);
     expect(completeClaimedWithTopOfBook).toHaveBeenNthCalledWith(1, {
@@ -137,18 +141,56 @@ describe('ListingObservationCheckpointCycleService', () => {
       completed: 0,
       failed: 0,
       lostLease: 0,
+      maximumClaimLagMs: null,
+      maximumCompletionLagMs: null,
     });
     expect(process).not.toHaveBeenCalled();
   });
+
+  it('reports maximum claim and durable completion lag from checkpoint targets', async () => {
+    const earlierTarget = new Date(claimedAt.getTime() - 4_500);
+    const completedAt = new Date(claimedAt.getTime() + 250);
+    const clock = jest
+      .fn<() => Date>()
+      .mockReturnValueOnce(claimedAt)
+      .mockReturnValueOnce(completedAt);
+    const service = new ListingObservationCheckpointCycleService(
+      {
+        claimDue: jest.fn(() =>
+          Promise.resolve([checkpoint('AUSDT', earlierTarget)]),
+        ),
+        completeClaimedWithTopOfBook: jest.fn(() => Promise.resolve(true)),
+      } as never,
+      options,
+      clock,
+      () => 'cycle-4',
+    );
+
+    await expect(
+      service.runOnce({
+        process: () => Promise.resolve(sampleProcessed('AUSDT')),
+      }),
+    ).resolves.toEqual({
+      claimed: 1,
+      completed: 1,
+      failed: 0,
+      lostLease: 0,
+      maximumClaimLagMs: 4_500,
+      maximumCompletionLagMs: 4_750,
+    });
+  });
 });
 
-function checkpoint(symbol: string): ClaimedListingObservationCheckpoint {
+function checkpoint(
+  symbol: string,
+  targetAt: Date = claimedAt,
+): ClaimedListingObservationCheckpoint {
   return {
     provider: 'binance',
     symbol,
     label: 'T+0',
     offsetMs: 0,
-    targetAt: claimedAt,
+    targetAt,
     claimToken: 'cycle-1',
     claimedAt,
     claimExpiresAt,

@@ -1,5 +1,19 @@
 # Current State
 
+M7.113 is complete. Binance Spot catalog responses now retain the current one-minute request weight and published limit. The sequential scanner uses its one-second configured quiet period while complete budget evidence remains below 80%, falls back to five seconds when the budget cannot be verified, waits a complete published interval near exhaustion, and honors provider `Retry-After` on typed `429`/`418` throttling. Ordinary failures remain sanitized and retry without overlapping requests.
+
+`GET /new-listings/scanner-status` now distinguishes startup, healthy waiting, and degraded retry state without initiating collection. It reports monitored-symbol count, configured/effective cadence, attempt/success/next timestamps, consecutive failures, sanitized failure code, and current request-weight evidence. The New Listings dashboard displays the same health panel above the cohort and explains that baseline identities are intentionally excluded.
+
+Post-M7.113 validation passes all 2,934 backend tests across 264 suites, all 145 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, all 117 dashboard tests across 20 files, formatting, lint, Prisma and Compose validation, and backend/dashboard builds. The restarted host runtime reports `waiting_for_activation`, 770 monitored Spot/USDT symbols, configured/effective 1,000 ms quiet periods, zero consecutive failures, and live request weight 42 of 6,000. Health, direct paper valuation, Vite-proxy paper valuation, direct scanner status, and proxy scanner status all return HTTP 200. The detection cohort remains honestly `[]` because no post-baseline first-tradeable activation has occurred.
+
+M7.112 is complete. Binance Spot catalog attempts now run on a five-second completion-relative cadence instead of 60 seconds. The service still performs at most one catalog request and persistence attempt at a time; a slow or failed attempt delays the next timer rather than creating overlap. This is a sampling cadence, not a promise that provider activation will be observed within an absolute wall-clock deadline.
+
+Catalog persistence no longer issues one upsert per each of the 770 symbols. One bounded bulk update advances freshness only for identities present in the current snapshot, one bulk insert creates genuinely new rows, and individual updates are reserved for changed or newly activated state. Omitted identities retain their prior `lastObservedAt`, preserving truthful per-symbol freshness while removing hundreds of redundant statements from every unchanged cycle.
+
+The opt-in checkpoint worker now defaults to a one-second completion-relative cadence, retains its 25-row batch and 30-second lease, processes claimed rows sequentially, and schedules the next cycle only after the prior one settles. Active-cycle telemetry reports `maximumClaimLagMs` and `maximumCompletionLagMs` relative to checkpoint targets. Empty cycles remain silent, while failures remain visible. New installations still default collection to disabled; this local runtime explicitly enables the one-second worker.
+
+Post-M7.112 validation passes all 2,926 backend tests across 263 suites, all 144 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, all 117 dashboard tests across 20 files, formatting, lint, Prisma and Compose validation, and backend/dashboard builds. After restarting only the project API, health plus direct and Vite-proxy paper valuation returned HTTP 200. Consecutive database timestamps measured effective full catalog intervals of 9,228 ms and 9,180 ms, improved from the pre-bulk-write samples of 11,807 ms and 10,814 ms; all 770 legacy symbols remain untracked and undetected.
+
 M7.111 is complete. The empty New Listings view was traced to truthful but incomplete detection semantics: the 770 current Binance Spot/USDT symbols all entered together as the startup baseline, and the repository detected only a later-absent identity. That could miss a launch announced in `BREAK` before it became tradeable.
 
 Every symbol first seen after an established baseline now receives durable activation-tracking provenance. If it is already `TRADING` with Spot trading allowed, it is detected immediately; otherwise it is detected exactly once on the first later catalog where both conditions become true. Detection and the nine existing observation checkpoints are created atomically. The 770 legacy baseline rows remain deliberately untracked, so current `GET /new-listings` may remain honestly empty until Binance introduces or activates a post-baseline symbol; no historical launch time is fabricated.
@@ -1101,7 +1115,7 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - M7.1 loads a strictly validated, deterministically ordered public Binance Spot/USDT symbol catalog at startup and retains it in memory as a provider-neutral baseline.
 - M7.2 persists immutable first-observation time and mutable latest provider state for each provider/symbol identity.
 - M7.3 detects only symbols absent from an established durable baseline and retains the latest detection result in memory.
-- M7.4 polls without overlapping requests using `NEW_LISTINGS_POLL_INTERVAL_MS`, which defaults to 60 seconds and cannot be configured below five seconds.
+- M7.4 polls without overlapping requests using `NEW_LISTINGS_POLL_INTERVAL_MS`; M7.113 changes the validated minimum and current default to one second, but only uses it with complete provider-budget headroom and otherwise applies conservative adaptive delay.
 - M7.5 records `detectedAt` only when a symbol is first observed after an established provider baseline; later refreshes cannot rewrite it.
 - M7.6 exposes detected symbols newest first at `GET /new-listings`, with optional `limit=1..100` and a default of 50.
 - M7.7 adds validated optional `detectedFrom` and `detectedTo` filters and rejects inverted ranges before querying PostgreSQL.
@@ -1115,7 +1129,7 @@ M0 through M8 are complete. The read-only local dashboard provides independent p
 - M7.15 prevents invalid or unbounded due reads before PostgreSQL access.
 - M7.16 uses a durable token and expiry with PostgreSQL `FOR UPDATE SKIP LOCKED` to claim due work without overlapping active consumers.
 - M7.17 validates completion identity and atomically requires matching ownership, an active lease interval, and incomplete state before recording `completedAt`.
-- M7.18 defaults the inactive future worker to a 5-second interval, 25-row batch, and 30-second lease, with strict startup bounds.
+- M7.18 introduced bounded worker options; M7.112 changes the current opt-in worker default to a 1-second interval while retaining the 25-row batch, 30-second lease, and strict startup bounds.
 - M7.19 isolates processor failures, completes only successful active claims, and has no timer or production processor, so it performs no live background work.
 - M7.20 exposes only an internal observation/provider contract; no Binance market-snapshot client, persistence, production processor, or worker timer exists yet.
 - M7.21 registers the public Binance observation adapter with a ten-second timeout and cancellation support, but nothing invokes it automatically and no observation persistence exists yet.

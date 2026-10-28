@@ -1,5 +1,23 @@
 # Technical Decisions
 
+## M7.113 — Tighten launch polling only under observable provider budget
+
+The scanner now reads Binance's `X-MBX-USED-WEIGHT-1M` response header together with the published one-minute request-weight limit. When both are valid and usage remains below 80%, the configured completion-relative quiet period can be one second. At or above 80%, the next attempt waits at least the complete published interval. If the budget cannot be verified, the service retains a five-second fallback instead of assuming capacity.
+
+Provider `429` and `418` responses are typed separately from ordinary catalog failures and honor a valid `Retry-After` duration; absent or malformed backoff evidence uses a conservative 60-second fallback. Attempts remain sequential and non-overlapping.
+
+An empty detection cohort is not treated as scanner failure. A separate read-only status resource exposes sanitized state, monitored-symbol count, timing, consecutive failures, and request-weight evidence. The dashboard uses it to distinguish a healthy scanner waiting for a future activation from startup or provider degradation. Existing baseline identities remain excluded, and this observability grants no signal or order authority.
+
+## M7.112 — Prefer bounded completion-relative rapid polling before event-stream expansion
+
+The corrected activation rule still inherited up to 60 seconds of configured quiet time before the next catalog attempt, followed by up to five seconds before a due T+0 checkpoint cycle. M7.112 uses the already validated lower bounds—five seconds for the full catalog and one second for the opt-in checkpoint worker—before introducing another Binance transport or speculative event source.
+
+Both loops remain recursive and completion-relative, so latency, failure, or throttling cannot accumulate overlapping calls. Checkpoint work remains batch- and lease-bounded and disabled by default for new installations. Because configuration alone does not prove achieved timing, active cycles emit maximum target-to-claim and target-to-durable-completion lag; empty one-second cycles are silent. This improves observable research capture only and grants no strategy or order authority.
+
+The first live measurement exposed persistence rather than timer overlap as the remaining cadence cost: every unchanged catalog still executed hundreds of upserts. The repository now updates `lastObservedAt` once for the bounded set of identities actually present, bulk-inserts new identities, and writes mutable state individually only when it changed or activated. It deliberately does not update rows absent from the snapshot, because provider omission must not become fabricated freshness.
+
+The quiet period is not lowered below five seconds yet. Binance's official Spot REST guidance requires consumers to monitor IP request-weight headers, stop on `429`, honor `Retry-After`, and avoid repeated violations that can cause `418` bans. The current catalog adapter validates status and payload but does not yet retain those headers or implement explicit rate-limit backoff. M7.113 must add that evidence before considering a tighter adaptive cadence or a separate public stream trigger.
+
 ## M7.111 — A listing detection is a forward-tracked first tradeable activation
 
 Catalog identity discovery and actual trading activation are different events. A provider can publish a symbol in `BREAK` before orders are permitted, so treating only a previously absent identity as the launch can miss the economically relevant transition. M7.111 durably arms only identities first seen after a valid baseline and sets `detectedAt` on their first observation with both `status=TRADING` and Spot trading allowed.

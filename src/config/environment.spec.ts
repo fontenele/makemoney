@@ -289,9 +289,9 @@ describe('validateEnvironment strategy periods', () => {
 });
 
 describe('validateEnvironment new-listing polling', () => {
-  it('uses a one-minute default', () => {
+  it('uses the bounded rapid-detection default', () => {
     expect(validateEnvironment(required)).toMatchObject({
-      NEW_LISTINGS_POLL_INTERVAL_MS: 60000,
+      NEW_LISTINGS_POLL_INTERVAL_MS: 1000,
     });
   });
 
@@ -299,12 +299,12 @@ describe('validateEnvironment new-listing polling', () => {
     expect(
       validateEnvironment({
         ...required,
-        NEW_LISTINGS_POLL_INTERVAL_MS: '5000',
+        NEW_LISTINGS_POLL_INTERVAL_MS: '1000',
       }),
-    ).toMatchObject({ NEW_LISTINGS_POLL_INTERVAL_MS: 5000 });
+    ).toMatchObject({ NEW_LISTINGS_POLL_INTERVAL_MS: 1000 });
   });
 
-  it.each([0, 4999, 5000.5])('rejects invalid interval %s', (interval) => {
+  it.each([0, 999, 1000.5])('rejects invalid interval %s', (interval) => {
     expect(() =>
       validateEnvironment({
         ...required,
@@ -318,7 +318,7 @@ describe('validateEnvironment new-listing checkpoint worker', () => {
   it('uses bounded operational defaults', () => {
     expect(validateEnvironment(required)).toMatchObject({
       NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED: false,
-      NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: 5000,
+      NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: 1000,
       NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: 25,
       NEW_LISTINGS_CHECKPOINT_LEASE_DURATION_MS: 30000,
     });

@@ -76,16 +76,13 @@ const environmentSchema = Joi.object<Environment>({
   POLYMARKET_DATA_BASE_URL: Joi.string()
     .uri({ scheme: ['https'] })
     .default('https://data-api.polymarket.com'),
-  NEW_LISTINGS_POLL_INTERVAL_MS: Joi.number()
-    .integer()
-    .min(5000)
-    .default(60000),
+  NEW_LISTINGS_POLL_INTERVAL_MS: Joi.number().integer().min(1000).default(1000),
   NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED: Joi.boolean().default(false),
   NEW_LISTINGS_CHECKPOINT_WORKER_INTERVAL_MS: Joi.number()
     .integer()
     .min(1000)
     .max(60000)
-    .default(5000),
+    .default(1000),
   NEW_LISTINGS_CHECKPOINT_WORKER_BATCH_SIZE: Joi.number()
     .integer()
     .min(1)

@@ -29,14 +29,14 @@ describe('ListingObservationCheckpointWorker', () => {
     const worker = createWorker(runOnce, true);
 
     worker.onModuleInit();
-    await jest.advanceTimersByTimeAsync(5_000);
+    await jest.advanceTimersByTimeAsync(1_000);
     expect(runOnce).toHaveBeenCalledTimes(1);
     await jest.advanceTimersByTimeAsync(20_000);
     expect(runOnce).toHaveBeenCalledTimes(1);
 
     finishFirst?.(emptyResult);
     await jest.advanceTimersByTimeAsync(0);
-    await jest.advanceTimersByTimeAsync(4_999);
+    await jest.advanceTimersByTimeAsync(999);
     expect(runOnce).toHaveBeenCalledTimes(1);
     await jest.advanceTimersByTimeAsync(1);
     expect(runOnce).toHaveBeenCalledTimes(2);
@@ -53,8 +53,8 @@ describe('ListingObservationCheckpointWorker', () => {
     const worker = createWorker(runOnce, true);
 
     worker.onModuleInit();
-    await jest.advanceTimersByTimeAsync(5_000);
-    await jest.advanceTimersByTimeAsync(5_000);
+    await jest.advanceTimersByTimeAsync(1_000);
+    await jest.advanceTimersByTimeAsync(1_000);
     expect(runOnce).toHaveBeenCalledTimes(2);
 
     await worker.onModuleDestroy();
@@ -67,13 +67,20 @@ describe('ListingObservationCheckpointWorker', () => {
 
     worker.onModuleInit();
     await worker.onModuleDestroy();
-    await jest.advanceTimersByTimeAsync(5_000);
+    await jest.advanceTimersByTimeAsync(1_000);
 
     expect(runOnce).not.toHaveBeenCalled();
   });
 });
 
-const emptyResult = { claimed: 0, completed: 0, failed: 0, lostLease: 0 };
+const emptyResult = {
+  claimed: 0,
+  completed: 0,
+  failed: 0,
+  lostLease: 0,
+  maximumClaimLagMs: null,
+  maximumCompletionLagMs: null,
+};
 
 function createWorker(
   runOnce: jest.Mock<() => Promise<typeof emptyResult>>,
@@ -82,6 +89,6 @@ function createWorker(
   return new ListingObservationCheckpointWorker(
     { runOnce } as never,
     {} as never,
-    { enabled, intervalMs: 5_000, batchSize: 25, leaseDurationMs: 30_000 },
+    { enabled, intervalMs: 1_000, batchSize: 25, leaseDurationMs: 30_000 },
   );
 }

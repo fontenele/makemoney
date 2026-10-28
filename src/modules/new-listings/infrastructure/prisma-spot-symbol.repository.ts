@@ -37,6 +37,10 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
           where: { provider },
           select: {
             symbol: true,
+            baseAsset: true,
+            quoteAsset: true,
+            status: true,
+            spotTradingAllowed: true,
             activationTrackingStartedAt: true,
             detectedAt: true,
           },
@@ -61,18 +65,38 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
         const newlyActivatedSymbols = new Set(
           newlyActivated.map(({ symbol }) => symbol),
         );
+        const newlyObserved = catalog.symbols.filter(
+          ({ symbol }) => !observedBySymbol.has(symbol),
+        );
+        const existingObserved = catalog.symbols.filter(({ symbol }) =>
+          observedBySymbol.has(symbol),
+        );
+        const changedExisting = existingObserved.filter((symbol) => {
+          const previous = observedBySymbol.get(symbol.symbol)!;
+          return (
+            newlyActivatedSymbols.has(symbol.symbol) ||
+            previous.baseAsset !== symbol.baseAsset ||
+            previous.quoteAsset !== symbol.quoteAsset ||
+            previous.status !== symbol.status ||
+            previous.spotTradingAllowed !== symbol.spotTradingAllowed
+          );
+        });
 
-        await Promise.all(
-          catalog.symbols.map((symbol) => {
-            const activated = newlyActivatedSymbols.has(symbol.symbol);
-            return tx.observedSpotSymbol.upsert({
-              where: {
-                provider_symbol: {
-                  provider: symbol.provider,
-                  symbol: symbol.symbol,
-                },
-              },
-              create: {
+        if (existingObserved.length > 0) {
+          await tx.observedSpotSymbol.updateMany({
+            where: {
+              provider,
+              symbol: { in: existingObserved.map(({ symbol }) => symbol) },
+            },
+            data: { lastObservedAt: catalog.receivedAt },
+          });
+        }
+
+        if (newlyObserved.length > 0) {
+          await tx.observedSpotSymbol.createMany({
+            data: newlyObserved.map((symbol) => {
+              const activated = newlyActivatedSymbols.has(symbol.symbol);
+              return {
                 ...symbol,
                 firstObservedAt: catalog.receivedAt,
                 lastObservedAt: catalog.receivedAt,
@@ -80,13 +104,26 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
                   ? catalog.receivedAt
                   : null,
                 detectedAt: activated ? catalog.receivedAt : null,
+              };
+            }),
+          });
+        }
+
+        await Promise.all(
+          changedExisting.map((symbol) => {
+            const activated = newlyActivatedSymbols.has(symbol.symbol);
+            return tx.observedSpotSymbol.update({
+              where: {
+                provider_symbol: {
+                  provider: symbol.provider,
+                  symbol: symbol.symbol,
+                },
               },
-              update: {
+              data: {
                 baseAsset: symbol.baseAsset,
                 quoteAsset: symbol.quoteAsset,
                 status: symbol.status,
                 spotTradingAllowed: symbol.spotTradingAllowed,
-                lastObservedAt: catalog.receivedAt,
                 ...(activated ? { detectedAt: catalog.receivedAt } : {}),
               },
             });

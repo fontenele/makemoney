@@ -861,6 +861,22 @@ describe('Application (e2e)', () => {
       .expect(200);
   });
 
+  it('/new-listings/scanner-status (GET) exposes scanner readiness without triggering collection', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(server)
+      .get('/new-listings/scanner-status')
+      .expect(200)
+      .expect(({ body }: { body: Record<string, unknown> }) => {
+        expect(body).toMatchObject({
+          state: 'waiting_for_activation',
+          monitoredSymbolCount: 0,
+          consecutiveFailures: 0,
+          lastFailureCode: null,
+          requestWeight: null,
+        });
+      });
+  });
+
   it('/new-listings/performance (GET) validates bounded cohort input', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     await request(server)

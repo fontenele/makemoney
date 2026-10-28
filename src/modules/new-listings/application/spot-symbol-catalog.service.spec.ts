@@ -1,5 +1,8 @@
 import { jest } from '@jest/globals';
-import { SpotSymbolCatalogProvider } from '../domain/spot-symbol-catalog';
+import {
+  SpotSymbolCatalogProvider,
+  SpotSymbolCatalogRateLimitError,
+} from '../domain/spot-symbol-catalog';
 import { SpotSymbolCatalogService } from './spot-symbol-catalog.service';
 
 describe('SpotSymbolCatalogService', () => {
@@ -83,6 +86,149 @@ describe('SpotSymbolCatalogService', () => {
       service.onModuleDestroy();
       await jest.advanceTimersByTimeAsync(5000);
       expect(load).toHaveBeenCalledTimes(2);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('uses the rapid interval when the provider budget has headroom', async () => {
+    jest.useFakeTimers();
+    try {
+      const now = new Date('2026-10-27T12:00:00.000Z');
+      const load = jest.fn<SpotSymbolCatalogProvider['load']>(() =>
+        Promise.resolve({
+          symbols: [],
+          receivedAt: now,
+          requestWeight: {
+            usedWeight: 20,
+            limit: 6000,
+            intervalMs: 60_000,
+            observedAt: now,
+          },
+        }),
+      );
+      const service = new SpotSymbolCatalogService(
+        { load },
+        {
+          observe: jest.fn(() => Promise.resolve([])),
+          listDetected: jest.fn(() => Promise.resolve([])),
+        },
+        1000,
+      );
+
+      service.onModuleInit();
+      await jest.advanceTimersByTimeAsync(0);
+      expect(service.status()).toMatchObject({
+        state: 'waiting_for_activation',
+        monitoredSymbolCount: 0,
+        effectivePollIntervalMs: 1000,
+        consecutiveFailures: 0,
+        requestWeight: { usedWeight: 20, limit: 6000 },
+      });
+      await jest.advanceTimersByTimeAsync(1000);
+      expect(load).toHaveBeenCalledTimes(2);
+      service.onModuleDestroy();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('retains the conservative fallback when request-budget evidence is incomplete', async () => {
+    jest.useFakeTimers();
+    try {
+      const load = jest.fn<SpotSymbolCatalogProvider['load']>(() =>
+        Promise.resolve({ symbols: [], receivedAt: new Date() }),
+      );
+      const service = new SpotSymbolCatalogService(
+        { load },
+        {
+          observe: jest.fn(() => Promise.resolve([])),
+          listDetected: jest.fn(() => Promise.resolve([])),
+        },
+        1000,
+      );
+
+      service.onModuleInit();
+      await jest.advanceTimersByTimeAsync(0);
+      expect(service.status().effectivePollIntervalMs).toBe(5000);
+      await jest.advanceTimersByTimeAsync(4999);
+      expect(load).toHaveBeenCalledTimes(1);
+      await jest.advanceTimersByTimeAsync(1);
+      expect(load).toHaveBeenCalledTimes(2);
+      service.onModuleDestroy();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('waits a complete provider interval when request-weight usage reaches 80 percent', async () => {
+    jest.useFakeTimers();
+    try {
+      const now = new Date('2026-10-27T12:00:00.000Z');
+      const load = jest.fn<SpotSymbolCatalogProvider['load']>(() =>
+        Promise.resolve({
+          symbols: [],
+          receivedAt: now,
+          requestWeight: {
+            usedWeight: 4800,
+            limit: 6000,
+            intervalMs: 60_000,
+            observedAt: now,
+          },
+        }),
+      );
+      const service = new SpotSymbolCatalogService(
+        { load },
+        {
+          observe: jest.fn(() => Promise.resolve([])),
+          listDetected: jest.fn(() => Promise.resolve([])),
+        },
+        1000,
+      );
+
+      service.onModuleInit();
+      await jest.advanceTimersByTimeAsync(0);
+      expect(service.status().effectivePollIntervalMs).toBe(60_000);
+      await jest.advanceTimersByTimeAsync(59_999);
+      expect(load).toHaveBeenCalledTimes(1);
+      await jest.advanceTimersByTimeAsync(1);
+      expect(load).toHaveBeenCalledTimes(2);
+      service.onModuleDestroy();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('backs off for the provider Retry-After duration and reports degradation', async () => {
+    jest.useFakeTimers();
+    try {
+      const now = new Date('2026-10-27T12:00:00.000Z');
+      const load = jest
+        .fn<SpotSymbolCatalogProvider['load']>()
+        .mockRejectedValueOnce(new SpotSymbolCatalogRateLimitError(429, 12_000))
+        .mockResolvedValueOnce({ symbols: [], receivedAt: now });
+      const service = new SpotSymbolCatalogService(
+        { load },
+        {
+          observe: jest.fn(() => Promise.resolve([])),
+          listDetected: jest.fn(() => Promise.resolve([])),
+        },
+        1000,
+      );
+
+      service.onModuleInit();
+      await jest.advanceTimersByTimeAsync(0);
+      expect(service.status()).toMatchObject({
+        state: 'degraded',
+        effectivePollIntervalMs: 12_000,
+        consecutiveFailures: 1,
+        lastFailureCode: 'provider_rate_limited',
+      });
+      await jest.advanceTimersByTimeAsync(11_999);
+      expect(load).toHaveBeenCalledTimes(1);
+      await jest.advanceTimersByTimeAsync(1);
+      expect(load).toHaveBeenCalledTimes(2);
+      service.onModuleDestroy();
     } finally {
       jest.useRealTimers();
     }

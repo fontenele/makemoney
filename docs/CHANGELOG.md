@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-10-27 — M7.113 rate-limit-aware adaptive launch detection and scanner visibility
+
+- Captured Binance's current `X-MBX-USED-WEIGHT-1M` value together with the published one-minute request-weight limit on each successful catalog response.
+- Added typed `429`/`418` throttling with numeric or HTTP-date `Retry-After` handling and a conservative 60-second fallback for missing or malformed evidence.
+- Reduced the validated/configured catalog quiet period to one second only when complete request-budget evidence remains below 80%; retained a five-second unobserved-budget fallback and a full-interval high-usage delay.
+- Preserved completion-relative, sequential, non-overlapping provider and persistence attempts.
+- Added read-only `GET /new-listings/scanner-status` with sanitized readiness, monitored-symbol count, timing, failure, and request-weight evidence; reading status never triggers collection.
+- Added a responsive dashboard scanner-health panel and clarified that an empty cohort means no eligible post-baseline first-tradeable activation, not an unknown scanner condition.
+- Added provider parsing, adaptive scheduling, backoff, controller, HTTP E2E, and dashboard API coverage; synchronized environment, route table, context, decisions, map, plan, roadmap, and subsystem documentation.
+- Passed 2,934 backend tests across 264 suites, 145 PostgreSQL E2E tests across 10 suites and all 50 migrations, 117 dashboard tests across 20 files, formatting, lint, Prisma/Compose validation, and both builds.
+- Restarted the API and dashboard as host processes; verified HTTP 200 for health and direct/proxy paper valuation plus direct/proxy scanner status. Live scanner state is healthy with 770 symbols, 1,000 ms configured/effective delay, zero failures, and observed request weight 42/6,000; the honest detection cohort remains empty.
+- Added no strategy signal, paper order, real order, or financial transaction.
+
+## 2026-10-27 — M7.112 bounded rapid launch detection and collection cadence
+
+- Reduced the completion-relative Binance Spot catalog polling default from 60 seconds to the existing validated five-second floor, retaining one in-flight request maximum and startup cancellation.
+- Reduced the opt-in checkpoint worker default from five seconds to its validated one-second floor while preserving sequential non-overlapping cycles, bounded batches, leases, and failure recovery.
+- Kept the checkpoint worker disabled by default for new installations; the existing local opt-in is now explicit at one second.
+- Added maximum claim-lag and durable completion-lag measurements to every active checkpoint cycle so early-sample timing can be audited rather than inferred from configuration.
+- Replaced 770 per-symbol catalog upserts with one presence-bounded freshness update, one bulk insert for genuinely new identities, and individual writes only for changed or newly activated rows.
+- Added PostgreSQL coverage proving that bulk freshness advances only symbols present in the current snapshot and never marks an absent identity as freshly observed.
+- Suppressed routine log entries for empty one-second worker cycles while preserving structured telemetry whenever due work is actually claimed and error logs on failures.
+- Updated environment examples, validation tests, worker timing tests, cycle telemetry tests, project context, decisions, state, plan, and roadmap.
+- Added no new provider endpoint, WebSocket, signal, paper order, real order, or financial transaction.
+- Passed 2,926 backend tests across 263 suites, 144 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, 117 dashboard tests, formatting, lint, Prisma/Compose validation, and both builds.
+- Restarted only the project API, received HTTP 200 from health plus direct and Vite-proxy paper valuation, and measured final consecutive catalog intervals of 9,228 ms and 9,180 ms including the public request and transaction, down from the pre-optimization 11,807 ms and 10,814 ms samples.
+
 ## 2026-10-27 — M7.111 forward-only first-tradeable listing activation
 
 - Diagnosed the empty New Listings cohort: all 770 durable symbols were one startup baseline, while the scanner only detected identities absent from a later catalog and could miss a pre-announced `BREAK` symbol becoming tradeable.

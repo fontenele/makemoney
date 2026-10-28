@@ -20,7 +20,7 @@ This is application-observation detection, not proof of an exchange listing time
 
 The catalog service loads immediately at startup and schedules the next refresh only after the current load and persistence attempt finishes. This prevents overlapping observations even when Binance or PostgreSQL is slow. Failures preserve the last successful catalog and detection result and still schedule a later retry.
 
-`NEW_LISTINGS_POLL_INTERVAL_MS` controls the delay between completed attempts, defaults to 60,000 milliseconds, and has a validated minimum of 5,000 milliseconds. Application shutdown aborts the active public request and clears any pending timer. No route, alert, score, strategy signal, order, or financial mutation is introduced.
+`NEW_LISTINGS_POLL_INTERVAL_MS` controls the base delay between completed attempts and has a validated minimum and current default of 1,000 milliseconds. M7.113 uses that base only with complete provider-budget headroom, retaining longer adaptive delays when evidence is missing, usage is high, or throttling occurs. Application shutdown still aborts the active public request and clears any pending timer. No alert, score, strategy signal, order, or financial mutation is introduced.
 
 ## M7.5 durable detection marker
 
@@ -98,7 +98,7 @@ Completed checkpoints are terminal and excluded from both due reads and later cl
 
 ## M7.18 bounded worker configuration
 
-The future checkpoint worker now has one injected options contract populated by startup-validated environment configuration. Defaults are a 5-second completion-relative interval, a batch size of 25, and a 30-second lease. Interval is restricted to 1–60 seconds, batch size to 1–100, and lease duration to 5–300 seconds.
+The future checkpoint worker now has one injected options contract populated by startup-validated environment configuration. M7.112 changes the current defaults to a 1-second completion-relative interval, a batch size of 25, and a 30-second lease. Interval is restricted to 1–60 seconds, batch size to 1–100, and lease duration to 5–300 seconds.
 
 The values are documented in `.env.example` and available to the new-listings module, but no scheduler or timer consumes them yet. No checkpoint is automatically claimed or completed and no provider request, market sample, alert, score, signal, or trade is introduced.
 
@@ -661,3 +661,23 @@ The production cohort was empty because all 770 known symbols were correctly sto
 `activationTrackingStartedAt` now distinguishes forward-observed candidates from legacy baseline rows. A symbol first appearing after an established baseline is armed at that observation. If the same observation has `status=TRADING` and `spotTradingAllowed=true`, `detectedAt` is set immediately; otherwise the candidate remains armed until the first later catalog satisfying both conditions. That activation atomically creates the canonical nine checkpoints at T+0, T+5s, T+10s, T+30s, T+1m, T+5m, T+15m, T+1h, and T+24h. Repeated observations cannot create another detection or checkpoint set.
 
 The migration copies the marker only for rows that already had a real `detectedAt`. Every undetected legacy baseline row remains null and therefore ineligible for backfill, even if its current status changes from `BREAK` to `TRADING`. Consequently, `GET /new-listings` can legitimately remain `[]` until the first future post-baseline candidate activates. This boundary deliberately adds no historical inference, announcement scraping, subsecond stream, strategy signal, simulated order, automatic buy/sell, or real trade.
+
+## M7.112 bounded rapid launch detection and checkpoint cadence
+
+The catalog's completion-relative quiet period now defaults to 5,000 milliseconds, the existing validated minimum, instead of 60,000. It still loads immediately at startup and never overlaps attempts: request time and persistence time are additional to the configured quiet period, and a failure simply leads to the next scheduled attempt after that period. The setting therefore bounds configured idle time without falsely promising an absolute five-second exchange-to-application latency.
+
+Persistence for an unchanged large catalog is set-oriented: a single update advances `lastObservedAt` for only the existing identities present in that snapshot, a single insert creates new identities, and mutable state updates run only for rows whose provider fields changed or whose first tradeable activation is being recorded. A symbol omitted from the current snapshot is not touched. Detection, checkpoint creation, and all state changes remain inside the existing serializable transaction.
+
+Local before/after measurement recorded full completion-relative intervals of 11,807/10,814 ms before the bulk-write change and 9,228/9,180 ms after it. These values include the public request, payload processing, serializable persistence, and the configured 5,000 ms quiet period. The cadence is deliberately not tightened further until the adapter can observe Binance IP-weight headers and honor explicit `429`/`Retry-After` backoff; repeated limit violations can lead to `418` IP bans under the official Spot REST policy.
+
+The opt-in checkpoint worker's current default is 1,000 milliseconds, also its existing validated minimum. Batch size remains 25, lease duration remains 30 seconds, claimed checkpoints are processed sequentially, and the next timer starts only after the whole cycle settles. `NEW_LISTINGS_CHECKPOINT_WORKER_ENABLED` remains `false` in the safe example; the local research environment explicitly enables it at the one-second cadence.
+
+Every non-empty cycle reports the maximum milliseconds from checkpoint target to claim and from target to successful durable completion. Empty cycles produce no routine log, preventing a one-second idle loop from flooding operational output; cycle failures are still logged. No checkpoint schedule label changes in this increment, so early research remains T+0, T+5s, T+10s, and the established later targets. No event stream, announcement scraper, signal, automatic pair selection, paper execution, real order, or financial mutation is introduced.
+
+## M7.113 rate-limit-aware adaptive activation detection and scanner visibility
+
+The public catalog adapter retains Binance's current one-minute request weight when `X-MBX-USED-WEIGHT-1M` is a valid non-negative integer and correlates it with the published one-minute `REQUEST_WEIGHT` limit in `exchangeInfo`. The catalog loop uses the configured one-second completion-relative quiet period only while a complete budget observation remains below 80% usage. Missing budget evidence keeps a five-second fallback; usage at or above the threshold waits at least the complete published interval.
+
+HTTP `429` and `418` are represented as explicit provider-throttling failures. A valid numeric or HTTP-date `Retry-After` controls the next attempt, with a 60-second fallback when the provider omits usable evidence. No retry can overlap the active request or persistence transaction.
+
+`GET /new-listings/scanner-status` reports startup, healthy-waiting, or degraded state; monitored catalog size; configured and effective intervals; last attempt and successful observation; next attempt; consecutive failure count; a sanitized failure code; and the latest request-weight observation. It does not initiate a provider call. The dashboard displays this state above the detection cohort, so `[]` now explicitly means no eligible post-baseline tradeable activation rather than an unknown scanner condition. Existing baseline rows are still never backfilled, and no signal, simulated order, real order, or financial mutation is added.

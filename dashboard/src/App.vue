@@ -3831,11 +3831,83 @@ onUnmounted(() => {
           </div>
 
           <template v-if="available(snapshot?.newListings)">
+            <article
+              v-if="available(snapshot?.newListingsScanner)"
+              class="listing-scanner-status"
+              :class="snapshot.newListingsScanner.data.state"
+            >
+              <div>
+                <span class="listing-provider">Scanner</span>
+                <strong>
+                  {{ snapshot.newListingsScanner.data.monitoredSymbolCount }}
+                  Spot/USDT symbols monitored
+                </strong>
+                <small
+                  v-if="snapshot.newListingsScanner.data.state === 'degraded'"
+                >
+                  Provider access is degraded; automatic retry remains active.
+                </small>
+                <small
+                  v-else-if="
+                    snapshot.newListingsScanner.data.state === 'starting'
+                  "
+                >
+                  Loading the first provider catalog.
+                </small>
+                <small v-else>
+                  Active and waiting for the first post-baseline tradeable
+                  activation.
+                </small>
+              </div>
+              <dl>
+                <div>
+                  <dt>Last catalog</dt>
+                  <dd>
+                    {{
+                      snapshot.newListingsScanner.data
+                        .lastSuccessfulObservationAt
+                        ? timestamp(
+                            snapshot.newListingsScanner.data
+                              .lastSuccessfulObservationAt,
+                          )
+                        : 'Pending'
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Next scan</dt>
+                  <dd>
+                    {{
+                      snapshot.newListingsScanner.data.nextAttemptAt
+                        ? timestamp(
+                            snapshot.newListingsScanner.data.nextAttemptAt,
+                          )
+                        : 'In progress'
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Request weight</dt>
+                  <dd>
+                    {{
+                      snapshot.newListingsScanner.data.requestWeight
+                        ? snapshot.newListingsScanner.data.requestWeight
+                            .usedWeight +
+                          ' / ' +
+                          (snapshot.newListingsScanner.data.requestWeight
+                            .limit ?? '?')
+                        : 'Not reported'
+                    }}
+                  </dd>
+                </div>
+              </dl>
+            </article>
             <p
               v-if="snapshot.newListings.data.length === 0"
               class="empty-state execution-empty"
             >
-              No post-baseline listings detected yet.
+              No post-baseline tradeable activation detected yet. Existing
+              baseline symbols are intentionally not presented as new listings.
             </p>
             <div v-else class="listing-grid">
               <article

@@ -10,6 +10,37 @@ export interface SpotSymbol {
 export interface SpotSymbolCatalog {
   symbols: SpotSymbol[];
   receivedAt: Date;
+  requestWeight?: ProviderRequestWeightObservation;
+}
+
+export interface ProviderRequestWeightObservation {
+  usedWeight: number;
+  limit: number | null;
+  intervalMs: number | null;
+  observedAt: Date;
+}
+
+export class SpotSymbolCatalogRateLimitError extends Error {
+  constructor(
+    readonly status: 418 | 429,
+    readonly retryAfterMs: number,
+  ) {
+    super(`Spot symbol catalog provider rate limited the request (${status})`);
+    this.name = SpotSymbolCatalogRateLimitError.name;
+  }
+}
+
+export interface SpotSymbolScannerStatus {
+  state: 'starting' | 'waiting_for_activation' | 'degraded';
+  monitoredSymbolCount: number;
+  configuredPollIntervalMs: number;
+  effectivePollIntervalMs: number | null;
+  lastAttemptAt: Date | null;
+  lastSuccessfulObservationAt: Date | null;
+  nextAttemptAt: Date | null;
+  consecutiveFailures: number;
+  lastFailureCode: 'provider_rate_limited' | 'catalog_load_failed' | null;
+  requestWeight: ProviderRequestWeightObservation | null;
 }
 
 export interface DetectedSpotSymbol extends SpotSymbol {

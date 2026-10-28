@@ -95,7 +95,9 @@ M10.175 Read-Only Post-Reconciliation Accounting Bootstrap Readiness Audit: DONE
 M10.176 Explicit Live Post-Reconciliation Accounting Bootstrap Application: DONE
 M10.177 Current Agentic Wallet Authentication Challenge Compatibility: DONE
 M7.111 Forward-Only First-Tradeable Listing Activation: DONE
-Next objective: M7.112 bounded higher-frequency launch observation design and collection, preserving provider limits and zero order authority; the separate M10 read-only accounting-origin view remains pending
+M7.112 Bounded Rapid Launch Detection and Checkpoint Cadence: DONE
+M7.113 Rate-Limit-Aware Adaptive Activation Detection and Scanner Visibility: DONE
+Next objective: M7.114 evaluate a public Binance activation stream or announcement corroboration source while preserving forward-only first-tradeable detection and zero order authority
 ```
 
 The detailed sections below preserve the original product plan. For current delivery status and exact increment boundaries, `docs/roadmap.md` and `docs/current-state.md` are authoritative.

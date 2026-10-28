@@ -49,6 +49,36 @@ describe('Spot symbol observation persistence (e2e)', () => {
     });
   });
 
+  it('advances freshness in bulk only for symbols present in the catalog', async () => {
+    const first = new Date('2026-09-14T01:00:00.000Z');
+    const second = new Date('2026-09-14T02:00:00.000Z');
+    const absent = {
+      ...symbol('TRADING', true),
+      symbol: 'ABSENTUSDT',
+      baseAsset: 'ABSENT',
+    };
+    await repository.observe({
+      receivedAt: first,
+      symbols: [symbol('TRADING', true), absent],
+    });
+
+    await expect(
+      repository.observe({
+        receivedAt: second,
+        symbols: [symbol('TRADING', true)],
+      }),
+    ).resolves.toEqual([]);
+    await expect(
+      prisma.observedSpotSymbol.findMany({
+        orderBy: { symbol: 'asc' },
+        select: { symbol: true, lastObservedAt: true },
+      }),
+    ).resolves.toEqual([
+      { symbol: 'ABSENTUSDT', lastObservedAt: first },
+      { symbol: 'TESTUSDT', lastObservedAt: second },
+    ]);
+  });
+
   it('detects a newly observed symbol that is immediately tradeable', async () => {
     const first = new Date('2026-09-14T01:00:00.000Z');
     const second = new Date('2026-09-14T02:00:00.000Z');
