@@ -1,5 +1,23 @@
 # Real Trading
 
+## M10.185 — Authenticated reconciled reservation capacity
+
+M10.185 carries authenticated reconciled resources and provider quota into the existing M10.17 aggregate reservation-capacity policy. In addition to the M10.184 inputs, it accepts one explicit bounded active-reservation snapshot and the existing reservation freshness bound.
+
+The M10.180 resource projection runs first, followed only on success by M10.182 quota projection. Invalid accounting evidence reports quota and capacity as unevaluated; invalid provider or valuation evidence stops before M10.17. With both snapshots complete, the established policy remains solely responsible for validating at most 100 unique reservation facts, excluding expired rows, rejecting active intent/quote reuse, reconciling active USDT budget with the budget snapshot, and independently checking proposed source-token, BNB, and provider-quota USD totals.
+
+Reconciliation identity/fingerprint and provider-observation/external-valuation provenance remain attached to available and downstream-blocked results. The capacity assessment is still point-in-time and non-atomic. The pure unregistered boundary creates no row, lock, quota consumption, provider access, Risk Engine approval, route, strategy bridge, order, mutation, or transaction authority.
+
+### M10.185 acceptance criteria
+
+- Reconciled resource projection must succeed before provider-quota projection is evaluated.
+- Both authenticated projections must succeed before M10.17 is invoked.
+- Projection blockers remain explicit and never produce a partial capacity assessment.
+- M10.17 remains the only policy for reservation bounds, identity, expiry, freshness, budget reconciliation, and aggregate capacity.
+- Active USDT budget, same-source token, native BNB, and provider quota USD remain independently calculated and compared.
+- Reconciliation and provider/valuation provenance remain attached to available and downstream-blocked results.
+- No persistence, atomic enforcement, runtime registration, route, provider call, reservation, Risk Engine approval, authorization, mutation, order, or financial transaction is added.
+
 ## M10.184 — Authenticated reconciled reservation plan
 
 M10.184 carries the two authenticated M10.180 and M10.182 projections into the existing M10.16 reservation planner. It accepts the fresh durable reconciled balance artifact, normalized pinned-CLI capability observation, exact approved intent and non-executable quote, explicit native-BNB and external-USD requirements, local limits, complete budget facts, freshness policy, and evaluation time.

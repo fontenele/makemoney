@@ -1,5 +1,11 @@
 # Current State
 
+M10.185 is complete. A new pure, unregistered aggregate requires the authenticated M10.180 reconciled-resource and M10.182 provider-quota projections before invoking the established M10.17 reservation-capacity policy. Invalid accounting evidence stops before quota projection; invalid provider or external valuation evidence stops before capacity evaluation.
+
+The existing policy alone validates the bounded reservation snapshot, excludes expired rows, rejects duplicate active identities, reconciles active USDT budget, and independently evaluates aggregate source-token, native-BNB, and provider-quota USD capacity. Available and blocked results retain reconciliation and provider/valuation provenance. No durable reservation, atomic enforcement, provider quota consumption, Risk Engine approval, provider access, funding, quote, submission, strategy, order, accounting mutation, or transaction authority exists.
+
+Post-M10.185 validation passes all 2,999 backend tests across 273 suites, all 150 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, all 117 dashboard tests across 20 files, formatting, lint, backend/dashboard builds, Prisma and Compose validation, and `git diff --check`.
+
 M10.184 is complete. A new pure, unregistered aggregate requires the authenticated M10.180 reconciled-resource and M10.182 provider-quota projections before invoking the established M10.16 reservation planner. Invalid accounting evidence stops before quota projection; invalid provider or external valuation evidence stops before planning.
 
 A ready result retains reconciliation identity/fingerprint and provider-observation/external-valuation provenance while materializing the exact quote-expiring USDT budget, source-token, native-BNB, and provider-quota USD requirements without merging denominations. The plan is not persisted and creates no reservation, capacity serialization, provider quota consumption, Risk Engine approval, provider access, funding, quote, submission, strategy, order, accounting mutation, or transaction authority.

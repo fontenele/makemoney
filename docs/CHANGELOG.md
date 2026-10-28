@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-28 — M10.185 authenticated reconciled reservation capacity
+
+### Added
+
+- Pure fail-closed composition from authenticated reconciled resources and provider quota into the existing M10.17 aggregate reservation-capacity policy.
+- Reconciliation and provider/valuation provenance beside available and downstream-blocked capacity results.
+- Focused coverage for available aggregate capacity, invalid reconciled evidence, absent provider quota, partial reservation coverage, and aggregate source insufficiency.
+
+### Safety
+
+- Resource failure stops before quota projection, and quota failure stops before capacity evaluation; M10.17 remains the only active-reservation policy.
+- Remains unregistered and adds no persistence, atomic enforcement, provider call, quota consumption, durable reservation, Risk Engine approval, funding, quote/submission authority, mutation, order, or financial transaction.
+- Passed 2,999 backend tests, 150 PostgreSQL E2E tests with all 50 migrations from scratch, 117 dashboard tests, formatting, lint, Prisma and Compose validation, backend/dashboard builds, and whitespace checks.
+
 ## 2026-10-28 — M10.184 authenticated reconciled reservation plan
 
 ### Added

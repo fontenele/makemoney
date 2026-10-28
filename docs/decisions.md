@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## M10.185 — Use authenticated capacity inputs without weakening reservation accounting
+
+M10.17 already owns the complete bounded active-reservation policy, including expiry, unique intent/quote identities, current-day and freshness checks, reconciliation of active USDT reservations with the budget snapshot, and independent source-token, BNB, and provider-quota USD totals. M10.185 therefore changes only the provenance of current resource and quota capacity: those facts must come through M10.180 and M10.182 rather than being assembled directly by a caller.
+
+The aggregate keeps the established fail-closed order. Invalid accounting reconciliation stops before quota projection; invalid provider or external valuation evidence stops before capacity evaluation. Only both complete projections and the caller-supplied bounded reservation snapshot reach M10.17. The aggregate neither interprets active rows nor duplicates their arithmetic, so expiration and aggregate-capacity behavior remain in one policy.
+
+The result retains reconciliation identity/fingerprint and authenticated provider/external-valuation provenance beside the complete M10.17 assessment. `reservation_capacity_available` remains a point-in-time non-atomic fact: no row is inserted, no balance or quota is locked, and no runtime registration, provider call, Risk Engine approval, funding, quote, submission, strategy, order, accounting mutation, or transaction authority is created.
+
 ## M10.184 — Materialize a plan only from authenticated resource and quota evidence
 
 M10.183 proves that the two new evidence bridges can reach the established M10.15 sufficiency policy, but its descriptive risk result deliberately exposes no raw snapshots for another caller to repurpose. M10.184 therefore repeats the same fail-closed projection order at a separate aggregate boundary and passes the two complete internal snapshots directly to M10.16. It does not reconstruct a reservation plan from summarized risk output or add a second planner policy.

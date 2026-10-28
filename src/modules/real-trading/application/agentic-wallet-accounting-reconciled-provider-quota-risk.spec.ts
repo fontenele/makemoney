@@ -8,6 +8,7 @@ import { prepareAgenticWalletAccountingLedgerReconciliationCommitment } from '..
 import { assessAgenticWalletAccountingLedgerReconciliationFreshness } from '../infrastructure/agentic-wallet-accounting-ledger-reconciliation-freshness';
 import { prepareAgenticWalletAccountingReconciledBalanceSnapshot } from '../infrastructure/agentic-wallet-accounting-reconciled-balance-snapshot';
 import { assessAgenticWalletAccountingReconciledProviderQuotaRisk } from './agentic-wallet-accounting-reconciled-provider-quota-risk';
+import { assessAgenticWalletAccountingReconciledReservationCapacity } from './agentic-wallet-accounting-reconciled-reservation-capacity';
 import { planAgenticWalletAccountingReconciledReservation } from './agentic-wallet-accounting-reconciled-reservation-plan';
 import { RealExecutionBudgetSnapshot } from './real-execution-budget-risk';
 import { APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT } from './real-execution-instrument-approval';
@@ -228,6 +229,120 @@ describe('Agentic Wallet reconciled reservation plan', () => {
   });
 });
 
+describe('Agentic Wallet reconciled reservation capacity', () => {
+  it('evaluates aggregate capacity from authenticated resource and quota facts', () => {
+    const result = capacityAssessment();
+
+    expect(result.reconciliationFingerprint).toMatch(/^[0-9a-f]{64}$/);
+    expect(result).toMatchObject({
+      scope:
+        'agentic_wallet_accounting_reconciled_reservation_capacity_assessment',
+      status: 'reservation_capacity_available',
+      blockers: [],
+      resourceSnapshotStatus: 'resource_snapshot_ready',
+      providerQuotaSnapshotStatus: 'provider_quota_snapshot_ready',
+      reconciliationId: RECONCILIATION_ID,
+      providerObservationValidated: true,
+      requirementValuationExternallySupplied: true,
+      reservationCapacity: {
+        status: 'reservation_capacity_available',
+        blockers: [],
+        reservationPlanStatus: 'reservation_plan_ready',
+        activeReservationCount: 1,
+        proposedBudgetReservationUsdt: '6.11',
+        proposedSourceReservationQuantity: '5.51',
+        proposedNativeGasReservationQuantity: '0.0003',
+        proposedProviderQuotaReservationUsd: '6.2',
+      },
+      usdtUsdParityAssumed: false,
+      providerDailyLimitAcceptedAsProjectRiskLimit: false,
+      durableReservationCreated: false,
+      atomicEnforcement: false,
+      riskApproved: false,
+      fundingAuthorized: false,
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    });
+  });
+
+  it('stops before quota and capacity when reconciled resources are invalid', () => {
+    const balances = balanceSnapshot();
+    const result = capacityAssessment({
+      balances: { ...balances, riskApproved: true } as typeof balances,
+    });
+
+    expect(result).toMatchObject({
+      status: 'blocked',
+      blockers: ['resource_snapshot_projection_blocked'],
+      resourceSnapshotBlockers: ['invalid_reconciled_balance_snapshot'],
+      providerQuotaSnapshotStatus: 'not_evaluated',
+      reservationCapacity: null,
+      reconciliationId: null,
+    });
+  });
+
+  it('stops before capacity when provider quota evidence is absent', () => {
+    const result = capacityAssessment({
+      observation: observation({ quota: null }),
+    });
+
+    expect(result).toMatchObject({
+      status: 'blocked',
+      blockers: ['provider_quota_snapshot_projection_blocked'],
+      resourceSnapshotStatus: 'resource_snapshot_ready',
+      providerQuotaSnapshotStatus: 'blocked',
+      providerQuotaSnapshotBlockers: ['provider_quota_unavailable'],
+      reservationCapacity: null,
+      reconciliationId: RECONCILIATION_ID,
+    });
+  });
+
+  it('preserves provenance when the established capacity policy blocks', () => {
+    const result = capacityAssessment({
+      reservationSnapshot: reservationSnapshot({ coverage: 'partial' }),
+    });
+
+    expect(result).toMatchObject({
+      status: 'blocked',
+      blockers: ['reservation_capacity_blocked'],
+      resourceSnapshotStatus: 'resource_snapshot_ready',
+      providerQuotaSnapshotStatus: 'provider_quota_snapshot_ready',
+      reconciliationId: RECONCILIATION_ID,
+      reservationCapacity: {
+        status: 'blocked',
+        blockers: ['reservation_coverage_incomplete'],
+        reservationPlanStatus: 'reservation_plan_ready',
+      },
+      durableReservationCreated: false,
+      atomicEnforcement: false,
+    });
+  });
+
+  it('uses reconciled source balance for aggregate capacity', () => {
+    const snapshot = reservationSnapshot();
+    const result = capacityAssessment({
+      reservationSnapshot: {
+        ...snapshot,
+        reservations: snapshot.reservations.map((reservation) => ({
+          ...reservation,
+          sourceQuantity: '895',
+        })),
+      },
+    });
+
+    expect(result).toMatchObject({
+      status: 'blocked',
+      blockers: ['reservation_capacity_blocked'],
+      reservationCapacity: {
+        blockers: ['aggregate_source_insufficient'],
+        proposedSourceReservationQuantity: '900.01',
+      },
+      riskApproved: false,
+      submissionAuthorized: false,
+    });
+  });
+});
+
 function assess(
   overrides: {
     balances?: ReturnType<typeof balanceSnapshot>;
@@ -290,6 +405,84 @@ function planAssessment(
     },
     EVALUATED_AT,
   );
+}
+
+function capacityAssessment(
+  overrides: {
+    balances?: ReturnType<typeof balanceSnapshot>;
+    observation?: AgenticWalletCapabilityObservation;
+    intent?: RealExecutionIntent;
+    quote?: RealExecutionQuote;
+    requiredUsd?: string;
+    budgetSnapshot?: RealExecutionBudgetSnapshot;
+    reservationSnapshot?: ReturnType<typeof reservationSnapshot>;
+  } = {},
+) {
+  const valueIntent = overrides.intent ?? intent();
+  const valueQuote = overrides.quote ?? quote({ intent: valueIntent });
+  return assessAgenticWalletAccountingReconciledReservationCapacity(
+    overrides.balances ?? balanceSnapshot(),
+    overrides.observation ?? observation(),
+    valueIntent,
+    valueQuote,
+    '0.0002',
+    overrides.requiredUsd ?? '5.2',
+    new Date('2026-10-16T12:01:29.000Z'),
+    limits(),
+    overrides.budgetSnapshot ?? budgetSnapshot(),
+    overrides.reservationSnapshot ?? reservationSnapshot(),
+    {
+      budgetSnapshotMaxAgeMs: 60_000,
+      resourceSnapshotMaxAgeMs: 60_000,
+      quotaSnapshotMaxAgeMs: 60_000,
+      requirementValuationMaxAgeMs: 60_000,
+      reservationSnapshotMaxAgeMs: 60_000,
+    },
+    EVALUATED_AT,
+  );
+}
+
+function reservationSnapshot(
+  overrides: Partial<{
+    providerId: string;
+    chainId: string;
+    utcDay: string;
+    reservations: readonly {
+      id: string;
+      intentId: string;
+      quoteId: string;
+      budgetChargeUsdt: string;
+      sourceTokenAddress: string;
+      sourceQuantity: string;
+      nativeGasQuantity: string;
+      providerQuotaUsd: string;
+      expiresAt: Date;
+    }[];
+    coverage: 'complete' | 'partial';
+    observedAt: Date;
+  }> = {},
+) {
+  return {
+    providerId: 'agentic_wallet',
+    chainId: '56',
+    utcDay: '2026-10-16',
+    reservations: [
+      {
+        id: '00000000-0000-4000-8000-000000000040',
+        intentId: '00000000-0000-4000-8000-000000000041',
+        quoteId: '00000000-0000-4000-8000-000000000042',
+        budgetChargeUsdt: '1',
+        sourceTokenAddress: usdt.tokenAddress,
+        sourceQuantity: '0.5',
+        nativeGasQuantity: '0.0001',
+        providerQuotaUsd: '1',
+        expiresAt: new Date('2026-10-16T12:02:00.000Z'),
+      },
+    ],
+    coverage: 'complete' as const,
+    observedAt: new Date('2026-10-16T12:01:29.000Z'),
+    ...overrides,
+  };
 }
 
 function observation(
