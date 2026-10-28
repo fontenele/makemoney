@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-28 — M10.188 authenticated durable reservation recording
+
+- Added an unregistered service that recomputes the complete M10.186 preparation from original authenticated evidence and delegates only a ready provenance-bound command to M10.18.
+- Kept projection and preliminary capacity blockers outside the store and honored cancellation after preparation but before durable mutation.
+- Preserved M10.18 as the sole serializable authority for active-set reconstruction, capacity revalidation, payload/provenance validation, immutable creation, and exact replay.
+- Exposed whether the durable artifact was newly created or replayed without implying Risk Engine approval or submission authority.
+- Added no Nest registration, route, provider access, quota consumption, automatic retry, funding, strategy bridge, order, accounting mutation, or financial transaction authorization.
+
 ## 2026-10-28 — M10.187 durable reservation provenance binding
 
 - Extended ready authenticated reservation commands with the exact accounting-reconciliation ID/fingerprint, provider observation time, explicit external-USD valuation basis, and valuation time.

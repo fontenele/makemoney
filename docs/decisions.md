@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## M10.188 — Recompute authenticated preparation immediately before the durable store
+
+M10.187 made the M10.18 row capable of retaining authenticated provenance, but passing an externally prepared command directly into the store would leave the new workflow vulnerable to a caller selecting or modifying the wrong intermediate artifact. M10.188 therefore adds a narrow application service that accepts the original evidence package and invokes M10.186 itself. A command exists only within that call and is delegated only after every projection and preliminary capacity rule passes.
+
+The preliminary M10.17 snapshot is useful for fail-fast behavior but is never treated as atomic authority. M10.18 still acquires its advisory lock, reads the current durable rows, reconstructs the complete active snapshot, and reruns capacity inside one serializable transaction. Store conflicts and failures propagate unchanged; the coordinator does not retry, reinterpret, or weaken them. Exact replay is reported separately from creation.
+
+This is the first authenticated composition capable of creating a local durable reservation, so it remains unregistered and has no route. It performs no provider call, quota consumption, external balance lock, Risk Engine approval, arm, confirmation, submission, accounting mutation, or financial authorization.
+
 ## M10.187 — Bind authenticated provenance before allowing durable mutation
 
 M10.186 intentionally stopped with reconciliation and provider/valuation provenance outside the M10.18 command because the existing reservation row had nowhere truthful to store it. Calling the store at that point would create an economically correct row whose authenticated evidence chain could be recovered only from an opaque request fingerprint. M10.187 therefore extends the contract and row before any authenticated coordinator is introduced.

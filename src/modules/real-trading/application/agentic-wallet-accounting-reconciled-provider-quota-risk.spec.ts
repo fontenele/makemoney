@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals';
+
 import {
   RealExecutionIntent,
   RealExecutionQuote,
@@ -10,6 +12,12 @@ import { prepareAgenticWalletAccountingReconciledBalanceSnapshot } from '../infr
 import { assessAgenticWalletAccountingReconciledProviderQuotaRisk } from './agentic-wallet-accounting-reconciled-provider-quota-risk';
 import { assessAgenticWalletAccountingReconciledReservationCapacity } from './agentic-wallet-accounting-reconciled-reservation-capacity';
 import { prepareAgenticWalletAccountingReconciledReservationCommand } from './agentic-wallet-accounting-reconciled-reservation-command';
+import { AgenticWalletAccountingReconciledReservationRecordingService } from './agentic-wallet-accounting-reconciled-reservation-recording.service';
+import {
+  RealExecutionReservationCommand,
+  RealExecutionReservationStore,
+  StoredRealExecutionReservation,
+} from './real-execution-reservation-store';
 import { planAgenticWalletAccountingReconciledReservation } from './agentic-wallet-accounting-reconciled-reservation-plan';
 import { RealExecutionBudgetSnapshot } from './real-execution-budget-risk';
 import { APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT } from './real-execution-instrument-approval';
@@ -450,6 +458,117 @@ describe('Agentic Wallet reconciled reservation command', () => {
   });
 });
 
+describe('Agentic Wallet reconciled durable reservation recording', () => {
+  it('persists only the freshly prepared authenticated command', async () => {
+    const reserve = jest.fn<RealExecutionReservationStore['reserve']>(
+      (command) =>
+        Promise.resolve({
+          reservation: storedReservation(command.provenance),
+          replayed: false,
+        }),
+    );
+    const service =
+      new AgenticWalletAccountingReconciledReservationRecordingService({
+        reserve,
+      });
+
+    const result = await service.record(recordingInput());
+
+    expect(result).toMatchObject({
+      status: 'durable_reservation_recorded',
+      blockers: [],
+      reconciliationId: RECONCILIATION_ID,
+      providerObservationValidated: true,
+      requirementValuationExternallySupplied: true,
+      replayed: false,
+      durableReservationRecorded: true,
+      reservationCreatedInThisAttempt: true,
+      providerAccessPerformed: false,
+      providerQuotaConsumed: false,
+      riskApproved: false,
+      submissionAuthorized: false,
+      automaticRetryAllowed: false,
+    });
+    expect(result.reservation?.provenance).toMatchObject({
+      accountingReconciliationId: RECONCILIATION_ID,
+      providerObservedAt: new Date('2026-10-16T12:01:28.000Z'),
+      requirementValuedAt: new Date('2026-10-16T12:01:29.000Z'),
+    });
+    expect(reserve).toHaveBeenCalledTimes(1);
+    expect(reserve.mock.calls[0][0]).toMatchObject({
+      intent: { id: INTENT_ID },
+      quote: { id: QUOTE_ID },
+      provenance: {
+        accountingReconciliationId: RECONCILIATION_ID,
+      },
+    });
+  });
+
+  it('returns preparation blockers without opening the durable store', async () => {
+    const reserve = jest.fn<RealExecutionReservationStore['reserve']>();
+    const service =
+      new AgenticWalletAccountingReconciledReservationRecordingService({
+        reserve,
+      });
+    const input = recordingInput();
+
+    await expect(
+      service.record({
+        ...input,
+        reservationSnapshot: {
+          ...input.reservationSnapshot,
+          coverage: 'partial',
+        },
+      }),
+    ).resolves.toMatchObject({
+      status: 'blocked',
+      blockers: ['reservation_capacity_blocked'],
+      reservation: null,
+      durableReservationRecorded: false,
+      reservationCreatedInThisAttempt: false,
+    });
+    expect(reserve).not.toHaveBeenCalled();
+  });
+
+  it('reports an exact durable replay without claiming a new row', async () => {
+    const reserve = jest.fn<RealExecutionReservationStore['reserve']>(
+      (command) =>
+        Promise.resolve({
+          reservation: storedReservation(command.provenance),
+          replayed: true,
+        }),
+    );
+    const service =
+      new AgenticWalletAccountingReconciledReservationRecordingService({
+        reserve,
+      });
+
+    await expect(service.record(recordingInput())).resolves.toMatchObject({
+      status: 'durable_reservation_recorded',
+      replayed: true,
+      durableReservationRecorded: true,
+      reservationCreatedInThisAttempt: false,
+      riskApproved: false,
+      submissionAuthorized: false,
+    });
+  });
+
+  it('honors cancellation after preparation and before durable mutation', async () => {
+    const reserve = jest.fn<RealExecutionReservationStore['reserve']>();
+    const service =
+      new AgenticWalletAccountingReconciledReservationRecordingService({
+        reserve,
+      });
+    const controller = new AbortController();
+    controller.abort(new Error('cancelled'));
+
+    await expect(
+      service.record(recordingInput(), controller.signal),
+    ).rejects.toThrow('cancelled');
+    expect(reserve).not.toHaveBeenCalled();
+  });
+});
+
 function assess(
   overrides: {
     balances?: ReturnType<typeof balanceSnapshot>;
@@ -582,6 +701,56 @@ function commandAssessment(
     },
     EVALUATED_AT,
   );
+}
+
+function recordingInput() {
+  const valueIntent = intent();
+  return {
+    balances: balanceSnapshot(),
+    observation: observation(),
+    intent: valueIntent,
+    quote: quote({ intent: valueIntent }),
+    nativeGasRequiredQuantity: '0.0002',
+    requiredUsd: '5.2',
+    requirementValuedAt: new Date('2026-10-16T12:01:29.000Z'),
+    limits: limits(),
+    budgetSnapshot: budgetSnapshot(),
+    reservationSnapshot: reservationSnapshot(),
+    freshness: {
+      budgetSnapshotMaxAgeMs: 60_000,
+      resourceSnapshotMaxAgeMs: 60_000,
+      quotaSnapshotMaxAgeMs: 60_000,
+      requirementValuationMaxAgeMs: 60_000,
+      reservationSnapshotMaxAgeMs: 60_000,
+    },
+    evaluatedAt: EVALUATED_AT,
+  };
+}
+
+function storedReservation(
+  provenance: RealExecutionReservationCommand['provenance'],
+): StoredRealExecutionReservation {
+  return {
+    id: '00000000-0000-4000-8000-000000000050',
+    providerId: 'agentic_wallet',
+    chainId: '56',
+    intentId: INTENT_ID,
+    quoteId: QUOTE_ID,
+    idempotencyKey: 'reconciled-provider-quota-risk-1',
+    payloadCommitmentVersion: 'real_execution_intent_quote_v1',
+    payloadCommitmentDigest: 'e'.repeat(64),
+    utcDay: '2026-10-16',
+    budgetChargeUsdt: '5.11',
+    sourceTokenAddress: usdt.tokenAddress,
+    sourceSymbol: 'USDT',
+    sourceQuantity: '5.01',
+    nativeGasSymbol: 'BNB',
+    nativeGasQuantity: '0.0002',
+    providerQuotaUsd: '5.2',
+    provenance,
+    expiresAt: new Date('2026-10-16T12:01:35.000Z'),
+    createdAt: new Date('2026-10-16T12:01:30.000Z'),
+  };
 }
 
 function reservationSnapshot(

@@ -1,5 +1,22 @@
 # Real Trading
 
+## M10.188 — Authenticated durable reservation recording
+
+M10.188 introduces the first composition that can carry the authenticated M10.180/M10.182 evidence chain through M10.186 and into the existing M10.18 serializable store. The service accepts the original internal reconciled-balance snapshot, normalized capability observation, exact intent and quote, explicit gas and USD requirements, risk limits, budget facts, bounded reservation snapshot, freshness policy, and evaluation time. It recomputes preparation itself and never accepts a caller-assembled command.
+
+Resource, quota, or preliminary capacity failure returns a blocked result without touching the store. Cancellation observed after synchronous preparation also stops before mutation. A ready command is delegated unchanged with its M10.187 provenance. Inside M10.18, the database transaction remains authoritative: it acquires the existing advisory lock, rebuilds the complete active reservation set, reruns capacity and payload/provenance validation, and creates one immutable row or returns an exact idempotent replay.
+
+The service is deliberately absent from Nest registration and has no controller route. Calling it explicitly can reserve local capacity, but it cannot contact Agentic Wallet, consume provider quota, lock external balances, approve operational risk, arm execution, obtain confirmation, submit an order, mutate accounting, or authorize a financial transaction. Automatic retry remains forbidden.
+
+### M10.188 acceptance criteria
+
+- The service recomputes M10.186 from original authenticated evidence rather than trusting a supplied command or assessment.
+- Any projection or preliminary capacity blocker stops before M10.18 is called.
+- Cancellation after preparation and before persistence prevents the store call.
+- Only a ready provenance-bound command reaches the existing serializable store.
+- Success distinguishes a newly created durable reservation from an exact replay.
+- No runtime registration, route, provider access, provider-quota consumption, retry, Risk Engine approval, funding, submission, strategy, order, accounting mutation, or financial authority is added.
+
 ## M10.187 — Durable reservation provenance binding
 
 M10.187 closes the audit gap deliberately left by M10.186 before the authenticated workflow is allowed to invoke M10.18. Every ready authenticated command now carries a separate immutable provenance object containing the exact durable accounting-reconciliation ID and fingerprint, provider observation time, explicit external-USD valuation basis, and valuation time that produced its resource and quota facts.
