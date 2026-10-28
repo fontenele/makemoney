@@ -44,11 +44,12 @@ describe('Spot symbol observation persistence (e2e)', () => {
       lastObservedAt: second,
       status: 'BREAK',
       spotTradingAllowed: false,
+      activationTrackingStartedAt: null,
       detectedAt: null,
     });
   });
 
-  it('detects only symbols absent from an established baseline', async () => {
+  it('detects a newly observed symbol that is immediately tradeable', async () => {
     const first = new Date('2026-09-14T01:00:00.000Z');
     const second = new Date('2026-09-14T02:00:00.000Z');
     await expect(
@@ -76,6 +77,7 @@ describe('Spot symbol observation persistence (e2e)', () => {
       }),
     ).resolves.toMatchObject({
       firstObservedAt: second,
+      activationTrackingStartedAt: second,
       detectedAt: second,
     });
     const checkpoints = await prisma.listingObservationCheckpoint.findMany({
@@ -131,6 +133,111 @@ describe('Spot symbol observation persistence (e2e)', () => {
         detectedFrom: new Date(second.getTime() + 1),
       }),
     ).resolves.toEqual([]);
+  });
+
+  it('does not backfill a baseline symbol when it later becomes tradeable', async () => {
+    const baselineAt = new Date('2026-09-14T01:00:00.000Z');
+    const activatedAt = new Date('2026-09-14T02:00:00.000Z');
+    await repository.observe({
+      receivedAt: baselineAt,
+      symbols: [symbol('BREAK', false)],
+    });
+
+    await expect(
+      repository.observe({
+        receivedAt: activatedAt,
+        symbols: [symbol('TRADING', true)],
+      }),
+    ).resolves.toEqual([]);
+    await expect(
+      prisma.observedSpotSymbol.findUnique({
+        where: {
+          provider_symbol: { provider: 'binance', symbol: 'TESTUSDT' },
+        },
+      }),
+    ).resolves.toMatchObject({
+      activationTrackingStartedAt: null,
+      detectedAt: null,
+      status: 'TRADING',
+      spotTradingAllowed: true,
+    });
+    await expect(prisma.listingObservationCheckpoint.count()).resolves.toBe(0);
+  });
+
+  it('detects a post-baseline symbol only on its first tradeable observation', async () => {
+    const baselineAt = new Date('2026-09-14T01:00:00.000Z');
+    const announcedAt = new Date('2026-09-14T02:00:00.000Z');
+    const activatedAt = new Date('2026-09-14T02:05:00.000Z');
+    const stillActiveAt = new Date('2026-09-14T02:06:00.000Z');
+    await repository.observe({
+      receivedAt: baselineAt,
+      symbols: [symbol('TRADING', true)],
+    });
+    const announced = {
+      ...symbol('BREAK', false),
+      symbol: 'LAUNCHUSDT',
+      baseAsset: 'LAUNCH',
+    };
+
+    await expect(
+      repository.observe({
+        receivedAt: announcedAt,
+        symbols: [symbol('TRADING', true), announced],
+      }),
+    ).resolves.toEqual([]);
+    await expect(
+      prisma.observedSpotSymbol.findUnique({
+        where: {
+          provider_symbol: { provider: 'binance', symbol: 'LAUNCHUSDT' },
+        },
+      }),
+    ).resolves.toMatchObject({
+      activationTrackingStartedAt: announcedAt,
+      detectedAt: null,
+      status: 'BREAK',
+      spotTradingAllowed: false,
+    });
+    await expect(
+      prisma.listingObservationCheckpoint.count({
+        where: { provider: 'binance', symbol: 'LAUNCHUSDT' },
+      }),
+    ).resolves.toBe(0);
+
+    const active = {
+      ...announced,
+      status: 'TRADING',
+      spotTradingAllowed: true,
+    };
+    await expect(
+      repository.observe({
+        receivedAt: activatedAt,
+        symbols: [symbol('TRADING', true), active],
+      }),
+    ).resolves.toEqual([active]);
+    await expect(
+      repository.observe({
+        receivedAt: stillActiveAt,
+        symbols: [symbol('TRADING', true), active],
+      }),
+    ).resolves.toEqual([]);
+    await expect(
+      prisma.observedSpotSymbol.findUnique({
+        where: {
+          provider_symbol: { provider: 'binance', symbol: 'LAUNCHUSDT' },
+        },
+      }),
+    ).resolves.toMatchObject({
+      activationTrackingStartedAt: announcedAt,
+      detectedAt: activatedAt,
+      status: 'TRADING',
+      spotTradingAllowed: true,
+      lastObservedAt: stillActiveAt,
+    });
+    await expect(
+      prisma.listingObservationCheckpoint.count({
+        where: { provider: 'binance', symbol: 'LAUNCHUSDT' },
+      }),
+    ).resolves.toBe(9);
   });
 
   it('paginates detections after the stable provider and symbol cursor', async () => {
@@ -434,6 +541,7 @@ function detectedRow(symbol: string, detectedAt: Date) {
     spotTradingAllowed: true,
     firstObservedAt: detectedAt,
     lastObservedAt: detectedAt,
+    activationTrackingStartedAt: detectedAt,
     detectedAt,
   };
 }

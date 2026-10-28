@@ -669,6 +669,7 @@ export const ObservedSpotSymbolScalarFieldEnum = {
   spotTradingAllowed: 'spotTradingAllowed',
   firstObservedAt: 'firstObservedAt',
   lastObservedAt: 'lastObservedAt',
+  activationTrackingStartedAt: 'activationTrackingStartedAt',
   detectedAt: 'detectedAt'
 } as const
 

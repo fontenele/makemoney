@@ -11,7 +11,7 @@ describe('SpotSymbolCatalogService', () => {
     const provider: SpotSymbolCatalogProvider = {
       load: jest.fn(() => Promise.resolve(catalog)),
     };
-    const newlyObserved = {
+    const newlyActivated = {
       provider: 'binance' as const,
       symbol: 'NEWUSDT',
       baseAsset: 'NEW',
@@ -20,14 +20,14 @@ describe('SpotSymbolCatalogService', () => {
       spotTradingAllowed: true,
     };
     const repository = {
-      observe: jest.fn(() => Promise.resolve([newlyObserved])),
+      observe: jest.fn(() => Promise.resolve([newlyActivated])),
       listDetected: jest.fn(() => Promise.resolve([])),
     };
     const service = new SpotSymbolCatalogService(provider, repository, 60_000);
     service.onModuleInit();
     await new Promise<void>((resolve) => setImmediate(resolve));
     expect(service.latest()).toBe(catalog);
-    expect(service.latestNewlyObserved()).toEqual([newlyObserved]);
+    expect(service.latestNewlyActivated()).toEqual([newlyActivated]);
     expect(repository.observe).toHaveBeenCalledWith(catalog);
     service.onModuleDestroy();
   });
@@ -47,7 +47,7 @@ describe('SpotSymbolCatalogService', () => {
     service.onModuleInit();
     await new Promise<void>((resolve) => setImmediate(resolve));
     expect(service.latest()).toBeUndefined();
-    expect(service.latestNewlyObserved()).toEqual([]);
+    expect(service.latestNewlyActivated()).toEqual([]);
     service.onModuleDestroy();
   });
 

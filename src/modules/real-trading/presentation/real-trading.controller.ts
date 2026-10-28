@@ -137,6 +137,19 @@ import {
   AgenticWalletMarketSwapAccountingMutationApplicationIdentityError,
   AgenticWalletMarketSwapAccountingMutationAuthorizationNotFoundError,
 } from '../infrastructure/agentic-wallet-market-swap-accounting-mutation-application.store';
+import { FUNDING_CONVERSION_ACCOUNTING_BOOTSTRAP_ACKNOWLEDGMENT } from '../application/agentic-wallet-funding-conversion-accounting-bootstrap';
+import {
+  AgenticWalletFundingConversionAccountingBootstrapService,
+  FundingConversionAccountingBootstrapRequestError,
+} from '../application/agentic-wallet-funding-conversion-accounting-bootstrap.service';
+import {
+  FundingConversionAccountingBootstrapBlockedError,
+  FundingConversionAccountingBootstrapConflictError,
+} from '../application/agentic-wallet-funding-conversion-accounting-bootstrap.store';
+import {
+  AgenticWalletFundingConversionAccountingBootstrapReadinessService,
+  FundingConversionAccountingBootstrapReadinessRequestError,
+} from '../application/agentic-wallet-funding-conversion-accounting-bootstrap-readiness.service';
 
 @Controller('real-trading')
 export class RealTradingController {
@@ -149,6 +162,8 @@ export class RealTradingController {
     private readonly fundingConversionStatus: AgenticWalletFundingConversionStatusService,
     private readonly fundingConversionReconciliation: AgenticWalletFundingConversionFinancialReconciliationService,
     private readonly fundingConversionAccountingSync: AgenticWalletFundingConversionAccountingSyncService,
+    private readonly fundingConversionAccountingBootstrapReadiness: AgenticWalletFundingConversionAccountingBootstrapReadinessService,
+    private readonly fundingConversionAccountingBootstrap: AgenticWalletFundingConversionAccountingBootstrapService,
     private readonly realExecutionSubmission: RealExecutionOperatorSubmissionService,
     private readonly realExecutionStatus: AgenticWalletMarketSwapStatusReconciliationAttempt,
     private readonly realExecutionReconciliation: RealExecutionFinancialReconciliationService,
@@ -383,6 +398,57 @@ export class RealTradingController {
       }
       throw new ServiceUnavailableException(
         'Agentic Wallet funding conversion accounting synchronization is unavailable',
+      );
+    }
+  }
+
+  @Post('funding-conversion-accounting-bootstrap-readiness')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async assessFundingConversionAccountingBootstrapReadiness(
+    @Body() body: unknown,
+  ) {
+    try {
+      return await this.fundingConversionAccountingBootstrapReadiness.assess(
+        fundingConversionAttemptId(body),
+      );
+    } catch (error) {
+      if (
+        error instanceof
+        FundingConversionAccountingBootstrapReadinessRequestError
+      ) {
+        throw new BadRequestException(
+          'Invalid funding conversion accounting bootstrap readiness request',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet funding conversion accounting bootstrap readiness is unavailable',
+      );
+    }
+  }
+
+  @Post('funding-conversion-accounting-bootstrap')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async bootstrapFundingConversionAccounting(@Body() body: unknown) {
+    try {
+      return await this.fundingConversionAccountingBootstrap.bootstrapOnce(
+        fundingConversionAccountingBootstrapCommand(body),
+      );
+    } catch (error) {
+      if (error instanceof FundingConversionAccountingBootstrapRequestError) {
+        throw new BadRequestException(
+          'Invalid funding conversion accounting bootstrap request',
+        );
+      }
+      if (
+        error instanceof FundingConversionAccountingBootstrapBlockedError ||
+        error instanceof FundingConversionAccountingBootstrapConflictError
+      ) {
+        throw new ConflictException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet funding conversion accounting bootstrap is unavailable',
       );
     }
   }
@@ -668,5 +734,27 @@ function fundingConversionAccountingSyncCommand(body: unknown) {
       typeof value.acknowledgment === 'string'
         ? (value.acknowledgment as typeof FUNDING_CONVERSION_ACCOUNTING_SYNC_ACKNOWLEDGMENT)
         : ('' as typeof FUNDING_CONVERSION_ACCOUNTING_SYNC_ACKNOWLEDGMENT),
+  };
+}
+
+function fundingConversionAccountingBootstrapCommand(body: unknown) {
+  if (
+    typeof body !== 'object' ||
+    body === null ||
+    Array.isArray(body) ||
+    Object.keys(body).length !== 2
+  )
+    return {
+      attemptId: '',
+      acknowledgment:
+        '' as typeof FUNDING_CONVERSION_ACCOUNTING_BOOTSTRAP_ACKNOWLEDGMENT,
+    };
+  const value = body as Record<string, unknown>;
+  return {
+    attemptId: typeof value.attemptId === 'string' ? value.attemptId : '',
+    acknowledgment:
+      typeof value.acknowledgment === 'string'
+        ? (value.acknowledgment as typeof FUNDING_CONVERSION_ACCOUNTING_BOOTSTRAP_ACKNOWLEDGMENT)
+        : ('' as typeof FUNDING_CONVERSION_ACCOUNTING_BOOTSTRAP_ACKNOWLEDGMENT),
   };
 }

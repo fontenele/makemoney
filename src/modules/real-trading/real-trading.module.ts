@@ -83,6 +83,12 @@ import { RealExecutionAccountingMutationAuthorizationService } from './applicati
 import { PrismaAgenticWalletMarketSwapAccountingMutationAuthorizationReadStore } from './infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-authorization-read.store';
 import { PrismaAgenticWalletMarketSwapAccountingMutationApplicationStore } from './infrastructure/prisma-agentic-wallet-market-swap-accounting-mutation-application.store';
 import { RealExecutionAccountingMutationApplicationService } from './application/real-execution-accounting-mutation-application.service';
+import { AgenticWalletFundingConversionAccountingAbsenceReader } from './application/agentic-wallet-funding-conversion-accounting-absence.reader';
+import { AgenticWalletFundingConversionAccountingBootstrapService } from './application/agentic-wallet-funding-conversion-accounting-bootstrap.service';
+import { AgenticWalletFundingConversionAccountingBootstrapStore } from './application/agentic-wallet-funding-conversion-accounting-bootstrap.store';
+import { AgenticWalletFundingConversionAccountingBootstrapReadinessService } from './application/agentic-wallet-funding-conversion-accounting-bootstrap-readiness.service';
+import { PrismaAgenticWalletFundingConversionAccountingAbsenceReader } from './infrastructure/prisma-agentic-wallet-funding-conversion-accounting-absence.reader';
+import { PrismaAgenticWalletFundingConversionAccountingBootstrapStore } from './infrastructure/prisma-agentic-wallet-funding-conversion-accounting-bootstrap.store';
 
 @Module({
   imports: [RiskEngineModule],
@@ -302,6 +308,57 @@ import { RealExecutionAccountingMutationApplicationService } from './application
           contexts,
           snapshots,
           initializations,
+        ),
+    },
+    {
+      provide: AgenticWalletFundingConversionAccountingAbsenceReader,
+      useClass: PrismaAgenticWalletFundingConversionAccountingAbsenceReader,
+    },
+    {
+      provide: AgenticWalletFundingConversionAccountingBootstrapStore,
+      useClass: PrismaAgenticWalletFundingConversionAccountingBootstrapStore,
+    },
+    {
+      provide:
+        AgenticWalletFundingConversionAccountingBootstrapReadinessService,
+      inject: [
+        PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore,
+        AgenticWalletFundingConversionFinancialEvidenceContextStore,
+        AgenticWalletFundingConversionAccountingAbsenceReader,
+      ],
+      useFactory: (
+        reconciliations: PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore,
+        contexts: AgenticWalletFundingConversionFinancialEvidenceContextStore,
+        absence: AgenticWalletFundingConversionAccountingAbsenceReader,
+      ) =>
+        new AgenticWalletFundingConversionAccountingBootstrapReadinessService(
+          reconciliations,
+          contexts,
+          absence,
+        ),
+    },
+    {
+      provide: AgenticWalletFundingConversionAccountingBootstrapService,
+      inject: [
+        PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore,
+        AgenticWalletFundingConversionFinancialEvidenceContextStore,
+        AgenticWalletFundingConversionAccountingAbsenceReader,
+        AgenticWalletFundingConversionAccountingSnapshotReader,
+        AgenticWalletFundingConversionAccountingBootstrapStore,
+      ],
+      useFactory: (
+        reconciliations: PrismaAgenticWalletFundingConversionFinancialReconciliationReadStore,
+        contexts: AgenticWalletFundingConversionFinancialEvidenceContextStore,
+        absence: AgenticWalletFundingConversionAccountingAbsenceReader,
+        snapshots: AgenticWalletFundingConversionAccountingSnapshotReader,
+        store: AgenticWalletFundingConversionAccountingBootstrapStore,
+      ) =>
+        new AgenticWalletFundingConversionAccountingBootstrapService(
+          reconciliations,
+          contexts,
+          absence,
+          snapshots,
+          store,
         ),
     },
     {

@@ -89,7 +89,13 @@ M10.169 Complete Funding-Conversion Financial Reconciliation: DONE
 M10.170 Fail-Closed Funding-Conversion Accounting Prerequisite: DONE
 M10.171 Truthful Post-Reconciliation Accounting Bootstrap Plan: DONE
 M10.172 Durable Atomic Post-Reconciliation Accounting Bootstrap: DONE
-Next objective: compose a one-shot guarded bootstrap coordinator that obtains fresh finalized evidence and invokes M10.172 only after a new explicit operator action; keep it unregistered until its dependency and failure boundaries are verified
+M10.173 Guarded One-Shot Post-Reconciliation Accounting Bootstrap Coordination: DONE
+M10.174 Protected Runtime Post-Reconciliation Accounting Bootstrap Boundary: DONE
+M10.175 Read-Only Post-Reconciliation Accounting Bootstrap Readiness Audit: DONE
+M10.176 Explicit Live Post-Reconciliation Accounting Bootstrap Application: DONE
+M10.177 Current Agentic Wallet Authentication Challenge Compatibility: DONE
+M7.111 Forward-Only First-Tradeable Listing Activation: DONE
+Next objective: M7.112 bounded higher-frequency launch observation design and collection, preserving provider limits and zero order authority; the separate M10 read-only accounting-origin view remains pending
 ```
 
 The detailed sections below preserve the original product plan. For current delivery status and exact increment boundaries, `docs/roadmap.md` and `docs/current-state.md` are authoritative.

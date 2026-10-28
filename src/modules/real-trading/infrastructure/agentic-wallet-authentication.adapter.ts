@@ -2,7 +2,11 @@ import { AgenticWalletCliJsonProcess } from './agentic-wallet-cli-json-process';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
-const PAIRING_CODE_PATTERN = /^\d{6}$/;
+const PAIRING_CODE_PATTERN = /^[A-Za-z0-9]{6}$/;
+const APPROVED_AUTHENTICATION_HOSTS = new Set([
+  'app.binance.com',
+  'web3.binance.com',
+]);
 const MAX_WEB_URL_LENGTH = 2048;
 const MAX_FLOW_DURATION_MS = 10 * 60 * 1000;
 
@@ -128,7 +132,7 @@ function authenticationUrl(value: unknown): string {
   }
   if (
     parsed.protocol !== 'https:' ||
-    parsed.hostname !== 'web3.binance.com' ||
+    !APPROVED_AUTHENTICATION_HOSTS.has(parsed.hostname) ||
     parsed.username !== '' ||
     parsed.password !== '' ||
     parsed.hash !== ''

@@ -1,5 +1,69 @@
 # Changelog
 
+## 2026-10-27 — M7.111 forward-only first-tradeable listing activation
+
+- Diagnosed the empty New Listings cohort: all 770 durable symbols were one startup baseline, while the scanner only detected identities absent from a later catalog and could miss a pre-announced `BREAK` symbol becoming tradeable.
+- Added durable `activationTrackingStartedAt` provenance so only symbols first seen after an established baseline are eligible for activation detection.
+- Defined detection as the first observation with `status=TRADING` and `spotTradingAllowed=true`; a newly seen already-tradeable symbol activates immediately, while a newly seen non-tradeable symbol remains armed until its first tradeable observation.
+- Preserved all legacy baseline rows as untracked and performed no historical backfill or fabricated launch timestamp.
+- Kept activation, `detectedAt`, and the nine existing T+0 through T+24h checkpoints in one serializable transaction; later observations are idempotent.
+- Renamed runtime telemetry to `newlyActivatedCount` to match the corrected semantics.
+- Added focused catalog-service coverage and PostgreSQL E2E coverage for immediate activation, delayed `BREAK`-to-`TRADING` activation, baseline exclusion, idempotency, and checkpoint creation across all 50 migrations.
+- Added no signal, order, automatic entry/exit, or real financial transaction.
+- Passed 2,925 backend tests across 263 suites, 143 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, 117 dashboard tests, formatting, lint, Prisma/Compose validation, and both builds.
+- Deployed the additive migration locally, verified all 770 legacy rows remain untracked and undetected, restarted only the project API, observed a fresh 770-symbol catalog cycle, and received HTTP 200 from health plus direct and Vite-proxy paper valuation.
+
+## 2026-10-27 — M10.177 current Agentic Wallet authentication challenge compatibility
+
+- Diagnosed the wallet valuation blockers as an expired/disconnected CLI session rather than accounting balance loss.
+- Reproduced the current successful CLI sign-in shape: exact official `app.binance.com` host and six-character mixed-case alphanumeric pairing code.
+- Expanded the strict host allowlist only to `app.binance.com` and `web3.binance.com` and updated the pairing-code grammar to exactly six ASCII alphanumeric characters.
+- Preserved verbatim challenge display, HTTPS, URL credential/fragment rejection, canonical UUID, bounded expiry, hidden QR identity, and zero financial authority.
+- Added regression coverage for the current response plus hostile lookalike hosts and malformed codes.
+- Completed a fresh official pairing and verified available funding valuation through both the API and dashboard proxy with no blockers.
+- Created no quote, order, retry, accounting mutation, or financial transaction; funding, quote, and submission authorization remained false.
+- Passed 2,925 backend tests across 263 suites, 141 PostgreSQL E2E tests with all 49 migrations applied from scratch, 117 dashboard tests, formatting, lint, and both builds.
+
+## 2026-10-27 — M10.176 explicit live post-reconciliation accounting bootstrap application
+
+- Revalidated the named reconciled attempt immediately before mutation and confirmed complete durable context plus empty initialization, balance, and ordinary synchronization state.
+- Applied exactly one operator-authorized bootstrap using the literal reviewed-current-balances acknowledgment and one fresh finalized BSC snapshot.
+- Atomically created exceptional origin/initialization `5ff2256c-bc18-48a4-aad5-2443e4b99355` and the three current BNB/USDT/BTCB balance rows.
+- Verified one initialization, three balances, one exceptional receipt, zero ordinary conversion synchronizations, correct attempt/reconciliation correlation, and false historical-continuity claims.
+- Confirmed that subsequent readiness is blocked by `accounting_state_not_empty` and that strategy execution and automatic retry remain unauthorized.
+- Submitted no order and performed no financial transaction; this milestone changed only local accounting state and its immutable audit origin.
+- Passed 2,922 backend tests across 263 suites, 141 PostgreSQL E2E tests with all 49 migrations applied from scratch, 117 dashboard tests, formatting, lint, and both builds.
+
+## 2026-10-27 — M10.175 read-only post-reconciliation accounting bootstrap readiness audit
+
+- Added a provider-free readiness service that correlates durable reconciliation and terminal conversion context before inspecting local accounting state.
+- Added loopback-only, Bearer-protected `POST /real-trading/funding-conversion-accounting-bootstrap-readiness` with a strict attempt-only body and no acknowledgment.
+- Restricted the response to safe IDs, local counts, blockers, and false provider/bootstrap/authority flags; no wallet or financial evidence is exposed.
+- Added focused and E2E coverage for ready, missing, divergent, nonempty, unauthenticated, malformed, and unknown-attempt paths.
+- Ran a direct production read-only audit of the known reconciled attempt and found all three accounting surfaces empty and ready for a separate explicit action.
+- Performed no BSC request, bootstrap invocation, accounting write, strategy activation, retry, order, or financial transaction.
+- Passed 2,922 backend tests across 263 suites, 141 PostgreSQL E2E tests with all 49 migrations applied from scratch, 117 dashboard tests, formatting, lint, builds, and Prisma/Compose validation.
+
+## 2026-10-27 — M10.174 protected runtime post-reconciliation accounting bootstrap boundary
+
+- Composed the M10.173 coordinator, serializable absence reader, finalized BSC snapshot reader, durable context readers, and M10.172 atomic store in the real-trading module.
+- Added loopback-only, Bearer-protected `POST /real-trading/funding-conversion-accounting-bootstrap` with an exact attempt/acknowledgment body.
+- Mapped invalid bodies to 400, typed atomic conflicts to 409, and unexpected dependency failures to a sanitized 503.
+- Added E2E coverage for missing authentication, malformed input, and an authenticated unknown attempt that blocks before accounting inspection or BSC access.
+- Synchronized the root README route table with the new method, access policy, parameters, effects, and safety boundaries.
+- Did not invoke the known reconciled live attempt or create production accounting state, retry authority, strategy authority, order, or financial transaction.
+- Passed 2,917 backend tests across 262 suites, 138 PostgreSQL E2E tests with all 49 migrations applied from scratch, 117 dashboard tests, formatting, lint, builds, and Prisma/Compose validation.
+
+## 2026-10-27 — M10.173 guarded one-shot post-reconciliation accounting bootstrap coordination
+
+- Added an unregistered operator-action coordinator requiring canonical attempt identity and the literal reconciled current-balance acknowledgment.
+- Added per-attempt overlap suppression and explicit cancellation boundaries with guard release after success or dependency failure.
+- Added a serializable absence reader covering initialization, current balances, and ordinary funding-conversion synchronization in one coherent snapshot.
+- Ordered preflight so missing durable reconciliation/context or nonempty accounting state blocks before public BSC access.
+- Acquired one finalized three-asset snapshot, prepared the fixed 60-second M10.171 plan, and delegated final revalidation and atomic persistence exclusively to M10.172.
+- Kept the coordinator and reader outside runtime composition and added no route, live bootstrap, automatic retry, strategy authority, order, or financial transaction.
+- Passed 2,917 backend tests across 262 suites, 135 PostgreSQL E2E tests with all 49 migrations applied from scratch, 117 dashboard tests, formatting, lint, builds, and Prisma/Compose validation.
+
 ## 2026-10-27 — M10.172 durable atomic post-reconciliation accounting bootstrap
 
 - Added a dedicated immutable bootstrap model and migration with unique initialization, reconciliation, attempt, and transaction correlation.

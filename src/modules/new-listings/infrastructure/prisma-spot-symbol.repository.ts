@@ -35,17 +35,37 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
       async (tx) => {
         const observed = await tx.observedSpotSymbol.findMany({
           where: { provider },
-          select: { symbol: true },
+          select: {
+            symbol: true,
+            activationTrackingStartedAt: true,
+            detectedAt: true,
+          },
         });
         const hadBaseline = observed.length > 0;
-        const observedSymbols = new Set(observed.map(({ symbol }) => symbol));
-        const newlyObserved = hadBaseline
-          ? catalog.symbols.filter(({ symbol }) => !observedSymbols.has(symbol))
+        const observedBySymbol = new Map(
+          observed.map((row) => [row.symbol, row] as const),
+        );
+        const newlyActivated = hadBaseline
+          ? catalog.symbols.filter((symbol) => {
+              const previous = observedBySymbol.get(symbol.symbol);
+              const trackingStarted = previous
+                ? previous.activationTrackingStartedAt !== null
+                : true;
+              return (
+                trackingStarted &&
+                previous?.detectedAt == null &&
+                isTradeable(symbol)
+              );
+            })
           : [];
+        const newlyActivatedSymbols = new Set(
+          newlyActivated.map(({ symbol }) => symbol),
+        );
 
         await Promise.all(
-          catalog.symbols.map((symbol) =>
-            tx.observedSpotSymbol.upsert({
+          catalog.symbols.map((symbol) => {
+            const activated = newlyActivatedSymbols.has(symbol.symbol);
+            return tx.observedSpotSymbol.upsert({
               where: {
                 provider_symbol: {
                   provider: symbol.provider,
@@ -56,7 +76,10 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
                 ...symbol,
                 firstObservedAt: catalog.receivedAt,
                 lastObservedAt: catalog.receivedAt,
-                detectedAt: hadBaseline ? catalog.receivedAt : null,
+                activationTrackingStartedAt: hadBaseline
+                  ? catalog.receivedAt
+                  : null,
+                detectedAt: activated ? catalog.receivedAt : null,
               },
               update: {
                 baseAsset: symbol.baseAsset,
@@ -64,14 +87,15 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
                 status: symbol.status,
                 spotTradingAllowed: symbol.spotTradingAllowed,
                 lastObservedAt: catalog.receivedAt,
+                ...(activated ? { detectedAt: catalog.receivedAt } : {}),
               },
-            }),
-          ),
+            });
+          }),
         );
 
-        if (newlyObserved.length > 0) {
+        if (newlyActivated.length > 0) {
           await tx.listingObservationCheckpoint.createMany({
-            data: newlyObserved.flatMap(({ provider, symbol }) =>
+            data: newlyActivated.flatMap(({ provider, symbol }) =>
               buildListingObservationSchedule(catalog.receivedAt).map(
                 ({ label, offsetMs, targetAt }) => ({
                   provider,
@@ -86,7 +110,7 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
           });
         }
 
-        return newlyObserved;
+        return newlyActivated;
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
@@ -411,6 +435,10 @@ export class PrismaSpotSymbolRepository implements SpotSymbolRepository {
       return true;
     });
   }
+}
+
+function isTradeable(symbol: SpotSymbol): boolean {
+  return symbol.status === 'TRADING' && symbol.spotTradingAllowed;
 }
 
 interface ClaimedCheckpointRow {

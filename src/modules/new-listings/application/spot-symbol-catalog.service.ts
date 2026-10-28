@@ -20,7 +20,7 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(SpotSymbolCatalogService.name);
   private readonly abortController = new AbortController();
   private catalog?: SpotSymbolCatalog;
-  private newlyObservedSymbols: SpotSymbol[] = [];
+  private newlyActivatedSymbols: SpotSymbol[] = [];
   private refreshTimer?: NodeJS.Timeout;
 
   constructor(
@@ -48,20 +48,20 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
     return this.catalog;
   }
 
-  latestNewlyObserved(): SpotSymbol[] {
-    return [...this.newlyObservedSymbols];
+  latestNewlyActivated(): SpotSymbol[] {
+    return [...this.newlyActivatedSymbols];
   }
 
   private async load(): Promise<void> {
     try {
       const catalog = await this.provider.load(this.abortController.signal);
-      const newlyObservedSymbols = await this.repository.observe(catalog);
+      const newlyActivatedSymbols = await this.repository.observe(catalog);
       this.catalog = catalog;
-      this.newlyObservedSymbols = newlyObservedSymbols;
+      this.newlyActivatedSymbols = newlyActivatedSymbols;
       this.logger.log({
         event: 'new_listings.catalog_loaded',
         symbolCount: this.catalog.symbols.length,
-        newlyObservedCount: newlyObservedSymbols.length,
+        newlyActivatedCount: newlyActivatedSymbols.length,
         receivedAt: this.catalog.receivedAt.toISOString(),
       });
     } catch (error: unknown) {

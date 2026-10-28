@@ -34,6 +34,27 @@ describe('AgenticWalletAuthenticationAdapter', () => {
     expect(runner.verify.mock.calls).toEqual([[QR_CODE_ID, undefined]]);
   });
 
+  it('accepts the current official app host and verbatim mixed-case alphanumeric pairing code', async () => {
+    const runner = mockRunner({
+      success: true,
+      data: {
+        urlForWeb: 'https://app.binance.com/uni-qr/3WMDtQ89',
+        qrCodeId: QR_CODE_ID,
+        expireAt: '1792584300000',
+        pairingCode: 'a1B2c3',
+      },
+    });
+    const adapter = new AgenticWalletAuthenticationAdapter(runner);
+
+    await expect(adapter.start(STARTED_AT)).resolves.toEqual({
+      status: 'awaiting_confirmation',
+      urlForWeb: 'https://app.binance.com/uni-qr/3WMDtQ89',
+      qrCodeId: QR_CODE_ID,
+      pairingCode: 'a1B2c3',
+      expiresAt: new Date('2026-10-21T12:05:00.000Z'),
+    });
+  });
+
   it('reports an existing authenticated CLI session without a challenge', async () => {
     const adapter = new AgenticWalletAuthenticationAdapter(
       mockRunner({ success: true, data: { status: 'ALREADY_CONNECTED' } }),
@@ -46,12 +67,14 @@ describe('AgenticWalletAuthenticationAdapter', () => {
   it.each([
     ['http://web3.binance.com/en/agent-login', QR_CODE_ID, '654321'],
     ['https://evil.example/agent-login', QR_CODE_ID, '654321'],
+    ['https://app.binance.com.evil.example/uni-qr/value', QR_CODE_ID, 'A1B2C3'],
     [
       'https://web3.binance.com/en/agent-login',
       'not-a-canonical-uuid',
       '654321',
     ],
     ['https://web3.binance.com/en/agent-login', QR_CODE_ID, '123456<script>'],
+    ['https://app.binance.com/uni-qr/value', QR_CODE_ID, 'ab-123'],
   ])('rejects an unsafe or malformed challenge %#', async (url, id, code) => {
     const adapter = new AgenticWalletAuthenticationAdapter(
       mockRunner({

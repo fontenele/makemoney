@@ -1,5 +1,88 @@
 # Real Trading
 
+## M10.177 — Current Agentic Wallet authentication challenge compatibility
+
+Live diagnosis of the dashboard's complete funding-valuation blocker set confirmed that the API and dashboard were healthy while `baw wallet status --json` reported `UNCONNECTED`. The pairing route then returned a sanitized 503 because pinned CLI 1.10.0 had evolved its successful challenge from the application's original assumptions: `urlForWeb` used exact host `app.binance.com`, and `pairingCode` was six mixed-case alphanumeric characters rather than six decimal digits.
+
+The adapter now admits only exact HTTPS hosts `app.binance.com` and `web3.binance.com` and requires exactly six ASCII alphanumeric pairing-code characters. It displays both values verbatim and still rejects credentials, fragments, overlong URLs, host lookalikes, malformed UUIDs, invalid expiry windows, punctuation, markup, and wrong-length codes. The QR identity remains internal to the blocking verifier.
+
+A fresh route-driven pairing reached `connected`. Subsequent direct and Vite-proxy funding valuation returned HTTP 200 with status `available`, no blockers, and reported BNB, USDT, and combined totals. The flow did not create a quote, authorize funding/submission, mutate accounting, place an order, or perform a financial transaction.
+
+### M10.177 acceptance criteria
+
+- Current pinned-CLI `app.binance.com` challenges and verbatim six-character mixed-case alphanumeric codes pass.
+- The existing exact `web3.binance.com` flow remains compatible.
+- Non-HTTPS, credentialed, fragmented, lookalike-host, malformed-code, UUID, and expiry evidence fails closed.
+- The dashboard pairing completes and both required runtime valuation paths remain healthy.
+- Authentication grants no quote, submission, retry, strategy, order, or transaction authority.
+
+## M10.176 — Explicit live post-reconciliation accounting bootstrap application
+
+The operator explicitly authorized one bootstrap for attempt `0f6caa40-97e7-45f6-84d1-614fc38f0ff8` with acknowledgment `reconciled_conversion_and_current_wallet_balances_reviewed_for_accounting_bootstrap`. An immediately preceding M10.175 assessment correlated reconciliation `db55b7e4-6372-4185-98e3-f3420859ee2d`, confirmed the terminal conversion context, and found all three accounting surfaces empty.
+
+The M10.174 action then acquired one finalized BNB/USDT/BTCB snapshot and delegated to the M10.172 serializable store. It atomically created initialization and exceptional receipt `5ff2256c-bc18-48a4-aad5-2443e4b99355` at finalized block `0x7c1dc0f` together with exactly three current balance rows. Durable inspection found one initialization, three balances, one bootstrap receipt, and zero ordinary conversion synchronizations. The receipt states the missing-preexisting-ledger reason and keeps both historical continuity claims false. A follow-up readiness assessment is blocked by `accounting_state_not_empty`.
+
+This application changed local accounting only. It did not submit or repeat the reconciled provider transaction, create an ordinary synchronization, authorize automatic retry, enable strategy execution, or place an order.
+
+### M10.176 acceptance criteria
+
+- A fresh preflight is ready immediately before the explicitly acknowledged action.
+- Exactly one initialization, three current balance rows, and one immutable exceptional receipt are committed atomically.
+- The receipt correlates the exact attempt and reconciliation and preserves both historical-continuity claims as false.
+- No ordinary conversion synchronization is invented for the historical transaction.
+- Subsequent readiness blocks on nonempty accounting state.
+- Strategy execution, automatic retry, order submission, and financial transactions remain unauthorized.
+
+## M10.175 — Read-only post-reconciliation accounting bootstrap readiness audit
+
+M10.175 separates operational inspection from the mutating M10.174 action. `POST /real-trading/funding-conversion-accounting-bootstrap-readiness` is loopback-only and Bearer-protected, accepts exactly one canonical `attemptId`, and accepts no acknowledgment. It reloads the immutable financial reconciliation and terminal conversion context, compares attempt, plan, provider order, submitted quantity, expected/minimum output, status observation, transaction, chain, terminal success, and no-retry facts, then uses the serializable M10.173 absence reader to count initialization, current balances, and ordinary conversion synchronization.
+
+The response contains only the attempt and reconciliation IDs, safe blockers, three local row counts with inspection time, and explicit readiness/safety flags. It never returns wallet address, quantities, transaction hash, provider order, or financial evidence. It has no snapshot-reader or bootstrap-store dependency, always reports provider read and bootstrap invocation false, and keeps explicit operator action required even when ready.
+
+A direct production read-only audit of attempt `0f6caa40-97e7-45f6-84d1-614fc38f0ff8` correlated reconciliation `db55b7e4-6372-4185-98e3-f3420859ee2d` and found initialization, balance, and synchronization counts all zero. The result was `ready_for_explicit_bootstrap_action`; no BSC read or mutation followed.
+
+### M10.175 acceptance criteria
+
+- The audit accepts exactly one canonical attempt identity and no mutation acknowledgment.
+- Missing reconciliation/context or durable identity divergence blocks before accounting inspection.
+- Accounting counts are read together through the serializable absence reader.
+- The response exposes safe IDs, counts, blockers, and flags but no wallet or financial evidence.
+- Provider access and bootstrap invocation remain structurally absent and explicitly false.
+- The protected HTTP boundary rejects missing authentication and malformed bodies before service access and sanitizes unexpected failures.
+- A production read-only audit may report ready but cannot authorize or invoke M10.174; a separate explicit operator action remains mandatory.
+
+## M10.174 — Protected runtime post-reconciliation accounting bootstrap boundary
+
+M10.174 composes the M10.173 coordinator and all of its concrete dependencies into the real-trading module. `POST /real-trading/funding-conversion-accounting-bootstrap` is loopback-only through the application bind policy and uses the existing fail-closed Bearer guard. Its body must contain exactly `attemptId` and the literal acknowledgment `reconciled_conversion_and_current_wallet_balances_reviewed_for_accounting_bootstrap`; missing, extra, mistyped, or noncanonical input returns 400 before coordinator dependencies are accessed.
+
+The protected route maps atomic bootstrap conflicts to 409 and replaces unexpected database, RPC, or internal failures with one generic 503 response. A valid request for an unknown canonical attempt returns the coordinator's explicit blocked result before accounting inspection or public BSC access. Runtime verification deliberately used only unauthenticated, malformed, and unknown-attempt requests. It did not submit the known reconciled attempt, read its live wallet snapshot, or create accounting state.
+
+### M10.174 acceptance criteria
+
+- The coordinator, serializable absence reader, finalized snapshot reader, and atomic store are composed through explicit NestJS dependencies.
+- The new POST action is loopback-only, Bearer-protected, and requires exactly the canonical attempt plus literal acknowledgment.
+- Missing authentication and malformed bodies fail before coordinator dependency access.
+- An unknown canonical attempt returns `financial_reconciliation_absent` without accounting inspection, provider read, or write.
+- Typed atomic blockers and conflicts return 409; unexpected dependency details never cross the HTTP boundary.
+- README route documentation remains synchronized with method, access requirements, body, effects, and preserved false authorities.
+- Verification does not invoke the known reconciled live attempt and creates no accounting row, order, retry, strategy authority, or financial transaction.
+
+## M10.173 — Guarded one-shot post-reconciliation accounting bootstrap coordination
+
+M10.173 adds an unregistered application coordinator for a new explicit operator action. The command accepts only the exact reconciled-balance acknowledgment and canonical attempt identity. The coordinator suppresses overlapping work for that attempt, resolves the durable financial reconciliation and terminal conversion context, and inspects initialization, balance, and ordinary conversion-synchronization counts together in one serializable read snapshot. Missing prerequisites or nonempty accounting state block before public BSC access.
+
+Only after those local checks does the coordinator request one finalized BNB/USDT/BTCB snapshot for the exact durable wallet. It creates a bounded 60-second M10.171 plan with a fresh bootstrap UUID and passes the complete reconciliation, context, snapshot, absence evidence, and exact plan to M10.172. M10.172 still reacquires the shared initialization lock and independently revalidates durable context, empty state, freshness, identity, and financial equations before any atomic write. Cancellation and dependency failures never become retries, and the process-local overlap guard is always released.
+
+### M10.173 acceptance criteria
+
+- Invalid attempt identity or missing literal acknowledgment fails before dependency access.
+- Durable reconciliation and terminal context must exist before accounting inspection or provider access.
+- All three accounting surfaces are inspected in one serializable read snapshot; nonempty state blocks before the BSC read.
+- At most one action per attempt runs in this process, and the guard is released after success or failure.
+- One fresh finalized snapshot is assessed through M10.171 before the exact plan can reach M10.172.
+- M10.172 remains the final serializable authority for context, freshness, emptiness, and atomic persistence.
+- The coordinator and reader remain unregistered; no route, live invocation, automatic retry, ordinary synchronization, strategy activation, order, or financial transaction is added.
+
 ## M10.172 — Durable atomic post-reconciliation accounting bootstrap
 
 M10.172 adds an unregistered serializable store for the exact M10.171 bootstrap plan. It uses the same advisory lock as ordinary accounting initialization, checks exact replay before mutable reads, reloads the fingerprint-validated financial reconciliation and durable submission attempt, and compares wallet, pre-balances, accepted quote quantities, fee evidence, terminal state, and no-retry policy with the supplied context. Initialization, balance, and ordinary funding-conversion synchronization tables must still all be empty, and the finalized snapshot must remain within its bounded age at the transaction clock.

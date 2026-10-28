@@ -33,6 +33,7 @@ export type ObservedSpotSymbolMinAggregateOutputType = {
   spotTradingAllowed: boolean | null
   firstObservedAt: Date | null
   lastObservedAt: Date | null
+  activationTrackingStartedAt: Date | null
   detectedAt: Date | null
 }
 
@@ -45,6 +46,7 @@ export type ObservedSpotSymbolMaxAggregateOutputType = {
   spotTradingAllowed: boolean | null
   firstObservedAt: Date | null
   lastObservedAt: Date | null
+  activationTrackingStartedAt: Date | null
   detectedAt: Date | null
 }
 
@@ -57,6 +59,7 @@ export type ObservedSpotSymbolCountAggregateOutputType = {
   spotTradingAllowed: number
   firstObservedAt: number
   lastObservedAt: number
+  activationTrackingStartedAt: number
   detectedAt: number
   _all: number
 }
@@ -71,6 +74,7 @@ export type ObservedSpotSymbolMinAggregateInputType = {
   spotTradingAllowed?: true
   firstObservedAt?: true
   lastObservedAt?: true
+  activationTrackingStartedAt?: true
   detectedAt?: true
 }
 
@@ -83,6 +87,7 @@ export type ObservedSpotSymbolMaxAggregateInputType = {
   spotTradingAllowed?: true
   firstObservedAt?: true
   lastObservedAt?: true
+  activationTrackingStartedAt?: true
   detectedAt?: true
 }
 
@@ -95,6 +100,7 @@ export type ObservedSpotSymbolCountAggregateInputType = {
   spotTradingAllowed?: true
   firstObservedAt?: true
   lastObservedAt?: true
+  activationTrackingStartedAt?: true
   detectedAt?: true
   _all?: true
 }
@@ -180,6 +186,7 @@ export type ObservedSpotSymbolGroupByOutputType = {
   spotTradingAllowed: boolean
   firstObservedAt: Date
   lastObservedAt: Date
+  activationTrackingStartedAt: Date | null
   detectedAt: Date | null
   _count: ObservedSpotSymbolCountAggregateOutputType | null
   _min: ObservedSpotSymbolMinAggregateOutputType | null
@@ -213,6 +220,7 @@ export type ObservedSpotSymbolWhereInput = {
   spotTradingAllowed?: Prisma.BoolFilter<"ObservedSpotSymbol"> | boolean
   firstObservedAt?: Prisma.DateTimeFilter<"ObservedSpotSymbol"> | Date | string
   lastObservedAt?: Prisma.DateTimeFilter<"ObservedSpotSymbol"> | Date | string
+  activationTrackingStartedAt?: Prisma.DateTimeNullableFilter<"ObservedSpotSymbol"> | Date | string | null
   detectedAt?: Prisma.DateTimeNullableFilter<"ObservedSpotSymbol"> | Date | string | null
   observationCheckpoints?: Prisma.ListingObservationCheckpointListRelationFilter
 }
@@ -226,6 +234,7 @@ export type ObservedSpotSymbolOrderByWithRelationInput = {
   spotTradingAllowed?: Prisma.SortOrder
   firstObservedAt?: Prisma.SortOrder
   lastObservedAt?: Prisma.SortOrder
+  activationTrackingStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   detectedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   observationCheckpoints?: Prisma.ListingObservationCheckpointOrderByRelationAggregateInput
 }
@@ -243,6 +252,7 @@ export type ObservedSpotSymbolWhereUniqueInput = Prisma.AtLeast<{
   spotTradingAllowed?: Prisma.BoolFilter<"ObservedSpotSymbol"> | boolean
   firstObservedAt?: Prisma.DateTimeFilter<"ObservedSpotSymbol"> | Date | string
   lastObservedAt?: Prisma.DateTimeFilter<"ObservedSpotSymbol"> | Date | string
+  activationTrackingStartedAt?: Prisma.DateTimeNullableFilter<"ObservedSpotSymbol"> | Date | string | null
   detectedAt?: Prisma.DateTimeNullableFilter<"ObservedSpotSymbol"> | Date | string | null
   observationCheckpoints?: Prisma.ListingObservationCheckpointListRelationFilter
 }, "provider_symbol">
@@ -256,6 +266,7 @@ export type ObservedSpotSymbolOrderByWithAggregationInput = {
   spotTradingAllowed?: Prisma.SortOrder
   firstObservedAt?: Prisma.SortOrder
   lastObservedAt?: Prisma.SortOrder
+  activationTrackingStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   detectedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ObservedSpotSymbolCountOrderByAggregateInput
   _max?: Prisma.ObservedSpotSymbolMaxOrderByAggregateInput
@@ -274,6 +285,7 @@ export type ObservedSpotSymbolScalarWhereWithAggregatesInput = {
   spotTradingAllowed?: Prisma.BoolWithAggregatesFilter<"ObservedSpotSymbol"> | boolean
   firstObservedAt?: Prisma.DateTimeWithAggregatesFilter<"ObservedSpotSymbol"> | Date | string
   lastObservedAt?: Prisma.DateTimeWithAggregatesFilter<"ObservedSpotSymbol"> | Date | string
+  activationTrackingStartedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ObservedSpotSymbol"> | Date | string | null
   detectedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ObservedSpotSymbol"> | Date | string | null
 }
 
@@ -286,6 +298,7 @@ export type ObservedSpotSymbolCreateInput = {
   spotTradingAllowed: boolean
   firstObservedAt: Date | string
   lastObservedAt: Date | string
+  activationTrackingStartedAt?: Date | string | null
   detectedAt?: Date | string | null
   observationCheckpoints?: Prisma.ListingObservationCheckpointCreateNestedManyWithoutDetectionInput
 }
@@ -299,6 +312,7 @@ export type ObservedSpotSymbolUncheckedCreateInput = {
   spotTradingAllowed: boolean
   firstObservedAt: Date | string
   lastObservedAt: Date | string
+  activationTrackingStartedAt?: Date | string | null
   detectedAt?: Date | string | null
   observationCheckpoints?: Prisma.ListingObservationCheckpointUncheckedCreateNestedManyWithoutDetectionInput
 }
@@ -312,6 +326,7 @@ export type ObservedSpotSymbolUpdateInput = {
   spotTradingAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activationTrackingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   observationCheckpoints?: Prisma.ListingObservationCheckpointUpdateManyWithoutDetectionNestedInput
 }
@@ -325,6 +340,7 @@ export type ObservedSpotSymbolUncheckedUpdateInput = {
   spotTradingAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activationTrackingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   observationCheckpoints?: Prisma.ListingObservationCheckpointUncheckedUpdateManyWithoutDetectionNestedInput
 }
@@ -338,6 +354,7 @@ export type ObservedSpotSymbolCreateManyInput = {
   spotTradingAllowed: boolean
   firstObservedAt: Date | string
   lastObservedAt: Date | string
+  activationTrackingStartedAt?: Date | string | null
   detectedAt?: Date | string | null
 }
 
@@ -350,6 +367,7 @@ export type ObservedSpotSymbolUpdateManyMutationInput = {
   spotTradingAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activationTrackingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -362,6 +380,7 @@ export type ObservedSpotSymbolUncheckedUpdateManyInput = {
   spotTradingAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activationTrackingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -379,6 +398,7 @@ export type ObservedSpotSymbolCountOrderByAggregateInput = {
   spotTradingAllowed?: Prisma.SortOrder
   firstObservedAt?: Prisma.SortOrder
   lastObservedAt?: Prisma.SortOrder
+  activationTrackingStartedAt?: Prisma.SortOrder
   detectedAt?: Prisma.SortOrder
 }
 
@@ -391,6 +411,7 @@ export type ObservedSpotSymbolMaxOrderByAggregateInput = {
   spotTradingAllowed?: Prisma.SortOrder
   firstObservedAt?: Prisma.SortOrder
   lastObservedAt?: Prisma.SortOrder
+  activationTrackingStartedAt?: Prisma.SortOrder
   detectedAt?: Prisma.SortOrder
 }
 
@@ -403,6 +424,7 @@ export type ObservedSpotSymbolMinOrderByAggregateInput = {
   spotTradingAllowed?: Prisma.SortOrder
   firstObservedAt?: Prisma.SortOrder
   lastObservedAt?: Prisma.SortOrder
+  activationTrackingStartedAt?: Prisma.SortOrder
   detectedAt?: Prisma.SortOrder
 }
 
@@ -434,6 +456,7 @@ export type ObservedSpotSymbolCreateWithoutObservationCheckpointsInput = {
   spotTradingAllowed: boolean
   firstObservedAt: Date | string
   lastObservedAt: Date | string
+  activationTrackingStartedAt?: Date | string | null
   detectedAt?: Date | string | null
 }
 
@@ -446,6 +469,7 @@ export type ObservedSpotSymbolUncheckedCreateWithoutObservationCheckpointsInput 
   spotTradingAllowed: boolean
   firstObservedAt: Date | string
   lastObservedAt: Date | string
+  activationTrackingStartedAt?: Date | string | null
   detectedAt?: Date | string | null
 }
 
@@ -474,6 +498,7 @@ export type ObservedSpotSymbolUpdateWithoutObservationCheckpointsInput = {
   spotTradingAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activationTrackingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -486,6 +511,7 @@ export type ObservedSpotSymbolUncheckedUpdateWithoutObservationCheckpointsInput 
   spotTradingAllowed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   firstObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastObservedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activationTrackingStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   detectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -529,6 +555,7 @@ export type ObservedSpotSymbolSelect<ExtArgs extends runtime.Types.Extensions.In
   spotTradingAllowed?: boolean
   firstObservedAt?: boolean
   lastObservedAt?: boolean
+  activationTrackingStartedAt?: boolean
   detectedAt?: boolean
   observationCheckpoints?: boolean | Prisma.ObservedSpotSymbol$observationCheckpointsArgs<ExtArgs>
   _count?: boolean | Prisma.ObservedSpotSymbolCountOutputTypeDefaultArgs<ExtArgs>
@@ -543,6 +570,7 @@ export type ObservedSpotSymbolSelectCreateManyAndReturn<ExtArgs extends runtime.
   spotTradingAllowed?: boolean
   firstObservedAt?: boolean
   lastObservedAt?: boolean
+  activationTrackingStartedAt?: boolean
   detectedAt?: boolean
 }, ExtArgs["result"]["observedSpotSymbol"]>
 
@@ -555,6 +583,7 @@ export type ObservedSpotSymbolSelectUpdateManyAndReturn<ExtArgs extends runtime.
   spotTradingAllowed?: boolean
   firstObservedAt?: boolean
   lastObservedAt?: boolean
+  activationTrackingStartedAt?: boolean
   detectedAt?: boolean
 }, ExtArgs["result"]["observedSpotSymbol"]>
 
@@ -567,10 +596,11 @@ export type ObservedSpotSymbolSelectScalar = {
   spotTradingAllowed?: boolean
   firstObservedAt?: boolean
   lastObservedAt?: boolean
+  activationTrackingStartedAt?: boolean
   detectedAt?: boolean
 }
 
-export type ObservedSpotSymbolOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"provider" | "symbol" | "baseAsset" | "quoteAsset" | "status" | "spotTradingAllowed" | "firstObservedAt" | "lastObservedAt" | "detectedAt", ExtArgs["result"]["observedSpotSymbol"]>
+export type ObservedSpotSymbolOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"provider" | "symbol" | "baseAsset" | "quoteAsset" | "status" | "spotTradingAllowed" | "firstObservedAt" | "lastObservedAt" | "activationTrackingStartedAt" | "detectedAt", ExtArgs["result"]["observedSpotSymbol"]>
 export type ObservedSpotSymbolInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   observationCheckpoints?: boolean | Prisma.ObservedSpotSymbol$observationCheckpointsArgs<ExtArgs>
   _count?: boolean | Prisma.ObservedSpotSymbolCountOutputTypeDefaultArgs<ExtArgs>
@@ -592,6 +622,7 @@ export type $ObservedSpotSymbolPayload<ExtArgs extends runtime.Types.Extensions.
     spotTradingAllowed: boolean
     firstObservedAt: Date
     lastObservedAt: Date
+    activationTrackingStartedAt: Date | null
     detectedAt: Date | null
   }, ExtArgs["result"]["observedSpotSymbol"]>
   composites: {}
@@ -1025,6 +1056,7 @@ export interface ObservedSpotSymbolFieldRefs {
   readonly spotTradingAllowed: Prisma.FieldRef<"ObservedSpotSymbol", 'Boolean'>
   readonly firstObservedAt: Prisma.FieldRef<"ObservedSpotSymbol", 'DateTime'>
   readonly lastObservedAt: Prisma.FieldRef<"ObservedSpotSymbol", 'DateTime'>
+  readonly activationTrackingStartedAt: Prisma.FieldRef<"ObservedSpotSymbol", 'DateTime'>
   readonly detectedAt: Prisma.FieldRef<"ObservedSpotSymbol", 'DateTime'>
 }
     

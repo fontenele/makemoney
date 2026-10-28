@@ -725,6 +725,8 @@ describe('Application (e2e)', () => {
     '/real-trading/funding-conversion-status',
     '/real-trading/funding-conversion-reconciliation',
     '/real-trading/funding-conversion-accounting-sync',
+    '/real-trading/funding-conversion-accounting-bootstrap-readiness',
+    '/real-trading/funding-conversion-accounting-bootstrap',
   ])(
     '%s (POST) fails closed without operator authentication',
     async (route) => {
@@ -747,6 +749,8 @@ describe('Application (e2e)', () => {
     '/real-trading/funding-conversion-status',
     '/real-trading/funding-conversion-reconciliation',
     '/real-trading/funding-conversion-accounting-sync',
+    '/real-trading/funding-conversion-accounting-bootstrap-readiness',
+    '/real-trading/funding-conversion-accounting-bootstrap',
   ])(
     '%s (POST) rejects malformed input before provider access',
     async (route) => {
@@ -769,6 +773,86 @@ describe('Application (e2e)', () => {
       }
     },
   );
+
+  it('/real-trading/funding-conversion-accounting-bootstrap-readiness (POST) audits an unknown attempt without provider access', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const token = 'e2e-funding-conversion-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/funding-conversion-accounting-bootstrap-readiness')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ attemptId: '019a0db1-bfea-7000-8000-000000000098' })
+        .expect(200)
+        .expect({
+          scope:
+            'agentic_wallet_funding_conversion_accounting_bootstrap_readiness',
+          status: 'blocked',
+          blockers: ['financial_reconciliation_absent'],
+          attemptId: '019a0db1-bfea-7000-8000-000000000098',
+          reconciliationId: null,
+          accountingState: null,
+          financialReconciliationComplete: false,
+          terminalConversionContextComplete: false,
+          accountingStateInspected: false,
+          accountingStateEmpty: false,
+          providerReadStarted: false,
+          bootstrapInvoked: false,
+          explicitOperatorActionRequired: true,
+          accountingBalancesInitialized: false,
+          strategyExecutionAuthorized: false,
+          automaticRetryAllowed: false,
+        });
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it('/real-trading/funding-conversion-accounting-bootstrap (POST) blocks an unknown attempt before public-chain access', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const token = 'e2e-funding-conversion-control-token';
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/funding-conversion-accounting-bootstrap')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          attemptId: '019a0db1-bfea-7000-8000-000000000099',
+          acknowledgment:
+            'reconciled_conversion_and_current_wallet_balances_reviewed_for_accounting_bootstrap',
+        })
+        .expect(200)
+        .expect({
+          scope:
+            'agentic_wallet_funding_conversion_accounting_bootstrap_action',
+          status: 'blocked',
+          blockers: ['financial_reconciliation_absent'],
+          applied: null,
+          replayed: false,
+          accountingStateInspected: false,
+          providerReadStarted: false,
+          providerReadCompleted: false,
+          accountingBootstrapComplete: false,
+          ordinaryAccountingSynchronizationApplied: false,
+          historicalLedgerContinuityClaimed: false,
+          historicalBtcbContinuityClaimed: false,
+          strategyExecutionAuthorized: false,
+          automaticRetryAllowed: false,
+        });
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
 
   it('/new-listings/summary (GET) exposes aggregate detection coverage', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];

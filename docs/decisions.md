@@ -1,5 +1,41 @@
 # Technical Decisions
 
+## M7.111 — A listing detection is a forward-tracked first tradeable activation
+
+Catalog identity discovery and actual trading activation are different events. A provider can publish a symbol in `BREAK` before orders are permitted, so treating only a previously absent identity as the launch can miss the economically relevant transition. M7.111 durably arms only identities first seen after a valid baseline and sets `detectedAt` on their first observation with both `status=TRADING` and Spot trading allowed.
+
+Legacy baseline rows keep a null activation-tracking marker permanently. This prevents a restart, migration, or ordinary status transition from fabricating a launch for any of the 770 pre-existing symbols. Activation and the existing checkpoint schedule are one serializable write, and repeated tradeable observations cannot redetect the symbol. This remains research collection only and grants no signal or execution authority.
+
+## M10.177 — Validate the current provider challenge narrowly without reconstructing it
+
+The official authentication workflow requires consumers to display `urlForWeb` and `pairingCode` verbatim. Live pinned-CLI evidence now uses `https://app.binance.com/uni-qr/...` and a six-character mixed-case alphanumeric code, so the older single-host and decimal-only assumptions rejected authentic challenges. The validation boundary now allows only the old and current exact Binance hosts and only six ASCII alphanumeric code characters; it does not normalize case, rewrite URLs, or broaden acceptance to subdomains or punctuation.
+
+All independent safety constraints remain: HTTPS is mandatory, credentials and fragments are forbidden, URL length and challenge lifetime stay bounded, QR identities remain canonical and server-side only, verification stays blocking and one-shot, and successful pairing grants no quote or submission authority. Provider connection is confirmed through the wallet status/valuation read surface rather than inferred from the mobile app alone.
+
+## M10.176 — Apply the exceptional origin once, then treat nonempty accounting as the durable stop
+
+The operator's exact attempt identity and literal acknowledgment authorized one local accounting bootstrap, not a provider order, retry, or strategy activation. The action was preceded by a fresh provider-free readiness assessment and was allowed to obtain a finalized public-chain snapshot only while all three accounting surfaces were still empty. The M10.172 serializable store remained the final authority and committed the ordinary-compatible initialization, three current balances, and exceptional receipt atomically.
+
+The exceptional receipt is the durable explanation for the origin and preserves both historical-ledger and historical-BTCB continuity claims as false. No ordinary conversion synchronization is fabricated for the already reconciled transaction. Once the origin exists, `accounting_state_not_empty` is the expected fail-closed readiness result and no automatic retry or second bootstrap is permitted.
+
+## M10.175 — Readiness must not carry mutation acknowledgment or provider capability
+
+Operational inspection and authorization are intentionally different acts. The readiness route accepts only an attempt identity, while the M10.174 bootstrap route separately requires the literal current-balance review acknowledgment. This prevents a successful audit, cached response, or repeated status check from becoming implicit consent to initialize accounting.
+
+The readiness service depends only on durable reconciliation/context readers and the serializable local absence reader. It does not receive a BSC snapshot reader or bootstrap store, so provider access and mutation are unavailable by construction. Its response omits wallet, balances, provider order, transaction hash, and financial evidence; a ready result states only that current durable/local prerequisites are compatible with a later explicit action, not that later finalized wallet evidence will pass.
+
+## M10.174 — Reuse the protected local control plane without weakening bootstrap evidence
+
+The exceptional bootstrap mutates only the local accounting origin, but it is still a sensitive irreversible interpretation of current wallet truth. M10.174 therefore exposes it only through the existing loopback bind restriction and timing-safe Bearer-token guard used by other operator accounting actions. The HTTP body contributes no balances, block, wallet, or time: it supplies only the durable attempt identity and exact review acknowledgment, while every financial fact comes from durable context and a fresh finalized public-chain snapshot.
+
+Runtime composition does not authorize operational execution during verification. HTTP tests use invalid input or a canonical attempt known to be absent, proving authentication, strict parsing, composition, and pre-provider blocking without contacting BSC or creating the exceptional origin. The known reconciled attempt remains a separate operator decision. Unknown failures are collapsed to a generic 503 so RPC, database, wallet, and internal details are not exposed.
+
+## M10.173 — Preflight cheaply, authorize mutation only in the atomic store
+
+The explicit bootstrap action needs fresh public-chain evidence, but a provider read is unnecessary and misleading when durable reconciliation context is absent or local accounting is already nonempty. M10.173 therefore orders dependencies from local and read-only to external and mutating: durable reconciliation, durable terminal context, one serializable three-surface absence inspection, one finalized wallet snapshot, pure M10.171 preparation, then the M10.172 store.
+
+The absence reader is intentionally advisory rather than authoritative. State may change after its transaction, so M10.172 must still acquire the shared initialization lock and repeat every durable emptiness, context, freshness, and financial check. A process-local per-attempt guard prevents overlapping operator actions but is not treated as a distributed lock or durable idempotency claim. The new coordinator remains outside runtime composition until a separately reviewed protected operator boundary is approved.
+
 ## M10.172 — Persist exceptional origin beside an ordinary-compatible initialization
 
 Existing accounting consumers require a `RealExecutionAccountingBalanceInitialization`, but changing that model's meaning or acknowledgment would weaken every established reader. M10.172 therefore creates a normal current-balance initialization and a separate one-to-one exceptional-origin receipt in the same serializable transaction. The initialization remains structurally compatible; the linked receipt explains that it arose after a reconciled conversion with no pre-existing ledger and permanently preserves both historical-continuity claims as false.
