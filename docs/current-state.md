@@ -1,5 +1,11 @@
 # Current State
 
+M10.181 is complete. A new pure, unregistered aggregate passes only a successful M10.180 reconciled resource projection into the established M10.14 resource-risk policy. Invalid or tampered reconciliation evidence stops before downstream evaluation, while valid evidence retains its reconciliation identity and fingerprint beside the exact quote, budget, source-token, native-BNB, coverage, identity, and freshness result.
+
+Budget failure and insufficient reconciled balances remain explicit blockers. Even `resources_sufficient` is descriptive only: provider quota is unevaluated, no durable reservation exists, and Risk Engine approval, funding, quote, submission, strategy, order, balance mutation, and transaction authority remain false.
+
+Post-M10.181 validation passes all 2,980 backend tests across 271 suites, all 150 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, all 117 dashboard tests across 20 files, formatting, lint, Prisma and Compose validation, backend/dashboard builds, and `git diff --check`.
+
 M10.180 is complete. A new pure, unregistered projection validates the complete fresh reconciled balance artifact from M10.115, the exact non-executable quote and its embedded intent, the approved Agentic Wallet/BSC/BTCB-USDT direction, and an explicit positive native-BNB requirement before producing the existing M10.14 resource snapshot.
 
 The projection carries only the approved source-token quantity and native BNB quantity, marks both coverages complete, preserves the authenticated wallet observation time plus reconciliation identity/fingerprint, and remains non-authorizing. Tampered reconciliation evidence, another quote provider, intent/quote divergence, unsupported instruments, absent source/gas balances, or invalid gas input fails closed. There is no module registration, route, provider read, reservation, Risk Engine approval, quote/submission authority, strategy bridge, order, balance mutation, or financial transaction.

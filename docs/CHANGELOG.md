@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-28 — M10.181 reconciled resource risk composition
+
+### Added
+
+- Pure composition from the M10.180 authenticated resource projection into the existing M10.14 budget-and-resource risk policy.
+- Reconciliation identity and fingerprint provenance beside successful and downstream-blocked risk assessments.
+- Focused coverage for sufficient resources, downstream budget failure, exact source-balance insufficiency, and projection failure from tampered evidence/invalid gas.
+
+### Safety
+
+- Projection failure stops before downstream resource-risk evaluation and never creates partial risk facts.
+- Reuses the established financial policy without adding provider quota, durable reservation, Risk Engine approval, runtime registration, route, authorization, mutation, order, or transaction authority.
+- Passed 2,980 backend tests, 150 PostgreSQL E2E tests with all 50 migrations from scratch, 117 dashboard tests, formatting, lint, Prisma and Compose validation, backend/dashboard builds, and whitespace checks.
+
 ## 2026-10-28 — M10.180 reconciled resource snapshot projection
 
 ### Added

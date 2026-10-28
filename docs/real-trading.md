@@ -1,5 +1,22 @@
 # Real Trading
 
+## M10.181 — Reconciled resource risk composition
+
+M10.181 composes the authenticated M10.180 resource projection with the existing M10.14 budget-and-resource risk policy. It accepts one M10.115 reconciled balance snapshot plus the exact intent, non-executable quote, explicit native-BNB requirement, local limits, complete budget facts, freshness policy, and evaluation time.
+
+Projection remains the first boundary. Invalid reconciliation evidence, intent/quote divergence, unsupported instruments, missing balances, or invalid gas input returns a projection blocker and never fabricates a resource-risk result. A valid projection is evaluated unchanged by M10.14, so quote and budget validity, exact source-token requirements including source-denominated provider fees, native-gas sufficiency, complete coverage, identity, and freshness retain one established policy. The aggregate keeps reconciliation identity and fingerprint beside the copied risk result for audit provenance.
+
+The boundary is pure and unregistered. `resources_sufficient` is descriptive evidence only: provider quota remains unevaluated, no durable resource reservation exists, the operational Risk Engine has not approved anything, and funding, quote, submission, strategy, order, mutation, and transaction authority remain false.
+
+### M10.181 acceptance criteria
+
+- M10.180 projection must succeed before M10.14 is evaluated.
+- Projection blockers remain explicit and produce no partial resource-risk assessment.
+- A valid projection is passed to the existing M10.14 policy without a parallel balance or freshness rule.
+- Reconciliation identity and fingerprint remain attached to both successful and downstream-blocked assessments.
+- Budget, source-balance, native-gas, coverage, identity, and freshness failures remain fail-closed.
+- No provider quota, reservation, Risk Engine approval, runtime registration, route, provider call, authorization, mutation, order, or financial transaction is added.
+
 ## M10.180 — Reconciled resource snapshot projection
 
 M10.180 adds the first pure bridge from the fresh, authenticated accounting evidence composed in M10.115–M10.116 to the resource shape already evaluated by M10.14. It accepts one complete reconciled BNB/USDT/BTCB snapshot, one validated intent, its exact correlated non-executable quote, and one explicit positive native-BNB gas requirement.

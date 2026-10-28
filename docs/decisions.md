@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## M10.181 — Reuse the established resource-risk policy for reconciled balances
+
+M10.180 deliberately ends at the existing resource-snapshot shape. Reimplementing source sufficiency, gas sufficiency, budget composition, or freshness beside that bridge would create a second financial policy. M10.181 therefore treats successful M10.180 projection as the only adapter step and delegates the complete decision unchanged to M10.14.
+
+Projection failure is terminal for this aggregate and exposes its bounded blockers without manufacturing a downstream assessment. Successful projection preserves reconciliation identity and fingerprint outside the generic M10.14 shape, including when budget or balance policy later blocks. This keeps durable accounting provenance auditable without coupling the provider-neutral resource policy to Agentic Wallet persistence types.
+
+The aggregate remains unregistered and descriptive. Provider quota, durable reservation, the operational Risk Engine, authorization, and execution remain later independent boundaries.
+
 ## M10.180 — Bridge reconciled balances into resource evidence without authorization
 
 M10.14 deliberately accepted caller-supplied resource facts because no trustworthy balance bridge existed. M10.178–M10.179 now establish authenticated, durable, fresh equality between the Agentic Wallet and the complete local BNB/USDT/BTCB ledger. M10.180 consumes only the internal fully revalidated M10.115 snapshot rather than a public readiness response or a new provider observation.
