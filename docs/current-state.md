@@ -1,5 +1,11 @@
 # Current State
 
+M10.184 is complete. A new pure, unregistered aggregate requires the authenticated M10.180 reconciled-resource and M10.182 provider-quota projections before invoking the established M10.16 reservation planner. Invalid accounting evidence stops before quota projection; invalid provider or external valuation evidence stops before planning.
+
+A ready result retains reconciliation identity/fingerprint and provider-observation/external-valuation provenance while materializing the exact quote-expiring USDT budget, source-token, native-BNB, and provider-quota USD requirements without merging denominations. The plan is not persisted and creates no reservation, capacity serialization, provider quota consumption, Risk Engine approval, provider access, funding, quote, submission, strategy, order, accounting mutation, or transaction authority.
+
+Post-M10.184 validation passes all 2,994 backend tests across 273 suites, all 150 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, all 117 dashboard tests across 20 files, formatting, lint, backend/dashboard builds, Prisma and Compose validation, and `git diff --check`.
+
 M10.183 is complete. A new pure, unregistered aggregate requires a valid M10.180 reconciled resource projection and a valid M10.182 authenticated provider-quota projection before invoking the established M10.15 nested resource/quota risk policy. Invalid accounting evidence stops before quota projection; invalid provider or external valuation evidence stops before risk evaluation.
 
 Successful and downstream-blocked assessments retain reconciliation identity/fingerprint, authenticated provider-observation state, explicit external-USD valuation state, and the unchanged M10.15 result. Even `provider_quota_sufficient` remains descriptive: USDT/USD parity is never assumed, the provider limit is not a project limit, no durable resource/quota reservation exists, and Risk Engine approval, provider access, funding, quote, submission, strategy, order, accounting mutation, and transaction authority remain false.

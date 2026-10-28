@@ -8,6 +8,7 @@ import { prepareAgenticWalletAccountingLedgerReconciliationCommitment } from '..
 import { assessAgenticWalletAccountingLedgerReconciliationFreshness } from '../infrastructure/agentic-wallet-accounting-ledger-reconciliation-freshness';
 import { prepareAgenticWalletAccountingReconciledBalanceSnapshot } from '../infrastructure/agentic-wallet-accounting-reconciled-balance-snapshot';
 import { assessAgenticWalletAccountingReconciledProviderQuotaRisk } from './agentic-wallet-accounting-reconciled-provider-quota-risk';
+import { planAgenticWalletAccountingReconciledReservation } from './agentic-wallet-accounting-reconciled-reservation-plan';
 import { RealExecutionBudgetSnapshot } from './real-execution-budget-risk';
 import { APPROVED_AGENTIC_WALLET_BSC_BTCB_USDT_INSTRUMENT } from './real-execution-instrument-approval';
 import { RealExecutionLocalRiskLimits } from './real-execution-local-risk-limits';
@@ -125,6 +126,108 @@ describe('Agentic Wallet reconciled provider quota risk', () => {
   });
 });
 
+describe('Agentic Wallet reconciled reservation plan', () => {
+  it('creates an exact inert plan only from both authenticated projections', () => {
+    const result = planAssessment();
+
+    expect(result.reconciliationFingerprint).toMatch(/^[0-9a-f]{64}$/);
+    expect(result).toMatchObject({
+      scope: 'agentic_wallet_accounting_reconciled_reservation_plan_assessment',
+      status: 'reservation_plan_ready',
+      blockers: [],
+      resourceSnapshotStatus: 'resource_snapshot_ready',
+      providerQuotaSnapshotStatus: 'provider_quota_snapshot_ready',
+      reconciliationId: RECONCILIATION_ID,
+      providerObservationValidated: true,
+      requirementValuationExternallySupplied: true,
+      reservationPlan: {
+        status: 'reservation_plan_ready',
+        blockers: [],
+        providerQuotaRiskStatus: 'provider_quota_sufficient',
+        plan: {
+          providerId: 'agentic_wallet',
+          chainId: '56',
+          intentId: INTENT_ID,
+          quoteId: QUOTE_ID,
+          idempotencyKey: 'reconciled-provider-quota-risk-1',
+          utcDay: '2026-10-16',
+          budgetChargeUsdt: '5.11',
+          sourceTokenAddress: usdt.tokenAddress,
+          sourceSymbol: 'USDT',
+          sourceQuantity: '5.01',
+          nativeGasSymbol: 'BNB',
+          nativeGasQuantity: '0.0002',
+          providerQuotaUsd: '5.2',
+          expiresAt: new Date('2026-10-16T12:01:35.000Z'),
+          plannedAt: EVALUATED_AT,
+        },
+      },
+      usdtUsdParityAssumed: false,
+      providerDailyLimitAcceptedAsProjectRiskLimit: false,
+      durableReservationCreated: false,
+      atomicEnforcement: false,
+      riskApproved: false,
+      fundingAuthorized: false,
+      quoteAuthorized: false,
+      submissionAuthorized: false,
+    });
+  });
+
+  it('stops before quota projection when reconciled resources are invalid', () => {
+    const balances = balanceSnapshot();
+    const result = planAssessment({
+      balances: { ...balances, submissionAuthorized: true } as typeof balances,
+    });
+
+    expect(result).toMatchObject({
+      status: 'blocked',
+      blockers: ['resource_snapshot_projection_blocked'],
+      resourceSnapshotBlockers: ['invalid_reconciled_balance_snapshot'],
+      providerQuotaSnapshotStatus: 'not_evaluated',
+      reservationPlan: null,
+      reconciliationId: null,
+      durableReservationCreated: false,
+    });
+  });
+
+  it('stops before planning when provider quota evidence is absent', () => {
+    const result = planAssessment({
+      observation: observation({ quota: null }),
+    });
+
+    expect(result).toMatchObject({
+      status: 'blocked',
+      blockers: ['provider_quota_snapshot_projection_blocked'],
+      resourceSnapshotStatus: 'resource_snapshot_ready',
+      providerQuotaSnapshotStatus: 'blocked',
+      providerQuotaSnapshotBlockers: ['provider_quota_unavailable'],
+      reservationPlan: null,
+      reconciliationId: RECONCILIATION_ID,
+    });
+  });
+
+  it('retains provenance when the established planner blocks', () => {
+    const result = planAssessment({ requiredUsd: '901' });
+
+    expect(result).toMatchObject({
+      status: 'blocked',
+      blockers: ['reservation_plan_blocked'],
+      resourceSnapshotStatus: 'resource_snapshot_ready',
+      providerQuotaSnapshotStatus: 'provider_quota_snapshot_ready',
+      reconciliationId: RECONCILIATION_ID,
+      providerObservationValidated: true,
+      reservationPlan: {
+        status: 'blocked',
+        blockers: ['provider_quota_risk_blocked'],
+        providerQuotaRiskStatus: 'blocked',
+        plan: null,
+      },
+      riskApproved: false,
+      submissionAuthorized: false,
+    });
+  });
+});
+
 function assess(
   overrides: {
     balances?: ReturnType<typeof balanceSnapshot>;
@@ -138,6 +241,38 @@ function assess(
   const valueIntent = overrides.intent ?? intent();
   const valueQuote = overrides.quote ?? quote({ intent: valueIntent });
   return assessAgenticWalletAccountingReconciledProviderQuotaRisk(
+    overrides.balances ?? balanceSnapshot(),
+    overrides.observation ?? observation(),
+    valueIntent,
+    valueQuote,
+    '0.0002',
+    overrides.requiredUsd ?? '5.2',
+    new Date('2026-10-16T12:01:29.000Z'),
+    limits(),
+    overrides.budgetSnapshot ?? budgetSnapshot(),
+    {
+      budgetSnapshotMaxAgeMs: 60_000,
+      resourceSnapshotMaxAgeMs: 60_000,
+      quotaSnapshotMaxAgeMs: 60_000,
+      requirementValuationMaxAgeMs: 60_000,
+    },
+    EVALUATED_AT,
+  );
+}
+
+function planAssessment(
+  overrides: {
+    balances?: ReturnType<typeof balanceSnapshot>;
+    observation?: AgenticWalletCapabilityObservation;
+    intent?: RealExecutionIntent;
+    quote?: RealExecutionQuote;
+    requiredUsd?: string;
+    budgetSnapshot?: RealExecutionBudgetSnapshot;
+  } = {},
+) {
+  const valueIntent = overrides.intent ?? intent();
+  const valueQuote = overrides.quote ?? quote({ intent: valueIntent });
+  return planAgenticWalletAccountingReconciledReservation(
     overrides.balances ?? balanceSnapshot(),
     overrides.observation ?? observation(),
     valueIntent,

@@ -1,5 +1,23 @@
 # Real Trading
 
+## M10.184 — Authenticated reconciled reservation plan
+
+M10.184 carries the two authenticated M10.180 and M10.182 projections into the existing M10.16 reservation planner. It accepts the fresh durable reconciled balance artifact, normalized pinned-CLI capability observation, exact approved intent and non-executable quote, explicit native-BNB and external-USD requirements, local limits, complete budget facts, freshness policy, and evaluation time.
+
+The aggregate preserves the same fail-closed order as M10.183. Invalid reconciled resource evidence stops before quota projection and reports it as `not_evaluated`. Invalid provider capability/settings/quota or external valuation evidence then stops before planning. Only both complete snapshots reach M10.16, which reruns the established nested M10.15 policy and emits separately denominated exact USDT budget, source-token, native-BNB, and provider-quota USD requirements bound to provider, chain, intent, quote, idempotency key, current UTC day, and quote expiry.
+
+The result retains reconciliation identity/fingerprint and authenticated provider-observation/external-valuation provenance. A ready plan is an inert input only: it is not persisted, does not serialize capacity, lock funds, consume provider quota, or approve risk. The boundary remains pure and unregistered and has no provider, route, wallet, strategy, order, mutation, or transaction access.
+
+### M10.184 acceptance criteria
+
+- Reconciled resource projection must succeed before provider-quota projection is evaluated.
+- Both authenticated projections must succeed before M10.16 is invoked.
+- Projection blockers remain explicit and never produce a partial reservation plan.
+- The established M10.16 planner remains the only derivation policy for the exact quote-expiring plan.
+- USDT budget, source-token, native-BNB, and provider-quota USD requirements remain separately denominated.
+- Reconciliation and provider/valuation provenance remain attached to ready and downstream-blocked results.
+- No persistence, capacity enforcement, runtime registration, route, provider call, reservation, Risk Engine approval, authorization, mutation, order, or financial transaction is added.
+
 ## M10.183 — Reconciled provider quota risk composition
 
 M10.183 composes both authenticated evidence bridges with the existing M10.15 provider-quota risk policy. It accepts one fresh durable M10.115 reconciled balance snapshot, one normalized pinned-CLI capability observation, the exact approved intent and non-executable quote, explicit native-BNB and external-USD requirements, local limits, complete budget facts, freshness bounds, and evaluation time.

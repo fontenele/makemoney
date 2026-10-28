@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-28 — M10.184 authenticated reconciled reservation plan
+
+### Added
+
+- Pure fail-closed composition from authenticated reconciled resources and provider quota into the existing M10.16 inert planner.
+- Exact quote-expiring plan facts for USDT budget, source token, native BNB, and provider quota USD with reconciliation and provider/valuation provenance.
+- Focused coverage for a complete ready plan, invalid reconciled evidence, absent provider quota, and downstream quota-risk failure.
+
+### Safety
+
+- Resource failure stops before quota projection, and quota failure stops before planning; neither path creates a partial plan.
+- Remains unregistered and adds no persistence, atomic enforcement, provider call, quota consumption, durable reservation, Risk Engine approval, funding, quote/submission authority, mutation, order, or financial transaction.
+- Passed 2,994 backend tests, 150 PostgreSQL E2E tests with all 50 migrations from scratch, 117 dashboard tests, formatting, lint, Prisma and Compose validation, backend/dashboard builds, and whitespace checks.
+
 ## 2026-10-28 — M10.183 reconciled provider quota risk composition
 
 ### Added

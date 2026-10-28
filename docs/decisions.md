@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## M10.184 — Materialize a plan only from authenticated resource and quota evidence
+
+M10.183 proves that the two new evidence bridges can reach the established M10.15 sufficiency policy, but its descriptive risk result deliberately exposes no raw snapshots for another caller to repurpose. M10.184 therefore repeats the same fail-closed projection order at a separate aggregate boundary and passes the two complete internal snapshots directly to M10.16. It does not reconstruct a reservation plan from summarized risk output or add a second planner policy.
+
+Invalid accounting reconciliation stops before quota projection; invalid capability, settings, quota, identity, instrument, or external USD valuation stops before planning. Only both complete projections reach M10.16, which reuses the established nested M10.15 decision and derives exact quote-expiring USDT budget, source-token, native-BNB, and provider-quota USD requirements without merging denominations.
+
+The aggregate retains reconciliation identity/fingerprint and authenticated provider/external-valuation provenance beside the copied inert plan. `reservation_plan_ready` creates no row, reservation, atomic capacity enforcement, provider quota consumption, runtime registration, Risk Engine approval, funding, quote, submission, strategy, order, accounting mutation, or transaction authority.
+
 ## M10.183 — Require both authenticated projections before provider-quota risk
 
 M10.180 and M10.182 independently close the two caller-supplied evidence gaps beneath M10.15: current spendable token/native-gas balances now come from a fresh durable wallet/ledger reconciliation, while provider quota comes from one normalized pinned-CLI capability observation. M10.183 composes those exact bridges in fail-closed order and delegates the complete nested resource-and-quota decision unchanged to M10.15 rather than recreating financial rules.
