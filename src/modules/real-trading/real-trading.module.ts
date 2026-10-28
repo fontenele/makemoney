@@ -89,6 +89,12 @@ import { AgenticWalletFundingConversionAccountingBootstrapStore } from './applic
 import { AgenticWalletFundingConversionAccountingBootstrapReadinessService } from './application/agentic-wallet-funding-conversion-accounting-bootstrap-readiness.service';
 import { PrismaAgenticWalletFundingConversionAccountingAbsenceReader } from './infrastructure/prisma-agentic-wallet-funding-conversion-accounting-absence.reader';
 import { PrismaAgenticWalletFundingConversionAccountingBootstrapStore } from './infrastructure/prisma-agentic-wallet-funding-conversion-accounting-bootstrap.store';
+import { PrismaAgenticWalletAccountingLedgerSnapshotReadStore } from './infrastructure/prisma-agentic-wallet-accounting-ledger-snapshot.store';
+import { AgenticWalletAccountingLedgerReconciliationService } from './infrastructure/agentic-wallet-accounting-ledger-reconciliation.service';
+import { AgenticWalletAccountingLedgerReconciliationAttempt } from './infrastructure/agentic-wallet-accounting-ledger-reconciliation-attempt';
+import { AgenticWalletAccountingLedgerReconciliationAttemptGuard } from './infrastructure/agentic-wallet-accounting-ledger-reconciliation-attempt.guard';
+import { PrismaAgenticWalletAccountingLedgerReconciliationCommitmentStore } from './infrastructure/prisma-agentic-wallet-accounting-ledger-reconciliation-commitment.store';
+import { AgenticWalletAccountingLedgerReconciliationRecordingService } from './application/agentic-wallet-accounting-ledger-reconciliation-recording.service';
 
 @Module({
   imports: [RiskEngineModule],
@@ -359,6 +365,64 @@ import { PrismaAgenticWalletFundingConversionAccountingBootstrapStore } from './
           absence,
           snapshots,
           store,
+        ),
+    },
+    {
+      provide: PrismaAgenticWalletAccountingLedgerSnapshotReadStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaAgenticWalletAccountingLedgerSnapshotReadStore(prisma),
+    },
+    {
+      provide: AgenticWalletAccountingLedgerReconciliationService,
+      inject: [PrismaAgenticWalletAccountingLedgerSnapshotReadStore],
+      useFactory: (
+        snapshots: PrismaAgenticWalletAccountingLedgerSnapshotReadStore,
+      ) => new AgenticWalletAccountingLedgerReconciliationService(snapshots),
+    },
+    {
+      provide: AgenticWalletAccountingLedgerReconciliationAttempt,
+      inject: [
+        AgenticWalletCapabilityAdapter,
+        AgenticWalletAccountingLedgerReconciliationService,
+      ],
+      useFactory: (
+        observations: AgenticWalletCapabilityAdapter,
+        reconciliation: AgenticWalletAccountingLedgerReconciliationService,
+      ) =>
+        new AgenticWalletAccountingLedgerReconciliationAttempt(
+          observations,
+          reconciliation,
+        ),
+    },
+    {
+      provide: AgenticWalletAccountingLedgerReconciliationAttemptGuard,
+      inject: [AgenticWalletAccountingLedgerReconciliationAttempt],
+      useFactory: (
+        attempt: AgenticWalletAccountingLedgerReconciliationAttempt,
+      ) => new AgenticWalletAccountingLedgerReconciliationAttemptGuard(attempt),
+    },
+    {
+      provide: PrismaAgenticWalletAccountingLedgerReconciliationCommitmentStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaAgenticWalletAccountingLedgerReconciliationCommitmentStore(
+          prisma,
+        ),
+    },
+    {
+      provide: AgenticWalletAccountingLedgerReconciliationRecordingService,
+      inject: [
+        AgenticWalletAccountingLedgerReconciliationAttemptGuard,
+        PrismaAgenticWalletAccountingLedgerReconciliationCommitmentStore,
+      ],
+      useFactory: (
+        attempt: AgenticWalletAccountingLedgerReconciliationAttemptGuard,
+        commitments: PrismaAgenticWalletAccountingLedgerReconciliationCommitmentStore,
+      ) =>
+        new AgenticWalletAccountingLedgerReconciliationRecordingService(
+          attempt,
+          commitments,
         ),
     },
     {

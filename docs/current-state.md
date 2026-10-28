@@ -1,5 +1,11 @@
 # Current State
 
+M10.178 is complete. `POST /real-trading/accounting-ledger-reconciliation` now composes the existing M10.101–M10.108 chain as a loopback-only, timing-safe Bearer-protected manual action. Its strict body accepts only a canonical accounting initialization UUID and an explicit 1–60,000 ms wallet-observation age limit. An admitted call performs one approved-chain read-only Agentic Wallet observation, reads initialization and the complete three-asset ledger coherently, and requires exact authenticated BNB/USDT/BTCB identity, freshness, chronology, and quantity equality.
+
+Missing or divergent evidence remains blocked without persistence. Exact equality alone reaches the existing serializable commitment store, which reloads current durable state before recording immutable reconciliation evidence. Overlapping attempts for one initialization fail immediately, cancellation stops before persistence, and the safe response omits wallet address and balances. Quote, submission, strategy execution, automatic retry, order, balance mutation, and financial transaction authority remain false.
+
+Post-M10.178 validation passes all 2,963 backend tests across 268 suites, all 148 PostgreSQL E2E tests across 10 suites with all 50 migrations applied from scratch, all 117 dashboard tests across 20 files, formatting, lint, backend/dashboard builds, Compose validation, and `git diff --check`.
+
 M7.116 is complete. `GET /new-listings/checkpoint-latency` now exposes bounded persisted target-to-completion distributions for the recent T+0-eligible detection cohort. Every canonical checkpoint reports an independent sample size, minimum, arithmetic median, nearest-rank p95, and maximum lag; missing later samples remain null rather than becoming zero or disappearing from an existing cohort.
 
 The live five-detection response reports T+0 median/p95 `1,119/1,795 ms`, T+5s `4,126/4,792 ms`, T+10s `1,778/2,519 ms`, T+30s `3,300/3,938 ms`, T+1m `3,509/4,152 ms`, T+5m `5,605/6,263 ms`, and T+15m `3,523/4,162 ms`. T+1h and T+24h correctly have zero samples and null distributions. This endpoint reads PostgreSQL only; it cannot contact Binance or activate collection.

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-28 — M10.178 guarded current-ledger reconciliation
+
+### Added
+
+- Bearer-protected `POST /real-trading/accounting-ledger-reconciliation` with strict initialization identity and bounded observation-age input.
+- Runtime composition of the existing one-shot authenticated wallet read, coherent durable ledger snapshot, exact three-asset comparison, and serializable immutable reconciliation commitment.
+- Focused service coverage for strict input, durable absence, mismatch blocking, successful evidence persistence, and cancellation, plus HTTP coverage for authentication and malformed-input rejection before provider access.
+
+### Safety
+
+- Each action permits one read-only provider observation, performs no retry, and suppresses overlapping work for the same initialization.
+- Blocked or cancelled comparisons persist nothing; successful responses omit wallet address and balance quantities.
+- No quote, submission, strategy authority, order, accounting mutation, or financial transaction was added.
+- Passed 2,963 backend tests, 148 PostgreSQL E2E tests with all 50 migrations from scratch, 117 dashboard tests, formatting, lint, backend/dashboard builds, Compose validation, and whitespace checks.
+
 ## 2026-10-28 — M7.116 durable checkpoint latency distributions
 
 ### Added

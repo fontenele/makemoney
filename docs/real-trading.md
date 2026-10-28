@@ -1,5 +1,23 @@
 # Real Trading
 
+## M10.178 — Guarded current accounting ledger reconciliation
+
+The exceptional M10.176 origin created an ordinary-compatible accounting initialization and exact current BNB/USDT/BTCB rows, but current wallet equality still needed an operational evidence path. M10.178 composes the already reviewed M10.101–M10.108 boundaries behind `POST /real-trading/accounting-ledger-reconciliation`. The loopback-only, Bearer-protected route accepts exactly one canonical `initializationId` and an explicit `maximumObservationAgeMs` from 1 through 60,000.
+
+One admitted call performs exactly one pinned read-only Agentic Wallet observation for approved BSC chain 56, then loads initialization and all current ledger rows under one repeatable-read snapshot. The policy independently revalidates authenticated provider/chain/address evidence, exact unique BNB/USDT/BTCB coverage, chronology, freshness, and quantity equality. Missing initialization or policy blockers return a non-persisted blocked result. A successful comparison receives a new canonical reconciliation identity and reaches the existing serializable immutable commitment store, which reloads and revalidates the durable ledger before insertion.
+
+The response exposes only safe audit identity, fingerprint, timestamps, status, blockers, and explicit authority flags; it does not return the wallet address or balances. A process-local guard rejects overlapping attempts for the same initialization, cancellation after provider return stops before persistence, provider failures are not retried, and unexpected dependency output is sanitized by the controller. Reconciliation evidence changes no balance and grants no quote, submission, strategy, order, retry, or transaction authority.
+
+### M10.178 acceptance criteria
+
+- Authentication and strict request validation stop unauthorized or malformed requests before wallet access.
+- Each admitted action performs at most one approved-chain read-only wallet observation with no retry.
+- Initialization plus all current balances are read coherently and the established M10.103 identity, freshness, chronology, and exact-quantity rules are reapplied.
+- Missing or divergent evidence remains blocked and creates no reconciliation row.
+- Exact equality is prepared and recorded through the existing canonical M10.107/M10.108 commitment boundary.
+- Same-initialization overlap fails immediately and caller cancellation stops before persistence.
+- The public result omits wallet address and quantities and keeps quote, submission, strategy execution, automatic retry, order, mutation, and financial transaction authority false.
+
 ## M10.177 — Current Agentic Wallet authentication challenge compatibility
 
 Live diagnosis of the dashboard's complete funding-valuation blocker set confirmed that the API and dashboard were healthy while `baw wallet status --json` reported `UNCONNECTED`. The pairing route then returned a sanitized 503 because pinned CLI 1.10.0 had evolved its successful challenge from the application's original assumptions: `urlForWeb` used exact host `app.binance.com`, and `pairingCode` was six mixed-case alphanumeric characters rather than six decimal digits.

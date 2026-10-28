@@ -1,5 +1,13 @@
 # Technical Decisions
 
+## M10.178 — Reconcile current wallet truth before using bootstrapped accounting
+
+The M10.176 exceptional origin is truthful about the point-in-time ledger it created, but it is not perpetual evidence that the external wallet still equals local accounting. Activation work must not consume that ledger merely because three rows exist. M10.178 therefore makes the existing authenticated wallet/ledger reconciliation chain operational before any Risk Engine bridge or strategy execution authority is considered.
+
+The route accepts no balance, address, provider identity, or reconciliation identity from the caller. One pinned read-only capability observation supplies wallet facts, one repeatable-read database transaction supplies local facts, and the shared pure policy compares exact canonical BNB, USDT, and BTCB quantities. Only exact equality reaches the serializable M10.108 store, which reloads the ledger and regenerates the commitment before insertion. The HTTP response omits financial quantities and the wallet address because the operational question is evidence status, not another holdings surface.
+
+A process-local same-initialization guard prevents accidental overlapping reads without claiming distributed exclusion. No retry, polling, scheduling, repair, ledger mutation, quote, submission, or strategy bridge follows from success. Durable reconciliation is evidence for later separately reviewed readiness composition, not execution authorization.
+
 ## M7.116 — Publish latency distributions from the existing bounded durable cohort
 
 Checkpoint timing must be based on committed completion facts rather than transient worker logs. M7.116 reuses the newest-first PostgreSQL cohort already bounded to 1–100 detections with completed T+0, then calculates `completedAt - targetAt` independently for every canonical checkpoint. This avoids a second selection rule, projection table, or cache lifecycle.

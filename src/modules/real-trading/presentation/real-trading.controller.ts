@@ -150,6 +150,16 @@ import {
   AgenticWalletFundingConversionAccountingBootstrapReadinessService,
   FundingConversionAccountingBootstrapReadinessRequestError,
 } from '../application/agentic-wallet-funding-conversion-accounting-bootstrap-readiness.service';
+import {
+  AgenticWalletAccountingLedgerReconciliationRecordingRequestError,
+  AgenticWalletAccountingLedgerReconciliationRecordingService,
+} from '../application/agentic-wallet-accounting-ledger-reconciliation-recording.service';
+import { AgenticWalletAccountingLedgerReconciliationAttemptInProgressError } from '../infrastructure/agentic-wallet-accounting-ledger-reconciliation-attempt.guard';
+import {
+  AgenticWalletAccountingLedgerReconciliationCommitmentBlockedError,
+  AgenticWalletAccountingLedgerReconciliationCommitmentConflictError,
+  AgenticWalletAccountingLedgerReconciliationInitializationNotFoundError,
+} from '../infrastructure/agentic-wallet-accounting-ledger-reconciliation-commitment.store';
 
 @Controller('real-trading')
 export class RealTradingController {
@@ -164,6 +174,7 @@ export class RealTradingController {
     private readonly fundingConversionAccountingSync: AgenticWalletFundingConversionAccountingSyncService,
     private readonly fundingConversionAccountingBootstrapReadiness: AgenticWalletFundingConversionAccountingBootstrapReadinessService,
     private readonly fundingConversionAccountingBootstrap: AgenticWalletFundingConversionAccountingBootstrapService,
+    private readonly accountingLedgerReconciliation: AgenticWalletAccountingLedgerReconciliationRecordingService,
     private readonly realExecutionSubmission: RealExecutionOperatorSubmissionService,
     private readonly realExecutionStatus: AgenticWalletMarketSwapStatusReconciliationAttempt,
     private readonly realExecutionReconciliation: RealExecutionFinancialReconciliationService,
@@ -449,6 +460,37 @@ export class RealTradingController {
       }
       throw new ServiceUnavailableException(
         'Agentic Wallet funding conversion accounting bootstrap is unavailable',
+      );
+    }
+  }
+
+  @Post('accounting-ledger-reconciliation')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async reconcileAccountingLedger(@Body() body: unknown) {
+    try {
+      return await this.accountingLedgerReconciliation.record(body);
+    } catch (error) {
+      if (
+        error instanceof
+        AgenticWalletAccountingLedgerReconciliationRecordingRequestError
+      )
+        throw new BadRequestException(
+          'Invalid accounting ledger reconciliation request',
+        );
+      if (
+        error instanceof
+          AgenticWalletAccountingLedgerReconciliationAttemptInProgressError ||
+        error instanceof
+          AgenticWalletAccountingLedgerReconciliationCommitmentBlockedError ||
+        error instanceof
+          AgenticWalletAccountingLedgerReconciliationCommitmentConflictError ||
+        error instanceof
+          AgenticWalletAccountingLedgerReconciliationInitializationNotFoundError
+      )
+        throw new ConflictException(error.message);
+      throw new ServiceUnavailableException(
+        'Agentic Wallet accounting ledger reconciliation is unavailable',
       );
     }
   }
