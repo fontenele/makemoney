@@ -6,6 +6,56 @@ import {
 } from '../domain/spot-symbol-catalog';
 
 describe('SpotSymbolDetectionReadModelService', () => {
+  it('loads a bounded durable checkpoint latency cohort', async () => {
+    const secondTarget = new Date('2026-09-14T02:00:00.000Z');
+    const listCompletedObservationCohort = jest.fn(() =>
+      Promise.resolve([
+        [completedObservation()],
+        [
+          completedObservation({
+            symbol: 'OTHERUSDT',
+            targetAt: secondTarget,
+            completedAt: new Date(secondTarget.getTime() + 3_000),
+          }),
+        ],
+      ]),
+    );
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    const result = await service.getCheckpointLatencyCohort('binance', 25);
+    expect(result).toMatchObject({
+      provider: 'binance',
+      detectionCount: 2,
+    });
+    expect(result.checkpoints).toHaveLength(9);
+    expect(result.checkpoints[0]).toMatchObject({
+      label: 'T+0',
+      sampleSize: 2,
+      minimumLagMs: 1_000,
+      medianLagMs: 2_000,
+      percentile95LagMs: 3_000,
+      maximumLagMs: 3_000,
+    });
+    expect(listCompletedObservationCohort).toHaveBeenCalledWith('binance', 25);
+  });
+
+  it('returns empty checkpoint latency and validates before persistence', async () => {
+    const listCompletedObservationCohort = jest.fn(() => Promise.resolve([]));
+    const service = new SpotSymbolDetectionReadModelService(
+      repositoryWith({ listCompletedObservationCohort }),
+    );
+
+    await expect(
+      service.getCheckpointLatencyCohort('binance', 50),
+    ).resolves.toEqual({ provider: null, detectionCount: 0, checkpoints: [] });
+    await expect(
+      service.getCheckpointLatencyCohort('binance', 101),
+    ).rejects.toThrow('cohort limit must be an integer from 1 to 100');
+    expect(listCompletedObservationCohort).toHaveBeenCalledTimes(1);
+  });
+
   it('loads the durable timeline and calculates price performance', async () => {
     const repository = repositoryWith({
       findDetected: jest.fn(() => Promise.resolve(detection())),

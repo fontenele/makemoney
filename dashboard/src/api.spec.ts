@@ -163,6 +163,15 @@ describe('loadDashboard', () => {
                         intervalMs: 60000,
                         observedAt: '2026-10-27T12:00:04.000Z',
                       },
+                      activityStream: {
+                        state: 'connected',
+                        lastConnectedAt: '2026-10-27T12:00:00.000Z',
+                        lastEventAt: '2026-10-27T12:00:04.000Z',
+                        lastTriggeredRefreshAt: null,
+                        lastTriggeredSymbol: null,
+                        triggeredRefreshCount: 0,
+                        reconnectCount: 0,
+                      },
                     }
                   : path.includes('/new-listings')
                     ? [
@@ -324,6 +333,7 @@ describe('loadDashboard', () => {
         state: 'waiting_for_activation',
         monitoredSymbolCount: 770,
         requestWeight: { usedWeight: 20, limit: 6000 },
+        activityStream: { state: 'connected', triggeredRefreshCount: 0 },
       },
     });
     expect(snapshot.strategySignals).toMatchObject({

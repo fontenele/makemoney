@@ -19,6 +19,10 @@ import {
   TickerStream,
 } from '../src/modules/market-data/domain/ticker-stream';
 import {
+  TICKER_SNAPSHOT_PROVIDER,
+  TickerSnapshotProvider,
+} from '../src/modules/market-data/domain/ticker-snapshot-provider';
+import {
   TRADE_STREAM,
   TradeStream,
 } from '../src/modules/market-data/domain/trade-stream';
@@ -34,6 +38,10 @@ import {
   SPOT_SYMBOL_CATALOG_PROVIDER,
   SpotSymbolCatalogProvider,
 } from '../src/modules/new-listings/domain/spot-symbol-catalog';
+import {
+  SPOT_SYMBOL_ACTIVITY_STREAM,
+  SpotSymbolActivityStream,
+} from '../src/modules/new-listings/domain/spot-symbol-activity-stream';
 import { PaperWalletService } from '../src/modules/paper-wallet/application/paper-wallet.service';
 import { PaperTradingExecutor } from '../src/modules/paper-trading/application/paper-trading.executor';
 import {
@@ -103,6 +111,9 @@ describe('Application (e2e)', () => {
       start: () => undefined,
       stop: () => undefined,
     };
+    const tickerSnapshotProvider: TickerSnapshotProvider = {
+      load: () => Promise.resolve(null),
+    };
     const tradeStream: TradeStream = {
       start: () => undefined,
       stop: () => undefined,
@@ -122,6 +133,10 @@ describe('Application (e2e)', () => {
           receivedAt: new Date(),
         }),
     };
+    const spotSymbolActivityStream: SpotSymbolActivityStream = {
+      start: () => undefined,
+      stop: () => undefined,
+    };
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     })
@@ -129,6 +144,8 @@ describe('Application (e2e)', () => {
       .useValue(pairMetadataProvider)
       .overrideProvider(TICKER_STREAM)
       .useValue(tickerStream)
+      .overrideProvider(TICKER_SNAPSHOT_PROVIDER)
+      .useValue(tickerSnapshotProvider)
       .overrideProvider(TRADE_STREAM)
       .useValue(tradeStream)
       .overrideProvider(CANDLE_STREAM)
@@ -137,6 +154,8 @@ describe('Application (e2e)', () => {
       .useValue(topOfBookStream)
       .overrideProvider(SPOT_SYMBOL_CATALOG_PROVIDER)
       .useValue(spotSymbolCatalogProvider)
+      .overrideProvider(SPOT_SYMBOL_ACTIVITY_STREAM)
+      .useValue(spotSymbolActivityStream)
       .overrideProvider(HistoricalStrategyReplayService)
       .useValue({
         run: runHistoricalReplay,
@@ -163,6 +182,15 @@ describe('Application (e2e)', () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
 
     return request(server).get('/health').expect(200);
+  });
+
+  it('/new-listings/checkpoint-latency (GET) returns an empty durable cohort', () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+
+    return request(server)
+      .get('/new-listings/checkpoint-latency')
+      .expect(200)
+      .expect({ provider: null, detectionCount: 0, checkpoints: [] });
   });
 
   it('/real-trading/funding-conversion-submission (POST) fails closed without operator authentication', async () => {

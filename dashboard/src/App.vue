@@ -3900,6 +3900,21 @@ onUnmounted(() => {
                     }}
                   </dd>
                 </div>
+                <div>
+                  <dt>Activity trigger</dt>
+                  <dd>
+                    {{ snapshot.newListingsScanner.data.activityStream.state }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Last trigger</dt>
+                  <dd>
+                    {{
+                      snapshot.newListingsScanner.data.activityStream
+                        .lastTriggeredSymbol ?? 'None'
+                    }}
+                  </dd>
+                </div>
               </dl>
             </article>
             <p

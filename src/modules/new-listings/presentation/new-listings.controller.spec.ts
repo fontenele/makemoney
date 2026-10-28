@@ -8,6 +8,40 @@ import {
 import { NewListingsController } from './new-listings.controller';
 
 describe('NewListingsController', () => {
+  it('returns durable checkpoint latency with bounded input', async () => {
+    const cohort = {
+      provider: 'binance' as const,
+      detectionCount: 1,
+      checkpoints: [],
+    };
+    const getCheckpointLatencyCohort = jest.fn(() => Promise.resolve(cohort));
+    const controller = new NewListingsController({
+      getCheckpointLatencyCohort,
+    });
+
+    await expect(controller.checkpointLatencyCohort()).resolves.toBe(cohort);
+    expect(getCheckpointLatencyCohort).toHaveBeenLastCalledWith('binance', 50);
+    await controller.checkpointLatencyCohort('25', 'binance');
+    expect(getCheckpointLatencyCohort).toHaveBeenLastCalledWith('binance', 25);
+  });
+
+  it.each([
+    ['0', undefined],
+    ['101', undefined],
+    ['1.5', undefined],
+    [undefined, 'other'],
+  ])('rejects invalid checkpoint latency query %s/%s', (limit, provider) => {
+    const getCheckpointLatencyCohort = jest.fn(() => Promise.resolve({}));
+    const controller = new NewListingsController({
+      getCheckpointLatencyCohort,
+    });
+
+    expect(() => controller.checkpointLatencyCohort(limit, provider)).toThrow(
+      BadRequestException,
+    );
+    expect(getCheckpointLatencyCohort).not.toHaveBeenCalled();
+  });
+
   it('returns the durable price path cohort with bounded input', async () => {
     const cohort = {
       provider: 'binance' as const,

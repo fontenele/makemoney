@@ -41,7 +41,13 @@ export interface SpotSymbolScannerStatus {
   consecutiveFailures: number;
   lastFailureCode: 'provider_rate_limited' | 'catalog_load_failed' | null;
   requestWeight: ProviderRequestWeightObservation | null;
+  activityStream: import('./spot-symbol-activity-stream').SpotSymbolActivityStreamStatus;
 }
+
+export type SpotSymbolCatalogScannerStatus = Omit<
+  SpotSymbolScannerStatus,
+  'activityStream'
+>;
 
 export interface DetectedSpotSymbol extends SpotSymbol {
   detectedAt: Date;

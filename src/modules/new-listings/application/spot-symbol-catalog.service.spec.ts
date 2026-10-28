@@ -133,6 +133,57 @@ describe('SpotSymbolCatalogService', () => {
     }
   });
 
+  it('uses unknown streamed activity to replace a pending timer with an immediate catalog refresh', async () => {
+    jest.useFakeTimers();
+    try {
+      const now = new Date('2026-10-28T12:00:00.000Z');
+      const catalog = {
+        symbols: [
+          {
+            provider: 'binance' as const,
+            symbol: 'BTCUSDT',
+            baseAsset: 'BTC',
+            quoteAsset: 'USDT' as const,
+            status: 'TRADING',
+            spotTradingAllowed: true,
+          },
+        ],
+        receivedAt: now,
+        requestWeight: {
+          usedWeight: 20,
+          limit: 6000,
+          intervalMs: 60_000,
+          observedAt: now,
+        },
+      };
+      const load = jest.fn<SpotSymbolCatalogProvider['load']>(() =>
+        Promise.resolve(catalog),
+      );
+      const service = new SpotSymbolCatalogService(
+        { load },
+        {
+          observe: jest.fn(() => Promise.resolve([])),
+          listDetected: jest.fn(() => Promise.resolve([])),
+        },
+        1000,
+      );
+
+      service.onModuleInit();
+      await jest.advanceTimersByTimeAsync(0);
+      expect(service.requestActivityRefresh('BTCUSDT')).toBe(false);
+      expect(service.requestActivityRefresh('NEWUSDT')).toBe(true);
+      await jest.advanceTimersByTimeAsync(0);
+      expect(load).toHaveBeenCalledTimes(2);
+      await jest.advanceTimersByTimeAsync(999);
+      expect(load).toHaveBeenCalledTimes(2);
+      await jest.advanceTimersByTimeAsync(1);
+      expect(load).toHaveBeenCalledTimes(3);
+      service.onModuleDestroy();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it('retains the conservative fallback when request-budget evidence is incomplete', async () => {
     jest.useFakeTimers();
     try {
@@ -189,6 +240,7 @@ describe('SpotSymbolCatalogService', () => {
       service.onModuleInit();
       await jest.advanceTimersByTimeAsync(0);
       expect(service.status().effectivePollIntervalMs).toBe(60_000);
+      expect(service.requestActivityRefresh('NEWUSDT')).toBe(false);
       await jest.advanceTimersByTimeAsync(59_999);
       expect(load).toHaveBeenCalledTimes(1);
       await jest.advanceTimersByTimeAsync(1);

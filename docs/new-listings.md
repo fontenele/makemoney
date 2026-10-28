@@ -681,3 +681,23 @@ The public catalog adapter retains Binance's current one-minute request weight w
 HTTP `429` and `418` are represented as explicit provider-throttling failures. A valid numeric or HTTP-date `Retry-After` controls the next attempt, with a 60-second fallback when the provider omits usable evidence. No retry can overlap the active request or persistence transaction.
 
 `GET /new-listings/scanner-status` reports startup, healthy-waiting, or degraded state; monitored catalog size; configured and effective intervals; last attempt and successful observation; next attempt; consecutive failure count; a sanitized failure code; and the latest request-weight observation. It does not initiate a provider call. The dashboard displays this state above the detection cohort, so `[]` now explicitly means no eligible post-baseline tradeable activation rather than an unknown scanner condition. Existing baseline rows are still never backfilled, and no signal, simulated order, real order, or financial mutation is added.
+
+## M7.114 official all-market activity acceleration hint
+
+The application now consumes Binance's official public `!miniTicker@arr` stream. The stream publishes a one-second array containing only market symbols whose 24-hour mini ticker changed, so it can reveal activity for a newly tradeable identity before the next completion-relative catalog timer. The adapter accepts only canonical USDT identities and safe event timestamps; invalid, unrelated, or malformed array members are ignored without discarding valid siblings. It reconnects after closure with bounded exponential delays from one through thirty seconds and shuts down without leaving a pending reconnect.
+
+Activity is evidence of a changed ticker only. It cannot arm a candidate, set `detectedAt`, create checkpoints, or establish `TRADING`/Spot permission. An identity absent from the latest catalog may replace one pending timer with an immediate authoritative REST refresh only when the catalog is idle and healthy and complete provider request-weight evidence remains below 80%. Repeated activity for the same unknown identity is suppressed for 60 seconds. If any guard fails, the existing adaptive poll remains the fallback.
+
+Scanner status now includes activity-stream connection state, last connection and event times, total reconnects, last identity that caused a guarded refresh, and total triggered refreshes. The dashboard exposes connection state and the last trigger. Live validation observed a connected stream receiving existing-symbol events with zero triggered refreshes, which is the expected steady state until a genuinely unknown USDT identity appears. The official stream contract is documented at <https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md>.
+
+## M7.115 early checkpoint density evaluation
+
+The first five forward-tracked activations completed all early checkpoints and supplied a real durable timing sample. Target-to-completion lag was 444–1,795 ms at T+0, 3,477–4,792 ms at T+5s, 1,138–2,519 ms at T+10s, and 2,652–3,938 ms at T+30s. The larger T+5s lag reflects five symbols becoming due together and the intentionally sequential ticker-plus-book processor.
+
+The canonical T+0/T+5s/T+10s/T+30s/T+1m/T+5m/T+15m/T+1h/T+24h schedule is therefore unchanged. Adding sub-five-second work before reducing or explicitly governing the existing provider workload would make later samples less timely. The next increment will expose bounded persisted latency statistics per checkpoint; only that evidence may support a later scheduling or concurrency change. Collection remains research-only and has no signal or order path.
+
+## M7.116 durable checkpoint latency aggregate
+
+`GET /new-listings/checkpoint-latency` accepts the established optional `provider=binance` and `limit=1..100` parameters. It selects a bounded recent cohort with completed T+0, reads only persisted completed checkpoints, and returns every canonical schedule point with its independent sample size plus minimum, arithmetic median, nearest-rank p95, and maximum target-to-durable-completion lag in milliseconds.
+
+An existing cohort keeps later unobserved checkpoints visible with zero samples and null statistics; a completely empty eligible cohort returns `provider: null`, zero detections, and no checkpoints. The first live response contains five samples through T+15m, with T+0 median/p95 `1119/1795` ms and T+5s median/p95 `4126/4792` ms; T+1h and T+24h remain unavailable. The route performs no provider request and cannot start or alter collection.

@@ -36,6 +36,7 @@ import { ListingObservationPatternCohort } from '../domain/listing-observation-p
 import { ListingObservationPatternMagnitudeCohort } from '../domain/listing-observation-pattern-magnitude-cohort';
 import { ListingObservationPatternTimingCohort } from '../domain/listing-observation-pattern-timing-cohort';
 import { ListingObservationMarketActivityCohort } from '../domain/listing-observation-market-activity-cohort';
+import { ListingObservationCheckpointLatencyCohort } from '../domain/listing-observation-checkpoint-latency-cohort';
 import { StoredListingTopOfBookCheckpoint } from '../domain/listing-top-of-book-observation-repository';
 import { ListingTopOfBookCohort } from '../domain/listing-top-of-book-cohort';
 import { StoredListingTopOfBookImbalance } from '../domain/listing-top-of-book-imbalance';
@@ -73,6 +74,17 @@ export class NewListingsController {
     @Query('provider') provider?: string,
   ): Promise<ListingObservationCohortPerformance> {
     return this.detections.getCohortPerformance(
+      optionalProvider(provider) ?? 'binance',
+      validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
+    );
+  }
+
+  @Get('checkpoint-latency')
+  checkpointLatencyCohort(
+    @Query('limit') limit?: string,
+    @Query('provider') provider?: string,
+  ): Promise<ListingObservationCheckpointLatencyCohort> {
+    return this.detections.getCheckpointLatencyCohort(
       optionalProvider(provider) ?? 'binance',
       validLimit(limit, MAX_LISTING_OBSERVATION_COHORT_LIMIT),
     );

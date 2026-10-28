@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-10-28 — M7.116 durable checkpoint latency distributions
+
+### Added
+
+- Pure validation and distribution calculation for persisted checkpoint completion lag.
+- Local read-only `GET /new-listings/checkpoint-latency` with bounded provider/limit input.
+- Independent minimum, median, nearest-rank p95, maximum, and sample availability for all canonical checkpoints.
+
+### Safety
+
+- The endpoint reuses stored observations only and cannot trigger Binance access, checkpoint collection, a signal, an order, or a financial transaction.
+- Unobserved checkpoints remain explicit zero-sample/null-statistic results.
+
+## 2026-10-28 — M7.114–M7.115 activity acceleration and checkpoint-density review
+
+### Added
+
+- Public read-only Binance all-market mini-ticker activity stream with strict USDT identity normalization, bounded reconnect, guarded REST refresh triggering, cooldown, tests, scanner status, and dashboard visibility.
+- A measured early-checkpoint density decision based on the first five durable forward activations.
+
+### Changed
+
+- Unknown stream activity may accelerate the next authoritative REST catalog refresh only while the scanner is healthy, idle, and below 80% of its verified request-weight limit.
+- Kept the canonical nine-checkpoint schedule unchanged after observed T+0 completion lag of 444–1,795 ms and T+5s lag of 3,477–4,792 ms showed that denser sequential collection would increase contention.
+- Isolated the E2E no-price scenario from the real REST ticker warm-up so it remains deterministic when tests run with outbound network access.
+
+### Safety
+
+- Stream activity cannot create a detection, checkpoint, signal, recommendation, order, or financial transaction.
+- Regular adaptive polling remains the fallback and REST remains the sole activation authority.
+
 ## 2026-10-27 — M7.113 rate-limit-aware adaptive launch detection and scanner visibility
 
 - Captured Binance's current `X-MBX-USED-WEIGHT-1M` value together with the published one-minute request-weight limit on each successful catalog response.

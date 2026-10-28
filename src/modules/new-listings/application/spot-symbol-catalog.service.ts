@@ -12,7 +12,7 @@ import {
   SpotSymbolCatalog,
   SpotSymbolCatalogProvider,
   SpotSymbolCatalogRateLimitError,
-  SpotSymbolScannerStatus,
+  SpotSymbolCatalogScannerStatus,
   SpotSymbol,
   SpotSymbolRepository,
 } from '../domain/spot-symbol-catalog';
@@ -24,6 +24,7 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(SpotSymbolCatalogService.name);
   private readonly abortController = new AbortController();
   private catalog?: SpotSymbolCatalog;
+  private catalogSymbols = new Set<string>();
   private newlyActivatedSymbols: SpotSymbol[] = [];
   private refreshTimer?: NodeJS.Timeout;
   private lastAttemptAt: Date | null = null;
@@ -31,7 +32,9 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
   private nextAttemptAt: Date | null = null;
   private effectivePollIntervalMs: number | null = null;
   private consecutiveFailures = 0;
-  private lastFailureCode: SpotSymbolScannerStatus['lastFailureCode'] = null;
+  private lastFailureCode: SpotSymbolCatalogScannerStatus['lastFailureCode'] =
+    null;
+  private loadInProgress = false;
   private readonly clock = (): Date => new Date();
 
   constructor(
@@ -44,7 +47,7 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit(): void {
-    void this.load();
+    void this.load('startup');
   }
 
   onModuleDestroy(): void {
@@ -63,7 +66,7 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
     return [...this.newlyActivatedSymbols];
   }
 
-  status(): SpotSymbolScannerStatus {
+  status(): SpotSymbolCatalogScannerStatus {
     return {
       state:
         this.consecutiveFailures > 0
@@ -83,7 +86,30 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  private async load(): Promise<void> {
+  requestActivityRefresh(symbol: string): boolean {
+    if (
+      this.abortController.signal.aborted ||
+      this.loadInProgress ||
+      !this.catalog ||
+      this.catalogSymbols.has(symbol) ||
+      this.consecutiveFailures > 0 ||
+      !this.hasRequestWeightHeadroom(this.catalog)
+    ) {
+      return false;
+    }
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+      this.refreshTimer = undefined;
+    }
+    void this.load('activity_stream');
+    return true;
+  }
+
+  private async load(
+    trigger: 'startup' | 'scheduled' | 'activity_stream',
+  ): Promise<void> {
+    if (this.loadInProgress || this.abortController.signal.aborted) return;
+    this.loadInProgress = true;
     this.lastAttemptAt = this.clock();
     this.nextAttemptAt = null;
     let nextDelayMs = SpotSymbolCatalogService.UNOBSERVED_WEIGHT_FALLBACK_MS;
@@ -91,6 +117,9 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
       const catalog = await this.provider.load(this.abortController.signal);
       const newlyActivatedSymbols = await this.repository.observe(catalog);
       this.catalog = catalog;
+      this.catalogSymbols = new Set(
+        catalog.symbols.map(({ symbol }) => symbol),
+      );
       this.newlyActivatedSymbols = newlyActivatedSymbols;
       this.lastSuccessfulObservationAt = catalog.receivedAt;
       this.consecutiveFailures = 0;
@@ -101,6 +130,7 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
         symbolCount: this.catalog.symbols.length,
         newlyActivatedCount: newlyActivatedSymbols.length,
         receivedAt: this.catalog.receivedAt.toISOString(),
+        trigger,
       });
     } catch (error: unknown) {
       if (!this.abortController.signal.aborted) {
@@ -115,6 +145,7 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
         this.logger.error('Failed to load Binance Spot symbol catalog', error);
       }
     } finally {
+      this.loadInProgress = false;
       this.scheduleNextLoad(nextDelayMs);
     }
   }
@@ -136,6 +167,17 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
     return this.pollIntervalMs;
   }
 
+  private hasRequestWeightHeadroom(catalog: SpotSymbolCatalog): boolean {
+    const weight = catalog.requestWeight;
+    return Boolean(
+      weight &&
+      weight.limit !== null &&
+      weight.intervalMs !== null &&
+      weight.usedWeight / weight.limit <
+        SpotSymbolCatalogService.REQUEST_WEIGHT_HEADROOM_RATIO,
+    );
+  }
+
   private scheduleNextLoad(delayMs: number): void {
     if (this.abortController.signal.aborted) {
       return;
@@ -144,7 +186,7 @@ export class SpotSymbolCatalogService implements OnModuleInit, OnModuleDestroy {
     this.nextAttemptAt = new Date(this.clock().getTime() + delayMs);
     this.refreshTimer = setTimeout(() => {
       this.refreshTimer = undefined;
-      void this.load();
+      void this.load('scheduled');
     }, delayMs);
   }
 }

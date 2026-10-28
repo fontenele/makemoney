@@ -38,6 +38,8 @@ import { ListingObservationPatternTimingCohort } from '../domain/listing-observa
 import { ListingObservationPatternTimingCohortCalculator } from './listing-observation-pattern-timing-cohort-calculator';
 import { ListingObservationMarketActivityCohort } from '../domain/listing-observation-market-activity-cohort';
 import { ListingObservationMarketActivityCohortCalculator } from './listing-observation-market-activity-cohort-calculator';
+import { ListingObservationCheckpointLatencyCohort } from '../domain/listing-observation-checkpoint-latency-cohort';
+import { ListingObservationCheckpointLatencyCohortCalculator } from './listing-observation-checkpoint-latency-cohort-calculator';
 import {
   LISTING_TOP_OF_BOOK_OBSERVATION_REPOSITORY,
   ListingTopOfBookObservationRepository,
@@ -115,6 +117,8 @@ export class SpotSymbolDetectionReadModelService {
     new ListingObservationPatternTimingCohortCalculator();
   private readonly marketActivityCohort =
     new ListingObservationMarketActivityCohortCalculator();
+  private readonly checkpointLatencyCohort =
+    new ListingObservationCheckpointLatencyCohortCalculator();
   private readonly topOfBookCohort = new ListingTopOfBookCohortCalculator();
   private readonly topOfBookImbalance =
     new ListingTopOfBookImbalanceCalculator();
@@ -402,6 +406,16 @@ export class SpotSymbolDetectionReadModelService {
   ): Promise<ListingObservationMarketActivityCohort> {
     this.validateCohortLimit(limit);
     return this.marketActivityCohort.calculate(
+      await this.repository.listCompletedObservationCohort(provider, limit),
+    );
+  }
+
+  async getCheckpointLatencyCohort(
+    provider: 'binance',
+    limit: number,
+  ): Promise<ListingObservationCheckpointLatencyCohort> {
+    this.validateCohortLimit(limit);
+    return this.checkpointLatencyCohort.calculate(
       await this.repository.listCompletedObservationCohort(provider, limit),
     );
   }

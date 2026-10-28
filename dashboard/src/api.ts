@@ -99,6 +99,15 @@ export interface NewListingsScannerStatus {
     intervalMs: number | null;
     observedAt: string;
   } | null;
+  activityStream: {
+    state: 'starting' | 'connected' | 'reconnecting' | 'stopped';
+    lastConnectedAt: string | null;
+    lastEventAt: string | null;
+    lastTriggeredRefreshAt: string | null;
+    lastTriggeredSymbol: string | null;
+    triggeredRefreshCount: number;
+    reconnectCount: number;
+  };
 }
 
 export interface ListingPerformancePoint {

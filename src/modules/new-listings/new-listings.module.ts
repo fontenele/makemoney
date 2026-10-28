@@ -7,6 +7,7 @@ import {
   SPOT_SYMBOL_CATALOG_PROVIDER,
   SPOT_SYMBOL_REPOSITORY,
 } from './domain/spot-symbol-catalog';
+import { SPOT_SYMBOL_ACTIVITY_STREAM } from './domain/spot-symbol-activity-stream';
 import { BinanceSpotSymbolCatalogClient } from './infrastructure/binance-spot-symbol-catalog.client';
 import { PrismaSpotSymbolRepository } from './infrastructure/prisma-spot-symbol.repository';
 import { NewListingsController } from './presentation/new-listings.controller';
@@ -33,6 +34,8 @@ import { ListingTopOfBookSnapshotService } from './application/listing-top-of-bo
 import { ListingTopOfBookSpreadCalculator } from './application/listing-top-of-book-spread-calculator';
 import { LISTING_TOP_OF_BOOK_OBSERVATION_REPOSITORY } from './domain/listing-top-of-book-observation-repository';
 import { PrismaListingTopOfBookObservationRepository } from './infrastructure/prisma-listing-top-of-book-observation.repository';
+import { BinanceSpotSymbolActivityClient } from './infrastructure/binance-spot-symbol-activity.client';
+import { SpotSymbolActivityTriggerService } from './application/spot-symbol-activity-trigger.service';
 
 @Module({
   controllers: [NewListingsController, NewListingsScannerController],
@@ -43,6 +46,14 @@ import { PrismaListingTopOfBookObservationRepository } from './infrastructure/pr
       useFactory: (config: ConfigService) =>
         new BinanceSpotSymbolCatalogClient(
           config.getOrThrow<string>('BINANCE_REST_BASE_URL'),
+        ),
+    },
+    {
+      provide: SPOT_SYMBOL_ACTIVITY_STREAM,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new BinanceSpotSymbolActivityClient(
+          config.getOrThrow<string>('BINANCE_WS_BASE_URL'),
         ),
     },
     {
@@ -87,6 +98,7 @@ import { PrismaListingTopOfBookObservationRepository } from './infrastructure/pr
         config.getOrThrow<number>('NEW_LISTINGS_POLL_INTERVAL_MS'),
     },
     SpotSymbolCatalogService,
+    SpotSymbolActivityTriggerService,
     SpotSymbolDetectionReadModelService,
     DueListingObservationCheckpointService,
     {

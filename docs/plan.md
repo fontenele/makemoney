@@ -97,7 +97,8 @@ M10.177 Current Agentic Wallet Authentication Challenge Compatibility: DONE
 M7.111 Forward-Only First-Tradeable Listing Activation: DONE
 M7.112 Bounded Rapid Launch Detection and Checkpoint Cadence: DONE
 M7.113 Rate-Limit-Aware Adaptive Activation Detection and Scanner Visibility: DONE
-Next objective: M7.114 evaluate a public Binance activation stream or announcement corroboration source while preserving forward-only first-tradeable detection and zero order authority
+M7.114 Official All-Market Activity Acceleration Hint: DONE
+Next objective: M7.115 evaluate measured denser early checkpoint observation while preserving research-only behavior and zero order authority
 ```
 
 The detailed sections below preserve the original product plan. For current delivery status and exact increment boundaries, `docs/roadmap.md` and `docs/current-state.md` are authoritative.
@@ -2467,5 +2468,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M9 is closed through M9.66. M10 is complete through M10.138, which adds an unregistered status-observation-keyed reader for the immutable M10.135 funding-conversion financial reconciliation. Canonical terminal observation identity is validated before access, absence is explicit, and present evidence is revalidated through the authoritative persisted mapper. Authenticated dashboard valuation is initial/manual only. There is no automatic status or valuation polling, retry, live conversion invocation, accounting mutation, conversion authority, or real-trading activation. Real trading remains disabled.
+M7 is complete through M7.116. A bounded local route now exposes durable target-to-completion latency distributions for every canonical checkpoint without triggering collection. M7.117 is next: separate durable queue delay from processing duration before reconsidering batching or concurrency. M10 remains complete through M10.177. Real trading remains disabled.
 ```

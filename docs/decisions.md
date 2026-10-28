@@ -1,5 +1,25 @@
 # Technical Decisions
 
+## M7.116 — Publish latency distributions from the existing bounded durable cohort
+
+Checkpoint timing must be based on committed completion facts rather than transient worker logs. M7.116 reuses the newest-first PostgreSQL cohort already bounded to 1–100 detections with completed T+0, then calculates `completedAt - targetAt` independently for every canonical checkpoint. This avoids a second selection rule, projection table, or cache lifecycle.
+
+Each checkpoint reports its own sample size, minimum, arithmetic median, nearest-rank p95, and maximum milliseconds. All nine schedule identities remain present when the cohort exists, even when a later checkpoint has no completed observation; those statistics are null rather than zero. Empty cohorts remain explicitly empty. The calculation revalidates provider, unique symbol/label identity, canonical offsets, and non-negative safe-integer lag before aggregation. Reading the route cannot contact Binance, claim work, collect a checkpoint, or create a signal or order.
+
+## M7.115 — Do not densify early checkpoints while collection latency consumes the window
+
+The first five forward-tracked activations produced a complete durable T+0, T+5s, T+10s, and T+30s sample. T+0 completion lag ranged from 444 to 1,795 milliseconds, while T+5s lag ranged from 3,477 to 4,792 milliseconds. These are target-to-durable-completion measurements, not estimates from timers or open ports.
+
+The worker intentionally processes claimed checkpoints sequentially and each completion requires both a public rolling-ticker snapshot and a public top-of-book snapshot. Adding T+1s or T+3s under that execution model would add provider work ahead of later checkpoints and reduce temporal fidelity rather than improve it. The canonical nine-checkpoint schedule therefore remains unchanged. M7.116 will make the persisted latency cohort available as a bounded read-only aggregate before any cadence, batching, or concurrency policy is reconsidered. No signal, recommendation, or order authority follows from this timing decision.
+
+## M7.114 — Use all-market activity only to accelerate authoritative REST confirmation
+
+Binance's official Spot stream documents `!miniTicker@arr` as a one-second array containing only symbols whose rolling mini ticker changed. That makes it useful as a low-cost wake-up hint near first market activity, but it does not carry Spot permission or authoritative symbol status. The application therefore never detects or persists a listing from the stream itself. It requests a normal catalog refresh, and the established REST observation must still confirm both `TRADING` and Spot trading allowed.
+
+The client accepts only strict canonical USDT identities with valid event timestamps, preserves Unicode provider symbols, and ignores malformed or unrelated rows independently. Connections use the existing public WebSocket base, report lifecycle state, and reconnect with bounded one-to-thirty-second exponential delay because Binance documents a 24-hour connection lifetime. The `ws` transport supplies protocol ping/pong handling.
+
+Only an identity absent from the latest successful catalog may trigger. The catalog must be healthy, idle, and carrying complete request-weight evidence below 80%; otherwise regular adaptive polling remains responsible. A 60-second per-symbol cooldown bounds inconsistent repeated activity. This preserves REST rate-limit policy and prevents a stream anomaly from becoming request amplification. Official reference: <https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md>.
+
 ## M7.113 — Tighten launch polling only under observable provider budget
 
 The scanner now reads Binance's `X-MBX-USED-WEIGHT-1M` response header together with the published one-minute request-weight limit. When both are valid and usage remains below 80%, the configured completion-relative quiet period can be one second. At or above 80%, the next attempt waits at least the complete published interval. If the budget cannot be verified, the service retains a five-second fallback instead of assuming capacity.
