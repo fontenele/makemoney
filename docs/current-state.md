@@ -1,5 +1,9 @@
 # Current State
 
+M10.189 is complete. The reservation store now captures a complete recursive command copy before validation, fingerprinting, and transaction entry. Two regression cases mutate nested caller-owned facts while lock acquisition or capacity reading is pending and require unchanged persistence plus exact replay. No live reservation, provider call, runtime startup, or financial transaction was performed.
+
+Post-M10.189 validation passes 3,011 backend tests across 273 suites, 150 PostgreSQL E2E tests across 10 suites with all 51 migrations from scratch, 117 dashboard tests, lint, formatting, backend/dashboard builds, Prisma/Compose validation, and diff checks. Compose retains the existing inaccessible user Docker-config warning.
+
 M10.188 is complete. A new unregistered recording service accepts the original authenticated evidence package, recomposes M10.186, and delegates only a ready provenance-bound command to M10.18. Resource/quota/capacity blockers and pre-store cancellation stop without durable access.
 
 The existing Prisma store remains the sole atomic authority: it rebuilds active rows and reruns capacity under its advisory-locked serializable transaction, then creates one immutable provenance-bound reservation or returns an exact replay. The result distinguishes replay from a row created by the current call. No runtime registration, route, provider access, quota consumption, external balance lock, automatic retry, Risk Engine approval, funding, submission, strategy, order, accounting mutation, or financial transaction authority exists.

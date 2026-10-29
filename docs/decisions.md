@@ -1,5 +1,9 @@
 # Technical Decisions
 
+## M10.189 — Capture reservation facts before asynchronous database work
+
+TypeScript readonly fields do not prevent a caller from changing nested objects or Date instances. M10.18 previously fingerprinted the command synchronously but reread caller-owned facts after acquiring the transaction lock. Capture one complete structured clone before validation so provenance checks, fingerprinting, capacity, payload commitment, and persisted columns all use the same evidence. The local copy recursively handles arrays, object facts, and Date instances without a dependency; exact decimal strings and Date values retain their types. The transaction still evaluates freshness against its own current clock.
+
 ## M10.188 — Recompute authenticated preparation immediately before the durable store
 
 M10.187 made the M10.18 row capable of retaining authenticated provenance, but passing an externally prepared command directly into the store would leave the new workflow vulnerable to a caller selecting or modifying the wrong intermediate artifact. M10.188 therefore adds a narrow application service that accepts the original evidence package and invokes M10.186 itself. A command exists only within that call and is delegated only after every projection and preliminary capacity rule passes.

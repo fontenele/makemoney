@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-29 — M10.189 reservation command isolation
+
+- Capture the full reservation command before validation and asynchronous database work so fingerprinting and persisted facts cannot diverge through caller mutation.
+- Preserve nested Date values, costs, assets, risk/capacity inputs, and authenticated provenance independently of the caller.
+- Add regression coverage at advisory-lock and capacity-query waits, including exact replay of the original request.
+- Preserve transaction-time capacity/freshness authority; add no route, schema, provider call, or financial authority. Verified with 3,011 backend, 150 PostgreSQL E2E, and 117 dashboard tests plus lint, formatting, builds, Prisma/Compose validation, and diff checks.
+
 ## 2026-10-28 — M10.188 authenticated durable reservation recording
 
 - Added an unregistered service that recomputes the complete M10.186 preparation from original authenticated evidence and delegates only a ready provenance-bound command to M10.18.

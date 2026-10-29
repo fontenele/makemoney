@@ -27,10 +27,12 @@ export class PrismaRealExecutionReservationStore implements RealExecutionReserva
     private readonly now: () => Date = () => new Date(),
   ) {}
 
-  async reserve(command: RealExecutionReservationCommand): Promise<{
+  async reserve(input: RealExecutionReservationCommand): Promise<{
     reservation: StoredRealExecutionReservation;
     replayed: boolean;
   }> {
+    // Keep validation, fingerprinting, and asynchronous writes on the same facts.
+    const command = copyReservationFacts(input);
     if (!validProvenance(command)) {
       throw new RealExecutionReservationProvenanceError();
     }
@@ -171,6 +173,20 @@ export class PrismaRealExecutionReservationStore implements RealExecutionReserva
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
   }
+}
+
+function copyReservationFacts<T>(value: T): T {
+  if (value instanceof Date) return new Date(value.getTime()) as T;
+  if (Array.isArray(value)) return value.map(copyReservationFacts) as T;
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, fact]) => [
+        key,
+        copyReservationFacts(fact),
+      ]),
+    ) as T;
+  }
+  return value;
 }
 
 function validProvenance(command: RealExecutionReservationCommand): boolean {

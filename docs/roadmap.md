@@ -2,6 +2,10 @@
 
 Implementation is incremental. A milestone starts only after the preceding scope is verified and the user approves the next plan.
 
+## Latest increment — M10.189 — complete
+
+Capture the complete M10.18 reservation command before provenance validation, fingerprinting, and asynchronous transaction work. Verify that nested caller mutations during lock and capacity-query waits cannot change persisted facts or the original request's exact replay. Preserve locked capacity/freshness checks and all existing authority boundaries. No new route, provider integration, or financial operation is included. Verified: 3,011 backend tests, 150 PostgreSQL E2E tests with all 51 migrations, 117 dashboard tests, lint, formatting, backend/dashboard builds, Prisma/Compose validation, and diff checks.
+
 ## M0 — Bootstrap — complete
 
 NestJS bootstrap, validated configuration, lint/format tooling, tests, Docker Compose, PostgreSQL, Redis, Prisma, health checks, and initial documentation.

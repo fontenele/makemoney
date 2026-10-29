@@ -1,5 +1,13 @@
 # Real Trading
 
+## M10.189 — Reservation command isolation
+
+The M10.18 store captures the complete command with a recursive defensive copy synchronously before provenance validation, fingerprinting, or transaction entry. Intent, embedded quote, assets, cost arrays, dates, risk limits, budget, resources, quota, freshness, and optional provenance therefore remain independent of caller-owned objects throughout asynchronous database work. Decimal quantities remain strings and dates remain dates.
+
+The same captured facts drive idempotency, locked capacity checks, payload commitment, and persistence. This closes a race where caller mutation during an awaited lock or query could make the stored row diverge from its request fingerprint. Transaction-time freshness and capacity revalidation remain authoritative; the copy does not freeze the evaluation clock or bypass concurrent reservations.
+
+Regression tests pause at lock acquisition and active-capacity reading, mutate the original nested command, and require unchanged persisted data plus exact replay of the original request. No route, schema, registration, provider access, live reservation, or financial authority is added.
+
 ## M10.188 — Authenticated durable reservation recording
 
 M10.188 introduces the first composition that can carry the authenticated M10.180/M10.182 evidence chain through M10.186 and into the existing M10.18 serializable store. The service accepts the original internal reconciled-balance snapshot, normalized capability observation, exact intent and quote, explicit gas and USD requirements, risk limits, budget facts, bounded reservation snapshot, freshness policy, and evaluation time. It recomputes preparation itself and never accepts a caller-assembled command.

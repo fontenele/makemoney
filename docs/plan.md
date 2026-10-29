@@ -2468,5 +2468,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7 is complete through M7.117. M10 is complete through M10.180: fresh reconciled accounting balances can now be projected purely into the existing non-authorizing resource-risk input for an exact approved intent and quote. Runtime risk composition, reservations, and real trading remain disabled and require separately reviewed increments.
+M7 is complete through M7.117. M10 is implemented through M10.189: authenticated reservation recording remains unregistered, and the durable store captures independent command facts before asynchronous work. Runtime risk composition and real trading remain disabled; further activation requires a separately reviewed increment.
 ```

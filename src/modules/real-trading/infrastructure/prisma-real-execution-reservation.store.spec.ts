@@ -16,6 +16,91 @@ const USDT_ADDRESS = '0x55d398326f99059ff775485246999027b3197955';
 const BTCB_ADDRESS = '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c';
 
 describe('PrismaRealExecutionReservationStore', () => {
+  it.each(['lock', 'capacity'] as const)(
+    'isolates the complete command from caller mutation while awaiting %s',
+    async (boundary) => {
+      const harness = repositoryHarness();
+      harness.create.mockImplementation(({ data }) =>
+        Promise.resolve(row(data)),
+      );
+      const input = command({
+        provenance: {
+          accountingReconciliationId: '44444444-4444-4444-8444-444444444444',
+          accountingReconciliationFingerprint: 'd'.repeat(64),
+          providerObservedAt: new Date('2026-10-01T14:00:00.000Z'),
+          requirementValuationBasis: 'explicit_external_usd_value',
+          requirementValuedAt: new Date('2026-10-01T14:00:01.000Z'),
+        },
+      });
+      const original = command({
+        provenance: {
+          ...input.provenance!,
+          providerObservedAt: new Date(input.provenance!.providerObservedAt),
+          requirementValuedAt: new Date(input.provenance!.requirementValuedAt),
+        },
+      });
+      await harness.store.reserve(original);
+      const expected = harness.create.mock.calls[0][0].data;
+      harness.create.mockClear();
+
+      let release!: () => void;
+      let entered!: () => void;
+      const waiting = new Promise<void>((resolve) => {
+        entered = resolve;
+      });
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      if (boundary === 'lock') {
+        harness.tx.$executeRaw.mockImplementationOnce(async () => {
+          entered();
+          await gate;
+          return 1;
+        });
+      } else {
+        harness.tx.realExecutionReservation.findMany.mockImplementationOnce(
+          async () => {
+            entered();
+            await gate;
+            return [];
+          },
+        );
+      }
+      const pending = harness.store.reserve(input);
+      await waiting;
+      Object.assign(input.intent, {
+        sourceQuantity: '999',
+        idempotencyKey: 'altered',
+      });
+      Object.assign(input.intent.sourceAsset, { tokenAddress: BTCB_ADDRESS });
+      Object.assign(input.quote.intent.targetAsset, { symbol: 'ALTERED' });
+      Object.assign(input.quote.costs[0], { quantity: '999' });
+      input.quote.expiresAt.setTime(0);
+      input.intent.createdAt.setTime(0);
+      Object.assign(input.limits, { maximumDailySpendUsdt: '0' });
+      Object.assign(input.budgetSnapshot, { settledSpendUsdt: '999' });
+      Object.assign(input.resourceSnapshot, { sourceAvailableQuantity: '0' });
+      Object.assign(input.quotaSnapshot, { remainingUsd: '0' });
+      input.quotaSnapshot.quotaObservedAt.setTime(0);
+      Object.assign(input.freshness, { budgetSnapshotMaxAgeMs: 1 });
+      Object.assign(input.provenance!, {
+        accountingReconciliationFingerprint: 'e'.repeat(64),
+      });
+      input.provenance!.providerObservedAt.setTime(0);
+      input.provenance!.requirementValuedAt.setTime(0);
+      release();
+
+      await expect(pending).resolves.toMatchObject({ replayed: false });
+      expect(harness.create.mock.calls[0][0].data).toEqual(expected);
+      harness.tx.realExecutionReservation.findUnique.mockResolvedValue(
+        row(expected),
+      );
+      await expect(harness.store.reserve(original)).resolves.toMatchObject({
+        replayed: true,
+      });
+    },
+  );
+
   it('serializes capacity assessment and persists one immutable reservation', async () => {
     const harness = repositoryHarness();
     harness.tx.realExecutionReservation.create.mockImplementation(

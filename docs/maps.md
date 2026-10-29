@@ -1,5 +1,7 @@
 # Project Map
 
+M10.189 reservation command isolation: read `real-trading.md`, `decisions.md`, `roadmap.md`, and `current-state.md`; implementation and asynchronous mutation regression tests are in `../src/modules/real-trading/infrastructure/prisma-real-execution-reservation.store.ts` and its adjacent spec. Capture the complete command before validation and transaction entry, preserving transaction-time freshness and capacity authority.
+
 Use this keyword map to locate context before changing code. Read the listed documentation and files for the relevant keyword.
 
 - **Authenticated durable reservation recording, M10.188:** start with `real-trading.md`, `roadmap.md`, `current-state.md`, and `decisions.md`; the unregistered composition is in `../src/modules/real-trading/application/agentic-wallet-accounting-reconciled-reservation-recording.service.ts`, command preparation remains in the adjacent M10.186 boundary, and serializable authority remains in `../src/modules/real-trading/infrastructure/prisma-real-execution-reservation.store.ts`. The service must recompute from original evidence, stop before the store on preparation blockers or cancellation, and delegate only a ready provenance-bound command; it has no provider, route, Risk Engine approval, submission, or financial authority.
