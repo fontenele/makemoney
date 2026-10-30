@@ -22,15 +22,43 @@ describe('BinanceFundingValuationPriceClient', () => {
     await expect(client.load()).resolves.toEqual({
       provider: 'binance',
       bnbUsdtPrice: '742.19000000',
+      btcUsdtPrice: null,
       usdtBrlPrice: '5.04450000',
       observedAt,
     });
     expect(httpClient.mock.calls[0]?.[0]).toBe(
-      'https://data-api.binance.vision/api/v3/ticker/price?symbols=%5B%22BNBUSDT%22%2C%22USDTBRL%22%5D',
+      'https://data-api.binance.vision/api/v3/ticker/price?symbols=%5B%22BNBUSDT%22%2C%22USDTBRL%22%2C%22BTCUSDT%22%5D',
     );
     expect(httpClient.mock.calls[0]?.[1]?.signal).toBeInstanceOf(AbortSignal);
   });
 
+  it('loads a precise BTC reference without claiming a BTCB quote', () => {
+    const client = new BinanceFundingValuationPriceClient(
+      'https://data-api.binance.vision',
+    );
+    expect(
+      client.normalize([
+        { symbol: 'BNBUSDT', price: '742.19' },
+        { symbol: 'USDTBRL', price: '5.0445' },
+        { symbol: 'BTCUSDT', price: '77000.12345678' },
+      ])?.btcUsdtPrice,
+    ).toBe('77000.12345678');
+  });
+  it.each(['0', '-1', '1e4', 'bad', 77000, '1'.repeat(80)])(
+    'keeps other prices when BTC reference is invalid: %s',
+    (price) => {
+      const client = new BinanceFundingValuationPriceClient(
+        'https://data-api.binance.vision',
+      );
+      expect(
+        client.normalize([
+          { symbol: 'BNBUSDT', price: '742.19' },
+          { symbol: 'USDTBRL', price: '5.0445' },
+          { symbol: 'BTCUSDT', price },
+        ]),
+      ).toMatchObject({ bnbUsdtPrice: '742.19', btcUsdtPrice: null });
+    },
+  );
   it.each([
     { payload: [] },
     { payload: [{ symbol: 'BNBUSDT', price: '742.19' }] },

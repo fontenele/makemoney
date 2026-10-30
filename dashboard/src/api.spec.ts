@@ -85,15 +85,20 @@ describe('loadAgenticWalletFundingValuation', () => {
           balance: {
             quantityBnb: '0.00975323',
             quantityUsdt: '2.955301453716908917',
+            quantityBtcb: '0.00001',
+            btcbValueUsdt: '0.77',
+            btcbValueBrl: '3.884265',
             valueUsdt: '7.2387497737',
             valueBrl: '36.51587323342965',
             usdtValueBrl: '14.908018183274947032',
-            totalValueUsdt: '10.194051227416908917',
-            totalValueBrl: '51.423891416704597032',
+            totalValueUsdt: '10.964051227416908917',
+            totalValueBrl: '55.308156416704597032',
           },
           prices: {
             provider: 'binance',
             bnbUsdt: '742.19',
+            btcUsdtReference: '77000',
+            btcbBasis: 'btc_spot_reference_not_btcb_quote',
             usdtBrl: '5.0445',
           },
           refreshMode: 'initial_and_manual',
@@ -114,7 +119,10 @@ describe('loadAgenticWalletFundingValuation', () => {
         balance: {
           quantityBnb: '0.00975323',
           quantityUsdt: '2.955301453716908917',
-          totalValueUsdt: '10.194051227416908917',
+          quantityBtcb: '0.00001',
+          btcbValueUsdt: '0.77',
+          btcbValueBrl: '3.884265',
+          totalValueUsdt: '10.964051227416908917',
         },
       },
     });
@@ -207,6 +215,9 @@ describe('loadDashboard', () => {
                               balance: {
                                 quantityBnb: '0.00975323',
                                 quantityUsdt: null,
+                                quantityBtcb: null,
+                                btcbValueUsdt: null,
+                                btcbValueBrl: null,
                                 valueUsdt: '7.2387497737',
                                 valueBrl: '36.51587323342965',
                                 usdtValueBrl: null,
@@ -216,6 +227,8 @@ describe('loadDashboard', () => {
                               prices: {
                                 provider: 'binance',
                                 bnbUsdt: '742.19',
+                                btcUsdtReference: '77000',
+                                btcbBasis: 'btc_spot_reference_not_btcb_quote',
                                 usdtBrl: '5.0445',
                               },
                               refreshMode: 'initial_and_manual',

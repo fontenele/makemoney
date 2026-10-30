@@ -714,10 +714,6 @@ export type AgenticWalletFundingConversionPlanScalarRelationFilter = {
   isNot?: Prisma.AgenticWalletFundingConversionPlanWhereInput
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type AgenticWalletFundingConversionPlanCreateNestedOneWithoutSubmissionAttemptInput = {
   create?: Prisma.XOR<Prisma.AgenticWalletFundingConversionPlanCreateWithoutSubmissionAttemptInput, Prisma.AgenticWalletFundingConversionPlanUncheckedCreateWithoutSubmissionAttemptInput>
   connectOrCreate?: Prisma.AgenticWalletFundingConversionPlanCreateOrConnectWithoutSubmissionAttemptInput

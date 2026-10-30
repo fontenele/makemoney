@@ -1,6 +1,29 @@
 import { Module } from '@nestjs/common';
+import {
+  DiagnosticFinancialReportService,
+  DiagnosticFinancialReportStore,
+} from './application/diagnostic-financial-report.service';
+import { PrismaDiagnosticFinancialReportStore } from './infrastructure/prisma-diagnostic-financial-report.store';
+import { BscDiagnosticReceiptsReader } from './infrastructure/bsc-diagnostic-receipts.reader';
+import { GasDiagnosticService } from './application/gas-diagnostic.service';
+import { GasDiagnosticStore } from './application/gas-diagnostic-store';
+import { PrismaGasDiagnosticStore } from './infrastructure/prisma-gas-diagnostic.store';
+import { GasDiagnosticCliTransport } from './infrastructure/gas-diagnostic.transport';
+import { StrategiesModule } from '../strategies/strategies.module';
+import {
+  MOVING_AVERAGE_CROSSOVER_STRATEGY,
+  Strategy,
+} from '../strategies/domain/strategy';
+import { BinanceHistoricalCandlesClient } from '../backtesting/infrastructure/binance/binance-historical-candles.client';
+import { AutonomousStrategyResearchService } from './application/autonomous-strategy-research.service';
 import { randomUUID } from 'node:crypto';
 import { RealTradingStatusService } from './application/real-trading-status.service';
+import { RealExecutionReadinessService } from './application/real-execution-readiness.service';
+import { AgenticWalletMarketCostAnalysisService } from './application/agentic-wallet-market-cost-analysis.service';
+import { AgenticWalletMarketCostPreviewService } from './application/agentic-wallet-market-cost-preview.service';
+import { AgenticWalletMarketFeeEvidenceAdapter } from './infrastructure/agentic-wallet-market-fee-evidence.adapter';
+import { AgenticWalletMarketQuoteService } from './application/agentic-wallet-market-quote.service';
+import { AgenticWalletMarketQuoteAdapter } from './infrastructure/agentic-wallet-market-quote.adapter';
 import { AgenticWalletCapabilityAdapter } from './infrastructure/agentic-wallet-capability.adapter';
 import { AgenticWalletCliProcessRunner } from './infrastructure/agentic-wallet-cli-process-runner';
 import { RealTradingController } from './presentation/real-trading.controller';
@@ -101,9 +124,108 @@ import { AgenticWalletAccountingLatestReconciledBalanceSnapshotService } from '.
 import { AgenticWalletAccountingLedgerReconciliationReadinessService } from './application/agentic-wallet-accounting-ledger-reconciliation-readiness.service';
 
 @Module({
-  imports: [RiskEngineModule],
+  imports: [RiskEngineModule, StrategiesModule],
   controllers: [RealTradingController],
   providers: [
+    {
+      provide: DiagnosticFinancialReportStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaDiagnosticFinancialReportStore(prisma),
+    },
+    {
+      provide: DiagnosticFinancialReportService,
+      inject: [GasDiagnosticStore, DiagnosticFinancialReportStore],
+      useFactory: (
+        diagnostics: GasDiagnosticStore,
+        reports: DiagnosticFinancialReportStore,
+      ) =>
+        new DiagnosticFinancialReportService(
+          diagnostics,
+          new GasDiagnosticCliTransport(),
+          new BscDiagnosticReceiptsReader(),
+          reports,
+        ),
+    },
+    {
+      provide: GasDiagnosticStore,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaGasDiagnosticStore(prisma),
+    },
+    {
+      provide: GasDiagnosticService,
+      inject: [
+        ConfigService,
+        RealTradingStatusService,
+        AgenticWalletMarketCostPreviewService,
+        EmergencyStopService,
+        GasDiagnosticStore,
+      ],
+      useFactory: (
+        config: ConfigService,
+        wallet: RealTradingStatusService,
+        quotes: AgenticWalletMarketCostPreviewService,
+        stop: EmergencyStopService,
+        store: GasDiagnosticStore,
+      ) =>
+        new GasDiagnosticService(
+          config,
+          wallet,
+          quotes,
+          stop,
+          store,
+          new GasDiagnosticCliTransport(),
+        ),
+    },
+    {
+      provide: AutonomousStrategyResearchService,
+      inject: [ConfigService, MOVING_AVERAGE_CROSSOVER_STRATEGY],
+      useFactory: (config: ConfigService, strategy: Strategy) =>
+        new AutonomousStrategyResearchService(
+          new BinanceHistoricalCandlesClient(
+            config.getOrThrow<string>('BINANCE_REST_BASE_URL'),
+          ),
+          strategy,
+        ),
+    },
+    {
+      provide: RealExecutionReadinessService,
+      inject: [ConfigService, RealTradingStatusService, EmergencyStopService],
+      useFactory: (
+        config: ConfigService,
+        status: RealTradingStatusService,
+        stop: EmergencyStopService,
+      ) => new RealExecutionReadinessService(config, status, stop),
+    },
+    {
+      provide: AgenticWalletMarketCostAnalysisService,
+      inject: [AgenticWalletMarketCostPreviewService, RealTradingStatusService],
+      useFactory: (
+        previews: AgenticWalletMarketCostPreviewService,
+        status: RealTradingStatusService,
+      ) => new AgenticWalletMarketCostAnalysisService(previews, status),
+    },
+    {
+      provide: AgenticWalletMarketCostPreviewService,
+      inject: [AgenticWalletMarketQuoteService],
+      useFactory: (quotes: AgenticWalletMarketQuoteService) =>
+        new AgenticWalletMarketCostPreviewService(
+          quotes,
+          new AgenticWalletMarketFeeEvidenceAdapter(),
+        ),
+    },
+    {
+      provide: AgenticWalletMarketQuoteService,
+      inject: [RealTradingStatusService],
+      useFactory: (status: RealTradingStatusService) =>
+        new AgenticWalletMarketQuoteService(
+          status,
+          new AgenticWalletMarketQuoteAdapter(
+            new AgenticWalletQuoteCliProcessRunner(),
+          ),
+        ),
+    },
     {
       provide: AgenticWalletCapabilityAdapter,
       useFactory: () =>

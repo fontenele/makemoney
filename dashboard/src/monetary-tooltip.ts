@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 
-export type MonetaryAsset = 'BNB' | 'BRL' | 'BTC' | 'USDT';
+export type MonetaryAsset = 'BNB' | 'BRL' | 'BTC' | 'BTCB' | 'USDT';
 
 export interface MonetaryTooltipRates {
   bnbUsdt?: string | null;
@@ -29,7 +29,7 @@ export function buildMonetaryTooltip(
   );
   if (assetUsdt === null) return undefined;
   const valueUsdt = quantity.times(assetUsdt);
-  return `Equivalent: ${formatUsdt(valueUsdt)} · ${formatBrl(
+  return `${asset === 'BTCB' ? 'BTC reference estimate' : 'Equivalent'}: ${formatUsdt(valueUsdt)} · ${formatBrl(
     valueUsdt.times(usdtBrl),
   )}`;
 }

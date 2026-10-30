@@ -29,6 +29,12 @@ describe('buildMonetaryTooltip', () => {
     );
   });
 
+  it('labels BTCB conversions as a BTC reference estimate', () => {
+    expect(buildMonetaryTooltip('0.0001', 'BTCB', rates)).toBe(
+      'BTC reference estimate: 6.80 USDT · R$ 34,30',
+    );
+  });
+
   it('omits a tooltip when an amount or required price is invalid', () => {
     expect(buildMonetaryTooltip('invalid', 'USDT', rates)).toBeUndefined();
     expect(

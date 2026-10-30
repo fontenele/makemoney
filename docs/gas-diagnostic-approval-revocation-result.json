@@ -1,0 +1,19 @@
+{
+  "transactionHash": "0x81c27bb611b32f9497c532039dc42feac290f44324ca8e3e7568c91d5a80504e",
+  "receiptSucceeded": true,
+  "finalized": true,
+  "remainingAllowanceRaw": "0",
+  "revoked": true,
+  "gasUsed": "24198",
+  "effectiveGasPriceWei": "91503142",
+  "networkFeeWei": "2214193030116",
+  "token": "USDT",
+  "spender": "0xb300000b72deaeb607a12d5f54773d1c19c7028d",
+  "btcbSalePerformed": false,
+  "automaticRetryAllowed": false,
+  "networkFeeBnb": "0.000002214193030116",
+  "indicativeNetworkFeeUsdt": "0.00155057723705993364",
+  "referenceBnbUsdt": "700.29000000",
+  "conversionBasis": "diagnostic_preparation_price_not_revoke_execution_price",
+  "finalityObservedAt": "2026-10-30T16:35:51.992Z"
+}

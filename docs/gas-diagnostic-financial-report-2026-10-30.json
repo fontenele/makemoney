@@ -1,0 +1,81 @@
+{
+  "scope": "diagnostic_financial_report",
+  "status": "recorded",
+  "report": {
+    "gas": {
+      "swapBnb": "0.000062548661717332",
+      "entryBnb": "0.00006579215610841",
+      "totalBnb": "0.000068006349138526",
+      "approvalBnb": "0.000003243494391078",
+      "revocationBnb": "0.000002214193030116"
+    },
+    "planId": "cbc61eb8-35a6-471a-95b2-04251343d8c2",
+    "chainId": "56",
+    "version": "diagnostic_financial_report_v1",
+    "approval": {
+      "spender": "0xb300000b72deaeb607a12d5f54773d1c19c7028d",
+      "observationBasis": "latest_public_call_not_finalized_state",
+      "originalAmountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+      "remainingAmountRaw": "0",
+      "clearedAtObservation": true,
+      "grantExceededTradeInput": true
+    },
+    "observedAt": "2026-10-30T17:25:44.761Z",
+    "assetDeltas": {
+      "BNB": "-0.000068006349138526",
+      "BTCB": "0.000012907690498746",
+      "USDT": "-1"
+    },
+    "fingerprint": "17f1f4f17de54896dbb0b2d851bd7d9e23dd256df1a83ed62f2fc5870adbc975",
+    "sampleCount": 1,
+    "receivedBtcb": "0.000012907690498746",
+    "transactions": {
+      "swap": "0x166137dd67227bd0ec90be47ca9a96858589c784b5dd37fc6735c48a55c812a8",
+      "approval": "0xc5fe3c591ab9c5547a1a61655682a232bbe5bef59123f3d2848920091b5f555f",
+      "revocation": "0x81c27bb611b32f9497c532039dc42feac290f44324ca8e3e7568c91d5a80504e"
+    },
+    "conversionBasis": "preparation_price_not_historical_execution_price",
+    "planFingerprint": "5e4a1629fddd1d1cf109fe1bedfd907b08a1fdbab27937a0261d2ebc4a3453e9",
+    "receiptEvidence": [
+      {
+        "hash": "0x166137dd67227bd0ec90be47ca9a96858589c784b5dd37fc6735c48a55c812a8",
+        "nonce": "2",
+        "gasUsed": "843353",
+        "blockHash": "0xee6c331cfd8aa77a4df47e392432fe2875e8d7f3f92e5d37b89c8071471e59ca",
+        "blockNumber": "130692588",
+        "effectiveGasPriceWei": "74166644"
+      },
+      {
+        "hash": "0xc5fe3c591ab9c5547a1a61655682a232bbe5bef59123f3d2848920091b5f555f",
+        "nonce": "1",
+        "gasUsed": "46482",
+        "blockHash": "0xee6c331cfd8aa77a4df47e392432fe2875e8d7f3f92e5d37b89c8071471e59ca",
+        "blockNumber": "130692588",
+        "effectiveGasPriceWei": "69779579"
+      },
+      {
+        "hash": "0x81c27bb611b32f9497c532039dc42feac290f44324ca8e3e7568c91d5a80504e",
+        "nonce": "4",
+        "gasUsed": "24198",
+        "blockHash": "0xb77e5bbd8e335e353024b2e4f26fc2499d3e4a090b70b6dd31cb6d733f999a68",
+        "blockNumber": "130697715",
+        "effectiveGasPriceWei": "91503142"
+      }
+    ],
+    "sellGasMeasured": false,
+    "sourceSpentUsdt": "1",
+    "referenceBnbUsdt": "700.29000000",
+    "submissionAuthorized": false,
+    "indicativeEntryGasUsdt": "0.046073589001158439",
+    "indicativeTotalGasUsdt": "0.047624166238218373",
+    "futureGasCostGuaranteed": false,
+    "globalAccountingMutated": false,
+    "indicativeEntryCostUsdt": "1.046073589001158439",
+    "realizedTradingPnlAvailable": false,
+    "indicativeEntryGasPercentage": "4.6073589001158439",
+    "indicativeExperimentCostUsdt": "1.047624166238218373",
+    "unrelatedTransactionsIncluded": false
+  },
+  "replayed": false,
+  "submissionAuthorized": false
+}

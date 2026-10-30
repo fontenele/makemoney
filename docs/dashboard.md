@@ -1,5 +1,35 @@
 # Dashboard
 
+## M10.218 — BTCB-inclusive real-wallet overview — complete
+
+The main overview now leads with reported real Agentic Wallet balances for BNB, USDT and BTCB, plus indicative combined USDT/BRL totals. The exact BTCB quantity comes from the current authenticated wallet observation, not the historical diagnostic receipt. BTCB is valued using a clearly labeled public BTC/USDT reference, never an executable BTCB quote, net liquidation or realized PnL. Missing BTCB balance/reference withholds the combined total instead of silently treating it as zero; an explicitly reported zero balance needs no BTC price. The existing initial/manual-only wallet refresh remains unchanged. Fictional paper portfolio/PnL/win-rate and position/activity/history panels are explicitly labeled and collapsed by default, preserving their independent data and implementation. Real PnL and win rate remain unavailable.
+
+Verified with 29 focused backend price/valuation cases, 160 dashboard tests including rendered real-wallet states, 181 isolated PostgreSQL E2E tests, lint/format checks, strict backend/Vue checks, production dashboard build and Compose validation. Live proxy funding valuation returns HTTP 200 with 0.000012907690498746 BTCB and its exact indicative value; total includes all three assets. Direct and proxy paper valuations and the new Vite component return HTTP 200. Browser visual inspection was unavailable; component rendering, responsive source and production build were verified. No order, approval, revocation, wallet/accounting mutation or execution activation occurred.
+
+## M10.213 — Dashboard diagnostic cost evidence — complete
+
+The execution-readiness page now displays the immutable cached diagnostic report: separate swap/approval/revocation gas, historical BTCB received, preparation-price USDT conversions, the dated allowance observation and the unmeasured sell-cost boundary. A bounded response decoder rejects numeric/exponential/negative money, malformed dates/hashes, incorrect conversion claims and any execution/profit authority. Visible-page polling reads only the cached local GET every 30 seconds; failure clears stale figures. Verified with 152 dashboard tests (17 new cases), Vue type checking and production build. API and Vite-proxy report/valuation reads return HTTP 200. Browser visual inspection was not available in this session; responsive layout and semantic table were checked in source/build. No wallet mutation or trading activation occurred.
+
+## M10.206 — Autonomous research dashboard — verified
+
+Verification: 133 dashboard tests, 28 focused backend tests and 156 E2E tests pass, along with lint, formatting, builds/type checks, Compose and diff checks.
+
+M10.206 exposes the cached autonomous research in the dashboard. Visible-page reads every 30 seconds cannot trigger historical collection, wallet access or execution. Bounded response validation rejects unsupported identities, invalid rates, dates and financial authority claims. Stale/unavailable research remains explicit; gross results are labeled before fees/spread/slippage/gas and never presented as BTCB profit predictions. Execution readiness separately requires a validated strategy-return model. Autonomous selection is the goal; no manual operator price target is required.
+
+## M10.204 — Estimated net profit policy — screening verified
+
+The operator explicitly selected `estimated_net_profit_after_costs` using exclusively the existing Agentic Wallet. This supersedes the earlier enforceable-fee-ceiling requirement. Expected exit proceeds must reflect adverse spread/slippage; deduct investment, entry/exit trading fees and both gas estimates with an explicit safety multiplier greater than one. Require strictly positive expected net profit; break-even, losses, missing/zero gas estimates, stale evidence and invalid inputs block. An estimate is not a guaranteed gas ceiling or realized profit. The first real order still requires immediate explicit confirmation and all independent Risk Engine, reservation and execution safeguards.
+
+M10.204 implements only the pure exact-decimal profitability screen and synchronizes provider-free readiness/dashboard policy. Gas is rounded upward to 18 decimals, evidence expires after five seconds, and the explicit multiplier is bounded above by ten. No default multiplier is activated. Zero provider display gas cannot pass. No route, provider call, reservation, signing or order is added. The evaluator is not registered in runtime; readiness remains blocked on reliable buffered gas evidence and runtime profitability composition. Next: bind conservative entry/exit cost and expected-return evidence to the same intent before reservation/Risk Engine integration; do not accept a caller profit claim as execution authority.
+
+Verified: 19 focused backend tests (including 16 profitability cases), 123 dashboard tests and 155 PostgreSQL E2E tests pass. Lint, formatting, backend/dashboard type checks and builds, Compose and diff checks pass. Windows-host API and Vite proxy both return HTTP 200 for paper-wallet valuation; live diagnostics report the new policy with submission authority false.
+
+Earlier policy sections below are historical and superseded where they require a guaranteed fee ceiling or another wallet.
+
+## M10.203 — Existing Agentic Wallet only
+
+The operator keeps exclusively the existing project-linked Agentic Wallet through the local API/CLI. No alternative wallet, injected-browser connector, mobile pairing, or funds migration is offered. The browser connector has been removed and `signerAccountAccessAuthorized` is false. The selected `enforceable_native_fee_ceiling` remains required; pinned CLI 1.10.0 cannot enforce it, so real execution remains blocked. Read-only and paper features remain available. No signature or financial transaction is authorized.
+
 ## M10.166 complete Agentic Wallet valuation
 
 The real-wallet card now shows the approved USDT balance returned by the same wallet observation as BNB. Exact-decimal backend fields retain the BNB-only USDT/BRL equivalents and add combined wallet totals in USDT and BRL. A combined total is withheld when USDT is not reported rather than treating missing provider evidence as zero.

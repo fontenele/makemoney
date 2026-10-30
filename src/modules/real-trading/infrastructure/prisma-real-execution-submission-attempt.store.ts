@@ -1,3 +1,4 @@
+import { assertNoUnresolvedApprovalCleanup } from './approval-cleanup-execution-guard';
 import { createHash } from 'node:crypto';
 
 import { Injectable } from '@nestjs/common';
@@ -46,6 +47,15 @@ export class PrismaRealExecutionSubmissionAttemptStore implements RealExecutionS
         async (tx) => {
           // Emergency-stop writes and atomic gate creation use this same lock.
           await tx.$executeRaw`SELECT pg_advisory_xact_lock(20261003, 34)`;
+          const diagnostic = await tx.$queryRaw<
+            Array<{ id: string }>
+          >`SELECT id FROM gas_diagnostics WHERE state <> 'prepared' OR expires_at > now() LIMIT 1`;
+          if (diagnostic.length)
+            throw new Error(
+              'A gas diagnostic blocks ordinary provider submission',
+            );
+
+          await assertNoUnresolvedApprovalCleanup(tx);
 
           const existingByGate =
             await tx.realExecutionSubmissionAttempt.findUnique({

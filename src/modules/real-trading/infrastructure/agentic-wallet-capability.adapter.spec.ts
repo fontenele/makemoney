@@ -1,10 +1,26 @@
 import { AgenticWalletCapabilityAdapter } from './agentic-wallet-capability.adapter';
+import { parseAgenticWalletCliJsonOutput } from './agentic-wallet-cli-json-process';
 import {
   AgenticWalletReadCommand,
   AgenticWalletReadCommandRunner,
 } from './agentic-wallet-read-command-runner';
 
 describe('AgenticWalletCapabilityAdapter', () => {
+  it('accepts fractional settings quota only after exact lexical JSON decoding', async () => {
+    const responses = connectedResponses();
+    const source = JSON.stringify(envelope(settingsData()))
+      .replace('"quotaUsed":0', '"quotaUsed":0.9983465393206')
+      .replace('"quotaLeft":50000', '"quotaLeft":49999.0016534606794');
+    responses.wallet_settings = parseAgenticWalletCliJsonOutput(source, true);
+    const result = await new AgenticWalletCapabilityAdapter(
+      new StubRunner(responses),
+    ).load('56', new Date('2026-09-30T12:00:00.000Z'));
+    expect(result.quota).toEqual({
+      usedUsd: '0.9983465393206',
+      remainingUsd: '49999.0016534606794',
+      date: '2026-09-30',
+    });
+  });
   it('loads and validates the complete read-only capability observation', async () => {
     const runner = new StubRunner(connectedResponses());
     const adapter = new AgenticWalletCapabilityAdapter(runner);

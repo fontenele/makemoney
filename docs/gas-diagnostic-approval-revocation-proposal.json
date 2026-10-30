@@ -1,0 +1,34 @@
+{
+  "scope": "proposed_targeted_usdt_approval_revocation",
+  "chainId": "56",
+  "tokenContract": "0x55d398326f99059ff775485246999027b3197955",
+  "spender": "0xb300000b72deaeb607a12d5f54773d1c19c7028d",
+  "type": "approve",
+  "newAllowance": "0",
+  "sourceTradeValueUsdt": "0",
+  "sellBtcb": false,
+  "readOnlyRpcGasEstimate": {
+    "gasUnits": "29181",
+    "gasPriceWei": "50000000",
+    "referenceFeeBnb": "0.00000145905",
+    "guaranteedCeiling": false,
+    "providerRevokeGasTier": "MEDIUM"
+  },
+  "commandPreview": [
+    "approvals",
+    "revoke",
+    "--binanceChainId",
+    "56",
+    "--tokenContract",
+    "0x55d398326f99059ff775485246999027b3197955",
+    "--spender",
+    "0xb300000b72deaeb607a12d5f54773d1c19c7028d",
+    "--type",
+    "approve",
+    "--json"
+  ],
+  "confirmed": true,
+  "broadcastPerformed": true,
+  "completionStatus": "finalized_zero_allowance",
+  "resultFile": "gas-diagnostic-approval-revocation-result.json"
+}

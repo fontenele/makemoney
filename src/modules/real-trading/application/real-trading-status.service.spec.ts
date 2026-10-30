@@ -5,7 +5,10 @@ import {
   AgenticWalletCapabilityAdapter,
   AgenticWalletCapabilityObservation,
 } from '../infrastructure/agentic-wallet-capability.adapter';
-import { BinanceFundingValuationPriceClient } from '../infrastructure/binance-funding-valuation-price.client';
+import {
+  BinanceFundingValuationPriceClient,
+  BinanceFundingValuationPrices,
+} from '../infrastructure/binance-funding-valuation-price.client';
 
 describe('RealTradingStatusService', () => {
   beforeEach(() => {
@@ -305,6 +308,15 @@ describe('RealTradingStatusService', () => {
         quantity: '2.955301453716908917',
       },
     ];
+    observation.balances = [
+      ...observation.balances,
+      {
+        chainId: '56',
+        tokenAddress: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+        symbol: 'BTCB',
+        quantity: '0',
+      },
+    ];
     const wallet = { load: jest.fn(() => Promise.resolve(observation)) };
     const { client: prices, load: loadPrices } = fundingPricesMock();
     const service = new RealTradingStatusService(
@@ -322,6 +334,9 @@ describe('RealTradingStatusService', () => {
       balance: {
         quantityBnb: '0.00975323',
         quantityUsdt: '2.955301453716908917',
+        quantityBtcb: '0',
+        btcbValueUsdt: '0',
+        btcbValueBrl: '0',
         valueUsdt: '7.2387497737',
         valueBrl: '36.51587323342965',
         usdtValueBrl: '14.9080181832749470318065',
@@ -331,6 +346,8 @@ describe('RealTradingStatusService', () => {
       prices: {
         provider: 'binance',
         bnbUsdt: '742.19',
+        btcUsdtReference: '77000',
+        btcbBasis: 'btc_spot_reference_not_btcb_quote',
         usdtBrl: '5.0445',
       },
       refreshMode: 'initial_and_manual',
@@ -340,6 +357,83 @@ describe('RealTradingStatusService', () => {
       submissionAuthorized: false,
     });
     expect(loadPrices).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    {
+      btcb: '0.000012907690498746',
+      btcPrice: '77000',
+      usdt: '2',
+      value: '0.993892168403442',
+      total: '745.183892168403442',
+    },
+    {
+      btcb: '0.00001',
+      btcPrice: '77000',
+      usdt: '2',
+      value: '0.77',
+      total: '744.96',
+    },
+    { btcb: null, btcPrice: '77000', usdt: '2', value: null, total: null },
+    { btcb: '0.00001', btcPrice: null, usdt: '2', value: null, total: null },
+    { btcb: '0', btcPrice: null, usdt: '2', value: '0', total: '744.19' },
+    {
+      btcb: '0.00001',
+      btcPrice: '77000',
+      usdt: null,
+      value: '0.77',
+      total: null,
+    },
+  ])('values BTCB with explicit coverage: %j', async (test) => {
+    const observation = connectedObservation();
+    observation.addresses = [
+      { chainId: '56', address: '0x1234567890abcdef1234567890abcdef12345678' },
+    ];
+    observation.balances = [
+      {
+        chainId: '56',
+        tokenAddress: 'native-bnb',
+        symbol: 'BNB',
+        quantity: '1',
+      },
+    ];
+    if (test.usdt !== null)
+      observation.balances = [
+        ...observation.balances,
+        {
+          chainId: '56',
+          tokenAddress: '0x55d398326f99059ff775485246999027b3197955',
+          symbol: 'USDT',
+          quantity: test.usdt,
+        },
+      ];
+    if (test.btcb !== null)
+      observation.balances = [
+        ...observation.balances,
+        {
+          chainId: '56',
+          tokenAddress: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+          symbol: 'BTCB',
+          quantity: test.btcb,
+        },
+      ];
+    const { client, load } = fundingPricesMock();
+    load.mockResolvedValue({ ...(await load()), btcUsdtPrice: test.btcPrice });
+    const service = new RealTradingStatusService(
+      config({ TRADING_MODE: 'paper', REAL_EXECUTION_ENABLED: false }),
+      {
+        load: () => Promise.resolve(observation),
+      } as unknown as AgenticWalletCapabilityAdapter,
+      client,
+    );
+    const result = await service.loadFundingValuation();
+    expect(result.balance).toMatchObject({
+      quantityBtcb: test.btcb,
+      btcbValueUsdt: test.value,
+      totalValueUsdt: test.total,
+    });
+    expect(result.prices?.btcbBasis).toBe('btc_spot_reference_not_btcb_quote');
+    expect(result.submissionAuthorized).toBe(false);
   });
 
   it('does not request Binance prices when BNB is not reported', async () => {
@@ -457,6 +551,7 @@ function fundingPrices(): BinanceFundingValuationPriceClient {
       Promise.resolve({
         provider: 'binance' as const,
         bnbUsdtPrice: '742.19',
+        btcUsdtPrice: '77000',
         usdtBrlPrice: '5.0445',
         observedAt: new Date('2026-10-01T12:00:00.000Z'),
       }),
@@ -465,10 +560,11 @@ function fundingPrices(): BinanceFundingValuationPriceClient {
 }
 
 function fundingPricesMock() {
-  const load = jest.fn(() =>
+  const load = jest.fn<() => Promise<BinanceFundingValuationPrices>>(() =>
     Promise.resolve({
       provider: 'binance' as const,
       bnbUsdtPrice: '742.19',
+      btcUsdtPrice: '77000',
       usdtBrlPrice: '5.0445',
       observedAt: new Date('2026-10-01T12:00:00.000Z'),
     }),

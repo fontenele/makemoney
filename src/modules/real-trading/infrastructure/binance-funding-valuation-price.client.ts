@@ -3,11 +3,12 @@ type Clock = () => Date;
 
 const REQUEST_TIMEOUT_MS = 10_000;
 const POSITIVE_DECIMAL_PATTERN = /^(?:[1-9]\d*(?:\.\d+)?|0\.(?:\d*[1-9]\d*))$/;
-const REQUIRED_SYMBOLS = ['BNBUSDT', 'USDTBRL'] as const;
+const REQUIRED_SYMBOLS = ['BNBUSDT', 'USDTBRL', 'BTCUSDT'] as const;
 
 export interface BinanceFundingValuationPrices {
   readonly provider: 'binance';
   readonly bnbUsdtPrice: string;
+  readonly btcUsdtPrice: string | null;
   readonly usdtBrlPrice: string;
   readonly observedAt: Date;
 }
@@ -39,14 +40,28 @@ export class BinanceFundingValuationPriceClient {
   }
 
   normalize(payload: unknown): BinanceFundingValuationPrices | null {
-    if (!Array.isArray(payload) || payload.length !== REQUIRED_SYMBOLS.length) {
+    if (
+      !Array.isArray(payload) ||
+      payload.length < 2 ||
+      payload.length > REQUIRED_SYMBOLS.length
+    ) {
       return null;
     }
     const prices = new Map<string, string>();
+    const seen = new Set<unknown>();
     for (const item of payload) {
       if (!isRecord(item) || !REQUIRED_SYMBOLS.includes(item.symbol as never)) {
         return null;
       }
+      if (seen.has(item.symbol)) return null;
+      seen.add(item.symbol);
+      if (
+        item.symbol === 'BTCUSDT' &&
+        (typeof item.price !== 'string' ||
+          !/^(?:0|[1-9]\d{0,29})(?:\.\d{1,18})?$/.test(item.price) ||
+          !POSITIVE_DECIMAL_PATTERN.test(item.price))
+      )
+        continue;
       if (
         typeof item.price !== 'string' ||
         !POSITIVE_DECIMAL_PATTERN.test(item.price) ||
@@ -63,6 +78,7 @@ export class BinanceFundingValuationPriceClient {
     return {
       provider: 'binance',
       bnbUsdtPrice,
+      btcUsdtPrice: prices.get('BTCUSDT') ?? null,
       usdtBrlPrice,
       observedAt: this.clock(),
     };

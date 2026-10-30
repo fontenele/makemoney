@@ -148,6 +148,9 @@ export interface AgenticWalletFundingValuation {
   readonly balance: {
     readonly quantityBnb: string;
     readonly quantityUsdt: string | null;
+    readonly quantityBtcb: string | null;
+    readonly btcbValueUsdt: string | null;
+    readonly btcbValueBrl: string | null;
     readonly valueUsdt: string;
     readonly valueBrl: string;
     readonly usdtValueBrl: string | null;
@@ -157,6 +160,8 @@ export interface AgenticWalletFundingValuation {
   readonly prices: {
     readonly provider: 'binance';
     readonly bnbUsdt: string;
+    readonly btcUsdtReference: string | null;
+    readonly btcbBasis: 'btc_spot_reference_not_btcb_quote';
     readonly usdtBrl: string;
   } | null;
   readonly refreshMode: 'initial_and_manual';
@@ -167,7 +172,7 @@ export interface AgenticWalletFundingValuation {
 }
 
 const EVM_ADDRESS_PATTERN = /^0x[0-9a-fA-F]{40}$/;
-const ExactDecimal = Decimal.clone({ precision: 40 });
+const ExactDecimal = Decimal.clone({ precision: 100 });
 
 @Injectable()
 export class RealTradingStatusService {
@@ -431,6 +436,7 @@ export class RealTradingStatusService {
     const verification = await this.verifyFunding();
     const bnb = verification.assets.find((asset) => asset.symbol === 'BNB');
     const usdt = verification.assets.find((asset) => asset.symbol === 'USDT');
+    const btcb = verification.assets.find((asset) => asset.symbol === 'BTCB');
     const blockers: Array<
       AgenticWalletFundingVerificationBlocker | 'bnb_not_reported'
     > = [...verification.blockers];
@@ -446,6 +452,7 @@ export class RealTradingStatusService {
       verification.observedAt,
       bnb.quantity,
       usdt?.quantity ?? null,
+      btcb?.quantity ?? null,
       prices,
     );
   }
@@ -548,6 +555,7 @@ function availableFundingValuation(
   balanceObservedAt: Date,
   quantityBnb: string,
   quantityUsdt: string | null,
+  quantityBtcb: string | null,
   prices: BinanceFundingValuationPrices,
 ): AgenticWalletFundingValuation {
   const valueUsdt = new ExactDecimal(quantityBnb).times(prices.bnbUsdtPrice);
@@ -555,7 +563,19 @@ function availableFundingValuation(
   const reportedUsdt =
     quantityUsdt === null ? null : new ExactDecimal(quantityUsdt);
   const usdtValueBrl = reportedUsdt?.times(prices.usdtBrlPrice) ?? null;
-  const totalValueUsdt = reportedUsdt?.plus(valueUsdt) ?? null;
+  const btcbValueUsdt =
+    quantityBtcb === null
+      ? null
+      : new ExactDecimal(quantityBtcb).isZero()
+        ? new ExactDecimal(0)
+        : prices.btcUsdtPrice
+          ? new ExactDecimal(quantityBtcb).times(prices.btcUsdtPrice)
+          : null;
+  const btcbValueBrl = btcbValueUsdt?.times(prices.usdtBrlPrice) ?? null;
+  const totalValueUsdt =
+    reportedUsdt !== null && btcbValueUsdt !== null
+      ? reportedUsdt.plus(valueUsdt).plus(btcbValueUsdt)
+      : null;
   const totalValueBrl = totalValueUsdt?.times(prices.usdtBrlPrice) ?? null;
   return {
     scope: 'agentic_wallet_funding_valuation',
@@ -566,6 +586,9 @@ function availableFundingValuation(
     balance: {
       quantityBnb,
       quantityUsdt,
+      quantityBtcb,
+      btcbValueUsdt: btcbValueUsdt?.toFixed() ?? null,
+      btcbValueBrl: btcbValueBrl?.toFixed() ?? null,
       valueUsdt: valueUsdt.toFixed(),
       valueBrl: valueBrl.toFixed(),
       usdtValueBrl: usdtValueBrl?.toFixed() ?? null,
@@ -575,6 +598,8 @@ function availableFundingValuation(
     prices: {
       provider: 'binance',
       bnbUsdt: prices.bnbUsdtPrice,
+      btcUsdtReference: prices.btcUsdtPrice ?? null,
+      btcbBasis: 'btc_spot_reference_not_btcb_quote',
       usdtBrl: prices.usdtBrlPrice,
     },
     refreshMode: 'initial_and_manual',

@@ -69,6 +69,8 @@ import { buildWalletAddressQrCode } from './wallet-address-qr';
 import { createFundingValuationLoader } from './funding-valuation-loader';
 import { buildMonetaryTooltip, type MonetaryAsset } from './monetary-tooltip';
 import DashboardChart from './DashboardChart.vue';
+import ExecutionReadiness from './ExecutionReadiness.vue';
+import RealWalletOverview from './RealWalletOverview.vue';
 import {
   dashboardRouteFromHash,
   dashboardRouteHref,
@@ -670,7 +672,12 @@ function moneyTooltip(
   const valuation = snapshot.value?.valuation;
   return buildMonetaryTooltip(value, asset, {
     bnbUsdt: prices?.bnbUsdt,
-    btcUsdt: valuation?.status === 'available' ? valuation.data.btcPrice : null,
+    btcUsdt:
+      asset === 'BTCB'
+        ? prices?.btcUsdtReference
+        : valuation?.status === 'available'
+          ? valuation.data.btcPrice
+          : null,
     usdtBrl: prices?.usdtBrl,
   });
 }
@@ -825,18 +832,19 @@ onUnmounted(() => {
           {{ refreshing ? 'Refreshing…' : 'Refresh data' }}
         </button>
       </div>
-      <p class="sidebar-safety">Read-only research. No real funds.</p>
+      <p class="sidebar-safety">Real wallet and separate paper simulation.</p>
     </aside>
 
     <div class="dashboard-content">
       <template v-if="currentRoute === 'overview'">
         <section id="overview" class="hero">
           <div>
-            <p class="eyebrow">Paper environment · Read only</p>
+            <p class="eyebrow">Real wallet · Read only</p>
             <h1>Risk first.<br /><em>Evidence always.</em></h1>
             <p class="hero-copy">
-              A calm view of fictional capital and measured outcomes. No
-              controls on this screen can place an order or move funds.
+              Reported real holdings and indicative values. Paper simulations
+              are shown separately and do not include Agentic Wallet
+              transactions.
             </p>
           </div>
           <div class="hero-time">
@@ -851,76 +859,87 @@ onUnmounted(() => {
           </div>
         </section>
 
-        <section class="metric-grid" aria-label="Portfolio overview">
-          <article class="metric-card featured">
-            <span class="metric-label">Fictional paper portfolio</span>
-            <template v-if="available(snapshot?.valuation)">
-              <strong
-                class="metric-value"
-                v-money-tooltip="
-                  moneyTooltip(snapshot.valuation.data.totalValue, 'USDT')
-                "
-              >
-                {{ decimal(snapshot.valuation.data.totalValue) }}
-                <small>USDT</small>
-              </strong>
-              <p>
-                {{ decimal(snapshot.valuation.data.usdtBalance) }} USDT cash ·
-                {{ decimal(snapshot.valuation.data.btcBalance, 8) }} BTC
+        <RealWalletOverview
+          :resource="fundingValuation"
+          :loading="fundingValuationLoading"
+          @reload="refreshFundingValuation"
+        />
+        <details class="panel paper-simulation">
+          <summary>
+            Paper simulation — fictional capital and performance
+          </summary>
+          <section class="metric-grid" aria-label="Portfolio overview">
+            <article class="metric-card featured">
+              <span class="metric-label">Fictional paper portfolio</span>
+              <template v-if="available(snapshot?.valuation)">
+                <strong
+                  class="metric-value"
+                  v-money-tooltip="
+                    moneyTooltip(snapshot.valuation.data.totalValue, 'USDT')
+                  "
+                >
+                  {{ decimal(snapshot.valuation.data.totalValue) }}
+                  <small>USDT</small>
+                </strong>
+                <p>
+                  {{ decimal(snapshot.valuation.data.usdtBalance) }} USDT cash ·
+                  {{ decimal(snapshot.valuation.data.btcBalance, 8) }} BTC
+                </p>
+              </template>
+              <p v-else class="empty-state">
+                {{ snapshot?.valuation.message ?? 'Loading valuation…' }}
               </p>
-            </template>
-            <p v-else class="empty-state">
-              {{ snapshot?.valuation.message ?? 'Loading valuation…' }}
-            </p>
-          </article>
+            </article>
 
-          <article class="metric-card">
-            <span class="metric-label">Total P&amp;L</span>
-            <template v-if="available(snapshot?.position)">
-              <strong
-                class="metric-value compact"
-                :class="tone(snapshot.position.data.totalPnl)"
-                v-money-tooltip="
-                  moneyTooltip(snapshot.position.data.totalPnl, 'USDT')
-                "
-              >
-                {{ signed(snapshot.position.data.totalPnl) }}
-              </strong>
-              <p
-                v-money-tooltip="
-                  moneyTooltip(snapshot.position.data.realizedPnl, 'USDT')
-                "
-              >
-                Realized {{ signed(snapshot.position.data.realizedPnl) }}
+            <article class="metric-card">
+              <span class="metric-label">Paper total P&amp;L</span>
+              <template v-if="available(snapshot?.position)">
+                <strong
+                  class="metric-value compact"
+                  :class="tone(snapshot.position.data.totalPnl)"
+                  v-money-tooltip="
+                    moneyTooltip(snapshot.position.data.totalPnl, 'USDT')
+                  "
+                >
+                  {{ signed(snapshot.position.data.totalPnl) }}
+                </strong>
+                <p
+                  v-money-tooltip="
+                    moneyTooltip(snapshot.position.data.realizedPnl, 'USDT')
+                  "
+                >
+                  Realized {{ signed(snapshot.position.data.realizedPnl) }}
+                </p>
+              </template>
+              <p v-else class="empty-state">
+                {{ snapshot?.position.message ?? 'Loading position…' }}
               </p>
-            </template>
-            <p v-else class="empty-state">
-              {{ snapshot?.position.message ?? 'Loading position…' }}
-            </p>
-          </article>
+            </article>
 
-          <article class="metric-card">
-            <span class="metric-label">Realized win rate</span>
-            <template v-if="available(snapshot?.performance)">
-              <strong class="metric-value compact">
-                {{
-                  snapshot.performance.data.winRate === null
-                    ? '—'
-                    : `${decimal(String(Number(snapshot.performance.data.winRate) * 100), 1)}%`
-                }}
-              </strong>
-              <p>
-                {{ snapshot.performance.data.profitableSellCount }} wins ·
-                {{ snapshot.performance.data.losingSellCount }} losses
+            <article class="metric-card">
+              <span class="metric-label">Paper realized win rate</span>
+              <template v-if="available(snapshot?.performance)">
+                <strong class="metric-value compact">
+                  {{
+                    snapshot.performance.data.winRate === null
+                      ? '—'
+                      : `${decimal(String(Number(snapshot.performance.data.winRate) * 100), 1)}%`
+                  }}
+                </strong>
+                <p>
+                  {{ snapshot.performance.data.profitableSellCount }} wins ·
+                  {{ snapshot.performance.data.losingSellCount }} losses
+                </p>
+              </template>
+              <p v-else class="empty-state">
+                {{ snapshot?.performance.message ?? 'Loading performance…' }}
               </p>
-            </template>
-            <p v-else class="empty-state">
-              {{ snapshot?.performance.message ?? 'Loading performance…' }}
-            </p>
-          </article>
-        </section>
+            </article>
+          </section>
+        </details>
 
         <section class="wallet-panel" aria-label="Agentic Wallet status">
+          <ExecutionReadiness />
           <div class="panel-heading">
             <div>
               <p class="eyebrow">Separate real environment</p>
@@ -951,7 +970,10 @@ onUnmounted(() => {
               </div>
               <div>
                 <dt>Runtime executor</dt>
-                <dd>Not implemented</dd>
+                <dd>
+                  Manual boundary implemented; prerequisites below remain
+                  required
+                </dd>
               </div>
               <div>
                 <dt>Quote / submission</dt>
@@ -1098,7 +1120,59 @@ onUnmounted(() => {
                     <dd v-else>Not reported</dd>
                   </div>
                   <div>
-                    <dt>Total wallet value</dt>
+                    <dt>BTCB</dt>
+                    <dd
+                      v-if="fundingValuation.data.balance.quantityBtcb !== null"
+                      v-money-tooltip="
+                        moneyTooltip(
+                          fundingValuation.data.balance.quantityBtcb,
+                          'BTCB',
+                        )
+                      "
+                    >
+                      {{ fundingValuation.data.balance.quantityBtcb }} BTCB
+                    </dd>
+                    <dd v-else>Not reported</dd>
+                  </div>
+                  <div>
+                    <dt>BTCB estimated value (BTC reference)</dt>
+                    <dd
+                      v-if="
+                        fundingValuation.data.balance.btcbValueUsdt !== null
+                      "
+                      v-money-tooltip="
+                        moneyTooltip(
+                          fundingValuation.data.balance.btcbValueUsdt,
+                          'USDT',
+                        )
+                      "
+                    >
+                      {{
+                        decimal(fundingValuation.data.balance.btcbValueUsdt, 4)
+                      }}
+                      USDT
+                    </dd>
+                    <dd v-else>
+                      Unavailable: BTCB balance or BTC reference missing
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>BTCB estimated value in BRL</dt>
+                    <dd
+                      v-if="fundingValuation.data.balance.btcbValueBrl !== null"
+                      v-money-tooltip="
+                        moneyTooltip(
+                          fundingValuation.data.balance.btcbValueBrl,
+                          'BRL',
+                        )
+                      "
+                    >
+                      {{ brl(fundingValuation.data.balance.btcbValueBrl) }}
+                    </dd>
+                    <dd v-else>Unavailable</dd>
+                  </div>
+                  <div>
+                    <dt>Estimated wallet value (BNB + USDT + BTCB)</dt>
                     <dd
                       v-if="
                         fundingValuation.data.balance.totalValueUsdt !== null
@@ -1115,7 +1189,10 @@ onUnmounted(() => {
                       }}
                       USDT
                     </dd>
-                    <dd v-else>Unavailable until USDT is reported</dd>
+                    <dd v-else>
+                      Unavailable until all asset balances and prices are
+                      reported
+                    </dd>
                   </div>
                   <div>
                     <dt>Total wallet value in BRL</dt>
@@ -1132,11 +1209,21 @@ onUnmounted(() => {
                     >
                       {{ brl(fundingValuation.data.balance.totalValueBrl) }}
                     </dd>
-                    <dd v-else>Unavailable until USDT is reported</dd>
+                    <dd v-else>
+                      Unavailable until all asset balances and prices are
+                      reported
+                    </dd>
                   </div>
                 </dl>
                 <p class="wallet-policy-note">
-                  Binance public prices: 1 BNB =
+                  BTCB uses the public BTC/USDT price as an indicative
+                  reference, not a BTCB sale quote or realized profit. BTC
+                  reference:
+                  {{
+                    fundingValuation.data.prices?.btcUsdtReference ??
+                    'Unavailable'
+                  }}
+                  USDT. Binance public prices: 1 BNB =
                   {{ fundingValuation.data.prices?.bnbUsdt }} USDT and 1 USDT =
                   {{ fundingValuation.data.prices?.usdtBrl }} BRL. Balance and
                   prices load when this page opens and only refresh when you
@@ -1988,235 +2075,250 @@ onUnmounted(() => {
           </p>
         </section>
 
-        <section class="detail-grid">
-          <article class="panel position-panel">
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">Current exposure</p>
-                <h2>BTC / USDT</h2>
+        <details class="panel paper-simulation">
+          <summary>Paper positions and fictional execution history</summary>
+          <section class="detail-grid">
+            <article class="panel position-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Paper exposure</p>
+                  <h2>BTC / USDT</h2>
+                </div>
+                <span class="paper-badge">Paper</span>
               </div>
-              <span class="paper-badge">Paper</span>
-            </div>
 
-            <template v-if="available(snapshot?.position)">
-              <div class="position-quantity">
-                <span>Open quantity</span>
-                <strong
-                  v-money-tooltip="
-                    moneyTooltip(snapshot.position.data.quantity, 'BTC')
-                  "
-                  >{{ decimal(snapshot.position.data.quantity, 8) }} BTC</strong
-                >
-              </div>
-              <dl class="detail-list">
-                <div>
-                  <dt>Average entry</dt>
-                  <dd
+              <template v-if="available(snapshot?.position)">
+                <div class="position-quantity">
+                  <span>Open quantity</span>
+                  <strong
                     v-money-tooltip="
-                      moneyTooltip(
-                        snapshot.position.data.averageEntryPrice,
-                        'USDT',
-                      )
+                      moneyTooltip(snapshot.position.data.quantity, 'BTC')
                     "
-                  >
-                    {{ decimal(snapshot.position.data.averageEntryPrice) }} USDT
-                  </dd>
-                </div>
-                <div>
-                  <dt>Market mark</dt>
-                  <dd
-                    v-money-tooltip="
-                      moneyTooltip(snapshot.position.data.markPrice, 'USDT')
-                    "
-                  >
-                    {{ decimal(snapshot.position.data.markPrice) }} USDT
-                  </dd>
-                </div>
-                <div>
-                  <dt>Net liquidation</dt>
-                  <dd
-                    v-money-tooltip="
-                      moneyTooltip(
-                        snapshot.position.data.netLiquidationValue,
-                        'USDT',
-                      )
-                    "
-                  >
-                    {{ decimal(snapshot.position.data.netLiquidationValue) }}
-                    USDT
-                  </dd>
-                </div>
-                <div>
-                  <dt>Estimated exit fee</dt>
-                  <dd
-                    v-money-tooltip="
-                      moneyTooltip(
-                        snapshot.position.data.estimatedExitFee,
-                        'USDT',
-                      )
-                    "
-                  >
-                    {{ decimal(snapshot.position.data.estimatedExitFee) }} USDT
-                  </dd>
-                </div>
-              </dl>
-            </template>
-            <p v-else class="empty-state panel-empty">
-              {{ snapshot?.position.message ?? 'Loading position…' }}
-            </p>
-          </article>
-
-          <article class="panel activity-panel">
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">Execution record</p>
-                <h2>Measured activity</h2>
-              </div>
-            </div>
-
-            <template v-if="available(snapshot?.performance)">
-              <div class="activity-total">
-                <strong>{{ snapshot.performance.data.executionCount }}</strong>
-                <span>Total fictional executions</span>
-              </div>
-              <div class="split-bar" aria-hidden="true">
-                <i
-                  :style="{
-                    width: `${
-                      snapshot.performance.data.executionCount === 0
-                        ? 50
-                        : (snapshot.performance.data.buyExecutionCount /
-                            snapshot.performance.data.executionCount) *
-                          100
-                    }%`,
-                  }"
-                ></i>
-              </div>
-              <div class="split-labels">
-                <span
-                  >Buys
-                  <b>{{ snapshot.performance.data.buyExecutionCount }}</b></span
-                >
-                <span
-                  >Sells
-                  <b>{{
-                    snapshot.performance.data.sellExecutionCount
-                  }}</b></span
-                >
-              </div>
-              <dl class="detail-list condensed">
-                <div>
-                  <dt>Total fees</dt>
-                  <dd
-                    v-money-tooltip="
-                      moneyTooltip(snapshot.performance.data.totalFees, 'USDT')
-                    "
-                  >
-                    {{ decimal(snapshot.performance.data.totalFees) }} USDT
-                  </dd>
-                </div>
-                <div>
-                  <dt>Break-even exits</dt>
-                  <dd>{{ snapshot.performance.data.breakEvenSellCount }}</dd>
-                </div>
-              </dl>
-            </template>
-            <p v-else class="empty-state panel-empty">
-              {{ snapshot?.performance.message ?? 'Loading performance…' }}
-            </p>
-          </article>
-        </section>
-
-        <section
-          id="executions"
-          class="panel execution-panel"
-          aria-labelledby="execution-title"
-        >
-          <div class="panel-heading execution-heading">
-            <div>
-              <p class="eyebrow">Immutable paper ledger</p>
-              <h2 id="execution-title">Recent executions</h2>
-            </div>
-            <span class="history-limit">Latest 12</span>
-          </div>
-
-          <template v-if="available(snapshot?.executions)">
-            <p
-              v-if="snapshot.executions.data.length === 0"
-              class="empty-state execution-empty"
-            >
-              No fictional executions recorded yet.
-            </p>
-            <div
-              v-else
-              class="execution-table"
-              role="table"
-              aria-label="Recent fictional executions"
-            >
-              <div class="execution-row execution-header" role="row">
-                <span role="columnheader">Side / time</span>
-                <span role="columnheader">Quantity</span>
-                <span role="columnheader">Price</span>
-                <span role="columnheader">Settlement</span>
-              </div>
-              <div
-                v-for="execution in snapshot.executions.data"
-                :key="execution.id"
-                class="execution-row"
-                role="row"
-              >
-                <span class="execution-identity" role="cell">
-                  <b :class="execution.side">{{ execution.side }}</b>
-                  <time :datetime="execution.executedAt">
-                    {{ timestamp(execution.executedAt) }}
-                  </time>
-                </span>
-                <span
-                  role="cell"
-                  v-money-tooltip="moneyTooltip(execution.quantity, 'BTC')"
-                >
-                  <small>Quantity</small>
-                  {{ decimal(execution.quantity, 8) }} BTC
-                </span>
-                <span
-                  role="cell"
-                  v-money-tooltip="moneyTooltip(execution.price, 'USDT')"
-                >
-                  <small>Price</small>
-                  {{ decimal(execution.price) }} USDT
-                </span>
-                <span
-                  role="cell"
-                  v-money-tooltip="
-                    moneyTooltip(
-                      execution.side === 'buy'
-                        ? execution.totalCost
-                        : execution.netProceeds,
-                      'USDT',
-                    )
-                  "
-                >
-                  <small>
-                    {{
-                      execution.side === 'buy' ? 'Total cost' : 'Net proceeds'
+                    >{{
+                      decimal(snapshot.position.data.quantity, 8)
                     }}
-                  </small>
-                  {{
-                    decimal(
-                      execution.side === 'buy'
-                        ? execution.totalCost
-                        : execution.netProceeds,
-                    )
-                  }}
-                  USDT
-                </span>
+                    BTC</strong
+                  >
+                </div>
+                <dl class="detail-list">
+                  <div>
+                    <dt>Average entry</dt>
+                    <dd
+                      v-money-tooltip="
+                        moneyTooltip(
+                          snapshot.position.data.averageEntryPrice,
+                          'USDT',
+                        )
+                      "
+                    >
+                      {{ decimal(snapshot.position.data.averageEntryPrice) }}
+                      USDT
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Market mark</dt>
+                    <dd
+                      v-money-tooltip="
+                        moneyTooltip(snapshot.position.data.markPrice, 'USDT')
+                      "
+                    >
+                      {{ decimal(snapshot.position.data.markPrice) }} USDT
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Net liquidation</dt>
+                    <dd
+                      v-money-tooltip="
+                        moneyTooltip(
+                          snapshot.position.data.netLiquidationValue,
+                          'USDT',
+                        )
+                      "
+                    >
+                      {{ decimal(snapshot.position.data.netLiquidationValue) }}
+                      USDT
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Estimated exit fee</dt>
+                    <dd
+                      v-money-tooltip="
+                        moneyTooltip(
+                          snapshot.position.data.estimatedExitFee,
+                          'USDT',
+                        )
+                      "
+                    >
+                      {{ decimal(snapshot.position.data.estimatedExitFee) }}
+                      USDT
+                    </dd>
+                  </div>
+                </dl>
+              </template>
+              <p v-else class="empty-state panel-empty">
+                {{ snapshot?.position.message ?? 'Loading position…' }}
+              </p>
+            </article>
+
+            <article class="panel activity-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Execution record</p>
+                  <h2>Paper activity</h2>
+                </div>
               </div>
+
+              <template v-if="available(snapshot?.performance)">
+                <div class="activity-total">
+                  <strong>{{
+                    snapshot.performance.data.executionCount
+                  }}</strong>
+                  <span>Total fictional executions</span>
+                </div>
+                <div class="split-bar" aria-hidden="true">
+                  <i
+                    :style="{
+                      width: `${
+                        snapshot.performance.data.executionCount === 0
+                          ? 50
+                          : (snapshot.performance.data.buyExecutionCount /
+                              snapshot.performance.data.executionCount) *
+                            100
+                      }%`,
+                    }"
+                  ></i>
+                </div>
+                <div class="split-labels">
+                  <span
+                    >Buys
+                    <b>{{
+                      snapshot.performance.data.buyExecutionCount
+                    }}</b></span
+                  >
+                  <span
+                    >Sells
+                    <b>{{
+                      snapshot.performance.data.sellExecutionCount
+                    }}</b></span
+                  >
+                </div>
+                <dl class="detail-list condensed">
+                  <div>
+                    <dt>Total fees</dt>
+                    <dd
+                      v-money-tooltip="
+                        moneyTooltip(
+                          snapshot.performance.data.totalFees,
+                          'USDT',
+                        )
+                      "
+                    >
+                      {{ decimal(snapshot.performance.data.totalFees) }} USDT
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Break-even exits</dt>
+                    <dd>{{ snapshot.performance.data.breakEvenSellCount }}</dd>
+                  </div>
+                </dl>
+              </template>
+              <p v-else class="empty-state panel-empty">
+                {{ snapshot?.performance.message ?? 'Loading performance…' }}
+              </p>
+            </article>
+          </section>
+
+          <section
+            id="executions"
+            class="panel execution-panel"
+            aria-labelledby="execution-title"
+          >
+            <div class="panel-heading execution-heading">
+              <div>
+                <p class="eyebrow">Immutable paper ledger</p>
+                <h2 id="execution-title">Recent executions</h2>
+              </div>
+              <span class="history-limit">Latest 12</span>
             </div>
-          </template>
-          <p v-else class="empty-state execution-empty">
-            {{ snapshot?.executions.message ?? 'Loading execution history…' }}
-          </p>
-        </section>
+
+            <template v-if="available(snapshot?.executions)">
+              <p
+                v-if="snapshot.executions.data.length === 0"
+                class="empty-state execution-empty"
+              >
+                No fictional executions recorded yet.
+              </p>
+              <div
+                v-else
+                class="execution-table"
+                role="table"
+                aria-label="Recent fictional executions"
+              >
+                <div class="execution-row execution-header" role="row">
+                  <span role="columnheader">Side / time</span>
+                  <span role="columnheader">Quantity</span>
+                  <span role="columnheader">Price</span>
+                  <span role="columnheader">Settlement</span>
+                </div>
+                <div
+                  v-for="execution in snapshot.executions.data"
+                  :key="execution.id"
+                  class="execution-row"
+                  role="row"
+                >
+                  <span class="execution-identity" role="cell">
+                    <b :class="execution.side">{{ execution.side }}</b>
+                    <time :datetime="execution.executedAt">
+                      {{ timestamp(execution.executedAt) }}
+                    </time>
+                  </span>
+                  <span
+                    role="cell"
+                    v-money-tooltip="moneyTooltip(execution.quantity, 'BTC')"
+                  >
+                    <small>Quantity</small>
+                    {{ decimal(execution.quantity, 8) }} BTC
+                  </span>
+                  <span
+                    role="cell"
+                    v-money-tooltip="moneyTooltip(execution.price, 'USDT')"
+                  >
+                    <small>Price</small>
+                    {{ decimal(execution.price) }} USDT
+                  </span>
+                  <span
+                    role="cell"
+                    v-money-tooltip="
+                      moneyTooltip(
+                        execution.side === 'buy'
+                          ? execution.totalCost
+                          : execution.netProceeds,
+                        'USDT',
+                      )
+                    "
+                  >
+                    <small>
+                      {{
+                        execution.side === 'buy' ? 'Total cost' : 'Net proceeds'
+                      }}
+                    </small>
+                    {{
+                      decimal(
+                        execution.side === 'buy'
+                          ? execution.totalCost
+                          : execution.netProceeds,
+                      )
+                    }}
+                    USDT
+                  </span>
+                </div>
+              </div>
+            </template>
+            <p v-else class="empty-state execution-empty">
+              {{ snapshot?.executions.message ?? 'Loading execution history…' }}
+            </p>
+          </section>
+        </details>
 
         <section
           id="strategy"

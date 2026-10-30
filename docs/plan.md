@@ -1,5 +1,23 @@
 # Crypto Trader — Project Context & Technical Roadmap
 
+## Current autonomous scope — M10.205–M10.208
+
+The operator chooses autonomous selection, not manual targets. Existing Agentic Wallet only; entry net-profit estimates remain required. The daily loss selection is 10 USDT, and protective exits at a loss are separately authorized. Cached public-data research is running; gross historical returns do not validate a live strategy. Real execution remains blocked by validated edge/cost evidence and authenticated reservation/daily-loss/operational-risk composition; no activation or real-order approval is implied.
+
+## M10.204 — Estimated net profit policy — screening verified
+
+The operator explicitly selected `estimated_net_profit_after_costs` using exclusively the existing Agentic Wallet. This supersedes the earlier enforceable-fee-ceiling requirement. Expected exit proceeds must reflect adverse spread/slippage; deduct investment, entry/exit trading fees and both gas estimates with an explicit safety multiplier greater than one. Require strictly positive expected net profit; break-even, losses, missing/zero gas estimates, stale evidence and invalid inputs block. An estimate is not a guaranteed gas ceiling or realized profit. The first real order still requires immediate explicit confirmation and all independent Risk Engine, reservation and execution safeguards.
+
+M10.204 implements only the pure exact-decimal profitability screen and synchronizes provider-free readiness/dashboard policy. Gas is rounded upward to 18 decimals, evidence expires after five seconds, and the explicit multiplier is bounded above by ten. No default multiplier is activated. Zero provider display gas cannot pass. No route, provider call, reservation, signing or order is added. The evaluator is not registered in runtime; readiness remains blocked on reliable buffered gas evidence and runtime profitability composition. Next: bind conservative entry/exit cost and expected-return evidence to the same intent before reservation/Risk Engine integration; do not accept a caller profit claim as execution authority.
+
+Verified: 19 focused backend tests (including 16 profitability cases), 123 dashboard tests and 155 PostgreSQL E2E tests pass. Lint, formatting, backend/dashboard type checks and builds, Compose and diff checks pass. Windows-host API and Vite proxy both return HTTP 200 for paper-wallet valuation; live diagnostics report the new policy with submission authority false.
+
+Earlier policy sections below are historical and superseded where they require a guaranteed fee ceiling or another wallet.
+
+## Current operator decision — 2026-10-30
+
+The operator keeps exclusively the existing project-linked Agentic Wallet through the local API/CLI. No alternative wallet, injected-browser connector, mobile pairing, or funds migration is offered. The browser connector has been removed and `signerAccountAccessAuthorized` is false. The selected `enforceable_native_fee_ceiling` remains required; pinned CLI 1.10.0 cannot enforce it, so real execution remains blocked. Read-only and paper features remain available. No signature or financial transaction is authorized. This supersedes earlier optional-signer plans and manual wallet-consent instructions preserved below as history. No phone or browser wallet action is pending.
+
 > Este documento é a fonte principal de contexto do projeto.
 >
 > Antes de implementar qualquer funcionalidade relevante, leia este documento e o `AGENTS.md`.
@@ -2468,5 +2486,5 @@ Leverage:             DISABLED
 Withdrawals:          DISABLED
 
 Current task:
-M7 is complete through M7.117. M10 is implemented through M10.189: authenticated reservation recording remains unregistered, and the durable store captures independent command facts before asynchronous work. Runtime risk composition and real trading remain disabled; further activation requires a separately reviewed increment.
+M7 is complete through M7.117. M10 is implemented through M10.202, with the M10.203 authorized connector implemented and pending live wallet consent: authenticated reservation recording remains unregistered, and the durable store captures independent command facts before asynchronous work. Runtime risk composition and real trading remain disabled; further activation requires a separately reviewed increment.
 ```

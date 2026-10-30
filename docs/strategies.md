@@ -1,5 +1,11 @@
 # Strategies
 
+## M10.205 — Autonomous strategy research — verified
+
+Verified with 9 focused tests, 156 PostgreSQL E2E tests, type check/build, lint, formatting, Compose and diff checks. Live collection returned 1,000 candles and 108 closed hypothetical trades with a negative gross mean return; this is not a profitable-entry approval. API and proxy paper valuation return HTTP 200.
+
+M10.205 adds autonomous background research for the configured moving-average strategy: a fixed 1,000 closed BTC/USDT one-minute candle window, next-open hypothetical fills, closed-trade gross mean/lower-quartile returns, startup collection and completion-relative refresh every 15 minutes. The existing bounded public Binance historical client owns retries/backoff/circuit breaking. Reads return a defensive cached snapshot and never trigger provider access. Incomplete/stale windows and failures are explicit; shutdown aborts collection and prevents late publication. This is descriptive Spot research, not a validated BTCB forecast or proof of net profitability. No wallet, sizing, reservation, risk approval, signature or order is performed. The operator wants autonomous selection/background operation, not manual per-trade price targets. Existing real caps remain unchanged; immediate explicit confirmation is still required before the first real order.
+
 ## M5.1 moving-average crossover
 
 M5.1 introduces a provider-neutral strategy contract and one deterministic BTC/USDT strategy. A strategy consumes ordered one-minute candle projections and returns a signal; it cannot access the wallet, Risk Engine, or trading executor.

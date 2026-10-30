@@ -8,6 +8,8 @@
  *
  * 🟢 You can import this file directly.
  */
+export type * from './models/GasDiagnostic'
+export type * from './models/GasDiagnosticFinancialReport'
 export type * from './models/PaperBalance'
 export type * from './models/PaperExecution'
 export type * from './models/RiskControlEvent'
@@ -40,4 +42,5 @@ export type * from './models/RealExecutionAccountingMutationApplication'
 export type * from './models/ObservedSpotSymbol'
 export type * from './models/ListingObservationCheckpoint'
 export type * from './models/ListingCheckpointTopOfBook'
+export type * from './models/ApprovalCleanupObligation'
 export type * from './commonInputTypes'

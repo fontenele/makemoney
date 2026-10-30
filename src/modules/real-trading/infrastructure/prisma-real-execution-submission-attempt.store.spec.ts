@@ -16,6 +16,16 @@ const BTCB = '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c';
 const USDT = '0x55d398326f99059ff775485246999027b3197955';
 
 describe('PrismaRealExecutionSubmissionAttemptStore', () => {
+  it('blocks before creating financial capacity or a provider claim when cleanup is unresolved', async () => {
+    const harness = repositoryHarness();
+    harness.tx.$queryRaw
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ id: 'pending-cleanup' }]);
+    await expect(harness.store.claim(claim())).rejects.toThrow(
+      'unresolved approval cleanup',
+    );
+    expect(harness.create).not.toHaveBeenCalled();
+  });
   it('claims one active gate under the shared emergency-stop lock', async () => {
     const harness = repositoryHarness();
     harness.create.mockImplementation(({ data }) =>
@@ -29,7 +39,7 @@ describe('PrismaRealExecutionSubmissionAttemptStore', () => {
       replayed: false,
       command: claimedCommand(),
     });
-    expect(harness.tx.$executeRaw).toHaveBeenCalledTimes(1);
+    expect(harness.tx.$executeRaw).toHaveBeenCalledTimes(2);
     expect(harness.tx.riskControlEvent.findFirst).toHaveBeenCalledWith({
       where: { control: 'emergency_stop' },
       orderBy: [{ changedAt: 'desc' }, { id: 'desc' }],
@@ -182,6 +192,7 @@ function repositoryHarness() {
     jest.fn<(args: { data: Record<string, unknown> }) => Promise<AttemptRow>>();
   const tx = {
     $executeRaw: jest.fn<() => Promise<number>>().mockResolvedValue(1),
+    $queryRaw: jest.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
     realExecutionSubmissionAttempt: {
       findUnique: jest
         .fn<() => Promise<AttemptRow | null>>()

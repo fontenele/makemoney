@@ -16,6 +16,16 @@ const USDT_ADDRESS = '0x55d398326f99059ff775485246999027b3197955';
 const BTCB_ADDRESS = '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c';
 
 describe('PrismaRealExecutionReservationStore', () => {
+  it('blocks before creating financial capacity or a provider claim when cleanup is unresolved', async () => {
+    const harness = repositoryHarness();
+    harness.tx.$queryRaw
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ id: 'pending-cleanup' }]);
+    await expect(harness.store.reserve(command())).rejects.toThrow(
+      'unresolved approval cleanup',
+    );
+    expect(harness.create).not.toHaveBeenCalled();
+  });
   it.each(['lock', 'capacity'] as const)(
     'isolates the complete command from caller mutation while awaiting %s',
     async (boundary) => {
@@ -112,7 +122,7 @@ describe('PrismaRealExecutionReservationStore', () => {
       reservation: publicReservation(),
       replayed: false,
     });
-    expect(harness.tx.$executeRaw).toHaveBeenCalledTimes(1);
+    expect(harness.tx.$executeRaw).toHaveBeenCalledTimes(2);
     expect(harness.tx.realExecutionReservation.findMany).toHaveBeenCalledWith({
       where: {
         providerId: 'agentic_wallet',
@@ -339,6 +349,7 @@ function repositoryHarness(now = NOW) {
     >();
   const tx = {
     $executeRaw: executeRaw,
+    $queryRaw: jest.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
     realExecutionReservation: {
       findUnique,
       findFirst,

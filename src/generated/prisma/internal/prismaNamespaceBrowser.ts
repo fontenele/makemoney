@@ -51,6 +51,8 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  GasDiagnostic: 'GasDiagnostic',
+  GasDiagnosticFinancialReport: 'GasDiagnosticFinancialReport',
   PaperBalance: 'PaperBalance',
   PaperExecution: 'PaperExecution',
   RiskControlEvent: 'RiskControlEvent',
@@ -82,7 +84,8 @@ export const ModelName = {
   RealExecutionAccountingMutationApplication: 'RealExecutionAccountingMutationApplication',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
-  ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
+  ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook',
+  ApprovalCleanupObligation: 'ApprovalCleanupObligation'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -99,6 +102,31 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const GasDiagnosticScalarFieldEnum = {
+  id: 'id',
+  slot: 'slot',
+  state: 'state',
+  fingerprint: 'fingerprint',
+  plan: 'plan',
+  expiresAt: 'expiresAt',
+  claimedAt: 'claimedAt',
+  providerOrderId: 'providerOrderId',
+  createdAt: 'createdAt'
+} as const
+
+export type GasDiagnosticScalarFieldEnum = (typeof GasDiagnosticScalarFieldEnum)[keyof typeof GasDiagnosticScalarFieldEnum]
+
+
+export const GasDiagnosticFinancialReportScalarFieldEnum = {
+  diagnosticId: 'diagnosticId',
+  fingerprint: 'fingerprint',
+  report: 'report',
+  createdAt: 'createdAt'
+} as const
+
+export type GasDiagnosticFinancialReportScalarFieldEnum = (typeof GasDiagnosticFinancialReportScalarFieldEnum)[keyof typeof GasDiagnosticFinancialReportScalarFieldEnum]
 
 
 export const PaperBalanceScalarFieldEnum = {
@@ -720,6 +748,20 @@ export const ListingCheckpointTopOfBookScalarFieldEnum = {
 export type ListingCheckpointTopOfBookScalarFieldEnum = (typeof ListingCheckpointTopOfBookScalarFieldEnum)[keyof typeof ListingCheckpointTopOfBookScalarFieldEnum]
 
 
+export const ApprovalCleanupObligationScalarFieldEnum = {
+  id: 'id',
+  operationId: 'operationId',
+  walletHash: 'walletHash',
+  fingerprint: 'fingerprint',
+  state: 'state',
+  record: 'record',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ApprovalCleanupObligationScalarFieldEnum = (typeof ApprovalCleanupObligationScalarFieldEnum)[keyof typeof ApprovalCleanupObligationScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -743,14 +785,6 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
 export const JsonNullValueFilter = {
   DbNull: DbNull,
   JsonNull: JsonNull,
@@ -758,4 +792,12 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

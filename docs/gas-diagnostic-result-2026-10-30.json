@@ -1,0 +1,50 @@
+{
+  "scope": "confirmed_single_1_usdt_btcb_gas_diagnostic",
+  "planId": "cbc61eb8-35a6-471a-95b2-04251343d8c2",
+  "providerOrderId": "26103000002008161174",
+  "sourceSpentUsdt": "1",
+  "actualReceivedBtcb": "0.000012907690498746",
+  "swapTransactionHash": "0x166137dd67227bd0ec90be47ca9a96858589c784b5dd37fc6735c48a55c812a8",
+  "approvalTransactionHash": "0xc5fe3c591ab9c5547a1a61655682a232bbe5bef59123f3d2848920091b5f555f",
+  "receiptSucceeded": true,
+  "tokenDecimalsVerifiedOnChain": true,
+  "gas": {
+    "swapGasBnb": "0.000062548661717332",
+    "approvalGasBnb": "0.000003243494391078",
+    "entryGasBnb": "0.00006579215610841",
+    "indicativeEntryGasUsdt": "0.0460735890011584389",
+    "indicativeEntryGasPercentage": "4.60735890011584389",
+    "referenceBnbUsdt": "700.29000000",
+    "netUsdtSpent": "1",
+    "netBtcbReceived": "0.000012907690498746",
+    "cleanupRevocationBnb": "0.000002214193030116",
+    "totalExperimentNetworkFeeBnb": "0.000068006349138526",
+    "indicativeTotalExperimentGasUsdt": "0.04762416623821837254"
+  },
+  "conversionBasis": "preparation_bnb_usdt_price_not_historical_execution_price",
+  "approval": {
+    "token": "USDT",
+    "spender": "0xb300000b72deaeb607a12d5f54773d1c19c7028d",
+    "originalGrantRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+    "remainingAllowanceObservedRaw": "115792089237316195423570985008687907853269984665640564039456584007913129639935",
+    "effectivelyUnlimited": false,
+    "revoked": true,
+    "remediationRequiresSeparateImmediateConfirmation": false,
+    "remainingAllowanceVerifiedRaw": "0",
+    "revocationTransactionHash": "0x81c27bb611b32f9497c532039dc42feac290f44324ca8e3e7568c91d5a80504e"
+  },
+  "separateLaterHistoryEvent": {
+    "type": "mint",
+    "asset": "AI",
+    "transactionHash": "0xf3eb9c0f49d00526f31cec8cde3add06eacb82dc9ada6b9174b46ff3602727ea",
+    "providerReportedNetworkFeeBnb": "0.000007173743183697",
+    "attributedToDiagnostic": false,
+    "mintCommandIssuedByThisFlow": false,
+    "causalOriginEstablished": false
+  },
+  "operatorSubmissionEnabled": false,
+  "automaticRetryAllowed": false,
+  "automaticSellPerformed": false,
+  "autonomousTradingEnabled": false,
+  "recordedAt": "2026-10-30T16:11:15.077Z"
+}

@@ -7,6 +7,31 @@ datasource db {
   provider = "postgresql"
 }
 
+model GasDiagnostic {
+  id              String                        @id @db.Uuid
+  slot            String                        @unique
+  state           String
+  fingerprint     String                        @db.VarChar(64)
+  plan            Json
+  expiresAt       DateTime                      @map("expires_at") @db.Timestamptz
+  claimedAt       DateTime?                     @map("claimed_at") @db.Timestamptz
+  providerOrderId String?                       @map("provider_order_id") @db.VarChar(256)
+  createdAt       DateTime                      @default(now()) @map("created_at") @db.Timestamptz
+  financialReport GasDiagnosticFinancialReport?
+
+  @@map("gas_diagnostics")
+}
+
+model GasDiagnosticFinancialReport {
+  diagnosticId String        @id @map("diagnostic_id") @db.Uuid
+  fingerprint  String        @db.Char(64)
+  report       Json
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  diagnostic   GasDiagnostic @relation(fields: [diagnosticId], references: [id], onDelete: Restrict)
+
+  @@map("gas_diagnostic_financial_reports")
+}
+
 model PaperBalance {
   asset     String   @id @db.VarChar(10)
   amount    Decimal  @db.Decimal(38, 18)
@@ -179,29 +204,29 @@ model AgenticWalletFundingConversionStatusObservation {
 }
 
 model AgenticWalletFundingConversionFinancialReconciliation {
-  id                         String                                          @id @db.Uuid
-  attemptId                  String                                          @unique(map: "funding_conversion_financial_attempt_key") @map("attempt_id") @db.Uuid
-  planId                     String                                          @map("plan_id") @db.Uuid
-  statusObservationId        String                                          @unique(map: "funding_conversion_financial_status_key") @map("status_observation_id") @db.Uuid
-  providerOrderId            String                                          @unique(map: "funding_conversion_financial_order_key") @map("provider_order_id") @db.VarChar(256)
-  transactionHash            String                                          @unique(map: "funding_conversion_financial_tx_key") @map("transaction_hash") @db.VarChar(66)
-  chainId                    String                                          @map("chain_id") @db.VarChar(32)
-  sourceTokenAddress         String                                          @map("source_token_address") @db.VarChar(42)
-  targetTokenAddress         String                                          @map("target_token_address") @db.VarChar(42)
-  submittedSourceQuantityBnb String                                          @map("submitted_source_quantity_bnb") @db.Text
-  expectedUsdt               String                                          @map("expected_usdt") @db.Text
-  minimumUsdt                String                                          @map("minimum_usdt") @db.Text
-  actualUsdtReceived         String                                          @map("actual_usdt_received") @db.Text
-  outputAssessment           String                                          @map("output_assessment") @db.VarChar(48)
-  providerFeeComponents      Json                                            @map("provider_fee_components")
-  networkFeeAsset            String                                          @map("network_fee_asset") @db.VarChar(16)
-  networkFeeQuantityBnb      String                                          @map("network_fee_quantity_bnb") @db.Text
-  observedAt                 DateTime                                        @map("observed_at")
-  requestFingerprint         String                                          @unique(map: "funding_conversion_financial_request_key") @map("request_fingerprint") @db.Char(64)
-  recordedAt                 DateTime                                        @map("recorded_at")
-  attempt                    AgenticWalletFundingConversionSubmissionAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict, map: "funding_conversion_financial_attempt_fkey")
-  plan                       AgenticWalletFundingConversionPlan              @relation(fields: [planId], references: [id], onDelete: Restrict, map: "funding_conversion_financial_plan_fkey")
-  statusObservation          AgenticWalletFundingConversionStatusObservation @relation(fields: [statusObservationId], references: [id], onDelete: Restrict, map: "funding_conversion_financial_status_fkey")
+  id                         String                                             @id @db.Uuid
+  attemptId                  String                                             @unique(map: "funding_conversion_financial_attempt_key") @map("attempt_id") @db.Uuid
+  planId                     String                                             @map("plan_id") @db.Uuid
+  statusObservationId        String                                             @unique(map: "funding_conversion_financial_status_key") @map("status_observation_id") @db.Uuid
+  providerOrderId            String                                             @unique(map: "funding_conversion_financial_order_key") @map("provider_order_id") @db.VarChar(256)
+  transactionHash            String                                             @unique(map: "funding_conversion_financial_tx_key") @map("transaction_hash") @db.VarChar(66)
+  chainId                    String                                             @map("chain_id") @db.VarChar(32)
+  sourceTokenAddress         String                                             @map("source_token_address") @db.VarChar(42)
+  targetTokenAddress         String                                             @map("target_token_address") @db.VarChar(42)
+  submittedSourceQuantityBnb String                                             @map("submitted_source_quantity_bnb") @db.Text
+  expectedUsdt               String                                             @map("expected_usdt") @db.Text
+  minimumUsdt                String                                             @map("minimum_usdt") @db.Text
+  actualUsdtReceived         String                                             @map("actual_usdt_received") @db.Text
+  outputAssessment           String                                             @map("output_assessment") @db.VarChar(48)
+  providerFeeComponents      Json                                               @map("provider_fee_components")
+  networkFeeAsset            String                                             @map("network_fee_asset") @db.VarChar(16)
+  networkFeeQuantityBnb      String                                             @map("network_fee_quantity_bnb") @db.Text
+  observedAt                 DateTime                                           @map("observed_at")
+  requestFingerprint         String                                             @unique(map: "funding_conversion_financial_request_key") @map("request_fingerprint") @db.Char(64)
+  recordedAt                 DateTime                                           @map("recorded_at")
+  attempt                    AgenticWalletFundingConversionSubmissionAttempt    @relation(fields: [attemptId], references: [id], onDelete: Restrict, map: "funding_conversion_financial_attempt_fkey")
+  plan                       AgenticWalletFundingConversionPlan                 @relation(fields: [planId], references: [id], onDelete: Restrict, map: "funding_conversion_financial_plan_fkey")
+  statusObservation          AgenticWalletFundingConversionStatusObservation    @relation(fields: [statusObservationId], references: [id], onDelete: Restrict, map: "funding_conversion_financial_status_fkey")
   accountingSynchronization  AgenticWalletFundingConversionAccountingSync?
   accountingBootstrap        AgenticWalletFundingConversionAccountingBootstrap?
 
@@ -345,19 +370,19 @@ model RealExecutionSubmissionGate {
 }
 
 model RealExecutionSubmissionAttempt {
-  id                          String                      @id @db.Uuid
-  gateId                      String                      @unique @map("gate_id") @db.Uuid
-  requestFingerprint          String                      @unique @map("request_fingerprint") @db.Char(64)
-  providerId                  String                      @map("provider_id") @db.VarChar(32)
-  chainId                     String                      @map("chain_id") @db.VarChar(32)
-  payloadCommitmentVersion    String                      @map("payload_commitment_version") @db.VarChar(64)
-  payloadCommitmentDigest     String                      @map("payload_commitment_digest") @db.Char(64)
-  emergencyStopChangeId       String                      @map("emergency_stop_change_id") @db.VarChar(100)
-  commandArgumentsFingerprint String                      @map("command_arguments_fingerprint") @db.Char(64)
-  state                       String                      @db.VarChar(32)
-  automaticRetryAllowed       Boolean                     @map("automatic_retry_allowed")
-  claimedAt                   DateTime                    @map("claimed_at")
-  gate                        RealExecutionSubmissionGate @relation(fields: [gateId], references: [id], onDelete: Restrict)
+  id                          String                          @id @db.Uuid
+  gateId                      String                          @unique @map("gate_id") @db.Uuid
+  requestFingerprint          String                          @unique @map("request_fingerprint") @db.Char(64)
+  providerId                  String                          @map("provider_id") @db.VarChar(32)
+  chainId                     String                          @map("chain_id") @db.VarChar(32)
+  payloadCommitmentVersion    String                          @map("payload_commitment_version") @db.VarChar(64)
+  payloadCommitmentDigest     String                          @map("payload_commitment_digest") @db.Char(64)
+  emergencyStopChangeId       String                          @map("emergency_stop_change_id") @db.VarChar(100)
+  commandArgumentsFingerprint String                          @map("command_arguments_fingerprint") @db.Char(64)
+  state                       String                          @db.VarChar(32)
+  automaticRetryAllowed       Boolean                         @map("automatic_retry_allowed")
+  claimedAt                   DateTime                        @map("claimed_at")
+  gate                        RealExecutionSubmissionGate     @relation(fields: [gateId], references: [id], onDelete: Restrict)
   submissionOutcome           RealExecutionSubmissionOutcome?
 
   @@index([providerId, state, claimedAt])
@@ -365,17 +390,17 @@ model RealExecutionSubmissionAttempt {
 }
 
 model RealExecutionSubmissionOutcome {
-  attemptId               String                         @id @map("attempt_id") @db.Uuid
-  gateId                  String                         @unique @map("gate_id") @db.Uuid
-  status                  String                         @db.VarChar(40)
-  providerOrderId         String?                        @unique @map("provider_order_id") @db.VarChar(256)
-  responseFingerprint     String                         @map("response_fingerprint") @db.Char(64)
-  blockers                Json
-  executionSucceeded      Boolean                        @map("execution_succeeded")
-  reconciliationRequired  Boolean                        @map("reconciliation_required")
-  automaticRetryAllowed   Boolean                        @map("automatic_retry_allowed")
-  completedAt             DateTime                       @map("completed_at")
-  attempt                 RealExecutionSubmissionAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
+  attemptId              String                         @id @map("attempt_id") @db.Uuid
+  gateId                 String                         @unique @map("gate_id") @db.Uuid
+  status                 String                         @db.VarChar(40)
+  providerOrderId        String?                        @unique @map("provider_order_id") @db.VarChar(256)
+  responseFingerprint    String                         @map("response_fingerprint") @db.Char(64)
+  blockers               Json
+  executionSucceeded     Boolean                        @map("execution_succeeded")
+  reconciliationRequired Boolean                        @map("reconciliation_required")
+  automaticRetryAllowed  Boolean                        @map("automatic_retry_allowed")
+  completedAt            DateTime                       @map("completed_at")
+  attempt                RealExecutionSubmissionAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
 
   @@index([status, completedAt])
   @@map("real_execution_submission_outcomes")
@@ -514,16 +539,16 @@ model RealExecutionAccountingBalance {
 }
 
 model RealExecutionAccountingBalanceInitialization {
-  id                                          String                                         @id @db.Uuid
-  providerId                                  String                                         @map("provider_id") @db.VarChar(32)
-  chainId                                     String                                         @map("chain_id") @db.VarChar(32)
-  acknowledgment                              String                                         @db.VarChar(96)
+  id                                          String                                             @id @db.Uuid
+  providerId                                  String                                             @map("provider_id") @db.VarChar(32)
+  chainId                                     String                                             @map("chain_id") @db.VarChar(32)
+  acknowledgment                              String                                             @db.VarChar(96)
   balances                                    Json
-  walletObservedAt                            DateTime                                       @map("wallet_observed_at")
-  maximumObservationAgeMs                     Int                                            @map("maximum_observation_age_ms")
-  preparedAt                                  DateTime                                       @map("prepared_at")
-  requestFingerprint                          String                                         @map("request_fingerprint") @db.Char(64)
-  initializedAt                               DateTime                                       @map("initialized_at")
+  walletObservedAt                            DateTime                                           @map("wallet_observed_at")
+  maximumObservationAgeMs                     Int                                                @map("maximum_observation_age_ms")
+  preparedAt                                  DateTime                                           @map("prepared_at")
+  requestFingerprint                          String                                             @map("request_fingerprint") @db.Char(64)
+  initializedAt                               DateTime                                           @map("initialized_at")
   ledgerReconciliations                       RealExecutionAccountingLedgerReconciliation[]
   fundingConversionAccountingSynchronizations AgenticWalletFundingConversionAccountingSync[]
   fundingConversionAccountingBootstrap        AgenticWalletFundingConversionAccountingBootstrap?
@@ -626,17 +651,17 @@ model RealExecutionAccountingMutationApplication {
 }
 
 model ObservedSpotSymbol {
-  provider               String                         @db.VarChar(30)
-  symbol                 String                         @db.VarChar(30)
-  baseAsset              String                         @map("base_asset") @db.VarChar(20)
-  quoteAsset             String                         @map("quote_asset") @db.VarChar(20)
-  status                 String                         @db.VarChar(30)
-  spotTradingAllowed     Boolean                        @map("spot_trading_allowed")
-  firstObservedAt        DateTime                       @map("first_observed_at")
-  lastObservedAt         DateTime                       @map("last_observed_at")
-  activationTrackingStartedAt DateTime?                 @map("activation_tracking_started_at")
-  detectedAt             DateTime?                      @map("detected_at")
-  observationCheckpoints ListingObservationCheckpoint[]
+  provider                    String                         @db.VarChar(30)
+  symbol                      String                         @db.VarChar(30)
+  baseAsset                   String                         @map("base_asset") @db.VarChar(20)
+  quoteAsset                  String                         @map("quote_asset") @db.VarChar(20)
+  status                      String                         @db.VarChar(30)
+  spotTradingAllowed          Boolean                        @map("spot_trading_allowed")
+  firstObservedAt             DateTime                       @map("first_observed_at")
+  lastObservedAt              DateTime                       @map("last_observed_at")
+  activationTrackingStartedAt DateTime?                      @map("activation_tracking_started_at")
+  detectedAt                  DateTime?                      @map("detected_at")
+  observationCheckpoints      ListingObservationCheckpoint[]
 
   @@id([provider, symbol])
   @@index([firstObservedAt, provider, symbol])
@@ -686,4 +711,17 @@ model ListingCheckpointTopOfBook {
 
   @@id([provider, symbol, label])
   @@map("listing_checkpoint_top_of_books")
+}
+
+model ApprovalCleanupObligation {
+  id          String   @id @db.Uuid
+  operationId String   @unique @map("operation_id") @db.Uuid
+  walletHash  String   @map("wallet_hash") @db.Char(64)
+  fingerprint String   @db.Char(64)
+  state       String   @db.VarChar(32)
+  record      Json
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz
+
+  @@map("approval_cleanup_obligations")
 }

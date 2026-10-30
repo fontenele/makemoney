@@ -1,3 +1,4 @@
+import { assertNoUnresolvedApprovalCleanup } from './approval-cleanup-execution-guard';
 import { createHash } from 'node:crypto';
 
 import { Prisma } from '../../../generated/prisma/client';
@@ -40,6 +41,15 @@ export class PrismaRealExecutionReservationStore implements RealExecutionReserva
     return this.prisma.$transaction(
       async (tx) => {
         await tx.$executeRaw`SELECT pg_advisory_xact_lock(20261001, 18)`;
+        const diagnostic = await tx.$queryRaw<
+          Array<{ id: string }>
+        >`SELECT id FROM gas_diagnostics WHERE state <> 'prepared' OR expires_at > now() LIMIT 1`;
+        if (diagnostic.length)
+          throw new Error(
+            'A gas diagnostic reservation requires review before ordinary execution',
+          );
+
+        await assertNoUnresolvedApprovalCleanup(tx);
 
         const existing = await tx.realExecutionReservation.findUnique({
           where: { idempotencyKey: command.intent.idempotencyKey },

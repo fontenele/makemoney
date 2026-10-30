@@ -1,8 +1,52 @@
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { delimiter, resolve } from 'node:path';
+import Decimal from 'decimal.js';
 
 const MAX_OUTPUT_BYTES = 64 * 1024;
+const QuotaDecimal = Decimal.clone({
+  precision: 80,
+  toExpNeg: -80,
+  toExpPos: 80,
+});
+
+/** Preserve the reported JSON decimal token before conversion through binary floats. */
+export function parseAgenticWalletCliJsonOutput(
+  text: string,
+  quotaRead = false,
+): unknown {
+  if (!quotaRead) {
+    const parsed: unknown = JSON.parse(text);
+    return parsed;
+  }
+  const parsed: unknown = JSON.parse(
+    text,
+    (key: string, value: unknown, context?: { source?: string }): unknown => {
+      if (
+        !['quotaUsed', 'quotaLeft', 'dailyLimit'].includes(key) ||
+        typeof value !== 'number'
+      )
+        return value;
+      const source = context?.source;
+      if (
+        typeof source !== 'string' ||
+        source.length > 96 ||
+        !/^(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(source)
+      )
+        throw new Error('Quota decimal source is unavailable or invalid');
+      const amount = new QuotaDecimal(source);
+      if (
+        !amount.isFinite() ||
+        amount.isNegative() ||
+        amount.e > 19 ||
+        amount.decimalPlaces() > 30
+      )
+        throw new Error('Quota decimal exceeds supported precision');
+      return amount.toFixed();
+    },
+  );
+  return parsed;
+}
 
 export interface AgenticWalletProcessInvocation {
   readonly executable: string;
@@ -35,6 +79,9 @@ export class AgenticWalletCliJsonProcess {
   }
 
   run(args: readonly string[], signal?: AbortSignal): Promise<unknown> {
+    const quotaRead =
+      args[0] === 'wallet' &&
+      (args[1] === 'left-quota' || args[1] === 'settings');
     let invocation: AgenticWalletProcessInvocation;
     try {
       invocation = this.executable
@@ -101,8 +148,9 @@ export class AgenticWalletCliJsonProcess {
           return;
         }
         try {
-          const value: unknown = JSON.parse(
+          const value: unknown = parseAgenticWalletCliJsonOutput(
             Buffer.concat(stdout).toString('utf8'),
+            quotaRead,
           );
           finish(() => resolve(value));
         } catch {

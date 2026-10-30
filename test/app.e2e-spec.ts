@@ -6,6 +6,7 @@ import Decimal from 'decimal.js';
 import { createHash } from 'node:crypto';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { AutonomousStrategyResearchService } from '../src/modules/real-trading/application/autonomous-strategy-research.service';
 import { PrismaService } from '../src/infrastructure/database/prisma.service';
 import { LatestPairMetadataService } from '../src/modules/market-data/application/latest-pair-metadata.service';
 import { LatestTopOfBookService } from '../src/modules/market-data/application/latest-top-of-book.service';
@@ -140,6 +141,16 @@ describe('Application (e2e)', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     })
+      .overrideProvider(AutonomousStrategyResearchService)
+      .useValue({
+        read: () => ({
+          scope: 'autonomous_strategy_research',
+          status: 'warming_up_or_stale',
+          evidence: null,
+          walletAccessPerformed: false,
+          submissionAuthorized: false,
+        }),
+      })
       .overrideProvider(PAIR_METADATA_PROVIDER)
       .useValue(pairMetadataProvider)
       .overrideProvider(TICKER_STREAM)
@@ -194,6 +205,120 @@ describe('Application (e2e)', () => {
       .get('/new-listings/checkpoint-latency')
       .expect(200)
       .expect({ provider: null, detectionCount: 0, checkpoints: [] });
+  });
+
+  it('/real-trading/execution-readiness (GET) is provider-free and non-authorizing', async () => {
+    const response = await request(
+      app.getHttpServer() as Parameters<typeof request>[0],
+    )
+      .get('/real-trading/execution-readiness')
+      .expect(200);
+    expect(response.body).toMatchObject({
+      signerAccountAccessAuthorized: false,
+      status: 'blocked',
+      providerAccessPerformed: false,
+      submissionAuthorized: false,
+      authenticatedReservationRuntimeAvailable: false,
+    });
+    expect(response.body).not.toHaveProperty('walletAddress');
+    expect(response.body).not.toHaveProperty('digest');
+  });
+
+  it('/real-trading/autonomous-research (GET) reads the cached non-authorizing research', async () => {
+    const response = await request(
+      app.getHttpServer() as Parameters<typeof request>[0],
+    )
+      .get('/real-trading/autonomous-research')
+      .expect(200);
+    expect(response.body).toMatchObject({
+      scope: 'autonomous_strategy_research',
+      walletAccessPerformed: false,
+      submissionAuthorized: false,
+    });
+  });
+
+  it.each([
+    '/real-trading/market-cost-preview',
+    '/real-trading/market-cost-analysis',
+    '/real-trading/market-quote-readiness',
+    '/real-trading/gas-diagnostic-report',
+  ])('%s authenticates before rejecting malformed input', async (path) => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    const token = 'cost-preview-e2e-only-token';
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server).post(path).send({}).expect(401);
+      await request(server)
+        .post(path)
+        .set('Authorization', `Bearer ${token}`)
+        .send({})
+        .expect(400);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
+  });
+
+  it.each([
+    '/real-trading/gas-diagnostic/prepare',
+    '/real-trading/gas-diagnostic/submit',
+  ])(
+    '%s requires authentication and rejects extra diagnostic parameters before provider access',
+    async (path) => {
+      const server = app.getHttpServer() as Parameters<typeof request>[0];
+      const config = app.get(ConfigService);
+      const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+      const token = 'diagnostic-e2e-only-token';
+      config.set(
+        'RISK_CONTROL_TOKEN_SHA256',
+        createHash('sha256').update(token).digest('hex'),
+      );
+      try {
+        await request(server).post(path).send({ unexpected: true }).expect(401);
+        await request(server)
+          .post(path)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ unexpected: true })
+          .expect(400);
+        await request(server)
+          .get('/real-trading/gas-diagnostic/invalid-id')
+          .expect(401);
+        await request(server)
+          .get('/real-trading/gas-diagnostic/invalid-id')
+          .set('Authorization', `Bearer ${token}`)
+          .expect(400);
+      } finally {
+        config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+      }
+    },
+  );
+
+  it('/real-trading/market-quote (POST) authenticates before validating input', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const config = app.get(ConfigService);
+    const previous = config.get<string>('RISK_CONTROL_TOKEN_SHA256');
+    const token = 'market-quote-e2e-only-token';
+    config.set(
+      'RISK_CONTROL_TOKEN_SHA256',
+      createHash('sha256').update(token).digest('hex'),
+    );
+    try {
+      await request(server)
+        .post('/real-trading/market-quote')
+        .send({})
+        .expect(401);
+      await request(server)
+        .post('/real-trading/market-quote')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ side: 'buy', sourceQuantity: '1', chainId: '1' })
+        .expect(400);
+    } finally {
+      config.set('RISK_CONTROL_TOKEN_SHA256', previous);
+    }
   });
 
   it('/real-trading/funding-conversion-submission (POST) fails closed without operator authentication', async () => {

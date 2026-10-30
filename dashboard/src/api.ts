@@ -653,6 +653,9 @@ export interface AgenticWalletFundingValuation {
   balance: {
     quantityBnb: string;
     quantityUsdt: string | null;
+    quantityBtcb: string | null;
+    btcbValueUsdt: string | null;
+    btcbValueBrl: string | null;
     valueUsdt: string;
     valueBrl: string;
     usdtValueBrl: string | null;
@@ -662,6 +665,8 @@ export interface AgenticWalletFundingValuation {
   prices: {
     provider: 'binance';
     bnbUsdt: string;
+    btcUsdtReference: string | null;
+    btcbBasis: 'btc_spot_reference_not_btcb_quote';
     usdtBrl: string;
   } | null;
   refreshMode: 'initial_and_manual';

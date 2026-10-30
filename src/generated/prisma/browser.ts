@@ -18,6 +18,16 @@ export { Prisma }
 export * as $Enums from './enums'
 export * from './enums';
 /**
+ * Model GasDiagnostic
+ * 
+ */
+export type GasDiagnostic = Prisma.GasDiagnosticModel
+/**
+ * Model GasDiagnosticFinancialReport
+ * 
+ */
+export type GasDiagnosticFinancialReport = Prisma.GasDiagnosticFinancialReportModel
+/**
  * Model PaperBalance
  * 
  */
@@ -177,3 +187,8 @@ export type ListingObservationCheckpoint = Prisma.ListingObservationCheckpointMo
  * 
  */
 export type ListingCheckpointTopOfBook = Prisma.ListingCheckpointTopOfBookModel
+/**
+ * Model ApprovalCleanupObligation
+ * 
+ */
+export type ApprovalCleanupObligation = Prisma.ApprovalCleanupObligationModel

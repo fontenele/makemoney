@@ -1,0 +1,34 @@
+{
+  "scope": "agentic_wallet_gas_diagnostic_preparation",
+  "status": "blocked_not_executable",
+  "authorizedScope": "prepare_one_btcb_buy_with_at_most_1_usdt_as_profitability_filter_exception",
+  "firstOrderConfirmationReceived": false,
+  "sourceQuantityUsdt": "1",
+  "network": "BNB Smart Chain",
+  "chainId": "56",
+  "targetSymbol": "BTCB",
+  "referenceQuote": {
+    "expectedTargetQuantity": "0.000012933644083323",
+    "minimumTargetQuantity": "0.000012868975862906385",
+    "maximumSlippageRate": "0.005",
+    "quotedAt": "2026-10-30T13:09:49.340Z",
+    "expiresAt": "2026-10-30T13:09:54.340Z"
+  },
+  "networkFeeEstimateUsd": "0",
+  "gasEstimateReliablyEstablished": false,
+  "configurationBlockers": ["operator_submission_disabled"],
+  "integrationBlockers": [
+    "verified_daily_loss_accounting_required",
+    "validated_strategy_return_model_required",
+    "estimated_net_profit_runtime_composition_required",
+    "exact_market_fee_debit_evidence_required",
+    "reliable_buffered_gas_estimate_required",
+    "authenticated_reservation_runtime_composition_required",
+    "reservation_to_operational_risk_gate_composition_required",
+    "complete_path_acceptance_required"
+  ],
+  "emergencyStopActive": false,
+  "submissionAuthorized": false,
+  "providerOrderSubmitted": false,
+  "signatureRequested": false
+}

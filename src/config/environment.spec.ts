@@ -54,6 +54,50 @@ describe('validateEnvironment API binding', () => {
 });
 
 describe('validateEnvironment real execution', () => {
+  it('requires independent explicit protective-exit policy without enabling submission', () => {
+    expect(validateEnvironment(required)).toMatchObject({
+      REAL_AUTONOMOUS_PROTECTIVE_EXITS_ALLOWED: false,
+    });
+    expect(
+      validateEnvironment({
+        ...required,
+        REAL_AUTONOMOUS_PROTECTIVE_EXITS_ALLOWED: 'true',
+      }),
+    ).toMatchObject({
+      REAL_AUTONOMOUS_PROTECTIVE_EXITS_ALLOWED: true,
+      REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: false,
+      REAL_EXECUTION_ENABLED: false,
+    });
+    expect(() =>
+      validateEnvironment({
+        ...required,
+        REAL_AUTONOMOUS_PROTECTIVE_EXITS_ALLOWED: 'sometimes',
+      }),
+    ).toThrow();
+  });
+  it('defaults the real daily-loss limit to unavailable and accepts the explicit operator value', () => {
+    expect(validateEnvironment(required)).toMatchObject({
+      REAL_RISK_MAX_DAILY_LOSS_USDT: null,
+    });
+    expect(
+      validateEnvironment({ ...required, REAL_RISK_MAX_DAILY_LOSS_USDT: '10' }),
+    ).toMatchObject({
+      REAL_RISK_MAX_DAILY_LOSS_USDT: '10',
+      REAL_EXECUTION_ENABLED: false,
+      REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: false,
+    });
+  });
+  it.each(['0', '-10', 'NaN', '1e1', '010', '10.0000000000000000001'])(
+    'rejects invalid daily-loss limit %s',
+    (value) => {
+      expect(() =>
+        validateEnvironment({
+          ...required,
+          REAL_RISK_MAX_DAILY_LOSS_USDT: value,
+        }),
+      ).toThrow('Invalid environment configuration');
+    },
+  );
   it('defaults both activation gates off with no approved instrument', () => {
     expect(validateEnvironment(required)).toMatchObject({
       TRADING_MODE: 'paper',

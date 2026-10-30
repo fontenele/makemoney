@@ -397,6 +397,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
+  GasDiagnostic: 'GasDiagnostic',
+  GasDiagnosticFinancialReport: 'GasDiagnosticFinancialReport',
   PaperBalance: 'PaperBalance',
   PaperExecution: 'PaperExecution',
   RiskControlEvent: 'RiskControlEvent',
@@ -428,7 +430,8 @@ export const ModelName = {
   RealExecutionAccountingMutationApplication: 'RealExecutionAccountingMutationApplication',
   ObservedSpotSymbol: 'ObservedSpotSymbol',
   ListingObservationCheckpoint: 'ListingObservationCheckpoint',
-  ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook'
+  ListingCheckpointTopOfBook: 'ListingCheckpointTopOfBook',
+  ApprovalCleanupObligation: 'ApprovalCleanupObligation'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -444,10 +447,158 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "agenticWalletFundingConversionPlan" | "agenticWalletFundingConversionSubmissionAttempt" | "agenticWalletFundingConversionStatusObservation" | "agenticWalletFundingConversionFinancialReconciliation" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionAttempt" | "realExecutionSubmissionOutcome" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingBalanceInitialization" | "agenticWalletFundingConversionAccountingSync" | "agenticWalletFundingConversionAccountingBootstrap" | "realExecutionAccountingLedgerReconciliation" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook"
+    modelProps: "gasDiagnostic" | "gasDiagnosticFinancialReport" | "paperBalance" | "paperExecution" | "riskControlEvent" | "strategySignal" | "historicalCandleRecord" | "backtestRun" | "agenticWalletFundingConversionPlan" | "agenticWalletFundingConversionSubmissionAttempt" | "agenticWalletFundingConversionStatusObservation" | "agenticWalletFundingConversionFinancialReconciliation" | "realExecutionReservation" | "realExecutionArm" | "realExecutionRiskApproval" | "realExecutionFinalConfirmation" | "realExecutionSubmissionGate" | "realExecutionSubmissionAttempt" | "realExecutionSubmissionOutcome" | "realExecutionSubmissionReceipt" | "realExecutionStatusObservation" | "realExecutionFinancialReconciliationEvidence" | "realExecutionAccountingBalanceEvidence" | "realExecutionAccountingMutationCommitment" | "realExecutionAccountingMutationAuthorization" | "realExecutionAccountingBalance" | "realExecutionAccountingBalanceInitialization" | "agenticWalletFundingConversionAccountingSync" | "agenticWalletFundingConversionAccountingBootstrap" | "realExecutionAccountingLedgerReconciliation" | "realExecutionAccountingMutationApplication" | "observedSpotSymbol" | "listingObservationCheckpoint" | "listingCheckpointTopOfBook" | "approvalCleanupObligation"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
+    GasDiagnostic: {
+      payload: Prisma.$GasDiagnosticPayload<ExtArgs>
+      fields: Prisma.GasDiagnosticFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GasDiagnosticFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GasDiagnosticFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticPayload>
+        }
+        findFirst: {
+          args: Prisma.GasDiagnosticFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GasDiagnosticFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticPayload>
+        }
+        findMany: {
+          args: Prisma.GasDiagnosticFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticPayload>[]
+        }
+        create: {
+          args: Prisma.GasDiagnosticCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticPayload>
+        }
+        createMany: {
+          args: Prisma.GasDiagnosticCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GasDiagnosticCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticPayload>[]
+        }
+        delete: {
+          args: Prisma.GasDiagnosticDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticPayload>
+        }
+        update: {
+          args: Prisma.GasDiagnosticUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticPayload>
+        }
+        deleteMany: {
+          args: Prisma.GasDiagnosticDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GasDiagnosticUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GasDiagnosticUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticPayload>[]
+        }
+        upsert: {
+          args: Prisma.GasDiagnosticUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticPayload>
+        }
+        aggregate: {
+          args: Prisma.GasDiagnosticAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGasDiagnostic>
+        }
+        groupBy: {
+          args: Prisma.GasDiagnosticGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GasDiagnosticGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GasDiagnosticCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GasDiagnosticCountAggregateOutputType> | number
+        }
+      }
+    }
+    GasDiagnosticFinancialReport: {
+      payload: Prisma.$GasDiagnosticFinancialReportPayload<ExtArgs>
+      fields: Prisma.GasDiagnosticFinancialReportFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GasDiagnosticFinancialReportFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticFinancialReportPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GasDiagnosticFinancialReportFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticFinancialReportPayload>
+        }
+        findFirst: {
+          args: Prisma.GasDiagnosticFinancialReportFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticFinancialReportPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GasDiagnosticFinancialReportFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticFinancialReportPayload>
+        }
+        findMany: {
+          args: Prisma.GasDiagnosticFinancialReportFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticFinancialReportPayload>[]
+        }
+        create: {
+          args: Prisma.GasDiagnosticFinancialReportCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticFinancialReportPayload>
+        }
+        createMany: {
+          args: Prisma.GasDiagnosticFinancialReportCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GasDiagnosticFinancialReportCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticFinancialReportPayload>[]
+        }
+        delete: {
+          args: Prisma.GasDiagnosticFinancialReportDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticFinancialReportPayload>
+        }
+        update: {
+          args: Prisma.GasDiagnosticFinancialReportUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticFinancialReportPayload>
+        }
+        deleteMany: {
+          args: Prisma.GasDiagnosticFinancialReportDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GasDiagnosticFinancialReportUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GasDiagnosticFinancialReportUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticFinancialReportPayload>[]
+        }
+        upsert: {
+          args: Prisma.GasDiagnosticFinancialReportUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GasDiagnosticFinancialReportPayload>
+        }
+        aggregate: {
+          args: Prisma.GasDiagnosticFinancialReportAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGasDiagnosticFinancialReport>
+        }
+        groupBy: {
+          args: Prisma.GasDiagnosticFinancialReportGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GasDiagnosticFinancialReportGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GasDiagnosticFinancialReportCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GasDiagnosticFinancialReportCountAggregateOutputType> | number
+        }
+      }
+    }
     PaperBalance: {
       payload: Prisma.$PaperBalancePayload<ExtArgs>
       fields: Prisma.PaperBalanceFieldRefs
@@ -2816,6 +2967,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ApprovalCleanupObligation: {
+      payload: Prisma.$ApprovalCleanupObligationPayload<ExtArgs>
+      fields: Prisma.ApprovalCleanupObligationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ApprovalCleanupObligationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApprovalCleanupObligationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ApprovalCleanupObligationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApprovalCleanupObligationPayload>
+        }
+        findFirst: {
+          args: Prisma.ApprovalCleanupObligationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApprovalCleanupObligationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ApprovalCleanupObligationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApprovalCleanupObligationPayload>
+        }
+        findMany: {
+          args: Prisma.ApprovalCleanupObligationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApprovalCleanupObligationPayload>[]
+        }
+        create: {
+          args: Prisma.ApprovalCleanupObligationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApprovalCleanupObligationPayload>
+        }
+        createMany: {
+          args: Prisma.ApprovalCleanupObligationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ApprovalCleanupObligationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApprovalCleanupObligationPayload>[]
+        }
+        delete: {
+          args: Prisma.ApprovalCleanupObligationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApprovalCleanupObligationPayload>
+        }
+        update: {
+          args: Prisma.ApprovalCleanupObligationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApprovalCleanupObligationPayload>
+        }
+        deleteMany: {
+          args: Prisma.ApprovalCleanupObligationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ApprovalCleanupObligationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ApprovalCleanupObligationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApprovalCleanupObligationPayload>[]
+        }
+        upsert: {
+          args: Prisma.ApprovalCleanupObligationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApprovalCleanupObligationPayload>
+        }
+        aggregate: {
+          args: Prisma.ApprovalCleanupObligationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateApprovalCleanupObligation>
+        }
+        groupBy: {
+          args: Prisma.ApprovalCleanupObligationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ApprovalCleanupObligationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ApprovalCleanupObligationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ApprovalCleanupObligationCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2853,6 +3078,31 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const GasDiagnosticScalarFieldEnum = {
+  id: 'id',
+  slot: 'slot',
+  state: 'state',
+  fingerprint: 'fingerprint',
+  plan: 'plan',
+  expiresAt: 'expiresAt',
+  claimedAt: 'claimedAt',
+  providerOrderId: 'providerOrderId',
+  createdAt: 'createdAt'
+} as const
+
+export type GasDiagnosticScalarFieldEnum = (typeof GasDiagnosticScalarFieldEnum)[keyof typeof GasDiagnosticScalarFieldEnum]
+
+
+export const GasDiagnosticFinancialReportScalarFieldEnum = {
+  diagnosticId: 'diagnosticId',
+  fingerprint: 'fingerprint',
+  report: 'report',
+  createdAt: 'createdAt'
+} as const
+
+export type GasDiagnosticFinancialReportScalarFieldEnum = (typeof GasDiagnosticFinancialReportScalarFieldEnum)[keyof typeof GasDiagnosticFinancialReportScalarFieldEnum]
 
 
 export const PaperBalanceScalarFieldEnum = {
@@ -3474,6 +3724,20 @@ export const ListingCheckpointTopOfBookScalarFieldEnum = {
 export type ListingCheckpointTopOfBookScalarFieldEnum = (typeof ListingCheckpointTopOfBookScalarFieldEnum)[keyof typeof ListingCheckpointTopOfBookScalarFieldEnum]
 
 
+export const ApprovalCleanupObligationScalarFieldEnum = {
+  id: 'id',
+  operationId: 'operationId',
+  walletHash: 'walletHash',
+  fingerprint: 'fingerprint',
+  state: 'state',
+  record: 'record',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ApprovalCleanupObligationScalarFieldEnum = (typeof ApprovalCleanupObligationScalarFieldEnum)[keyof typeof ApprovalCleanupObligationScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -3497,14 +3761,6 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
 export const JsonNullValueFilter = {
   DbNull: DbNull,
   JsonNull: JsonNull,
@@ -3512,6 +3768,14 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 
@@ -3535,16 +3799,16 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
- * Reference to a field of type 'Decimal'
+ * Reference to a field of type 'Json'
  */
-export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
     
 
 
 /**
- * Reference to a field of type 'Decimal[]'
+ * Reference to a field of type 'QueryMode'
  */
-export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -3559,6 +3823,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
     
 
 
@@ -3594,20 +3872,6 @@ export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
  * Reference to a field of type 'BigInt[]'
  */
 export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
-    
-
-
-/**
- * Reference to a field of type 'Json'
- */
-export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-/**
- * Reference to a field of type 'QueryMode'
- */
-export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -3775,6 +4039,8 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
  */
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
+  gasDiagnostic?: Prisma.GasDiagnosticOmit
+  gasDiagnosticFinancialReport?: Prisma.GasDiagnosticFinancialReportOmit
   paperBalance?: Prisma.PaperBalanceOmit
   paperExecution?: Prisma.PaperExecutionOmit
   riskControlEvent?: Prisma.RiskControlEventOmit
@@ -3807,6 +4073,7 @@ export type GlobalOmitConfig = {
   observedSpotSymbol?: Prisma.ObservedSpotSymbolOmit
   listingObservationCheckpoint?: Prisma.ListingObservationCheckpointOmit
   listingCheckpointTopOfBook?: Prisma.ListingCheckpointTopOfBookOmit
+  approvalCleanupObligation?: Prisma.ApprovalCleanupObligationOmit
 }
 
 /* Types for Logging */

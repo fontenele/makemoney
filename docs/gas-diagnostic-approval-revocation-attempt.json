@@ -1,0 +1,14 @@
+{
+  "scope": "single_explicitly_confirmed_usdt_approval_revocation",
+  "state": "confirmed_revoked",
+  "claimedAt": "2026-10-30T16:33:00.6196504Z",
+  "chainId": "56",
+  "tokenContract": "0x55d398326f99059ff775485246999027b3197955",
+  "spender": "0xb300000b72deaeb607a12d5f54773d1c19c7028d",
+  "newAllowance": "0",
+  "automaticRetryAllowed": false,
+  "transactionHash": "0x81c27bb611b32f9497c532039dc42feac290f44324ca8e3e7568c91d5a80504e",
+  "providerOrderId": "26103000002008223610",
+  "remainingAllowanceRaw": "0",
+  "finalityObservedAt": "2026-10-30T16:35:51.992Z"
+}

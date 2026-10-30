@@ -1,5 +1,65 @@
 # Technical Decisions
 
+## Provider-managed approval and targeted cleanup policy — 2026-10-30
+
+The operator explicitly selected the design of provider-managed token approvals followed by automatic targeted revocation after every operation, retaining the existing Agentic Wallet and accepting the exposure/failure risks in `provider-approval-policy-review.md`. This is design/implementation authorization only. No immediate approval, order or revocation is authorized by the choice; financial confirmation, cost/risk checks and independent runtime safeguards remain mandatory. Cleanup claims must be durable and consumed before any mutation; ambiguous/failed attempts never automatically retry, and unresolved obligations block new entries. All approval, swap, cleanup and exit costs must enter net-profit screening with a safety margin. M10.215–M10.217 implement persistence, passive monitoring and entry barriers without activating an automatic runner.
+
+## M10.211 — Explicit targeted USDT allowance revocation — complete
+
+The operator explicitly authorized one targeted revocation of the USDT approval to router 0xb300000b72deaeb607a12d5f54773d1c19c7028d on BSC. The existing CLI version, wallet identity, positive allowance and native gas reserve were rechecked; an exclusive durable attempt record preceded the only revoke command. Transaction 0x81c27bb611b32f9497c532039dc42feac290f44324ca8e3e7568c91d5a80504e has a successful finalized receipt, its calldata is approve(spender, 0), and an independent allowance(owner, spender) read returns exactly zero. Network fee: 0.000002214193030116 BNB; indicative 0.00155057723705993364 USDT using the earlier diagnostic preparation price of 700.29 BNB/USDT, not an execution-time conversion. The 0.000012907690498746 BTCB holding is unchanged. No sale, repeat attempt, new approval or trading activation occurred. Operator submission remains false, and direct/proxy paper valuations plus the post-trade wallet read return HTTP 200. Evidence is in `gas-diagnostic-approval-revocation-result.json`; the original proposal and attempt records now indicate finalized revocation. Future swaps must review the provider’s automatic approval behavior before granting any new allowance. Earlier pending-remediation notes below are historical.
+
+## M10.208 — Autonomous daily-loss and protective-exit policy — verified
+
+Verified: 104 focused backend/configuration tests, 135 dashboard tests and 156 PostgreSQL E2E tests pass; lint, formatting, builds/type checks, Compose and diff checks pass. The operator policy is configured locally with safe disabled/unset example defaults; real execution remains unauthorized.
+
+M10.208 implements a pure autonomous daily-loss policy and records the separately approved protective-exit permission. New entries require complete fresh same-UTC-day economic PnL including open-position marks, fees and failed-order gas, plus outstanding potential losses and the proposed full loss reserve. Reject capacity excess and stop new entries at the daily threshold; earlier profits do not expand the risk budget. An explicitly authorized protective sell can only reduce a verified held base quantity, even after the daily threshold is breached. Other emergency-stop, instrument, risk, reservation and immediate-confirmation gates remain independent. The pure rule is not registered as an executor and cannot authenticate its input evidence. The ignored local permission is true, safe examples default false, and runtime diagnostics disclose policy authorization without claiming daily-loss enforcement or submission readiness.
+
+## M10.207 — Operator daily-loss configuration — verified
+
+Verified: 85 focused backend/configuration tests, 135 dashboard tests, 156 E2E tests, lint, formatting, builds/type checks, Compose and diff checks. The ignored local environment and live readiness report 10 USDT with loss enforcement unavailable and submission unauthorized; direct/proxy paper valuations return HTTP 200.
+
+M10.207 records the operator-selected 10 USDT maximum daily loss in validated local configuration and provider-free API/dashboard diagnostics. Safe examples remain blank. Existing order (1 USDT), daily spend (2 USDT), bankroll (12 USDT), execution flags and credentials are unchanged. Configuration never implies enforcement: `dailyLossEnforcementAvailable` remains false and verified daily-loss accounting is an explicit blocker. Missing/invalid values block configuration. No trading or automatic protective sale is enabled. The operator separately approved risk-reducing protective exits at a loss; this is policy authorization, not an order confirmation or implemented execution path.
+
+## M10.204 — Estimated net profit policy — screening verified
+
+The operator explicitly selected `estimated_net_profit_after_costs` using exclusively the existing Agentic Wallet. This supersedes the earlier enforceable-fee-ceiling requirement. Expected exit proceeds must reflect adverse spread/slippage; deduct investment, entry/exit trading fees and both gas estimates with an explicit safety multiplier greater than one. Require strictly positive expected net profit; break-even, losses, missing/zero gas estimates, stale evidence and invalid inputs block. An estimate is not a guaranteed gas ceiling or realized profit. The first real order still requires immediate explicit confirmation and all independent Risk Engine, reservation and execution safeguards.
+
+M10.204 implements only the pure exact-decimal profitability screen and synchronizes provider-free readiness/dashboard policy. Gas is rounded upward to 18 decimals, evidence expires after five seconds, and the explicit multiplier is bounded above by ten. No default multiplier is activated. Zero provider display gas cannot pass. No route, provider call, reservation, signing or order is added. The evaluator is not registered in runtime; readiness remains blocked on reliable buffered gas evidence and runtime profitability composition. Next: bind conservative entry/exit cost and expected-return evidence to the same intent before reservation/Risk Engine integration; do not accept a caller profit claim as execution authority.
+
+Verified: 19 focused backend tests (including 16 profitability cases), 123 dashboard tests and 155 PostgreSQL E2E tests pass. Lint, formatting, backend/dashboard type checks and builds, Compose and diff checks pass. Windows-host API and Vite proxy both return HTTP 200 for paper-wallet valuation; live diagnostics report the new policy with submission authority false.
+
+Earlier policy sections below are historical and superseded where they require a guaranteed fee ceiling or another wallet.
+
+## Current operator decision — 2026-10-30
+
+The operator keeps exclusively the existing project-linked Agentic Wallet through the local API/CLI. No alternative wallet, injected-browser connector, mobile pairing, or funds migration is offered. The browser connector has been removed and `signerAccountAccessAuthorized` is false. The selected `enforceable_native_fee_ceiling` remains required; pinned CLI 1.10.0 cannot enforce it, so real execution remains blocked. Read-only and paper features remain available. No signature or financial transaction is authorized. This supersedes earlier optional-signer plans and manual wallet-consent instructions preserved below as history. No phone or browser wallet action is pending.
+
+## M10.203 — Distinguish the existing Agentic Wallet from an optional browser signer
+
+The operator clarified that the browser is desktop Chrome and the wallet is the same mobile Agentic Wallet linked to the project. A fresh CLI observation confirmed connection. A missing injected provider therefore must not be presented as a missing authorization step for that wallet. Keep the browser connector as an explicitly separate, optional signer review and identify the approved CLI's fee-ceiling limitation as the actual blocker. Do not infer consent to create/fund another wallet, add mobile pairing, move assets, or relax the selected hard-fee policy.
+
+## M10.203 — Require an enforceable fee ceiling and separate account-access consent
+
+The final operator choice is an enforceable total native-fee ceiling. Remove the unactivated estimated-reserve draft rather than weakening exact execution bounds. A reviewed signer must return the signed transaction before broadcast; an ordinary account connection cannot establish this capability. The operator has now separately approved the read-only account connector. Offer account access only after a user click and wallet consent; retain fee-bound signer verification and execution blockers. The connection is browser-local and must never imply signing capability. No vendor patch, new credential, Developer Mode setting, or transaction follows from this choice.
+
+## M10.202 — Require an operator choice at the provider cost-policy boundary
+
+The pinned public CLI code and official market-order contract expose no operator-controlled total native-gas ceiling. Local reservation code cannot create that guarantee, and an extra environment flag cannot repair missing provider authority. Keep all execution blockers and document concrete policy alternatives rather than adding more unwired abstractions or silently treating USD estimates as complete costs. The installed vendor program remains unchanged; its hidden response objects are not obtained through credential extraction, monkey-patching, or a private undocumented endpoint.
+
+## M10.201 — Apply operator authentication without persisting the caller credential
+
+The operator explicitly authorized configuring `RISK_CONTROL_TOKEN_SHA256`. Generate the caller credential locally, keep it only in the current JavaScript runtime, and save only its digest in the ignored environment file. The digest is intentionally one-way: losing caller memory requires local reissuance, not secret recovery. Validate the boundary with missing-authentication and malformed authenticated requests before bounded live read-only market preparation. A provider-displayed zero USD fee or gas estimate remains insufficient for exact execution evidence, and no activation flag or financial mutation follows from authentication alone.
+
+## M10.191–M10.200 — Expose uncertainty and collect the final quote last
+
+Display USD fee estimates are useful operator evidence but do not establish the exact token debit or BNB gas quantity required by reservations. Keep that distinction explicit, require separately denominated external prices for conversion, round estimated requirements upward, and preserve zero-gas uncertainty. Never manufacture complete cost coverage from a display or from operator-supplied valuation metadata.
+
+Quote readiness now prepares server-owned intent after holdings checks without a market quote. Cost collection uses that preparation, fee display, then final JSON quote, avoiding an unnecessary initial quote and preserving the final quote's useful lifetime. A process-local singleton guard suppresses overlapping cost work and releases in `finally`; it provides no distributed idempotency or order authority. Provider-free readiness diagnostics and the dashboard expose remaining work while all activation flags remain independent and disabled by default.
+
+## M10.190 — Expose the existing market quote adapter through a manual boundary
+
+The approved BTCB/USDT quote adapter had no runtime consumer. Compose it behind operator authentication with server-owned instrument identity, explicit quantity, configured limits, and current source holdings. Preserve partial costs rather than treating a quote as reservation or operational risk approval. Sell notional is checked in USDT after quoting because it is unavailable beforehand. Complete authenticated capacity and execution-gate wiring remain separate closure requirements.
+
 ## M10.189 — Capture reservation facts before asynchronous database work
 
 TypeScript readonly fields do not prevent a caller from changing nested objects or Date instances. M10.18 previously fingerprinted the command synchronously but reread caller-owned facts after acquiring the transaction lock. Capture one complete structured clone before validation so provenance checks, fingerprinting, capacity, payload commitment, and persisted columns all use the same evidence. The local copy recursively handles arrays, object facts, and Date instances without a dependency; exact decimal strings and Date values retain their types. The transaction still evaluates freshness against its own current clock.

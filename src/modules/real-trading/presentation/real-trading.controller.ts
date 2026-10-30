@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Body,
+  Param,
   Controller,
   Get,
   HttpCode,
@@ -10,6 +11,28 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RealTradingStatusService } from '../application/real-trading-status.service';
+import {
+  DiagnosticFinancialReportService,
+  DiagnosticReportBlockedError,
+  InvalidDiagnosticReportRequestError,
+} from '../application/diagnostic-financial-report.service';
+import { GasDiagnosticService } from '../application/gas-diagnostic.service';
+import {
+  GasDiagnosticBlockedError,
+  InvalidGasDiagnosticRequestError,
+} from '../application/gas-diagnostic-store';
+import { AutonomousStrategyResearchService } from '../application/autonomous-strategy-research.service';
+import { RealExecutionReadinessService } from '../application/real-execution-readiness.service';
+import { AgenticWalletMarketCostAnalysisService } from '../application/agentic-wallet-market-cost-analysis.service';
+import { InvalidMarketCostAnalysisRequestError } from '../application/agentic-wallet-market-cost-analysis';
+import {
+  AgenticWalletMarketCostPreviewService,
+  MarketCostPreviewInProgressError,
+} from '../application/agentic-wallet-market-cost-preview.service';
+import {
+  AgenticWalletMarketQuoteService,
+  InvalidMarketQuoteRequestError,
+} from '../application/agentic-wallet-market-quote.service';
 import { AgenticWalletAuthenticationService } from '../application/agentic-wallet-authentication.service';
 import {
   AgenticWalletFundingConversionQuoteService,
@@ -169,6 +192,13 @@ import {
 export class RealTradingController {
   constructor(
     private readonly status: RealTradingStatusService,
+    private readonly diagnosticReports: DiagnosticFinancialReportService,
+    private readonly gasDiagnostic: GasDiagnosticService,
+    private readonly autonomousResearch: AutonomousStrategyResearchService,
+    private readonly readiness: RealExecutionReadinessService,
+    private readonly marketCostAnalysis: AgenticWalletMarketCostAnalysisService,
+    private readonly marketCosts: AgenticWalletMarketCostPreviewService,
+    private readonly marketQuote: AgenticWalletMarketQuoteService,
     private readonly authentication: AgenticWalletAuthenticationService,
     private readonly fundingConversionQuote: AgenticWalletFundingConversionQuoteService,
     private readonly fundingConversionPlan: AgenticWalletFundingConversionPlanService,
@@ -192,6 +222,68 @@ export class RealTradingController {
   @Get('status')
   getStatus() {
     return this.status.getLocalStatus();
+  }
+
+  @Post('gas-diagnostic-report')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async recordDiagnosticReport(@Body() body: unknown) {
+    try {
+      return await this.diagnosticReports.record(body);
+    } catch (error) {
+      if (error instanceof InvalidDiagnosticReportRequestError)
+        throw new BadRequestException(error.message);
+      if (error instanceof DiagnosticReportBlockedError)
+        throw new ConflictException(error.message);
+      throw new ServiceUnavailableException(
+        'Diagnostic receipt verification is unavailable',
+      );
+    }
+  }
+
+  @Get('gas-diagnostic-report')
+  async readDiagnosticReport() {
+    try {
+      return await this.diagnosticReports.read();
+    } catch {
+      throw new ServiceUnavailableException(
+        'Stored diagnostic financial report is unavailable',
+      );
+    }
+  }
+
+  @Post('gas-diagnostic/prepare')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  prepareGasDiagnostic(@Body() body: unknown) {
+    return this.diagnosticResponse(() => this.gasDiagnostic.prepare(body));
+  }
+
+  @Post('gas-diagnostic/submit')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  submitGasDiagnostic(@Body() body: unknown) {
+    return this.diagnosticResponse(() => this.gasDiagnostic.submit(body));
+  }
+
+  @Get('gas-diagnostic/:id')
+  @UseGuards(RiskControlAuthGuard)
+  readGasDiagnostic(@Param('id') id: string) {
+    return this.diagnosticResponse(() => this.gasDiagnostic.read(id));
+  }
+
+  private async diagnosticResponse<T>(work: () => Promise<T>): Promise<T> {
+    try {
+      return await work();
+    } catch (error) {
+      if (error instanceof InvalidGasDiagnosticRequestError)
+        throw new BadRequestException(error.message);
+      if (error instanceof GasDiagnosticBlockedError)
+        throw new ConflictException(error.message);
+      throw new ServiceUnavailableException(
+        'Gas diagnostic is unavailable; do not retry a submission automatically',
+      );
+    }
   }
 
   @Post('wallet-observation')
@@ -237,6 +329,84 @@ export class RealTradingController {
     } catch {
       throw new ServiceUnavailableException(
         'Agentic Wallet funding valuation is unavailable',
+      );
+    }
+  }
+
+  @Get('execution-readiness')
+  getExecutionReadiness() {
+    return this.readiness.assess();
+  }
+
+  @Get('autonomous-research')
+  getAutonomousResearch() {
+    return this.autonomousResearch.read();
+  }
+
+  @Post('market-quote-readiness')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async prepareMarketQuote(@Body() body: unknown) {
+    try {
+      return await this.marketQuote.prepare(body);
+    } catch (error) {
+      if (error instanceof InvalidMarketQuoteRequestError)
+        throw new BadRequestException(error.message);
+      throw new ServiceUnavailableException(
+        'Agentic Wallet market quote readiness is unavailable',
+      );
+    }
+  }
+
+  @Post('market-cost-analysis')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async analyzeMarketCosts(@Body() body: unknown) {
+    try {
+      return await this.marketCostAnalysis.load(body);
+    } catch (error) {
+      if (error instanceof MarketCostPreviewInProgressError)
+        throw new ConflictException(error.message);
+      if (
+        error instanceof InvalidMarketCostAnalysisRequestError ||
+        error instanceof InvalidMarketQuoteRequestError
+      )
+        throw new BadRequestException(error.message);
+      throw new ServiceUnavailableException(
+        'Agentic Wallet market cost analysis is unavailable',
+      );
+    }
+  }
+
+  @Post('market-cost-preview')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async previewMarketCosts(@Body() body: unknown) {
+    try {
+      return await this.marketCosts.load(body);
+    } catch (error) {
+      if (error instanceof MarketCostPreviewInProgressError)
+        throw new ConflictException(error.message);
+      if (error instanceof InvalidMarketQuoteRequestError)
+        throw new BadRequestException(error.message);
+      throw new ServiceUnavailableException(
+        'Agentic Wallet market cost preview is unavailable',
+      );
+    }
+  }
+
+  @Post('market-quote')
+  @UseGuards(RiskControlAuthGuard)
+  @HttpCode(200)
+  async quoteMarket(@Body() body: unknown) {
+    try {
+      return await this.marketQuote.load(body);
+    } catch (error) {
+      if (error instanceof InvalidMarketQuoteRequestError) {
+        throw new BadRequestException(error.message);
+      }
+      throw new ServiceUnavailableException(
+        'Agentic Wallet market quote is unavailable',
       );
     }
   }

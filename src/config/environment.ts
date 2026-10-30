@@ -35,6 +35,7 @@ interface Environment {
   TRADING_MODE: 'paper' | 'real';
   REAL_EXECUTION_ENABLED: boolean;
   REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: boolean;
+  REAL_GAS_DIAGNOSTIC_ENABLED: boolean;
   REAL_EXECUTION_APPROVED_PROVIDER_ID: string | null;
   REAL_EXECUTION_APPROVED_CHAIN_ID: string | null;
   REAL_EXECUTION_APPROVED_SOURCE_TOKEN_ADDRESS: string | null;
@@ -42,6 +43,8 @@ interface Environment {
   REAL_EXECUTION_CAPABILITY_MAX_AGE_MS: number;
   REAL_RISK_MAX_ORDER_NOTIONAL_USDT: string | null;
   REAL_RISK_MAX_DAILY_SPEND_USDT: string | null;
+  REAL_RISK_MAX_DAILY_LOSS_USDT: string | null;
+  REAL_AUTONOMOUS_PROTECTIVE_EXITS_ALLOWED: boolean;
   REAL_RISK_MAX_BANKROLL_USDT: string | null;
   REAL_RISK_MAX_PROVIDER_FEE_RATE: string | null;
   REAL_RISK_MAX_NETWORK_FEE_USDT: string | null;
@@ -134,6 +137,7 @@ const environmentSchema = Joi.object<Environment>({
   TRADING_MODE: Joi.string().valid('paper', 'real').default('paper'),
   REAL_EXECUTION_ENABLED: Joi.boolean().default(false),
   REAL_EXECUTION_OPERATOR_SUBMISSION_ENABLED: Joi.boolean().default(false),
+  REAL_GAS_DIAGNOSTIC_ENABLED: Joi.boolean().default(false),
   REAL_EXECUTION_APPROVED_PROVIDER_ID: Joi.string()
     .pattern(/^[a-z][a-z0-9_-]{0,31}$/)
     .empty('')
@@ -163,6 +167,11 @@ const environmentSchema = Joi.object<Environment>({
     .pattern(positiveDecimalPattern)
     .empty('')
     .default(null),
+  REAL_RISK_MAX_DAILY_LOSS_USDT: Joi.string()
+    .pattern(positiveDecimalPattern)
+    .empty('')
+    .default(null),
+  REAL_AUTONOMOUS_PROTECTIVE_EXITS_ALLOWED: Joi.boolean().default(false),
   REAL_RISK_MAX_BANKROLL_USDT: Joi.string()
     .pattern(positiveDecimalPattern)
     .empty('')
