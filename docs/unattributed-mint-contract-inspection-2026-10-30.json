@@ -1,0 +1,33 @@
+{
+  "calldataStringCandidates": [
+    "makemake"
+  ],
+  "transactionHash": "0xf3eb9c0f49d00526f31cec8cde3add06eacb82dc9ada6b9174b46ff3602727ea",
+  "target": "0x60b9262456de011f7d15a54cdd8c48baaa8b022f",
+  "selector": "0x8580974c",
+  "inputBytes": 292,
+  "nativeValueWei": "0",
+  "blockTime": "2026-10-30T15:57:42.000Z",
+  "transferEvents": [
+    {
+      "contract": "0x60b9262456de011f7d15a54cdd8c48baaa8b022f",
+      "erc721Style": true,
+      "fromIsZero": true,
+      "toIsSender": true,
+      "tokenId": "63938721169931419337772804480817708204105760883838507663446560888669272827227"
+    }
+  ],
+  "contractMetadata": [
+    {
+      "contract": "0x60b9262456de011f7d15a54cdd8c48baaa8b022f",
+      "name": "SPACE ID Agent ID",
+      "symbol": "AI"
+    }
+  ],
+  "otherEventSignatures": [
+    {
+      "contract": "0x60b9262456de011f7d15a54cdd8c48baaa8b022f",
+      "signature": "0x663d34a86c6277aafbd5c6912c96cc5df091e6702ea3ea91b8f378adcbd8a5e5"
+    }
+  ]
+}

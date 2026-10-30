@@ -46,6 +46,7 @@ describe('Passive approval-cleanup monitor', () => {
     'awaiting_operation',
     'ready',
     'claimed',
+    'accepted',
     'unknown',
     'failed',
   ] as const)('never attempts financial retry for %s', async (state) => {

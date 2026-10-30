@@ -1,3 +1,4 @@
+import { ApprovalCleanupWatchService } from '../application/approval-cleanup-watch.service';
 import {
   BadRequestException,
   Body,
@@ -192,6 +193,7 @@ import {
 export class RealTradingController {
   constructor(
     private readonly status: RealTradingStatusService,
+    private readonly cleanupWatch: ApprovalCleanupWatchService,
     private readonly diagnosticReports: DiagnosticFinancialReportService,
     private readonly gasDiagnostic: GasDiagnosticService,
     private readonly autonomousResearch: AutonomousStrategyResearchService,
@@ -331,6 +333,11 @@ export class RealTradingController {
         'Agentic Wallet funding valuation is unavailable',
       );
     }
+  }
+
+  @Get('approval-cleanup-status')
+  getApprovalCleanupStatus() {
+    return this.cleanupWatch.read();
   }
 
   @Get('execution-readiness')

@@ -1,0 +1,60 @@
+{
+  "audit": {
+    "scope": "diagnostic_ledger_gap_audit",
+    "status": "unattributed_change",
+    "initializationId": "5ff2256c-bc18-48a4-aad5-2443e4b99355",
+    "diagnosticFingerprint": "17f1f4f17de54896dbb0b2d851bd7d9e23dd256df1a83ed62f2fc5870adbc975",
+    "assets": [
+      {
+        "asset": "BNB",
+        "ledgerQuantity": "0.00573473587298894",
+        "diagnosticDelta": "-0.000068006349138526",
+        "expectedAfterDiagnostic": "0.005666729523850414",
+        "observedQuantity": "0.005659555780666717",
+        "unexplainedDelta": "-0.000007173743183697"
+      },
+      {
+        "asset": "USDT",
+        "ledgerQuantity": "2.955301453716908917",
+        "diagnosticDelta": "-1",
+        "expectedAfterDiagnostic": "1.955301453716908917",
+        "observedQuantity": "1.955301453716908917",
+        "unexplainedDelta": "0"
+      },
+      {
+        "asset": "BTCB",
+        "ledgerQuantity": "0",
+        "diagnosticDelta": "0.000012907690498746",
+        "expectedAfterDiagnostic": "0.000012907690498746",
+        "observedQuantity": "0.000012907690498746",
+        "unexplainedDelta": "0"
+      }
+    ],
+    "observedAt": "2026-10-30T18:48:27.901Z",
+    "coverage": "diagnostic_receipts_only_not_complete_wallet_history",
+    "fullHistoryReconciled": false,
+    "realizedPnlAvailable": false,
+    "accountingMutated": false,
+    "submissionAuthorized": false
+  },
+  "candidate": {
+    "transactionHash": "0xf3eb9c0f49d00526f31cec8cde3add06eacb82dc9ada6b9174b46ff3602727ea",
+    "chainId": "56",
+    "nonce": "3",
+    "blockNumber": "130693004",
+    "blockHash": "0xdadb3beab6797ddeb800bb3f594378603ecc925150b706a46d0f32826ed4d362",
+    "finalized": true,
+    "canonical": true,
+    "sameWalletVerified": true,
+    "receiptSucceeded": true,
+    "nativeValueWei": "0",
+    "gasUsed": "105379",
+    "effectiveGasPriceWei": "68075643",
+    "networkFeeBnb": "0.000007173743183697",
+    "feeMatchesUnexplainedNativeOutflow": true,
+    "previousProviderHistoryLabel": "AI/NFT mint",
+    "operatorIntentVerified": false,
+    "originAttributedToProject": false
+  },
+  "financialTransactionSent": false
+}

@@ -1,0 +1,61 @@
+{
+  "reconciliation": {
+    "scope": "recognized_agent_id_reconciliation",
+    "status": "scoped_quantities_match",
+    "initializationId": "5ff2256c-bc18-48a4-aad5-2443e4b99355",
+    "diagnosticFingerprint": "17f1f4f17de54896dbb0b2d851bd7d9e23dd256df1a83ed62f2fc5870adbc975",
+    "registeredName": "makemake.ai",
+    "identityTransactionHash": "0xf3eb9c0f49d00526f31cec8cde3add06eacb82dc9ada6b9174b46ff3602727ea",
+    "identityContract": "0x60b9262456de011f7d15a54cdd8c48baaa8b022f",
+    "identityTokenId": "63938721169931419337772804480817708204105760883838507663446560888669272827227",
+    "receiptBlockHash": "0xdadb3beab6797ddeb800bb3f594378603ecc925150b706a46d0f32826ed4d362",
+    "receiptBlockNumber": "130693004",
+    "operatorRecognitionVerified": true,
+    "expenseCategory": "wallet_identity_registration",
+    "identityGasBnb": "0.000007173743183697",
+    "diagnosticGasBnb": "0.000068006349138526",
+    "totalKnownGasBnb": "0.000075180092322223",
+    "assets": [
+      {
+        "asset": "BNB",
+        "ledgerQuantity": "0.00573473587298894",
+        "diagnosticDelta": "-0.000068006349138526",
+        "expectedAfterDiagnostic": "0.005666729523850414",
+        "observedQuantity": "0.005659555780666717",
+        "unexplainedDelta": "-0.000007173743183697",
+        "identityRegistrationDelta": "-0.000007173743183697",
+        "remainingUnexplainedDelta": "0"
+      },
+      {
+        "asset": "USDT",
+        "ledgerQuantity": "2.955301453716908917",
+        "diagnosticDelta": "-1",
+        "expectedAfterDiagnostic": "1.955301453716908917",
+        "observedQuantity": "1.955301453716908917",
+        "unexplainedDelta": "0",
+        "identityRegistrationDelta": "0",
+        "remainingUnexplainedDelta": "0"
+      },
+      {
+        "asset": "BTCB",
+        "ledgerQuantity": "0",
+        "diagnosticDelta": "0.000012907690498746",
+        "expectedAfterDiagnostic": "0.000012907690498746",
+        "observedQuantity": "0.000012907690498746",
+        "unexplainedDelta": "0",
+        "identityRegistrationDelta": "0",
+        "remainingUnexplainedDelta": "0"
+      }
+    ],
+    "nftMarketValue": null,
+    "fullHistoryReconciled": false,
+    "realizedTradingPnlAvailable": false,
+    "accountingMutated": false,
+    "submissionAuthorized": false,
+    "fingerprint": "da32f1b37677b21677bb6f4b9c85b4095d6b6438dec21e2239a877410d17f92f",
+    "observedAt": "2026-10-30T19:03:56.390Z"
+  },
+  "priorUnattributedEvidence": "diagnostic-ledger-gap-audit-2026-10-30.json",
+  "recognitionSource": "operator_confirmed_binance_agent_id_registration",
+  "financialTransactionSent": false
+}

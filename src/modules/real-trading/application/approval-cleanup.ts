@@ -19,6 +19,7 @@ export type ApprovalCleanupState =
   | 'awaiting_operation'
   | 'ready'
   | 'claimed'
+  | 'accepted'
   | 'submitted'
   | 'unknown'
   | 'failed'
@@ -29,6 +30,7 @@ export interface ApprovalCleanupRecord {
   state: ApprovalCleanupState;
   operationOrderId: string | null;
   transactionHash: string | null;
+  revocationOrderId: string | null;
   measuredGasWei: string | null;
   lastObservation: {
     observedAt: string;
@@ -51,6 +53,7 @@ export interface ApprovalCleanupReceiptEvidence {
 export type ApprovalCleanupEvent =
   | { type: 'operation_terminal'; operationId: string; providerOrderId: string }
   | { type: 'claim' }
+  | { type: 'accepted'; providerOrderId: string }
   | { type: 'broadcast'; transactionHash: string }
   | { type: 'ambiguous' }
   | { type: 'receipt'; evidence: ApprovalCleanupReceiptEvidence };
@@ -93,6 +96,7 @@ export function newApprovalCleanup(
     state: 'awaiting_operation',
     operationOrderId: null,
     transactionHash: null,
+    revocationOrderId: null,
     measuredGasWei: null,
     lastObservation: null,
   };
@@ -123,7 +127,19 @@ export function transitionApprovalCleanup(
     next.state = 'ready';
   } else if (event.type === 'claim' && record.state === 'ready')
     next.state = 'claimed';
-  else if (event.type === 'broadcast' && record.state === 'claimed') {
+  else if (event.type === 'accepted' && record.state === 'claimed') {
+    if (
+      typeof event.providerOrderId !== 'string' ||
+      !/^[A-Za-z0-9_-]{1,256}$/.test(event.providerOrderId) ||
+      event.providerOrderId === record.operationOrderId
+    )
+      throw new Error('Invalid revocation provider order identity');
+    next.revocationOrderId = event.providerOrderId;
+    next.state = 'accepted';
+  } else if (
+    event.type === 'broadcast' &&
+    (record.state === 'claimed' || record.state === 'accepted')
+  ) {
     if (!HASH.test(event.transactionHash))
       throw new Error('Invalid revocation transaction hash');
     next.transactionHash = event.transactionHash;

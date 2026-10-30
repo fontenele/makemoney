@@ -1,3 +1,4 @@
+import { ApprovalCleanupCoordinator } from '../src/modules/real-trading/application/approval-cleanup-coordinator';
 import { assertNoUnresolvedApprovalCleanup } from '../src/modules/real-trading/infrastructure/approval-cleanup-execution-guard';
 import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
@@ -41,6 +42,7 @@ describe('Durable one-attempt approval cleanup (e2e)', () => {
     'awaiting_operation',
     'ready',
     'claimed',
+    'accepted',
     'submitted',
     'unknown',
     'failed',
@@ -96,6 +98,85 @@ describe('Durable one-attempt approval cleanup (e2e)', () => {
         operationId: randomUUID(),
       }),
     ).rejects.toThrow();
+  });
+  it('retains a provider-accepted revocation across instances before resolving its hash', async () => {
+    const r = await ready();
+    await store.transition(r.plan.id, r.fingerprint, { type: 'claim' });
+    await store.transition(r.plan.id, r.fingerprint, {
+      type: 'accepted',
+      providerOrderId: 'revoke456',
+    });
+    const recovered = (
+      await new PrismaApprovalCleanupStore(prisma).unresolved(r.plan.walletHash)
+    )[0];
+    expect(recovered).toMatchObject({
+      state: 'accepted',
+      revocationOrderId: 'revoke456',
+      transactionHash: null,
+    });
+    await expect(
+      store.transition(r.plan.id, r.fingerprint, { type: 'claim' }),
+    ).rejects.toThrow();
+    expect(
+      (
+        await store.transition(r.plan.id, r.fingerprint, {
+          type: 'broadcast',
+          transactionHash: cleanupReceipt().receipt.hash,
+        })
+      ).state,
+    ).toBe('submitted');
+  });
+  it('invokes the injected revocation port once across concurrent coordinator instances', async () => {
+    const r = await ready();
+    let calls = 0;
+    const port = {
+      preflight: () =>
+        Promise.resolve({
+          planFingerprint: r.fingerprint,
+          operationOrderId: r.operationOrderId ?? '',
+          executionAuthorizationVerified: true,
+          riskApproved: true,
+          operationTerminalVerified: true,
+          allowanceRaw: '1',
+          nativeBalanceBnb: '0.01',
+          gasEstimateBnb: '0.000002',
+          reservedGasBnb: '0.000003',
+          gasSafetyMultiplier: '1.5',
+          observedAt: new Date(cleanupNow),
+        }),
+      revoke: () => {
+        calls += 1;
+        return Promise.resolve({ providerOrderId: 'revoke456' });
+      },
+    };
+    const controls = {
+      cleanupEnabled: () => true,
+      operatorSubmissionEnabled: () => true,
+      emergencyStopActive: () => false,
+    };
+    const a = new ApprovalCleanupCoordinator(
+      store,
+      port,
+      controls,
+      () => cleanupNow,
+    );
+    const b = new ApprovalCleanupCoordinator(
+      new PrismaApprovalCleanupStore(prisma, () => cleanupNow),
+      port,
+      controls,
+      () => cleanupNow,
+    );
+    const results = await Promise.all([
+      a.run(r.plan.walletHash, r.plan.id, r.fingerprint),
+      b.run(r.plan.walletHash, r.plan.id, r.fingerprint),
+    ]);
+    expect(calls).toBe(1);
+    expect(
+      results.filter((row) => row.status === 'accepted_pending_confirmation'),
+    ).toHaveLength(1);
+    expect((await store.unresolved(r.plan.walletHash))[0]?.state).toBe(
+      'accepted',
+    );
   });
   it('keeps ambiguous attempts consumed without retry', async () => {
     const r = await ready();

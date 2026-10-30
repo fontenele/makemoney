@@ -20,3 +20,5 @@ A validated net-return model, fresh buffered entry/exit estimates, authenticated
 ## Implementation after selection
 
 M10.215 adds durable one-attempt obligations; M10.216 adds a passive public-receipt monitor; M10.217 blocks ordinary reservations/claims while any cleanup is unresolved. Full automatic revocation composition remains unavailable. No new financial transaction was sent while implementing these milestones.
+
+M10.219–M10.223 preserve provider acceptance before a hash, add an unregistered one-attempt coordinator, require complete six-component gas screening and schedule passive receipt observation only. A separate ledger-gap audit identifies additional mint gas pending operator recognition. No new financial transaction is authorized.

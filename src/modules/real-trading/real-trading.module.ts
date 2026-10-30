@@ -1,3 +1,8 @@
+import { ApprovalCleanupWatchService } from './application/approval-cleanup-watch.service';
+import { ApprovalCleanupMonitor } from './application/approval-cleanup-monitor';
+import { PrismaApprovalCleanupStore } from './infrastructure/prisma-approval-cleanup.store';
+import { PrismaApprovalCleanupWatchQueue } from './infrastructure/prisma-approval-cleanup-watch.queue';
+import { BscApprovalCleanupReader } from './infrastructure/bsc-approval-cleanup.reader';
 import { Module } from '@nestjs/common';
 import {
   DiagnosticFinancialReportService,
@@ -127,6 +132,18 @@ import { AgenticWalletAccountingLedgerReconciliationReadinessService } from './a
   imports: [RiskEngineModule, StrategiesModule],
   controllers: [RealTradingController],
   providers: [
+    {
+      provide: ApprovalCleanupWatchService,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new ApprovalCleanupWatchService(
+          new PrismaApprovalCleanupWatchQueue(prisma),
+          new ApprovalCleanupMonitor(
+            new PrismaApprovalCleanupStore(prisma),
+            new BscApprovalCleanupReader(),
+          ),
+        ),
+    },
     {
       provide: DiagnosticFinancialReportStore,
       inject: [PrismaService],

@@ -49,6 +49,47 @@ describe('Approval cleanup one-attempt lifecycle', () => {
     ).toBe('unknown');
     expect(record.state).toBe('awaiting_operation');
   });
+  it('persists a distinct accepted order before a known transaction without retry', () => {
+    const r = {
+      ...cleanupSubmitted(),
+      state: 'claimed' as const,
+      transactionHash: null,
+    };
+    const accepted = transitionApprovalCleanup(
+      r,
+      { type: 'accepted', providerOrderId: 'revoke456' },
+      cleanupNow,
+    );
+    expect(accepted).toMatchObject({
+      state: 'accepted',
+      revocationOrderId: 'revoke456',
+      transactionHash: null,
+    });
+    expect(() =>
+      transitionApprovalCleanup(accepted, { type: 'claim' }, cleanupNow),
+    ).toThrow();
+    expect(() =>
+      transitionApprovalCleanup(
+        accepted,
+        { type: 'accepted', providerOrderId: 'revoke789' },
+        cleanupNow,
+      ),
+    ).toThrow();
+    expect(
+      transitionApprovalCleanup(
+        accepted,
+        { type: 'broadcast', transactionHash: cleanupReceipt().receipt.hash },
+        cleanupNow,
+      ),
+    ).toMatchObject({ state: 'submitted', revocationOrderId: 'revoke456' });
+    expect(() =>
+      transitionApprovalCleanup(
+        r,
+        { type: 'accepted', providerOrderId: r.operationOrderId! },
+        cleanupNow,
+      ),
+    ).toThrow();
+  });
   it('clears only a finalized exact revoke with current zero allowance and accounts gas exactly', () => {
     const result = transitionApprovalCleanup(
       cleanupSubmitted(),

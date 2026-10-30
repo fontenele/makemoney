@@ -1,3 +1,4 @@
+import { ApprovalCleanupWatchService } from '../src/modules/real-trading/application/approval-cleanup-watch.service';
 import { INestApplication } from '@nestjs/common';
 import { jest } from '@jest/globals';
 import { Test } from '@nestjs/testing';
@@ -141,6 +142,19 @@ describe('Application (e2e)', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     })
+      .overrideProvider(ApprovalCleanupWatchService)
+      .useValue(
+        new ApprovalCleanupWatchService(
+          { list: () => Promise.resolve([]) },
+          {
+            observe: () =>
+              Promise.resolve({
+                status: 'clear',
+                providerAccessPerformed: false,
+              }),
+          },
+        ),
+      )
       .overrideProvider(AutonomousStrategyResearchService)
       .useValue({
         read: () => ({
@@ -237,6 +251,20 @@ describe('Application (e2e)', () => {
     });
   });
 
+  it('reads cached passive cleanup status without provider or submission authority', async () => {
+    const response = await request(
+      app.getHttpServer() as Parameters<typeof request>[0],
+    )
+      .get('/real-trading/approval-cleanup-status')
+      .expect(200);
+    expect(response.body).toMatchObject({
+      scope: 'approval_cleanup_watch',
+      backgroundMode: 'receipt_observation_only',
+      providerAccessPerformed: false,
+      submissionAuthorized: false,
+      automaticRetryAllowed: false,
+    });
+  });
   it.each([
     '/real-trading/market-cost-preview',
     '/real-trading/market-cost-analysis',
